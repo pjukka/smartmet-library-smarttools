@@ -35,7 +35,6 @@
 #include "NFmiSortedPtrList.h"
 #include "NFmiGlobals.h"
 #include "NFmiParameterName.h"
-//#include "FmiNMeteditLibraryDefinitions.h"
 #include <list>
 #include <vector>
 #include "NFmiInfoData.h"
@@ -64,7 +63,6 @@ public:
 	void            Clear (const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved, bool fDeleteData = false);
 	bool      Add (NFmiDrawParam * theParam);
 	bool      Add (NFmiDrawParam * theParam, unsigned long theIndex);
-	bool      Replace(NFmiDrawParam * theParam, bool fUseOnlyParamId, bool fInitNewDrawParamFromListFirst); // tuhoaa vanhan, jos löytyy, ja lisää perään
 	bool      Remove (bool fDeleteData = false);
 	bool      Index(unsigned long index);
 	bool		Find(NFmiDrawParam* item);
@@ -72,10 +70,9 @@ public:
 	void			HideAllParams(bool newState);
 	void			DisableEditing(void);
 	void			DeactivateAll(void);
-	bool		Find(const NFmiDataIdent& theParam, bool fIgnoreProducer = false);
-	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel);
+//	bool		Find(const NFmiDataIdent& theParam, bool fIgnoreProducer = false);
+//	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel);
 	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId = false);
-	bool		SyncronizeTimes(const NFmiMetTime& theTime);
 
 	void            Update(void);
 	bool      IsDirty (void){ return fDirtyList; }; 

@@ -29,7 +29,6 @@
 #endif
 
 #include "NFmiDrawParamList.h"
-#include "NFmiSmartInfo.h"
 #include "NFmiDrawParam.h"
 #include <algorithm>
 #include <list>
@@ -88,24 +87,6 @@ bool NFmiDrawParamList::Add(NFmiDrawParam * theParam, unsigned long theIndex)
 	   }
    }
    return false;
-}
-//--------------------------------------------------------
-// Replace 
-//--------------------------------------------------------
-// tuhoaa vanhan, jos löytyy, ja lisää perään
-bool NFmiDrawParamList::Replace(NFmiDrawParam * theParam, bool fUseOnlyParamId, bool fInitNewDrawParamFromListFirst)
-{
-	if(theParam && theParam->Info())
-	{
-		if(Find(theParam->Param(), theParam->Info()->Level(), theParam->Info()->DataType(), fUseOnlyParamId))
-		{
-			if(fInitNewDrawParamFromListFirst)
-				theParam->Init(Current()); // näin muutokset eivät mene haluttaessa hukkaan kun vaihdetaan drawparamin 'dataa'. Tämähän on varsinaisesti drawparamissa olevan datan päivitystä, eikä piirto-ominaisuuksien korvaamista 
-			Remove(true);
-		}
-		return Add(theParam);
-	}
-	return false;
 }
 //--------------------------------------------------------
 // Current 
@@ -207,25 +188,24 @@ void NFmiDrawParamList::DeactivateAll(void)
 	for(Reset(); Next();)
 		Current()->Activate(false);
 }
-
+/*
 bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, bool fIgnoreProducer)
 {
 	for(Reset(); Next();)
 	{
 		if(fIgnoreProducer)
 		{
-//			if(*(Current()->EditParam().GetParam()) == *(theParam.GetParam()))
 			if(*(Current()->Param().GetParam()) == *(theParam.GetParam()))
 				return true;
 		}
 		else
-//			if(Current()->EditParam() == theParam)
 			if(Current()->Param() == theParam)
 				return true;
 	}
 	return false;
 }
-
+*/
+/*
 bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel)
 {
 	for(Reset(); Next();)
@@ -241,6 +221,7 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 	}
 	return false;
 }
+*/
 
 bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId)
 {
@@ -254,28 +235,19 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 		}
 		else
 		{
-			NFmiSmartInfo* info = drawParam->Info();
-			if(info && (fUseOnlyParamId ? drawParam->Param().GetParamIdent() == theParam.GetParamIdent() : drawParam->Param() == theParam))
+			if(fUseOnlyParamId ? drawParam->Param().GetParamIdent() == theParam.GetParamIdent() : drawParam->Param() == theParam)
 			{
 				if(drawParam->DataType() == theDataType)
 				{
-					if(!theLevel && info->SizeLevels() <= 1)
+					if(!theLevel)
 						return true;
-					if(theLevel && info->Level() && (*(theLevel) == *(info->Level())))
+					if(theLevel && (*(theLevel) == drawParam->Level()))
 						return true;
 				}
 			}
 		}
 	}
 	return false;
-}
-
-bool NFmiDrawParamList::SyncronizeTimes(const NFmiMetTime& theTime)
-{
-	for(Reset(); Next();)
-		if(Current()->Info())
-			Current()->Info()->Time(theTime);
-	return true;
 }
 
 // Poistaa listalta kaikki halutun tuottajan ja mahd. annetun levelin parametrit.
@@ -295,20 +267,15 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::vector<int>&
 	{
 		for(Reset(); Next();)
 		{
-//			if(*(Current()->EditParam().GetProducer()) == theProducer)
 			if(*(Current()->Param().GetProducer()) == theProducer)
 			{
-				if(Current()->Info()) // tämä tarkistus satel-datan takia
+				if(Current()->Level() == *theLevel)
 				{
-					if(*Current()->Info()->Level() == *theLevel)
-					{
-//						it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->EditParam().GetParamIdent()));
-						it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->Param().GetParamIdent()));
-						if(it == tmpParIdList.end())
-							Remove(fDeleteData);
-						else
-							tmpParIdList.erase(it);
-					}
+					it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->Param().GetParamIdent()));
+					if(it == tmpParIdList.end())
+						Remove(fDeleteData);
+					else
+						tmpParIdList.erase(it);
 				}
 			}
 		}
@@ -317,21 +284,13 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::vector<int>&
 	{
 		for(Reset(); Next();)
 		{
-			if(Current()->Info()) // tämä tarkistus satel-datan takia
+			if(*(Current()->Param().GetProducer()) == theProducer)
 			{
-				if(Current()->Info()->SizeLevels() == 1) // pitää olla 'ground' info (eli ei level-dataa), ennen kuin ruvetaan siivoamaan!!!
-				{
-//					if(*(Current()->EditParam().GetProducer()) == theProducer)
-					if(*(Current()->Param().GetProducer()) == theProducer)
-					{
-//						it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->EditParam().GetParamIdent()));
-						it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->Param().GetParamIdent()));
-						if(it == tmpParIdList.end())
-							Remove(fDeleteData);
-						else
-							tmpParIdList.erase(it);
-					}
-				}
+				it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->Param().GetParamIdent()));
+				if(it == tmpParIdList.end())
+					Remove(fDeleteData);
+				else
+					tmpParIdList.erase(it);
 			}
 		}
 	}
@@ -369,22 +328,14 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pa
 	std::list<std::pair<int, NFmiLevel> >::iterator it;
 	for(Reset(); Next();)
 	{
-		if(Current()->Info()) // tämä tarkistus satel-datan takia
+		if(*(Current()->Param().GetProducer()) == theProducer)
 		{
-			if(Current()->Info()->SizeLevels() > 1) // pitää olla level info, ennen kuin ruvetaan siivoamaan!!!
-			{
-//				if(*(Current()->EditParam().GetProducer()) == theProducer)
-				if(*(Current()->Param().GetProducer()) == theProducer)
-				{
-//					std::pair<int, NFmiLevel> tmp(Current()->EditParam().GetParamIdent(), *Current()->Info()->Level());
-					std::pair<int, NFmiLevel> tmp(Current()->Param().GetParamIdent(), *Current()->Info()->Level());
-					it = std::find(theParamIdsAndLevelsNotRemoved.begin(), theParamIdsAndLevelsNotRemoved.end(), tmp);
-					if(it == theParamIdsAndLevelsNotRemoved.end())
-						Remove(fDeleteData);
-					else
-						theParamIdsAndLevelsNotRemoved.erase(it);
-				}
-			}
+			std::pair<int, NFmiLevel> tmp(Current()->Param().GetParamIdent(), Current()->Level());
+			it = std::find(theParamIdsAndLevelsNotRemoved.begin(), theParamIdsAndLevelsNotRemoved.end(), tmp);
+			if(it == theParamIdsAndLevelsNotRemoved.end())
+				Remove(fDeleteData);
+			else
+				theParamIdsAndLevelsNotRemoved.erase(it);
 		}
 	}
 }
