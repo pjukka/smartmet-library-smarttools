@@ -139,6 +139,11 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 			aInfo = aIter.CurrentPtr();
 			if((aInfo->DataType() == theType  || anyDataOk) && aInfo->Param(theParam) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
 			{
+				if(theLevel == 0 && aInfo->SizeLevels() > 1) // en osaa nyt laittaa tätä ehtoa edellä olevaan if-lauseeseen, mutta pelkkä edellinen ei toimi, jos leveldata löytyy ennen pintadataa
+				{
+					aInfo = 0; // pitää aina tässä nollata, muuten viimeisen jälkeen jää voimaan
+					continue;
+				}
 				fSubParameter = aInfo->UseSubParam();
 				break;
 			}
@@ -181,6 +186,11 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 			aInfo = Current();
 			if((aInfo->DataType() == theType || anyDataOk) && aInfo->Param(theDataIdent) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
 			{
+				if(theLevel == 0 && aInfo->SizeLevels() > 1) // en osaa nyt laittaa tätä ehtoa edellä olevaan if-lauseeseen, mutta pelkkä edellinen ei toimi, jos leveldata löytyy ennen pintadataa
+				{
+					aInfo = 0; // pitää aina tässä nollata, muuten viimeisen jälkeen jää voimaan
+					continue;
+				}
 				fSubParameter = aInfo->UseSubParam();
 				break;
 			}
