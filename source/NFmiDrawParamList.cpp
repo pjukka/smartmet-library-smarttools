@@ -57,12 +57,21 @@ NFmiDrawParamList::~NFmiDrawParamList(void)
 //--------------------------------------------------------
 bool NFmiDrawParamList::Add (NFmiDrawParam* theParam)
 {
-   if(theParam && itsList.AddEnd(theParam))
-   {
-		fDirtyList = true;
-		return true;
-   }
-   return false;
+	if(theParam)
+	{
+		FmiParameterName parId = static_cast<FmiParameterName>(theParam->Param().GetParamIdent());
+		if(parId >= kFmiSatelCh1 && parId <= kFmiSatelCh345 && itsList.AddStart(theParam))
+		{ // satelliitti-näytöt pitää laitaa aina 1. näytölle, koska ne peittävät muut
+			fDirtyList = true;
+			return true;
+		}
+		else if(itsList.AddEnd(theParam))
+		{
+			fDirtyList = true;
+			return true;
+		}
+	}
+	return false;
 }
 //--------------------------------------------------------
 // Add 
