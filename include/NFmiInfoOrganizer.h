@@ -68,6 +68,7 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* EditedInfoCopy(void){return itsEditedDataCopy;}; 
 	NFmiSmartInfo* ViewableInfo(void); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	std::vector<NFmiSmartInfo*> GetInfos(NFmiInfoData::Type theDataType); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
+	std::vector<NFmiSmartInfo*> GetInfos(int theProducerId, int theProducerId2 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
 	NFmiSmartInfo* ViewableInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
 	NFmiSmartInfo* ObservationInfo(void); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* ObservationInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)

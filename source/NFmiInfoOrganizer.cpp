@@ -916,6 +916,24 @@ std::vector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type theDa
 	return infoVector;
 }
 
+// Palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota.
+// Ei katso tuottaja datoja editable infosta eikä sen kopioista!
+// voi antaa kaksi eri tuottaja id:tä jos haluaa, jos esim. hirlamia voi olla kahden eri tuottaja id:n alla
+std::vector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(int theProducerId, int theProducerId2)
+{
+	std::vector<NFmiSmartInfo*> infoVector;
+	for(Reset(); Next();)
+	{
+		int currentProdId = static_cast<int>(Current()->Producer()->GetIdent());
+		if(currentProdId == theProducerId)
+			infoVector.push_back(Current());
+		else if(theProducerId2 != -1 && currentProdId == theProducerId2)
+			infoVector.push_back(Current());
+	}
+	return infoVector;
+}
+
+
 // Haetaan halutun datatyypin, tuottajan joko pinta tai level dataa (mahd indeksi kertoo sitten konfliktin
 // yhteydessä, monesko otetaan)
 NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex)
