@@ -56,13 +56,13 @@ void NFmiSmartToolCalculation::Calculate(const NFmiPoint &theLatlon, unsigned lo
 {
 
 	double value = eval_exp(theLatlon, theTime, theTimeIndex);
-//	if(value != kFloatMissing) // pit‰‰ pysty‰ sittenkin asettamaan arvoksi kFloatMissing:in!!!
-//	{
+	if(value != kFloatMissing) // tuli ongelmia missing asetuksissa, pit‰‰ mietti vaikka jokin funktio, jolla asetetaan puuttuva arvo // pit‰‰ pysty‰ sittenkin asettamaan arvoksi kFloatMissing:in!!!
+	{
 		itsResultInfo->LocationIndex(theLocationIndex); // kohde dataa juoksutetaan, joten lokaatio indeksien pit‰‰ olla synkassa!!!
 		value = GetInsideLimitsValue(static_cast<float>(value)); // asetetaan value viel‰ drawparamista satuihin rajoihin, ettei esim. RH voi olla alle 0 tai yli 100 %
 
 		itsResultInfo->FloatValue(static_cast<float>(value)); // miten info saadaan osoittamaan oikeaan kohtaan?!?
-//	}
+	}
 }
 
 // ei ota huomioon missing arvoa, koska se pit‰‰ ottaa huomioon jo ennen t‰m‰n kutsua.
