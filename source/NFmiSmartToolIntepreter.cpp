@@ -166,7 +166,7 @@ void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText)  throw 
 		catch(NFmiSmartToolIntepreter::Exception e)
 		{
 			block.Clear();
-			for(int i=0; i<itsSmartToolCalculationBlocks.size(); i++)
+			for(unsigned int i=0; i<itsSmartToolCalculationBlocks.size(); i++)
 				itsSmartToolCalculationBlocks[i].Clear();
 			itsSmartToolCalculationBlocks.clear();
 			throw e;
