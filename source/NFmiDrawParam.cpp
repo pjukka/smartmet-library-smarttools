@@ -150,6 +150,7 @@ NFmiDrawParam::NFmiDrawParam()
 , itsUnit								("?")
 , fActive(kFalse)
 , fShowDifference(kFalse)
+, fShowDifferenceToOriginalData(false)
 , itsMetEditorCoordinatorMapOptions(0)
 
 //***********************************************
@@ -277,6 +278,7 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , itsUnit								("?")
 , fActive(kFalse)
 , fShowDifference(kFalse)
+, fShowDifferenceToOriginalData(false)
 , itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 
 {
@@ -401,6 +403,7 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 , itsUnit								("?")
 , fActive(kFalse)
 , fShowDifference(kFalse)
+, fShowDifferenceToOriginalData(false)
 , itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 
 {
@@ -476,6 +479,7 @@ void NFmiDrawParam::Init(NFmiDrawParam* theDrawParam)
 	fShowColoredNumbers = theDrawParam->ShowColoredNumbers();
 	fZeroColorMean = theDrawParam->ZeroColorMean();
 	fShowDifference = theDrawParam->ShowDifference();
+	fShowDifferenceToOriginalData = theDrawParam->ShowDifferenceToOriginalData();
 
 //***********************************************
 //********** 'versio 2' parametreja *************

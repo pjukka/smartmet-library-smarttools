@@ -145,6 +145,8 @@ public:
 	void UseSecondaryColors(FmiBoolean newState){fUseSecondaryColors = newState;};
 	FmiBoolean ShowDifference(void){return fShowDifference;};
 	void ShowDifference(FmiBoolean newState){fShowDifference = newState;};
+	bool ShowDifferenceToOriginalData(void) const{return fShowDifferenceToOriginalData;}
+	void ShowDifferenceToOriginalData(bool newValue){fShowDifferenceToOriginalData = newValue;}
 	NFmiMetEditorCoordinatorMapOptions* MetEditorCoordinatorMapOptions(void){return itsMetEditorCoordinatorMapOptions;};
 	void MetEditorCoordinatorMapOptions(NFmiMetEditorCoordinatorMapOptions* theNewOptions);
 
@@ -438,6 +440,7 @@ private:
 	NFmiString itsUnit;			
 	FmiBoolean fActive;			// onko kyseinen parametri näytön aktiivinen parametri (jokaisella näyttörivillä aina yksi aktivoitunut parametri)
 	FmiBoolean fShowDifference;	// näytetäänkö kartalla parametrin arvo, vai erotus edelliseen aikaan (ei ole vielä talletettu tiedostoon)
+	bool fShowDifferenceToOriginalData;
 
 	NFmiMetEditorCoordinatorMapOptions* itsMetEditorCoordinatorMapOptions; // tätä käytetään koordinaatio tarkasteluissa
 };
