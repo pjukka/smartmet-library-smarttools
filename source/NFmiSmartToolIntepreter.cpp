@@ -1845,6 +1845,11 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("WD"), kFmiWindDirection));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Wd"), kFmiWindDirection));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wd"), kFmiWindDirection));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("u"), kFmiWindUMS));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("U"), kFmiWindUMS));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("v"), kFmiWindVMS));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("V"), kFmiWindVMS));
+
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("N"), kFmiTotalCloudCover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("n"), kFmiTotalCloudCover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("CL"), kFmiLowCloudCover));
