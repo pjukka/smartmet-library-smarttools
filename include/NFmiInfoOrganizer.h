@@ -62,6 +62,10 @@ class NFmiInfoOrganizer
 
 	bool Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist, bool createEditedDataCopy);
 
+	// Kehit‰ t‰h‰n perhe infojen palautus funktioita, jotka korvaavat vanhat
+  	NFmiSmartInfo* Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted = false); 
+  	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType); 
+
 // n‰m‰ infon palauttavat metodit ovat toistaiseksi vain apu funktioita, jotka toimivat
 // vajavaisesti. Niist‰ pit‰‰ tehd‰ fiksumpia, kun tulee enemm‰n dataa talteen!
 	NFmiSmartInfo* EditedInfo(void){return itsEditedData;}; // t‰m‰ toimii jos rajoitetaan editoitavien infojen m‰‰r‰‰
@@ -91,16 +95,16 @@ class NFmiInfoOrganizer
 	NFmiParamBag ObservationParams(int theIndex); // vain halutun indeksin parametrit (HUONO VIRITYS KORJAA!!!!)
 //	NFmiParamBag CompareModelsParams(void); // palauttaa vain 1. kyseisen datan parametrit!
 
-	NFmiSmartInfo* CreateInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
-	NFmiSmartInfo* CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+//	NFmiSmartInfo* CreateInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+	NFmiSmartInfo* CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fTryParIdAlso);
 	NFmiSmartInfo* CreateInfo(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 
 	// SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
-	NFmiSmartInfo* CreateShallowCopyInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
-	NFmiSmartInfo* CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+//	NFmiSmartInfo* CreateShallowCopyInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+	NFmiSmartInfo* CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly);
 
-	NFmiDrawParam* CreateDrawParam(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
-	NFmiDrawParam* CreateEmptyInfoDrawParam(FmiParameterName theParamName); // luo drawparam ilman infoa
+//	NFmiDrawParam* CreateDrawParam(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+//	NFmiDrawParam* CreateEmptyInfoDrawParam(const NFmiDataIdent& theDataIdent); // luo drawparam ilman infoa
 	NFmiDrawParam* CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	NFmiDrawParam* CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
 	NFmiDrawParam* CreateDrawParam(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
@@ -133,8 +137,8 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* Current (void);
 
  private:
-	NFmiSmartInfo* Info (const FmiParameterName& theParam, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
   	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType); 
+	NFmiSmartInfo* Info (const FmiParameterName& theParam, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	NFmiSmartInfo* CrossSectionInfo(const NFmiDataIdent& theDataIdent, bool& fSubParameter, NFmiInfoData::Type theType);
     bool Add (NFmiSmartInfo* theInfo);
 	NFmiParamBag GetParams(NFmiInfoData::Type theDataType);
@@ -143,8 +147,7 @@ class NFmiInfoOrganizer
 										, bool& fSubParameter 
 										, const NFmiLevel* theLevel
 										, NFmiInfoData::Type theType);
-	NFmiDrawParam* CreateSynopPlotDrawParam(NFmiSmartInfo* theUsedInfo
-											,const NFmiDataIdent& theDataIdent
+	NFmiDrawParam* CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent
 											,const NFmiLevel* theLevel
 											,NFmiInfoData::Type theType);
 

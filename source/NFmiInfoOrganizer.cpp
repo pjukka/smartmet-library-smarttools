@@ -354,6 +354,7 @@ NFmiParamBag NFmiInfoOrganizer::StaticParams(void)
 }
 
 // SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
+/*
 NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
 	bool aSubParam;	
@@ -368,15 +369,16 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(FmiParameterName thePara
 	}
 	return 0;
 }
+*/
 
 // SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
-NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
+NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly)
 {
 	bool aSubParam;	
-	NFmiSmartInfo* info = Info(theDataIdent, aSubParam, theLevel, theType);
+	NFmiSmartInfo* info = fUseParIdOnly ? Info(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), aSubParam, theLevel, theType) : Info(theDataIdent, aSubParam, theLevel, theType);
 	if(info)
 	{
-		if(theType == NFmiInfoData::kMacroParam || info->Param(theDataIdent))  // makroparamille ei tarvitse laittaa parametria kohdalleen!
+		if(theType == NFmiInfoData::kMacroParam || (fUseParIdOnly ?  info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) : info->Param(theDataIdent)))  // makroparamille ei tarvitse laittaa parametria kohdalleen!
 		{
 			NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
 			return copyOfInfo;
@@ -384,7 +386,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& the
 	}
 	return 0;
 }
-
+/*
 NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
 	bool aSubParam;	
@@ -396,11 +398,15 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(FmiParameterName theParamName, cons
 	}
 	return 0;
 }
+*/
 
-NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
+// T‰m‰ luo SmartInfosta syv‰ kopion eli k‰ytt‰‰ Clone-metodia, eli datakin kopioituu ja se pit‰‰ tuhota!!
+NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fTryParIdAlso)
 {
 	bool aSubParam;	
 	NFmiSmartInfo* info = Info(theDataIdent, aSubParam, theLevel, theType);
+	if(info == 0 && fTryParIdAlso)
+		info = Info(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), aSubParam, theLevel, theType);
 	if(info)
 	{
 		if(info->Param(theDataIdent))
@@ -409,6 +415,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(const NFmiDataIdent& theDataIdent, 
 	return 0;
 }
 
+// T‰m‰ luo SmartInfosta pinta kopioin, eli vain ns. iteraattori (info osuus) kopioituu, data pysyy alkuper‰isen kanssa jaettuna.
 NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
 	if(theUsedInfo && theUsedInfo->DataType() == theType && theUsedInfo->Param(theDataIdent) && (!theLevel || (theLevel && theUsedInfo->Level(*theLevel))))
@@ -425,6 +432,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(NFmiSmartInfo* theUsedInfo, const N
 // Tutkii lˆytyykˆ listasta itsList infoa, jossa on theParam.
 // Jos t‰ll‰inen info lˆytyy, pyydet‰‰n itsDrawParamFactory luomaan
 // drawParam kyseiselle parametrille lˆydetyn infon avulla.
+/*
 NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
 // Huomaa, ett‰ palautettava pointteri drawParam luodaan attribuutin 
@@ -432,34 +440,29 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(FmiParameterName theParamName,
 // pit‰‰ muistaa tuhota  NFmiInfoOrganizer:n ulkopuolella
 
 	NFmiDrawParam* drawParam = 0;
-	bool aSubParam;	
-	NFmiSmartInfo* info = Info(theParamName, aSubParam, theLevel, theType);
-	if(info)
+	if(info->Param(theParamName))
 	{
-		if(info->Param(theParamName))
-		{
-			NFmiDataIdent dataIdent(info->Param());
-			return CreateDrawParam(dataIdent, theLevel, theType);
-		}
-		else if(theParamName == 997) // synop plottia varten taas kikkailua
-		{
-			info->FirstParam();
-			NFmiDataIdent dataIdent(info->Param());
-			dataIdent.GetParam()->SetIdent(theParamName);
-			dataIdent.GetParam()->SetName("Synop");
-			return CreateSynopPlotDrawParam(info, dataIdent, theLevel, theType);
-		}
-		if(aSubParam)
-		{
-			info->FirstParam();
-			NFmiDataIdent dataIdent(info->Param());
-			dataIdent.GetParam()->SetIdent(theParamName);
-			return CreateDrawParam(dataIdent, theLevel, theType);
-		}
+		NFmiDataIdent dataIdent(info->Param());
+		return CreateDrawParam(dataIdent, theLevel, theType);
+	}
+	else if(theParamName == 997) // synop plottia varten taas kikkailua
+	{
+		info->FirstParam();
+		NFmiDataIdent dataIdent(info->Param());
+		dataIdent.GetParam()->SetIdent(theParamName);
+		dataIdent.GetParam()->SetName("Synop");
+		return CreateSynopPlotDrawParam(dataIdent, theLevel, theType);
+	}
+	if(aSubParam)
+	{
+		info->FirstParam();
+		NFmiDataIdent dataIdent(info->Param());
+		dataIdent.GetParam()->SetIdent(theParamName);
+		return CreateDrawParam(dataIdent, theLevel, theType);
 	}
 	return drawParam;
 }
-
+*/
 //--------------------------------------------------------
 // CreateDrawParam(NFmiDataIdent& theDataIdent)
 //--------------------------------------------------------
@@ -475,24 +478,16 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 	NFmiDrawParam* drawParam = 0;
 	if(theType == NFmiInfoData::kSatelData) // spesiaali keissi satelliitti kuville, niill‰ ei ole infoa
 	{
-		drawParam = new NFmiDrawParam(0, theIdent, 1, theType);
+		drawParam = new NFmiDrawParam(theIdent, NFmiLevel(), 1, theType);
 		return drawParam;
 	}
-	bool aSubParam;	
-	NFmiSmartInfo* info = Info(theIdent, aSubParam, theLevel, theType);
-	if(info)
+	if(theIdent.GetParamIdent() == 997) // synop plottia varten taas kikkailua
 	{
-		if(theIdent.GetParamIdent() == 997) // synop plottia varten taas kikkailua
-		{
-//			info->FirstParam();
-//			NFmiDataIdent dataIdent(info->Param());
-//			dataIdent.GetParam()->SetIdent(theParamName);
-//			dataIdent.GetParam()->SetName("Synop");
-			return CreateSynopPlotDrawParam(info, theIdent, theLevel, theType);
-		}
-		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
-		drawParam = itsDrawParamFactory->CreateDrawParam(copyOfInfo, theIdent, aSubParam, theLevel);	
+		return CreateSynopPlotDrawParam(theIdent, theLevel, theType);
 	}
+	drawParam = itsDrawParamFactory->CreateDrawParam(theIdent, theLevel);	
+	if(drawParam)
+		drawParam->DataType(theType); // data tyyppi pit‰‰ myˆs asettaa!!
 	return drawParam;
 }
 
@@ -500,19 +495,22 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 NFmiDrawParam* NFmiInfoOrganizer::CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType)
 {
 	NFmiDrawParam* drawParam = 0;
-	bool aSubParam;
-	NFmiSmartInfo* info = CrossSectionInfo(theDataIdent, aSubParam, theType);
-	if(info)
-	{
-		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
-		drawParam = itsDrawParamFactory->CreateCrossSectionDrawParam(copyOfInfo, theDataIdent, aSubParam);	
-	}
+//	bool aSubParam;
+//	NFmiSmartInfo* info = CrossSectionInfo(theDataIdent, aSubParam, theType);
+//	if(info)
+//	{
+//		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
+	drawParam = itsDrawParamFactory->CreateCrossSectionDrawParam(theDataIdent);	
+	if(drawParam)
+		drawParam->DataType(theType); // data tyyppi pit‰‰ myˆs asettaa!!
+//	}
 	return drawParam;
 }
 
 // Luo halutun drawparam:in, mutta k‰ytt‰en annettua smartinfoa. 
 // K‰ytet‰‰n kun ratkaistaan parametrin tasaus + maski ongelmaa (maski muuttuu kun 
 // tasausta suoritetaan, joten pit‰‰ k‰ytt‰‰ kopiota)
+/*
 NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(NFmiSmartInfo* theUsedInfo
 												 ,const NFmiDataIdent& theDataIdent
 												 ,const NFmiLevel* theLevel
@@ -529,31 +527,27 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(NFmiSmartInfo* theUsedInfo
 	}
 	return drawParam;
 }
-
-NFmiDrawParam* NFmiInfoOrganizer::CreateSynopPlotDrawParam(NFmiSmartInfo* theUsedInfo
-															,const NFmiDataIdent& theDataIdent
-															,const NFmiLevel* theLevel
-															,NFmiInfoData::Type theType)
+*/
+NFmiDrawParam* NFmiInfoOrganizer::CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent
+														  ,const NFmiLevel* theLevel
+														  ,NFmiInfoData::Type theType)
 {
-	NFmiDrawParam* drawParam = 0;
-	bool aSubParam = false;	
-	if(theUsedInfo && theUsedInfo->DataType() == theType)
-	{
-		aSubParam = theUsedInfo->UseSubParam();
-		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*theUsedInfo);
-		drawParam = itsDrawParamFactory->CreateDrawParam(copyOfInfo, theDataIdent, aSubParam, theLevel, false); // false merkitsee, ett‰ parametria ei taas aseteta tuolla metodissa
-	}
+	NFmiDrawParam *drawParam = itsDrawParamFactory->CreateDrawParam(theDataIdent, theLevel); // false merkitsee, ett‰ parametria ei taas aseteta tuolla metodissa
+	if(drawParam)
+		drawParam->DataType(theType);
 	return drawParam;
 }
 
-NFmiDrawParam* NFmiInfoOrganizer::CreateEmptyInfoDrawParam(FmiParameterName theParamName)
+// T‰m‰ pit‰isi korvata jotenkin muun nimisell‰ metodilla, koska nyky‰‰n ei ole drawparamissa en‰‰ infoa kuitenkaan
+/*
+NFmiDrawParam* NFmiInfoOrganizer::CreateEmptyInfoDrawParam(const NFmiDataIdent& theDataIdent)
 {
 	NFmiParam param(theParamName);
 	NFmiDataIdent dataIdent(param);
 	NFmiDrawParam *drawParam = itsDrawParamFactory->CreateEmptyInfoDrawParam(dataIdent);
 	return drawParam;
 }
-
+*/
 //--------------------------------------------------------
 // AddData 
 //--------------------------------------------------------
@@ -1043,3 +1037,30 @@ const std::string NFmiInfoOrganizer::GetDrawParamPath(void)
 		retValue = static_cast<char*>(itsDrawParamFactory->LoadDirectory());
 	return retValue;
 }
+NFmiSmartInfo* NFmiInfoOrganizer::Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted)
+{
+	bool subParameter = false;
+	NFmiInfoData::Type dataType = theDrawParam.DataType();
+	if(fCrossSectionInfoWanted)
+		return CrossSectionInfo(theDrawParam.Param(), subParameter, dataType);
+	else
+	{
+		NFmiLevel* level = &theDrawParam.Level();
+		if(level && level->GetIdent() == 0) // jos t‰m‰ on ns. default-level otus (GetIdent() == 0), annetaan 0-pointteri Info-metodiin
+			level = 0;
+		if(dataType == NFmiInfoData::kEditable || dataType == NFmiInfoData::kCopyOfEdited || dataType == NFmiInfoData::kAnyData) // jos editoitava data, ei tuottajalla v‰li‰
+			return Info(static_cast<FmiParameterName>(theDrawParam.Param().GetParamIdent()), subParameter, level, dataType);
+		else
+			return Info(theDrawParam.Param(), subParameter, level, dataType);
+	}
+}
+
+NFmiSmartInfo* NFmiInfoOrganizer::Info(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
+{
+	bool subParameter = false;
+	if(theType == NFmiInfoData::kEditable || theType == NFmiInfoData::kCopyOfEdited || theType == NFmiInfoData::kAnyData) // jos editoitava data, ei tuottajalla v‰li‰
+		return Info(static_cast<FmiParameterName>(theIdent.GetParamIdent()), subParameter, theLevel, theType);
+	else
+		return Info(theIdent, subParameter, theLevel, theType);
+}
+
