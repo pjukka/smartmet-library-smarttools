@@ -24,6 +24,7 @@
 #define  NFMISMARTTOOLCALCULATION_H
 
 #include <vector>
+#include <string>
 
 class NFmiPoint;
 class NFmiMetTime;
