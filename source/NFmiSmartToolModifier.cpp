@@ -61,7 +61,7 @@ static char THIS_FILE[] = __FILE__;
 //--------------------------------------------------------
 NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer)
 :itsInfoOrganizer(theInfoOrganizer)
-,itsSmartToolIntepreter(new NFmiSmartToolIntepreter)
+,itsSmartToolIntepreter(new NFmiSmartToolIntepreter(theInfoOrganizer))
 ,itsFirstCalculationSection(0)
 ,itsLastCalculationSection(0)
 ,itsIfAreaMaskSection(0)

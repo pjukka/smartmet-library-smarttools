@@ -47,6 +47,7 @@
 #include "NFmiAreaMask.h"
 //#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiProducer.h"
+#include "NFmiLeveltype.h"
 
 #include <string>
 #include <vector>
@@ -58,6 +59,7 @@ class NFmiSmartToolCalculationSectionInfo;
 class NFmiAreaMaskSectionInfo;
 class NFmiAreaMaskInfo;
 class NFmiSmartToolCalculationInfo;
+class NFmiInfoOrganizer;
 
 class NFmiSmartToolCalculationBlock
 {
@@ -93,7 +95,7 @@ public:
 
 	void Interpret(const std::string &theMacroText);
 
-	NFmiSmartToolIntepreter(void);
+	NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer);
 	~NFmiSmartToolIntepreter(void);
 
 	void Clear(void);
@@ -107,7 +109,7 @@ private:
 
 	bool CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlock* theBlock);
 	std::string HandlePossibleUnaryMarkers(const std::string &theCurrentString);
-	NFmiLevel GetPossibleLevelInfo(const std::string &theLevelText);
+	NFmiLevel GetPossibleLevelInfo(const std::string &theLevelText, NFmiInfoData::Type theDataType);
 	NFmiProducer GetPossibleProducerInfo(const std::string &theProducerText);
 	bool IsProducerOrig(std::string &theProducerText);
 	bool FindParamAndLevelAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
@@ -136,7 +138,7 @@ private:
 	bool IsPossiblyLevelItem(const std::string &theText, LevelMap &theMap);
 	bool IsPossiblyProducerItem(const std::string &theText, ProducerMap &theMap);
 	bool GetProducerFromVariableById(const std::string &theVariableText, NFmiProducer &theProducer);
-	bool GetLevelFromVariableById(const std::string &theVariableText, NFmiLevel &theLevel);
+	bool GetLevelFromVariableById(const std::string &theVariableText, NFmiLevel &theLevel, NFmiInfoData::Type theDataType);
 	bool IsWantedStart(const std::string &theText, const std::string &theWantedStart);
 	bool GetParamFromVariable(const std::string &theVariableText, ParamMap& theParamMap, NFmiParam &theParam, bool &fUseWildDataType);
 	bool GetParamFromVariableById(const std::string &theVariableText, NFmiParam &theParam);
@@ -169,6 +171,9 @@ private:
 	std::string ExtractNextLine(std::string &theText, std::string::iterator theStartPos, std::string::iterator* theEndPos);
 	bool IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
+	FmiLevelType GetLevelType(NFmiInfoData::Type theDataType, long levelValue);
+
+	NFmiInfoOrganizer* itsInfoOrganizer; // ei omista
 	std::string itsCheckOutSectionText; // esim. if-sectionin koko teksti
 	std::string::iterator itsCheckOutTextStartPosition; // sen hetkinen tekstiosan alkupiste
 	std::string::iterator itsCheckOutTextEndPosition; // sen hetkinen tekstiosan alkupiste

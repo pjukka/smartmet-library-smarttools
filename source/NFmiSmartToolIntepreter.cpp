@@ -32,6 +32,8 @@
 #include "NFmiValueString.h"
 #include "NFmiLevelType.h"
 #include "NFmiLevel.h"
+#include "NFmiInfoOrganizer.h"
+#include "NFmiSmartInfo.h"
 
 #include <algorithm>
 #include <utility>
@@ -119,8 +121,9 @@ NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctio
 //--------------------------------------------------------
 // Constructor/Destructor 
 //--------------------------------------------------------
-NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(void)
-:itsSmartToolCalculationBlocks()
+NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer)
+:itsInfoOrganizer(theInfoOrganizer)
+,itsSmartToolCalculationBlocks()
 {
 	NFmiSmartToolIntepreter::InitTokens();
 }
@@ -981,7 +984,9 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &th
 	}
 	else if(fLevelExist) // kokeillaan ensin, löytyykö param+level+producer
 	{
-		if(FindParamAndLevelAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, NFmiAreaMask::InfoVariable, NFmiInfoData::kViewable, theMaskInfo))
+//		if(FindParamAndLevelAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, NFmiAreaMask::InfoVariable, NFmiInfoData::kViewable, theMaskInfo))
+		// Jos tuottajaa ei ole mainittu, oletetaan, että kyseessä on editoitava parametri.
+		if(FindParamAndLevelAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, NFmiAreaMask::InfoVariable, NFmiInfoData::kEditable, theMaskInfo))
 			return true;
 	}
 	else if(fProducerExist) // kokeillaan ensin, löytyykö param+level+producer
@@ -1138,7 +1143,7 @@ bool NFmiSmartToolIntepreter::FindParamAndLevelAndSetMaskInfo(const std::string 
 {
 	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo))
 	{
-		NFmiLevel level(GetPossibleLevelInfo(theLevelText));
+		NFmiLevel level(GetPossibleLevelInfo(theLevelText, theDataType));
 		theMaskInfo->SetLevel(&level);
 		return true;
 	}
@@ -1158,7 +1163,7 @@ bool NFmiSmartToolIntepreter::FindParamAndLevelAndProducerAndSetMaskInfo(const s
 	NFmiProducer producer(GetPossibleProducerInfo(theProducerText));
 	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer))
 	{
-		NFmiLevel level(GetPossibleLevelInfo(theLevelText));
+		NFmiLevel level(GetPossibleLevelInfo(theLevelText, theDataType));
 		theMaskInfo->SetLevel(&level);
 		return true;
 	}
@@ -1166,13 +1171,13 @@ bool NFmiSmartToolIntepreter::FindParamAndLevelAndProducerAndSetMaskInfo(const s
 }
 
 // Level tekstin (850, 500 jne.) luodaan NFmiLevel-otus.
-NFmiLevel NFmiSmartToolIntepreter::GetPossibleLevelInfo(const std::string &theLevelText)
+NFmiLevel NFmiSmartToolIntepreter::GetPossibleLevelInfo(const std::string &theLevelText, NFmiInfoData::Type theDataType)
 {
 	NFmiLevel level;
 	LevelMap::iterator it = itsTokenLevelNamesIdentsAndValues.find(theLevelText);
 	if(it != itsTokenLevelNamesIdentsAndValues.end())
 		level = NFmiLevel((*it).second.first, (*it).first, (*it).second.second);
-	else if(!GetLevelFromVariableById(theLevelText, level))
+	else if(!GetLevelFromVariableById(theLevelText, level, theDataType))
 		throw NFmiSmartToolIntepreter::Exception(string("Level tietoa ei saatu rakennettua (vika ohjelmassa): \n") + theLevelText);
 	return level;
 }
@@ -1241,19 +1246,42 @@ bool NFmiSmartToolIntepreter::GetProducerFromVariableById(const std::string &the
 
 // tutkii alkaako annettu sana "lev"-osiolla ja sitä seuraavalla numerolla
 // esim. par100 tai LEV850 jne.
-bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVariableText, NFmiLevel &theLevel)
+bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVariableText, NFmiLevel &theLevel, NFmiInfoData::Type theDataType)
 {
 	if(IsWantedStart(theVariableText, "lev"))
 	{
 		NFmiValueString numericPart(theVariableText.substr(3));
 		if(numericPart.IsNumeric())
 		{
+			long levelValue = (long)numericPart;
 			// pitaisi tunnistaa level tyyppi arvosta kait, nyt oletus että painepinta
-			theLevel = NFmiLevel(kFmiPressureLevel, theVariableText, (long)numericPart);
+			FmiLevelType levelType = GetLevelType(theDataType, levelValue);
+			theLevel = NFmiLevel(levelType, theVariableText, (long)numericPart);
 			return true;
 		}
 	}
 	return false;
+}
+
+FmiLevelType NFmiSmartToolIntepreter::GetLevelType(NFmiInfoData::Type theDataType, long levelValue)
+{
+	FmiLevelType levelType = kFmiPressureLevel; // default
+	if(theDataType == NFmiInfoData::kEditable)
+	{
+		NFmiSmartInfo *editedInfo = itsInfoOrganizer->EditedInfo();
+		if(editedInfo)
+		{
+			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
+			{
+				if(editedInfo->Level()->LevelValue() == levelValue)
+				{
+					levelType = editedInfo->Level()->LevelType();
+					break;
+				}
+			}
+		}
+	}
+	return levelType;
 }
 
 bool NFmiSmartToolIntepreter::IsWantedStart(const std::string &theText, const std::string &theWantedStart)
