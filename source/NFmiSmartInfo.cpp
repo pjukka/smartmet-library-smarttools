@@ -60,6 +60,7 @@ NFmiSmartInfo::NFmiSmartInfo()
 	itsUndoTable = NULL;
 	itsUndoTextTable = NULL;
 	itsEditedParamBag = new NFmiParamBag;
+	itsUndoRedoHarmonizerBookKeepingData = 0;
 }
 
 NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theData
@@ -90,6 +91,7 @@ NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theDa
 	NFmiParamDescriptor& temp = const_cast<NFmiParamDescriptor&>(theInfo.ParamDescriptor());
 	itsEditedParamBag = new NFmiParamBag(*(temp.ParamBag()));
 	InitEditedParamBag();
+	itsUndoRedoHarmonizerBookKeepingData = 0;
 }
 
 NFmiSmartInfo::NFmiSmartInfo (const NFmiSmartInfo & theInfo)
@@ -114,6 +116,7 @@ NFmiSmartInfo::NFmiSmartInfo (const NFmiSmartInfo & theInfo)
 	this->itsAreaFactors = theInfo.itsAreaFactors; 
 	this->itsDataReference = theInfo.itsDataReference;
 	this->itsEditedParamBag = theInfo.itsEditedParamBag;
+	this->itsUndoRedoHarmonizerBookKeepingData = theInfo.itsUndoRedoHarmonizerBookKeepingData;
 }
 
 NFmiSmartInfo::~NFmiSmartInfo()
@@ -181,6 +184,13 @@ void NFmiSmartInfo::DestroyData(void)
 	
 	delete itsEditedParamBag;
 	itsEditedParamBag = 0;
+
+	if(itsUndoRedoHarmonizerBookKeepingData)
+	{
+		itsUndoRedoHarmonizerBookKeepingData->clear();
+		delete itsUndoRedoHarmonizerBookKeepingData;
+		itsUndoRedoHarmonizerBookKeepingData = 0;
+	}
 }
 
 //--------------------------------------------------------
@@ -214,7 +224,7 @@ NFmiSmartInfo* NFmiSmartInfo::Clone(void) const
 		copy->itsUndoTextTable = 0;
 
 		copy->SetDescriptors(const_cast<NFmiSmartInfo *>(this), false);
-
+		copy->itsUndoRedoHarmonizerBookKeepingData = 0;
 		return copy;
 	}
 	else
@@ -263,6 +273,8 @@ NFmiSmartInfo& NFmiSmartInfo::operator=(const NFmiSmartInfo& theSmartInfo)
 	
 	this->itsEditedParamBag = theSmartInfo.itsEditedParamBag;
 	this->itsDataType = theSmartInfo.itsDataType;
+	this->itsUndoRedoHarmonizerBookKeepingData = theSmartInfo.itsUndoRedoHarmonizerBookKeepingData;
+	
 	return *this;
 }
 
@@ -391,7 +403,7 @@ void NFmiSmartInfo::LocationMask (const NFmiBitMask& theMask, unsigned long theM
 //   toiminnosta ("aikasarjamuutos", "kursori 
 //   ylös", "aluemuutos")
 
-bool NFmiSmartInfo::SnapShotData (const NFmiString& theAction)
+bool NFmiSmartInfo::SnapShotData (const NFmiString& theAction, const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
 {
 	if(itsCurrentUndoLevelPtr == 0)
 		return false;
@@ -407,6 +419,7 @@ bool NFmiSmartInfo::SnapShotData (const NFmiString& theAction)
 	(*itsCurrentUndoLevelPtr)++;
 	memcpy(itsUndoTable[*itsCurrentUndoLevelPtr], itsRefDataPool->Data(), 
 				itsRefDataPool->Size());
+	itsUndoRedoHarmonizerBookKeepingData->push_back(theHarmonizerBookKeepingData); // lisätään perään annettu bagi
 	(*itsCurrentRedoLevelPtr) = (*itsCurrentUndoLevelPtr);
 	(*itsMaxRedoLevelPtr) = (*itsCurrentRedoLevelPtr);
 
@@ -437,6 +450,8 @@ void NFmiSmartInfo::RearrangeUndoTable(void)
 
 	(*itsCurrentUndoLevelPtr)--;
 	(*itsCurrentRedoLevelPtr)--;
+
+	itsUndoRedoHarmonizerBookKeepingData->pop_front(); // otetaan pois alusta yksi parBagi
 
 	return;
 }
@@ -549,7 +564,7 @@ void NFmiSmartInfo::CommitData (void)
 //   että voidaan myös tehdä Redo(). Jos ei ole 
 //   mitään Undo:ta tehtävissä, palautetaan false.
    
-bool NFmiSmartInfo::UndoData (void)
+bool NFmiSmartInfo::UndoData (const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
 {
 	if(itsCurrentUndoLevelPtr == 0)
 		return false;
@@ -558,7 +573,8 @@ bool NFmiSmartInfo::UndoData (void)
 	if ((*itsCurrentUndoLevelPtr) == (*itsCurrentRedoLevelPtr))
 	{
 		NFmiString action("");
-		SnapShotData(action);		// "Ottaa kuvan" undo-toimintoa edeltäneestä tilanteesta,
+		/// KORJAA TÄMÄ **************************************
+		SnapShotData(action, theHarmonizerBookKeepingData);		// "Ottaa kuvan" undo-toimintoa edeltäneestä tilanteesta,
 		(*itsCurrentUndoLevelPtr)--;		// jos siihen halutaankin myöhemmin palata redo:lla.
 	}
 
@@ -631,6 +647,7 @@ void NFmiSmartInfo::UndoLevel (const long& theDepth)	// theDepth kuvaa kuinka mo
 			{
 				itsUndoTable[level] = new char[itsRefDataPool->Size()];
 			}
+			itsUndoRedoHarmonizerBookKeepingData = new std::deque<NFmiHarmonizerBookKeepingData>;
 		}
 	}
 
@@ -850,4 +867,17 @@ void NFmiSmartInfo::AreaFactors(NFmiGrid* theAreaFactor)
 int NFmiSmartInfo::MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea)
 {
 	return (*itsAreaMask)->MaskedCount(theMaskType, theIndex, theSearchArea, itsGridXNumber, itsGridYNumber);
+}
+
+const NFmiHarmonizerBookKeepingData* NFmiSmartInfo::CurrentHarmonizerBookKeepingData(void) const
+{
+	int usedIndex = *itsCurrentUndoLevelPtr + 1; // tässä pitää olla +1, koska tämä bookkeepin data systeemi on poikkeava originaali undo/redo datan kanssa
+	if(itsUndoRedoHarmonizerBookKeepingData == 0)
+		return 0;
+	else if(usedIndex >= 0 && usedIndex < static_cast<int>(itsUndoRedoHarmonizerBookKeepingData->size()))
+		return &(itsUndoRedoHarmonizerBookKeepingData->operator [](usedIndex));
+	else if(usedIndex >= static_cast<int>(itsUndoRedoHarmonizerBookKeepingData->size()))
+		throw std::runtime_error("Vika ohjelmassa NFmiSmartInfo::CurrentHarmonizerParams");
+	else
+		return 0;
 }
