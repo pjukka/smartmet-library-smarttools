@@ -34,6 +34,7 @@
 #include "NFmiLevel.h"
 #include "NFmiInfoOrganizer.h"
 #include "NFmiSmartInfo.h"
+#include "NFmiEnumConverter.h"
 
 #include <algorithm>
 #include <utility>
@@ -89,6 +90,23 @@ void NFmiSmartToolCalculationBlock::Clear(void)
 	delete itsElseCalculationSectionInfo;
 	itsElseCalculationSectionInfo = 0;
 	fElseSectionExist = false;
+}
+
+// Lisätään set:iin kaikki parametrit, joita tässä calculationblokissa 
+// voidaan muokata. Talteen otetaan vain identti, koska muu ei 
+// kiinnosta (ainakaan nyt).
+void NFmiSmartToolCalculationBlock::AddModifiedParams(std::set<int> &theModifiedParams)
+{
+	if(itsFirstCalculationSectionInfo) // eka section
+		itsFirstCalculationSectionInfo->AddModifiedParams(theModifiedParams);
+	if(itsLastCalculationSectionInfo) // vika section
+		itsLastCalculationSectionInfo->AddModifiedParams(theModifiedParams);
+	if(itsIfCalculationSectionInfo) // if section
+		itsIfCalculationSectionInfo->AddModifiedParams(theModifiedParams);
+	if(itsElseIfCalculationSectionInfo) // elseif section
+		itsElseIfCalculationSectionInfo->AddModifiedParams(theModifiedParams);
+	if(itsElseCalculationSectionInfo) // else section
+		itsElseCalculationSectionInfo->AddModifiedParams(theModifiedParams);
 }
 
 // Luokan staattisten dataosien pakollinen alustus.
@@ -168,6 +186,32 @@ void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText)
 			throw e;
 		}
 	}
+}
+
+// kun joku skripti on tulkittu Interpret-metodissa, on tuotettu
+// laskenta-lausekkeet itsSmartToolCalculationBlocks, joista tämä
+// metodi käy katsomassa, mitä parametreja ollaan mahd. muokkaamassa
+// eli T = ? jne. tarkoittaa että lämpötilaa ollaan ainakin
+// mahdollisesti muokkaamassa.
+NFmiParamBag NFmiSmartToolIntepreter::ModifiedParams(void)
+{
+	std::set<int> modifiedParams;
+	std::vector<NFmiSmartToolCalculationBlock>::size_type ssize = itsSmartToolCalculationBlocks.size();
+	std::vector<NFmiSmartToolCalculationBlock>::size_type i = 0;
+	for( ;i<ssize; i++)
+	{
+		itsSmartToolCalculationBlocks[i].AddModifiedParams(modifiedParams);
+	}
+	NFmiEnumConverter converter;
+	NFmiParamBag params;
+	std::set<int>::iterator it = modifiedParams.begin();
+	std::set<int>::iterator endIt = modifiedParams.end();
+	for( ; it != endIt; ++it)
+	{
+		params.Add(NFmiDataIdent(NFmiParam(*it, converter.ToString(*it))));
+	}
+	params.SetActivities(true);
+	return params;
 }
 
 bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlock* theBlock)
@@ -252,6 +296,14 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(void)
 			// en ole varma vielä näistä iteraattoreista, mitkä ovat tarpeellisisa ja mitkä turhia.
 			itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
 			itsCheckOutSectionText += nextLine;
+			if(*eolPos == '{') // jos seuraavan blokin alkumerkki löytyi, lopetetaan tämä blokki tähän
+			{
+				if(itsCheckOutSectionText.empty())
+					return false;
+				else
+					return true;
+			}
+
 //			eolPos = std::find(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), '\n');
 			eolPos = std::find_if(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), EndOfLineSearcher());
 			
@@ -1269,7 +1321,7 @@ FmiLevelType NFmiSmartToolIntepreter::GetLevelType(NFmiInfoData::Type theDataTyp
 	FmiLevelType levelType = kFmiPressureLevel; // default
 	if(theDataType == NFmiInfoData::kEditable)
 	{
-		NFmiSmartInfo *editedInfo = itsInfoOrganizer->EditedInfo();
+		NFmiSmartInfo *editedInfo = itsInfoOrganizer ? itsInfoOrganizer->EditedInfo() : 0;
 		if(editedInfo)
 		{
 			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
