@@ -1,38 +1,41 @@
-/**********************************************************
-// C++ Class Name : NFmiInfoOrganizer 
-// ---------------------------------------------------------
-// Filetype: (SOURCE)
-// Filepath: D:/projekti/GDPro/GDTemp/NFmiInfoOrganizer.cpp 
-// 
-// 
-// GDPro Properties 
-// ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 2.1.4 ) 
-//  - GD System Name    : Met-editor Plan 2 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : Markon ehdotus 
-// ---------------------------------------------------  
-//  Author         : pietarin 
-//  Creation Date  : Tues - Feb 9, 1999 
-// 
-// 
-//  Description: 
-//   Sisältää mahdollisesti listan infoja, joista 
-//   luokka osaa antaa tarvittavan
-//   infon pointterin parametrin nimellä. Listalla 
-//   ei ole järjestystä.
-// 
-//  Change Log: 
-// 1999.08.26/Marko	Laitoin organizeriin eri tyyppisten datojen talletuksen
-//					mahdollisuuden. Editoitavaa dataa voi olla vain yksi, mutta 
-//					katsottavaa/maskattavaa dataa voi olla useita erilaisia ja statio-
-//					näärisiä (esim. topografia) datoja voi olla myös useita erilaisia. 
-// 1999.08.26/Marko	Laitoin level tiedon DrawParam:in luonti-kutsuun varten.
-// 1999.09.22/Marko	DrawParamin luonnissa otetaan huomioon datan tyyppi tästälähtien.
-// 1999.09.22/Marko	Lisäsin EditedDatan kopion, jota käytetään visualisoimaan dataan tehtyjä muutoksia.
-// 
-//**********************************************************
+// ======================================================================
+/*!
+ * C++ Class Name : NFmiInfoOrganizer 
+ * ---------------------------------------------------------
+ * Filetype: (SOURCE)
+ * Filepath: D:/projekti/GDPro/GDTemp/NFmiInfoOrganizer.cpp 
+ * 
+ * 
+ * GDPro Properties 
+ * ---------------------------------------------------
+ *  - GD Symbol Type    : CLD_Class 
+ *  - GD Method         : UML ( 2.1.4 ) 
+ *  - GD System Name    : Met-editor Plan 2 
+ *  - GD View Type      : Class Diagram 
+ *  - GD View Name      : Markon ehdotus 
+ * ---------------------------------------------------  
+ *  Author         : pietarin 
+ *  Creation Date  : Tues - Feb 9, 1999 
+ * 
+ * 
+ *  Description: 
+ *   Sisältää mahdollisesti listan infoja, joista 
+ *   luokka osaa antaa tarvittavan
+ *   infon pointterin parametrin nimellä. Listalla 
+ *   ei ole järjestystä.
+ * 
+ *  Change Log: 
+ * 1999.08.26/Marko	Laitoin organizeriin eri tyyppisten datojen talletuksen
+ *					mahdollisuuden. Editoitavaa dataa voi olla vain yksi, mutta 
+ *					katsottavaa/maskattavaa dataa voi olla useita erilaisia ja statio-
+ *					näärisiä (esim. topografia) datoja voi olla myös useita erilaisia. 
+ * 1999.08.26/Marko	Laitoin level tiedon DrawParam:in luonti-kutsuun varten.
+ * 1999.09.22/Marko	DrawParamin luonnissa otetaan huomioon datan tyyppi tästälähtien.
+ * 1999.09.22/Marko	Lisäsin EditedDatan kopion, jota käytetään visualisoimaan dataan tehtyjä muutoksia.
+ * 
+ */
+// ======================================================================
+
 #ifdef WIN32
 #pragma warning(disable : 4786) // poistaa n kpl VC++ kääntäjän varoitusta (liian pitkä nimi >255 merkkiä joka johtuu 'puretuista' STL-template nimistä)
 #endif

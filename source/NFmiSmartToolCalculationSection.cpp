@@ -1,24 +1,27 @@
-/**********************************************************
-// C++ Class Name : NFmiSmartToolCalculationSection 
-// ---------------------------------------------------------
-// Filetype: (SOURCE)
-// Filepath: G:/siirto/marko/oc/NFmiSmartToolCalculationSection.cpp 
-// 
-// 
-// GDPro Properties 
-// ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 4.0 ) 
-//  - GD System Name    : aSmartTools 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : smarttools 1 
-// ---------------------------------------------------  
-//  Author         : pietarin 
-//  Creation Date  : Thur - Jun 20, 2002 
-// 
-//  Change Log     : 
-// 
-//**********************************************************
+// ======================================================================
+/*!
+ * C++ Class Name : NFmiSmartToolCalculationSection 
+ * ---------------------------------------------------------
+ * Filetype: (SOURCE)
+ * Filepath: G:/siirto/marko/oc/NFmiSmartToolCalculationSection.cpp 
+ * 
+ * 
+ * GDPro Properties 
+ * ---------------------------------------------------
+ *  - GD Symbol Type    : CLD_Class 
+ *  - GD Method         : UML ( 4.0 ) 
+ *  - GD System Name    : aSmartTools 
+ *  - GD View Type      : Class Diagram 
+ *  - GD View Name      : smarttools 1 
+ * ---------------------------------------------------  
+ *  Author         : pietarin 
+ *  Creation Date  : Thur - Jun 20, 2002 
+ * 
+ *  Change Log     : 
+ * 
+ */
+// ======================================================================
+
 #ifdef WIN32
 #pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
 #endif
