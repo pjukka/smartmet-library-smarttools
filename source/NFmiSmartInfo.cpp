@@ -192,7 +192,7 @@ void NFmiSmartInfo::DestroyData(void)
 // * fDirty (asetetaan aina puhtaaksi) 
 // * fEditable 
 // * itsPriority
-NFmiSmartInfo* NFmiSmartInfo::Clone(void)
+NFmiSmartInfo* NFmiSmartInfo::Clone(void) const
 {
 	if(this != 0)
 	{
@@ -213,7 +213,7 @@ NFmiSmartInfo* NFmiSmartInfo::Clone(void)
 		copy->itsUndoTable = 0;
 		copy->itsUndoTextTable = 0;
 
-		copy->SetDescriptors(this, false);
+		copy->SetDescriptors(const_cast<NFmiSmartInfo *>(this), false);
 
 		return copy;
 	}
@@ -654,7 +654,7 @@ void NFmiSmartInfo::MaskLocation (const bool& newState,
 	(*itsAreaMask)->Mask(LocationIndex(),newState, theMaskType);
 }
 
-void NFmiSmartInfo::MaskType(const unsigned long& theMaskType)
+void NFmiSmartInfo::MaskType(unsigned long theMaskType)
 {
 	(*itsAreaMask)->MaskType(theMaskType);
 }

@@ -47,7 +47,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	NFmiSmartInfo (const NFmiSmartInfo & theInfo); 
 	~NFmiSmartInfo();
 	
-	NFmiSmartInfo* Clone(void);
+	NFmiSmartInfo* Clone(void) const;
 	void AreaMask(NFmiUndoableMultiLevelMask* theAreaMask);
 	int MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea);
 	bool MaskByArea(const NFmiArea &theArea, unsigned long theMaskType);
@@ -65,7 +65,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 
 	bool IsMaskedLocation (unsigned long theMaskType) const;
 
-	void MaskType(const unsigned long& theMaskType);
+	void MaskType(unsigned long theMaskType);
 	unsigned long MaskType(void);
 
 	const NFmiBitMask& LocationMask (unsigned long theMaskType) const; 
