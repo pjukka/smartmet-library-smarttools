@@ -277,7 +277,7 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::vector<int>&
 			if(*(Current()->EditParam().GetProducer()) == theProducer)
 				if(*Current()->Info()->Level() == *theLevel)
 				{
-					it = std::find(tmpParIdList.begin(), tmpParIdList.end(), Current()->EditParam().GetParamIdent());
+					it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->EditParam().GetParamIdent()));
 					if(it == tmpParIdList.end())
 						Remove(fDeleteData);
 					else
@@ -292,7 +292,7 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::vector<int>&
 			{
 				if(*(Current()->EditParam().GetProducer()) == theProducer)
 				{
-					it = std::find(tmpParIdList.begin(), tmpParIdList.end(), Current()->EditParam().GetParamIdent());
+					it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->EditParam().GetParamIdent()));
 					if(it == tmpParIdList.end())
 						Remove(fDeleteData);
 					else
