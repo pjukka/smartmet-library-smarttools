@@ -163,6 +163,8 @@ bool NFmiDrawParamFactory::Init()
 NFmiString NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool fCrossSectionCase)
 {
 	NFmiString fileName(itsLoadDirectory);
+	if(itsLoadDirectory.GetLen() > 0)
+		fileName += "/";  // laitetaan varmuuden vuoksi keno, jos asetetun polun lopussa ei ole kenoa
 	fileName += "DrawParam_";
 
 	if(drawParam)
