@@ -90,7 +90,7 @@ float NFmiSmartToolCalculation::GetInsideLimitsValue(float theValue)
 void NFmiSmartToolCalculation::SetLimits(float theLowerLimit, float theUpperLimit)
 {
 	if(theLowerLimit >= theUpperLimit)
-		 throw NFmiSmartToolCalculation::Exception("Parametrin max ja min rajat ovat v‰‰rin p‰in.");
+		 throw runtime_error("Parametrin max ja min rajat ovat v‰‰rin p‰in.");
 	else
 	{
 		itsLowerLimit = theLowerLimit;
@@ -151,11 +151,11 @@ double NFmiSmartToolCalculation::eval_exp(const NFmiPoint &theLatlon, const NFmi
 
 	get_token();
 	if(!token || token->GetCalculationOperationType() == NFmiAreaMask::NoType || token->GetCalculationOperationType() == NFmiAreaMask::EndOfOperations) 
-		throw  NFmiSmartToolCalculation::Exception(string("Virheellinen laskusuoritus yritys, ei laskuja ollenkaan: \n") + GetCalculationText());
+		throw  runtime_error(string("Virheellinen laskusuoritus yritys, ei laskuja ollenkaan: \n") + GetCalculationText());
 
 	eval_exp1(result, theLatlon, theTime, theTimeIndex);
 	if(token->GetCalculationOperationType() != NFmiAreaMask::EndOfOperations) 
-		throw  NFmiSmartToolCalculation::Exception(string("Virheellinen laskusuoritus yritys, lasku ei loppunut kuin olisi pit‰nyt: \n") + GetCalculationText());
+		throw  runtime_error(string("Virheellinen laskusuoritus yritys, lasku ei loppunut kuin olisi pit‰nyt: \n") + GetCalculationText());
 	return result;
 }
 
@@ -289,7 +289,7 @@ void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLat
 		eval_exp2(result, theLatlon, theTime, theTimeIndex);
 //		if(*token != ')')
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis)
-			throw  NFmiSmartToolCalculation::Exception(string("Sulut eiv‰t ole oikein laskussa: \n") + GetCalculationText());
+			throw  runtime_error(string("Sulut eiv‰t ole oikein laskussa: \n") + GetCalculationText());
 		get_token();
 	}
 	else if(token->GetCalculationOperationType() == NFmiAreaMask::MathFunctionStart)
@@ -299,7 +299,7 @@ void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLat
 		eval_exp2(result, theLatlon, theTime, theTimeIndex);
 //		if(*token != ')')
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
-			throw  NFmiSmartToolCalculation::Exception(string("Sulut eiv‰t ole oikein laskussa matemaattisen funktion yhteydess‰: \n") + GetCalculationText());
+			throw  runtime_error(string("Sulut eiv‰t ole oikein laskussa matemaattisen funktion yhteydess‰: \n") + GetCalculationText());
 		eval_math_function(result, function);
 		get_token();
 	}
@@ -378,7 +378,7 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
 		  result = (static_cast<double>(rand()) / RAND_MAX) * result; // palauttaa luvun 0 ja result:in v‰lilt‰
 		  break;
 		default:
-		  throw  NFmiSmartToolCalculation::Exception(string("Outo matemaattinen funktio, ohjelmointi vika: \n") + GetCalculationText());
+		  throw  runtime_error(string("Outo matemaattinen funktio, ohjelmointi vika: \n") + GetCalculationText());
 		}
 	}
 }
@@ -401,7 +401,7 @@ void NFmiSmartToolCalculation::atom(double &result, const NFmiPoint &theLatlon, 
 		get_token();
 		return;
 	default:
-		throw  NFmiSmartToolCalculation::Exception(string("Muutuja/funktio puuttuu laskusta: ") + GetCalculationText());
+		throw  runtime_error(string("Muutuja/funktio puuttuu laskusta: ") + GetCalculationText());
 	}
 }
 
@@ -427,11 +427,11 @@ bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiPoint &theLatlon, const NF
 
 	get_token();
 	if(!token || token->GetCalculationOperationType() == NFmiAreaMask::NoType || token->GetCalculationOperationType() == NFmiAreaMask::EndOfOperations) 
-		throw  NFmiSmartToolCalculation::Exception(string("Virheellinen laskusuoritus yritys, ei laskuja ollenkaan: \n") + GetCalculationText());
+		throw  runtime_error(string("Virheellinen laskusuoritus yritys, ei laskuja ollenkaan: \n") + GetCalculationText());
 
 	bin_eval_exp1(maskresult, result, theLatlon, theTime, theTimeIndex);
 	if(token->GetCalculationOperationType() != NFmiAreaMask::EndOfOperations) 
-		throw  NFmiSmartToolCalculation::Exception(string("Virheellinen maskin-laskusuoritus yritys, Lasku ei loppunutkaan kuin olisi pit‰nyt: \n") + GetCalculationText());
+		throw  runtime_error(string("Virheellinen maskin-laskusuoritus yritys, Lasku ei loppunutkaan kuin olisi pit‰nyt: \n") + GetCalculationText());
 	return maskresult;
 }
 
@@ -497,7 +497,7 @@ void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult, double &result,
 			maskresult = (maskresult || tempmask);
 			break;
 		default:
-			throw  NFmiSmartToolCalculation::Exception(string("Outo  bin‰‰ri-operaattori maskissa:\n") + GetCalculationText());
+			throw  runtime_error(string("Outo  bin‰‰ri-operaattori maskissa:\n") + GetCalculationText());
 		}
 	}
 }
@@ -544,7 +544,7 @@ void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result,
 				maskresult = (result != temp);
 				break;
 			  default:
-				throw  NFmiSmartToolCalculation::Exception(string("Outo vertailu operaattori maskissa:\n") + GetCalculationText());
+				throw  runtime_error(string("Outo vertailu operaattori maskissa:\n") + GetCalculationText());
 			  }
 		  }
 	}
@@ -639,7 +639,7 @@ void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, c
 		bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
 //		if(*token != ')')
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis)
-			throw  NFmiSmartToolCalculation::Exception(string("Sulut eiv‰t ole oikein laskussa: ") + GetCalculationText());
+			throw  runtime_error(string("Sulut eiv‰t ole oikein laskussa: ") + GetCalculationText());
 		get_token();
 	}
 	else if(token->GetCalculationOperationType() == NFmiAreaMask::MathFunctionStart)
@@ -649,7 +649,7 @@ void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, c
 		bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
 //		if(*token != ')')
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
-			throw  NFmiSmartToolCalculation::Exception(string("Sulut eiv‰t ole oikein laskussa matemaattisen funktion yhteydess‰: \n") + GetCalculationText());
+			throw  runtime_error(string("Sulut eiv‰t ole oikein laskussa matemaattisen funktion yhteydess‰: \n") + GetCalculationText());
 		eval_math_function(result, function);
 		get_token();
 	}
@@ -676,7 +676,7 @@ void NFmiSmartToolCalculation::bin_atom(bool &maskresult, double &result, const 
 		get_token();
 		return;
 	default:
-		throw  NFmiSmartToolCalculation::Exception(string("Muutuja/funktio puuttuu laskusta: ") + GetCalculationText());
+		throw  runtime_error(string("Muutuja/funktio puuttuu laskusta: ") + GetCalculationText());
 	}
 }
 
