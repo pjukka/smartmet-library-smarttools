@@ -387,7 +387,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 
 	switch(maskType)
 	{
-		case NFmiInfoAreaMask::InfoVariable:
+		case NFmiAreaMask::InfoVariable:
 			{
 			// HUOM!! Tähän vaaditaan syvä data kopio!!!
 			// JOS kyseessä on ehtolauseen muuttujasta, joka on editoitavaa dataa. 
@@ -395,7 +395,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			areaMask = new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, true);
 			break;
 			}
-		case NFmiInfoAreaMask::RampFunction:
+		case NFmiAreaMask::RampFunction:
 			{
 			NFmiInfoData::Type type = theAreaMaskInfo.GetDataType();
 			if(type != NFmiInfoData::kCalculatedValue)
@@ -410,8 +410,8 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			}
 			break;
 			}
-		case NFmiInfoAreaMask::FunctionAreaIntergration:
-		case NFmiInfoAreaMask::FunctionTimeIntergration:
+		case NFmiAreaMask::FunctionAreaIntergration:
+		case NFmiAreaMask::FunctionTimeIntergration:
 			{
 			// HUOM!! Tähän vaaditaan syvä data kopio!!!
 			// JOS kyseessä on ehtolauseen muuttujasta, joka on editoitavaa dataa. 
@@ -429,41 +429,41 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			areaMask = new NFmiCalculationIntegrationFuction(iterator, modifier, NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, true, deepCopyCreated);
 			break;
 			}
-		case NFmiInfoAreaMask::CalculatedVariable:
+		case NFmiAreaMask::CalculatedVariable:
 			{
 			areaMask = CreateCalculatedAreaMask(theAreaMaskInfo);
 			break;
 			}
-		case NFmiInfoAreaMask::Constant:
+		case NFmiAreaMask::Constant:
 			{
 			areaMask = new NFmiCalculationConstantValue(theAreaMaskInfo.GetMaskCondition().LowerLimit());
 			break;
 			}
-		case NFmiInfoAreaMask::ModifyFactor:
+		case NFmiAreaMask::ModifyFactor:
 			{
 			areaMask = new NFmiCalculationChangeFactorArray;
 			break;
 			}
-		case NFmiInfoAreaMask::Operator:
-		case NFmiInfoAreaMask::StartParenthesis:
-		case NFmiInfoAreaMask::EndParenthesis:
+		case NFmiAreaMask::Operator:
+		case NFmiAreaMask::StartParenthesis:
+		case NFmiAreaMask::EndParenthesis:
 			{
 			areaMask = new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator());
 			break;
 			}
-		case NFmiInfoAreaMask::Comparison:
+		case NFmiAreaMask::Comparison:
 			{
 			areaMask = new NFmiCalculationSpecialCase;
 			areaMask->Condition(theAreaMaskInfo.GetMaskCondition());
 			break;
 			}
-		case NFmiInfoAreaMask::BinaryOperatorType:
+		case NFmiAreaMask::BinaryOperatorType:
 			{
 			areaMask = new NFmiCalculationSpecialCase;
 			areaMask->PostBinaryOperator(theAreaMaskInfo.GetBinaryOperator());
 			break;
 			}
-		case NFmiInfoAreaMask::MathFunctionStart:
+		case NFmiAreaMask::MathFunctionStart:
 			{
 			areaMask = new NFmiCalculationSpecialCase;
 			areaMask->SetMathFunctionType(theAreaMaskInfo.GetMathFunctionType());
@@ -503,16 +503,16 @@ NFmiDataModifier* NFmiSmartToolModifier::CreateIntegrationFuction(const NFmiArea
 	NFmiAreaMask::FunctionType func = theAreaMaskInfo.GetFunctionType();
 	switch(func)
 	{
-	case NFmiInfoAreaMask::Avg:
+	case NFmiAreaMask::Avg:
 		modifier = new NFmiDataModifierAvg;
 		break;
-	case NFmiInfoAreaMask::Min:
+	case NFmiAreaMask::Min:
 		modifier = new NFmiDataModifierMin;
 		break;
-	case NFmiInfoAreaMask::Max:
+	case NFmiAreaMask::Max:
 		modifier = new NFmiDataModifierMax;
 		break;
-	case NFmiInfoAreaMask::Sum:
+	case NFmiAreaMask::Sum:
 		modifier = new NFmiDataModifierSum;
 		break;
 		// HUOM!!!! Tee WAvg-modifier myös, joka on peritty Avg-modifieristä ja tee joku kerroin juttu painotukseen.
@@ -528,7 +528,7 @@ NFmiDataIterator* NFmiSmartToolModifier::CreateIterator(const NFmiAreaMaskInfo &
 	NFmiAreaMask::CalculationOperationType mType = theAreaMaskInfo.GetOperationType();
 	switch(mType)
 	{
-		case NFmiInfoAreaMask::FunctionAreaIntergration:
+		case NFmiAreaMask::FunctionAreaIntergration:
 			// HUOM!! NFmiRelativeDataIterator:iin pitää tehdä joustavampi 'laatikon' säätö systeemi, että laatikko ei olisi aina keskitetty
 			iterator = new NFmiRelativeDataIterator(theInfo,
 													static_cast<long>(theAreaMaskInfo.GetOffsetPoint1().X()),
@@ -538,7 +538,7 @@ NFmiDataIterator* NFmiSmartToolModifier::CreateIterator(const NFmiAreaMaskInfo &
 													static_cast<long>(theAreaMaskInfo.GetOffsetPoint2().Y()),
 													0);
 			break;
-		case NFmiInfoAreaMask::FunctionTimeIntergration:
+		case NFmiAreaMask::FunctionTimeIntergration:
 			{
 				NFmiPoint p(theAreaMaskInfo.GetOffsetPoint1());
 				iterator = new NFmiRelativeTimeIntegrationIterator(theInfo,
