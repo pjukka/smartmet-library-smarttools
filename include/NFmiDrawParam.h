@@ -34,7 +34,7 @@
 #include "NFmiParameterName.h"
 #include "NFmiDataIdent.h"
 #include "FmiNMeteditLibraryDefinitions.h"
-#include "TFmiColor.h"
+#include "NFmiColor.h"
 #include "NFmiPoint.h"
 
 #include <vector>
@@ -77,12 +77,12 @@ public:
 	int					 Priority (void){ return itsPriority; }; 
 	void				 ViewType (const FmiEditorMapViewType& theViewType) { itsViewType = theViewType; };
 	FmiEditorMapViewType ViewType (void) {return itsViewType;};
-	void				 FrameColor (const TFmiColor& theFrameColor) { itsFrameColor = theFrameColor; };
-	const TFmiColor&	 FrameColor (void) const { return itsFrameColor; };
-	void				 FillColor (const TFmiColor& theFillColor) { itsFillColor = theFillColor; };
-	const TFmiColor&	 FillColor (void) const { return itsFillColor; };
-	void				 NonModifiableColor (const TFmiColor& theNonModifiableColor) { itsNonModifiableColor = theNonModifiableColor; };
-	const TFmiColor&	 NonModifiableColor (void) const { return itsNonModifiableColor; };
+	void				 FrameColor (const NFmiColor& theFrameColor) { itsFrameColor = theFrameColor; };
+	const NFmiColor&	 FrameColor (void) const { return itsFrameColor; };
+	void				 FillColor (const NFmiColor& theFillColor) { itsFillColor = theFillColor; };
+	const NFmiColor&	 FillColor (void) const { return itsFillColor; };
+	void				 NonModifiableColor (const NFmiColor& theNonModifiableColor) { itsNonModifiableColor = theNonModifiableColor; };
+	const NFmiColor&	 NonModifiableColor (void) const { return itsNonModifiableColor; };
 	void				 RelativeSize (const NFmiPoint& theRelativeSize) { itsRelativeSize = theRelativeSize; };
 	const NFmiPoint&	 RelativeSize (void) const { return itsRelativeSize; };
 	void				 RelativePositionOffset (const NFmiPoint& theRelativePositionOffset) { itsRelativePositionOffset = theRelativePositionOffset; };
@@ -112,10 +112,10 @@ public:
 	double TimeSeriesScaleMax(void){return itsTimeSeriesScaleMax;};
 	void TimeSeriesScaleMin(double theValue){itsTimeSeriesScaleMin = theValue;};
 	void TimeSeriesScaleMax(double theValue){itsTimeSeriesScaleMax = theValue;};
-	TFmiColor IsolineColor(void){return fUseSecondaryColors ? itsSecondaryIsolineColor : itsIsolineColor;};
-	TFmiColor IsolineTextColor(void){return fUseSecondaryColors ? itsSecondaryIsolineTextColor : itsIsolineTextColor;};
-	void IsolineColor(const TFmiColor& newColor){itsIsolineColor = newColor;};
-	void IsolineTextColor(const TFmiColor& newColor){itsIsolineTextColor = newColor;};
+	NFmiColor IsolineColor(void){return fUseSecondaryColors ? itsSecondaryIsolineColor : itsIsolineColor;};
+	NFmiColor IsolineTextColor(void){return fUseSecondaryColors ? itsSecondaryIsolineTextColor : itsIsolineTextColor;};
+	void IsolineColor(const NFmiColor& newColor){itsIsolineColor = newColor;};
+	void IsolineTextColor(const NFmiColor& newColor){itsIsolineTextColor = newColor;};
 	double TimeSerialModifyingLimit(void){return fModifyingUnit ? itsTimeSerialModifyingLimit : 100;};
 	FmiEditorMapViewType StationDataViewType(void){return itsStationDataViewType;};
 	void TimeSerialModifyingLimit(double newValue){itsTimeSerialModifyingLimit = newValue;};
@@ -158,12 +158,12 @@ public:
 	void StationSymbolColorShadeMidValue(float newValue){itsStationSymbolColorShadeMidValue = newValue;}
 	float StationSymbolColorShadeHighValue(void){return itsStationSymbolColorShadeHighValue;}
 	void StationSymbolColorShadeHighValue(float newValue){itsStationSymbolColorShadeHighValue = newValue;}
-	const TFmiColor& StationSymbolColorShadeLowValueColor(void){return itsStationSymbolColorShadeLowValueColor;}
-	void StationSymbolColorShadeLowValueColor(const TFmiColor& newValue){itsStationSymbolColorShadeLowValueColor = newValue;}
-	const TFmiColor& StationSymbolColorShadeMidValueColor(void){return itsStationSymbolColorShadeMidValueColor;}
-	void StationSymbolColorShadeMidValueColor(const TFmiColor& newValue){itsStationSymbolColorShadeMidValueColor = newValue;}
-	const TFmiColor& StationSymbolColorShadeHighValueColor(void){return itsStationSymbolColorShadeHighValueColor;}
-	void StationSymbolColorShadeHighValueColor(const TFmiColor& newValue){itsStationSymbolColorShadeHighValueColor = newValue;}
+	const NFmiColor& StationSymbolColorShadeLowValueColor(void){return itsStationSymbolColorShadeLowValueColor;}
+	void StationSymbolColorShadeLowValueColor(const NFmiColor& newValue){itsStationSymbolColorShadeLowValueColor = newValue;}
+	const NFmiColor& StationSymbolColorShadeMidValueColor(void){return itsStationSymbolColorShadeMidValueColor;}
+	void StationSymbolColorShadeMidValueColor(const NFmiColor& newValue){itsStationSymbolColorShadeMidValueColor = newValue;}
+	const NFmiColor& StationSymbolColorShadeHighValueColor(void){return itsStationSymbolColorShadeHighValueColor;}
+	void StationSymbolColorShadeHighValueColor(const NFmiColor& newValue){itsStationSymbolColorShadeHighValueColor = newValue;}
 	int StationSymbolColorShadeClassCount(void){return itsStationSymbolColorShadeClassCount;}
 	void StationSymbolColorShadeClassCount(int newValue){itsStationSymbolColorShadeClassCount = newValue;}
 	bool UseSymbolsInTextMode(void){return fUseSymbolsInTextMode;}
@@ -207,12 +207,12 @@ public:
 	void SimpleIsoLineColorShadeMidValue(float newValue){itsSimpleIsoLineColorShadeMidValue = newValue;}
 	float SimpleIsoLineColorShadeHighValue(void){return itsSimpleIsoLineColorShadeHighValue;}
 	void SimpleIsoLineColorShadeHighValue(float newValue){itsSimpleIsoLineColorShadeHighValue = newValue;}
-	const TFmiColor& SimpleIsoLineColorShadeLowValueColor(void){return itsSimpleIsoLineColorShadeLowValueColor;}
-	void SimpleIsoLineColorShadeLowValueColor(const TFmiColor& newValue){itsSimpleIsoLineColorShadeLowValueColor = newValue;}
-	const TFmiColor& SimpleIsoLineColorShadeMidValueColor(void){return itsSimpleIsoLineColorShadeMidValueColor;}
-	void SimpleIsoLineColorShadeMidValueColor(const TFmiColor& newValue){itsSimpleIsoLineColorShadeMidValueColor = newValue;}
-	const TFmiColor& SimpleIsoLineColorShadeHighValueColor(void){return itsSimpleIsoLineColorShadeHighValueColor;}
-	void SimpleIsoLineColorShadeHighValueColor(const TFmiColor& newValue){itsSimpleIsoLineColorShadeHighValueColor = newValue;}
+	const NFmiColor& SimpleIsoLineColorShadeLowValueColor(void){return itsSimpleIsoLineColorShadeLowValueColor;}
+	void SimpleIsoLineColorShadeLowValueColor(const NFmiColor& newValue){itsSimpleIsoLineColorShadeLowValueColor = newValue;}
+	const NFmiColor& SimpleIsoLineColorShadeMidValueColor(void){return itsSimpleIsoLineColorShadeMidValueColor;}
+	void SimpleIsoLineColorShadeMidValueColor(const NFmiColor& newValue){itsSimpleIsoLineColorShadeMidValueColor = newValue;}
+	const NFmiColor& SimpleIsoLineColorShadeHighValueColor(void){return itsSimpleIsoLineColorShadeHighValueColor;}
+	void SimpleIsoLineColorShadeHighValueColor(const NFmiColor& newValue){itsSimpleIsoLineColorShadeHighValueColor = newValue;}
 	int SimpleIsoLineColorShadeClassCount(void){return itsSimpleIsoLineColorShadeClassCount;}
 	void SimpleIsoLineColorShadeClassCount(int newValue){itsSimpleIsoLineColorShadeClassCount = newValue;}
 	std::vector<float>& SpecialIsoLineValues(void){return itsSpecialIsoLineValues;}
@@ -241,12 +241,12 @@ public:
 	void ColorContouringColorShadeMidValue(float newValue){itsColorContouringColorShadeMidValue = newValue;}
 	float ColorContouringColorShadeHighValue(void){return itsColorContouringColorShadeHighValue;}
 	void ColorContouringColorShadeHighValue(float newValue){itsColorContouringColorShadeHighValue = newValue;}
-	const TFmiColor& ColorContouringColorShadeLowValueColor(void){return itsColorContouringColorShadeLowValueColor;}
-	void ColorContouringColorShadeLowValueColor(const TFmiColor& newValue){itsColorContouringColorShadeLowValueColor = newValue;}
-	const TFmiColor& ColorContouringColorShadeMidValueColor(void){return itsColorContouringColorShadeMidValueColor;}
-	void ColorContouringColorShadeMidValueColor(const TFmiColor& newValue){itsColorContouringColorShadeMidValueColor = newValue;}
-	const TFmiColor& ColorContouringColorShadeHighValueColor(void){return itsColorContouringColorShadeHighValueColor;}
-	void ColorContouringColorShadeHighValueColor(const TFmiColor& newValue){itsColorContouringColorShadeHighValueColor = newValue;}
+	const NFmiColor& ColorContouringColorShadeLowValueColor(void){return itsColorContouringColorShadeLowValueColor;}
+	void ColorContouringColorShadeLowValueColor(const NFmiColor& newValue){itsColorContouringColorShadeLowValueColor = newValue;}
+	const NFmiColor& ColorContouringColorShadeMidValueColor(void){return itsColorContouringColorShadeMidValueColor;}
+	void ColorContouringColorShadeMidValueColor(const NFmiColor& newValue){itsColorContouringColorShadeMidValueColor = newValue;}
+	const NFmiColor& ColorContouringColorShadeHighValueColor(void){return itsColorContouringColorShadeHighValueColor;}
+	void ColorContouringColorShadeHighValueColor(const NFmiColor& newValue){itsColorContouringColorShadeHighValueColor = newValue;}
 	int ColorContouringColorShadeClassCount(void){return itsColorContouringColorShadeClassCount;}
 	void ColorContouringColorShadeClassCount(int newValue){itsColorContouringColorShadeClassCount = newValue;}
 	bool UseWithIsoLineHatch1(void){return fUseWithIsoLineHatch1;}
@@ -259,10 +259,10 @@ public:
 	void IsoLineHatchHighValue1(float newValue){itsIsoLineHatchHighValue1 = newValue;}
 	int IsoLineHatchType1(void){return itsIsoLineHatchType1;}
 	void IsoLineHatchType1(int newValue){itsIsoLineHatchType1 = newValue;}
-	const TFmiColor& IsoLineHatchColor1(void){return itsIsoLineHatchColor1;}
-	void IsoLineHatchColor1(const TFmiColor& newValue){itsIsoLineHatchColor1 = newValue;}
-	const TFmiColor& IsoLineHatchBorderColor1(void){return itsIsoLineHatchBorderColor1;}
-	void IsoLineHatchBorderColor1(const TFmiColor& newValue){itsIsoLineHatchBorderColor1 = newValue;}
+	const NFmiColor& IsoLineHatchColor1(void){return itsIsoLineHatchColor1;}
+	void IsoLineHatchColor1(const NFmiColor& newValue){itsIsoLineHatchColor1 = newValue;}
+	const NFmiColor& IsoLineHatchBorderColor1(void){return itsIsoLineHatchBorderColor1;}
+	void IsoLineHatchBorderColor1(const NFmiColor& newValue){itsIsoLineHatchBorderColor1 = newValue;}
 
 	bool UseWithIsoLineHatch2(void){return fUseWithIsoLineHatch2;}
 	void UseWithIsoLineHatch2(bool newValue){fUseWithIsoLineHatch2 = newValue;}
@@ -274,10 +274,10 @@ public:
 	void IsoLineHatchHighValue2(float newValue){itsIsoLineHatchHighValue2 = newValue;}
 	int IsoLineHatchType2(void){return itsIsoLineHatchType2;}
 	void IsoLineHatchType2(int newValue){itsIsoLineHatchType2 = newValue;}
-	const TFmiColor& IsoLineHatchColor2(void){return itsIsoLineHatchColor2;}
-	void IsoLineHatchColor2(const TFmiColor& newValue){itsIsoLineHatchColor2 = newValue;}
-	const TFmiColor& IsoLineHatchBorderColor2(void){return itsIsoLineHatchBorderColor2;}
-	void IsoLineHatchBorderColor2(const TFmiColor& newValue){itsIsoLineHatchBorderColor2 = newValue;}
+	const NFmiColor& IsoLineHatchColor2(void){return itsIsoLineHatchColor2;}
+	void IsoLineHatchColor2(const NFmiColor& newValue){itsIsoLineHatchColor2 = newValue;}
+	const NFmiColor& IsoLineHatchBorderColor2(void){return itsIsoLineHatchBorderColor2;}
+	void IsoLineHatchBorderColor2(const NFmiColor& newValue){itsIsoLineHatchBorderColor2 = newValue;}
 	int IsoLineLabelDigitCount(void){return itsIsoLineLabelDigitCount;}
 	void IsoLineLabelDigitCount(int newValue){itsIsoLineLabelDigitCount = newValue; if(itsIsoLineLabelDigitCount > 10)itsIsoLineLabelDigitCount = 10;}
 //**************************************************************
@@ -301,14 +301,14 @@ protected:
 //  isoviiva, teksti...)
 	FmiEditorMapViewType itsViewType;
 	FmiEditorMapViewType itsStationDataViewType; // jos viewtype on isoviiva, mutta data on asema dataa, pitää olla varalla joku näyttötyyppi että voidaan piirtää tällöin
-	TFmiColor itsFrameColor;
-	TFmiColor itsFillColor;
+	NFmiColor itsFrameColor;
+	NFmiColor itsFillColor;
 
 //   Jos jonkin paikan arvo on ei-maskattu, eli 
 //   sitä ei voi muuttaa koska
 //   parametrimaskaus ei salli, väritetään data 
 //   tällä värillä (oletusarvo).
-	TFmiColor itsNonModifiableColor;
+	NFmiColor itsNonModifiableColor;
 //   Minkä kokoinen näyttöön piirrettävä 'symbolidata' 
 //   on suhteessa
 //   annettuun asemalle/hilalle varattuun 'datalaatikkoon'. 
@@ -322,10 +322,10 @@ protected:
 	double itsModifyingStep;
 	bool fModifyingUnit;	//(= 0, jos yksikkö on %, = 1, jos yksikkö on sama kuin itsUnit)
 	double itsTimeSerialModifyingLimit; // aikasarjanäytön muutos akselin minimi ja maksimi arvo
-	TFmiColor itsIsolineColor;
-	TFmiColor itsIsolineTextColor;
-	TFmiColor itsSecondaryIsolineColor;
-	TFmiColor itsSecondaryIsolineTextColor;
+	NFmiColor itsIsolineColor;
+	NFmiColor itsIsolineTextColor;
+	NFmiColor itsSecondaryIsolineColor;
+	NFmiColor itsSecondaryIsolineTextColor;
 	bool fUseSecondaryColors;
 
 	double itsAbsoluteMinValue;
@@ -352,9 +352,9 @@ protected:
 	float itsStationSymbolColorShadeLowValue; //väri skaalaus alkaa tästä arvosta
 	float itsStationSymbolColorShadeMidValue; //väri skaalauksen keskiarvo
 	float itsStationSymbolColorShadeHighValue; //väri skaalaus loppuu tähän arvoon
-	TFmiColor itsStationSymbolColorShadeLowValueColor;
-	TFmiColor itsStationSymbolColorShadeMidValueColor;
-	TFmiColor itsStationSymbolColorShadeHighValueColor;
+	NFmiColor itsStationSymbolColorShadeLowValueColor;
+	NFmiColor itsStationSymbolColorShadeMidValueColor;
+	NFmiColor itsStationSymbolColorShadeHighValueColor;
 	int itsStationSymbolColorShadeClassCount; // kuinka monta väri luokkaa tehdään skaalaukseen
 	bool fUseSymbolsInTextMode; // käytetäänkö tekstiä vai mapataanko arvoja kohden jokin symboli ruudulle?
 	int itsUsedSymbolListIndex; // 0=ei mitään, 1=synopfont, 2=hessaa, ...
@@ -378,9 +378,9 @@ protected:
 	float itsSimpleIsoLineColorShadeLowValue; //väri skaalaus alkaa tästä arvosta
 	float itsSimpleIsoLineColorShadeMidValue; //väri skaalauksen keskiarvo
 	float itsSimpleIsoLineColorShadeHighValue; //väri skaalaus loppuu tähän arvoon
-	TFmiColor itsSimpleIsoLineColorShadeLowValueColor;
-	TFmiColor itsSimpleIsoLineColorShadeMidValueColor;
-	TFmiColor itsSimpleIsoLineColorShadeHighValueColor;
+	NFmiColor itsSimpleIsoLineColorShadeLowValueColor;
+	NFmiColor itsSimpleIsoLineColorShadeMidValueColor;
+	NFmiColor itsSimpleIsoLineColorShadeHighValueColor;
 	int itsSimpleIsoLineColorShadeClassCount; // kuinka monta väri luokkaa tehdään skaalaukseen
 // speciaali isoviiva asetukset (otetaan käyttöön, jos fUseSimpleIsoLineDefinitions=false)
 	std::vector<float> itsSpecialIsoLineValues; // tähän laitetaan kaikki arvot, johon halutaan isoviiva
@@ -397,9 +397,9 @@ protected:
 	float itsColorContouringColorShadeLowValue; //väri skaalaus alkaa tästä arvosta
 	float itsColorContouringColorShadeMidValue; //väri skaalauksen keskiarvo
 	float itsColorContouringColorShadeHighValue; //väri skaalaus loppuu tähän arvoon
-	TFmiColor itsColorContouringColorShadeLowValueColor;
-	TFmiColor itsColorContouringColorShadeMidValueColor;
-	TFmiColor itsColorContouringColorShadeHighValueColor;
+	NFmiColor itsColorContouringColorShadeLowValueColor;
+	NFmiColor itsColorContouringColorShadeMidValueColor;
+	NFmiColor itsColorContouringColorShadeHighValueColor;
 	int itsColorContouringColorShadeClassCount; // kuinka monta väri luokkaa tehdään skaalaukseen
 // isoviivojen kanssa voi käyttää myös hatchättyjä alueita (2 kpl)
 	bool fUseWithIsoLineHatch1;
@@ -407,15 +407,15 @@ protected:
 	float itsIsoLineHatchLowValue1; // hatch alueen ala-arvo
 	float itsIsoLineHatchHighValue1; // hatch alueen yläarvo
 	int itsIsoLineHatchType1; // hatch tyyppi 1=vinoviiva oikealle, 2=vinoviiva vasemmalle jne.
-	TFmiColor itsIsoLineHatchColor1;
-	TFmiColor itsIsoLineHatchBorderColor1;
+	NFmiColor itsIsoLineHatchColor1;
+	NFmiColor itsIsoLineHatchBorderColor1;
 	bool fUseWithIsoLineHatch2;
 	bool fDrawIsoLineHatchWithBorders2;
 	float itsIsoLineHatchLowValue2; // hatch alueen ala-arvo
 	float itsIsoLineHatchHighValue2; // hatch alueen yläarvo
 	int itsIsoLineHatchType2; // hatch tyyppi 1=vinoviiva oikealle, 2=vinoviiva vasemmalle jne.
-	TFmiColor itsIsoLineHatchColor2;
-	TFmiColor itsIsoLineHatchBorderColor2;
+	NFmiColor itsIsoLineHatchColor2;
+	NFmiColor itsIsoLineHatchBorderColor2;
 	int itsIsoLineLabelDigitCount; // isoviiva labelin näytettävien digitaalien lukumäärä 
 //***********************************************
 //********** 'versio 2' parametreja *************

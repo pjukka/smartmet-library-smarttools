@@ -44,9 +44,9 @@ NFmiDrawParam::NFmiDrawParam()
 , itsPriority(1)
 , itsViewType							 (kFmiIsoLineView)
 , itsStationDataViewType				 (kFmiTextView)
-, itsFrameColor						     (TFmiColor(0.,0.,0.)) // musta
-, itsFillColor						     (TFmiColor(0.,0.,0.)) // musta
-, itsNonModifiableColor				     (TFmiColor(0.,0.,0.)) // musta
+, itsFrameColor						     (NFmiColor(0.,0.,0.)) // musta
+, itsFillColor						     (NFmiColor(0.,0.,0.)) // musta
+, itsNonModifiableColor				     (NFmiColor(0.,0.,0.)) // musta
 , itsRelativeSize                        (NFmiPoint(1,1))
 , itsRelativePositionOffset              (NFmiPoint(0,0))
 , itsOnlyOneSymbolRelativeSize           (NFmiPoint(1,1))
@@ -56,8 +56,8 @@ NFmiDrawParam::NFmiDrawParam()
 , itsModifyingStep                       (1.)
 , fModifyingUnit						 (true)
 , itsTimeSerialModifyingLimit(10)
-, itsIsolineColor						(TFmiColor(0.,0.,0.))
-, itsIsolineTextColor					(TFmiColor(0.,0.,0.))
+, itsIsolineColor						(NFmiColor(0.,0.,0.))
+, itsIsolineTextColor					(NFmiColor(0.,0.,0.))
 , itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
 , itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
 , fUseSecondaryColors(false)
@@ -173,9 +173,9 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , itsPriority(thePriority)
 , itsViewType							 (kFmiIsoLineView)
 , itsStationDataViewType				 (kFmiTextView)
-, itsFrameColor						     (TFmiColor(0.,0.,0.)) // musta
-, itsFillColor						     (TFmiColor(0.,0.,0.)) // musta
-, itsNonModifiableColor				     (TFmiColor(0.,0.,0.)) // musta
+, itsFrameColor						     (NFmiColor(0.,0.,0.)) // musta
+, itsFillColor						     (NFmiColor(0.,0.,0.)) // musta
+, itsNonModifiableColor				     (NFmiColor(0.,0.,0.)) // musta
 , itsRelativeSize                        (NFmiPoint(1,1))
 , itsRelativePositionOffset              (NFmiPoint(0,0))
 , itsOnlyOneSymbolRelativeSize           (NFmiPoint(1,1))
@@ -185,8 +185,8 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , itsModifyingStep                       (1.)
 , fModifyingUnit						 (true)
 , itsTimeSerialModifyingLimit(10)
-, itsIsolineColor						(TFmiColor(0.,0.,0.))
-, itsIsolineTextColor					(TFmiColor(0.,0.,0.))
+, itsIsolineColor						(NFmiColor(0.,0.,0.))
+, itsIsolineTextColor					(NFmiColor(0.,0.,0.))
 , itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
 , itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
 , fUseSecondaryColors(false)
@@ -298,9 +298,9 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 , itsPriority(thePriority)
 , itsViewType							 (kFmiIsoLineView)
 , itsStationDataViewType				 (kFmiTextView)
-, itsFrameColor						     (TFmiColor(0.,0.,0.)) // musta
-, itsFillColor						     (TFmiColor(0.,0.,0.)) // musta
-, itsNonModifiableColor				     (TFmiColor(0.,0.,0.)) // musta
+, itsFrameColor						     (NFmiColor(0.,0.,0.)) // musta
+, itsFillColor						     (NFmiColor(0.,0.,0.)) // musta
+, itsNonModifiableColor				     (NFmiColor(0.,0.,0.)) // musta
 , itsRelativeSize                        (NFmiPoint(1,1))
 , itsRelativePositionOffset              (NFmiPoint(0,0))
 , itsOnlyOneSymbolRelativeSize           (NFmiPoint(1,1))
@@ -310,8 +310,8 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 , itsModifyingStep                       (1.)
 , fModifyingUnit						 (true)
 , itsTimeSerialModifyingLimit(10)
-, itsIsolineColor						(TFmiColor(0.,0.,0.))
-, itsIsolineTextColor					(TFmiColor(0.,0.,0.))
+, itsIsolineColor						(NFmiColor(0.,0.,0.))
+, itsIsolineTextColor					(NFmiColor(0.,0.,0.))
 , itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
 , itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
 , fUseSecondaryColors(false)
@@ -422,8 +422,6 @@ NFmiDrawParam::~NFmiDrawParam(void)
 //-------------------------------------------------------
 // Init
 //-------------------------------------------------------
-// Kopioi kaikki DrawParamEditorDlg -dialogissa tarvittavat
-// attribuutit.
 void NFmiDrawParam::Init(NFmiDrawParam* theDrawParam)
 {
 	if(theDrawParam)
@@ -434,9 +432,9 @@ void NFmiDrawParam::Init(NFmiDrawParam* theDrawParam)
 		itsViewType = theDrawParam->ViewType();
 		itsStationDataViewType = theDrawParam->StationDataViewType();
 
-		itsFrameColor = TFmiColor(theDrawParam->FrameColor());
-		itsFillColor = TFmiColor(theDrawParam->FillColor());
-		itsNonModifiableColor = TFmiColor(theDrawParam->NonModifiableColor());
+		itsFrameColor = NFmiColor(theDrawParam->FrameColor());
+		itsFillColor = NFmiColor(theDrawParam->FillColor());
+		itsNonModifiableColor = NFmiColor(theDrawParam->NonModifiableColor());
 
 		itsRelativeSize = NFmiPoint(theDrawParam->RelativeSize());
 		itsRelativePositionOffset = NFmiPoint(theDrawParam->RelativePositionOffset());
