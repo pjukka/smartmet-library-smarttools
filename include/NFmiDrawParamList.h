@@ -64,7 +64,7 @@ public:
 	void            Clear (const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved, bool fDeleteData = false);
 	bool      Add (NFmiDrawParam * theParam);
 	bool      Add (NFmiDrawParam * theParam, unsigned long theIndex);
-	bool      Replace(NFmiDrawParam * theParam, bool fUseOnlyParamId = false); // tuhoaa vanhan, jos löytyy, ja lisää perään
+	bool      Replace(NFmiDrawParam * theParam, bool fUseOnlyParamId, bool fInitNewDrawParamFromListFirst); // tuhoaa vanhan, jos löytyy, ja lisää perään
 	bool      Remove (bool fDeleteData = false);
 	bool      Index(unsigned long index);
 	bool		Find(NFmiDrawParam* item);

@@ -93,12 +93,16 @@ bool NFmiDrawParamList::Add(NFmiDrawParam * theParam, unsigned long theIndex)
 // Replace 
 //--------------------------------------------------------
 // tuhoaa vanhan, jos löytyy, ja lisää perään
-bool NFmiDrawParamList::Replace(NFmiDrawParam * theParam, bool fUseOnlyParamId)
+bool NFmiDrawParamList::Replace(NFmiDrawParam * theParam, bool fUseOnlyParamId, bool fInitNewDrawParamFromListFirst)
 {
-	if(theParam->Info())
+	if(theParam && theParam->Info())
 	{
 		if(Find(theParam->Param(), theParam->Info()->Level(), theParam->Info()->DataType(), fUseOnlyParamId))
+		{
+			if(fInitNewDrawParamFromListFirst)
+				theParam->Init(Current()); // näin muutokset eivät mene haluttaessa hukkaan kun vaihdetaan drawparamin 'dataa'. Tämähän on varsinaisesti drawparamissa olevan datan päivitystä, eikä piirto-ominaisuuksien korvaamista 
 			Remove(true);
+		}
 		return Add(theParam);
 	}
 	return false;
