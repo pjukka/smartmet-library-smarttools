@@ -477,13 +477,13 @@ void NFmiInfoOrganizer::ClearData(NFmiInfoData::Type theDataType)
 	}
 }
 
-void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo)
+void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData::Type theDataType)
 {
 	if(theInfo)
 	{
 		if(itsEditedData)
 		{
-			if(IsInfosTwoOfTheKind(theInfo, itsEditedData))
+			if(IsInfosTwoOfTheKind(theInfo, theDataType, itsEditedData, itsEditedData->DataType()))
 			{
 				itsEditedData->DestroySharedData();
 				delete itsEditedData;
@@ -494,7 +494,7 @@ void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo)
 
 		for(Reset(); Next(); )
 		{
-			if(IsInfosTwoOfTheKind(theInfo, Current()))
+			if(IsInfosTwoOfTheKind(theInfo, theDataType, Current(), Current()->DataType()))
 			{
 				Current()->DestroySharedData();
 				Remove();
@@ -516,26 +516,32 @@ int NFmiInfoOrganizer::CountData(void)
 
 // this kind of määritellään tällä hetkellä:
 // parametrien, leveleiden ja mahdollisen gridin avulla (ei location bagin avulla)
-bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiQueryInfo* theInfo2)
+bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, NFmiQueryInfo* theInfo2, NFmiInfoData::Type theType2)
 {
 	// parametrit ja tuottajat samoja
-	if(theInfo1 && theInfo2 && theInfo1->ParamBag() == theInfo2->ParamBag()) 
+	if(theInfo1 && theInfo2)
 	{
-		// level jutut samoja
-		if(theInfo1->VPlaceDescriptor() == theInfo2->VPlaceDescriptor())
+		if(theType1 == theType2)
 		{
-			// mahdollinen gridi samoja
-			bool status3 = true;
-			if(theInfo1->Grid() && theInfo2->Grid())
+			if(theInfo1->ParamBag() == theInfo2->ParamBag()) 
 			{
-				status3 = (theInfo1->Grid()->AreGridsIdentical(*theInfo2->Grid())) == true;
-			}
-			if(status3)
-			{
-				theInfo1->FirstParam(); // varmistaa, että producer löytyy
-				theInfo2->FirstParam();
-				if(*theInfo1->Producer() == *theInfo2->Producer())
-					return true;
+				// level jutut samoja
+				if(theInfo1->VPlaceDescriptor() == theInfo2->VPlaceDescriptor())
+				{
+					// mahdollinen gridi samoja
+					bool status3 = true;
+					if(theInfo1->Grid() && theInfo2->Grid())
+					{
+						status3 = (theInfo1->Grid()->AreGridsIdentical(*theInfo2->Grid())) == true;
+					}
+					if(status3)
+					{
+						theInfo1->FirstParam(); // varmistaa, että producer löytyy
+						theInfo2->FirstParam();
+						if(*theInfo1->Producer() == *theInfo2->Producer())
+							return true;
+					}
+				}
 			}
 		}
 	}

@@ -108,7 +108,7 @@ class NFmiInfoOrganizer
 
 	bool Clear (void);
 	void ClearData(NFmiInfoData::Type theDataType);
-	void ClearThisKindOfData(NFmiQueryInfo* theInfo);
+	void ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData::Type theDataType);
  	NFmiProducerList* ProducerList(void); // käy läpi kaikki SmartInfot ja pyytää ensimmäiseltä parametrilta tuottajan (vielä ainakaan SmartInfolla ei ole montaa tuottajaa)
 	NFmiLevelBag* GetAndCreateViewableInfoWithManyLevelsOrZeroPointer(void);
 
@@ -118,7 +118,7 @@ class NFmiInfoOrganizer
  private:
 	int CountData(void);
  	bool Remove(void);	
-	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiQueryInfo* theInfo2);
+	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, NFmiQueryInfo* theInfo2, NFmiInfoData::Type theType2);
 
  public: // nämä ovat pikaviritys käytössä nämä metodit pitäisi laittaa takaisin privateiksi
 	bool Reset (void);
