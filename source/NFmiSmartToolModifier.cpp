@@ -527,12 +527,20 @@ NFmiDataIterator* NFmiSmartToolModifier::CreateIterator(const NFmiAreaMaskInfo &
 	{
 		case NFmiInfoAreaMask::FunctionAreaIntergration:
 			// HUOM!! NFmiRelativeDataIterator:iin pitää tehdä joustavampi 'laatikon' säätö systeemi, että laatikko ei olisi aina keskitetty
-			iterator = new NFmiRelativeDataIterator(theInfo, theAreaMaskInfo.GetOffsetPoint1().X(), theAreaMaskInfo.GetOffsetPoint1().Y(), 0, theAreaMaskInfo.GetOffsetPoint2().X(), theAreaMaskInfo.GetOffsetPoint2().Y(), 0);
+			iterator = new NFmiRelativeDataIterator(theInfo,
+													static_cast<long>(theAreaMaskInfo.GetOffsetPoint1().X()),
+													static_cast<long>(theAreaMaskInfo.GetOffsetPoint1().Y()),
+													0,
+													static_cast<long>(theAreaMaskInfo.GetOffsetPoint2().X()),
+													static_cast<long>(theAreaMaskInfo.GetOffsetPoint2().Y()),
+													0);
 			break;
 		case NFmiInfoAreaMask::FunctionTimeIntergration:
 			{
 				NFmiPoint p(theAreaMaskInfo.GetOffsetPoint1());
-				iterator = new NFmiRelativeTimeIntegrationIterator(theInfo, p.Y() - p.X() + 1, p.X());
+				iterator = new NFmiRelativeTimeIntegrationIterator(theInfo,
+																   static_cast<int>(p.Y() - p.X() + 1),
+																   static_cast<int>(p.X()));
 				break;
 			}
 	default:
