@@ -1305,6 +1305,8 @@ bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVari
 		theMaskInfo->SetUseDefaultProducer(false);
 		if(fUseWildDataType)
 			theMaskInfo->SetDataType(NFmiInfoData::kAnyData);
+		else if(theProducer.GetIdent() == 999) // t‰m‰ 999 on viritys, mutta se on m‰‰r‰tty helpdatainfo.dat tiedostossa kepa-datan feikki id numeroksi. Oikeaa id:t‰ ei voi k‰ytt‰‰, koska se on sama kuin editoitavalla datalla.
+			theMaskInfo->SetDataType(NFmiInfoData::kKepaData);
 		else
 			theMaskInfo->SetDataType(theDataType);
 		return true;
@@ -1842,7 +1844,7 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("FHour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia k‰ytetty, koska ei ollut valmista parametria
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("Fhour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia k‰ytetty, koska ei ollut valmista parametria
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("fhour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia k‰ytetty, koska ei ollut valmista parametria
-		
+
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("HIR"), kFmiMTAHIRMESO));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Hir"), kFmiMTAHIRMESO));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("hir"), kFmiMTAHIRMESO));
@@ -1852,9 +1854,9 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 //		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("SYNOP"), kFmiSYNOP));
 //		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Synop"), kFmiSYNOP));
 //		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("synop"), kFmiSYNOP));
-//		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("MET"), kFmiMETEOR));
-//		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Met"), kFmiMETEOR));
-//		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("met"), kFmiMETEOR));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("MET"), static_cast<FmiProducerName>(999))); // 999 on m‰‰ritelty helpdatainfo.dat tiedostossa viimeksi editoidun datan kohdalla (feikki tuottaja id:n kohdalla)
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Met"), static_cast<FmiProducerName>(999)));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("met"), static_cast<FmiProducerName>(999)));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ORIG"), kFmiMETEOR)); // tuottaja id:ll‰ ei ole v‰li‰ t‰ss‰ oikeasti
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Orig"), kFmiMETEOR));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("orig"), kFmiMETEOR));
