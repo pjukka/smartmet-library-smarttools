@@ -25,6 +25,8 @@
 #ifndef  NFMISMARTTOOLMODIFIER_H
 #define  NFMISMARTTOOLMODIFIER_H
 
+#include "NFmiParamBag.h"
+
 #include <string>
 #include <vector>
 
@@ -65,6 +67,8 @@ public:
 	const std::string& GetErrorText(void) const {return itsErrorText;}
 	const std::string& IncludeDirectory(void) const {return itsIncludeDirectory;}
 	void IncludeDirectory(const std::string& newValue) {itsIncludeDirectory = newValue;}
+	NFmiParamBag ModifiedParams(void);
+	const std::string& GetStrippedMacroText(void) const;
 
 private:
 	NFmiSmartInfo* CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent);
