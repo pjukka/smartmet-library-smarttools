@@ -47,7 +47,7 @@
 #include "NFmiAreaMask.h"
 //#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiProducer.h"
-#include "NFmiLeveltype.h"
+#include "NFmiLevelType.h"
 
 #include <string>
 #include <vector>
