@@ -86,7 +86,7 @@ unsigned long NFmiMultiLevelMask::MaskType(void) const
 //--------------------------------------------------------
 // MaskType
 //--------------------------------------------------------
-void NFmiMultiLevelMask::MaskType (const unsigned long& theMaskType)
+void NFmiMultiLevelMask::MaskType (unsigned long theMaskType)
 {
 	itsMaskType = theMaskType;
 	return;
@@ -106,7 +106,7 @@ const unsigned long& NFmiMultiLevelMask::MaskSize(void) const
 //   newState:n mukaiseksi.
 //   Se mikä/mitkä maskit asetetaan , riippuu 
 //   itsMaskType:n arvosta.
-void NFmiMultiLevelMask::Mask (const unsigned long& theIndex, const bool& theNewState)
+void NFmiMultiLevelMask::Mask (unsigned long theIndex, bool theNewState)
 {
 	if((itsMaskType & NFmiMetEditorTypes::kFmiNoMask) == NFmiMetEditorTypes::kFmiNoMask)
 		return;
@@ -129,7 +129,7 @@ void NFmiMultiLevelMask::Mask (const unsigned long& theIndex, const bool& theNew
 //   Tarkista indeksin koko ja jos se ei sovi, 
 //   palauta false.
 //   
-bool NFmiMultiLevelMask::IsMasked (const unsigned long& theIndex) const
+bool NFmiMultiLevelMask::IsMasked (unsigned long theIndex) const
 {
 	if((itsMaskType & NFmiMetEditorTypes::kFmiNoMask) == NFmiMetEditorTypes::kFmiNoMask)
 		return true;
@@ -151,7 +151,7 @@ bool NFmiMultiLevelMask::IsMasked (const unsigned long& theIndex) const
 //--------------------------------------------------------
 //   Asettaa vain theMaskTypen:n osoittamat maskit 
 //   .
-void NFmiMultiLevelMask::Mask (const unsigned long& theIndex, const bool& theNewState, const unsigned long& theMaskType)
+void NFmiMultiLevelMask::Mask (unsigned long theIndex, bool theNewState, unsigned long theMaskType)
 {
 	if((theMaskType & NFmiMetEditorTypes::kFmiNoMask) == NFmiMetEditorTypes::kFmiNoMask)
 		return;
@@ -166,7 +166,7 @@ void NFmiMultiLevelMask::Mask (const unsigned long& theIndex, const bool& theNew
 //--------------------------------------------------------
 // IsMasked 
 //--------------------------------------------------------
-bool NFmiMultiLevelMask::IsMasked (const unsigned long& theIndex, const unsigned long& theMaskType) const
+bool NFmiMultiLevelMask::IsMasked (unsigned long theIndex, unsigned long theMaskType) const
 {
 	if((theMaskType & NFmiMetEditorTypes::kFmiNoMask) == NFmiMetEditorTypes::kFmiNoMask)
 		return true;
@@ -193,7 +193,7 @@ bool NFmiMultiLevelMask::IsMasked (const unsigned long& theIndex, const unsigned
 //   eli asettaa kaikkien itsMaskTypen osoittamien 
 //   NFmiBitMask:ien
 //   kaikki arvot newStaten mukaisiksi.
-void NFmiMultiLevelMask::MaskAll (const bool& theNewState)
+void NFmiMultiLevelMask::MaskAll (bool theNewState)
 {	
 	if((itsMaskType & NFmiMetEditorTypes::kFmiNoMask) == NFmiMetEditorTypes::kFmiNoMask)
 		return;
@@ -208,7 +208,7 @@ void NFmiMultiLevelMask::MaskAll (const bool& theNewState)
 //--------------------------------------------------------
 // MaskAll 
 //--------------------------------------------------------
-void NFmiMultiLevelMask::MaskAll (const bool& theNewState, const unsigned long& theMaskType)
+void NFmiMultiLevelMask::MaskAll (bool theNewState, unsigned long theMaskType)
 {
 	if ((theMaskType & NFmiMetEditorTypes::kFmiNoMask) == NFmiMetEditorTypes::kFmiNoMask)
 		return;
@@ -233,7 +233,7 @@ bool NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask)
 {
 	if ((itsMaskType & NFmiMetEditorTypes::kFmiNoMask) == NFmiMetEditorTypes::kFmiNoMask)
 		return true;
-	if (itsMaskSize == (unsigned long)(theMask.Size()))
+	if (itsMaskSize == static_cast<unsigned long>(theMask.Size()))
 	{
 		if ((itsMaskType & NFmiMetEditorTypes::kFmiActivationMask) == NFmiMetEditorTypes::kFmiActivationMask)
 			itsActivationMask = theMask;
@@ -252,11 +252,11 @@ bool NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask)
 
 //   Kopioi maskin vain theMaskType:n osoittamiin 
 //   maskeihin.
-bool NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask, const unsigned long& theMaskType)
+bool NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask, unsigned long theMaskType)
 {
 	if ((theMaskType & NFmiMetEditorTypes::kFmiNoMask) == NFmiMetEditorTypes::kFmiNoMask)
 		return true;
-	if (itsMaskSize == (unsigned long)(theMask.Size()))
+	if (itsMaskSize == static_cast<unsigned long>(theMask.Size()))
 	{
 		if ((theMaskType & NFmiMetEditorTypes::kFmiActivationMask) == NFmiMetEditorTypes::kFmiActivationMask)
 			itsActivationMask = theMask;
@@ -289,7 +289,7 @@ const NFmiBitMask& NFmiMultiLevelMask::Mask (void) const
 //--------------------------------------------------------
 // Mask
 //--------------------------------------------------------
-const NFmiBitMask& NFmiMultiLevelMask::Mask (const unsigned long& theMaskType) const
+const NFmiBitMask& NFmiMultiLevelMask::Mask (unsigned long theMaskType) const
 {
 	if ((theMaskType & NFmiMetEditorTypes::kFmiNoMask) == NFmiMetEditorTypes::kFmiNoMask)
 		return itsActivationMask;						// ???????
