@@ -59,6 +59,8 @@ public:
 	const std::string& GetCalculationText(void){return itsCalculationText;}
 	void SetCalculationText(const std::string& theText){itsCalculationText = theText;}
 	void SetLimits(float theLowerLimit, float theUpperLimit);
+	bool AllowMissingValueAssignment(void){return fAllowMissingValueAssignment;};
+	void AllowMissingValueAssignment(bool newState){fAllowMissingValueAssignment = newState;};
 
 private:
 	std::string itsCalculationText; // originaali teksti, mistä tämä lasku on tulkittu
@@ -98,5 +100,6 @@ private:
 	std::vector<NFmiAreaMask*> itsCalculations; // omistaa+tuhoaa
 
 	std::vector<double> *itsModificationFactors; // mahdolliset aikasarja muokkaus kertoimet (ei omista, ei tuhoa)
+	bool fAllowMissingValueAssignment; 
 };
 #endif

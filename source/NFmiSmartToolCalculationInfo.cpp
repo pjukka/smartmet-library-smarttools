@@ -32,6 +32,7 @@
 NFmiSmartToolCalculationInfo::NFmiSmartToolCalculationInfo(void)
 :itsResultDataInfo(0)
 ,itsCalculationOperandInfoVector()
+,fAllowMissingValueAssignment(false)
 {
 }
 
@@ -52,4 +53,25 @@ void NFmiSmartToolCalculationInfo::Clear(void)
 	itsResultDataInfo = 0;
 	std::for_each(itsCalculationOperandInfoVector.begin(), itsCalculationOperandInfoVector.end(), PointerDestroyer());
 	itsCalculationOperandInfoVector.clear();
+}
+
+/*! tarkistaa onko lause muotoa:
+ * par = MISS
+ * vain tälläinen lauseke sallii puuttuvan arvon sijoituksen dataan skripteillä.
+ * Pitää tehdä speciaali asetus systeemi, sillä muuten tulee ongelmia sijotusten kanssa,
+ * koska muuten puuttuvia arvoja tulee sijoitetuksi aina kun jotain dataa puuttuu, 
+ * tai se ei kata koko aluetta tai aika-skaalaa.
+ */
+void NFmiSmartToolCalculationInfo::CheckIfAllowMissingValueAssignment(void)
+{
+	fAllowMissingValueAssignment = false;
+	int size = itsCalculationOperandInfoVector.size();
+	if(size == 1)
+	{
+		if(itsCalculationOperandInfoVector[0]->GetOperationType() == NFmiAreaMask::Constant)
+		{
+			if(itsCalculationOperandInfoVector[0]->GetMaskCondition().LowerLimit() == kFloatMissing)
+				fAllowMissingValueAssignment = true;
+		}
+	}
 }

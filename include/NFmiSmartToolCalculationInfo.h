@@ -49,6 +49,8 @@ public:
 //	std::vector<NFmiSmartToolCalculation::FmiCalculationOperators>* GetOperationVector(void) {return &itsOperationVector;}
 	const std::string& GetCalculationText(void){return itsCalculationText;}
 	void SetCalculationText(const std::string& theText){itsCalculationText = theText;}
+	void CheckIfAllowMissingValueAssignment(void);
+	bool AllowMissingValueAssignment(void){return fAllowMissingValueAssignment;};
 
 private:
 	// HUOM!! Tämä erillinen ResultInfo-systeemi oli huono ratkaisu, laita ne mielluummin
@@ -58,5 +60,6 @@ private:
 	std::vector<NFmiAreaMaskInfo*> itsCalculationOperandInfoVector;  // omistaa+tuhoaa
 //	std::vector<NFmiSmartToolCalculation::FmiCalculationOperators> itsOperationVector;
 	std::string itsCalculationText; // originaali teksti, mistä tämä lasku on tulkittu
+	bool fAllowMissingValueAssignment; 
 };
 #endif

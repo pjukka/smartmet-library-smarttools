@@ -42,6 +42,7 @@ NFmiSmartToolCalculation::NFmiSmartToolCalculation(void)
 ,itsCalculations()
 //,itsOperators()
 ,itsModificationFactors(0)
+,fAllowMissingValueAssignment(false)
 {
 }
 
@@ -62,6 +63,14 @@ void NFmiSmartToolCalculation::Calculate(const NFmiPoint &theLatlon, unsigned lo
 		value = GetInsideLimitsValue(static_cast<float>(value)); // asetetaan value vielä drawparamista satuihin rajoihin, ettei esim. RH voi olla alle 0 tai yli 100 %
 
 		itsResultInfo->FloatValue(static_cast<float>(value)); // miten info saadaan osoittamaan oikeaan kohtaan?!?
+	}
+	else
+	{
+		if(fAllowMissingValueAssignment)
+		{
+			itsResultInfo->LocationIndex(theLocationIndex); // kohde dataa juoksutetaan, joten lokaatio indeksien pitää olla synkassa!!!
+			itsResultInfo->FloatValue(static_cast<float>(value)); // nyt voidaan asettaa puuttuva arvo dataan
+		}
 	}
 }
 
