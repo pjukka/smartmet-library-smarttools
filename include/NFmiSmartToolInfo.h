@@ -18,8 +18,7 @@ class NFmiSmartToolInfo
 public:
 	NFmiSmartToolInfo(void);
 	~NFmiSmartToolInfo(void);
-	bool Init(const std::string &theFileName);
-	bool Store(const std::string &theFileName);
+	bool Init(void);
 
 	bool LoadAsCurrentScript(const std::string &theFileName);
 	bool SaveCurrentScript(void);
@@ -27,7 +26,6 @@ public:
 	bool LoadDBChecker(void);
 	bool SaveDBChecker(void);
 
-	const std::string& CurrentInfoFile(void) const{return itsCurrentInfoFile;}
 	const std::string& CurrentScript(void) const{return itsCurrentScript;}
 	const std::string& CurrentScriptFileName(void) const{return itsCurrentScriptFileName;}
 	const std::string& LastLoadDirectory(void) const {return itsLastLoadDirectory;}
@@ -37,27 +35,27 @@ public:
 	bool IsThereDBCheckScript(void) const {return fIsThereDBCheckScript;}
 	bool HasCurrentScriptFileName(void) const {return fHasCurrentScriptFileName;}
 
-	void CurrentInfoFile(const std::string& newValue) {itsCurrentInfoFile = newValue;}
-	void CurrentScript(const std::string& newValue) {itsCurrentScript = newValue;}
-	void CurrentScriptFileName(const std::string &newValue) {itsCurrentScriptFileName = newValue;}
-	void LastLoadDirectory(const std::string& newValue) {itsLastLoadDirectory = newValue;}
+	void CurrentScript(const std::string& newValue) {itsCurrentScript = newValue; SaveSettings();}
+	void CurrentScriptFileName(const std::string &newValue) {itsCurrentScriptFileName = newValue; SaveSettings();}
+	void LastLoadDirectory(const std::string& newValue) {itsLastLoadDirectory = newValue; SaveSettings();}
 	void DBCheckerFileName(const std::string& newValue) {itsDBCheckerFileName = newValue;}
 	void DBCheckerText(const std::string& newValue) {itsDBCheckerText = newValue;}
-	void MakeDBCheckAtSend(bool newValue) {fMakeDBCheckAtSend = newValue;}
+	void MakeDBCheckAtSend(bool newValue) {fMakeDBCheckAtSend = newValue; SaveSettings();}
 	void IsThereDBCheckScript(bool newValue) {fIsThereDBCheckScript = newValue;}
 	void HasCurrentScriptFileName(bool newValue) {fHasCurrentScriptFileName = newValue;}
 
 	//@{ \name Kirjoitus- ja luku-operaatiot (luokka tallettaa vain pari polkua tiedostoon talteen)
-	std::ostream& Write(std::ostream &file) const;
-	std::istream& Read(std::istream &file); 
+//	std::ostream& Write(std::ostream &file) const;
+//	std::istream& Read(std::istream &file); 
 	//@}
 
 private:
+	bool WriteScript2File(const std::string &theFileName, const std::string &theScript);
+	bool LoadSettings(void);
+	bool SaveSettings(void);
 	std::string ExtractPath(const std::string &theFullFileName);
 	bool LoadLastScript(void);
-	bool ReadFileToString(const std::string &theFileName, std::string *theString);
 
-	std::string itsCurrentInfoFile; //! Tämän olion tiedoston nimi polkuineen. 
 	std::string itsCurrentScript; //! Dialogissa oleva scripti. 
 	std::string itsCurrentScriptFileName; //! (talleta init-fileen) Dialogissa olevan scriptin polku ja tiedostonnimi kokonaisuudessaan. 
 	std::string itsLastLoadDirectory; //! (talleta init-fileen) Viimeisin hakemisto, mistä on ladattu/talletettu smarttool scripti. 
@@ -69,8 +67,8 @@ private:
 };
 
 //@{ \name Globaalit NFmiPoint-luokan uudelleenohjaus-operaatiot
-inline std::ostream& operator<<(std::ostream& os, const NFmiSmartToolInfo& item){return item.Write(os);}
-inline std::istream& operator>>(std::istream& is, NFmiSmartToolInfo& item){return item.Read(is);}
+//inline std::ostream& operator<<(std::ostream& os, const NFmiSmartToolInfo& item){return item.Write(os);}
+//inline std::istream& operator>>(std::istream& is, NFmiSmartToolInfo& item){return item.Read(is);}
 //@}
 
 #endif // NFMISMARTTOOLINFO_H

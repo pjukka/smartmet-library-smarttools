@@ -95,9 +95,13 @@ bool NFmiDrawParamList::Add(NFmiDrawParam * theParam, unsigned long theIndex)
 // tuhoaa vanhan, jos lˆytyy, ja lis‰‰ per‰‰n
 bool NFmiDrawParamList::Replace(NFmiDrawParam * theParam)
 {
-	if(Find(theParam->Param(), theParam->Info()->Level(), theParam->Info()->DataType()))
-		Remove(true);
-	return Add(theParam);
+	if(theParam->Info())
+	{
+		if(Find(theParam->Param(), theParam->Info()->Level(), theParam->Info()->DataType()))
+			Remove(true);
+		return Add(theParam);
+	}
+	return false;
 }
 //--------------------------------------------------------
 // Current 
@@ -254,7 +258,8 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 bool NFmiDrawParamList::SyncronizeTimes(const NFmiMetTime& theTime)
 {
 	for(Reset(); Next();)
-		Current()->Info()->Time(theTime);
+		if(Current()->Info())
+			Current()->Info()->Time(theTime);
 	return true;
 }
 
@@ -274,29 +279,39 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::vector<int>&
 	if(theLevel)
 	{
 		for(Reset(); Next();)
+		{
 			if(*(Current()->EditParam().GetProducer()) == theProducer)
-				if(*Current()->Info()->Level() == *theLevel)
+			{
+				if(Current()->Info()) // t‰m‰ tarkistus satel-datan takia
 				{
-					it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->EditParam().GetParamIdent()));
-					if(it == tmpParIdList.end())
-						Remove(fDeleteData);
-					else
-						tmpParIdList.erase(it);
+					if(*Current()->Info()->Level() == *theLevel)
+					{
+						it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->EditParam().GetParamIdent()));
+						if(it == tmpParIdList.end())
+							Remove(fDeleteData);
+						else
+							tmpParIdList.erase(it);
+					}
 				}
+			}
+		}
 	}
 	else
 	{
 		for(Reset(); Next();)
 		{
-			if(Current()->Info()->SizeLevels() == 1) // pit‰‰ olla 'ground' info (eli ei level-dataa), ennen kuin ruvetaan siivoamaan!!!
+			if(Current()->Info()) // t‰m‰ tarkistus satel-datan takia
 			{
-				if(*(Current()->EditParam().GetProducer()) == theProducer)
+				if(Current()->Info()->SizeLevels() == 1) // pit‰‰ olla 'ground' info (eli ei level-dataa), ennen kuin ruvetaan siivoamaan!!!
 				{
-					it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->EditParam().GetParamIdent()));
-					if(it == tmpParIdList.end())
-						Remove(fDeleteData);
-					else
-						tmpParIdList.erase(it);
+					if(*(Current()->EditParam().GetProducer()) == theProducer)
+					{
+						it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->EditParam().GetParamIdent()));
+						if(it == tmpParIdList.end())
+							Remove(fDeleteData);
+						else
+							tmpParIdList.erase(it);
+					}
 				}
 			}
 		}
@@ -335,16 +350,19 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pa
 	std::list<std::pair<int, NFmiLevel> >::iterator it;
 	for(Reset(); Next();)
 	{
-		if(Current()->Info()->SizeLevels() > 1) // pit‰‰ olla level info, ennen kuin ruvetaan siivoamaan!!!
+		if(Current()->Info()) // t‰m‰ tarkistus satel-datan takia
 		{
-			if(*(Current()->EditParam().GetProducer()) == theProducer)
+			if(Current()->Info()->SizeLevels() > 1) // pit‰‰ olla level info, ennen kuin ruvetaan siivoamaan!!!
 			{
-				std::pair<int, NFmiLevel> tmp(Current()->EditParam().GetParamIdent(), *Current()->Info()->Level());
-				it = std::find(theParamIdsAndLevelsNotRemoved.begin(), theParamIdsAndLevelsNotRemoved.end(), tmp);
-				if(it == theParamIdsAndLevelsNotRemoved.end())
-					Remove(fDeleteData);
-				else
-					theParamIdsAndLevelsNotRemoved.erase(it);
+				if(*(Current()->EditParam().GetProducer()) == theProducer)
+				{
+					std::pair<int, NFmiLevel> tmp(Current()->EditParam().GetParamIdent(), *Current()->Info()->Level());
+					it = std::find(theParamIdsAndLevelsNotRemoved.begin(), theParamIdsAndLevelsNotRemoved.end(), tmp);
+					if(it == theParamIdsAndLevelsNotRemoved.end())
+						Remove(fDeleteData);
+					else
+						theParamIdsAndLevelsNotRemoved.erase(it);
+				}
 			}
 		}
 	}
