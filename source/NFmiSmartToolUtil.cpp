@@ -113,7 +113,12 @@ bool NFmiSmartToolUtil::InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, c
 	for(unsigned int i=0; i<theHelperDataFileNames.size(); i++)
 	{
 		if(sQData.ReadData(theHelperDataFileNames[i]))
-			theDataBase.AddData(sQData.QueryData(true), theHelperDataFileNames[i], NFmiInfoData::kViewable, 0); // 0=undolevel
+		{
+			NFmiInfoData::Type dataType = NFmiInfoData::kViewable;
+			if(sQData.QueryData()->Info()->SizeTimes() == 1)
+				dataType = NFmiInfoData::kStationary;
+			theDataBase.AddData(sQData.QueryData(true), theHelperDataFileNames[i], dataType, 0); // 0=undolevel
+		}
 	}
 	return true;
 }
