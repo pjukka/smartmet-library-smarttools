@@ -527,7 +527,9 @@ void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result,
 		bin_eval_exp2(tempmask, temp, theLatlon, theTime, theTimeIndex);
 
 		// resultit eivät saa olla missin-arvoja, paitsi jos ne ovat Constant-maskista, eli halutaan nimenomaan verrata jotain missing-arvoon
-		if((result == kFloatMissing && opType1 != NFmiAreaMask::Constant) || (temp == kFloatMissing && opType2 != NFmiAreaMask::Constant))
+		bool allowMissingComparison = (result == kFloatMissing && opType1 == NFmiAreaMask::Constant) || (temp == kFloatMissing && opType2 == NFmiAreaMask::Constant);
+		bool missingValuesExist = (result == kFloatMissing) || (temp == kFloatMissing);
+		if((!allowMissingComparison) && missingValuesExist)
 		  maskresult = false;
 		else
 		  {
