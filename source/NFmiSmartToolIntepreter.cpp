@@ -550,7 +550,6 @@ bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, NF
 {
 	string maskText(theMaskSectionText);
 	exp_ptr = maskText.begin();
-	int maskCount = 0;
 
 	string tmp;
 	for(; GetToken(); )
