@@ -185,7 +185,6 @@ std::vector<std::string> NFmiSmartToolIntepreter::itsTokenRampUpFunctions;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenRampDownFunctions;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenDoubleRampFunctions;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenRampFunctions;
-std::vector<std::string> NFmiSmartToolIntepreter::itsTokenTMFs;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenMacroParamIdentifiers;
 
 NFmiSmartToolIntepreter::MaskOperMap NFmiSmartToolIntepreter::itsTokenMaskOperations;
@@ -1213,9 +1212,6 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &th
 	if(IsVariableRampFunction(theVariableText, theMaskInfo))
 		return true;
 
-	if(IsVariableTMF(theVariableText, theMaskInfo))
-		return true;
-
 	if(IsVariableMacroParam(theVariableText, theMaskInfo))
 		return true;
 
@@ -1574,16 +1570,6 @@ bool NFmiSmartToolIntepreter::IsVariableConstantValue(const std::string &theVari
 		theMaskInfo->SetOperationType(NFmiAreaMask::Constant);
 		NFmiCalculationCondition calcCond(kFmiMaskEqual, (*it).second);
 		theMaskInfo->SetMaskCondition(calcCond);
-		return true;
-	}
-	return false;
-}
-
-bool NFmiSmartToolIntepreter::IsVariableTMF(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
-{
-	if(FindAnyFromText(theVariableText, itsTokenTMFs))
-	{
-		theMaskInfo->SetOperationType(NFmiAreaMask::ModifyFactor);
 		return true;
 	}
 	return false;
@@ -2248,10 +2234,6 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenRampFunctions.insert(itsTokenRampFunctions.end(), itsTokenRampUpFunctions.begin(), itsTokenRampUpFunctions.end());
 		itsTokenRampFunctions.insert(itsTokenRampFunctions.end(), itsTokenRampDownFunctions.begin(), itsTokenRampDownFunctions.end());
 		itsTokenRampFunctions.insert(itsTokenRampFunctions.end(), itsTokenDoubleRampFunctions.begin(), itsTokenDoubleRampFunctions.end());
-
-		itsTokenTMFs.push_back(string("TMF"));
-		itsTokenTMFs.push_back(string("Tmf"));
-		itsTokenTMFs.push_back(string("tmf"));
 
 		itsTokenMacroParamIdentifiers.push_back(string("result"));
 		itsTokenMacroParamIdentifiers.push_back(string("Result"));

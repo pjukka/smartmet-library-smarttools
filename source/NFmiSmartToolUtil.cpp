@@ -51,8 +51,7 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 
 	try // suoritetaan macro sitten
 	{
-		std::vector<double> dummyFactors(theTimes->Size(), 0);
-		smartToolModifier.ModifyData(theTimes, dummyFactors, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
+		smartToolModifier.ModifyData(theTimes, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
 	}
 	catch(std::exception &e)
 	{

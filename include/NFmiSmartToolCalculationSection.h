@@ -39,7 +39,6 @@ class NFmiSmartToolCalculationSection
 public:
 	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
 	void Clear(void);
-	void SetModificationFactors(std::vector<double> *theFactors);
 	void SetTime(const NFmiMetTime &theTime);
 	NFmiSmartInfo* FirstVariableInfo(void);
 
@@ -51,7 +50,6 @@ public:
 
 private:
 	std::vector<NFmiSmartToolCalculation*> itsCalculations; // omistaa+tuhoaa
-	std::vector<double> *itsModificationFactors; // mahdolliset aikasarja muokkaus kertoimet (ei omista, ei tuhoa)
 
 };
 #endif

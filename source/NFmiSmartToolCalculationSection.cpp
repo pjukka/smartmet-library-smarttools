@@ -1,4 +1,4 @@
-//**********************************************************
+/**********************************************************
 // C++ Class Name : NFmiSmartToolCalculationSection 
 // ---------------------------------------------------------
 // Filetype: (SOURCE)
@@ -81,19 +81,4 @@ struct TimeSetter
 void NFmiSmartToolCalculationSection::SetTime(const NFmiMetTime &theTime)
 {
 	std::for_each(itsCalculations.begin(), itsCalculations.end(), TimeSetter(theTime));
-}
-
-// globaali asetus luokka for_each-funktioon
-struct FactorSetter
-{
-	FactorSetter(std::vector<double> *theFactors):itsFactors(theFactors){}
-	void operator()(NFmiSmartToolCalculation* theCalculation){theCalculation->SetModificationFactors(itsFactors);}
-
-	std::vector<double> *itsFactors;
-};
-
-void NFmiSmartToolCalculationSection::SetModificationFactors(std::vector<double> *theFactors) 
-{
-	itsModificationFactors = theFactors;
-	std::for_each(itsCalculations.begin(), itsCalculations.end(), FactorSetter(theFactors));
 }

@@ -146,7 +146,6 @@ private:
 	bool FindParamAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
 	bool FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
 	bool ExtractParamAndLevel(const std::string &theVariableText, std::string *theParamNameOnly, std::string *theLevelNameOnly);
-	bool IsVariableTMF(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariableMacroParam(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariableRampFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
@@ -238,7 +237,6 @@ private:
 	static std::vector<std::string> itsTokenRampDownFunctions;
 	static std::vector<std::string> itsTokenDoubleRampFunctions;
 	static std::vector<std::string> itsTokenRampFunctions;
-	static std::vector<std::string> itsTokenTMFs; // aikasarjamuokkauskerroin
 	static std::vector<std::string> itsTokenMacroParamIdentifiers; // t‰nne listataan result jne. sanat joita k‰ytet‰‰n makrojen visualisoinnissa
 
 	typedef std::map<std::string, FmiMaskOperation> MaskOperMap;

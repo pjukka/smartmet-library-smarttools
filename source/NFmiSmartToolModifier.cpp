@@ -37,7 +37,6 @@
 #include "NFmiInfoOrganizer.h"
 #include "NFmiAreaMaskSectionInfo.h"
 #include "NFmiCalculatedAreaMask.h"
-#include "NFmiCalculationChangeFactorArray.h"
 #include "NFmiDataModifierClasses.h"
 #include "NFmiRelativeDataIterator.h"
 #include "NFmiRelativeTimeIntegrationIterator.h"
@@ -98,14 +97,6 @@ void NFmiSmartToolCalculationBlockVector::Calculate(const NFmiPoint &theLatlon, 
 	Iterator endIt = End();
 	for( ; it != endIt; ++it)
 		(*it)->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
-}
-
-void NFmiSmartToolCalculationBlockVector::SetModificationFactors(std::vector<double> *theFactors)
-{
-	Iterator it = Begin();
-	Iterator endIt = End();
-	for( ; it != endIt; ++it)
-		(*it)->SetModificationFactors(theFactors);
 }
 
 void NFmiSmartToolCalculationBlockVector::Add(NFmiSmartToolCalculationBlock* theBlock)
@@ -200,24 +191,6 @@ void NFmiSmartToolCalculationBlock::SetTime(const NFmiMetTime &theTime)
 		itsElseCalculationBlocks->SetTime(theTime);
 	if(itsLastCalculationSection)
 		itsLastCalculationSection->SetTime(theTime);
-}
-
-void NFmiSmartToolCalculationBlock::SetModificationFactors(std::vector<double> *theFactors)
-{
-	if(itsFirstCalculationSection)
-		itsFirstCalculationSection->SetModificationFactors(theFactors);
-	if(itsIfAreaMaskSection)
-		itsIfAreaMaskSection->SetModificationFactors(theFactors);
-	if(itsIfCalculationBlocks)
-		itsIfCalculationBlocks->SetModificationFactors(theFactors);
-	if(itsElseIfAreaMaskSection)
-		itsElseIfAreaMaskSection->SetModificationFactors(theFactors);
-	if(itsElseIfCalculationBlocks)
-		itsElseIfCalculationBlocks->SetModificationFactors(theFactors);
-	if(itsElseCalculationBlocks)
-		itsElseCalculationBlocks->SetModificationFactors(theFactors);
-	if(itsLastCalculationSection)
-		itsLastCalculationSection->SetModificationFactors(theFactors);
 }
 
 void NFmiSmartToolCalculationBlock::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
@@ -474,7 +447,7 @@ void NFmiSmartToolModifier::ClearCalculationModifiers(void)
 // Suorittaa varsinaiset modifikaatiot. K‰ytt‰j‰ voi antaa parametrina rajoitetun ajan
 // modifioinneille, jos theModifiedTimes on 0-pointteri, tehd‰‰n operaatiot kaikille
 // datan ajoille.
-void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, const std::vector<double> &theModificationFactors, bool fSelectedLocationsOnly)
+void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly)
 {
 	fModifySelectedLocationsOnly = fSelectedLocationsOnly;
 	try
@@ -482,8 +455,6 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, con
 		// Seed the random-number generator with current time so that
 		// the numbers will be different every time we run.
 		srand( static_cast<unsigned int>(time( NULL ))); // mahd. satunnais funktion k‰ytˆn takia, pit‰‰ 'sekoittaa' random generaattori
-
-		itsModificationFactors = theModificationFactors; // huom! t‰ss‰ tehd‰‰n kopio
 
 		std::vector<NFmiSmartToolCalculationBlockInfo>& smartToolCalculationBlockInfos = itsSmartToolIntepreter->SmartToolCalculationBlocks();
 		int size = smartToolCalculationBlockInfos.size();
@@ -528,16 +499,6 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiTimeDescriptor *theModifie
 {
 	if(theCalculationBlock->itsIfAreaMaskSection && theCalculationBlock->itsIfCalculationBlocks)
 	{
-		theCalculationBlock->itsIfAreaMaskSection->SetModificationFactors(&(this->itsModificationFactors)); // maskissakin voi olla tmf:i‰
-		theCalculationBlock->itsIfCalculationBlocks->SetModificationFactors(&(this->itsModificationFactors)); // maskissakin voi olla tmf:i‰
-		if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks)
-		{
-			theCalculationBlock->itsElseIfAreaMaskSection->SetModificationFactors(&(this->itsModificationFactors));
-			theCalculationBlock->itsElseIfCalculationBlocks->SetModificationFactors(&(this->itsModificationFactors));
-		}
-		if(theCalculationBlock->itsElseCalculationBlocks)
-			theCalculationBlock->itsElseCalculationBlocks->SetModificationFactors(&(this->itsModificationFactors));
-
 		NFmiSmartInfo *info = theCalculationBlock->FirstVariableInfo()->Clone();
 		std::auto_ptr<NFmiSmartInfo> infoPtr(info);
 
@@ -594,15 +555,6 @@ static void ModifyConditionalData(bool modifySelectedOnly, NFmiTimeDescriptor *t
 {
 	if(theIfAreaMaskSection && theIfCalculationSection && theIfCalculationSection->FirstVariableInfo())
 	{
-		theIfAreaMaskSection->SetModificationFactors(&theModificationFactors); // maskissakin voi olla tmf:i‰
-		theIfCalculationSection->SetModificationFactors(&theModificationFactors);
-		if(theElseIfAreaMaskSection && theElseIfCalculationSection)
-		{
-			theElseIfAreaMaskSection->SetModificationFactors(&theModificationFactors);
-			theElseIfCalculationSection->SetModificationFactors(&theModificationFactors);
-		}
-		if(theElseCalculationSection)
-			theElseCalculationSection->SetModificationFactors(&theModificationFactors);
 //		NFmiFastQueryInfo info(*theIfCalculationSection->FirstVariableInfo());
 		NFmiSmartInfo *info = theIfCalculationSection->FirstVariableInfo()->Clone();
 		std::auto_ptr<NFmiSmartInfo> infoPtr(info);
@@ -666,7 +618,6 @@ void NFmiSmartToolModifier::ModifyData2(NFmiTimeDescriptor* theModifiedTimes, NF
 {
 	if(theCalculationSection && theCalculationSection->FirstVariableInfo())
 	{
-		theCalculationSection->SetModificationFactors(&itsModificationFactors);
 //		NFmiFastQueryInfo info(*theCalculationSection->FirstVariableInfo());
 		NFmiSmartInfo *info = theCalculationSection->FirstVariableInfo()->Clone();
 		std::auto_ptr<NFmiSmartInfo> infoPtr(info);
@@ -777,11 +728,6 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 		case NFmiAreaMask::Constant:
 			{
 			areaMask = new NFmiCalculationConstantValue(theAreaMaskInfo.GetMaskCondition().LowerLimit());
-			break;
-			}
-		case NFmiAreaMask::ModifyFactor:
-			{
-			areaMask = new NFmiCalculationChangeFactorArray;
 			break;
 			}
 		case NFmiAreaMask::Operator:

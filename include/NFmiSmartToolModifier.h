@@ -61,7 +61,6 @@ public:
 	NFmiSmartInfo* FirstVariableInfo(void);
 	void SetTime(const NFmiMetTime &theTime);
 	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
-	void SetModificationFactors(std::vector<double> *theFactors);
 	void Add(NFmiSmartToolCalculationBlock* theBlock);
 	Iterator Begin(void) {return itsCalculationBlocks.begin();}
 	Iterator End(void) {return itsCalculationBlocks.end();}
@@ -80,7 +79,6 @@ public:
 	NFmiSmartInfo* FirstVariableInfo(void);
 	void SetTime(const NFmiMetTime &theTime);
 	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
-	void SetModificationFactors(std::vector<double> *theFactors);
 
 	NFmiSmartToolCalculationSection* itsFirstCalculationSection;
 	NFmiSmartToolCalculation* itsIfAreaMaskSection;
@@ -105,7 +103,7 @@ public:
 	};
 */
 	void InitSmartTool(const std::string &theSmartToolText, bool fThisIsMacroParamSkript = false);
-	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, const std::vector<double> &theModificationFactors, bool fSelectedLocationsOnly);
+	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly);
 	NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer);
 	~NFmiSmartToolModifier(void);
 
@@ -157,7 +155,6 @@ private:
 //	NFmiSmartToolCalculationSection* itsElseCalculationSection;
 //	NFmiSmartToolCalculationSection* itsLastCalculationSection;
 
-	std::vector<double> itsModificationFactors; // mahdolliset aikasarja muokkaus kertoimet (ei omista, ei tuhoa)
 	bool fModifySelectedLocationsOnly;
 	std::vector<NFmiSmartInfo*> itsScriptVariableInfos; // mahdolliset skripti-muuttujat talletetaan tänne
 	std::string itsIncludeDirectory; // mistä ladataan mahd. include filet
