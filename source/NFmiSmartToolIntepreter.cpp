@@ -23,8 +23,6 @@
 #pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
 #endif
 
-#include "stdafx.h"
-
 #include "NFmiSmartToolIntepreter.h"
 #include "NFmiAreaMaskInfo.h"
 #include "NFmiSmartToolCalculationSectionInfo.h"
