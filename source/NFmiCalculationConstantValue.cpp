@@ -117,3 +117,9 @@ NFmiCalculationRampFuctionWithAreaMask::~NFmiCalculationRampFuctionWithAreaMask(
 	}
 }
 
+double NFmiCalculationDeltaZValue::itsHeightValue;
+
+NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(void)
+:NFmiAreaMaskImpl()
+{
+}

@@ -46,6 +46,32 @@ private:
 
 };
 
+// T‰m‰ luokka antaa laskuihin mukaan korkeus laskuissa (esim. SumZ tai MinH tyyliset funktiot)
+// k‰ytetyn kerroksen paksuuden. Korkeus laskut jakavat laskuissaan korkeus akselin vaihtuvan 
+// paksuisiin kerroksiin siten ett‰ alhaalla on tarkempi resoluutio kuin ylh‰‰ll‰. T‰t‰ voi k‰ytt‰‰
+// vain ed. mainittujen korkeus laskujen yhteydess‰.
+class NFmiCalculationDeltaZValue : public NFmiAreaMaskImpl
+{
+
+public:
+   double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways)
+   {
+	   return NFmiCalculationDeltaZValue::itsHeightValue;
+   }
+
+   NFmiCalculationDeltaZValue(void);
+   ~NFmiCalculationDeltaZValue(){};
+
+   // t‰t‰ funktiota k‰ytt‰m‰ll‰ asetetaan korkeus 'siivun' paksuus. HUOM! se on staattinen kuten on
+   // itsHeightValue-dataosakin, joten se tulee kaikille 'DeltaZ':oille yhteiseksi arvoksi.
+   static void SetDeltaZValue(double value){itsHeightValue = value;}
+
+private:
+   static double itsHeightValue;
+
+};
+
+
 // T‰m‰ on taas pika suunnittelua/toteutusta, mutta laitoin t‰ll‰isen luokan
 // jonka avulla hoidetaan smarttools laskuissa mm. sulut ja lasku- ja vertailu operaattorit.
 // Kun laitoin uuden smarttool systeemin laskemaan rekursiivisesti laskut ja
