@@ -43,22 +43,21 @@
 #include "NFmiProducerList.h"
 #include "NFmiGrid.h"
 
-#ifndef UNIX
-  #include "stdafx.h" // TRACE-kutsu
-#endif
+//#ifndef UNIX
+//  #include "stdafx.h" // TRACE-kutsu
+//#endif
 
 //--------------------------------------------------------
 // Constructor/Destructor 
 //--------------------------------------------------------
 // luodaan tyhjä lista
-NFmiInfoOrganizer::NFmiInfoOrganizer (bool theIsToolMasterAvailable)
+NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 :itsList()
 ,itsIter(itsList.Start())
 ,itsDrawParamFactory(0)
 ,itsWorkingDirectory("")
 ,itsEditedData(0)
 ,itsEditedDataCopy(0)
-,fToolMasterAvailable(theIsToolMasterAvailable)
 {
 }
 
@@ -377,7 +376,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 	if(info)
 	{
 		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
-		drawParam = itsDrawParamFactory->CreateDrawParam(copyOfInfo, theIdent, aSubParam, theLevel, fToolMasterAvailable);	
+		drawParam = itsDrawParamFactory->CreateDrawParam(copyOfInfo, theIdent, aSubParam, theLevel);	
 	}
 	return drawParam;
 }
@@ -397,7 +396,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(NFmiSmartInfo* theUsedInfo
 	{
 		aSubParam = theUsedInfo->UseSubParam();
 		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*theUsedInfo);
-		drawParam = itsDrawParamFactory->CreateDrawParam(copyOfInfo, theDataIdent, aSubParam, theLevel, fToolMasterAvailable);	
+		drawParam = itsDrawParamFactory->CreateDrawParam(copyOfInfo, theDataIdent, aSubParam, theLevel);	
 	}
 	return drawParam;
 }
@@ -406,7 +405,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateEmptyInfoDrawParam(FmiParameterName theP
 {
 	NFmiParam param(theParamName);
 	NFmiDataIdent dataIdent(param);
-	NFmiDrawParam *drawParam = itsDrawParamFactory->CreateEmptyInfoDrawParam(dataIdent, fToolMasterAvailable);
+	NFmiDrawParam *drawParam = itsDrawParamFactory->CreateEmptyInfoDrawParam(dataIdent);
 	return drawParam;
 }
 
@@ -422,9 +421,6 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 									 ,int theUndoLevel)
 {
 	bool status = false;
-#ifndef UNIX
-	TRACE("Dataa NFmiInfoOrganizerissa ennen AddData:a %d kpl.\n", CountData());
-#endif
 	if(theData)
 	{
 		NFmiQueryInfo aQueryInfo(theData);
@@ -448,9 +444,6 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 		else
 			status = Add(aSmartInfo); // muun tyyppiset datat kuin editoitavat menevät listaan
 	}
-#ifndef UNIX
-	TRACE("Dataa NFmiInfoOrganizerissa jälkeen AddData:a %d kpl.\n", CountData());
-#endif
 	return status;
 }
 

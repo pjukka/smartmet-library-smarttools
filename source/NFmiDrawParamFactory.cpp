@@ -50,8 +50,7 @@ NFmiDrawParamFactory::~NFmiDrawParamFactory(void)
 NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo 
 													 , const NFmiDataIdent& theIdent
 													 , bool& fSubParam
-													 , const NFmiLevel* theLevel
-													 , bool theIsToolMasterAvailable)
+													 , const NFmiLevel* theLevel)
 
 //  Tässä metodissa valitaan sääparametrin theParam perusteella piirtoa
 //  varten sopiva drawParam. Kostruktorin NFmiDrawParam vaatima pointteri
@@ -63,7 +62,6 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo
 	if(!theInfo)
 		return 0;
 
-	fToolMasterAvailable = theIsToolMasterAvailable;
 	theInfo->Param(theIdent);
 	if(theLevel)
 		theInfo->Level(*theLevel);
@@ -88,9 +86,8 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo
 	return drawParam;
 }
 
-NFmiDrawParam* NFmiDrawParamFactory::CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent, bool theIsToolMasterAvailable)
+NFmiDrawParam* NFmiDrawParamFactory::CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent)
 {
-	fToolMasterAvailable = theIsToolMasterAvailable;
 	NFmiDrawParam* drawParam = new NFmiDrawParam;
 
 	if(drawParam)
@@ -120,14 +117,8 @@ bool NFmiDrawParamFactory::Init()
 NFmiString NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam)
 {
 	NFmiString fileName(itsWorkingDirectory);
-//#ifdef FMI_USE_TOOLMASTER
-//	if(fToolMasterAvailable)
-		fileName += "\\TMDrawParams\\DrawParam_";
-//#else
-//	else
-//		fileName += "\\DrawParams\\DrawParam_";
-//#endif
-//	assert(drawParam->Param().GetParam()); // testaa, onko parametri asetettu kohdalleen
+	fileName += "\\TMDrawParams\\DrawParam_";
+
 	if(drawParam)
 	{
 		int paramId = drawParam->Param().GetParam()->GetIdent();

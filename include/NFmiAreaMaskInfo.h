@@ -25,7 +25,7 @@
 #include "NFmiAreaMask.h"
 #include "NFmiDataIdent.h"
 #include "NFmiCalculationCondition.h"
-#include "FmiNMeteditLibraryDefinitions.h"
+//#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiPoint.h"
 
 class NFmiLevel;

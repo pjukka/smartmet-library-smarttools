@@ -42,8 +42,8 @@ NFmiDrawParam::NFmiDrawParam()
 : itsParameter(NFmiParam(kFmiLastParameter))
 , itsParameterAbbreviation("?")
 , itsPriority(1)
-, itsViewType							 (kFmiIsoLineView)
-, itsStationDataViewType				 (kFmiTextView)
+, itsViewType							 (NFmiMetEditorTypes::kFmiIsoLineView)
+, itsStationDataViewType				 (NFmiMetEditorTypes::kFmiTextView)
 , itsFrameColor						     (NFmiColor(0.,0.,0.)) // musta
 , itsFillColor						     (NFmiColor(0.,0.,0.)) // musta
 , itsNonModifiableColor				     (NFmiColor(0.,0.,0.)) // musta
@@ -157,8 +157,8 @@ NFmiDrawParam::NFmiDrawParam()
 //********** 'versio 2' parametreja *************
 //***********************************************
 {
-	itsPossibleViewTypeList[0] = kFmiTextView;
-	itsPossibleViewTypeList[1] = kFmiIsoLineView;
+	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
+	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
 }
 
 //-------------------------------------------------------
@@ -171,8 +171,8 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 : itsParameter(NFmiParam(theParam))
 , itsParameterAbbreviation("?")
 , itsPriority(thePriority)
-, itsViewType							 (kFmiIsoLineView)
-, itsStationDataViewType				 (kFmiTextView)
+, itsViewType							 (NFmiMetEditorTypes::kFmiIsoLineView)
+, itsStationDataViewType				 (NFmiMetEditorTypes::kFmiTextView)
 , itsFrameColor						     (NFmiColor(0.,0.,0.)) // musta
 , itsFillColor						     (NFmiColor(0.,0.,0.)) // musta
 , itsNonModifiableColor				     (NFmiColor(0.,0.,0.)) // musta
@@ -282,8 +282,8 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 
 {
-	itsPossibleViewTypeList[0] = kFmiTextView;
-	itsPossibleViewTypeList[1] = kFmiIsoLineView;
+	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
+	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
 }
 
 //-------------------------------------------------------
@@ -296,8 +296,8 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 : itsParameter(theParam)
 , itsParameterAbbreviation("?")
 , itsPriority(thePriority)
-, itsViewType							 (kFmiIsoLineView)
-, itsStationDataViewType				 (kFmiTextView)
+, itsViewType							 (NFmiMetEditorTypes::kFmiIsoLineView)
+, itsStationDataViewType				 (NFmiMetEditorTypes::kFmiTextView)
 , itsFrameColor						     (NFmiColor(0.,0.,0.)) // musta
 , itsFillColor						     (NFmiColor(0.,0.,0.)) // musta
 , itsNonModifiableColor				     (NFmiColor(0.,0.,0.)) // musta
@@ -407,8 +407,8 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 , itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 
 {
-	itsPossibleViewTypeList[0] = kFmiTextView;
-	itsPossibleViewTypeList[1] = kFmiIsoLineView;
+	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
+	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
 }
 //-------------------------------------------------------
 // ~NFmiDrawParam
@@ -462,7 +462,7 @@ void NFmiDrawParam::Init(NFmiDrawParam* theDrawParam)
 
 		itsPossibleViewTypeCount = theDrawParam->PossibleViewTypeCount();
 
-		FmiEditorMapViewType* possibleViewTypeList = theDrawParam->PossibleViewTypeList();
+		NFmiMetEditorTypes::View* possibleViewTypeList = theDrawParam->PossibleViewTypeList();
 		for (int typeNumber = 0; typeNumber < itsPossibleViewTypeCount; typeNumber++)
 		{
 			itsPossibleViewTypeList[typeNumber] = possibleViewTypeList[typeNumber];
@@ -823,7 +823,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			file >> itsPriority;
 			file >> temp; // luetaan nimike pois
 			file >> number;
-			itsViewType = (FmiEditorMapViewType)number;
+			itsViewType = (NFmiMetEditorTypes::View)number;
 			
 			file >> temp; // luetaan nimike pois
 			file >> number;
@@ -871,14 +871,14 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			for(int ind = 0; ind < itsPossibleViewTypeCount;ind++)
 			{
 				file >> number;
-				itsPossibleViewTypeList[ind] = (FmiEditorMapViewType)number;
+				itsPossibleViewTypeList[ind] = (NFmiMetEditorTypes::View)number;
 			}
 
 			file >> temp; // luetaan nimike pois
 			file >> itsTimeSerialModifyingLimit;
 			file >> temp; // luetaan nimike pois
 			file >> number;
-			itsStationDataViewType = (FmiEditorMapViewType)number;
+			itsStationDataViewType = (NFmiMetEditorTypes::View)number;
 			file >> temp; // luetaan nimike pois
 			file >> fEditableParam;
 
@@ -1037,3 +1037,6 @@ const NFmiString& NFmiDrawParam::ParameterAbbreviation(void) const
 	else
 		return itsInfo->Param().GetParam()->GetName();
 }
+
+
+

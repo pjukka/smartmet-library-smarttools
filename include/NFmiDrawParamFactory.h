@@ -45,19 +45,15 @@ public:
 	NFmiDrawParam * CreateDrawParam( NFmiSmartInfo* theInfo
                                    , const NFmiDataIdent& theIdent
 								   , bool& fSubParam 
-								   , const NFmiLevel* theLevel
-								   , bool theIsToolMasterAvailable);
-	NFmiDrawParam * CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent, bool theIsToolMasterAvailable);
+								   , const NFmiLevel* theLevel);
+	NFmiDrawParam * CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent);
 	bool Init();
 	const NFmiString& WorkingDirectory(void) const {return itsWorkingDirectory;};
 	void WorkingDirectory(const NFmiString& newValue){itsWorkingDirectory = newValue;};
 
 private:
 	NFmiString CreateFileName(NFmiDrawParam* drawParam);
-// Attributes
-//	NFmiDrawParam itsDefaultDrawParam;	
 	NFmiString itsWorkingDirectory;
-	bool fToolMasterAvailable;
 };
 
 #endif

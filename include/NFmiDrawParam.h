@@ -33,9 +33,10 @@
 #include "NFmiGlobals.h"
 #include "NFmiParameterName.h"
 #include "NFmiDataIdent.h"
-#include "FmiNMeteditLibraryDefinitions.h"
+//#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiColor.h"
 #include "NFmiPoint.h"
+#include "NFmiMetEditorTypes.h"
 
 #include <vector>
 
@@ -75,8 +76,8 @@ public:
 	NFmiSmartInfo*       Info (void){ return itsInfo; } ; 
 	void				 Priority (int thePriority){ itsPriority = thePriority; }; 
 	int					 Priority (void){ return itsPriority; }; 
-	void				 ViewType (const FmiEditorMapViewType& theViewType) { itsViewType = theViewType; };
-	FmiEditorMapViewType ViewType (void) {return itsViewType;};
+	void				 ViewType (const NFmiMetEditorTypes::View& theViewType) { itsViewType = theViewType; };
+	NFmiMetEditorTypes::View ViewType (void) {return itsViewType;};
 	void				 FrameColor (const NFmiColor& theFrameColor) { itsFrameColor = theFrameColor; };
 	const NFmiColor&	 FrameColor (void) const { return itsFrameColor; };
 	void				 FillColor (const NFmiColor& theFillColor) { itsFillColor = theFillColor; };
@@ -99,7 +100,7 @@ public:
 	double				 ModifyingStep (void) { return itsModifyingStep; };
 	void				 ModifyingUnit (bool theModifyingUnit) { fModifyingUnit = theModifyingUnit; }
 	bool			 ModifyingUnit (void) { return fModifyingUnit; }
-	FmiEditorMapViewType* PossibleViewTypeList (void) {return itsPossibleViewTypeList;}
+	NFmiMetEditorTypes::View* PossibleViewTypeList (void) {return itsPossibleViewTypeList;}
 	int					 PossibleViewTypeCount (void) { return itsPossibleViewTypeCount; };
 	NFmiString			 InitFileName(void) { return itsInitFileName; }
 	void				 InitFileName(NFmiString theFileName) { itsInitFileName = theFileName; }
@@ -117,9 +118,9 @@ public:
 	void IsolineColor(const NFmiColor& newColor){itsIsolineColor = newColor;};
 	void IsolineTextColor(const NFmiColor& newColor){itsIsolineTextColor = newColor;};
 	double TimeSerialModifyingLimit(void){return fModifyingUnit ? itsTimeSerialModifyingLimit : 100;};
-	FmiEditorMapViewType StationDataViewType(void){return itsStationDataViewType;};
+	NFmiMetEditorTypes::View StationDataViewType(void){return itsStationDataViewType;};
 	void TimeSerialModifyingLimit(double newValue){itsTimeSerialModifyingLimit = newValue;};
-	void StationDataViewType(FmiEditorMapViewType newValue){itsStationDataViewType = newValue;};
+	void StationDataViewType(NFmiMetEditorTypes::View newValue){itsStationDataViewType = newValue;};
 
 
 	void				 FileVersionNumber (const float theFileVersionNumber) { itsFileVersionNumber = theFileVersionNumber; };
@@ -299,8 +300,8 @@ protected:
 
 //  Parametrin oletus näyttötyyppi (symboli, 
 //  isoviiva, teksti...)
-	FmiEditorMapViewType itsViewType;
-	FmiEditorMapViewType itsStationDataViewType; // jos viewtype on isoviiva, mutta data on asema dataa, pitää olla varalla joku näyttötyyppi että voidaan piirtää tällöin
+	NFmiMetEditorTypes::View itsViewType;
+	NFmiMetEditorTypes::View itsStationDataViewType; // jos viewtype on isoviiva, mutta data on asema dataa, pitää olla varalla joku näyttötyyppi että voidaan piirtää tällöin
 	NFmiColor itsFrameColor;
 	NFmiColor itsFillColor;
 
@@ -336,7 +337,7 @@ protected:
 
 //   Lista mahdollisista näyttötyypeistä kyseiselle 
 //   parametrille.
-	FmiEditorMapViewType itsPossibleViewTypeList[5];
+	NFmiMetEditorTypes::View itsPossibleViewTypeList[5];
 	int itsPossibleViewTypeCount;
 
 	// Tekstinäyttö:
@@ -449,3 +450,6 @@ inline std::istream& operator>>(std::istream& is, NFmiDrawParam& item){return it
 //@}
 
 #endif
+
+
+

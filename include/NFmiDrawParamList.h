@@ -35,7 +35,7 @@
 #include "NFmiSortedPtrList.h"
 #include "NFmiGlobals.h"
 #include "NFmiParameterName.h"
-#include "FmiNMeteditLibraryDefinitions.h"
+//#include "FmiNMeteditLibraryDefinitions.h"
 #include <list>
 #include <vector>
 #include "NFmiInfoData.h"

@@ -31,16 +31,13 @@
 #endif
 
 #include "NFmiSmartInfo.h"
-#include "FmiNMeteditLibraryDefinitions.h"
+//#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiUndoableMultiLevelMask.h"
 #include "NFmiMultiLevelMask.h"
 #include "NFmiQueryData.h"
 #include "NFmiGrid.h"
 #include "NFmiCombinedParam.h"
-
-#ifndef UNIX
- #include "stdafx.h"
-#endif
+#include "NFmiMetEditorTypes.h"
 
 NFmiSmartInfo::NFmiSmartInfo()
 :NFmiFastQueryInfo()
@@ -288,7 +285,7 @@ bool NFmiSmartInfo::operator<(const NFmiSmartInfo& theSmartInfo) const
 bool NFmiSmartInfo::MaskByArea(const NFmiArea &theArea, unsigned long theMaskType)
 {
 	unsigned long oldMask = MaskType();
-	MaskType(kFmiNoMask);
+	MaskType(NFmiMetEditorTypes::kFmiNoMask);
 	for(ResetLocation(); NextLocation();)
 	{
 		NFmiPoint latlon = LatLon();

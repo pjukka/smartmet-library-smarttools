@@ -38,7 +38,7 @@
 #include "NFmiSortedPtrList.h"
 #include "NFmiParamBag.h"
 #include "NFmiParameterName.h"
-#include "FmiNMeteditLibraryDefinitions.h"
+//#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiInfoData.h"
 #include <vector>
 
@@ -56,7 +56,7 @@ class NFmiInfoOrganizer
 {
  public:
 	 	
-	NFmiInfoOrganizer (bool theIsToolMasterAvailable);
+	NFmiInfoOrganizer (void);
 	~NFmiInfoOrganizer (void); 
 
  	bool Init (void);
@@ -138,7 +138,6 @@ class NFmiInfoOrganizer
 	NFmiString itsWorkingDirectory;
 	NFmiSmartInfo* itsEditedData; // editoitavaa dataa voi olla vain yksi kerrallaan, joten laitoin sen erilleen tehokkuuden takia.
 	NFmiSmartInfo* itsEditedDataCopy; // t‰m‰ on editoitavan datan kopio, mit‰ k‰ytt‰j‰ voi halutessaan p‰ivitt‰‰, k‰ytet‰‰n visualisoimaan tehtyj‰ muutoksia datassa
-	bool fToolMasterAvailable;
 };
 
 #endif

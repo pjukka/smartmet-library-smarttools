@@ -30,7 +30,7 @@
 #define  NFMISMARTINFO_H
 
 #include "NFmiFastQueryInfo.h"
-#include "FmiNMeteditLibraryDefinitions.h"
+//#include "FmiNMeteditLibraryDefinitions.h"
 
 class NFmiUndoableMultiLevelMask;
 class NFmiBitMask;

@@ -41,6 +41,7 @@
 #include "NFmiRelativeDataIterator.h"
 #include "NFmiRelativeTimeIntegrationIterator.h"
 #include "NFmiDrawParam.h"
+#include "NFmiMetEditorTypes.h"
 
 #include <cassert>
 
@@ -274,9 +275,9 @@ static void ModifyConditionalData(bool modifySelectedOnly, NFmiTimeDescriptor *t
 		try
 		{
 			if(modifySelectedOnly)
-				info->MaskType(kFmiSelectionMask);
+				info->MaskType(NFmiMetEditorTypes::kFmiSelectionMask);
 			else
-				info->MaskType(kFmiNoMask);
+				info->MaskType(NFmiMetEditorTypes::kFmiNoMask);
 			NFmiTimeDescriptor modifiedTimes(theModifiedTimes ? *theModifiedTimes : info->TimeDescriptor());
 			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 			{
@@ -336,9 +337,9 @@ void NFmiSmartToolModifier::ModifyData2(NFmiTimeDescriptor* theModifiedTimes, NF
 		try
 		{
 			if(fModifySelectedLocationsOnly)
-				info->MaskType(kFmiSelectionMask);
+				info->MaskType(NFmiMetEditorTypes::kFmiSelectionMask);
 			else
-				info->MaskType(kFmiNoMask);
+				info->MaskType(NFmiMetEditorTypes::kFmiNoMask);
 			NFmiTimeDescriptor modifiedTimes(theModifiedTimes ? *theModifiedTimes : info->TimeDescriptor());
 			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 			{
