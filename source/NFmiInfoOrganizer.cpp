@@ -889,10 +889,24 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, int t
 std::vector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type theDataType)
 {
 	std::vector<NFmiSmartInfo*> infoVector;
-	for(Reset(); Next();)
+
+	if(theDataType == NFmiInfoData::kEditable)
 	{
-		if(Current()->DataType() == theDataType)
-			infoVector.push_back(Current());
+		if(itsEditedData)
+			infoVector.push_back(itsEditedData);
+	}
+	else if(theDataType == NFmiInfoData::kCopyOfEdited)
+	{
+		if(itsEditedDataCopy)
+			infoVector.push_back(itsEditedDataCopy);
+	}
+	else 
+	{
+		for(Reset(); Next();)
+		{
+			if(Current()->DataType() == theDataType)
+				infoVector.push_back(Current());
+		}
 	}
 	return infoVector;
 }
