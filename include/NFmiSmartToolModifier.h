@@ -41,6 +41,7 @@ class NFmiSmartInfo;
 class NFmiAreaMaskSectionInfo;
 class NFmiDataModifier;
 class NFmiDataIterator;
+class NFmiSmartToolCalculationBlock;
 
 class NFmiSmartToolModifier 
 {
@@ -64,12 +65,13 @@ public:
 
 private:
 //	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculation *theMaskCondition, NFmiSmartToolCalculationSection *theConditionalCalculations);
+	NFmiAreaMask* CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception);
 	void GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit) throw (NFmiSmartToolModifier::Exception);
 	NFmiDataModifier* CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception);
 	NFmiDataIterator* CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo) throw (NFmiSmartToolModifier::Exception);
 	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes);
 	void ModifyData2(NFmiTimeDescriptor* theModifiedTimes, NFmiSmartToolCalculationSection* theCalculationSection);
-	void InitializeCalculationModifiers(void);
+	void InitializeCalculationModifiers(NFmiSmartToolCalculationBlock* theBlock);
 	void ClearCalculationModifiers(void);
 	NFmiAreaMask* CreateAreaMask(const NFmiAreaMaskInfo &theInfo) throw (NFmiSmartToolModifier::Exception);
 	NFmiAreaMask* CreateEndingAreaMask(void);

@@ -58,6 +58,25 @@ class NFmiAreaMaskSectionInfo;
 class NFmiAreaMaskInfo;
 class NFmiSmartToolCalculationInfo;
 
+class NFmiSmartToolCalculationBlock
+{
+public:
+	NFmiSmartToolCalculationBlock(void);
+	~NFmiSmartToolCalculationBlock(void);
+	void Clear(void);
+	
+	NFmiSmartToolCalculationSectionInfo* itsFirstCalculationSectionInfo;
+	NFmiSmartToolCalculationSectionInfo* itsLastCalculationSectionInfo;
+	NFmiAreaMaskSectionInfo* itsIfAreaMaskSectionInfo;
+	NFmiSmartToolCalculationSectionInfo* itsIfCalculationSectionInfo;
+//	std::vector<NFmiAreaMaskSectionInfo*> itsElseIfAreaMaskSectionInfoVector;
+//	std::vector<NFmiSmartToolCalculationSectionInfo*> itsElseIfCalculationSectionInfoVector;
+	NFmiAreaMaskSectionInfo* itsElseIfAreaMaskSectionInfo;
+	NFmiSmartToolCalculationSectionInfo* itsElseIfCalculationSectionInfo;
+	bool fElseSectionExist;
+	NFmiSmartToolCalculationSectionInfo* itsElseCalculationSectionInfo;
+};
+
 class NFmiSmartToolIntepreter 
 {
 public:
@@ -79,6 +98,8 @@ public:
 	const std::string& GetMacroText(void) const {return itsMacroText;}
 	const std::string& GetStrippedMacroText(void) const {return itsStrippedMacroText;}
 
+	std::vector<NFmiSmartToolCalculationBlock>& SmartToolCalculationBlocks(void){return itsSmartToolCalculationBlocks;}
+/*
 	NFmiSmartToolCalculationSectionInfo* FirstCalculationSectionInfo(void){return itsFirstCalculationSectionInfo;}
 	NFmiSmartToolCalculationSectionInfo* LastCalculationSectionInfo(void){return itsLastCalculationSectionInfo;}
 	NFmiAreaMaskSectionInfo* IfAreaMaskSectionInfo(void){return itsIfAreaMaskSectionInfo;}
@@ -90,10 +111,11 @@ public:
 //	NFmiAreaMaskSectionInfo* ElseAreaMaskSectionInfo(void){return itsElseAreaMaskSectionInfo;}
 	bool ElseSectionExist(void){return fElseSectionExist;}
 	NFmiSmartToolCalculationSectionInfo* ElseCalculationSectionInfo(void){return itsElseCalculationSectionInfo;}
-
+*/
 private:
 	typedef std::map<std::string, FmiParameterName> ParamMap;
 
+	bool CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlock* theBlock);
 	std::string NFmiSmartToolIntepreter::HandlePossibleUnaryMarkers(const std::string &theCurrentString);
 	NFmiLevel GetPossibleLevelInfo(const std::string &theLevelText) throw (NFmiSmartToolIntepreter::Exception);
 	NFmiProducer GetPossibleProducerInfo(const std::string &theProducerText) throw (NFmiSmartToolIntepreter::Exception);
@@ -115,14 +137,14 @@ private:
 	NFmiSmartToolCalculationInfo* InterpretCalculationLine(const std::string &theCalculationLineText) throw (NFmiSmartToolIntepreter::Exception);
 	bool InterpretNextMask(const std::string &theMaskSectionText);
 	std::string::iterator ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition);
-	void InitSectionInfos(void);
+//	void InitSectionInfos(void);
 	void InitCheckOut(void);
-	void CheckoutPossibleFirstCalculationSection(void);
-	bool CheckoutPossibleIfClauseSection(void);
-	bool CheckoutPossibleElseIfClauseSection(void);
+//	void CheckoutPossibleFirstCalculationSection(void);
+	bool CheckoutPossibleIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
+	bool CheckoutPossibleElseIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
 	bool CheckoutPossibleElseClauseSection(void);
 	bool CheckoutPossibleNextCalculationSection(NFmiSmartToolCalculationSectionInfo* theSectionInfo);
-	void CheckoutPossibleLastCalculationSection(void);
+//	void CheckoutPossibleLastCalculationSection(void);
 	bool ExtractPossibleNextCalculationSection(void) throw (NFmiSmartToolIntepreter::Exception);
 	bool ExtractPossibleIfClauseSection(void);
 	bool ExtractPossibleElseIfClauseSection(void);
@@ -155,16 +177,7 @@ private:
 	std::string itsMacroText;
 	std::string itsStrippedMacroText;
 
-	NFmiSmartToolCalculationSectionInfo* itsFirstCalculationSectionInfo;
-	NFmiSmartToolCalculationSectionInfo* itsLastCalculationSectionInfo;
-	NFmiAreaMaskSectionInfo* itsIfAreaMaskSectionInfo;
-	NFmiSmartToolCalculationSectionInfo* itsIfCalculationSectionInfo;
-//	std::vector<NFmiAreaMaskSectionInfo*> itsElseIfAreaMaskSectionInfoVector;
-//	std::vector<NFmiSmartToolCalculationSectionInfo*> itsElseIfCalculationSectionInfoVector;
-	NFmiAreaMaskSectionInfo* itsElseIfAreaMaskSectionInfo;
-	NFmiSmartToolCalculationSectionInfo* itsElseIfCalculationSectionInfo;
-	bool fElseSectionExist;
-	NFmiSmartToolCalculationSectionInfo* itsElseCalculationSectionInfo;
+	std::vector<NFmiSmartToolCalculationBlock> itsSmartToolCalculationBlocks;
 
 	int itsMaxCalculationSectionCount;
 

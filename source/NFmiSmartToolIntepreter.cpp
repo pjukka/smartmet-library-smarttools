@@ -54,6 +54,42 @@ struct EndOfLineSearcher
 
 };
 
+//HUOM!!! vaarallinen luokka, pitää muistaa kutsua Clearia, muuten vuotaa!!!
+NFmiSmartToolCalculationBlock::NFmiSmartToolCalculationBlock(void)
+:itsFirstCalculationSectionInfo(new NFmiSmartToolCalculationSectionInfo)
+,itsLastCalculationSectionInfo(new NFmiSmartToolCalculationSectionInfo)
+,itsIfAreaMaskSectionInfo(new NFmiAreaMaskSectionInfo)
+,itsIfCalculationSectionInfo(new NFmiSmartToolCalculationSectionInfo)
+,itsElseIfAreaMaskSectionInfo(new NFmiAreaMaskSectionInfo)
+,itsElseIfCalculationSectionInfo(new NFmiSmartToolCalculationSectionInfo)
+,itsElseCalculationSectionInfo(new NFmiSmartToolCalculationSectionInfo)
+{
+}
+
+NFmiSmartToolCalculationBlock::~NFmiSmartToolCalculationBlock(void)
+{
+}
+
+// älä kutsu Clear:ia destruktorissa!!!!
+void NFmiSmartToolCalculationBlock::Clear(void)
+{
+	delete itsFirstCalculationSectionInfo;
+	itsFirstCalculationSectionInfo = 0;
+	delete itsLastCalculationSectionInfo;
+	itsLastCalculationSectionInfo = 0;
+	delete itsIfAreaMaskSectionInfo;
+	itsIfAreaMaskSectionInfo = 0;
+	delete itsIfCalculationSectionInfo;
+	itsIfCalculationSectionInfo = 0;
+	delete itsElseIfAreaMaskSectionInfo;
+	itsElseIfAreaMaskSectionInfo = 0;
+	delete itsElseIfCalculationSectionInfo;
+	itsElseIfCalculationSectionInfo = 0;
+	delete itsElseCalculationSectionInfo;
+	itsElseCalculationSectionInfo = 0;
+	fElseSectionExist = false;
+}
+
 // Luokan staattisten dataosien pakollinen alustus.
 bool NFmiSmartToolIntepreter::fTokensInitialized = false;
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenParameterNamesAndIds;
@@ -84,17 +120,15 @@ NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctio
 // Constructor/Destructor 
 //--------------------------------------------------------
 NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(void)
-:itsFirstCalculationSectionInfo(0)
-,itsLastCalculationSectionInfo(0)
-,itsIfAreaMaskSectionInfo(0)
-,itsIfCalculationSectionInfo(0)
-//,itsElseAreaMaskSectionInfo(0)
-,fElseSectionExist(false)
-,itsElseCalculationSectionInfo(0)
-//,itsElseIfAreaMaskSectionInfoVector()
-//,itsElseIfCalculationSectionInfoVector()
-,itsElseIfAreaMaskSectionInfo(0)
-,itsElseIfCalculationSectionInfo(0)
+:itsSmartToolCalculationBlocks()
+//itsFirstCalculationSectionInfo(0)
+//,itsLastCalculationSectionInfo(0)
+//,itsIfAreaMaskSectionInfo(0)
+//,itsIfCalculationSectionInfo(0)
+//,fElseSectionExist(false)
+//,itsElseCalculationSectionInfo(0)
+//,itsElseIfAreaMaskSectionInfo(0)
+//,itsElseIfCalculationSectionInfo(0)
 {
 	NFmiSmartToolIntepreter::InitTokens();
 }
@@ -111,28 +145,48 @@ NFmiSmartToolIntepreter::~NFmiSmartToolIntepreter(void)
 void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText)  throw (NFmiSmartToolIntepreter::Exception)
 {
 	Clear();
-	InitSectionInfos();
+//	InitSectionInfos();
 	SetMacroTexts(theMacroText);
 	InitCheckOut();
 
-	CheckoutPossibleFirstCalculationSection();
-	if(CheckoutPossibleIfClauseSection())
+	bool fGoOn = true;
+	int index = 0;
+	while(fGoOn)
 	{
-		if(!CheckoutPossibleNextCalculationSection(itsIfCalculationSectionInfo))
-			throw NFmiSmartToolIntepreter::Exception(string("IF-haaran jälkeen ei löytynyt laskuja."));
-//		while(CheckoutPossibleElseIfClauseSection())
-		if(CheckoutPossibleElseIfClauseSection())
-		{
-			if(!CheckoutPossibleNextCalculationSection(itsElseIfCalculationSectionInfo))
-				throw NFmiSmartToolIntepreter::Exception(string("ELSEIF-haaran jälkeen ei löytynyt laskuja."));
-		}
-		if((fElseSectionExist = CheckoutPossibleElseClauseSection()) == true)
-			if(!CheckoutPossibleNextCalculationSection(itsElseCalculationSectionInfo))
-				throw NFmiSmartToolIntepreter::Exception(string("ELSE-haaran jälkeen ei löytynyt laskuja."));
+		index++;
+		NFmiSmartToolCalculationBlock block;
+		fGoOn = CheckoutPossibleNextCalculationBlock(&block);
+		itsSmartToolCalculationBlocks.push_back(block);
+		if(index > 10000)
+			break; // huvin vuoksi laitoin iki loopin eston, tai jos yli 10000 lasku blokkia niin sorry!
 	}
-	CheckoutPossibleLastCalculationSection();
 }
 
+bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlock* theBlock)
+{
+//	CheckoutPossibleFirstCalculationSection();
+	CheckoutPossibleNextCalculationSection(theBlock->itsFirstCalculationSectionInfo);
+	if(CheckoutPossibleIfClauseSection(theBlock->itsIfAreaMaskSectionInfo))
+	{
+		if(!CheckoutPossibleNextCalculationSection(theBlock->itsIfCalculationSectionInfo))
+			throw NFmiSmartToolIntepreter::Exception(string("IF-haaran jälkeen ei löytynyt laskuja."));
+//		while(CheckoutPossibleElseIfClauseSection())
+		if(CheckoutPossibleElseIfClauseSection(theBlock->itsElseIfAreaMaskSectionInfo))
+		{
+			if(!CheckoutPossibleNextCalculationSection(theBlock->itsElseIfCalculationSectionInfo))
+				throw NFmiSmartToolIntepreter::Exception(string("ELSEIF-haaran jälkeen ei löytynyt laskuja."));
+		}
+		if((theBlock->fElseSectionExist = CheckoutPossibleElseClauseSection()) == true)
+			if(!CheckoutPossibleNextCalculationSection(theBlock->itsElseCalculationSectionInfo))
+				throw NFmiSmartToolIntepreter::Exception(string("ELSE-haaran jälkeen ei löytynyt laskuja."));
+	}
+//	CheckoutPossibleLastCalculationSection();
+	CheckoutPossibleNextCalculationSection(theBlock->itsLastCalculationSectionInfo);
+	if(itsCheckOutTextStartPosition == itsStrippedMacroText.end())
+		return false;
+	return true;
+}
+/*
 void NFmiSmartToolIntepreter::InitSectionInfos(void)
 {
 	itsFirstCalculationSectionInfo = new NFmiSmartToolCalculationSectionInfo;
@@ -141,10 +195,9 @@ void NFmiSmartToolIntepreter::InitSectionInfos(void)
 	itsIfCalculationSectionInfo = new NFmiSmartToolCalculationSectionInfo;
 	itsElseIfAreaMaskSectionInfo = new NFmiAreaMaskSectionInfo;
 	itsElseIfCalculationSectionInfo = new NFmiSmartToolCalculationSectionInfo;
-//	itsElseAreaMaskSectionInfo = new NFmiAreaMaskSectionInfo;
 	itsElseCalculationSectionInfo = new NFmiSmartToolCalculationSectionInfo;
 }
-
+*/
 void NFmiSmartToolIntepreter::InitCheckOut(void)
 {
 	itsCheckOutSectionText = "";
@@ -152,13 +205,13 @@ void NFmiSmartToolIntepreter::InitCheckOut(void)
 	itsCheckOutTextEndPosition = itsStrippedMacroText.begin(); // tällä ei vielä väliä
 	fContinueCurrentSectionCheckOut = true;
 }
-
+/*
 void NFmiSmartToolIntepreter::CheckoutPossibleFirstCalculationSection(void)
 {
 	if(ExtractPossibleNextCalculationSection())
 		InterpretCalculationSection(itsCheckOutSectionText, itsFirstCalculationSectionInfo);
 }
-
+*/
 static std::string::iterator EatWhiteSpaces(std::string::iterator it)
 {
 	for(; ::isspace(*it) ; ++it)
@@ -286,10 +339,10 @@ bool NFmiSmartToolIntepreter::FindAnyFromText(const std::string &theText, const 
 }
 
 // palauttaa true, jos if-lause löytyi
-bool NFmiSmartToolIntepreter::CheckoutPossibleIfClauseSection(void)
+bool NFmiSmartToolIntepreter::CheckoutPossibleIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo)
 {
 	if(ExtractPossibleIfClauseSection())
-		return InterpretMaskSection(itsCheckOutSectionText, itsIfAreaMaskSectionInfo);
+		return InterpretMaskSection(itsCheckOutSectionText, theAreaMaskSectionInfo);
 	return false;
 }
 
@@ -352,10 +405,10 @@ bool NFmiSmartToolIntepreter::ExtractPossibleConditionalClauseSection(memfunctio
 // ExtractPossibleIfClauseSection-metodista. Olisin halunnut käyttää yleistä
 // funktiota, jolle annetaan parametrina yksi erottava metodi.
 // palauttaa true, jos ifelse-lause löytyi
-bool NFmiSmartToolIntepreter::CheckoutPossibleElseIfClauseSection(void)
+bool NFmiSmartToolIntepreter::CheckoutPossibleElseIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo)
 {
 	if(ExtractPossibleElseIfClauseSection())
-		return InterpretMaskSection(itsCheckOutSectionText, itsElseIfAreaMaskSectionInfo);
+		return InterpretMaskSection(itsCheckOutSectionText, theAreaMaskSectionInfo);
 	return false;
 }
 
@@ -411,12 +464,12 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationSection(NFmiSmartTo
 		return InterpretCalculationSection(itsCheckOutSectionText, theSectionInfo);
 	return false;
 }
-
+/*
 void NFmiSmartToolIntepreter::CheckoutPossibleLastCalculationSection(void)
 {
 	CheckoutPossibleNextCalculationSection(itsLastCalculationSectionInfo);
 }
-
+*/
 void NFmiSmartToolIntepreter::SetMacroTexts(const std::string &theMacroText) throw (NFmiSmartToolIntepreter::Exception)
 {
 	itsMacroText = theMacroText;
@@ -920,7 +973,7 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 						  levelExist, levelNameOnly,
 						  producerExist, producerNameOnly);
 
-	bool origWanted = IsProducerOrig(producerNameOnly);
+	bool origWanted = producerExist ? IsProducerOrig(producerNameOnly) : false; // lisäsin ehdon, koska boundchecker valitti tyhjän stringin vertailua IsProducerOrig-metodissa.
 
 //	bool levelInVariableName = ExtractParamAndLevel(theVariableText, &paramNameOnly, &levelNameOnly);
 	if(levelExist && producerExist) // kokeillaan ensin, löytyykö param+level+producer
@@ -1306,7 +1359,8 @@ bool NFmiSmartToolIntepreter::IsVariableRampFunction(const std::string &theVaria
 			if(tokens[1].second == VARIABLE && tokens[2].second == NUMBER && tokens[3].second == NUMBER)
 			{
 				InterpretVariable(tokens[1].first, theMaskInfo);
-				if(theMaskInfo->GetOperationType() == CalculationOperationType::InfoVariable)
+				CalculationOperationType type = theMaskInfo->GetOperationType();
+				if(type == CalculationOperationType::InfoVariable || type == CalculationOperationType::CalculatedVariable)
 				{
 					theMaskInfo->SetOperationType(CalculationOperationType::RampFunction);
 					NFmiValueString valueString1(tokens[2].first);
@@ -1376,6 +1430,10 @@ std::string::iterator NFmiSmartToolIntepreter::ExtractFirstCalculationSection(co
 
 void NFmiSmartToolIntepreter::Clear(void)
 {
+	int size = itsSmartToolCalculationBlocks.size();
+	for(int i=0; i<size; i++)
+		itsSmartToolCalculationBlocks[i].Clear();
+/*
 	delete itsFirstCalculationSectionInfo;
 	itsFirstCalculationSectionInfo = 0;
 	delete itsLastCalculationSectionInfo;
@@ -1392,7 +1450,7 @@ void NFmiSmartToolIntepreter::Clear(void)
 	itsElseIfAreaMaskSectionInfo = 0;
 	delete itsElseIfCalculationSectionInfo;
 	itsElseIfCalculationSectionInfo = 0;
-
+*/
 /*
 	std::for_each(itsElseIfAreaMaskSectionInfoVector.begin(), itsElseIfAreaMaskSectionInfoVector.end(), PointerDestroyer());
 	itsElseIfAreaMaskSectionInfoVector.clear();
