@@ -714,8 +714,6 @@ void NFmiInfoOrganizer::UpdateEditedDataCopy(void)
 // ja editoidun datan hplaceDescriptori
 static NFmiQueryData* CreateDefaultMacroParamQueryData(NFmiQueryInfo & theEditedInfo)
 {
-	NFmiQueryData* data = 0;
-
 	NFmiLevelBag levelBag;
 	levelBag.AddLevel(NFmiLevel(kFmiGroundSurface, 0)); // ihan mitä puppua vain, ei väliä
 	NFmiVPlaceDescriptor vPlace(levelBag);
