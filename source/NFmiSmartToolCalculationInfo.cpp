@@ -75,3 +75,4 @@ void NFmiSmartToolCalculationInfo::CheckIfAllowMissingValueAssignment(void)
 		}
 	}
 }
+

@@ -61,3 +61,4 @@ void NFmiSmartToolCalculationSectionInfo::AddModifiedParams(std::set<int> &theMo
 		theModifiedParams.insert(itsSmartToolCalculationInfoVector[i]->GetResultDataInfo()->GetDataIdent().GetParamIdent());
 	}
 }
+
