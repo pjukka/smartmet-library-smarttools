@@ -44,7 +44,7 @@
 #include <functional>
 #include <cctype>
 
-const static int gMesanProdId = 104;
+static const int gMesanProdId = 104;
 
 using namespace std;
 /*
