@@ -160,5 +160,14 @@ private:
 	std::string itsIncludeDirectory; // mist‰ ladataan mahd. include filet
 
 	NFmiTimeDescriptor *itsModifiedTimes; // ei omista/tuhoa
+
+	// N‰m‰ muuttujat ovat sit‰ varten ett‰ SumZ ja MinH tyyppisiss‰ funktoissa
+	// k‰ytet‰‰n parasta mahdollista level-dataa. Eli ensin hybridi ja sitten painepinta dataa.
+	bool fHeightFunctionFlag; // ollaanko tekem‰ss‰ SumZ tai MinH tyyppisen funktion calculaatio-otusta
+	bool fUseLevelData; // kun t‰m‰ flagi on p‰‰ll‰, k‰ytet‰‰n CreateInfo-metodissa hybridi-datoja jos mahd. ja sitten painepinta datoja.
+	int itsCommaCounter; // tarvitaan laskemaan pilkkuja, kun lasketaan milloin level-dataa pit‰‰ k‰ytt‰‰.
+	int itsParethesisCounter; // kun k‰ytet‰‰n esim. Sumz-funktion 2. pilkun j‰lkeen level-dataa, 
+							  // pit‰‰ laskea sulkujen avulla, milloin funktio loppuu.
+							  // HUOM! sulkujen lis‰ksi pit‰‰ laskea myˆs erilaisten funktioiden alut.
 };
 #endif

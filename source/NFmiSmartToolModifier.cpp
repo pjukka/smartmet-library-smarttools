@@ -225,6 +225,10 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer
 ,fModifySelectedLocationsOnly(false)
 ,itsIncludeDirectory()
 ,itsModifiedTimes(0)
+,fHeightFunctionFlag(false)
+,fUseLevelData(false)
+,itsCommaCounter(0)
+,itsParethesisCounter(0)
 {
 	assert(itsInfoOrganizer);
 }
@@ -718,6 +722,8 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 				NFmiAreaMask *areaMask2 = CreateCalculatedAreaMask(theAreaMaskInfo);
 				areaMask = new NFmiCalculationRampFuctionWithAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), areaMask2, true);
 			}
+			if(fUseLevelData)
+				itsParethesisCounter++;
 			break;
 			}
 		case NFmiAreaMask::FunctionAreaIntergration:
@@ -738,6 +744,8 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			NFmiDataIterator *iterator = CreateIterator(theAreaMaskInfo, info);
 			areaMask = new NFmiCalculationIntegrationFuction(iterator, modifier, NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, true, deepCopyCreated);
 			areaMask->SetFunctionType(theAreaMaskInfo.GetFunctionType());
+			if(fUseLevelData)
+				itsParethesisCounter++;
 			break;
 			}
 		case NFmiAreaMask::FunctionPeekXY:
@@ -755,6 +763,8 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			}
 			areaMask = new NFmiInfoAreaMaskPeekXY(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, 
 				static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), true, NFmiAreaMask::kNoValue, deepCopyCreated);
+			if(fUseLevelData)
+				itsParethesisCounter++;
 			break;
 			}
 		case NFmiAreaMask::CalculatedVariable:
@@ -768,11 +778,44 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			break;
 			}
 		case NFmiAreaMask::Operator:
+			{
+			areaMask = new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator());
+			break;
+			}
 		case NFmiAreaMask::StartParenthesis:
+			{
+			areaMask = new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator());
+			if(fUseLevelData)
+				itsParethesisCounter++;
+			break;
+			}
 		case NFmiAreaMask::EndParenthesis:
+			{
+			areaMask = new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator());
+			if(fUseLevelData)
+			{
+				itsParethesisCounter--;
+				if(itsParethesisCounter <= 0)
+				{
+					fHeightFunctionFlag = false;
+					fUseLevelData = false;
+				}
+			}
+			break;
+			}
 		case NFmiAreaMask::CommaOperator:
 			{
 			areaMask = new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator());
+			if(fHeightFunctionFlag)
+			{
+				itsCommaCounter++;
+				if(itsCommaCounter >= 2)
+				{  // kun pilkku-laskuri tuli täyteen
+					fUseLevelData = true; // on aika ruveta käyttämään level-dataa infoissa
+					itsParethesisCounter = 1; // lisäksi ruvetaan metsästämään sulkuja, 
+											  // että tiedetään milloin funktio ja level datan käyttö loppuu
+				}
+			}
 			break;
 			}
 		case NFmiAreaMask::Comparison:
@@ -791,12 +834,26 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			{
 			areaMask = new NFmiCalculationSpecialCase;
 			areaMask->SetMathFunctionType(theAreaMaskInfo.GetMathFunctionType());
+			if(fUseLevelData)
+				itsParethesisCounter++;
 			break;
 			}
 		case NFmiAreaMask::ThreeArgumentFunctionStart:
 			{
 			areaMask = new NFmiCalculationSpecialCase;
 			areaMask->SetFunctionType(theAreaMaskInfo.GetFunctionType());
+			areaMask->IntegrationFunctionType(theAreaMaskInfo.IntegrationFunctionType());
+			if(theAreaMaskInfo.IntegrationFunctionType() == 2 || theAreaMaskInfo.IntegrationFunctionType() == 3)
+			{ // jos funktio oli SumZ tai MinH tyyppinen, laitetaan seuraavat jutut 'päälle'
+				fHeightFunctionFlag = true;
+				fUseLevelData = false;
+				itsCommaCounter = 0;
+			}
+			break;
+			}
+		case NFmiAreaMask::DeltaZFunction:
+			{
+			areaMask = new NFmiCalculationDeltaZValue;
 			break;
 			}
 		default:
@@ -900,9 +957,16 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 	if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kScriptVariableData)
 		info = CreateScriptVariableInfo(theAreaMaskInfo.GetDataIdent());
 	else if(theAreaMaskInfo.GetUseDefaultProducer() || theAreaMaskInfo.GetDataType() == NFmiInfoData::kCopyOfEdited)
-		info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), true);
+		info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), true, fUseLevelData);
 	else
-		info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false);
+	{
+		if(fUseLevelData && theAreaMaskInfo.GetLevel() != 0) // jos pitää käyttää level dataa (SumZ ja MinH funktiot), ei saa antaa level infoa parametrin yhteydessä
+			throw runtime_error("Nyt pitää antaa parametri ilman level tietoa.\n" + theAreaMaskInfo.GetMaskText());
+		if(fUseLevelData) // jos leveldata-flagi päällä, yritetään ensin, löytyykö hybridi dataa
+			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), NFmiInfoData::kHybridData, false, fUseLevelData); // tähän pieni hybrid-koukku, jos haluttiin level dataa
+		if(info == 0)
+			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData);
+	}
 	if(!info)
 		throw runtime_error("Haluttua parametria ei löytynyt tietokannasta.\n" + theAreaMaskInfo.GetMaskText());
 	return info;
