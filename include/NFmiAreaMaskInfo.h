@@ -72,7 +72,8 @@ public:
 	void SetOffsetPoint2(const NFmiPoint& newValue){itsOffsetPoint2 = newValue;}
 	NFmiAreaMask::MathFunctionType GetMathFunctionType(void) const {return itsMathFunctionType;};
 	void SetMathFunctionType(NFmiAreaMask::MathFunctionType newValue) {itsMathFunctionType = newValue;};
-
+	int IntegrationFunctionType(void) const {return itsIntegrationFunctionType;}
+	void IntegrationFunctionType(int newValue) {itsIntegrationFunctionType = newValue;}
 private:
 	NFmiDataIdent itsDataIdent;
 	bool fUseDefaultProducer;
@@ -88,5 +89,6 @@ private:
 	NFmiPoint itsOffsetPoint1; // esim. aikaoffset (x alku ja y loppu) tai paikkaoffset (alku x ja y offset)
 	NFmiPoint itsOffsetPoint2; // paikkaoffset (loppu x ja y offset)
 	NFmiAreaMask::MathFunctionType itsMathFunctionType;
+	int itsIntegrationFunctionType; // 1=SumT tyylinen ja 2=SumZ tyylinen ja 3=MinH tyylinen funktio
 };
 #endif

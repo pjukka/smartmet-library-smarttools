@@ -37,6 +37,12 @@ NFmiAreaMaskInfo::NFmiAreaMaskInfo()
 ,itsBinaryOperator(NFmiAreaMask::kNoValue)
 ,itsDataType(NFmiInfoData::kNoDataType)
 ,itsLevel(0)
+,itsMaskText()
+,itsFunctionType(NFmiAreaMask::NotFunction)
+,itsOffsetPoint1()
+,itsOffsetPoint2()
+,itsMathFunctionType(NFmiAreaMask::NotMathFunction)
+,itsIntegrationFunctionType(0)
 {
 }
 
