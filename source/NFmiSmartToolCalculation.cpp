@@ -53,14 +53,15 @@ NFmiSmartToolCalculation::~NFmiSmartToolCalculation(void)
 //--------------------------------------------------------
 // Calculate 
 //--------------------------------------------------------
-void NFmiSmartToolCalculation::Calculate(const NFmiPoint &theLatlon, int theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
 {
 
 	double value = eval_exp(theLatlon, theTime, theTimeIndex);
 	if(value != kFloatMissing)
 	{
-		assert(itsResultInfo->LocationIndex(theLocationIndex)); // kohde dataa juoksutetaan, joten lokaatio indeksien pitää olla synkassa!!!
+		itsResultInfo->LocationIndex(theLocationIndex); // kohde dataa juoksutetaan, joten lokaatio indeksien pitää olla synkassa!!!
 		value = GetInsideLimitsValue(value); // asetetaan value vielä drawparamista satuihin rajoihin, ettei esim. RH voi olla alle 0 tai yli 100 %
+
 		itsResultInfo->FloatValue(value); // miten info saadaan osoittamaan oikeaan kohtaan?!?
 	}
 }
