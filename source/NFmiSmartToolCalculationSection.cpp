@@ -27,6 +27,7 @@
 #include "NFmiAreaMaskInfo.h"
 #include "NFmiSmartToolCalculation.h"
 #include <algorithm>
+
 //--------------------------------------------------------
 // Constructor/Destructor 
 //--------------------------------------------------------
@@ -40,9 +41,10 @@ NFmiSmartToolCalculationSection::~NFmiSmartToolCalculationSection(void)
 //--------------------------------------------------------
 // Calculate 
 //--------------------------------------------------------
-void NFmiSmartToolCalculationSection::Calculate(const NFmiPoint &theLatlon, int theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculationSection::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
 {
 	int size = itsCalculations.size();
+
 	for(int i=0; i<size; i++)
 		itsCalculations[i]->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
 }
