@@ -128,11 +128,15 @@ private:
 	NFmiAreaMaskInfo* CreateWantedAreaMaskInfo(const std::string &theMaskSectionText, std::queue<NFmiAreaMaskInfo *> &theMaskQueue);
 	NFmiSmartToolCalculationInfo* InterpretCalculationLine(const std::string &theCalculationLineText);
 	bool InterpretNextMask(const std::string &theMaskSectionText);
-#if (defined _MSC_VER) && (_MSC_VER < 1310) // 1310 eli kääntäjän versio 13.1 eli MSVC++ 7.1  toteuttaa 1. kerran kunnolla standardia
+
+  // 1310 eli kääntäjän versio 13.1 eli MSVC++ 7.1  toteuttaa 1. kerran kunnolla standardia
+
+#ifdef OLD_MSC
 	std::string::iterator ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition);
 #else
 	std::string::const_iterator ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition);
 #endif
+
 	void InitCheckOut(void);
 	bool IsCaseInsensitiveEqual(const std::string &theStr1, const std::string &theStr2);
 	bool IsPossiblyLevelItem(const std::string &theText, LevelMap &theMap);

@@ -691,7 +691,7 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 		variableInfo = new NFmiAreaMaskInfo;
 		InterpretVariable(tmp, variableInfo);
 
-		sStream >> tmp2; // luetaan operaattori (+-/*)
+		sStream >> tmp2; // luetaan operaattori (+ - / *)
 		calculationInfo->AddCalculationInfo(variableInfo, InterpretCalculationOperator(tmp2));
 	}while(!sStream.fail());
 	if(calculationInfo->GetCalculationOperandInfoVector()->empty())
@@ -1563,13 +1563,14 @@ bool NFmiSmartToolIntepreter::InterpretNextMask(const std::string &theMaskSectio
 // ExtractNextElseIfMaskSection
 // ExtractElseCalculationSection
 
-#if (defined _MSC_VER) && (_MSC_VER < 1310) // 1310 eli kääntäjän versio 13.1 eli MSVC++ 7.1  toteuttaa 1. kerran kunnolla standardia
+ // 1310 eli kääntäjän versio 13.1 eli MSVC++ 7.1  toteuttaa 1. kerran kunnolla standardia
+#ifdef OLD_MSC
 std::string::iterator NFmiSmartToolIntepreter::ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition)
 #else
 std::string::const_iterator NFmiSmartToolIntepreter::ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition)
 #endif
 {
-#if (defined _MSC_VER) && (_MSC_VER < 1310) // 1310 eli kääntäjän versio 13.1 eli MSVC++ 7.1  toteuttaa 1. kerran kunnolla standardia
+#ifdef OLD_MSC
   return const_cast<std::string::iterator>(theMacroText.end());
 #else
   return theMacroText.end();
