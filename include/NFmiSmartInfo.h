@@ -49,7 +49,7 @@ struct NFmiHarmonizerBookKeepingData
 	{}
 
 	NFmiHarmonizerBookKeepingData(const std::set<NFmiMetTime> &theHarmonizerTimesSet, 
-								  bool fHarmonizeAllTimes,
+								  bool foobar,
 								  const NFmiParamBag &theHarmonizerParams)
 	:itsHarmonizerTimesSet()
 	,fHarmonizeAllTimes(false)
