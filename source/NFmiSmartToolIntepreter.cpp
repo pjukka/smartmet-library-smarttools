@@ -929,7 +929,7 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 	calculationInfo->CheckIfAllowMissingValueAssignment();
 	if(calculationInfo->GetResultDataInfo()->GetDataType() == NFmiInfoData::kMacroParam)
 		fMacroParamFound = true;
-	else
+	else if(calculationInfo->GetResultDataInfo()->GetDataType() != NFmiInfoData::kScriptVariableData) // skripti muuttuja voi olla kummassakin tapauksessa mukana
 	{
 		fNormalAssigmentFound = true;
 		if(fMacroParamSkriptInProgress)
