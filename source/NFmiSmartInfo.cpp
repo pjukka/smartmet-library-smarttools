@@ -72,8 +72,6 @@ NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theDa
 ,itsDataType(theType) // 1999.08.24/Marko
 {
 	itsDataReference = theData;
-	if(itsDataReference) // tämän olisi kyllä syytä olla olemassa
-		itsLatLonCache = itsDataReference->LatLonCache(); // latlon cache pitää ottaa fastinfoon käyttöön!!!
 	itsDataFileName = theDataFileName;
 	itsAreaMask = new NFmiUndoableMultiLevelMask(HPlaceDescriptor().Size());
 	itsAreaFactors = 0;
