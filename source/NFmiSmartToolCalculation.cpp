@@ -211,7 +211,9 @@ void NFmiSmartToolCalculation::eval_exp2(double &result, const NFmiPoint &theLat
 		get_token();
 		eval_exp3(temp, theLatlon, theTime, theTimeIndex);
 
-		if(op == NFmiAreaMask::Sub)
+		if(result == kFloatMissing || temp==kFloatMissing)
+		  result = kFloatMissing;
+		else if(op == NFmiAreaMask::Sub)
 		  result = result - temp;
 		else	// Add
 		  result = result + temp;
@@ -232,10 +234,12 @@ void NFmiSmartToolCalculation::eval_exp3(double &result, const NFmiPoint &theLat
 		get_token();
 		eval_exp4(temp, theLatlon, theTime, theTimeIndex);
 
-		if(op == NFmiAreaMask::Mul)
+		if(result == kFloatMissing || temp==kFloatMissing)
+		  result = kFloatMissing;
+		else if(op == NFmiAreaMask::Mul)
 		  result = result * temp;
 		else if(op == NFmiAreaMask::Div)
-		  result = result / temp;
+		  result = (temp == 0 ? kFloatMissing : result / temp);
 		else // NFmiAreaMask::Mod:
 		  result = static_cast<int>(result) % static_cast<int>(temp);
 	}
@@ -260,7 +264,10 @@ void NFmiSmartToolCalculation::eval_exp4(double &result, const NFmiPoint &theLat
 		}
 //		for(t=(int)temp-1; t>0; --t) 
 //			result = result * (double)ex;
-		result = pow(result, temp);
+		if(result == kFloatMissing || temp==kFloatMissing)
+		  result = kFloatMissing;
+		else
+		  result = pow(result, temp);
 	}
 }
 
@@ -272,7 +279,7 @@ void NFmiSmartToolCalculation::eval_exp5(double &result, const NFmiPoint &theLat
 		get_token();
 	eval_exp6(result, theLatlon, theTime, theTimeIndex);
 
-	if(op == NFmiAreaMask::Sub) 
+	if(op == NFmiAreaMask::Sub && result!=kFloatMissing)
 		result = -result;
 }
 
@@ -308,69 +315,74 @@ void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLat
 // c++ funktioille jotka odottavat kulmaa radiaaneille.
 void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunction)
 {
-	static const double trigFactor = 2 * kPii / 360;
-	if(result != kFloatMissing)
+  static const double trigFactor = 2 * kPii / 360;
+
+  if(result != kFloatMissing)
 	{
 	  switch(NFmiAreaMask::MathFunctionType(theFunction))
 		{
 		case NFmiAreaMask::Exp:
-			result = exp(result);
-			break;
+		  result = exp(result);
+		  break;
 		case NFmiAreaMask::Sqrt:
-			result = sqrt(result);
-			break;
+		  result = sqrt(result);
+		  break;
 		case NFmiAreaMask::Log:
-			result = log(result);
-			break;
+		  result = log(result);
+		  break;
 		case NFmiAreaMask::Log10:
-			result = log10(result);
-			break;
+		  result = log10(result);
+		  break;
 		case NFmiAreaMask::Sin:
-			result = sin(result * trigFactor); // konversio asteista radiaaneiksi tehtävä
-			break;
+		  result = sin(result * trigFactor); // konversio asteista radiaaneiksi tehtävä
+		  break;
 		case NFmiAreaMask::Cos:
 			result = cos(result * trigFactor); // konversio asteista radiaaneiksi tehtävä
 			break;
 		case NFmiAreaMask::Tan:
-			result = tan(result * trigFactor); // konversio asteista radiaaneiksi tehtävä
-			break;
+		  result = tan(result * trigFactor); // konversio asteista radiaaneiksi tehtävä
+		  break;
 		case NFmiAreaMask::Sinh:
-			result = sinh(result);
-			break;
+		  result = sinh(result);
+		  break;
 		case NFmiAreaMask::Cosh:
-			result = cosh(result);
+		  result = cosh(result);
 			break;
 		case NFmiAreaMask::Tanh:
-			result = tanh(result);
-			break;
+		  result = tanh(result);
+		  break;
 		case NFmiAreaMask::Asin:
-			if(result >= -1 && result <= 1)
-				result = asin(result)/trigFactor; // konversio radiaaneista asteiksi tehtävä
-			break;
+		  if(result >= -1 && result <= 1)
+			result = asin(result)/trigFactor; // konversio radiaaneista asteiksi tehtävä
+		  else
+			result = kFloatMissing;
+		  break;
 		case NFmiAreaMask::Acos:
-			if(result >= -1 && result <= 1)
-				result = acos(result)/trigFactor; // konversio radiaaneista asteiksi tehtävä
-			break;
+		  if(result >= -1 && result <= 1)
+			result = acos(result)/trigFactor; // konversio radiaaneista asteiksi tehtävä
+		  else
+			result = kFloatMissing;
+		  break;
 		case NFmiAreaMask::Atan:
-			result = atan(result)/trigFactor; // konversio radiaaneista asteiksi tehtävä
-			break;
+		  result = atan(result)/trigFactor; // konversio radiaaneista asteiksi tehtävä
+		  break;
 		case NFmiAreaMask::Ceil:
-			result = ceil(result);
-			break;
+		  result = ceil(result);
+		  break;
 		case NFmiAreaMask::Floor:
-			result = floor(result);
-			break;
+		  result = floor(result);
+		  break;
 		case NFmiAreaMask::Round:
-			result = FmiRound(result);
-			break;
+		  result = FmiRound(result);
+		  break;
 		case NFmiAreaMask::Abs:
-			result = fabs(result);
-			break;
+		  result = fabs(result);
+		  break;
 		case NFmiAreaMask::Rand:
-			result = (static_cast<double>(rand()) / RAND_MAX) * result; // palauttaa luvun 0 ja result:in väliltä
-			break;
+		  result = (static_cast<double>(rand()) / RAND_MAX) * result; // palauttaa luvun 0 ja result:in väliltä
+		  break;
 		default:
-			throw  NFmiSmartToolCalculation::Exception(string("Outo matemaattinen funktio, ohjelmointi vika: \n") + GetCalculationText());
+		  throw  NFmiSmartToolCalculation::Exception(string("Outo matemaattinen funktio, ohjelmointi vika: \n") + GetCalculationText());
 		}
 	}
 }
@@ -510,29 +522,35 @@ void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result,
 	{
 		get_token();
 		bin_eval_exp2(tempmask, temp, theLatlon, theTime, theTimeIndex);
-		switch(op) 
-		{
-		case kFmiMaskEqual:
-			maskresult = (result == temp);
-			break;
-		case kFmiMaskGreaterThan:
-			maskresult = (result > temp);
-			break;
-		case kFmiMaskLessThan:
-			maskresult = (result < temp);
-			break;
-		case kFmiMaskGreaterOrEqualThan:
-			maskresult = (result >= temp);
-			break;
-		case kFmiMaskLessOrEqualThan:
-			maskresult = (result <= temp);
-			break;
-		case kFmiMaskNotEqual:
-			maskresult = (result != temp);
-			break;
-		default:
-			throw  NFmiSmartToolCalculation::Exception(string("Outo vertailu operaattori maskissa:\n") + GetCalculationText());
-		}
+
+		if(result == kFloatMissing || temp == kFloatMissing)
+		  maskresult = false;
+		else
+		  {
+			switch(op) 
+			  {
+			  case kFmiMaskEqual:
+				maskresult = (result == temp);
+				break;
+			  case kFmiMaskGreaterThan:
+				maskresult = (result > temp);
+				break;
+			  case kFmiMaskLessThan:
+				maskresult = (result < temp);
+				break;
+			  case kFmiMaskGreaterOrEqualThan:
+				maskresult = (result >= temp);
+				break;
+			  case kFmiMaskLessOrEqualThan:
+				maskresult = (result <= temp);
+				break;
+			  case kFmiMaskNotEqual:
+				maskresult = (result != temp);
+				break;
+			  default:
+				throw  NFmiSmartToolCalculation::Exception(string("Outo vertailu operaattori maskissa:\n") + GetCalculationText());
+			  }
+		  }
 	}
 }
 
@@ -548,7 +566,9 @@ void NFmiSmartToolCalculation::bin_eval_exp2(bool &maskresult, double &result, c
 	{
 		get_token();
 		bin_eval_exp3(maskresult, temp, theLatlon, theTime, theTimeIndex);
-		if(op == NFmiAreaMask::Sub)
+		if(result == kFloatMissing || temp == kFloatMissing)
+		  result = kFloatMissing;
+		else if(op == NFmiAreaMask::Sub)
 		  result = result - temp;
 		else // NFmiAreaMask::Add
 		  result = result + temp;
@@ -568,10 +588,12 @@ void NFmiSmartToolCalculation::bin_eval_exp3(bool &maskresult, double &result, c
 	{
 		get_token();
 		bin_eval_exp4(maskresult, temp, theLatlon, theTime, theTimeIndex);
-		if(op == NFmiAreaMask::Mul)
+		if(result == kFloatMissing || temp == kFloatMissing)
+		  result = kFloatMissing;
+		else if(op == NFmiAreaMask::Mul)
 		  result = result * temp;
 		else if(op == NFmiAreaMask::Div)
-		  result = result / temp;
+		  result = (temp==0 ? kFloatMissing : result / temp);
 		else // NFmiAreaMask::Mod
 		  result = static_cast<int>(result) % static_cast<int>(temp);
 	}
@@ -596,7 +618,10 @@ void NFmiSmartToolCalculation::bin_eval_exp4(bool &maskresult, double &result, c
 		}
 //		for(t=(int)temp-1; t>0; --t) 
 //			result = result * (double)ex;
-		result = pow(result, temp);
+		if(result == kFloatMissing || temp == kFloatMissing)
+		  result = kFloatMissing;
+		else
+		  result = pow(result, temp);
 	}
 }
 
@@ -608,7 +633,7 @@ void NFmiSmartToolCalculation::bin_eval_exp5(bool &maskresult, double &result, c
 		get_token();
 	bin_eval_exp6(maskresult, result, theLatlon, theTime, theTimeIndex);
 
-	if(op == NFmiAreaMask::Sub) 
+	if(op == NFmiAreaMask::Sub && result != kFloatMissing)
 		result = -result;
 }
 
