@@ -40,6 +40,10 @@
 #pragma warning(disable : 4786) // poistaa n kpl VC++ kääntäjän varoitusta (liian pitkä nimi >255 merkkiä joka johtuu 'puretuista' STL-template nimistä)
 #endif
 
+//#ifndef UNIX
+//  #include "stdafx.h" // DEBUG_NEW
+//#endif
+
 #include "NFmiInfoOrganizer.h"
 #include "NFmiSmartInfo.h"
 #include "NFmiDrawParamFactory.h"
@@ -48,10 +52,14 @@
 #include "NFmiGrid.h"
 #include "NFmiQueryDataUtil.h"
 
-//#ifndef UNIX
-//  #include "stdafx.h" // TRACE-kutsu
-//#endif
 
+/*
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+*/
 //--------------------------------------------------------
 // Constructor/Destructor 
 //--------------------------------------------------------
