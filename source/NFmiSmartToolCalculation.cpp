@@ -391,23 +391,8 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
 
 void NFmiSmartToolCalculation::atom(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-	NFmiAreaMask::CalculationOperationType opType = token->GetCalculationOperationType();
-//	switch(tok_type) 
-	switch(opType)
-	{
-	case NFmiAreaMask::InfoVariable:
-	case NFmiAreaMask::Constant:
-	case NFmiAreaMask::CalculatedVariable:
-	case NFmiAreaMask::RampFunction:
-	case NFmiAreaMask::FunctionAreaIntergration:
-	case NFmiAreaMask::FunctionTimeIntergration:
-//		result = find_var(token);
-		result = token->Value(theLatlon, theTime, theTimeIndex);
-		get_token();
-		return;
-	default:
-		throw  runtime_error(string("Muutuja/funktio puuttuu laskusta: ") + GetCalculationText());
-	}
+	result = token->Value(theLatlon, theTime, theTimeIndex);
+	get_token();
 }
 
 // ottaa seuraavan 'tokenin' kohdalle, mutta koska aluksi 
@@ -670,23 +655,8 @@ void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, c
 
 void NFmiSmartToolCalculation::bin_atom(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-	NFmiAreaMask::CalculationOperationType opType = token->GetCalculationOperationType();
-//	switch(tok_type) 
-	switch(opType)
-	{
-	case NFmiAreaMask::InfoVariable:
-	case NFmiAreaMask::Constant:
-	case NFmiAreaMask::CalculatedVariable:
-	case NFmiAreaMask::RampFunction:
-	case NFmiAreaMask::FunctionAreaIntergration:
-	case NFmiAreaMask::FunctionTimeIntergration:
-//		result = find_var(token);
-		result = token->Value(theLatlon, theTime, theTimeIndex);
-		get_token();
-		return;
-	default:
-		throw  runtime_error(string("Muutuja/funktio puuttuu laskusta: ") + GetCalculationText());
-	}
+	result = token->Value(theLatlon, theTime, theTimeIndex);
+	get_token();
 }
 
 // tarkistaa onko resultinfon aktiivinen parametri kuten tuulen suunta
