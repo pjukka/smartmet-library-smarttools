@@ -39,6 +39,7 @@
 #include "NFmiParamBag.h"
 #include "NFmiParameterName.h"
 #include "NFmiSmartInfo.h"
+#include <vector>
 
 class NFmiDrawParamFactory;
 class NFmiDrawParamList;
@@ -61,6 +62,7 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* EditedInfo(void){return itsEditedData;}; // t‰m‰ toimii jos rajoitetaan editoitavien infojen m‰‰r‰‰
 	NFmiSmartInfo* EditedInfoCopy(void){return itsEditedDataCopy;}; 
 	NFmiSmartInfo* ViewableInfo(void); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
+	std::vector<NFmiSmartInfo*> GetInfos(FmiQueryInfoDataType theDataType); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
 	NFmiSmartInfo* ViewableInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
 	NFmiSmartInfo* ObservationInfo(void); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* ObservationInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
@@ -72,6 +74,8 @@ class NFmiInfoOrganizer
 
 	NFmiSmartInfo* FindInfo(FmiQueryInfoDataType theDataType); // Hakee 1. tietyn datatyypin infon
 	NFmiSmartInfo* FindInfo(FmiQueryInfoDataType theDataType, int theIndex); // Hakee indeksin mukaisen tietyn datatyypin infon
+
+	NFmiSmartInfo* FindInfo(FmiQueryInfoDataType theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
 
 	NFmiParamBag EditedParams(void); // itsEditedData infon parambagi
 	NFmiParamBag ViewableParams(void); // kaikkien apudatojen parametrit yhdess‰ bagissa (joita voidaan katsoa/maskata)
@@ -85,7 +89,12 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
 	NFmiSmartInfo* CreateInfo(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
 
+	// SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
+	NFmiSmartInfo* CreateShallowCopyInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
+	NFmiSmartInfo* CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
+
 	NFmiDrawParam* CreateDrawParam(FmiParameterName theParamName, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
+	NFmiDrawParam* CreateEmptyInfoDrawParam(FmiParameterName theParamName); // luo drawparam ilman infoa
 	NFmiDrawParam* CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
 	NFmiDrawParam* CreateDrawParam(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
 	FmiBoolean AddData(NFmiQueryData* theData

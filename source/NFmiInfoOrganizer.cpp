@@ -105,33 +105,35 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 									   , const NFmiLevel* theLevel
 									   , FmiQueryInfoDataType theType)
 {
+	NFmiSmartInfo* aInfo = 0;
 	if(itsEditedData && itsEditedData->DataType() == theType && itsEditedData->Param(theParam) && (!theLevel || (theLevel && itsEditedData->Level(*theLevel))))
 	{
 		fSubParameter = itsEditedData->UseSubParam();
-		return itsEditedData;
+		aInfo = itsEditedData;
 	}
-
-	// 28.09.1999/Marko
-	if(itsEditedDataCopy && itsEditedDataCopy->DataType() == theType && itsEditedDataCopy->Param(theParam) && (!theLevel || (theLevel && itsEditedDataCopy->Level(*theLevel))))
+	else if(itsEditedDataCopy && itsEditedDataCopy->DataType() == theType && itsEditedDataCopy->Param(theParam) && (!theLevel || (theLevel && itsEditedDataCopy->Level(*theLevel))))
 	{
 		fSubParameter = itsEditedDataCopy->UseSubParam();
-		return itsEditedDataCopy;
+		aInfo = itsEditedDataCopy;
 	}
-
-	NFmiSmartInfo* aInfo = 0;
-
-	NFmiPtrList<NFmiSmartInfo>::Iterator aIter = itsList.Start();
-// tutkitaan ensin löytyykö theParam suoraan joltain listassa olevalta NFmiSmartInfo-pointterilta
-	while(aIter.Next())
+	else
 	{
-		aInfo = aIter.CurrentPtr();
-		if(aInfo->DataType() == theType && aInfo->Param(theParam) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
+		NFmiPtrList<NFmiSmartInfo>::Iterator aIter = itsList.Start();
+		// tutkitaan ensin löytyykö theParam suoraan joltain listassa olevalta NFmiSmartInfo-pointterilta
+		while(aIter.Next())
 		{
-			fSubParameter = aInfo->UseSubParam();
-			return aInfo; // theParam löytyi suoraan pointterista aInfo
+			aInfo = aIter.CurrentPtr();
+			if(aInfo->DataType() == theType && aInfo->Param(theParam) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
+			{
+				fSubParameter = aInfo->UseSubParam();
+				break;
+			}
+			aInfo = 0; // pitää aina tässä nollata, muuten viimeisen jälkeen jää voimaan
 		}
 	}
-	return 0; // theParam ei löytynyt edes aliparametrina miltään listassa olevalta aInfo-pointterilta
+	if(aInfo && aInfo->SizeLevels() == 1)
+		aInfo->FirstLevel();
+	return aInfo; // theParam ei löytynyt edes aliparametrina miltään listassa olevalta aInfo-pointterilta
 }
 //--------------------------------------------------------
 // Info 
@@ -142,31 +144,34 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 									   , const NFmiLevel* theLevel
 									   , FmiQueryInfoDataType theType)
 {
+	NFmiSmartInfo* aInfo = 0;
 	if(itsEditedData && itsEditedData->DataType() == theType && itsEditedData->Param(theDataIdent) && (!theLevel || (theLevel && itsEditedData->Level(*theLevel))))
 	{
 		fSubParameter = itsEditedData->UseSubParam();
-		return itsEditedData;
+		aInfo = itsEditedData;
 	}
-
-	// 28.09.1999/Marko
-	if(itsEditedDataCopy && itsEditedDataCopy->DataType() == theType && itsEditedDataCopy->Param(theDataIdent) && (!theLevel || (theLevel && itsEditedDataCopy->Level(*theLevel))))
+	else if(itsEditedDataCopy && itsEditedDataCopy->DataType() == theType && itsEditedDataCopy->Param(theDataIdent) && (!theLevel || (theLevel && itsEditedDataCopy->Level(*theLevel))))
 	{
 		fSubParameter = itsEditedDataCopy->UseSubParam();
-		return itsEditedDataCopy;
+		aInfo = itsEditedDataCopy;
 	}
-
-	NFmiSmartInfo* aInfo = 0;
-// tutkitaan ensin löytyykö theParam suoraan joltain listassa olevalta NFmiSmartInfo-pointterilta
-	for(Reset(); Next(); )
+	else
 	{
-		aInfo = Current();
-		if(aInfo->DataType() == theType && aInfo->Param(theDataIdent) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
+		// tutkitaan ensin löytyykö theParam suoraan joltain listassa olevalta NFmiSmartInfo-pointterilta
+		for(Reset(); Next(); )
 		{
-			fSubParameter = aInfo->UseSubParam();
-			return aInfo; // theParam löytyi suoraan pointterista aInfo
+			aInfo = Current();
+			if(aInfo->DataType() == theType && aInfo->Param(theDataIdent) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
+			{
+				fSubParameter = aInfo->UseSubParam();
+				break;
+			}
+			aInfo = 0; // pitää aina tässä nollata, muuten viimeisen jälkeen jää voimaan
 		}
 	}
-	return 0; // theParam ei löytynyt edes aliparametrina miltään listassa olevalta aInfo-pointterilta
+	if(aInfo && aInfo->SizeLevels() == 1)
+		aInfo->FirstLevel();
+	return aInfo; // theParam ei löytynyt edes aliparametrina miltään listassa olevalta aInfo-pointterilta
 }
 
 // itsEditedData infon parambagi
@@ -248,6 +253,38 @@ NFmiParamBag NFmiInfoOrganizer::GetParams(FmiQueryInfoDataType theDataType)
 NFmiParamBag NFmiInfoOrganizer::StaticParams(void)
 {
 	return GetParams(kFmiDataTypeStationary);
+}
+
+// SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
+NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
+{
+	FmiBoolean aSubParam;	
+	NFmiSmartInfo* info = Info(theParamName, aSubParam, theLevel, theType);
+	if(info)
+	{
+		if(info->Param(theParamName))
+		{
+			NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
+			return copyOfInfo;
+		}
+	}
+	return 0;
+}
+
+// SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
+NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
+{
+	FmiBoolean aSubParam;	
+	NFmiSmartInfo* info = Info(theDataIdent, aSubParam, theLevel, theType);
+	if(info)
+	{
+		if(info->Param(theDataIdent))
+		{
+			NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
+			return copyOfInfo;
+		}
+	}
+	return 0;
 }
 
 NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
@@ -362,6 +399,14 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(NFmiSmartInfo* theUsedInfo
 	return drawParam;
 }
 
+NFmiDrawParam* NFmiInfoOrganizer::CreateEmptyInfoDrawParam(FmiParameterName theParamName)
+{
+	NFmiParam param(theParamName);
+	NFmiDataIdent dataIdent(param);
+	NFmiDrawParam *drawParam = itsDrawParamFactory->CreateEmptyInfoDrawParam(dataIdent, fToolMasterAvailable);
+	return drawParam;
+}
+
 //--------------------------------------------------------
 // AddData 
 //--------------------------------------------------------
@@ -472,18 +517,27 @@ int NFmiInfoOrganizer::CountData(void)
 bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiQueryInfo* theInfo2)
 {
 	// parametrit ja tuottajat samoja
-	bool status1 = (theInfo1->ParamBag() == theInfo2->ParamBag()) == kTrue;
-
-	// level jutut samoja
-	bool status2 = (theInfo1->VPlaceDescriptor() == theInfo2->VPlaceDescriptor()) == kTrue;
-
-	// mahdollinen gridi samoja
-	bool status3 = kTrue;
-	if(theInfo1->Grid() && theInfo2->Grid())
+	if(theInfo1->ParamBag() == theInfo2->ParamBag()) 
 	{
-		status3 = (theInfo1->Grid()->AreGridsIdentical(*theInfo2->Grid())) == kTrue;
+		// level jutut samoja
+		if(theInfo1->VPlaceDescriptor() == theInfo2->VPlaceDescriptor())
+		{
+			// mahdollinen gridi samoja
+			bool status3 = kTrue;
+			if(theInfo1->Grid() && theInfo2->Grid())
+			{
+				status3 = (theInfo1->Grid()->AreGridsIdentical(*theInfo2->Grid())) == kTrue;
+			}
+			if(status3)
+			{
+				theInfo1->FirstParam(); // varmistaa, että producer löytyy
+				theInfo2->FirstParam();
+				if(*theInfo1->Producer() == *theInfo2->Producer())
+					return true;
+			}
+		}
 	}
-	return status1 && status2 && status3;
+	return false;
 }
 
 //--------------------------------------------------------
@@ -690,6 +744,51 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(FmiQueryInfoDataType theDataType, int
 			if(ind == theIndex)
 				return Current();
 			ind++;
+		}
+	}
+	return 0;
+}
+
+// Palauttaa vectorin viewable infoja, vectori ei omista pointtereita, 
+// joten infoja ei saa tuhota.
+std::vector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(FmiQueryInfoDataType theDataType)
+{
+	std::vector<NFmiSmartInfo*> infoVector;
+	for(Reset(); Next();)
+	{
+		if(Current()->DataType() == theDataType)
+			infoVector.push_back(Current());
+	}
+	return infoVector;
+}
+
+// Haetaan halutun datatyypin, tuottajan joko pinta tai level dataa (mahd indeksi kertoo sitten konfliktin
+// yhteydessä, monesko otetaan)
+NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(FmiQueryInfoDataType theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex)
+{
+	if(theDataType == kFmiDataTypeEditable)
+		return EditedInfo();
+	else if(theDataType == kFmiDataTypeCopyOfEdited)
+		return EditedInfoCopy();
+	else
+	{
+		int ind = 0;
+		for(Reset(); Next();)
+		{
+			if(Current()->DataType() == theDataType)
+			{
+				Current()->FirstParam(); // pitää varmistaa, että producer löytyy
+				if(*Current()->Producer() == theProducer)
+				{
+					int levSize = Current()->SizeLevels();
+					if((levSize == 1 && fGroundData) || (levSize > 1 && (!fGroundData)))
+					{
+						if(ind == theIndex)
+							return Current();
+						ind++;
+					}
+				}
+			}
 		}
 	}
 	return 0;
