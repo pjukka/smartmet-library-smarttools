@@ -228,7 +228,7 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, con
 	{
 		// Seed the random-number generator with current time so that
 		// the numbers will be different every time we run.
-		srand( (unsigned)time( NULL ) ); // mahd. satunnais funktion käytön takia, pitää 'sekoittaa' random generaattori
+		srand( static_cast<unsigned int>(time( NULL ))); // mahd. satunnais funktion käytön takia, pitää 'sekoittaa' random generaattori
 
 		itsModificationFactors = theModificationFactors; // huom! tässä tehdään kopio
 
@@ -481,7 +481,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 NFmiAreaMask* NFmiSmartToolModifier::CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception)
 {
 	NFmiAreaMask* areaMask = 0;
-	FmiParameterName parId = (FmiParameterName)theAreaMaskInfo.GetDataIdent().GetParamIdent();
+	FmiParameterName parId = FmiParameterName(theAreaMaskInfo.GetDataIdent().GetParamIdent());
 	if(parId == kFmiLatitude || parId == kFmiLongitude)
 		areaMask = new NFmiLatLonAreaMask(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
 	else if(parId == kFmiElevationAngle)
@@ -495,7 +495,6 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateCalculatedAreaMask(const NFmiAreaMask
 		return areaMask;
 
 	throw NFmiSmartToolModifier::Exception(string("Outo laskettava muuttuja/data tyyppi (ohjelmointi vika?)."));
-	return 0; // tähän ei mennä, mutta return pitää olla syntaksin takia
 }
 
 NFmiDataModifier* NFmiSmartToolModifier::CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception)
@@ -564,7 +563,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 {
 	NFmiSmartInfo* info = 0;
 	if(theAreaMaskInfo.GetUseDefaultProducer() || theAreaMaskInfo.GetDataType() == NFmiInfoData::kCopyOfEdited)
-		info = itsInfoOrganizer->CreateShallowCopyInfo((FmiParameterName)theAreaMaskInfo.GetDataIdent().GetParamIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
+		info = itsInfoOrganizer->CreateShallowCopyInfo(FmiParameterName(theAreaMaskInfo.GetDataIdent().GetParamIdent()), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
 	else
 		info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
 	if(!info)
@@ -574,7 +573,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 
 void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit) throw (NFmiSmartToolModifier::Exception)
 {
-	NFmiDrawParam* drawParam = itsInfoOrganizer->CreateEmptyInfoDrawParam((FmiParameterName)theAreaMaskInfo.GetDataIdent().GetParamIdent());
+	NFmiDrawParam* drawParam = itsInfoOrganizer->CreateEmptyInfoDrawParam(FmiParameterName(theAreaMaskInfo.GetDataIdent().GetParamIdent()));
 	if(drawParam)
 	{
 		*theLowerLimit = drawParam->AbsoluteMinValue();

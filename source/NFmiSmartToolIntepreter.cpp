@@ -199,12 +199,19 @@ void NFmiSmartToolIntepreter::InitCheckOut(void)
 	fContinueCurrentSectionCheckOut = true;
 }
 
+#ifdef UNIX
 static std::string::iterator EatWhiteSpaces(std::string::iterator it)
 {
-	for(; ::isspace(*it) ; ++it)
-		;
+  for(; isspace(*it) ; ++it)  ;
 	return it;
 }
+#else
+static std::string::iterator EatWhiteSpaces(std::string::iterator it)
+{
+  for(; ::isspace(*it) ; ++it)  ;
+	return it;
+}
+#endif
 
 // Irroitetaan mahdollisia laskuoperaatio rivejä tulkkausta varten.
 // laskun pitää olla yhdellä rivillä ja ne ovat muotoa:
@@ -508,7 +515,6 @@ bool NFmiSmartToolIntepreter::InterpretMaskSection(const std::string &theMaskSec
 		}
 	}
 	throw NFmiSmartToolIntepreter::Exception(string("Maski-ehto lauseessa oli vikaa: \n" + maskText));
-	return false;
 }	
 
 // tässä on enää ehtolauseen sulkujen sisältävä oleva teksti esim.
@@ -535,7 +541,6 @@ bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, NF
 	if(theAreaMaskSectionInfo->GetAreaMaskInfoVector()->size() >= 3)
 		return true;
 	throw NFmiSmartToolIntepreter::Exception(string("Maski-ehto lause oli puutteellinen: " + theMaskSectionText));
-	return false;
 }
 
 NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::string &theMaskSectionText, queue<NFmiAreaMaskInfo *> &theMaskQueue) throw (NFmiSmartToolIntepreter::Exception)
@@ -573,7 +578,6 @@ NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::s
 		}
 	}
 	throw NFmiSmartToolIntepreter::Exception(string("Ei ollut laillinen maski: ") + theMaskSectionText);
-	return 0;
 }
 
 //--------------------------------------------------------

@@ -17,6 +17,9 @@
 
 #ifndef UNIX
   #include <direct.h> // working directory juttuja varten
+#else
+  #include <stdexcept>
+  #include <unistd.h>
 #endif
 
 NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, const std::vector<std::string> *theHelperDataFileNames)
@@ -76,11 +79,18 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 
 std::string NFmiSmartToolUtil::GetWorkingDirectory(void)
 {
+#ifndef UNIX
 	static char path[_MAX_PATH];
 	int curdrive = ::_getdrive();
 	::_getdcwd(curdrive , path, _MAX_PATH );
 	std::string workingDirectory(path);
 	return workingDirectory;
+#else
+	static char path[4096];	// we assume 4096 is maximum buffer length
+	if(!::getcwd(path,4096))
+	  throw std::runtime_error("Error: Current path is too long (>4096)");
+	return std::string(path);
+#endif
 }
 
 bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryData* theModifiedData, const std::vector<std::string> *theHelperDataFileNames)
@@ -100,7 +110,7 @@ bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryDa
 bool NFmiSmartToolUtil::InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, const std::vector<std::string> &theHelperDataFileNames)
 {
 	NFmiStreamQueryData sQData;
-	for(int i=0; i<theHelperDataFileNames.size(); i++)
+	for(unsigned int i=0; i<theHelperDataFileNames.size(); i++)
 	{
 		if(sQData.ReadData(theHelperDataFileNames[i]))
 			theDataBase.AddData(sQData.QueryData(true), theHelperDataFileNames[i], NFmiInfoData::kViewable, 0); // 0=undolevel
