@@ -394,3 +394,47 @@ bool NFmiDrawParamList::RemoveMacroParam(const std::string &theName)
 	}
 	return status;
 }
+
+/*!
+ * Liikuttaa aktiivista parametriä listalla halutun verran als/ylös päin.
+ * Tarkoitus on muuttaa esim. karttanäytöllä parametrien piirtojärjestystä.
+ * Palauttaa true jos lista meni likaiseksi eli siirto tapahtui.
+ */
+bool NFmiDrawParamList::MoveActiveParam(int theMovement)
+{
+	int paramCount = NumberOfItems();
+	if(theMovement && paramCount > 1)
+	{
+		int index = FindActive();
+		int oldIndex = index;
+		if(index)
+		{
+			index += theMovement;
+			index = std::max(index, 1);
+			index = std::min(index, paramCount);
+			if(index != oldIndex) // jos todella tapahtuu siirto, tehdään se ja laitetaan lista likaiseksi
+			{
+				itsList.Swap(index, oldIndex);
+				fDirtyList = true;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+/*!
+ * Etsii aktiivisen parametrin listalta. Jos löytyy, Currentti osoittaa siihen
+ * ja sen indeksi palautetaan (indeksit alkavat 1:stä). Jos ei ole aktiivista
+ * palautetaan 0.
+ */
+int NFmiDrawParamList::FindActive(void)
+{
+	int index = 1;
+	for(Reset(); Next(); index++)
+	{
+		if(Current()->IsActive())
+			return index;
+	}
+	return 0;
+}
