@@ -248,22 +248,18 @@ void NFmiSmartToolCalculation::eval_exp3(double &result, const NFmiPoint &theLat
 // Process an exponent
 void NFmiSmartToolCalculation::eval_exp4(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-	double temp, ex;
+	double temp;
 
 	eval_exp5(result, theLatlon, theTime, theTimeIndex);
-//	if(*token== '^')
 	if(token->GetCalculationOperator() == NFmiAreaMask::Pow)
 	{
 		get_token();
 		eval_exp4(temp, theLatlon, theTime, theTimeIndex);
-		ex = result;
 		if(temp==0.0) 
 		{
 			result = 1.0;
 			return;
 		}
-//		for(t=(int)temp-1; t>0; --t) 
-//			result = result * (double)ex;
 		if(result == kFloatMissing || temp==kFloatMissing)
 		  result = kFloatMissing;
 		else
@@ -602,22 +598,18 @@ void NFmiSmartToolCalculation::bin_eval_exp3(bool &maskresult, double &result, c
 // Process an exponent
 void NFmiSmartToolCalculation::bin_eval_exp4(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-	double temp, ex;
+	double temp;
 
 	bin_eval_exp5(maskresult, result, theLatlon, theTime, theTimeIndex);
-//	if(*token== '^')
 	if(token->GetCalculationOperator() == NFmiAreaMask::Pow)
 	{
 		get_token();
 		bin_eval_exp4(maskresult, temp, theLatlon, theTime, theTimeIndex);
-		ex = result;
 		if(temp==0.0) 
 		{
 			result = 1.0;
 			return;
 		}
-//		for(t=(int)temp-1; t>0; --t) 
-//			result = result * (double)ex;
 		if(result == kFloatMissing || temp == kFloatMissing)
 		  result = kFloatMissing;
 		else
