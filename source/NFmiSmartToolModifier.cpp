@@ -287,7 +287,7 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiTimeDescriptor *theModifie
 			for(info.ResetLocation(); info.NextLocation(); )
 			{
 				NFmiPoint latlon(info.LatLon());
-				int locationIndex = info.LocationIndex();
+				unsigned long locationIndex = info.LocationIndex();
 				int timeIndex = info.TimeIndex();
 				if(itsIfAreaMaskSection->IsMasked(latlon, locationIndex, time1, timeIndex))
 					itsIfCalculationSection->Calculate(latlon, locationIndex, time1, timeIndex);
