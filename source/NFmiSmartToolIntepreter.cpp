@@ -2121,6 +2121,11 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Mist"), kFmiMist));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("mist"), kFmiMist));
 
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pseudosatel"), kFmiRadiationNetTopAtmLW));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Pseudosatel"), kFmiRadiationNetTopAtmLW));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("PseudoSatel"), kFmiRadiationNetTopAtmLW));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("PSEUDOSATEL"), kFmiRadiationNetTopAtmLW));
+	
 /*
 
   ,
