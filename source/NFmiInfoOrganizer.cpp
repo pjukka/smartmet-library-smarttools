@@ -40,6 +40,7 @@
 #include "NFmiInfoOrganizer.h"
 #include "NFmiSmartInfo.h"
 #include "NFmiDrawParamFactory.h"
+#include "NFmiDrawParam.h"
 #include "NFmiProducerList.h"
 #include "NFmiGrid.h"
 
@@ -373,6 +374,11 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 // drawParam pit‰‰ muistaa tuhota  NFmiInfoOrganizer:n ulkopuolella
 	// int thePriority = 1;// toistaiseksi HARDCODE, thePriority m‰‰ritys tehd‰‰n myˆhemmin
 	NFmiDrawParam* drawParam = 0;
+	if(theType == NFmiInfoData::kSatelData) // spesiaali keissi satelliitti kuville, niill‰ ei ole infoa
+	{
+		drawParam = new NFmiDrawParam(0, theIdent, 1);
+		return drawParam;
+	}
 	bool aSubParam;	
 	NFmiSmartInfo* info = Info(theIdent, aSubParam, theLevel, theType);
 	if(info)
