@@ -1937,6 +1937,19 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Z"), kFmiGeopHeight));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("z"), kFmiGeopHeight));
 
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrcon"), kFmiPrecipitationConv));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrCon"), kFmiPrecipitationConv));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RRCon"), kFmiPrecipitationConv));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RRcon"), kFmiPrecipitationConv));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrCON"), kFmiPrecipitationConv));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RRCON"), kFmiPrecipitationConv));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrlar"), kFmiPrecipitationLarge));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrLar"), kFmiPrecipitationLarge));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RRlar"), kFmiPrecipitationLarge));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RRLar"), kFmiPrecipitationLarge));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrLAR"), kFmiPrecipitationLarge));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RRLAR"), kFmiPrecipitationLarge));
+
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1BASE"), kFmi_FL_1_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1Base"), kFmi_FL_1_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl1Base"), kFmi_FL_1_Base));
