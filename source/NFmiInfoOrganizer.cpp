@@ -779,16 +779,17 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(FmiQueryInfoDataType theDataType, con
 		int ind = 0;
 		for(Reset(); Next();)
 		{
-			if(Current()->DataType() == theDataType)
+			NFmiSmartInfo* info = Current();
+			if(info->DataType() == theDataType)
 			{
-				Current()->FirstParam(); // pitää varmistaa, että producer löytyy
-				if(*Current()->Producer() == theProducer)
+				info->FirstParam(); // pitää varmistaa, että producer löytyy
+				if(*(info->Producer()) == theProducer)
 				{
-					int levSize = Current()->SizeLevels();
+					int levSize = info->SizeLevels();
 					if((levSize == 1 && fGroundData) || (levSize > 1 && (!fGroundData)))
 					{
 						if(ind == theIndex)
-							return Current();
+							return info;
 						ind++;
 					}
 				}
