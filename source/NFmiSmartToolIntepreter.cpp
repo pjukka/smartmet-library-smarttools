@@ -527,6 +527,7 @@ bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, NF
 {
 	string maskText(theMaskSectionText);
 	exp_ptr = maskText.begin();
+	exp_end = maskText.end();
 
 	string tmp;
 	for(; GetToken(); )
