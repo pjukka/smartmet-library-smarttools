@@ -46,7 +46,7 @@ public:
 
 	bool InsertionSort (Type* theItem)
 	{
-		Iterator tempIter = Start();
+		typename NFmiPtrList<Type>::Iterator tempIter = Start();
 		while(tempIter.Next())
 		{
 			if(*theItem < tempIter.Current())
@@ -57,8 +57,8 @@ public:
 
 	bool Sort(bool fAscendingOrder = true)
 	{
-		Iterator theIter1 = Start();
-		Iterator theIter2;
+		typename NFmiPtrList<Type>::Iterator theIter1 = Start();
+		typename NFmiPtrList<Type>::Iterator theIter2;
 		while(theIter1.Next())
 		{
 			theIter2 = theIter1;
@@ -76,7 +76,7 @@ public:
 
 	NFmiPtrList<Type>::Iterator Find(Type* theItem)
 	{
-		Iterator theIter = Start();
+		typename NFmiPtrList<Type>::Iterator theIter = Start();
 		while(theIter.Next())
 		{
 
