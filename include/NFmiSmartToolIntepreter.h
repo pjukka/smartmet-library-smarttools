@@ -81,6 +81,7 @@ class NFmiSmartToolIntepreter
 public:
 	typedef std::map<std::string, FmiProducerName> ProducerMap;
 	typedef std::map<std::string, std::pair<unsigned long, unsigned long> > LevelMap; // nimi, ident, levelValue 
+	typedef std::map<std::string, double> ConstantMap; // esim. MISS 32700 tai PI 3.14159
 	class Exception
 	{
 	public:
@@ -185,6 +186,7 @@ private:
 	static bool fTokensInitialized;
 	static ParamMap itsTokenParameterNamesAndIds;
 	static ProducerMap itsTokenProducerNamesAndIds;
+	static ConstantMap itsTokenConstants; 
 	static std::vector<std::string> itsTokenConditionalCommands;
 	static std::vector<std::string> itsTokenIfCommands;
 	static std::vector<std::string> itsTokenElseIfCommands;

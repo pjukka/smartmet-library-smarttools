@@ -93,6 +93,7 @@ void NFmiSmartToolCalculationBlock::Clear(void)
 bool NFmiSmartToolIntepreter::fTokensInitialized = false;
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenParameterNamesAndIds;
 NFmiSmartToolIntepreter::ProducerMap NFmiSmartToolIntepreter::itsTokenProducerNamesAndIds;
+NFmiSmartToolIntepreter::ConstantMap NFmiSmartToolIntepreter::itsTokenConstants; 
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenConditionalCommands;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenIfCommands;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenElseIfCommands;
@@ -316,6 +317,7 @@ bool NFmiSmartToolIntepreter::IsPossibleElseConditionLine(const std::string &the
 	sstream >> tmp;
 	if(!FindAnyFromText(tmp, itsTokenElseCommands))
 			return false;
+	tmp = ""; // nollataan tämä, koska MSVC++7.1 ei sijoita jostain syystä mitään kun ollaan tultu loppuun (muilla kääntäjillä on sijoitettu tyhjä tmp-stringiin)
 	sstream >> tmp;
 	if(tmp.empty())
 		return true;
@@ -742,6 +744,7 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 		if(calculationInfo->GetCalculationOperandInfoVector()->empty())
 			return 0;
 	}
+	calculationInfo->CheckIfAllowMissingValueAssignment();
 	calculationInfoPtr.release();
 	return calculationInfo;
 }
@@ -1325,6 +1328,16 @@ bool NFmiSmartToolIntepreter::IsVariableConstantValue(const std::string &theVari
 		theMaskInfo->SetMaskCondition(calcCond);
 		return true;
 	}
+
+	// sitten katsotaan onko se esim. MISS tai PI tms esi määritelty vakio
+	ConstantMap::iterator it = itsTokenConstants.find(theVariableText);
+	if(it != itsTokenConstants.end())
+	{
+		theMaskInfo->SetOperationType(NFmiAreaMask::Constant);
+		NFmiCalculationCondition calcCond(kFmiMaskEqual, (*it).second);
+		theMaskInfo->SetMaskCondition(calcCond);
+		return true;
+	}
 	return false;
 }
 
@@ -1868,6 +1881,13 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Orig"), kFmiMETEOR));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("orig"), kFmiMETEOR));
 
+		itsTokenConstants.insert(ConstantMap::value_type(string("MISS"), kFloatMissing));
+		itsTokenConstants.insert(ConstantMap::value_type(string("Miss"), kFloatMissing));
+		itsTokenConstants.insert(ConstantMap::value_type(string("miss"), kFloatMissing));
+		itsTokenConstants.insert(ConstantMap::value_type(string("PI"), 3.14159265358979));
+		itsTokenConstants.insert(ConstantMap::value_type(string("Pi"), 3.14159265358979));
+		itsTokenConstants.insert(ConstantMap::value_type(string("pi"), 3.14159265358979));
+		
 		itsTokenIfCommands.push_back(string("IF"));
 		itsTokenIfCommands.push_back(string("if"));
 		itsTokenIfCommands.push_back(string("If"));
