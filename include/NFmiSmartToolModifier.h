@@ -104,7 +104,7 @@ public:
 		const std::string itsText;
 	};
 */
-	void InitSmartTool(const std::string &theSmartToolText);
+	void InitSmartTool(const std::string &theSmartToolText, bool fThisIsMacroParamSkript = false);
 	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, const std::vector<double> &theModificationFactors, bool fSelectedLocationsOnly);
 	NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer);
 	~NFmiSmartToolModifier(void);
@@ -115,6 +115,7 @@ public:
 	void IncludeDirectory(const std::string& newValue) {itsIncludeDirectory = newValue;}
 	NFmiParamBag ModifiedParams(void);
 	const std::string& GetStrippedMacroText(void) const;
+	bool IsInterpretedSkriptMacroParam(void); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns. macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
 
 private:
 	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculationBlock *theCalculationBlock);

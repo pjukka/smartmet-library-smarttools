@@ -263,14 +263,14 @@ NFmiSmartToolModifier::~NFmiSmartToolModifier(void)
 // InitSmartTool 
 //--------------------------------------------------------
 // Tulkitsee macron, luo tavittavat systeemit, että makro voidaan suorittaa.
-void NFmiSmartToolModifier::InitSmartTool(const std::string &theSmartToolText)
+void NFmiSmartToolModifier::InitSmartTool(const std::string &theSmartToolText, bool fThisIsMacroParamSkript)
 {
 	fMacroRunnable = true;
 	itsErrorText = "";
 	try
 	{
 		itsSmartToolIntepreter->IncludeDirectory(itsIncludeDirectory);
-		itsSmartToolIntepreter->Interpret(theSmartToolText);
+		itsSmartToolIntepreter->Interpret(theSmartToolText, fThisIsMacroParamSkript);
 	}
 	catch(...)
 	{
@@ -509,6 +509,12 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, con
 		fMacroRunnable = false;
 		throw ;
 	}
+}
+
+// Kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns. macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
+bool NFmiSmartToolModifier::IsInterpretedSkriptMacroParam(void) 
+{
+	return itsSmartToolIntepreter ? itsSmartToolIntepreter->IsInterpretedSkriptMacroParam() : false;
 }
 
 void NFmiSmartToolModifier::ModifyBlockData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculationBlock *theCalculationBlock)
