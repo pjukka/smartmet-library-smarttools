@@ -180,7 +180,7 @@ std::string NFmiSmartToolInfo::ExtractPath(const std::string &theFullFileName)
 	path += kFmiDirectorySeparator;
 	path += fileString.Path();
 	path += kFmiDirectorySeparator;
-	string path2((char*)path);
+	string path2(path);
 	return path2;
 }
 

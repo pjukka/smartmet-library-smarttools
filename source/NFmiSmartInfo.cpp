@@ -699,8 +699,8 @@ void NFmiSmartInfo::LocationMaskStepGrid(bool newStatus, bool fResetAllFirst, co
 	if(fResetAllFirst)
 		MaskAllLocations(!newStatus);
 
-	unsigned long midX = (unsigned long)(theXStep/2); // sijoittaa näkyvät hilat 'keskemmälle'
-	unsigned long midY = (unsigned long)(theYStep/2);
+	unsigned long midX = static_cast<unsigned long>(theXStep/2); // sijoittaa näkyvät hilat 'keskemmälle'
+	unsigned long midY = static_cast<unsigned long>(theYStep/2);
 
 	ResetLocation();
 	for(unsigned int j=0; j<y; j++)
@@ -724,8 +724,8 @@ void NFmiSmartInfo::LocationMaskStepGrid(bool newStatus, unsigned long theMaskTy
 	if(fResetAllFirst)
 		MaskAllLocations(!newStatus, theMaskType);
 
-	unsigned long midX = (unsigned long)(theXStep/2); // sijoittaa näkyvät hilat 'keskemmälle'
-	unsigned long midY = (unsigned long)(theYStep/2);
+	unsigned long midX = static_cast<unsigned long>(theXStep/2); // sijoittaa näkyvät hilat 'keskemmälle'
+	unsigned long midY = static_cast<unsigned long>(theYStep/2);
 
 	ResetLocation();
 	for(unsigned int j=0; j<y; j++)

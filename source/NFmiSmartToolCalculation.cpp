@@ -232,7 +232,7 @@ void NFmiSmartToolCalculation::eval_exp3(double &result, const NFmiPoint &theLat
 				result = result / temp;
 				break;
 			case NFmiAreaMask::Mod:
-				result = (int) result % (int) temp;
+				result = static_cast<int>(result) % static_cast<int>(temp);
 				break;
 		}
 	}
@@ -364,7 +364,7 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
 			result = fabs(result);
 			break;
 		case NFmiAreaMask::Rand:
-			result = ((double)rand() / RAND_MAX) * result; // palauttaa luvun 0 ja result:in väliltä
+			result = (static_cast<double>(rand()) / RAND_MAX) * result; // palauttaa luvun 0 ja result:in väliltä
 			break;
 		default:
 			throw  NFmiSmartToolCalculation::Exception(string("Outo matemaattinen funktio, ohjelmointi vika: \n") + GetCalculationText());
@@ -579,7 +579,7 @@ void NFmiSmartToolCalculation::bin_eval_exp3(bool &maskresult, double &result, c
 				result = result / temp;
 				break;
 			case NFmiAreaMask::Mod:
-				result = (int) result % (int) temp;
+				result = static_cast<int>(result) % static_cast<int>(temp);
 				break;
 		}
 	}
@@ -680,7 +680,7 @@ void NFmiSmartToolCalculation::SetModificationFactors(std::vector<double> *theFa
 		for(int i=0; i<size; i++)
 		{
 			if(itsCalculations[i] && itsCalculations[i]->GetCalculationOperationType() == NFmiAreaMask::ModifyFactor)
-				((NFmiCalculationChangeFactorArray*)itsCalculations[i])->SetChangeFactors(*theFactors);
+				static_cast<NFmiCalculationChangeFactorArray*>(itsCalculations[i])->SetChangeFactors(*theFactors);
 		}
 	}
 }
