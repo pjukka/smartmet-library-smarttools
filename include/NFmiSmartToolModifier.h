@@ -43,12 +43,35 @@ class NFmiAreaMaskSectionInfo;
 class NFmiAreaMask;
 class NFmiDataModifier;
 class NFmiDataIterator;
-class NFmiSmartToolCalculationBlock;
+class NFmiSmartToolCalculationBlockInfo;
 class NFmiDataIdent;
+class NFmiMetTime;
+class NFmiPoint;
+
+class NFmiSmartToolCalculationBlock
+{
+public:
+	NFmiSmartToolCalculationBlock(void);
+	~NFmiSmartToolCalculationBlock(void);
+	void Clear(void);
+	NFmiSmartInfo* FirstVariableInfo(void);
+	void SetTime(const NFmiMetTime &theTime);
+	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
+	void SetModificationFactors(std::vector<double> *theFactors);
+
+	NFmiSmartToolCalculationSection* itsFirstCalculationSection;
+	NFmiSmartToolCalculation* itsIfAreaMaskSection;
+	NFmiSmartToolCalculationBlock* itsIfCalculationBlock;
+	NFmiSmartToolCalculation* itsElseIfAreaMaskSection;
+	NFmiSmartToolCalculationBlock* itsElseIfCalculationBlock;
+	NFmiSmartToolCalculationBlock* itsElseCalculationBlock;;
+	NFmiSmartToolCalculationSection* itsLastCalculationSection;
+};
 
 class NFmiSmartToolModifier 
 {
 public:
+/*
 	class Exception
 	{
 	public:
@@ -57,7 +80,7 @@ public:
 	private:
 		const std::string itsText;
 	};
-
+*/
 	void InitSmartTool(const std::string &theSmartToolText);
 	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, const std::vector<double> &theModificationFactors, bool fSelectedLocationsOnly);
 	NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer);
@@ -71,6 +94,9 @@ public:
 	const std::string& GetStrippedMacroText(void) const;
 
 private:
+	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculationBlock *theCalculationBlock);
+	void ModifyBlockData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculationBlock *theCalculationBlock);
+	NFmiSmartToolCalculationBlock* CreateCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlock);
 	NFmiSmartInfo* CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 	NFmiSmartInfo* GetScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 	void ClearScriptVariableInfos(void);
@@ -80,10 +106,10 @@ private:
 	void GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit);
 	NFmiDataModifier* CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	NFmiDataIterator* CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo);
-	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes);
+//	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes);
 	void ModifyData2(NFmiTimeDescriptor* theModifiedTimes, NFmiSmartToolCalculationSection* theCalculationSection);
-	void InitializeCalculationModifiers(NFmiSmartToolCalculationBlock* theBlock);
-	void ClearCalculationModifiers(void);
+//	void InitializeCalculationModifiers(NFmiSmartToolCalculationBlockInfo* theBlock);
+//	void ClearCalculationModifiers(void);
 	NFmiAreaMask* CreateAreaMask(const NFmiAreaMaskInfo &theInfo);
 	NFmiAreaMask* CreateEndingAreaMask(void);
 	NFmiSmartInfo* CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo);
@@ -98,16 +124,13 @@ private:
 	bool fMacroRunnable;
 	std::string itsErrorText;
 
-	NFmiSmartToolCalculationSection* itsFirstCalculationSection;
-	NFmiSmartToolCalculationSection* itsLastCalculationSection;
-	NFmiSmartToolCalculation* itsIfAreaMaskSection;
-	NFmiSmartToolCalculationSection* itsIfCalculationSection;
-//	std::vector<NFmiSmartToolCalculation*> itsElseIfAreaMaskSectionVector;
-//	std::vector<NFmiSmartToolCalculationSection*> itsElseIfCalculationSectionVector;
-	NFmiSmartToolCalculation* itsElseIfAreaMaskSection;
-	NFmiSmartToolCalculationSection* itsElseIfCalculationSection;
-//	NFmiSmartToolCalculation* itsElseAreaMaskSection; // else:ss‰ ei voi olla tietenk‰‰n ehtoja, joten t‰t‰ ei tarvita
-	NFmiSmartToolCalculationSection* itsElseCalculationSection;
+//	NFmiSmartToolCalculationSection* itsFirstCalculationSection;
+//	NFmiSmartToolCalculation* itsIfAreaMaskSection;
+//	NFmiSmartToolCalculationSection* itsIfCalculationSection;
+//	NFmiSmartToolCalculation* itsElseIfAreaMaskSection;
+//	NFmiSmartToolCalculationSection* itsElseIfCalculationSection;
+//	NFmiSmartToolCalculationSection* itsElseCalculationSection;
+//	NFmiSmartToolCalculationSection* itsLastCalculationSection;
 
 	std::vector<double> itsModificationFactors; // mahdolliset aikasarja muokkaus kertoimet (ei omista, ei tuhoa)
 	bool fModifySelectedLocationsOnly;
