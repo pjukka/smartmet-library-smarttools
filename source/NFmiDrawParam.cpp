@@ -40,7 +40,7 @@ float NFmiDrawParam::itsFileVersionNumber=2.0;
 //--------------------------------------------------------
 NFmiDrawParam::NFmiDrawParam()
 : itsInfo(0)
-, itsParameter(kFmiLastParameter)
+, itsParameter(NFmiParam(kFmiLastParameter))
 , itsParameterAbbreviation("?")
 , itsPriority(1)
 , itsViewType							 (kFmiIsoLineView)
@@ -167,7 +167,7 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 							 , int thePriority
 							 , NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions)
 : itsInfo(theInfo)
-, itsParameter(theParam)
+, itsParameter(NFmiParam(theParam))
 , itsParameterAbbreviation("?")
 , itsPriority(thePriority)
 , itsViewType							 (kFmiIsoLineView)
