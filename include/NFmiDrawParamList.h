@@ -35,11 +35,17 @@
 #include "NFmiSortedPtrList.h"
 #include "NFmiGlobals.h"
 #include "NFmiParameterName.h"
-#include "NFmiDrawParam.h"
+#include "FmiNMeteditLibraryDefinitions.h"
 #include <list>
+#include <vector>
+#include "NFmiInfoData.h"
 
 class NFmiMetTime;
 class NFmiLevel;
+class NFmiDrawParam;
+class NFmiProducer;
+class NFmiLevel;
+class NFmiDataIdent;
 
 class NFmiDrawParamList 
 {
@@ -67,7 +73,7 @@ public:
 	void			DeactivateAll(void);
 	bool		Find(const NFmiDataIdent& theParam, bool fIgnoreProducer = false);
 	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel);
-	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, FmiQueryInfoDataType theDataType);
+	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType);
 	bool		SyncronizeTimes(const NFmiMetTime& theTime);
 
 	void            Update(void);

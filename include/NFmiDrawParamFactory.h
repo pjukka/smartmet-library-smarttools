@@ -29,11 +29,12 @@
 
 #include "NFmiParameterName.h"
 #include "NFmiGlobals.h"
-#include "NFmiDrawParam.h"
+#include "NFmiString.h"
 
 class NFmiDrawParam;
 class NFmiSmartInfo;
 class NFmiLevel;
+class NFmiDataIdent;
 
 class NFmiDrawParamFactory 
 {
@@ -54,7 +55,7 @@ public:
 private:
 	NFmiString CreateFileName(NFmiDrawParam* drawParam);
 // Attributes
-	NFmiDrawParam itsDefaultDrawParam;	
+//	NFmiDrawParam itsDefaultDrawParam;	
 	NFmiString itsWorkingDirectory;
 	bool fToolMasterAvailable;
 };

@@ -30,8 +30,9 @@
 #ifndef  NFMIUNDOABLEMULTILEVELMASK_H
 #define  NFMIUNDOABLEMULTILEVELMASK_H
 
-#include "NFmiMultiLevelMask.h"
 #include "NFmiPtrList.h"
+
+class NFmiMultiLevelMask;
 
 class NFmiUndoableMultiLevelMask 
 {

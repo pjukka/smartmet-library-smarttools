@@ -38,7 +38,8 @@
 #include "NFmiSortedPtrList.h"
 #include "NFmiParamBag.h"
 #include "NFmiParameterName.h"
-#include "NFmiSmartInfo.h"
+#include "FmiNMeteditLibraryDefinitions.h"
+#include "NFmiInfoData.h"
 #include <vector>
 
 class NFmiDrawParamFactory;
@@ -46,7 +47,10 @@ class NFmiDrawParamList;
 class NFmiDrawParam;
 class NFmiQueryData;
 class NFmiProducerList;
-
+class NFmiSmartInfo;
+class NFmiLevel;
+class NFmiQueryInfo;
+class NFmiLevelBag;
 
 class NFmiInfoOrganizer 
 {
@@ -62,7 +66,7 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* EditedInfo(void){return itsEditedData;}; // t‰m‰ toimii jos rajoitetaan editoitavien infojen m‰‰r‰‰
 	NFmiSmartInfo* EditedInfoCopy(void){return itsEditedDataCopy;}; 
 	NFmiSmartInfo* ViewableInfo(void); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
-	std::vector<NFmiSmartInfo*> GetInfos(FmiQueryInfoDataType theDataType); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
+	std::vector<NFmiSmartInfo*> GetInfos(NFmiInfoData::Type theDataType); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
 	NFmiSmartInfo* ViewableInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
 	NFmiSmartInfo* ObservationInfo(void); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* ObservationInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
@@ -72,10 +76,10 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* ClimatologyInfo(void); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* AnalyzeDataInfo(void); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 
-	NFmiSmartInfo* FindInfo(FmiQueryInfoDataType theDataType); // Hakee 1. tietyn datatyypin infon
-	NFmiSmartInfo* FindInfo(FmiQueryInfoDataType theDataType, int theIndex); // Hakee indeksin mukaisen tietyn datatyypin infon
+	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType); // Hakee 1. tietyn datatyypin infon
+	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType, int theIndex); // Hakee indeksin mukaisen tietyn datatyypin infon
 
-	NFmiSmartInfo* FindInfo(FmiQueryInfoDataType theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
+	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
 
 	NFmiParamBag EditedParams(void); // itsEditedData infon parambagi
 	NFmiParamBag ViewableParams(void); // kaikkien apudatojen parametrit yhdess‰ bagissa (joita voidaan katsoa/maskata)
@@ -85,25 +89,25 @@ class NFmiInfoOrganizer
 	NFmiParamBag ObservationParams(int theIndex); // vain halutun indeksin parametrit (HUONO VIRITYS KORJAA!!!!)
 	NFmiParamBag CompareModelsParams(void); // palauttaa vain 1. kyseisen datan parametrit!
 
-	NFmiSmartInfo* CreateInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
-	NFmiSmartInfo* CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
-	NFmiSmartInfo* CreateInfo(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
+	NFmiSmartInfo* CreateInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+	NFmiSmartInfo* CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+	NFmiSmartInfo* CreateInfo(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 
 	// SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
-	NFmiSmartInfo* CreateShallowCopyInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
-	NFmiSmartInfo* CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
+	NFmiSmartInfo* CreateShallowCopyInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+	NFmiSmartInfo* CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 
-	NFmiDrawParam* CreateDrawParam(FmiParameterName theParamName, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
+	NFmiDrawParam* CreateDrawParam(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	NFmiDrawParam* CreateEmptyInfoDrawParam(FmiParameterName theParamName); // luo drawparam ilman infoa
-	NFmiDrawParam* CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
-	NFmiDrawParam* CreateDrawParam(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
+	NFmiDrawParam* CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+	NFmiDrawParam* CreateDrawParam(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	bool AddData(NFmiQueryData* theData
 					  ,const NFmiString& theDataFileName
-					  ,FmiQueryInfoDataType theDataType
+					  ,NFmiInfoData::Type theDataType
 					  ,int theUndoLevel = 0);
 
 	bool Clear (void);
-	void ClearData(FmiQueryInfoDataType theDataType);
+	void ClearData(NFmiInfoData::Type theDataType);
 	void ClearThisKindOfData(NFmiQueryInfo* theInfo);
  	NFmiProducerList* ProducerList(void); // k‰y l‰pi kaikki SmartInfot ja pyyt‰‰ ensimm‰iselt‰ parametrilta tuottajan (viel‰ ainakaan SmartInfolla ei ole montaa tuottajaa)
 	NFmiLevelBag* GetAndCreateViewableInfoWithManyLevelsOrZeroPointer(void);
@@ -122,10 +126,10 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* Current (void);
 
  private:
-	NFmiSmartInfo* Info (const FmiParameterName& theParam, bool& fSubParameter, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
-  	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, bool& fSubParameter, const NFmiLevel* theLevel, FmiQueryInfoDataType theType); 
+	NFmiSmartInfo* Info (const FmiParameterName& theParam, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+  	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType); 
     bool Add (NFmiSmartInfo* theInfo);
-	NFmiParamBag GetParams(FmiQueryInfoDataType theDataType);
+	NFmiParamBag GetParams(NFmiInfoData::Type theDataType);
 
 // Attributes
   	NFmiSortedPtrList<NFmiSmartInfo> itsList; // error when compiling NFmiInfoOrganizer.cpp//binary '<' : 'class NFmiSmartInfo' does not define this operator or a conversion to a type acceptable to the predefined operator

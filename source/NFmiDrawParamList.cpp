@@ -30,6 +30,7 @@
 
 #include "NFmiDrawParamList.h"
 #include "NFmiSmartInfo.h"
+#include "NFmiDrawParam.h"
 #include <algorithm>
 #include <list>
 
@@ -56,7 +57,7 @@ NFmiDrawParamList::~NFmiDrawParamList(void)
 //--------------------------------------------------------
 bool NFmiDrawParamList::Add (NFmiDrawParam* theParam)
 {
-   if(itsList.AddEnd(theParam))
+   if(theParam && itsList.AddEnd(theParam))
    {
 		fDirtyList = true;
 		return true;
@@ -68,11 +69,14 @@ bool NFmiDrawParamList::Add (NFmiDrawParam* theParam)
 //--------------------------------------------------------
 bool NFmiDrawParamList::Add(NFmiDrawParam * theParam, unsigned long theIndex)
 {
-   NFmiPtrList < NFmiDrawParam > :: Iterator iter = itsList.Index(theIndex);
-   if(iter.AddBefore(theParam))
+   if(theParam)
    {
-		fDirtyList = true;
-		return true;
+	   NFmiPtrList < NFmiDrawParam > :: Iterator iter = itsList.Index(theIndex);
+	   if(iter.AddBefore(theParam))
+	   {
+			fDirtyList = true;
+			return true;
+	   }
    }
    return false;
 }
@@ -140,10 +144,13 @@ bool NFmiDrawParamList::Index(unsigned long index)
 //--------------------------------------------------------
 bool NFmiDrawParamList::Find(NFmiDrawParam* item)
 {
-	itsIter = itsList.Find(item);
-	if(Current())
-		return true;
-	Reset();
+	if(item)
+	{
+		itsIter = itsList.Find(item);
+		if(Current())
+			return true;
+		Reset();
+	}
 	return false;
 }
 
@@ -177,6 +184,7 @@ void NFmiDrawParamList::DeactivateAll(void)
 bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, bool fIgnoreProducer)
 {
 	for(Reset(); Next();)
+	{
 		if(fIgnoreProducer)
 		{
 			if(*(Current()->EditParam().GetParam()) == *(theParam.GetParam()))
@@ -185,6 +193,7 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, bool fIgnoreProducer
 		else
 			if(Current()->EditParam() == theParam)
 				return true;
+	}
 	return false;
 }
 
@@ -193,7 +202,7 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 	for(Reset(); Next();)
 	{
 		NFmiSmartInfo* info = Current()->Info();
-		if(info->Param() == theParam)
+		if(info && info->Param() == theParam)
 		{
 			if(!theLevel && info->SizeLevels() <= 1)
 				return true;
@@ -204,12 +213,12 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 	return false;
 }
 
-bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, FmiQueryInfoDataType theDataType)
+bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType)
 {
 	for(Reset(); Next();)
 	{
 		NFmiSmartInfo* info = Current()->Info();
-		if(info->Param() == theParam)
+		if(info && info->Param() == theParam)
 		{
 			if(info->DataType() == theDataType)
 			{

@@ -30,7 +30,6 @@
 #define  NFMISMARTINFO_H
 
 #include "NFmiFastQueryInfo.h"
-#include "NFmiString.h"
 #include "FmiNMeteditLibraryDefinitions.h"
 
 class NFmiUndoableMultiLevelMask;
@@ -44,7 +43,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	NFmiSmartInfo(void);
 	NFmiSmartInfo(const NFmiQueryInfo & theInfo
 				 ,NFmiQueryData* theData=0,NFmiString theDataFileName=""
-				 ,FmiQueryInfoDataType theType = kFmiDataTypeEditable);
+				 ,NFmiInfoData::Type theType = NFmiInfoData::kEditable);
 	NFmiSmartInfo (const NFmiSmartInfo & theInfo); 
 	~NFmiSmartInfo();
 	
@@ -126,8 +125,8 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	bool LocationSelectionUndoData(void);	// suorittaa todellisen undon
 	bool LocationSelectionRedoData(void);	// suorittaa todellisen redon
 	void LocationSelectionUndoLevel(int theNewUndoLevel); // undolevel asetetaan tällä
-	FmiQueryInfoDataType DataType(void){return itsDataType;}; // 1999.08.24/Marko
-	void DataType(FmiQueryInfoDataType newType){itsDataType = newType;}; // 1999.08.24/Marko
+	NFmiInfoData::Type DataType(void) const {return itsDataType;}; // 1999.08.24/Marko
+	void DataType(NFmiInfoData::Type newType){itsDataType = newType;}; // 1999.08.24/Marko
 
  private:
 
@@ -164,7 +163,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 
 	//parambag, siksi että tiedettäisiin mitä parametriä on muutettu
 	NFmiParamBag* itsEditedParamBag;
-	FmiQueryInfoDataType itsDataType; // 1999.08.24/Marko
+	NFmiInfoData::Type itsDataType; // 1999.08.24/Marko
 };
 
 #endif

@@ -26,8 +26,8 @@
 #define  NFMIPRODUCERLIST_H
 
 #include "NFmiSortedPtrList.h"
-#include "NFmiGlobals.h"
-#include "NFmiProducer.h"
+
+class NFmiProducer;
 
 class NFmiProducerList 
 {

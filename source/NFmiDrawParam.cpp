@@ -426,131 +426,133 @@ NFmiDrawParam::~NFmiDrawParam(void)
 // attribuutit.
 void NFmiDrawParam::Init(NFmiDrawParam* theDrawParam)
 {
-	itsParameterAbbreviation = NFmiString(theDrawParam->ParameterAbbreviation());
-    itsPriority = theDrawParam->Priority();
-
-	itsViewType = theDrawParam->ViewType();
-	itsStationDataViewType = theDrawParam->StationDataViewType();
-
-	itsFrameColor = TFmiColor(theDrawParam->FrameColor());
-	itsFillColor = TFmiColor(theDrawParam->FillColor());
-	itsNonModifiableColor = TFmiColor(theDrawParam->NonModifiableColor());
-
-	itsRelativeSize = NFmiPoint(theDrawParam->RelativeSize());
-	itsRelativePositionOffset = NFmiPoint(theDrawParam->RelativePositionOffset());
-	itsOnlyOneSymbolRelativeSize = NFmiPoint(theDrawParam->OnlyOneSymbolRelativeSize());
-	itsOnlyOneSymbolRelativePositionOffset = NFmiPoint(theDrawParam->OnlyOneSymbolRelativePositionOffset());
-
-	itsIsoLineGab = theDrawParam->IsoLineGab();
-	itsModifyingStep =  theDrawParam->ModifyingStep();
-	fModifyingUnit =  theDrawParam->ModifyingUnit();
-	itsTimeSerialModifyingLimit = theDrawParam->TimeSerialModifyingLimit();
-	
-	itsIsolineColor =  theDrawParam->IsolineColor();
-	itsIsolineTextColor =  theDrawParam->IsolineTextColor();
-
-// ei tarvitse toistaiseksi alustaa sekundaarisia värejä
-//	itsSecondaryIsolineColor = theDrawParam->IsolineSecondaryColor();
-//	itsSecondaryIsolineTextColor = theDrawParam->IsolineSecondaryTextColor();
-// ei tarvitse toistaiseksi alustaa sekundaarisia värejä
-
-	itsAbsoluteMinValue = theDrawParam->AbsoluteMinValue();
-	itsAbsoluteMaxValue =  theDrawParam->AbsoluteMaxValue();
-
-	itsTimeSeriesScaleMin =  theDrawParam->TimeSeriesScaleMin();
-	itsTimeSeriesScaleMax =  theDrawParam->TimeSeriesScaleMax();
-
-	itsPossibleViewTypeCount = theDrawParam->PossibleViewTypeCount();
-
-	FmiEditorMapViewType* possibleViewTypeList = theDrawParam->PossibleViewTypeList();
-	for (int typeNumber = 0; typeNumber < itsPossibleViewTypeCount; typeNumber++)
+	if(theDrawParam)
 	{
-		itsPossibleViewTypeList[typeNumber] = possibleViewTypeList[typeNumber];
+		itsParameterAbbreviation = NFmiString(theDrawParam->ParameterAbbreviation());
+		itsPriority = theDrawParam->Priority();
+
+		itsViewType = theDrawParam->ViewType();
+		itsStationDataViewType = theDrawParam->StationDataViewType();
+
+		itsFrameColor = TFmiColor(theDrawParam->FrameColor());
+		itsFillColor = TFmiColor(theDrawParam->FillColor());
+		itsNonModifiableColor = TFmiColor(theDrawParam->NonModifiableColor());
+
+		itsRelativeSize = NFmiPoint(theDrawParam->RelativeSize());
+		itsRelativePositionOffset = NFmiPoint(theDrawParam->RelativePositionOffset());
+		itsOnlyOneSymbolRelativeSize = NFmiPoint(theDrawParam->OnlyOneSymbolRelativeSize());
+		itsOnlyOneSymbolRelativePositionOffset = NFmiPoint(theDrawParam->OnlyOneSymbolRelativePositionOffset());
+
+		itsIsoLineGab = theDrawParam->IsoLineGab();
+		itsModifyingStep =  theDrawParam->ModifyingStep();
+		fModifyingUnit =  theDrawParam->ModifyingUnit();
+		itsTimeSerialModifyingLimit = theDrawParam->TimeSerialModifyingLimit();
+		
+		itsIsolineColor =  theDrawParam->IsolineColor();
+		itsIsolineTextColor =  theDrawParam->IsolineTextColor();
+
+	// ei tarvitse toistaiseksi alustaa sekundaarisia värejä
+	//	itsSecondaryIsolineColor = theDrawParam->IsolineSecondaryColor();
+	//	itsSecondaryIsolineTextColor = theDrawParam->IsolineSecondaryTextColor();
+	// ei tarvitse toistaiseksi alustaa sekundaarisia värejä
+
+		itsAbsoluteMinValue = theDrawParam->AbsoluteMinValue();
+		itsAbsoluteMaxValue =  theDrawParam->AbsoluteMaxValue();
+
+		itsTimeSeriesScaleMin =  theDrawParam->TimeSeriesScaleMin();
+		itsTimeSeriesScaleMax =  theDrawParam->TimeSeriesScaleMax();
+
+		itsPossibleViewTypeCount = theDrawParam->PossibleViewTypeCount();
+
+		FmiEditorMapViewType* possibleViewTypeList = theDrawParam->PossibleViewTypeList();
+		for (int typeNumber = 0; typeNumber < itsPossibleViewTypeCount; typeNumber++)
+		{
+			itsPossibleViewTypeList[typeNumber] = possibleViewTypeList[typeNumber];
+		}
+
+		fHidden = theDrawParam->IsParamHidden();
+		fEditableParam = theDrawParam->IsEditable();
+
+		itsUnit = theDrawParam->Unit();	
+
+		fShowNumbers = theDrawParam->ShowNumbers();
+		fShowMasks = theDrawParam->ShowMasks();
+		fShowColors = theDrawParam->ShowColors();
+		fShowColoredNumbers = theDrawParam->ShowColoredNumbers();
+		fZeroColorMean = theDrawParam->ZeroColorMean();
+		fShowDifference = theDrawParam->ShowDifference();
+		fShowDifferenceToOriginalData = theDrawParam->ShowDifferenceToOriginalData();
+
+	//***********************************************
+	//********** 'versio 2' parametreja *************
+	//***********************************************
+		itsStationSymbolColorShadeLowValue = theDrawParam->StationSymbolColorShadeLowValue();
+		itsStationSymbolColorShadeMidValue = theDrawParam->StationSymbolColorShadeMidValue();
+		itsStationSymbolColorShadeHighValue = theDrawParam->StationSymbolColorShadeHighValue();
+		itsStationSymbolColorShadeLowValueColor = theDrawParam->StationSymbolColorShadeLowValueColor();
+		itsStationSymbolColorShadeMidValueColor = theDrawParam->StationSymbolColorShadeMidValueColor();
+		itsStationSymbolColorShadeHighValueColor = theDrawParam->StationSymbolColorShadeHighValueColor();
+		itsStationSymbolColorShadeClassCount = theDrawParam->StationSymbolColorShadeClassCount();
+		fUseSymbolsInTextMode = theDrawParam->UseSymbolsInTextMode();
+		itsUsedSymbolListIndex = theDrawParam->UsedSymbolListIndex();
+		itsSymbolIndexingMapListIndex = theDrawParam->SymbolIndexingMapListIndex();
+		itsGridDataPresentationStyle = theDrawParam->GridDataPresentationStyle();
+		fUseIsoLineFeathering = theDrawParam->UseIsoLineFeathering();
+		fIsoLineLabelsOverLapping = theDrawParam->IsoLineLabelsOverLapping();
+		fShowColorLegend = theDrawParam->ShowColorLegend();
+		fUseSimpleIsoLineDefinitions = theDrawParam->UseSimpleIsoLineDefinitions();
+		fUseSeparatorLinesBetweenColorContourClasses = theDrawParam->UseSeparatorLinesBetweenColorContourClasses();
+		itsSimpleIsoLineGap = theDrawParam->SimpleIsoLineGap();
+		itsSimpleIsoLineZeroValue = theDrawParam->SimpleIsoLineZeroValue();
+		itsSimpleIsoLineLabelHeight = theDrawParam->SimpleIsoLineLabelHeight();
+		fShowSimpleIsoLineLabelBox = theDrawParam->ShowSimpleIsoLineLabelBox();
+		itsSimpleIsoLineWidth = theDrawParam->SimpleIsoLineWidth();
+		itsSimpleIsoLineLineStyle = theDrawParam->SimpleIsoLineLineStyle();
+		itsIsoLineSplineSmoothingFactor = theDrawParam->IsoLineSplineSmoothingFactor();
+		fUseSingleColorsWithSimpleIsoLines = theDrawParam->UseSingleColorsWithSimpleIsoLines();
+		itsSimpleIsoLineColorShadeLowValue = theDrawParam->SimpleIsoLineColorShadeLowValue();
+		itsSimpleIsoLineColorShadeMidValue = theDrawParam->SimpleIsoLineColorShadeMidValue();
+		itsSimpleIsoLineColorShadeHighValue = theDrawParam->SimpleIsoLineColorShadeHighValue();
+		itsSimpleIsoLineColorShadeLowValueColor = theDrawParam->SimpleIsoLineColorShadeLowValueColor();
+		itsSimpleIsoLineColorShadeMidValueColor = theDrawParam->SimpleIsoLineColorShadeMidValueColor();
+		itsSimpleIsoLineColorShadeHighValueColor = theDrawParam->SimpleIsoLineColorShadeHighValueColor();
+		itsSimpleIsoLineColorShadeClassCount = theDrawParam->SimpleIsoLineColorShadeClassCount();
+		itsSpecialIsoLineValues = theDrawParam->SpecialIsoLineValues();
+		itsSpecialIsoLineLabelHeight = theDrawParam->SpecialIsoLineLabelHeight();
+		itsSpecialIsoLineWidth = theDrawParam->SpecialIsoLineWidth();
+		itsSpecialIsoLineStyle = theDrawParam->SpecialIsoLineStyle();
+		itsSpecialIsoLineColorIndexies = theDrawParam->SpecialIsoLineColorIndexies();
+		itsSpecialIsoLineShowLabelBox = theDrawParam->SpecialIsoLineShowLabelBox();
+		fUseDefaultRegioning = theDrawParam->UseDefaultRegioning();
+		fUseCustomColorContouring = theDrawParam->UseCustomColorContouring();
+		itsSpecialColorContouringValues = theDrawParam->SpecialColorContouringValues();
+		itsSpecialColorContouringColorIndexies = theDrawParam->SpecialColorContouringColorIndexies();
+		itsColorContouringColorShadeLowValue = theDrawParam->ColorContouringColorShadeLowValue();
+		itsColorContouringColorShadeMidValue = theDrawParam->ColorContouringColorShadeMidValue();
+		itsColorContouringColorShadeHighValue = theDrawParam->ColorContouringColorShadeHighValue();
+		itsColorContouringColorShadeLowValueColor = theDrawParam->ColorContouringColorShadeLowValueColor();
+		itsColorContouringColorShadeMidValueColor = theDrawParam->ColorContouringColorShadeMidValueColor();
+		itsColorContouringColorShadeHighValueColor = theDrawParam->ColorContouringColorShadeHighValueColor();
+		itsColorContouringColorShadeClassCount = theDrawParam->ColorContouringColorShadeClassCount();
+		fUseWithIsoLineHatch1 = theDrawParam->UseWithIsoLineHatch1();
+		fDrawIsoLineHatchWithBorders1 = theDrawParam->DrawIsoLineHatchWithBorders1();
+		itsIsoLineHatchLowValue1 = theDrawParam->IsoLineHatchLowValue1();
+		itsIsoLineHatchHighValue1 = theDrawParam->IsoLineHatchHighValue1();
+		itsIsoLineHatchType1 = theDrawParam->IsoLineHatchType1();
+		itsIsoLineHatchColor1 = theDrawParam->IsoLineHatchColor1();
+		itsIsoLineHatchBorderColor1 = theDrawParam->IsoLineHatchBorderColor1();
+		fUseWithIsoLineHatch2 = theDrawParam->UseWithIsoLineHatch2();
+		fDrawIsoLineHatchWithBorders2 = theDrawParam->DrawIsoLineHatchWithBorders2();
+		itsIsoLineHatchLowValue2 = theDrawParam->IsoLineHatchLowValue2();
+		itsIsoLineHatchHighValue2 = theDrawParam->IsoLineHatchHighValue2();
+		itsIsoLineHatchType2 = theDrawParam->IsoLineHatchType2();
+		itsIsoLineHatchColor2 = theDrawParam->IsoLineHatchColor2();
+		itsIsoLineHatchBorderColor2 = theDrawParam->IsoLineHatchBorderColor2();
+		itsIsoLineLabelDigitCount = theDrawParam->IsoLineLabelDigitCount();
+	//***********************************************
+	//********** 'versio 2' parametreja *************
+	//***********************************************
 	}
-
-	fHidden = theDrawParam->IsParamHidden();
-	fEditableParam = theDrawParam->IsEditable();
-
-	itsUnit = theDrawParam->Unit();	
-
-	fShowNumbers = theDrawParam->ShowNumbers();
-	fShowMasks = theDrawParam->ShowMasks();
-	fShowColors = theDrawParam->ShowColors();
-	fShowColoredNumbers = theDrawParam->ShowColoredNumbers();
-	fZeroColorMean = theDrawParam->ZeroColorMean();
-	fShowDifference = theDrawParam->ShowDifference();
-	fShowDifferenceToOriginalData = theDrawParam->ShowDifferenceToOriginalData();
-
-//***********************************************
-//********** 'versio 2' parametreja *************
-//***********************************************
-	itsStationSymbolColorShadeLowValue = theDrawParam->StationSymbolColorShadeLowValue();
-	itsStationSymbolColorShadeMidValue = theDrawParam->StationSymbolColorShadeMidValue();
-	itsStationSymbolColorShadeHighValue = theDrawParam->StationSymbolColorShadeHighValue();
-	itsStationSymbolColorShadeLowValueColor = theDrawParam->StationSymbolColorShadeLowValueColor();
-	itsStationSymbolColorShadeMidValueColor = theDrawParam->StationSymbolColorShadeMidValueColor();
-	itsStationSymbolColorShadeHighValueColor = theDrawParam->StationSymbolColorShadeHighValueColor();
-	itsStationSymbolColorShadeClassCount = theDrawParam->StationSymbolColorShadeClassCount();
-	fUseSymbolsInTextMode = theDrawParam->UseSymbolsInTextMode();
-	itsUsedSymbolListIndex = theDrawParam->UsedSymbolListIndex();
-	itsSymbolIndexingMapListIndex = theDrawParam->SymbolIndexingMapListIndex();
-	itsGridDataPresentationStyle = theDrawParam->GridDataPresentationStyle();
-	fUseIsoLineFeathering = theDrawParam->UseIsoLineFeathering();
-	fIsoLineLabelsOverLapping = theDrawParam->IsoLineLabelsOverLapping();
-	fShowColorLegend = theDrawParam->ShowColorLegend();
-	fUseSimpleIsoLineDefinitions = theDrawParam->UseSimpleIsoLineDefinitions();
-	fUseSeparatorLinesBetweenColorContourClasses = theDrawParam->UseSeparatorLinesBetweenColorContourClasses();
-	itsSimpleIsoLineGap = theDrawParam->SimpleIsoLineGap();
-	itsSimpleIsoLineZeroValue = theDrawParam->SimpleIsoLineZeroValue();
-	itsSimpleIsoLineLabelHeight = theDrawParam->SimpleIsoLineLabelHeight();
-	fShowSimpleIsoLineLabelBox = theDrawParam->ShowSimpleIsoLineLabelBox();
-	itsSimpleIsoLineWidth = theDrawParam->SimpleIsoLineWidth();
-	itsSimpleIsoLineLineStyle = theDrawParam->SimpleIsoLineLineStyle();
-	itsIsoLineSplineSmoothingFactor = theDrawParam->IsoLineSplineSmoothingFactor();
-	fUseSingleColorsWithSimpleIsoLines = theDrawParam->UseSingleColorsWithSimpleIsoLines();
-	itsSimpleIsoLineColorShadeLowValue = theDrawParam->SimpleIsoLineColorShadeLowValue();
-	itsSimpleIsoLineColorShadeMidValue = theDrawParam->SimpleIsoLineColorShadeMidValue();
-	itsSimpleIsoLineColorShadeHighValue = theDrawParam->SimpleIsoLineColorShadeHighValue();
-	itsSimpleIsoLineColorShadeLowValueColor = theDrawParam->SimpleIsoLineColorShadeLowValueColor();
-	itsSimpleIsoLineColorShadeMidValueColor = theDrawParam->SimpleIsoLineColorShadeMidValueColor();
-	itsSimpleIsoLineColorShadeHighValueColor = theDrawParam->SimpleIsoLineColorShadeHighValueColor();
-	itsSimpleIsoLineColorShadeClassCount = theDrawParam->SimpleIsoLineColorShadeClassCount();
-	itsSpecialIsoLineValues = theDrawParam->SpecialIsoLineValues();
-	itsSpecialIsoLineLabelHeight = theDrawParam->SpecialIsoLineLabelHeight();
-	itsSpecialIsoLineWidth = theDrawParam->SpecialIsoLineWidth();
-	itsSpecialIsoLineStyle = theDrawParam->SpecialIsoLineStyle();
-	itsSpecialIsoLineColorIndexies = theDrawParam->SpecialIsoLineColorIndexies();
-	itsSpecialIsoLineShowLabelBox = theDrawParam->SpecialIsoLineShowLabelBox();
-	fUseDefaultRegioning = theDrawParam->UseDefaultRegioning();
-	fUseCustomColorContouring = theDrawParam->UseCustomColorContouring();
-	itsSpecialColorContouringValues = theDrawParam->SpecialColorContouringValues();
-	itsSpecialColorContouringColorIndexies = theDrawParam->SpecialColorContouringColorIndexies();
-	itsColorContouringColorShadeLowValue = theDrawParam->ColorContouringColorShadeLowValue();
-	itsColorContouringColorShadeMidValue = theDrawParam->ColorContouringColorShadeMidValue();
-	itsColorContouringColorShadeHighValue = theDrawParam->ColorContouringColorShadeHighValue();
-	itsColorContouringColorShadeLowValueColor = theDrawParam->ColorContouringColorShadeLowValueColor();
-	itsColorContouringColorShadeMidValueColor = theDrawParam->ColorContouringColorShadeMidValueColor();
-	itsColorContouringColorShadeHighValueColor = theDrawParam->ColorContouringColorShadeHighValueColor();
-	itsColorContouringColorShadeClassCount = theDrawParam->ColorContouringColorShadeClassCount();
-	fUseWithIsoLineHatch1 = theDrawParam->UseWithIsoLineHatch1();
-	fDrawIsoLineHatchWithBorders1 = theDrawParam->DrawIsoLineHatchWithBorders1();
-	itsIsoLineHatchLowValue1 = theDrawParam->IsoLineHatchLowValue1();
-	itsIsoLineHatchHighValue1 = theDrawParam->IsoLineHatchHighValue1();
-	itsIsoLineHatchType1 = theDrawParam->IsoLineHatchType1();
-	itsIsoLineHatchColor1 = theDrawParam->IsoLineHatchColor1();
-	itsIsoLineHatchBorderColor1 = theDrawParam->IsoLineHatchBorderColor1();
-	fUseWithIsoLineHatch2 = theDrawParam->UseWithIsoLineHatch2();
-	fDrawIsoLineHatchWithBorders2 = theDrawParam->DrawIsoLineHatchWithBorders2();
-	itsIsoLineHatchLowValue2 = theDrawParam->IsoLineHatchLowValue2();
-	itsIsoLineHatchHighValue2 = theDrawParam->IsoLineHatchHighValue2();
-	itsIsoLineHatchType2 = theDrawParam->IsoLineHatchType2();
-	itsIsoLineHatchColor2 = theDrawParam->IsoLineHatchColor2();
-	itsIsoLineHatchBorderColor2 = theDrawParam->IsoLineHatchBorderColor2();
-	itsIsoLineLabelDigitCount = theDrawParam->IsoLineLabelDigitCount();
-//***********************************************
-//********** 'versio 2' parametreja *************
-//***********************************************
-
 	return;
 }
 

@@ -35,7 +35,6 @@
 #ifndef  NFMIMULTILEVELMASK_H
 #define  NFMIMULTILEVELMASK_H
 
-#include "NFmiGlobals.h"
 #include "NFmiBitMask.h"
 
 class NFmiRect;

@@ -27,6 +27,7 @@
 #include "NFmiDrawParamFactory.h"
 #include "NFmiSmartInfo.h"
 #include "NFmiValueString.h"
+#include "NFmiDrawParam.h"
 #include <assert.h>
 
 //--------------------------------------------------------
@@ -59,6 +60,9 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo
 //  pit‰‰ muistaa tuhota ulkopuolella.
 
 {
+	if(!theInfo)
+		return 0;
+
 	fToolMasterAvailable = theIsToolMasterAvailable;
 	theInfo->Param(theIdent);
 	if(theLevel)
@@ -123,26 +127,31 @@ NFmiString NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam)
 //	else
 //		fileName += "\\DrawParams\\DrawParam_";
 //#endif
-	assert(drawParam->Param().GetParam()); // testaa, onko parametri asetettu kohdalleen
-	int paramId = drawParam->Param().GetParam()->GetIdent();
-	NFmiValueString idStr(paramId, "%d");
-	fileName += idStr;
-	if(drawParam && drawParam->Info() && drawParam->Info()->SizeLevels() > 1)
-	{ // jos leveleit‰ on useita, niill‰ on omat tiedostot
-		fileName += "_level_";
-		const NFmiLevel* level = drawParam->Info()->Level();
-		int levelTypeId = level->LevelTypeId();
-		NFmiValueString levelTypeIdStr(levelTypeId, "%d");
-		fileName += levelTypeIdStr;
-		fileName += "_";
-		int levelValue = level->LevelValue();
-		NFmiValueString levelValueStr(levelValue, "%d");
-		fileName += levelValueStr;
-	}
-	else
+//	assert(drawParam->Param().GetParam()); // testaa, onko parametri asetettu kohdalleen
+	if(drawParam)
 	{
-		// normaali parametrille ei taida olla tiedosto nimess‰ mit‰‰n ekstraa
+		int paramId = drawParam->Param().GetParam()->GetIdent();
+		NFmiValueString idStr(paramId, "%d");
+		fileName += idStr;
+		if(drawParam && drawParam->Info() && drawParam->Info()->SizeLevels() > 1)
+		{ // jos leveleit‰ on useita, niill‰ on omat tiedostot
+			fileName += "_level_";
+			const NFmiLevel* level = drawParam->Info()->Level();
+			int levelTypeId = 0;
+			if(level)
+				levelTypeId = level->LevelTypeId();
+			NFmiValueString levelTypeIdStr(levelTypeId, "%d");
+			fileName += levelTypeIdStr;
+			fileName += "_";
+			int levelValue = level->LevelValue();
+			NFmiValueString levelValueStr(levelValue, "%d");
+			fileName += levelValueStr;
+		}
+		else
+		{
+			// normaali parametrille ei taida olla tiedosto nimess‰ mit‰‰n ekstraa
+		}
+		fileName +=".dpa";
 	}
-	fileName +=".dpa";
 	return fileName;
 }

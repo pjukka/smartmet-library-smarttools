@@ -33,6 +33,7 @@
 #include "NFmiSmartInfo.h"
 #include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiUndoableMultiLevelMask.h"
+#include "NFmiMultiLevelMask.h"
 #include "NFmiQueryData.h"
 #include "NFmiGrid.h"
 #include "NFmiCombinedParam.h"
@@ -49,7 +50,7 @@ NFmiSmartInfo::NFmiSmartInfo()
 ,itsDataFileName("")
 ,itsPriority(0)
 ,itsEditedParamBag(0)
-,itsDataType(kFmiDataTypeEditable) // 1999.08.24/Marko
+,itsDataType(NFmiInfoData::kEditable) // 1999.08.24/Marko
 {
 	fDirty = new bool;
 	*fDirty = false;
@@ -66,7 +67,7 @@ NFmiSmartInfo::NFmiSmartInfo()
 
 NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theData
 							 ,NFmiString theDataFileName
-							 ,FmiQueryInfoDataType theType)
+							 ,NFmiInfoData::Type theType)
 :NFmiFastQueryInfo(theInfo)
 ,itsDataType(theType) // 1999.08.24/Marko
 {
