@@ -15,10 +15,10 @@
 #include "NFmiQueryData.h"
 #include "NFmiStreamQueryData.h"
 
+#include <stdexcept>
 #ifndef UNIX
   #include <direct.h> // working directory juttuja varten
 #else
-  #include <stdexcept>
   #include <unistd.h>
 #endif
 
@@ -43,7 +43,7 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	{
 		smartToolModifier.InitSmartTool(theMacroText);
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
 		return 0;
@@ -54,7 +54,7 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 		std::vector<double> dummyFactors(theTimes->Size(), 0);
 		smartToolModifier.ModifyData(theTimes, dummyFactors, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
 		return 0;
