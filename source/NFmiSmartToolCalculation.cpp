@@ -1,4 +1,4 @@
-//**********************************************************
+/**********************************************************
 // C++ Class Name : NFmiSmartToolCalculation 
 // ---------------------------------------------------------
 // Filetype: (SOURCE)
@@ -26,7 +26,6 @@
 #include "NFmiSmartToolCalculation.h"
 #include "NFmiAreaMaskInfo.h"
 #include "NFmiSmartInfo.h"
-#include "NFmiCalculationChangeFactorArray.h"
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
@@ -42,8 +41,9 @@ NFmiSmartToolCalculation::NFmiSmartToolCalculation(void)
 ,itsResultInfo(0)
 ,itsCalculations()
 //,itsOperators()
-,itsModificationFactors(0)
 ,fAllowMissingValueAssignment(false)
+,fCircularValue(false)
+,itsCircularValueModulor(kFloatMissing)
 {
 }
 
@@ -61,6 +61,7 @@ void NFmiSmartToolCalculation::Calculate(const NFmiPoint &theLatlon, unsigned lo
 	if(value != kFloatMissing) // tuli ongelmia missing asetuksissa, pit‰‰ mietti vaikka jokin funktio, jolla asetetaan puuttuva arvo // pit‰‰ pysty‰ sittenkin asettamaan arvoksi kFloatMissing:in!!!
 	{
 		itsResultInfo->LocationIndex(theLocationIndex); // kohde dataa juoksutetaan, joten lokaatio indeksien pit‰‰ olla synkassa!!!
+		value = FixCircularValues(value); // ensin tehd‰‰n circular tarkistus ja sitten vasta min/max
 		value = GetInsideLimitsValue(static_cast<float>(value)); // asetetaan value viel‰ drawparamista satuihin rajoihin, ettei esim. RH voi olla alle 0 tai yli 100 %
 
 		itsResultInfo->FloatValue(static_cast<float>(value)); // miten info saadaan osoittamaan oikeaan kohtaan?!?
@@ -393,7 +394,6 @@ void NFmiSmartToolCalculation::atom(double &result, const NFmiPoint &theLatlon, 
 	case NFmiAreaMask::InfoVariable:
 	case NFmiAreaMask::Constant:
 	case NFmiAreaMask::CalculatedVariable:
-	case NFmiAreaMask::ModifyFactor:
 	case NFmiAreaMask::RampFunction:
 	case NFmiAreaMask::FunctionAreaIntergration:
 	case NFmiAreaMask::FunctionTimeIntergration:
@@ -512,15 +512,18 @@ void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result,
 	FmiMaskOperation op;
 	bool tempmask;
 	double temp;
+	NFmiAreaMask::CalculationOperationType opType1 = token->GetCalculationOperationType();
 
 	bin_eval_exp2(maskresult, result, theLatlon, theTime, theTimeIndex);
 //	while((op = *token) == '>' || op == '<' || op == '=') 
 	while((op = token->Condition().Condition()) != kFmiNoMaskOperation) 
 	{
 		get_token();
+		NFmiAreaMask::CalculationOperationType opType2 = token->GetCalculationOperationType();
 		bin_eval_exp2(tempmask, temp, theLatlon, theTime, theTimeIndex);
 
-		if(result == kFloatMissing || temp == kFloatMissing)
+		// resultit eiv‰t saa olla missin-arvoja, paitsi jos ne ovat Constant-maskista, eli halutaan nimenomaan verrata jotain missing-arvoon
+		if((result == kFloatMissing && opType1 != NFmiAreaMask::Constant) || (temp == kFloatMissing && opType2 != NFmiAreaMask::Constant))
 		  maskresult = false;
 		else
 		  {
@@ -668,7 +671,6 @@ void NFmiSmartToolCalculation::bin_atom(bool &maskresult, double &result, const 
 	case NFmiAreaMask::InfoVariable:
 	case NFmiAreaMask::Constant:
 	case NFmiAreaMask::CalculatedVariable:
-	case NFmiAreaMask::ModifyFactor:
 	case NFmiAreaMask::RampFunction:
 	case NFmiAreaMask::FunctionAreaIntergration:
 	case NFmiAreaMask::FunctionTimeIntergration:
@@ -681,16 +683,31 @@ void NFmiSmartToolCalculation::bin_atom(bool &maskresult, double &result, const 
 	}
 }
 
-void NFmiSmartToolCalculation::SetModificationFactors(std::vector<double> *theFactors)
+// tarkistaa onko resultinfon aktiivinen parametri kuten tuulen suunta
+// ja tekee tarvittavat asetukset
+void NFmiSmartToolCalculation::CheckIfModularParameter(void)
 {
-	itsModificationFactors = theFactors;
-	if(theFactors)
+	fCircularValue = false;
+	itsCircularValueModulor = kFloatMissing;
+	if(itsResultInfo)
 	{
-		int size = itsCalculations.size();
-		for(int i=0; i<size; i++)
+		if(itsResultInfo->Param().GetParamIdent() == kFmiWindDirection)
 		{
-			if(itsCalculations[i] && itsCalculations[i]->GetCalculationOperationType() == NFmiAreaMask::ModifyFactor)
-				static_cast<NFmiCalculationChangeFactorArray*>(itsCalculations[i])->SetChangeFactors(*theFactors);
+			fCircularValue = true;
+			itsCircularValueModulor = 360;
 		}
 	}
 }
+
+double NFmiSmartToolCalculation::FixCircularValues(double theValue)
+{
+	if(fCircularValue && theValue != kFloatMissing)
+	{
+		if(theValue < 0)
+			return itsCircularValueModulor - fmod(-theValue, itsCircularValueModulor);
+		else
+			return fmod(theValue, itsCircularValueModulor);
+	}
+	return theValue;
+}
+

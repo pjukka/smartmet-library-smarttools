@@ -47,13 +47,12 @@ public:
 	bool IsMasked(const NFmiPoint &theLatlon, int theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
 	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
 	void SetTime(const NFmiMetTime &theTime); // optimointia laskuja varten
-	void SetModificationFactors(std::vector<double> *theFactors);
 
 	NFmiSmartToolCalculation(void);
 	~NFmiSmartToolCalculation(void);
 	void Clear(void);
 
-	void SetResultInfo(NFmiSmartInfo* value) {itsResultInfo = value;}
+	void SetResultInfo(NFmiSmartInfo* value) {itsResultInfo = value; CheckIfModularParameter();}
 	NFmiSmartInfo* GetResultInfo(void) {return itsResultInfo;}
 	std::vector<NFmiAreaMask*>* GetCalculations(void) {return &itsCalculations;}
 	void AddCalculation(NFmiAreaMask* theCalculation);
@@ -100,7 +99,12 @@ private:
 	NFmiSmartInfo* itsResultInfo; // omistaa+tuhoaa
 	std::vector<NFmiAreaMask*> itsCalculations; // omistaa+tuhoaa
 
-	std::vector<double> *itsModificationFactors; // mahdolliset aikasarja muokkaus kertoimet (ei omista, ei tuhoa)
 	bool fAllowMissingValueAssignment; 
+
+	// tuulen suuntaa varten pit‰‰ tehd‰ virityksi‰, ett‰ esim. 350 + 20 olisi 10 eik‰ 360 (eli maksimi) jne.
+	bool fCircularValue;
+	double itsCircularValueModulor;
+	void CheckIfModularParameter(void);
+	double FixCircularValues(double theValue);
 };
 #endif
