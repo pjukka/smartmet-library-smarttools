@@ -827,7 +827,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			
 			file >> temp; // luetaan nimike pois
 			file >> number;
-			fShowStationMarker = (bool)number;
+			fShowStationMarker = number != 0;
 			file >> temp; // luetaan nimike pois
 			file >> itsIsoLineGab;
 			file >> temp; // luetaan nimike pois
