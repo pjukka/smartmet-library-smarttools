@@ -64,7 +64,7 @@ double NFmiCalculationRampFuction::Value(const NFmiPoint &theLatlon, const NFmiM
 
 
 NFmiCalculationIntegrationFuction::NFmiCalculationIntegrationFuction(NFmiDataIterator *theDataIterator, NFmiDataModifier *theDataModifier, Type theMaskType, DataType theDataType, NFmiQueryInfo* theInfo, bool ownsInfo, bool destroySmartInfoData)
-:NFmiInfoAreaMask(NFmiCalculationCondition(), theMaskType, theDataType, theInfo, ownsInfo, NFmiAreaMask::BinaryOperator::kNoValue, destroySmartInfoData)
+:NFmiInfoAreaMask(NFmiCalculationCondition(), theMaskType, theDataType, theInfo, ownsInfo, NFmiAreaMask::kNoValue, destroySmartInfoData)
 ,itsDataModifier(theDataModifier)
 ,itsDataIterator(theDataIterator)
 {
