@@ -237,11 +237,13 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 		{
 			if(fUseOnlyParamId ? drawParam->Param().GetParamIdent() == theParam.GetParamIdent() : drawParam->Param() == theParam)
 			{
-				if(drawParam->DataType() == theDataType)
+				if(theDataType == NFmiInfoData::kAnyData || drawParam->DataType() == theDataType)
 				{
-					if(!theLevel)
+					if(theLevel == 0)
 						return true;
-					if(theLevel && (*(theLevel) == drawParam->Level()))
+					if(drawParam->Level().LevelType() == 0 && theLevel->LevelType() == kFmiAnyLevelType)
+						return true; // t‰m‰ case tulee kun nyky‰‰n tehd‰‰n pinta parametreja
+					if(*(theLevel) == drawParam->Level())
 						return true;
 				}
 			}
@@ -330,12 +332,15 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pa
 	{
 		if(*(Current()->Param().GetProducer()) == theProducer)
 		{
-			std::pair<int, NFmiLevel> tmp(Current()->Param().GetParamIdent(), Current()->Level());
-			it = std::find(theParamIdsAndLevelsNotRemoved.begin(), theParamIdsAndLevelsNotRemoved.end(), tmp);
-			if(it == theParamIdsAndLevelsNotRemoved.end())
-				Remove(fDeleteData);
-			else
-				theParamIdsAndLevelsNotRemoved.erase(it);
+			if(Current()->Level().LevelType() == kFmiPressureLevel) // koska kyse vain painepinta parametreista, pit‰‰ level tyypin olla painepinta
+			{
+				std::pair<int, NFmiLevel> tmp(Current()->Param().GetParamIdent(), Current()->Level());
+				it = std::find(theParamIdsAndLevelsNotRemoved.begin(), theParamIdsAndLevelsNotRemoved.end(), tmp);
+				if(it == theParamIdsAndLevelsNotRemoved.end())
+					Remove(fDeleteData);
+				else
+					theParamIdsAndLevelsNotRemoved.erase(it);
+			}
 		}
 	}
 }
