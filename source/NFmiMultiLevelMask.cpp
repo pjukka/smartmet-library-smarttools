@@ -105,7 +105,7 @@ const unsigned long& NFmiMultiLevelMask::MaskSize(void) const
 //   newState:n mukaiseksi.
 //   Se mik‰/mitk‰ maskit asetetaan , riippuu 
 //   itsMaskType:n arvosta.
-void NFmiMultiLevelMask::Mask (const unsigned long& theIndex, const FmiBoolean& theNewState)
+void NFmiMultiLevelMask::Mask (const unsigned long& theIndex, const bool& theNewState)
 {
 	if((itsMaskType & kFmiNoMask) == kFmiNoMask)
 		return;
@@ -124,33 +124,33 @@ void NFmiMultiLevelMask::Mask (const unsigned long& theIndex, const FmiBoolean& 
 //   Palauttaa indeksin osoittaman kohdan, itsMaskType:n 
 //   osoittamien 
 //   maskien arvon. Jos kFmiNoMask 'p‰‰ll‰', palauttaa 
-//   aina kTrue. 
+//   aina true. 
 //   Tarkista indeksin koko ja jos se ei sovi, 
-//   palauta kFalse.
+//   palauta false.
 //   
-FmiBoolean NFmiMultiLevelMask::IsMasked (const unsigned long& theIndex) const
+bool NFmiMultiLevelMask::IsMasked (const unsigned long& theIndex) const
 {
 	if((itsMaskType & kFmiNoMask) == kFmiNoMask)
-		return kTrue;
+		return true;
 	if((itsMaskType & kFmiActivationMask) == kFmiActivationMask)
 		if(!itsActivationMask.IsMasked(theIndex))
-			return kFalse;
+			return false;
 	if((itsMaskType & kFmiSelectionMask) == kFmiSelectionMask)
 		if(!itsSelectionMask.IsMasked(theIndex))
-			return kFalse;
+			return false;
 	if((itsMaskType & kFmiDisplayedMask) == kFmiDisplayedMask)
 		if(!itsDisplayedMask.IsMasked(theIndex))
-			return kFalse;
+			return false;
 	if((itsMaskType & 0xffffffff) == 0)		// Jos mit‰‰n maaskityyppi‰ ei ole valittu.
-		return kFalse;			// T‰m‰ on k‰ytt‰j‰n aiheuttama virhetila.
-	return kTrue;
+		return false;			// T‰m‰ on k‰ytt‰j‰n aiheuttama virhetila.
+	return true;
 }
 //--------------------------------------------------------
 // Mask 
 //--------------------------------------------------------
 //   Asettaa vain theMaskTypen:n osoittamat maskit 
 //   .
-void NFmiMultiLevelMask::Mask (const unsigned long& theIndex, const FmiBoolean& theNewState, const unsigned long& theMaskType)
+void NFmiMultiLevelMask::Mask (const unsigned long& theIndex, const bool& theNewState, const unsigned long& theMaskType)
 {
 	if((theMaskType & kFmiNoMask) == kFmiNoMask)
 		return;
@@ -165,22 +165,22 @@ void NFmiMultiLevelMask::Mask (const unsigned long& theIndex, const FmiBoolean& 
 //--------------------------------------------------------
 // IsMasked 
 //--------------------------------------------------------
-FmiBoolean NFmiMultiLevelMask::IsMasked (const unsigned long& theIndex, const unsigned long& theMaskType) const
+bool NFmiMultiLevelMask::IsMasked (const unsigned long& theIndex, const unsigned long& theMaskType) const
 {
 	if((theMaskType & kFmiNoMask) == kFmiNoMask)
-		return kTrue;
+		return true;
 	if((theMaskType & kFmiActivationMask) == kFmiActivationMask)
 		if(!itsActivationMask.IsMasked(theIndex))
-			return kFalse;
+			return false;
 	if((theMaskType & kFmiSelectionMask) == kFmiSelectionMask)
 		if(!itsSelectionMask.IsMasked(theIndex))
-			return kFalse;
+			return false;
 	if((theMaskType & kFmiDisplayedMask) == kFmiDisplayedMask)
 		if(!itsDisplayedMask.IsMasked(theIndex))
-			return kFalse;
+			return false;
 	if((theMaskType & 0xffffffff) == 0)
-		return kFalse;			// T‰m‰ on k‰ytt‰j‰n aiheuttama virhetila.
-	return kTrue;
+		return false;			// T‰m‰ on k‰ytt‰j‰n aiheuttama virhetila.
+	return true;
 
 }
 //--------------------------------------------------------
@@ -192,7 +192,7 @@ FmiBoolean NFmiMultiLevelMask::IsMasked (const unsigned long& theIndex, const un
 //   eli asettaa kaikkien itsMaskTypen osoittamien 
 //   NFmiBitMask:ien
 //   kaikki arvot newStaten mukaisiksi.
-void NFmiMultiLevelMask::MaskAll (const FmiBoolean& theNewState)
+void NFmiMultiLevelMask::MaskAll (const bool& theNewState)
 {	
 	if((itsMaskType & kFmiNoMask) == kFmiNoMask)
 		return;
@@ -207,7 +207,7 @@ void NFmiMultiLevelMask::MaskAll (const FmiBoolean& theNewState)
 //--------------------------------------------------------
 // MaskAll 
 //--------------------------------------------------------
-void NFmiMultiLevelMask::MaskAll (const FmiBoolean& theNewState, const unsigned long& theMaskType)
+void NFmiMultiLevelMask::MaskAll (const bool& theNewState, const unsigned long& theMaskType)
 {
 	if ((theMaskType & kFmiNoMask) == kFmiNoMask)
 		return;
@@ -228,10 +228,10 @@ void NFmiMultiLevelMask::MaskAll (const FmiBoolean& theNewState, const unsigned 
 //   Jos aneetun maskin ja itsMaskSize:n koot 
 //   eiv‰t t‰sm‰‰, ep‰onnistuu
 //   koko operaatio.
-FmiBoolean NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask)
+bool NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask)
 {
 	if ((itsMaskType & kFmiNoMask) == kFmiNoMask)
-		return kTrue;
+		return true;
 	if (itsMaskSize == (unsigned long)(theMask.Size()))
 	{
 		if ((itsMaskType & kFmiActivationMask) == kFmiActivationMask)
@@ -240,10 +240,10 @@ FmiBoolean NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask)
 			itsSelectionMask = theMask;
 		if ((itsMaskType & kFmiDisplayedMask) == kFmiDisplayedMask)
 			itsDisplayedMask = theMask;
-		return kTrue;
+		return true;
 	}
 	else
-		return kFalse;
+		return false;
 }
 //--------------------------------------------------------
 // Mask 
@@ -251,10 +251,10 @@ FmiBoolean NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask)
 
 //   Kopioi maskin vain theMaskType:n osoittamiin 
 //   maskeihin.
-FmiBoolean NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask, const unsigned long& theMaskType)
+bool NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask, const unsigned long& theMaskType)
 {
 	if ((theMaskType & kFmiNoMask) == kFmiNoMask)
-		return kTrue;
+		return true;
 	if (itsMaskSize == (unsigned long)(theMask.Size()))
 	{
 		if ((theMaskType & kFmiActivationMask) == kFmiActivationMask)
@@ -263,10 +263,10 @@ FmiBoolean NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask, const unsigned 
 			itsSelectionMask = theMask;
 		if ((theMaskType & kFmiDisplayedMask) == kFmiDisplayedMask)
 			itsDisplayedMask = theMask;
-		return kTrue;
+		return true;
 	}
 	else
-		return kFalse;
+		return false;
 }
 //--------------------------------------------------------
 // Mask

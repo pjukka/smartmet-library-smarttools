@@ -37,14 +37,14 @@ class NFmiSortedPtrList : public NFmiPtrList<Type>
 
 public:
 
-	NFmiSortedPtrList (FmiBoolean fAscendingOrder = kTrue)
+	NFmiSortedPtrList (bool fAscendingOrder = true)
 					: NFmiPtrList<Type>()
 	{};
 
 	virtual ~NFmiSortedPtrList (void)
 	{};
 
-	FmiBoolean InsertionSort (Type* theItem)
+	bool InsertionSort (Type* theItem)
 	{
 		Iterator tempIter = Start();
 		while(tempIter.Next())
@@ -55,7 +55,7 @@ public:
 		return  AddEnd(theItem);
 	};
 
-	FmiBoolean Sort(FmiBoolean fAscendingOrder = kTrue)
+	bool Sort(bool fAscendingOrder = true)
 	{
 		Iterator theIter1 = Start();
 		Iterator theIter2;
@@ -71,7 +71,7 @@ public:
 				}
 			}
 		}
-		return kTrue;
+		return true;
 	};
 
 	NFmiPtrList<Type>::Iterator Find(Type* theItem)
@@ -92,7 +92,7 @@ private:
 
 
 private: 
-	FmiBoolean fAscending; //   M‰‰r‰‰ listan j‰rjestyksen (kTrue = nouseva).
+	bool fAscending; //   M‰‰r‰‰ listan j‰rjestyksen (true = nouseva).
 };
 
 

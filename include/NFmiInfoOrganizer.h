@@ -55,7 +55,7 @@ class NFmiInfoOrganizer
 	NFmiInfoOrganizer (bool theIsToolMasterAvailable);
 	~NFmiInfoOrganizer (void); 
 
- 	FmiBoolean Init (void);
+ 	bool Init (void);
 
 // nämä infon palauttavat metodit ovat toistaiseksi vain apu funktioita, jotka toimivat
 // vajavaisesti. Niistä pitää tehdä fiksumpia, kun tulee enemmän dataa talteen!
@@ -97,12 +97,12 @@ class NFmiInfoOrganizer
 	NFmiDrawParam* CreateEmptyInfoDrawParam(FmiParameterName theParamName); // luo drawparam ilman infoa
 	NFmiDrawParam* CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
 	NFmiDrawParam* CreateDrawParam(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
-	FmiBoolean AddData(NFmiQueryData* theData
+	bool AddData(NFmiQueryData* theData
 					  ,const NFmiString& theDataFileName
 					  ,FmiQueryInfoDataType theDataType
 					  ,int theUndoLevel = 0);
 
-	FmiBoolean Clear (void);
+	bool Clear (void);
 	void ClearData(FmiQueryInfoDataType theDataType);
 	void ClearThisKindOfData(NFmiQueryInfo* theInfo);
  	NFmiProducerList* ProducerList(void); // käy läpi kaikki SmartInfot ja pyytää ensimmäiseltä parametrilta tuottajan (vielä ainakaan SmartInfolla ei ole montaa tuottajaa)
@@ -113,18 +113,18 @@ class NFmiInfoOrganizer
 	void UpdateEditedDataCopy(void); // 28.09.1999/Marko
  private:
 	int CountData(void);
- 	FmiBoolean Remove(void);	
+ 	bool Remove(void);	
 	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiQueryInfo* theInfo2);
 
  public: // nämä ovat pikaviritys käytössä nämä metodit pitäisi laittaa takaisin privateiksi
-	FmiBoolean Reset (void);
-	FmiBoolean Next (void);
+	bool Reset (void);
+	bool Next (void);
 	NFmiSmartInfo* Current (void);
 
  private:
-	NFmiSmartInfo* Info (const FmiParameterName& theParam, FmiBoolean& fSubParameter, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
-  	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, FmiBoolean& fSubParameter, const NFmiLevel* theLevel, FmiQueryInfoDataType theType); 
-    FmiBoolean Add (NFmiSmartInfo* theInfo);
+	NFmiSmartInfo* Info (const FmiParameterName& theParam, bool& fSubParameter, const NFmiLevel* theLevel, FmiQueryInfoDataType theType);
+  	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, bool& fSubParameter, const NFmiLevel* theLevel, FmiQueryInfoDataType theType); 
+    bool Add (NFmiSmartInfo* theInfo);
 	NFmiParamBag GetParams(FmiQueryInfoDataType theDataType);
 
 // Attributes

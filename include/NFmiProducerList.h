@@ -35,15 +35,15 @@ class NFmiProducerList
  public:
 	NFmiProducerList ();
 	~NFmiProducerList ();
-	FmiBoolean		Remove (FmiBoolean fDeleteData = kFalse);
-	void			Clear (FmiBoolean fDeleteData = kFalse);
-	FmiBoolean		Add (NFmiProducer* theProducer);
+	bool		Remove (bool fDeleteData = false);
+	void			Clear (bool fDeleteData = false);
+	bool		Add (NFmiProducer* theProducer);
 	NFmiProducer*	Current ();
-	FmiBoolean		Reset (void);
-	FmiBoolean		Next (void);
-	FmiBoolean		Previous (void);
-	FmiBoolean		Index(unsigned long index);
-	FmiBoolean		Find(NFmiProducer* item);
+	bool		Reset (void);
+	bool		Next (void);
+	bool		Previous (void);
+	bool		Index(unsigned long index);
+	bool		Find(NFmiProducer* item);
 
  private:
 	NFmiSortedPtrList < NFmiProducer > itsList;

@@ -48,7 +48,7 @@ NFmiDrawParamFactory::~NFmiDrawParamFactory(void)
 //--------------------------------------------------------
 NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo 
 													 , const NFmiDataIdent& theIdent
-													 , FmiBoolean& fSubParam
+													 , bool& fSubParam
 													 , const NFmiLevel* theLevel
 													 , bool theIsToolMasterAvailable)
 
@@ -105,9 +105,9 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateEmptyInfoDrawParam(const NFmiDataIden
 //--------------------------------------------------------
 // Init 
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParamFactory::Init()
+bool NFmiDrawParamFactory::Init()
 {
- 	return kTrue;
+ 	return true;
 }
 
 //--------------------------------------------------------

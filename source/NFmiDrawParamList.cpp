@@ -39,7 +39,7 @@
 NFmiDrawParamList::NFmiDrawParamList(void):
 itsList(),
 itsIter(itsList.Start()),
-fDirtyList(kTrue)
+fDirtyList(true)
 {
 }
 
@@ -48,33 +48,33 @@ fDirtyList(kTrue)
 //--------------------------------------------------------
 NFmiDrawParamList::~NFmiDrawParamList(void)
 {
-	Clear(kTrue);
+	Clear(true);
 }
 
 //--------------------------------------------------------
 // Add 
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParamList::Add (NFmiDrawParam* theParam)
+bool NFmiDrawParamList::Add (NFmiDrawParam* theParam)
 {
    if(itsList.AddEnd(theParam))
    {
-		fDirtyList = kTrue;
-		return kTrue;
+		fDirtyList = true;
+		return true;
    }
-   return kFalse;
+   return false;
 }
 //--------------------------------------------------------
 // Add 
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParamList::Add(NFmiDrawParam * theParam, unsigned long theIndex)
+bool NFmiDrawParamList::Add(NFmiDrawParam * theParam, unsigned long theIndex)
 {
    NFmiPtrList < NFmiDrawParam > :: Iterator iter = itsList.Index(theIndex);
    if(iter.AddBefore(theParam))
    {
-		fDirtyList = kTrue;
-		return kTrue;
+		fDirtyList = true;
+		return true;
    }
-   return kFalse;
+   return false;
 }
 //--------------------------------------------------------
 // Current 
@@ -86,65 +86,65 @@ NFmiDrawParam* NFmiDrawParamList::Current (void)
 //--------------------------------------------------------
 // Reset 
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParamList::Reset (void)
+bool NFmiDrawParamList::Reset (void)
 {
    itsIter = itsList.Start();
-   return kTrue;
+   return true;
 }
 //--------------------------------------------------------
 // Next 
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParamList::Next (void)
+bool NFmiDrawParamList::Next (void)
 {
    return itsIter.Next();
 }
 //--------------------------------------------------------
 // Previous 
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParamList::Previous (void)
+bool NFmiDrawParamList::Previous (void)
 {
    return itsIter.Previous();
 }
 //--------------------------------------------------------
 // Clear 
 //--------------------------------------------------------
-void NFmiDrawParamList::Clear(FmiBoolean fDeleteData)
+void NFmiDrawParamList::Clear(bool fDeleteData)
 {
 	itsList.Clear(fDeleteData);
-	fDirtyList = kTrue;
+	fDirtyList = true;
 }
 //--------------------------------------------------------
 // Remove 
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParamList::Remove(FmiBoolean fDeleteData)
+bool NFmiDrawParamList::Remove(bool fDeleteData)
 {
    if(itsIter.Remove(fDeleteData))
    {
-		fDirtyList = kTrue;
-		return kTrue;
+		fDirtyList = true;
+		return true;
    }
-   return kFalse;
+   return false;
 }
 //--------------------------------------------------------
 // Index
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParamList::Index(unsigned long index)
+bool NFmiDrawParamList::Index(unsigned long index)
 {
 	itsIter = itsList.Index(index);
 	if(Current())
-		return kTrue;
-	return kFalse;
+		return true;
+	return false;
 }
 //--------------------------------------------------------
 // Find
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParamList::Find(NFmiDrawParam* item)
+bool NFmiDrawParamList::Find(NFmiDrawParam* item)
 {
 	itsIter = itsList.Find(item);
 	if(Current())
-		return kTrue;
+		return true;
 	Reset();
-	return kFalse;
+	return false;
 }
 
 //--------------------------------------------------------
@@ -155,7 +155,7 @@ void NFmiDrawParamList::Update(void)
 	
 }
 
-void NFmiDrawParamList::HideAllParams(FmiBoolean newState)
+void NFmiDrawParamList::HideAllParams(bool newState)
 {
 	for(Reset(); Next();)
 		Current()->HideParam(newState);
@@ -165,30 +165,30 @@ void NFmiDrawParamList::HideAllParams(FmiBoolean newState)
 void NFmiDrawParamList::DisableEditing(void)
 {
 	for(Reset(); Next();)
-		Current()->EditParam(kFalse);
+		Current()->EditParam(false);
 }
 
 void NFmiDrawParamList::DeactivateAll(void)
 {
 	for(Reset(); Next();)
-		Current()->Activate(kFalse);
+		Current()->Activate(false);
 }
 
-FmiBoolean NFmiDrawParamList::Find(const NFmiDataIdent& theParam, bool fIgnoreProducer)
+bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, bool fIgnoreProducer)
 {
 	for(Reset(); Next();)
 		if(fIgnoreProducer)
 		{
 			if(*(Current()->EditParam().GetParam()) == *(theParam.GetParam()))
-				return kTrue;
+				return true;
 		}
 		else
 			if(Current()->EditParam() == theParam)
-				return kTrue;
-	return kFalse;
+				return true;
+	return false;
 }
 
-FmiBoolean NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel)
+bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel)
 {
 	for(Reset(); Next();)
 	{
@@ -196,15 +196,15 @@ FmiBoolean NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLeve
 		if(info->Param() == theParam)
 		{
 			if(!theLevel && info->SizeLevels() <= 1)
-				return kTrue;
+				return true;
 			if(theLevel && info->Level() && (*(theLevel) == *(info->Level())))
-				return kTrue;
+				return true;
 		}
 	}
-	return kFalse;
+	return false;
 }
 
-FmiBoolean NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, FmiQueryInfoDataType theDataType)
+bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, FmiQueryInfoDataType theDataType)
 {
 	for(Reset(); Next();)
 	{
@@ -214,27 +214,27 @@ FmiBoolean NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLeve
 			if(info->DataType() == theDataType)
 			{
 				if(!theLevel && info->SizeLevels() <= 1)
-					return kTrue;
+					return true;
 				if(theLevel && info->Level() && (*(theLevel) == *(info->Level())))
-					return kTrue;
+					return true;
 			}
 		}
 	}
-	return kFalse;
+	return false;
 }
 
-FmiBoolean NFmiDrawParamList::SyncronizeTimes(const NFmiMetTime& theTime)
+bool NFmiDrawParamList::SyncronizeTimes(const NFmiMetTime& theTime)
 {
 	for(Reset(); Next();)
 		Current()->Info()->Time(theTime);
-	return kTrue;
+	return true;
 }
 
 // Poistaa listalta kaikki halutun tuottajan ja mahd. annetun levelin parametrit.
 // Ei poista niitä parametreja, jotka ovat theParamIdsNotRemoved-listalla. Löy-
 // tynyt paramId poistetaan theParamIdsNotRemoved-listalta, että niitä ei
 // lisättäisi myöhemmin tähän listaan.
-void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::vector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel, FmiBoolean fDeleteData)
+void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::vector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel, bool fDeleteData)
 {
 	std::list<int> tmpParIdList;
 //	std::copy(theParamIdsNotRemoved.begin(), theParamIdsNotRemoved.end(), tmpParIdList.begin());
@@ -302,7 +302,7 @@ struct ParamIdLevelSearcher
  * tynyt paramId poistetaan theParamIdsNotRemoved-listalta, että niitä ei
  * lisättäisi myöhemmin tähän listaan.
  */
-void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved, FmiBoolean fDeleteData)
+void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved, bool fDeleteData)
 {
 	std::list<std::pair<int, NFmiLevel> >::iterator it;
 	for(Reset(); Next();)

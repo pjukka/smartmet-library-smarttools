@@ -51,26 +51,26 @@ NFmiDrawParam::NFmiDrawParam()
 , itsRelativePositionOffset              (NFmiPoint(0,0))
 , itsOnlyOneSymbolRelativeSize           (NFmiPoint(1,1))
 , itsOnlyOneSymbolRelativePositionOffset (NFmiPoint(0,0))
-, fShowStationMarker(kFalse)
+, fShowStationMarker(false)
 , itsIsoLineGab						     (1.)
 , itsModifyingStep                       (1.)
-, fModifyingUnit						 (kTrue)
+, fModifyingUnit						 (true)
 , itsTimeSerialModifyingLimit(10)
 , itsIsolineColor						(TFmiColor(0.,0.,0.))
 , itsIsolineTextColor					(TFmiColor(0.,0.,0.))
 , itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
 , itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
-, fUseSecondaryColors(kFalse)
+, fUseSecondaryColors(false)
 , itsAbsoluteMinValue(-10000)
 , itsAbsoluteMaxValue(10000)
 , itsTimeSeriesScaleMin(0)
 , itsTimeSeriesScaleMax(100)
 , itsPossibleViewTypeCount(2)
-, fShowNumbers(kTrue)
-, fShowMasks(kFalse) // tämä on turha
-, fShowColors(kFalse)
-, fShowColoredNumbers(kFalse)
-, fZeroColorMean(kFalse)
+, fShowNumbers(true)
+, fShowMasks(false) // tämä on turha
+, fShowColors(false)
+, fShowColoredNumbers(false)
+, fZeroColorMean(false)
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
@@ -143,13 +143,13 @@ NFmiDrawParam::NFmiDrawParam()
 // protected osa
 , itsInitFileVersionNumber(itsFileVersionNumber)
 , itsInitFileName("")
-, fHidden(kFalse)
-, fEditedParam(kFalse)
-, fEditableParam(kTrue)
+, fHidden(false)
+, fEditedParam(false)
+, fEditableParam(true)
 , itsInfo(0)
 , itsUnit								("?")
-, fActive(kFalse)
-, fShowDifference(kFalse)
+, fActive(false)
+, fShowDifference(false)
 , fShowDifferenceToOriginalData(false)
 , itsMetEditorCoordinatorMapOptions(0)
 
@@ -180,26 +180,26 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , itsRelativePositionOffset              (NFmiPoint(0,0))
 , itsOnlyOneSymbolRelativeSize           (NFmiPoint(1,1))
 , itsOnlyOneSymbolRelativePositionOffset (NFmiPoint(0,0))
-, fShowStationMarker(kFalse)
+, fShowStationMarker(false)
 , itsIsoLineGab						     (1.)
 , itsModifyingStep                       (1.)
-, fModifyingUnit						 (kTrue)
+, fModifyingUnit						 (true)
 , itsTimeSerialModifyingLimit(10)
 , itsIsolineColor						(TFmiColor(0.,0.,0.))
 , itsIsolineTextColor					(TFmiColor(0.,0.,0.))
 , itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
 , itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
-, fUseSecondaryColors(kFalse)
+, fUseSecondaryColors(false)
 , itsAbsoluteMinValue(-10000)
 , itsAbsoluteMaxValue(10000)
 , itsTimeSeriesScaleMin(0)
 , itsTimeSeriesScaleMax(100)
 , itsPossibleViewTypeCount(2)
-, fShowNumbers(kTrue)
-, fShowMasks(kFalse) // tämä on turha
-, fShowColors(kFalse)
-, fShowColoredNumbers(kFalse)
-, fZeroColorMean(kFalse)
+, fShowNumbers(true)
+, fShowMasks(false) // tämä on turha
+, fShowColors(false)
+, fShowColoredNumbers(false)
+, fZeroColorMean(false)
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
@@ -271,13 +271,13 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 //***********************************************
 , itsInitFileVersionNumber(itsFileVersionNumber)
 , itsInitFileName("")
-, fHidden(kFalse)
-, fEditedParam(kFalse)
-, fEditableParam(kTrue)
+, fHidden(false)
+, fEditedParam(false)
+, fEditableParam(true)
 , itsInfo(theInfo)
 , itsUnit								("?")
-, fActive(kFalse)
-, fShowDifference(kFalse)
+, fActive(false)
+, fShowDifference(false)
 , fShowDifferenceToOriginalData(false)
 , itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 
@@ -305,26 +305,26 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 , itsRelativePositionOffset              (NFmiPoint(0,0))
 , itsOnlyOneSymbolRelativeSize           (NFmiPoint(1,1))
 , itsOnlyOneSymbolRelativePositionOffset (NFmiPoint(0,0))
-, fShowStationMarker(kFalse)
+, fShowStationMarker(false)
 , itsIsoLineGab						     (1.)
 , itsModifyingStep                       (1.)
-, fModifyingUnit						 (kTrue)
+, fModifyingUnit						 (true)
 , itsTimeSerialModifyingLimit(10)
 , itsIsolineColor						(TFmiColor(0.,0.,0.))
 , itsIsolineTextColor					(TFmiColor(0.,0.,0.))
 , itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
 , itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
-, fUseSecondaryColors(kFalse)
+, fUseSecondaryColors(false)
 , itsAbsoluteMinValue(-10000)
 , itsAbsoluteMaxValue(10000)
 , itsTimeSeriesScaleMin(0)
 , itsTimeSeriesScaleMax(100)
 , itsPossibleViewTypeCount(2)
-, fShowNumbers(kTrue)
-, fShowMasks(kFalse) // tämä on turha
-, fShowColors(kFalse)
-, fShowColoredNumbers(kFalse)
-, fZeroColorMean(kFalse)
+, fShowNumbers(true)
+, fShowMasks(false) // tämä on turha
+, fShowColors(false)
+, fShowColoredNumbers(false)
+, fZeroColorMean(false)
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
@@ -396,13 +396,13 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 //***********************************************
 , itsInitFileVersionNumber(itsFileVersionNumber)
 , itsInitFileName("")
-, fHidden(kFalse)
-, fEditedParam(kFalse)
-, fEditableParam(kTrue)
+, fHidden(false)
+, fEditedParam(false)
+, fEditableParam(true)
 , itsInfo(theInfo)
 , itsUnit								("?")
-, fActive(kFalse)
-, fShowDifference(kFalse)
+, fActive(false)
+, fShowDifference(false)
 , fShowDifferenceToOriginalData(false)
 , itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 
@@ -557,7 +557,7 @@ void NFmiDrawParam::Init(NFmiDrawParam* theDrawParam)
 //--------------------------------------------------------
 // Init
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParam::Init (const NFmiString& theFilename)
+bool NFmiDrawParam::Init (const NFmiString& theFilename)
 {
 	std::ifstream in(theFilename, std::ios::in);
 	if(in)
@@ -567,30 +567,30 @@ FmiBoolean NFmiDrawParam::Init (const NFmiString& theFilename)
 		in >> *this;
 		in.close();
 		itsInitFileName = theFilename;
-		return kTrue;
+		return true;
 	}
-	return kFalse;
+	return false;
 }
 
 //--------------------------------------------------------
 // StoreData
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParam::StoreData (const NFmiString& theFilename)
+bool NFmiDrawParam::StoreData (const NFmiString& theFilename)
 {
 	std::ofstream out(theFilename);
 	if(out)
 	{
 		out << *this;
 		out.close();
-		return kTrue;
+		return true;
 	}
-	return kFalse;
+	return false;
 }
 
 //--------------------------------------------------------
 // operator == 
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParam::operator==(const NFmiDrawParam& theDrawParam) const
+bool NFmiDrawParam::operator==(const NFmiDrawParam& theDrawParam) const
 {
 	return (itsPriority == theDrawParam.itsPriority);
 }
@@ -598,7 +598,7 @@ FmiBoolean NFmiDrawParam::operator==(const NFmiDrawParam& theDrawParam) const
 //--------------------------------------------------------
 // operator <
 //--------------------------------------------------------
-FmiBoolean NFmiDrawParam::operator< (const NFmiDrawParam& theDrawParam) const
+bool NFmiDrawParam::operator< (const NFmiDrawParam& theDrawParam) const
 {
 	return (itsPriority < theDrawParam.itsPriority);
 }
@@ -827,7 +827,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			
 			file >> temp; // luetaan nimike pois
 			file >> number;
-			fShowStationMarker = (FmiBoolean)number;
+			fShowStationMarker = (bool)number;
 			file >> temp; // luetaan nimike pois
 			file >> itsIsoLineGab;
 			file >> temp; // luetaan nimike pois

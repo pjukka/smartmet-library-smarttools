@@ -77,7 +77,7 @@ NFmiInfoOrganizer::~NFmiInfoOrganizer (void)
 //--------------------------------------------------------
 // Init 
 //--------------------------------------------------------
-FmiBoolean NFmiInfoOrganizer::Init (void)
+bool NFmiInfoOrganizer::Init (void)
 {
  	itsDrawParamFactory =new NFmiDrawParamFactory;
 	itsDrawParamFactory->WorkingDirectory(WorkingDirectory());
@@ -98,10 +98,10 @@ FmiBoolean NFmiInfoOrganizer::Init (void)
 //	ei ole rajoitettu. Tässä metodissa tutkitaan vain parameri ja tarvittaessa
 //  parametrin aliparametri. 
 
-//  22.02.1999 lisättiin  tunnistin FmiBoolean fSubParameter, josta saadaan tieto
+//  22.02.1999 lisättiin  tunnistin bool fSubParameter, josta saadaan tieto
 //  siitä, oliko löydetty parametri itsenäinen vaiko jonkin parametrin aliparametri.
 NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
-									   , FmiBoolean& fSubParameter 
+									   , bool& fSubParameter 
 									   , const NFmiLevel* theLevel
 									   , FmiQueryInfoDataType theType)
 {
@@ -140,7 +140,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 //--------------------------------------------------------
 
 NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
-									   , FmiBoolean& fSubParameter 
+									   , bool& fSubParameter 
 									   , const NFmiLevel* theLevel
 									   , FmiQueryInfoDataType theType)
 {
@@ -258,7 +258,7 @@ NFmiParamBag NFmiInfoOrganizer::StaticParams(void)
 // SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
 NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
 {
-	FmiBoolean aSubParam;	
+	bool aSubParam;	
 	NFmiSmartInfo* info = Info(theParamName, aSubParam, theLevel, theType);
 	if(info)
 	{
@@ -274,7 +274,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(FmiParameterName thePara
 // SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
 NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
 {
-	FmiBoolean aSubParam;	
+	bool aSubParam;	
 	NFmiSmartInfo* info = Info(theDataIdent, aSubParam, theLevel, theType);
 	if(info)
 	{
@@ -289,7 +289,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& the
 
 NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
 {
-	FmiBoolean aSubParam;	
+	bool aSubParam;	
 	NFmiSmartInfo* info = Info(theParamName, aSubParam, theLevel, theType);
 	if(info)
 	{
@@ -301,7 +301,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(FmiParameterName theParamName, cons
 
 NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
 {
-	FmiBoolean aSubParam;	
+	bool aSubParam;	
 	NFmiSmartInfo* info = Info(theDataIdent, aSubParam, theLevel, theType);
 	if(info)
 	{
@@ -313,7 +313,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(const NFmiDataIdent& theDataIdent, 
 
 NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
 {
-	FmiBoolean aSubParam = kFalse;	
+	bool aSubParam = false;	
 	if(theUsedInfo && theUsedInfo->DataType() == theType && theUsedInfo->Param(theDataIdent) && (!theLevel || (theLevel && theUsedInfo->Level(*theLevel))))
 	{
 		aSubParam = theUsedInfo->UseSubParam();
@@ -336,7 +336,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(FmiParameterName theParamName,
 // pitää muistaa tuhota  NFmiInfoOrganizer:n ulkopuolella
 
 	NFmiDrawParam* drawParam = 0;
-	FmiBoolean aSubParam;	
+	bool aSubParam;	
 	NFmiSmartInfo* info = Info(theParamName, aSubParam, theLevel, theType);
 	if(info)
 	{
@@ -369,7 +369,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 // drawParam pitää muistaa tuhota  NFmiInfoOrganizer:n ulkopuolella
 	// int thePriority = 1;// toistaiseksi HARDCODE, thePriority määritys tehdään myöhemmin
 	NFmiDrawParam* drawParam = 0;
-	FmiBoolean aSubParam;	
+	bool aSubParam;	
 	NFmiSmartInfo* info = Info(theIdent, aSubParam, theLevel, theType);
 	if(info)
 	{
@@ -389,7 +389,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(NFmiSmartInfo* theUsedInfo
 												 ,FmiQueryInfoDataType theType)
 {
 	NFmiDrawParam* drawParam = 0;
-	FmiBoolean aSubParam = kFalse;	
+	bool aSubParam = false;	
 	if(theUsedInfo && theUsedInfo->DataType() == theType && theUsedInfo->Param(theDataIdent) && (!theLevel || (theLevel && theUsedInfo->Level(*theLevel))))
 	{
 		aSubParam = theUsedInfo->UseSubParam();
@@ -412,13 +412,13 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateEmptyInfoDrawParam(FmiParameterName theP
 //--------------------------------------------------------
 // HUOM!!!! Tänne ei ole sitten tarkoitus antaa kFmiDataTypeCopyOfEdited-tyyppistä
 // dataa, koska se luodaan kun tänne annetaan editoitavaa dataa.
-FmiBoolean NFmiInfoOrganizer::AddData(NFmiQueryData* theData
+bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 									 ,const NFmiString& theDataFileName
 //									 ,FmiSmartInfoDataType theDataType
 									 ,FmiQueryInfoDataType theDataType
 									 ,int theUndoLevel)
 {
-	FmiBoolean status = kFalse;
+	bool status = false;
 #ifndef UNIX
 	TRACE("Dataa NFmiInfoOrganizerissa ennen AddData:a %d kpl.\n", CountData());
 #endif
@@ -440,7 +440,7 @@ FmiBoolean NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 			}
 			itsEditedData = aSmartInfo;
 			UpdateEditedDataCopy();
-			status = kTrue;
+			status = true;
 		}
 		else
 			status = Add(aSmartInfo); // muun tyyppiset datat kuin editoitavat menevät listaan
@@ -523,10 +523,10 @@ bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiQueryIn
 		if(theInfo1->VPlaceDescriptor() == theInfo2->VPlaceDescriptor())
 		{
 			// mahdollinen gridi samoja
-			bool status3 = kTrue;
+			bool status3 = true;
 			if(theInfo1->Grid() && theInfo2->Grid())
 			{
-				status3 = (theInfo1->Grid()->AreGridsIdentical(*theInfo2->Grid())) == kTrue;
+				status3 = (theInfo1->Grid()->AreGridsIdentical(*theInfo2->Grid())) == true;
 			}
 			if(status3)
 			{
@@ -562,7 +562,7 @@ NFmiProducerList* NFmiInfoOrganizer::ProducerList(void)
 //   Laittaa alkuperäisen pointterin listaan - uutta pointteria
 //   ei luoda vaan NFmiInfoOrganizer::itsList ottaa pointterin 
 //   'omistukseen'. Tämän luokan destruktori tuhoaa infot.
-FmiBoolean NFmiInfoOrganizer::Add (NFmiSmartInfo* theInfo)
+bool NFmiInfoOrganizer::Add (NFmiSmartInfo* theInfo)
 {
 	return itsList.InsertionSort(theInfo);
 }
@@ -570,29 +570,29 @@ FmiBoolean NFmiInfoOrganizer::Add (NFmiSmartInfo* theInfo)
 // Clear 
 //--------------------------------------------------------
 // tuhoaa aina datan
-FmiBoolean NFmiInfoOrganizer::Clear (void)
+bool NFmiInfoOrganizer::Clear (void)
 { 
 	for( Reset(); Next(); )
 	{
 		Current()->DestroySharedData();
 		delete Current();
 	}
-	itsList.Clear(kFalse);
-	return kTrue; // jotain pitäsi varmaan tsekatakin? 
+	itsList.Clear(false);
+	return true; // jotain pitäsi varmaan tsekatakin? 
 }
  
 //--------------------------------------------------------
 // Reset 
 //--------------------------------------------------------
-FmiBoolean NFmiInfoOrganizer::Reset (void)
+bool NFmiInfoOrganizer::Reset (void)
 {
    itsIter = itsList.Start();
-   return kTrue;
+   return true;
 }
 //--------------------------------------------------------
 // Next 
 //--------------------------------------------------------
-FmiBoolean NFmiInfoOrganizer::Next (void)
+bool NFmiInfoOrganizer::Next (void)
 {
    return itsIter.Next();
 }
@@ -607,9 +607,9 @@ NFmiSmartInfo* NFmiInfoOrganizer::Current (void)
 //--------------------------------------------------------
 // Remove 
 //--------------------------------------------------------
-FmiBoolean NFmiInfoOrganizer::Remove(void)
+bool NFmiInfoOrganizer::Remove(void)
 {
-	return itsIter.Remove(kTrue);
+	return itsIter.Remove(true);
 }
 
 // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon

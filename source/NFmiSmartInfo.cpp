@@ -47,10 +47,10 @@ NFmiSmartInfo::NFmiSmartInfo()
 ,itsEditedParamBag(0)
 ,itsDataType(kFmiDataTypeEditable) // 1999.08.24/Marko
 {
-	fDirty = new FmiBoolean;
-	*fDirty = kFalse;
-	fLoadedFromFile = new FmiBoolean;
-	*fLoadedFromFile = kFalse;
+	fDirty = new bool;
+	*fDirty = false;
+	fLoadedFromFile = new bool;
+	*fLoadedFromFile = false;
 	itsMaxUndoLevelPtr = NULL;
 	itsMaxRedoLevelPtr = NULL;
 	itsCurrentUndoLevelPtr = NULL;
@@ -70,13 +70,13 @@ NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theDa
 	itsDataFileName = theDataFileName;
 	itsAreaMask = new NFmiUndoableMultiLevelMask(HPlaceDescriptor().Size());
 	itsAreaFactors = 0;
-	fEditable = kTrue; //mikä alkuarvoksi?!! 
+	fEditable = true; //mikä alkuarvoksi?!! 
 	itsPriority = 0;
 
-	fDirty = new FmiBoolean;
-	*fDirty = kFalse;
-	fLoadedFromFile = new FmiBoolean;
-	*fLoadedFromFile = kFalse;
+	fDirty = new bool;
+	*fDirty = false;
+	fLoadedFromFile = new bool;
+	*fLoadedFromFile = false;
 
 	itsMaxUndoLevelPtr = NULL; 
 	itsMaxRedoLevelPtr = NULL;
@@ -202,7 +202,7 @@ NFmiSmartInfo* NFmiSmartInfo::Clone(void)
 		
 		*(copy->itsAreaMask) = *(this->itsAreaMask); // laura muutti 06051999
 		
-		*(copy->fDirty) = kFalse; //laura 07051999
+		*(copy->fDirty) = false; //laura 07051999
 		*(copy->fLoadedFromFile) = *(this->fLoadedFromFile); //laura 07051999
 		copy->itsMaxUndoLevelPtr = 0;
 		copy->itsMaxRedoLevelPtr = 0;
@@ -211,7 +211,7 @@ NFmiSmartInfo* NFmiSmartInfo::Clone(void)
 		copy->itsUndoTable = 0;
 		copy->itsUndoTextTable = 0;
 
-		copy->SetDescriptors(this, kFalse);
+		copy->SetDescriptors(this, false);
 
 		return copy;
 	}
@@ -219,11 +219,11 @@ NFmiSmartInfo* NFmiSmartInfo::Clone(void)
 		return 0;
 }
 
-FmiBoolean NFmiSmartInfo::InitEditedParamBag()
+bool NFmiSmartInfo::InitEditedParamBag()
 {
 	for(itsEditedParamBag->Reset(); itsEditedParamBag->Next();)
-		itsEditedParamBag->SetActive(itsEditedParamBag->CurrentParam(),kFalse);
-	return kTrue;
+		itsEditedParamBag->SetActive(itsEditedParamBag->CurrentParam(),false);
+	return true;
 	
 }
 
@@ -264,23 +264,23 @@ NFmiSmartInfo& NFmiSmartInfo::operator=(const NFmiSmartInfo& theSmartInfo)
 	return *this;
 }
 
-FmiBoolean NFmiSmartInfo::operator==(const NFmiSmartInfo& theSmartInfo) const
+bool NFmiSmartInfo::operator==(const NFmiSmartInfo& theSmartInfo) const
 {
 	if(this->itsPriority == theSmartInfo.itsPriority)
-		return kTrue;
+		return true;
 	else
-		return kFalse;
+		return false;
 }
 
-FmiBoolean NFmiSmartInfo::operator<(const NFmiSmartInfo& theSmartInfo) const
+bool NFmiSmartInfo::operator<(const NFmiSmartInfo& theSmartInfo) const
 {
 	if(this->itsPriority < theSmartInfo.itsPriority)
-		return kTrue;
+		return true;
 	else
-		return kFalse;
+		return false;
 }
 
-FmiBoolean NFmiSmartInfo::MaskByArea(const NFmiArea &theArea, unsigned long theMaskType)
+bool NFmiSmartInfo::MaskByArea(const NFmiArea &theArea, unsigned long theMaskType)
 {
 	unsigned long oldMask = MaskType();
 	MaskType(kFmiNoMask);
@@ -288,12 +288,12 @@ FmiBoolean NFmiSmartInfo::MaskByArea(const NFmiArea &theArea, unsigned long theM
 	{
 		NFmiPoint latlon = LatLon();
 		if(theArea.IsInside(latlon))
-			MaskLocation(kTrue,theMaskType);
+			MaskLocation(true,theMaskType);
 		else
-			MaskLocation(kFalse,theMaskType);
+			MaskLocation(false,theMaskType);
 	}
 	MaskType(oldMask);
-	return kTrue;
+	return true;
 }
 
 //--------------------------------------------------------
@@ -301,13 +301,13 @@ FmiBoolean NFmiSmartInfo::MaskByArea(const NFmiArea &theArea, unsigned long theM
 //--------------------------------------------------------
 //   Aktivoi tai deaktivoi kaikki locationit.
 //   
-void NFmiSmartInfo::MaskAllLocations (const FmiBoolean& newState, 
+void NFmiSmartInfo::MaskAllLocations (const bool& newState, 
 									  unsigned long theMaskType)
 {
 	(*itsAreaMask)->MaskAll(newState,theMaskType);
 }
 
-void NFmiSmartInfo::MaskAllLocations (const FmiBoolean& newState)
+void NFmiSmartInfo::MaskAllLocations (const bool& newState)
 {
    (*itsAreaMask)->MaskAll(newState);
 }
@@ -324,11 +324,11 @@ void NFmiSmartInfo::MaskAllLocations (const FmiBoolean& newState)
 //   taas emon Next:iä ja jatketaan kunnes emon 
 //   Next palauttaa falsen.
 
-FmiBoolean NFmiSmartInfo::NextLocation()
+bool NFmiSmartInfo::NextLocation()
 {
-	FmiBoolean returnVal = kFalse;
+	bool returnVal = false;
 
-	while((returnVal==kFalse) && NFmiFastQueryInfo::NextLocation())
+	while((returnVal==false) && NFmiFastQueryInfo::NextLocation())
 	{
 		returnVal = (*itsAreaMask)->IsMasked(LocationIndex());
 	}
@@ -342,7 +342,7 @@ FmiBoolean NFmiSmartInfo::NextLocation()
 //   Kysy hplacedesc:in indeksia ja kysy sitten 
 //   itsMaskArea-oliolta onko
 //   maski päällä.
-FmiBoolean NFmiSmartInfo::IsMaskedLocation (unsigned long theMaskType) const
+bool NFmiSmartInfo::IsMaskedLocation (unsigned long theMaskType) const
 {
 	return (*itsAreaMask)->IsMasked(LocationIndex(),theMaskType);
 }
@@ -389,15 +389,15 @@ void NFmiSmartInfo::LocationMask (const NFmiBitMask& theMask, unsigned long theM
 //   toiminnosta ("aikasarjamuutos", "kursori 
 //   ylös", "aluemuutos")
 
-FmiBoolean NFmiSmartInfo::SnapShotData (const NFmiString& theAction)
+bool NFmiSmartInfo::SnapShotData (const NFmiString& theAction)
 {
 	if(itsCurrentUndoLevelPtr == 0)
-		return kFalse;
+		return false;
 	if(!itsUndoTable || !itsUndoTextTable)
-		return kFalse;
+		return false;
 
 	if (*itsMaxUndoLevelPtr <= 0)
-		return kFalse;
+		return false;
 
 	if (*itsCurrentUndoLevelPtr == *itsMaxUndoLevelPtr - 1)
 		RearrangeUndoTable();
@@ -410,7 +410,7 @@ FmiBoolean NFmiSmartInfo::SnapShotData (const NFmiString& theAction)
 
 	itsUndoTextTable[*itsCurrentUndoLevelPtr] += theAction;
 
-	return kTrue;
+	return true;
 }
 
 
@@ -449,10 +449,10 @@ void NFmiSmartInfo::RearrangeUndoTable(void)
 //   tehdystä toiminnosta ("aikasarjamuutos", 
 //   "kursori ylös", "aluemuutos").
 
-FmiBoolean NFmiSmartInfo::SnapShotData (const NFmiString& theAction
+bool NFmiSmartInfo::SnapShotData (const NFmiString& theAction
  ,FmiParameterName theParameter)
 {
-   FmiBoolean returnVal = kFalse;
+   bool returnVal = false;
    return returnVal;
 }
 
@@ -495,29 +495,29 @@ NFmiString NFmiSmartInfo::RedoText (void)
 // Undo				M.K. 
 //--------------------------------------------------------
 // Kertoo onko undo mahdollista suorittaa.
-FmiBoolean NFmiSmartInfo::Undo (void)
+bool NFmiSmartInfo::Undo (void)
 {
 	if(itsCurrentUndoLevelPtr == 0)
-		return kFalse;
+		return false;
 	if ((*itsCurrentUndoLevelPtr) < 0)
-		return kFalse;
+		return false;
 	else
-		return kTrue;
+		return true;
 }
 
 //--------------------------------------------------------
 // Redo				M.K. 
 //--------------------------------------------------------
 // Kertoo onko redo mahdollista suorittaa.
-FmiBoolean NFmiSmartInfo::Redo (void)
+bool NFmiSmartInfo::Redo (void)
 {
 	if(itsCurrentUndoLevelPtr == 0)
-		return kFalse;
+		return false;
 	if ((*itsCurrentRedoLevelPtr) == (*itsCurrentUndoLevelPtr) 
 			|| (*itsCurrentRedoLevelPtr) == ((*itsCurrentUndoLevelPtr) + 1))
-		return kFalse;
+		return false;
 	else
-		return kTrue;
+		return true;
 }
 //--------------------------------------------------------
 // CommitData			M.K.
@@ -545,14 +545,14 @@ void NFmiSmartInfo::CommitData (void)
 //   Palaa undo-listassa yhden pykälän takaisin 
 //   päin, mutta ei tuhoa viimeisiä muutoksia
 //   että voidaan myös tehdä Redo(). Jos ei ole 
-//   mitään Undo:ta tehtävissä, palautetaan kFalse.
+//   mitään Undo:ta tehtävissä, palautetaan false.
    
-FmiBoolean NFmiSmartInfo::UndoData (void)
+bool NFmiSmartInfo::UndoData (void)
 {
 	if(itsCurrentUndoLevelPtr == 0)
-		return kFalse;
+		return false;
 	if ((*itsCurrentUndoLevelPtr) < 0)
-		return kFalse;
+		return false;
 	if ((*itsCurrentUndoLevelPtr) == (*itsCurrentRedoLevelPtr))
 	{
 		NFmiString action("");
@@ -563,8 +563,8 @@ FmiBoolean NFmiSmartInfo::UndoData (void)
 	memcpy(itsRefDataPool->Data(), itsUndoTable[*itsCurrentUndoLevelPtr], itsRefDataPool->Size());
 	(*itsCurrentUndoLevelPtr)--;
 	*itsCurrentRedoLevelPtr = (*itsCurrentUndoLevelPtr) + 2;
-	*fDirty = kTrue; // 18.1.2002/Marko lisäsin datan likauksen.
-	return kTrue;
+	*fDirty = true; // 18.1.2002/Marko lisäsin datan likauksen.
+	return true;
 }
 
 //--------------------------------------------------------
@@ -574,15 +574,15 @@ FmiBoolean NFmiSmartInfo::UndoData (void)
 //   Redo palauttaa Undo:n jälkeen datan tilan 
 //   takaisin Undo:ta edeltäneeseen tilaan. Jos    
 //   ei ole tehty Undo:ta edellä, ei Redo:ta voida 
-//   tehdä ja palauttaa kFalse.
+//   tehdä ja palauttaa false.
 
-FmiBoolean NFmiSmartInfo::RedoData (void)
+bool NFmiSmartInfo::RedoData (void)
 {
 	if(itsCurrentUndoLevelPtr == 0)
-		return kFalse;
+		return false;
 	if ((*itsCurrentUndoLevelPtr) == (*itsCurrentRedoLevelPtr) 
 			|| ((*itsCurrentUndoLevelPtr) + 1) == (*itsCurrentRedoLevelPtr))
-		return kFalse;
+		return false;
 	else
 	{
 		memcpy(itsRefDataPool->Data(), itsUndoTable[*itsCurrentRedoLevelPtr], itsRefDataPool->Size());
@@ -590,8 +590,8 @@ FmiBoolean NFmiSmartInfo::RedoData (void)
 		if((*itsCurrentRedoLevelPtr) + 1 <= (*itsMaxRedoLevelPtr))
 			(*itsCurrentRedoLevelPtr)++;
 	}
-	*fDirty = kTrue; // 18.1.2002/Marko lisäsin datan likauksen.
-	return kTrue;
+	*fDirty = true; // 18.1.2002/Marko lisäsin datan likauksen.
+	return true;
 }
 
 //--------------------------------------------------------
@@ -641,12 +641,12 @@ void NFmiSmartInfo::UndoLevel (const long& theDepth)	// theDepth kuvaa kuinka mo
 //   Asettaa currentin paikan maskin riippuen 
 //   itsMaskStatesta.
 
-void NFmiSmartInfo::MaskLocation (const FmiBoolean& newState)
+void NFmiSmartInfo::MaskLocation (const bool& newState)
 {
 	(*itsAreaMask)->Mask(LocationIndex(),newState);
 }
 
-void NFmiSmartInfo::MaskLocation (const FmiBoolean& newState, 
+void NFmiSmartInfo::MaskLocation (const bool& newState, 
 								  unsigned long theMaskType)
 {
 	(*itsAreaMask)->Mask(LocationIndex(),newState, theMaskType);
@@ -670,7 +670,7 @@ unsigned long NFmiSmartInfo::MaskType(void)
 //   neljännen aseman tai joka viides hila ja joka neljäs rivi (kun piirretään
 //   esim. pieneen tilaan tiheää hilaa ja kaikkia paikkoja ei haluta piirtää).
 
-void NFmiSmartInfo::LocationMaskStep (FmiBoolean newStatus, FmiBoolean fResetAllFirst, const long& theXStep, const long& theYStep)
+void NFmiSmartInfo::LocationMaskStep (bool newStatus, bool fResetAllFirst, const long& theXStep, const long& theYStep)
 {
 	if(IsGrid())
 		LocationMaskStepGrid(newStatus, fResetAllFirst, theXStep,theYStep);
@@ -678,7 +678,7 @@ void NFmiSmartInfo::LocationMaskStep (FmiBoolean newStatus, FmiBoolean fResetAll
 		LocationMaskStepLocation(newStatus, fResetAllFirst, theXStep);
 }
 
-void NFmiSmartInfo::LocationMaskStep (FmiBoolean newStatus, unsigned long theMaskType, FmiBoolean fResetAllFirst, const long& theXStep, const long& theYStep)
+void NFmiSmartInfo::LocationMaskStep (bool newStatus, unsigned long theMaskType, bool fResetAllFirst, const long& theXStep, const long& theYStep)
 {
 	if(IsGrid())
 		LocationMaskStepGrid(newStatus, theMaskType, fResetAllFirst, theXStep, theYStep);
@@ -686,7 +686,7 @@ void NFmiSmartInfo::LocationMaskStep (FmiBoolean newStatus, unsigned long theMas
 		LocationMaskStepLocation(newStatus, theMaskType, fResetAllFirst, theXStep);
 }
 
-void NFmiSmartInfo::LocationMaskStepGrid(FmiBoolean newStatus, FmiBoolean fResetAllFirst, const long& theXStep, const long& theYStep)
+void NFmiSmartInfo::LocationMaskStepGrid(bool newStatus, bool fResetAllFirst, const long& theXStep, const long& theYStep)
 {
 	if(!(theYStep && theXStep)) // jos ystep tai xstep 0, ei tehdä mitään
 		return;
@@ -711,7 +711,7 @@ void NFmiSmartInfo::LocationMaskStepGrid(FmiBoolean newStatus, FmiBoolean fReset
 	}
 }
 
-void NFmiSmartInfo::LocationMaskStepGrid(FmiBoolean newStatus, unsigned long theMaskType, FmiBoolean fResetAllFirst, const long& theXStep, const long& theYStep)
+void NFmiSmartInfo::LocationMaskStepGrid(bool newStatus, unsigned long theMaskType, bool fResetAllFirst, const long& theXStep, const long& theYStep)
 {
 	if(!(theYStep && theXStep)) // jos ystep tai xstep 0, ei tehdä mitään
 		return;
@@ -736,7 +736,7 @@ void NFmiSmartInfo::LocationMaskStepGrid(FmiBoolean newStatus, unsigned long the
 	}
 }
 
-void NFmiSmartInfo::LocationMaskStepLocation(FmiBoolean newStatus, FmiBoolean fResetAllFirst, const long& theXStep)
+void NFmiSmartInfo::LocationMaskStepLocation(bool newStatus, bool fResetAllFirst, const long& theXStep)
 {
 	if(!theXStep) // jos xstep 0, ei tehdä mitään
 		return;
@@ -751,7 +751,7 @@ void NFmiSmartInfo::LocationMaskStepLocation(FmiBoolean newStatus, FmiBoolean fR
 	}
 }
 
-void NFmiSmartInfo::LocationMaskStepLocation(FmiBoolean newStatus, unsigned long theMaskType, FmiBoolean fResetAllFirst, const long& theXStep)
+void NFmiSmartInfo::LocationMaskStepLocation(bool newStatus, unsigned long theMaskType, bool fResetAllFirst, const long& theXStep)
 {
 	if(!theXStep) // jos xstep 0, ei tehdä mitään
 		return;
@@ -772,7 +772,7 @@ NFmiQueryData* NFmiSmartInfo::DataReference()
 	return itsDataReference;
 }
 
-FmiBoolean NFmiSmartInfo::Extrapolate(void)
+bool NFmiSmartInfo::Extrapolate(void)
 {
 	for(this->ResetLevel(); this->NextLevel();)
 	{
@@ -796,7 +796,7 @@ FmiBoolean NFmiSmartInfo::Extrapolate(void)
 			}
 		}
 	}
-	return kTrue;
+	return true;
 }
 
 unsigned long NFmiSmartInfo::LocationMaskedCount(unsigned long theMaskType)
@@ -804,17 +804,17 @@ unsigned long NFmiSmartInfo::LocationMaskedCount(unsigned long theMaskType)
 	return (*itsAreaMask)->MaskedCount(theMaskType);
 }
 
-FmiBoolean NFmiSmartInfo::LocationSelectionSnapShot(void)
+bool NFmiSmartInfo::LocationSelectionSnapShot(void)
 {
 	return itsAreaMask->SnapShotData();
 }
 
-FmiBoolean NFmiSmartInfo::LocationSelectionUndo(void)
+bool NFmiSmartInfo::LocationSelectionUndo(void)
 {
 	return itsAreaMask->Undo();
 }
 
-FmiBoolean NFmiSmartInfo::LocationSelectionRedo(void)
+bool NFmiSmartInfo::LocationSelectionRedo(void)
 {
 	return itsAreaMask->Redo();
 }
@@ -824,12 +824,12 @@ void NFmiSmartInfo::LocationSelectionCommitData(void)
 	itsAreaMask->CommitData();
 }
 
-FmiBoolean NFmiSmartInfo::LocationSelectionUndoData(void)
+bool NFmiSmartInfo::LocationSelectionUndoData(void)
 {
 	return itsAreaMask->UndoData();
 }
 
-FmiBoolean NFmiSmartInfo::LocationSelectionRedoData(void)
+bool NFmiSmartInfo::LocationSelectionRedoData(void)
 {
 	return itsAreaMask->RedoData();
 }

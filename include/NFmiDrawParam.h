@@ -56,15 +56,15 @@ public:
 	virtual  ~NFmiDrawParam (void);
 
 	void Init(NFmiDrawParam* theDrawParam);
-	void HideParam(FmiBoolean newValue){fHidden = newValue;};
-	void EditParam(FmiBoolean newValue){fEditedParam = newValue;};
-	FmiBoolean IsParamHidden(void){return fHidden;};
-	FmiBoolean IsParamEdited(void){return fEditedParam;};
-	FmiBoolean IsEditable(void){return fEditableParam;};
-	void EditableParam(FmiBoolean newValue){fEditableParam = newValue;};
+	void HideParam(bool newValue){fHidden = newValue;};
+	void EditParam(bool newValue){fEditedParam = newValue;};
+	bool IsParamHidden(void){return fHidden;};
+	bool IsParamEdited(void){return fEditedParam;};
+	bool IsEditable(void){return fEditableParam;};
+	void EditableParam(bool newValue){fEditableParam = newValue;};
 
-	FmiBoolean              Init (const NFmiString& theFilename = NFmiString());
-	FmiBoolean              StoreData (const NFmiString& theFilename = NFmiString());
+	bool              Init (const NFmiString& theFilename = NFmiString());
+	bool              StoreData (const NFmiString& theFilename = NFmiString());
 
 // --------------- "set" ja "get" metodit -----------------
 	const NFmiString&	 ParameterAbbreviation (void) const;
@@ -92,14 +92,14 @@ public:
 	const NFmiPoint&	 OnlyOneSymbolRelativeSize (void) const { return itsOnlyOneSymbolRelativeSize; };
 	void				 OnlyOneSymbolRelativePositionOffset (const NFmiPoint& theOnlyOneSymbolRelativePositionOffset) { itsOnlyOneSymbolRelativePositionOffset = theOnlyOneSymbolRelativePositionOffset; };
 	const NFmiPoint&	 OnlyOneSymbolRelativePositionOffset (void) const { return itsOnlyOneSymbolRelativePositionOffset; };
-	void				 ShowStationMarker (const FmiBoolean newState) { fShowStationMarker = newState; };
-	FmiBoolean			 ShowStationMarker (void) { return fShowStationMarker; };
+	void				 ShowStationMarker (const bool newState) { fShowStationMarker = newState; };
+	bool			 ShowStationMarker (void) { return fShowStationMarker; };
 	void				 IsoLineGab (const double theIsoLineGab) { itsIsoLineGab = theIsoLineGab; };
 	double				 IsoLineGab (void) { return itsIsoLineGab; };
 	void				 ModifyingStep (const double theModifyingStep) { itsModifyingStep = theModifyingStep; };
 	double				 ModifyingStep (void) { return itsModifyingStep; };
-	void				 ModifyingUnit (FmiBoolean theModifyingUnit) { fModifyingUnit = theModifyingUnit; }
-	FmiBoolean			 ModifyingUnit (void) { return fModifyingUnit; }
+	void				 ModifyingUnit (bool theModifyingUnit) { fModifyingUnit = theModifyingUnit; }
+	bool			 ModifyingUnit (void) { return fModifyingUnit; }
 	FmiEditorMapViewType* PossibleViewTypeList (void) {return itsPossibleViewTypeList;}
 	int					 PossibleViewTypeCount (void) { return itsPossibleViewTypeCount; };
 	NFmiString			 InitFileName(void) { return itsInitFileName; }
@@ -129,22 +129,22 @@ public:
 	void				 Unit (const NFmiString& theUnit) { itsUnit = theUnit; };
 	const NFmiString&	 Unit (void) { return itsUnit; };
 
-	FmiBoolean ShowNumbers(void) {return fShowNumbers;}
-	void ShowNumbers(FmiBoolean theValue) {fShowNumbers = theValue;}
-	FmiBoolean	ShowMasks(void) {return fShowMasks;}
-	void	ShowMasks(FmiBoolean theValue) {fShowMasks = theValue;}
-	FmiBoolean	ShowColors(void) {return fShowColors;}
-	void	ShowColors(FmiBoolean theValue) {fShowColors = theValue;}
-	FmiBoolean	ShowColoredNumbers(void) {return fShowColoredNumbers;}
-	void	ShowColoredNumbers(FmiBoolean theValue) {fShowColoredNumbers = theValue;}
-	FmiBoolean	ZeroColorMean(void) {return fZeroColorMean;}
-	void	ZeroColorMean(FmiBoolean theValue) {fZeroColorMean = theValue;}
-	FmiBoolean IsActive(void){return fActive;};
-	void Activate(FmiBoolean newState){fActive = newState;};
-	FmiBoolean UseSecondaryColors(void){return fUseSecondaryColors;};
-	void UseSecondaryColors(FmiBoolean newState){fUseSecondaryColors = newState;};
-	FmiBoolean ShowDifference(void){return fShowDifference;};
-	void ShowDifference(FmiBoolean newState){fShowDifference = newState;};
+	bool ShowNumbers(void) {return fShowNumbers;}
+	void ShowNumbers(bool theValue) {fShowNumbers = theValue;}
+	bool	ShowMasks(void) {return fShowMasks;}
+	void	ShowMasks(bool theValue) {fShowMasks = theValue;}
+	bool	ShowColors(void) {return fShowColors;}
+	void	ShowColors(bool theValue) {fShowColors = theValue;}
+	bool	ShowColoredNumbers(void) {return fShowColoredNumbers;}
+	void	ShowColoredNumbers(bool theValue) {fShowColoredNumbers = theValue;}
+	bool	ZeroColorMean(void) {return fZeroColorMean;}
+	void	ZeroColorMean(bool theValue) {fZeroColorMean = theValue;}
+	bool IsActive(void){return fActive;};
+	void Activate(bool newState){fActive = newState;};
+	bool UseSecondaryColors(void){return fUseSecondaryColors;};
+	void UseSecondaryColors(bool newState){fUseSecondaryColors = newState;};
+	bool ShowDifference(void){return fShowDifference;};
+	void ShowDifference(bool newState){fShowDifference = newState;};
 	bool ShowDifferenceToOriginalData(void) const{return fShowDifferenceToOriginalData;}
 	void ShowDifferenceToOriginalData(bool newValue){fShowDifferenceToOriginalData = newValue;}
 	NFmiMetEditorCoordinatorMapOptions* MetEditorCoordinatorMapOptions(void){return itsMetEditorCoordinatorMapOptions;};
@@ -286,8 +286,8 @@ public:
 //**************************************************************
 
 // ---------------------- operators ------------------------
-	FmiBoolean operator == (const NFmiDrawParam & theDrawParam) const;
-	FmiBoolean operator < (const NFmiDrawParam & theDrawParam) const;
+	bool operator == (const NFmiDrawParam & theDrawParam) const;
+	bool operator < (const NFmiDrawParam & theDrawParam) const;
 	virtual std::ostream & Write (std::ostream &file);
 	virtual std::istream & Read (std::istream &file);
 
@@ -318,16 +318,16 @@ protected:
 	NFmiPoint itsRelativePositionOffset;
 	NFmiPoint itsOnlyOneSymbolRelativeSize;
 	NFmiPoint itsOnlyOneSymbolRelativePositionOffset;
-	FmiBoolean fShowStationMarker;
+	bool fShowStationMarker;
 	double itsIsoLineGab;
 	double itsModifyingStep;
-	FmiBoolean fModifyingUnit;	//(= 0, jos yksikkö on %, = 1, jos yksikkö on sama kuin itsUnit)
+	bool fModifyingUnit;	//(= 0, jos yksikkö on %, = 1, jos yksikkö on sama kuin itsUnit)
 	double itsTimeSerialModifyingLimit; // aikasarjanäytön muutos akselin minimi ja maksimi arvo
 	TFmiColor itsIsolineColor;
 	TFmiColor itsIsolineTextColor;
 	TFmiColor itsSecondaryIsolineColor;
 	TFmiColor itsSecondaryIsolineTextColor;
-	FmiBoolean fUseSecondaryColors;
+	bool fUseSecondaryColors;
 
 	double itsAbsoluteMinValue;
 	double itsAbsoluteMaxValue;
@@ -341,11 +341,11 @@ protected:
 	int itsPossibleViewTypeCount;
 
 	// Tekstinäyttö:
-	FmiBoolean	fShowNumbers;
-	FmiBoolean	fShowMasks; // tämä on turha!!!!!
-	FmiBoolean	fShowColors; // asema tekstiä varten
-	FmiBoolean	fShowColoredNumbers; // asema tekstiä varten
-	FmiBoolean	fZeroColorMean; // asema tekstiä varten
+	bool	fShowNumbers;
+	bool	fShowMasks; // tämä on turha!!!!!
+	bool	fShowColors; // asema tekstiä varten
+	bool	fShowColoredNumbers; // asema tekstiä varten
+	bool	fZeroColorMean; // asema tekstiä varten
 
 //***********************************************
 //********** 'versio 2' parametreja *************
@@ -432,14 +432,14 @@ private:
 //   kyseisen luokan tiedot.
 	NFmiString itsInitFileName;
 
-	FmiBoolean fHidden;			// näyttö voidaan piiloittaa tämän mukaisesti
-	FmiBoolean fEditedParam;	// vain yksi parametreista voidaan editoida yhtä aikaa
-	FmiBoolean fEditableParam;	// onko parametri suoraan editoitavissa ollenkaan? (esim. HESSAA tai tuulivektori eivät ole)
+	bool fHidden;			// näyttö voidaan piiloittaa tämän mukaisesti
+	bool fEditedParam;	// vain yksi parametreista voidaan editoida yhtä aikaa
+	bool fEditableParam;	// onko parametri suoraan editoitavissa ollenkaan? (esim. HESSAA tai tuulivektori eivät ole)
 
 	NFmiSmartInfo* itsInfo;
 	NFmiString itsUnit;			
-	FmiBoolean fActive;			// onko kyseinen parametri näytön aktiivinen parametri (jokaisella näyttörivillä aina yksi aktivoitunut parametri)
-	FmiBoolean fShowDifference;	// näytetäänkö kartalla parametrin arvo, vai erotus edelliseen aikaan (ei ole vielä talletettu tiedostoon)
+	bool fActive;			// onko kyseinen parametri näytön aktiivinen parametri (jokaisella näyttörivillä aina yksi aktivoitunut parametri)
+	bool fShowDifference;	// näytetäänkö kartalla parametrin arvo, vai erotus edelliseen aikaan (ei ole vielä talletettu tiedostoon)
 	bool fShowDifferenceToOriginalData;
 
 	NFmiMetEditorCoordinatorMapOptions* itsMetEditorCoordinatorMapOptions; // tätä käytetään koordinaatio tarkasteluissa

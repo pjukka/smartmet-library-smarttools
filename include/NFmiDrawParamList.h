@@ -24,8 +24,8 @@
 //
 //  Change Log: 
 // 
-//  22.02.-99 lisättiin FmiBoolean fDirtyList, joka saa arvon
-//  metodeissa Add, Remove ja Clear kTrue. Oletusarvo on kFalse. 
+//  22.02.-99 lisättiin bool fDirtyList, joka saa arvon
+//  metodeissa Add, Remove ja Clear true. Oletusarvo on false. 
 // Changed 26.08.1999/Marko		Lisäsin uuden Find()-metodin.
 //
 //**********************************************************
@@ -50,35 +50,35 @@ public:
 	~NFmiDrawParamList (void);
 
 	NFmiDrawParam*  Current (void);
-	FmiBoolean      Reset (void);
-	FmiBoolean      Next (void);
-	FmiBoolean      Previous (void);
-	void            Clear (FmiBoolean fDeleteData = kFalse);
-	void            Clear (const NFmiProducer& theProducer, std::vector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel = 0, FmiBoolean fDeleteData = kFalse);
-	void            Clear (const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved, FmiBoolean fDeleteData = kFalse);
-	FmiBoolean      Add (NFmiDrawParam * theParam);
-	FmiBoolean      Add (NFmiDrawParam * theParam, unsigned long theIndex);
-	FmiBoolean      Remove (FmiBoolean fDeleteData = kFalse);
-	FmiBoolean      Index(unsigned long index);
-	FmiBoolean		Find(NFmiDrawParam* item);
+	bool      Reset (void);
+	bool      Next (void);
+	bool      Previous (void);
+	void            Clear (bool fDeleteData = false);
+	void            Clear (const NFmiProducer& theProducer, std::vector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel = 0, bool fDeleteData = false);
+	void            Clear (const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved, bool fDeleteData = false);
+	bool      Add (NFmiDrawParam * theParam);
+	bool      Add (NFmiDrawParam * theParam, unsigned long theIndex);
+	bool      Remove (bool fDeleteData = false);
+	bool      Index(unsigned long index);
+	bool		Find(NFmiDrawParam* item);
 
-	void			HideAllParams(FmiBoolean newState);
+	void			HideAllParams(bool newState);
 	void			DisableEditing(void);
 	void			DeactivateAll(void);
-	FmiBoolean		Find(const NFmiDataIdent& theParam, bool fIgnoreProducer = false);
-	FmiBoolean		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel);
-	FmiBoolean		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, FmiQueryInfoDataType theDataType);
-	FmiBoolean		SyncronizeTimes(const NFmiMetTime& theTime);
+	bool		Find(const NFmiDataIdent& theParam, bool fIgnoreProducer = false);
+	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel);
+	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, FmiQueryInfoDataType theDataType);
+	bool		SyncronizeTimes(const NFmiMetTime& theTime);
 
 	void            Update(void);
-	FmiBoolean      IsDirty (void){ return fDirtyList; }; 
-	void            Dirty (FmiBoolean fDirty){ fDirtyList = fDirty; }; 
+	bool      IsDirty (void){ return fDirtyList; }; 
+	void            Dirty (bool fDirty){ fDirtyList = fDirty; }; 
 	unsigned long NumberOfItems(void){return itsList.NumberOfItems();};
 
 private:
 	NFmiSortedPtrList < NFmiDrawParam > itsList;
 	NFmiPtrList < NFmiDrawParam > :: Iterator itsIter;
-	FmiBoolean fDirtyList;
+	bool fDirtyList;
 };
 
 #endif

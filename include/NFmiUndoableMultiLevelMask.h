@@ -43,12 +43,12 @@ class NFmiUndoableMultiLevelMask
    ~NFmiUndoableMultiLevelMask(void);
    NFmiMultiLevelMask* operator->(void){return itsMultiLevelMask;};
    operator NFmiMultiLevelMask*(void){return itsMultiLevelMask;};
-   FmiBoolean SnapShotData(void);	// ota maskit talteen
-   FmiBoolean Undo(void);							// kysyy onko undo mahdollinen
-   FmiBoolean Redo(void);							// kysyy onko redo mahdollinen
+   bool SnapShotData(void);	// ota maskit talteen
+   bool Undo(void);							// kysyy onko undo mahdollinen
+   bool Redo(void);							// kysyy onko redo mahdollinen
    void CommitData(void);							// hyväksy tehdyt muutokset (eli tuhoaa undo mahdollisuudet)
-   FmiBoolean UndoData(void);						// suorittaa todellisen undon
-   FmiBoolean RedoData(void);						// suorittaa todellisen redon
+   bool UndoData(void);						// suorittaa todellisen undon
+   bool RedoData(void);						// suorittaa todellisen redon
 
    // HUOM! ei toimi aivan oikein, jos undoleveliksi annetaan 5, on todellinen undo 
    // mahdollista vain 4 kertaa. En jaksa nyt ihmetellä sitä nyt (T:Marko).

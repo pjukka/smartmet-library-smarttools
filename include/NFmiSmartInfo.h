@@ -51,20 +51,20 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	NFmiSmartInfo* Clone(void);
 	void AreaMask(NFmiUndoableMultiLevelMask* theAreaMask);
 	int MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea);
-	FmiBoolean MaskByArea(const NFmiArea &theArea, unsigned long theMaskType);
+	bool MaskByArea(const NFmiArea &theArea, unsigned long theMaskType);
 
-	void MaskAllLocations (const FmiBoolean& newState, unsigned long theMaskType);
-	void MaskAllLocations (const FmiBoolean& newState);
+	void MaskAllLocations (const bool& newState, unsigned long theMaskType);
+	void MaskAllLocations (const bool& newState);
 	
-	FmiBoolean NextLocation (void);
+	bool NextLocation (void);
    
 	unsigned long LocationMaskedCount(unsigned long theMaskType);
 
 	//toimii vaan, jos on yksi info
-	FmiBoolean IsDirty(void) const {return *fDirty;};
-	void Dirty(FmiBoolean newState){*fDirty = newState;};
+	bool IsDirty(void) const {return *fDirty;};
+	void Dirty(bool newState){*fDirty = newState;};
 
-	FmiBoolean IsMaskedLocation (unsigned long theMaskType) const;
+	bool IsMaskedLocation (unsigned long theMaskType) const;
 
 	void MaskType(const unsigned long& theMaskType);
 	unsigned long MaskType(void);
@@ -72,23 +72,23 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	const NFmiBitMask& LocationMask (unsigned long theMaskType) const; 
 	void LocationMask (const NFmiBitMask& theMask, unsigned long theMaskType);
    
-	FmiBoolean SnapShotData (const NFmiString& theAction);
+	bool SnapShotData (const NFmiString& theAction);
 	void RearrangeUndoTable(void);
-	FmiBoolean SnapShotData (const NFmiString& theAction,FmiParameterName theParameter);
+	bool SnapShotData (const NFmiString& theAction,FmiParameterName theParameter);
 	NFmiString UndoText (void);
 	NFmiString RedoText (void);
-	FmiBoolean Undo (void);
-	FmiBoolean Redo (void);
+	bool Undo (void);
+	bool Redo (void);
 	void CommitData (void);
-	FmiBoolean UndoData (void);
-	FmiBoolean RedoData (void);
+	bool UndoData (void);
+	bool RedoData (void);
 	void UndoLevel (const long& theDepth);
 
-	void MaskLocation (const FmiBoolean& newState);
-	void MaskLocation (const FmiBoolean& newState, unsigned long theMaskType);
+	void MaskLocation (const bool& newState);
+	void MaskLocation (const bool& newState, unsigned long theMaskType);
 
-	void LocationMaskStep (FmiBoolean newStatus, FmiBoolean fResetAllFirst, const long& theXStep, const long& theYStep=1);
-	void LocationMaskStep (FmiBoolean newStatus, unsigned long theMaskType, FmiBoolean fResetAllFirst, const long& theXStep, const long& theYStep=1);
+	void LocationMaskStep (bool newStatus, bool fResetAllFirst, const long& theXStep, const long& theYStep=1);
+	void LocationMaskStep (bool newStatus, unsigned long theMaskType, bool fResetAllFirst, const long& theXStep, const long& theYStep=1);
 
 	NFmiGrid* AreaFactors(void){return itsAreaFactors;};
 	void AreaFactors(NFmiGrid* theAreaFactor);
@@ -97,45 +97,45 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	void DataFileName(const NFmiString& theDataFileName){itsDataFileName = theDataFileName;}
 	NFmiSmartInfo& operator=(const NFmiSmartInfo& theSmartInfo);
 	
-	FmiBoolean operator==(const NFmiSmartInfo& theSmartInfo) const;
-	FmiBoolean operator< (const NFmiSmartInfo& theSmartInfo) const;
+	bool operator==(const NFmiSmartInfo& theSmartInfo) const;
+	bool operator< (const NFmiSmartInfo& theSmartInfo) const;
 	
 	void DestroyData(void);
 	void DestroySharedData(void){DestroyData();};
 	NFmiQueryData* DataReference(void);
 
-	FmiBoolean IsEditable(void){return fEditable;}
-	void Editable(FmiBoolean newState){fEditable = newState;}
+	bool IsEditable(void){return fEditable;}
+	void Editable(bool newState){fEditable = newState;}
 	
 	int Priority(void){return itsPriority;}
 	void Priority(int thePriority){itsPriority = thePriority;}
 
-	FmiBoolean LoadedFromFile(void){return *fLoadedFromFile;}
-	void LoadedFromFile(FmiBoolean loadedFromFile){*fLoadedFromFile = loadedFromFile;}
+	bool LoadedFromFile(void){return *fLoadedFromFile;}
+	void LoadedFromFile(bool loadedFromFile){*fLoadedFromFile = loadedFromFile;}
 
-	FmiBoolean Extrapolate(void);
+	bool Extrapolate(void);
 
 	NFmiParamBag* EditedParamBag(void){return itsEditedParamBag;}
 	void EditedParamBag(const NFmiParamBag& theParamBag){*itsEditedParamBag = theParamBag;}
-	FmiBoolean InitEditedParamBag(void);
+	bool InitEditedParamBag(void);
 
-	FmiBoolean LocationSelectionSnapShot(void);	// ota maskit talteen
-	FmiBoolean LocationSelectionUndo(void);		// kysyy onko undo mahdollinen
-	FmiBoolean LocationSelectionRedo(void);		// kysyy onko redo mahdollinen
+	bool LocationSelectionSnapShot(void);	// ota maskit talteen
+	bool LocationSelectionUndo(void);		// kysyy onko undo mahdollinen
+	bool LocationSelectionRedo(void);		// kysyy onko redo mahdollinen
 	void LocationSelectionCommitData(void);		// hyväksy tehdyt muutokset (eli tuhoaa undo mahdollisuudet)
-	FmiBoolean LocationSelectionUndoData(void);	// suorittaa todellisen undon
-	FmiBoolean LocationSelectionRedoData(void);	// suorittaa todellisen redon
+	bool LocationSelectionUndoData(void);	// suorittaa todellisen undon
+	bool LocationSelectionRedoData(void);	// suorittaa todellisen redon
 	void LocationSelectionUndoLevel(int theNewUndoLevel); // undolevel asetetaan tällä
 	FmiQueryInfoDataType DataType(void){return itsDataType;}; // 1999.08.24/Marko
 	void DataType(FmiQueryInfoDataType newType){itsDataType = newType;}; // 1999.08.24/Marko
 
  private:
 
-	void LocationMaskStepGrid(FmiBoolean newStatus, FmiBoolean fResetAllFirst, const long& theXStep, const long& theYStep);
-	void LocationMaskStepGrid(FmiBoolean newStatus, unsigned long theMaskType, FmiBoolean fResetAllFirst, const long& theXStep, const long& theYStep);
+	void LocationMaskStepGrid(bool newStatus, bool fResetAllFirst, const long& theXStep, const long& theYStep);
+	void LocationMaskStepGrid(bool newStatus, unsigned long theMaskType, bool fResetAllFirst, const long& theXStep, const long& theYStep);
 	
-	void LocationMaskStepLocation(FmiBoolean newStatus, FmiBoolean fResetAllFirst, const long& theXStep);
-	void LocationMaskStepLocation(FmiBoolean newStatus, unsigned long theMaskType, FmiBoolean fResetAllFirst, const long& theXStep);
+	void LocationMaskStepLocation(bool newStatus, bool fResetAllFirst, const long& theXStep);
+	void LocationMaskStepLocation(bool newStatus, unsigned long theMaskType, bool fResetAllFirst, const long& theXStep);
 
 
 //   Vain pointteri, ei tuhota destruktorissa. 
@@ -148,7 +148,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	
 	NFmiString itsDataFileName;
 	int itsPriority;
-	FmiBoolean fEditable;
+	bool fEditable;
 	
 	long* itsMaxUndoLevelPtr;
 	long* itsMaxRedoLevelPtr;
@@ -159,8 +159,8 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	NFmiString* itsUndoTextTable;
 
 	//(kertoo onko data ladattu tiedostosta vai työlistan mukaisesti)
-	FmiBoolean* fLoadedFromFile;
-   	FmiBoolean*	fDirty; //laura muutti pointteriksi, että tieto säilyisi kaikissa listoissa
+	bool* fLoadedFromFile;
+   	bool*	fDirty; //laura muutti pointteriksi, että tieto säilyisi kaikissa listoissa
 
 	//parambag, siksi että tiedettäisiin mitä parametriä on muutettu
 	NFmiParamBag* itsEditedParamBag;

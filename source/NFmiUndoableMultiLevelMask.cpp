@@ -67,15 +67,15 @@ NFmiUndoableMultiLevelMask& NFmiUndoableMultiLevelMask::operator=(const NFmiUndo
 NFmiUndoableMultiLevelMask::~NFmiUndoableMultiLevelMask(void)
 {
 	delete itsMultiLevelMask;
-	itsUndoList.Clear(kTrue);
+	itsUndoList.Clear(true);
 }
 //--------------------------------------------------------
 // SnapShotData 
 //--------------------------------------------------------
-FmiBoolean NFmiUndoableMultiLevelMask::SnapShotData(void)
+bool NFmiUndoableMultiLevelMask::SnapShotData(void)
 {
 	if(!itsMultiLevelMask || itsMaxUndoLevel <= 0)
-		return kFalse;
+		return false;
 
 	if (itsCurrentUndoLevel == itsMaxUndoLevel - 1)
 		RearrangeUndoTable();
@@ -83,12 +83,12 @@ FmiBoolean NFmiUndoableMultiLevelMask::SnapShotData(void)
 	itsCurrentUndoLevel++;
 	NFmiPtrList<NFmiMultiLevelMask>::Iterator it = itsUndoList.Index(itsCurrentUndoLevel);
 	if(it.CurrentPtr() == 0)
-		return kFalse; // ei pitäisi mennä tähän, exceptionin paikka!
+		return false; // ei pitäisi mennä tähän, exceptionin paikka!
 	it.Current() = *itsMultiLevelMask;
 	itsCurrentRedoLevel = itsCurrentUndoLevel;
 	itsMaxRedoLevel = itsCurrentRedoLevel;
 
-	return kTrue;
+	return true;
 }
 //--------------------------------------------------------
 // RearrangeUndoTable 
@@ -108,7 +108,7 @@ void NFmiUndoableMultiLevelMask::RearrangeUndoTable(void)
 		return;  // ei pitäisi mennä tähän, exceptionin paikka!
 
 	NFmiMultiLevelMask* tempMask = it.CurrentPtr();
-	it.Remove(kFalse); // kFalse = ei tuhoa dataa
+	it.Remove(false); // false = ei tuhoa dataa
 	itsUndoList.AddEnd(tempMask);
 
 	itsCurrentUndoLevel--;
@@ -117,23 +117,23 @@ void NFmiUndoableMultiLevelMask::RearrangeUndoTable(void)
 //--------------------------------------------------------
 // Undo 
 //--------------------------------------------------------
-FmiBoolean NFmiUndoableMultiLevelMask::Undo(void)
+bool NFmiUndoableMultiLevelMask::Undo(void)
 {
 	if (itsCurrentUndoLevel < 1)
-		return kFalse;
+		return false;
 	else
-		return kTrue;
+		return true;
 }
 //--------------------------------------------------------
 // Redo 
 //--------------------------------------------------------
-FmiBoolean NFmiUndoableMultiLevelMask::Redo(void)
+bool NFmiUndoableMultiLevelMask::Redo(void)
 {
 	if (itsCurrentRedoLevel == itsCurrentUndoLevel 
 			|| (itsCurrentRedoLevel == itsCurrentUndoLevel + 1))
-		return kFalse;
+		return false;
 	else
-		return kTrue;
+		return true;
 }
 //--------------------------------------------------------
 // CommitData 
@@ -147,10 +147,10 @@ void NFmiUndoableMultiLevelMask::CommitData(void)
 //--------------------------------------------------------
 // UndoData 
 //--------------------------------------------------------
-FmiBoolean NFmiUndoableMultiLevelMask::UndoData(void)
+bool NFmiUndoableMultiLevelMask::UndoData(void)
 {
 	if(!itsMultiLevelMask || itsCurrentUndoLevel < 1)
-		return kFalse;
+		return false;
 	if(itsCurrentUndoLevel == itsCurrentRedoLevel)
 	{
 		SnapShotData();		// "Ottaa kuvan" undo-toimintoa edeltäneestä tilanteesta,
@@ -159,33 +159,33 @@ FmiBoolean NFmiUndoableMultiLevelMask::UndoData(void)
 
 	NFmiPtrList<NFmiMultiLevelMask>::Iterator it = itsUndoList.Index(itsCurrentUndoLevel);
 	if(it.CurrentPtr() == 0)
-		return kFalse;  // ei pitäisi mennä tähän, exceptionin paikka!
+		return false;  // ei pitäisi mennä tähän, exceptionin paikka!
 	*itsMultiLevelMask = *it.CurrentPtr();
 	itsCurrentUndoLevel--;
 	itsCurrentRedoLevel = itsCurrentUndoLevel + 2;
-	return kTrue;
+	return true;
 }
 //--------------------------------------------------------
 // RedoData 
 //--------------------------------------------------------
-FmiBoolean NFmiUndoableMultiLevelMask::RedoData(void)
+bool NFmiUndoableMultiLevelMask::RedoData(void)
 {
 	if (itsCurrentUndoLevel == itsCurrentRedoLevel 
 			|| (itsCurrentUndoLevel + 1 == itsCurrentRedoLevel))
-		return kFalse;
+		return false;
 	else
 	{
 
 		NFmiPtrList<NFmiMultiLevelMask>::Iterator it = itsUndoList.Index(itsCurrentRedoLevel);
 		if(it.CurrentPtr() == 0)
-			return kFalse;  // ei pitäisi mennä tähän, exceptionin paikka!
+			return false;  // ei pitäisi mennä tähän, exceptionin paikka!
 		*itsMultiLevelMask = *it.CurrentPtr();
 		
 		itsCurrentUndoLevel++;
 		if(itsCurrentRedoLevel + 1 <= itsMaxRedoLevel)
 			itsCurrentRedoLevel++;
 	}
-	return kTrue;
+	return true;
 }
 //--------------------------------------------------------
 // UndoLevel 
@@ -201,7 +201,7 @@ void NFmiUndoableMultiLevelMask::UndoLevel(int theNewUndoLevel)
 	itsCurrentUndoLevel = 0;	// ??
 	itsCurrentRedoLevel = 0;	// ??
 
-	itsUndoList.Clear(kTrue);
+	itsUndoList.Clear(true);
 	for(int i = 0; i < itsMaxUndoLevel; i++)
 		itsUndoList.AddEnd(new NFmiMultiLevelMask(itsMultiLevelMask->MaskSize()));
 

@@ -35,26 +35,26 @@ itsIter(itsList.Start())
 
 NFmiProducerList::~NFmiProducerList()
 {
-	Clear(kTrue);
+	Clear(true);
 }
 //--------------------------------------------------------
 // Remove 
 //--------------------------------------------------------
-FmiBoolean NFmiProducerList::Remove(FmiBoolean fDeleteData)
+bool NFmiProducerList::Remove(bool fDeleteData)
 {
 	return itsIter.Remove(fDeleteData);
 }
 //--------------------------------------------------------
 // Clear 
 //--------------------------------------------------------
-void NFmiProducerList::Clear(FmiBoolean fDeleteData)
+void NFmiProducerList::Clear(bool fDeleteData)
 {
 	itsList.Clear(fDeleteData);
 }
 //--------------------------------------------------------
 // Add 
 //--------------------------------------------------------
-FmiBoolean NFmiProducerList::Add(NFmiProducer* theProducer)
+bool NFmiProducerList::Add(NFmiProducer* theProducer)
 {
 	return itsList.AddEnd(theProducer);
 }
@@ -68,43 +68,43 @@ NFmiProducer * NFmiProducerList::Current()
 //--------------------------------------------------------
 // Reset 
 //--------------------------------------------------------
-FmiBoolean NFmiProducerList::Reset(void)
+bool NFmiProducerList::Reset(void)
 {
    itsIter = itsList.Start();
-   return kTrue;
+   return true;
 }
 //--------------------------------------------------------
 // Next 
 //--------------------------------------------------------
-FmiBoolean NFmiProducerList::Next(void)
+bool NFmiProducerList::Next(void)
 {
    return itsIter.Next();
 }
 //--------------------------------------------------------
 // Previous 
 //--------------------------------------------------------
-FmiBoolean NFmiProducerList::Previous (void)
+bool NFmiProducerList::Previous (void)
 {
    return itsIter.Previous();
 }
 //--------------------------------------------------------
 // Index
 //--------------------------------------------------------
-FmiBoolean NFmiProducerList::Index(unsigned long index)
+bool NFmiProducerList::Index(unsigned long index)
 {
 	itsIter = itsList.Index(index);
 	if(Current())
-		return kTrue;
-	return kFalse;
+		return true;
+	return false;
 }
 //--------------------------------------------------------
 // Find
 //--------------------------------------------------------
-FmiBoolean NFmiProducerList::Find(NFmiProducer* item)
+bool NFmiProducerList::Find(NFmiProducer* item)
 {
 	itsIter = itsList.Find(item);
 	if(Current())
-		return kTrue;
+		return true;
 	Reset();
-	return kFalse;
+	return false;
 }
