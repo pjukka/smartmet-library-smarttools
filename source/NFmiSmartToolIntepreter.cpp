@@ -40,6 +40,7 @@
 #include <utility>
 #include <memory>
 #include <sstream>
+#include <stdexcept>
 #include <functional>
 #include <cctype>
 

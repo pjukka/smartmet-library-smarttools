@@ -39,6 +39,8 @@
 #include "NFmiCombinedParam.h"
 #include "NFmiMetEditorTypes.h"
 
+#include <stdexcept>
+
 NFmiSmartInfo::NFmiSmartInfo()
 :NFmiFastQueryInfo()
 ,itsAreaMask(0)
