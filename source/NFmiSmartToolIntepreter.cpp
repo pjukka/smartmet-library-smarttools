@@ -186,6 +186,7 @@ std::vector<std::string> NFmiSmartToolIntepreter::itsTokenRampDownFunctions;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenDoubleRampFunctions;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenRampFunctions;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenMacroParamIdentifiers;
+std::vector<std::string> NFmiSmartToolIntepreter::itsTokenDeltaZIdentifiers;
 
 NFmiSmartToolIntepreter::MaskOperMap NFmiSmartToolIntepreter::itsTokenMaskOperations;
 NFmiSmartToolIntepreter::CalcOperMap NFmiSmartToolIntepreter::itsCalculationOperations;
@@ -1232,6 +1233,9 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &th
 	if(IsVariableMacroParam(theVariableText, theMaskInfo))
 		return true;
 
+	if(IsVariableDeltaZ(theVariableText, theMaskInfo))
+		return true;
+
 	if(IsVariableBinaryOperator(theVariableText, theMaskInfo)) // tämä on and ja or tapausten käsittelyyn
 		return true;
 
@@ -1603,6 +1607,16 @@ bool NFmiSmartToolIntepreter::IsVariableMacroParam(const std::string &theVariabl
 	return false;
 }
 
+bool NFmiSmartToolIntepreter::IsVariableDeltaZ(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
+{
+	if(FindAnyFromText(theVariableText, itsTokenDeltaZIdentifiers))
+	{
+		theMaskInfo->SetOperationType(NFmiAreaMask::DeltaZFunction);
+		return true;
+	}
+	return false;
+}
+
 bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
 {
 	MathFunctionMap::iterator it = itsMathFunctions.find(theVariableText);
@@ -1630,12 +1644,13 @@ bool NFmiSmartToolIntepreter::IsVariableThreeArgumentFunction(const std::string 
 	FunctionMap::iterator it = itsTokenThreeArgumentFunctions.find(theVariableText);
 	if(it != itsTokenThreeArgumentFunctions.end())
 	{
-		// Tee tarkistus, onko muodollisesti oikea funktio kutsu 
-		// (tämä tutkitaan myös suoritus osiossa, joten voi olla turhaa tarkistaa tässä)
-		// 1. pitää olla kaksi pilkkua
-		// 2. alkaa ja loppuu sulkuun esim. SUMT(... , ... , ...)
-
+		int functionUsed = 1; // 1 = T-funktio, 2 = Z-funktio ja 3 = H-funktio
+		if(theVariableText.find('z') != string::npos || theVariableText.find('Z') != string::npos)
+			functionUsed = 2;
+		else if(theVariableText.find('h') != string::npos || theVariableText.find('H') != string::npos)
+			functionUsed = 3;
 		theMaskInfo->SetFunctionType((*it).second); // min, max jne. asetus
+		theMaskInfo->IntegrationFunctionType(functionUsed);
 		string tmp;
 		if(GetToken())
 		{
@@ -2352,6 +2367,26 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("AvgT"), NFmiAreaMask::Avg));
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("AVGT"), NFmiAreaMask::Avg));
 
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("sumz"), NFmiAreaMask::Sum));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("SumZ"), NFmiAreaMask::Sum));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("SUMZ"), NFmiAreaMask::Sum));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxz"), NFmiAreaMask::Max));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MaxZ"), NFmiAreaMask::Max));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MAXZ"), NFmiAreaMask::Max));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("minz"), NFmiAreaMask::Min));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MinZ"), NFmiAreaMask::Min));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MINZ"), NFmiAreaMask::Min));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("avgz"), NFmiAreaMask::Avg));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("AvgZ"), NFmiAreaMask::Avg));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("AVGZ"), NFmiAreaMask::Avg));
+
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxh"), NFmiAreaMask::Max));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MaxH"), NFmiAreaMask::Max));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MAXH"), NFmiAreaMask::Max));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("minh"), NFmiAreaMask::Min));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MinH"), NFmiAreaMask::Min));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MINH"), NFmiAreaMask::Min));
+
 		itsTokenPeekXYFunctions.push_back(string("PEEKXY"));
 		itsTokenPeekXYFunctions.push_back(string("PeekXY"));
 		itsTokenPeekXYFunctions.push_back(string("Peekxy"));
@@ -2374,6 +2409,10 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenMacroParamIdentifiers.push_back(string("result"));
 		itsTokenMacroParamIdentifiers.push_back(string("Result"));
 		itsTokenMacroParamIdentifiers.push_back(string("RESULT"));
+
+		itsTokenDeltaZIdentifiers.push_back(string("deltaz"));
+		itsTokenDeltaZIdentifiers.push_back(string("DeltaZ"));
+		itsTokenDeltaZIdentifiers.push_back(string("DELTAZ"));
 
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("EXP"), NFmiAreaMask::Exp));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("Exp"), NFmiAreaMask::Exp));

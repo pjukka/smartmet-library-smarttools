@@ -147,6 +147,7 @@ private:
 	bool FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
 	bool ExtractParamAndLevel(const std::string &theVariableText, std::string *theParamNameOnly, std::string *theLevelNameOnly);
 	bool IsVariableMacroParam(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
+	bool IsVariableDeltaZ(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariableRampFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
 	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo, const NFmiProducer &theProducer);
@@ -240,6 +241,7 @@ private:
 	static std::vector<std::string> itsTokenDoubleRampFunctions;
 	static std::vector<std::string> itsTokenRampFunctions;
 	static std::vector<std::string> itsTokenMacroParamIdentifiers; // t‰nne listataan result jne. sanat joita k‰ytet‰‰n makrojen visualisoinnissa
+	static std::vector<std::string> itsTokenDeltaZIdentifiers; // t‰nne listataan deltaz 'funktiot'
 
 	typedef std::map<std::string, FmiMaskOperation> MaskOperMap;
 	static MaskOperMap itsTokenMaskOperations;
