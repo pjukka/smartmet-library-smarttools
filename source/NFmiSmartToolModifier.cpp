@@ -77,7 +77,7 @@ NFmiSmartToolModifier::~NFmiSmartToolModifier(void)
 // InitSmartTool 
 //--------------------------------------------------------
 // Tulkitsee macron, luo tavittavat systeemit, ett‰ makro voidaan suorittaa.
-void NFmiSmartToolModifier::InitSmartTool(const std::string &theSmartToolText)  throw (NFmiSmartToolModifier::Exception)
+void NFmiSmartToolModifier::InitSmartTool(const std::string &theSmartToolText)
 {
 	fMacroRunnable = true;
 	itsErrorText = "";
@@ -225,7 +225,7 @@ void NFmiSmartToolModifier::ClearCalculationModifiers(void)
 // Suorittaa varsinaiset modifikaatiot. K‰ytt‰j‰ voi antaa parametrina rajoitetun ajan
 // modifioinneille, jos theModifiedTimes on 0-pointteri, tehd‰‰n operaatiot kaikille
 // datan ajoille.
-void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, const std::vector<double> &theModificationFactors, bool fSelectedLocationsOnly) throw (NFmiSmartToolModifier::Exception)
+void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, const std::vector<double> &theModificationFactors, bool fSelectedLocationsOnly)
 {
 	fModifySelectedLocationsOnly = fSelectedLocationsOnly;
 	try
@@ -389,7 +389,7 @@ static NFmiAreaMask::DataType ConvertType(NFmiInfoData::Type theType)
 //--------------------------------------------------------
 // HUOM!! Ei osaa hoitaa kuin editoitavia datoja!!!!
 // HUOM!! Vuotaa exception tilanteissa.
-NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception)
+NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo)
 {
 	NFmiAreaMask::CalculationOperationType maskType = theAreaMaskInfo.GetOperationType();
 	NFmiAreaMask* areaMask = 0;
@@ -487,7 +487,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 	return areaMask;
 }
 
-NFmiAreaMask* NFmiSmartToolModifier::CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception)
+NFmiAreaMask* NFmiSmartToolModifier::CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo)
 {
 	NFmiAreaMask* areaMask = 0;
 	FmiParameterName parId = FmiParameterName(theAreaMaskInfo.GetDataIdent().GetParamIdent());
@@ -509,7 +509,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateCalculatedAreaMask(const NFmiAreaMask
 	throw NFmiSmartToolModifier::Exception(string("Outo laskettava muuttuja/data tyyppi (ohjelmointi vika?)."));
 }
 
-NFmiDataModifier* NFmiSmartToolModifier::CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception)
+NFmiDataModifier* NFmiSmartToolModifier::CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo)
 {
 	NFmiDataModifier* modifier = 0;
 	NFmiAreaMask::FunctionType func = theAreaMaskInfo.GetFunctionType();
@@ -534,7 +534,7 @@ NFmiDataModifier* NFmiSmartToolModifier::CreateIntegrationFuction(const NFmiArea
 	return modifier;
 }
 
-NFmiDataIterator* NFmiSmartToolModifier::CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo) throw (NFmiSmartToolModifier::Exception)
+NFmiDataIterator* NFmiSmartToolModifier::CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo)
 {
 	NFmiDataIterator* iterator = 0;
 	NFmiAreaMask::CalculationOperationType mType = theAreaMaskInfo.GetOperationType();
@@ -571,7 +571,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateEndingAreaMask(void)
 	return areaMask;
 }
 
-NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception)
+NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo)
 {
 	NFmiSmartInfo* info = 0;
 	if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kScriptVariableData)
@@ -585,13 +585,13 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 	return info;
 }
 
-void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit) throw (NFmiSmartToolModifier::Exception)
+void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit)
 {
 	NFmiDrawParam* drawParam = itsInfoOrganizer->CreateEmptyInfoDrawParam(FmiParameterName(theAreaMaskInfo.GetDataIdent().GetParamIdent()));
 	if(drawParam)
 	{
-		*theLowerLimit = drawParam->AbsoluteMinValue();
-		*theUpperLimit = drawParam->AbsoluteMaxValue();
+		*theLowerLimit = static_cast<float>(drawParam->AbsoluteMinValue());
+		*theUpperLimit = static_cast<float>(drawParam->AbsoluteMaxValue());
 		delete drawParam;
 	}
 	else

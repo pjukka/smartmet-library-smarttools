@@ -56,8 +56,8 @@ public:
 		const std::string itsText;
 	};
 
-	void InitSmartTool(const std::string &theSmartToolText) throw (NFmiSmartToolModifier::Exception);
-	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, const std::vector<double> &theModificationFactors, bool fSelectedLocationsOnly) throw (NFmiSmartToolModifier::Exception);
+	void InitSmartTool(const std::string &theSmartToolText);
+	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, const std::vector<double> &theModificationFactors, bool fSelectedLocationsOnly);
 	NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer);
 	~NFmiSmartToolModifier(void);
 
@@ -70,17 +70,17 @@ private:
 	void ClearScriptVariableInfos(void);
 	NFmiSmartInfo* CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 //	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculation *theMaskCondition, NFmiSmartToolCalculationSection *theConditionalCalculations);
-	NFmiAreaMask* CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception);
-	void GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit) throw (NFmiSmartToolModifier::Exception);
-	NFmiDataModifier* CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception);
-	NFmiDataIterator* CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo) throw (NFmiSmartToolModifier::Exception);
+	NFmiAreaMask* CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
+	void GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit);
+	NFmiDataModifier* CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo);
+	NFmiDataIterator* CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo);
 	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes);
 	void ModifyData2(NFmiTimeDescriptor* theModifiedTimes, NFmiSmartToolCalculationSection* theCalculationSection);
 	void InitializeCalculationModifiers(NFmiSmartToolCalculationBlock* theBlock);
 	void ClearCalculationModifiers(void);
-	NFmiAreaMask* CreateAreaMask(const NFmiAreaMaskInfo &theInfo) throw (NFmiSmartToolModifier::Exception);
+	NFmiAreaMask* CreateAreaMask(const NFmiAreaMaskInfo &theInfo);
 	NFmiAreaMask* CreateEndingAreaMask(void);
-	NFmiSmartInfo* CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception);
+	NFmiSmartInfo* CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	void CreateCalculationModifiers(void);
 	void CreateFirstCalculationSection(void);
 	NFmiSmartToolCalculationSection* CreateCalculationSection(NFmiSmartToolCalculationSectionInfo *theCalcSectionInfo);

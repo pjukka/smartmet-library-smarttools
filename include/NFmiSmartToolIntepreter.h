@@ -90,7 +90,7 @@ public:
 		const std::string itsText;
 	};
 
-	void Interpret(const std::string &theMacroText) throw (NFmiSmartToolIntepreter::Exception);
+	void Interpret(const std::string &theMacroText);
 
 	NFmiSmartToolIntepreter(void);
 	~NFmiSmartToolIntepreter(void);
@@ -106,29 +106,29 @@ private:
 
 	bool CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlock* theBlock);
 	std::string HandlePossibleUnaryMarkers(const std::string &theCurrentString);
-	NFmiLevel GetPossibleLevelInfo(const std::string &theLevelText) throw (NFmiSmartToolIntepreter::Exception);
-	NFmiProducer GetPossibleProducerInfo(const std::string &theProducerText) throw (NFmiSmartToolIntepreter::Exception);
+	NFmiLevel GetPossibleLevelInfo(const std::string &theLevelText);
+	NFmiProducer GetPossibleProducerInfo(const std::string &theProducerText);
 	bool IsProducerOrig(std::string &theProducerText);
 	bool FindParamAndLevelAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
 	bool FindParamAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
 	bool FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
 	bool ExtractParamAndLevel(const std::string &theVariableText, std::string *theParamNameOnly, std::string *theLevelNameOnly);
 	bool IsVariableTMF(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
-	bool IsVariableRampFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception);
+	bool IsVariableRampFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
 	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo, const NFmiProducer &theProducer);
-	void InterpretDelimiter(const std::string &theDelimText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception);
-	void InterpretToken(const std::string &theTokenText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception);
-	bool InterpretMaskSection(const std::string &theMaskSectorText, NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo) throw (NFmiSmartToolIntepreter::Exception);
-	bool InterpretMasks(std::string &theMaskSectionText, NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo) throw (NFmiSmartToolIntepreter::Exception);
-	bool InterpretCalculationSection(std::string &theCalculationSectionText, NFmiSmartToolCalculationSectionInfo* theSectionInfo) throw (NFmiSmartToolIntepreter::Exception);
-	NFmiAreaMaskInfo* CreateWantedAreaMaskInfo(const std::string &theMaskSectionText, std::queue<NFmiAreaMaskInfo *> &theMaskQueue) throw (NFmiSmartToolIntepreter::Exception);
-	NFmiSmartToolCalculationInfo* InterpretCalculationLine(const std::string &theCalculationLineText) throw (NFmiSmartToolIntepreter::Exception);
+	void InterpretDelimiter(const std::string &theDelimText, NFmiAreaMaskInfo *theMaskInfo);
+	void InterpretToken(const std::string &theTokenText, NFmiAreaMaskInfo *theMaskInfo);
+	bool InterpretMaskSection(const std::string &theMaskSectorText, NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
+	bool InterpretMasks(std::string &theMaskSectionText, NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
+	bool InterpretCalculationSection(std::string &theCalculationSectionText, NFmiSmartToolCalculationSectionInfo* theSectionInfo);
+	NFmiAreaMaskInfo* CreateWantedAreaMaskInfo(const std::string &theMaskSectionText, std::queue<NFmiAreaMaskInfo *> &theMaskQueue);
+	NFmiSmartToolCalculationInfo* InterpretCalculationLine(const std::string &theCalculationLineText);
 	bool InterpretNextMask(const std::string &theMaskSectionText);
-#ifdef UNIX
-	std::string::const_iterator ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition);
-#else
+#if (defined _MSC_VER) && (_MSC_VER < 1310) // 1310 eli k‰‰nt‰j‰n versio 13.1 eli MSVC++ 7.1  toteuttaa 1. kerran kunnolla standardia
 	std::string::iterator ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition);
+#else
+	std::string::const_iterator ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition);
 #endif
 	void InitCheckOut(void);
 	bool IsCaseInsensitiveEqual(const std::string &theStr1, const std::string &theStr2);
@@ -143,7 +143,7 @@ private:
 	bool CheckoutPossibleElseIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
 	bool CheckoutPossibleElseClauseSection(void);
 	bool CheckoutPossibleNextCalculationSection(NFmiSmartToolCalculationSectionInfo* theSectionInfo);
-	bool ExtractPossibleNextCalculationSection(void) throw (NFmiSmartToolIntepreter::Exception);
+	bool ExtractPossibleNextCalculationSection(void);
 	bool ExtractPossibleIfClauseSection(void);
 	bool ExtractPossibleElseIfClauseSection(void);
 	template<typename memfunction>
@@ -151,29 +151,29 @@ private:
 	bool IsPossibleCalculationLine(const std::string &theTextLine);
 	bool IsPossibleIfConditionLine(const std::string &theTextLine);
 	bool IsPossibleElseIfConditionLine(const std::string &theTextLine);
-	bool IsPossibleElseConditionLine(const std::string &theTextLine) throw (NFmiSmartToolIntepreter::Exception);
+	bool IsPossibleElseConditionLine(const std::string &theTextLine);
 	bool FindAnyFromText(const std::string &theText, const std::vector<std::string>& theSearchedItems);
 	bool ConsistOnlyWhiteSpaces(const std::string &theText);
 	bool IsVariableBinaryOperator(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
-	NFmiAreaMask::CalculationOperator InterpretCalculationOperator(const std::string &theOperatorText) throw (NFmiSmartToolIntepreter::Exception);
-	void InterpretVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fNewScriptVariable = false) throw (NFmiSmartToolIntepreter::Exception);
+	NFmiAreaMask::CalculationOperator InterpretCalculationOperator(const std::string &theOperatorText);
+	void InterpretVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fNewScriptVariable = false);
 	bool InterpretVariableCheckTokens(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fOrigWanted, bool fLevelExist, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theLevelNameOnly, const std::string &theProducerNameOnly);
-	bool InterpretPossibleScriptVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fNewScriptVariable) throw (NFmiSmartToolIntepreter::Exception);
+	bool InterpretPossibleScriptVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fNewScriptVariable);
 	void CheckVariableString(const std::string &theVariableText, std::string &theParamText,
 							 bool &fLevelExist, std::string &theLevelText,
-							 bool &fProducerExist, std::string &theProducerText) throw (NFmiSmartToolIntepreter::Exception);
+							 bool &fProducerExist, std::string &theProducerText);
 	template<typename mapType>
 	bool IsInMap(mapType& theMap, const std::string &theSearchedItem);
 	bool IsVariableConstantValue(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	std::string ExtractNextLine(std::string &theText, std::string::iterator theStartPos, std::string::iterator* theEndPos);
-	bool IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception);
-	bool IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception);
+	bool IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
+	bool IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	std::string itsCheckOutSectionText; // esim. if-sectionin koko teksti
 	std::string::iterator itsCheckOutTextStartPosition; // sen hetkinen tekstiosan alkupiste
 	std::string::iterator itsCheckOutTextEndPosition; // sen hetkinen tekstiosan alkupiste
 	bool fContinueCurrentSectionCheckOut; // jatketaanko sen hetkisen sectionin tutkimista, vai onko selv‰‰, ettei esim. else-sectionia ole olemassa
 
-	void SetMacroTexts(const std::string &theMacroText) throw (NFmiSmartToolIntepreter::Exception);
+	void SetMacroTexts(const std::string &theMacroText);
 	std::string itsMacroText;
 	std::string itsStrippedMacroText;
 

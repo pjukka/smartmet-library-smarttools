@@ -59,9 +59,9 @@ void NFmiSmartToolCalculation::Calculate(const NFmiPoint &theLatlon, unsigned lo
 //	if(value != kFloatMissing) // pit‰‰ pysty‰ sittenkin asettamaan arvoksi kFloatMissing:in!!!
 //	{
 		itsResultInfo->LocationIndex(theLocationIndex); // kohde dataa juoksutetaan, joten lokaatio indeksien pit‰‰ olla synkassa!!!
-		value = GetInsideLimitsValue(value); // asetetaan value viel‰ drawparamista satuihin rajoihin, ettei esim. RH voi olla alle 0 tai yli 100 %
+		value = GetInsideLimitsValue(static_cast<float>(value)); // asetetaan value viel‰ drawparamista satuihin rajoihin, ettei esim. RH voi olla alle 0 tai yli 100 %
 
-		itsResultInfo->FloatValue(value); // miten info saadaan osoittamaan oikeaan kohtaan?!?
+		itsResultInfo->FloatValue(static_cast<float>(value)); // miten info saadaan osoittamaan oikeaan kohtaan?!?
 //	}
 }
 
@@ -78,7 +78,7 @@ float NFmiSmartToolCalculation::GetInsideLimitsValue(float theValue)
 	return theValue;			
 }
 
-void NFmiSmartToolCalculation::SetLimits(float theLowerLimit, float theUpperLimit) throw (NFmiSmartToolCalculation::Exception)
+void NFmiSmartToolCalculation::SetLimits(float theLowerLimit, float theUpperLimit)
 {
 	if(theLowerLimit >= theUpperLimit)
 		 throw NFmiSmartToolCalculation::Exception("Parametrin max ja min rajat ovat v‰‰rin p‰in.");
@@ -132,7 +132,7 @@ void NFmiSmartToolCalculation::SetTime(const NFmiMetTime &theTime)
 
 // eval_exp-metodit otettu H. Schilbertin  C++: the Complete Refeference third ed.
 // jouduin muuttamaan niit‰ v‰h‰n sopimaan t‰h‰n ymp‰ristˆˆn.
-double NFmiSmartToolCalculation::eval_exp(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+double NFmiSmartToolCalculation::eval_exp(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
 	double result = kFloatMissing;
 
@@ -268,7 +268,7 @@ void NFmiSmartToolCalculation::eval_exp5(double &result, const NFmiPoint &theLat
 }
 
 // Process a parenthesized expression.
-void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
 //	if((*token == '(')) 
 	if(token->GetCalculationOperationType() == NFmiAreaMask::StartParenthesis)
@@ -297,7 +297,7 @@ void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLat
 
 // HUOM! trigonometriset funktiot tehd‰‰n asteille, joten annettu luku pit‰‰ konvertoida
 // c++ funktioille jotka odottavat kulmaa radiaaneille.
-void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunction) throw (NFmiSmartToolCalculation::Exception)
+void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunction)
 {
 	static const double trigFactor = 2 * kPii / 360;
 	if(result != kFloatMissing)
@@ -366,7 +366,7 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
 	}
 }
 
-void NFmiSmartToolCalculation::atom(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+void NFmiSmartToolCalculation::atom(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
 	NFmiAreaMask::CalculationOperationType opType = token->GetCalculationOperationType();
 //	switch(tok_type) 
@@ -399,7 +399,7 @@ void NFmiSmartToolCalculation::get_token(void)
 }
 
 // Laskun alustus, alustetaan iteraattori ja token.
-bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
 	bool maskresult = true;
 	double result = kFloatMissing;
@@ -459,7 +459,7 @@ void NFmiSmartToolCalculation::bin_eval_exp1(bool &maskresult, double &result, c
 
 // T‰m‰ pit‰‰ siirt‰‰ prioriteetissa alle yhteen laskun
 // Process a binary expression. && ja || eli AND ja OR
-void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
 //	register char op;
 	NFmiAreaMask::BinaryOperator op;
@@ -487,7 +487,7 @@ void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult, double &result,
 
 // T‰m‰ pit‰‰ siirt‰‰ prioriteetissa alle yhteen laskun
 // Process a comparison expression <, >, ==, <=, >=
-void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
 //	register char op;
 //	using NFmiAreaMask::CalculationOperator;
@@ -604,7 +604,7 @@ void NFmiSmartToolCalculation::bin_eval_exp5(bool &maskresult, double &result, c
 }
 
 // Process a parenthesized expression.
-void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
 //	if((*token == '(')) 
 	if(token->GetCalculationOperationType() == NFmiAreaMask::StartParenthesis)
@@ -632,7 +632,7 @@ void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, c
 }
 
 
-void NFmiSmartToolCalculation::bin_atom(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+void NFmiSmartToolCalculation::bin_atom(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
 	NFmiAreaMask::CalculationOperationType opType = token->GetCalculationOperationType();
 //	switch(tok_type) 

@@ -133,7 +133,7 @@ NFmiSmartToolIntepreter::~NFmiSmartToolIntepreter(void)
 // Tulkitsee annetun macro-tekstin. Erottelee eri calculationSectionit, mahdolliset ehto rakenteet ja niiden maskit ja rakentaa sen 
 // mukaiset maski ja calculation infot, ett‰ SmartToolModifier osaa rakentaa oikeat systeemit (areamaskit ja lasku-oliot).
 // Jos macrossa virhe, heitt‰‰ poikkeuksen.
-void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText)  throw (NFmiSmartToolIntepreter::Exception)
+void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText)
 {
 	Clear();
 	itsTokenScriptVariableNames.clear(); // tyhjennetaan aluksi kaikki skripti muuttujat
@@ -219,7 +219,7 @@ static std::string::iterator EatWhiteSpaces(std::string::iterator it)
 // Eli pit‰‰ olla joku sijoitus johonkin parametriin.
 // Palauttaa true jos lˆytyi jotai lasku-operaatioita.
 // P‰ivitt‰‰ myˆs luokan sis‰isi‰ iteraattoreita macro-tekstiin.
-bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(void) throw (NFmiSmartToolIntepreter::Exception)
+bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(void)
 {
 	itsCheckOutSectionText = "";
 	string nextLine;
@@ -309,7 +309,7 @@ bool NFmiSmartToolIntepreter::IsPossibleElseIfConditionLine(const std::string &t
 
 // Yksinkertainen ELSE -rivin tarkistus:
 // 1. saa olla vain else-sana
-bool NFmiSmartToolIntepreter::IsPossibleElseConditionLine(const std::string &theTextLine) throw (NFmiSmartToolIntepreter::Exception)
+bool NFmiSmartToolIntepreter::IsPossibleElseConditionLine(const std::string &theTextLine)
 {
 	stringstream sstream(theTextLine);
 	string tmp;
@@ -485,7 +485,7 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationSection(NFmiSmartTo
 	return false;
 }
 
-void NFmiSmartToolIntepreter::SetMacroTexts(const std::string &theMacroText) throw (NFmiSmartToolIntepreter::Exception)
+void NFmiSmartToolIntepreter::SetMacroTexts(const std::string &theMacroText)
 {
 	itsMacroText = theMacroText;
 	NFmiCommentStripper commentStripper;
@@ -507,7 +507,7 @@ void NFmiSmartToolIntepreter::SetMacroTexts(const std::string &theMacroText) thr
 // IF(T<1)
 // IF(T<1 && P>1012)
 // IF(T<1 && P>1012 || RH>=95)
-bool NFmiSmartToolIntepreter::InterpretMaskSection(const std::string &theMaskSectorText, NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo) throw (NFmiSmartToolIntepreter::Exception)
+bool NFmiSmartToolIntepreter::InterpretMaskSection(const std::string &theMaskSectorText, NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo)
 {
 	theAreaMaskSectionInfo->SetCalculationText(theMaskSectorText);
 	string maskText(theMaskSectorText);
@@ -546,7 +546,7 @@ bool NFmiSmartToolIntepreter::InterpretMaskSection(const std::string &theMaskSec
 // T<1 && P>1012
 // T<1 && P>1012 || RH>=95
 // HUOM!!!! T‰m‰ vuotaa exceptionin yhteydess‰, pino ei tuhoa AreaMaskInfoja!!!!! (korjaa)
-bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo) throw (NFmiSmartToolIntepreter::Exception)
+bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo)
 {
 	string maskText(theMaskSectionText);
 	exp_ptr = maskText.begin();
@@ -568,7 +568,7 @@ bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, NF
 	throw NFmiSmartToolIntepreter::Exception(string("Maski-ehto lause oli puutteellinen: " + theMaskSectionText));
 }
 
-NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::string &theMaskSectionText, queue<NFmiAreaMaskInfo *> &theMaskQueue) throw (NFmiSmartToolIntepreter::Exception)
+NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::string &theMaskSectionText, queue<NFmiAreaMaskInfo *> &theMaskQueue)
 {
 	NFmiAreaMaskInfo *maskInfo1 = theMaskQueue.front(); // t‰ss‰ pit‰‰ olla muuttuja esim T, p, jne.
 	auto_ptr<NFmiAreaMaskInfo> maskInfoPtr1(maskInfo1); // tuhoaa automaattisesti maskInfon
@@ -612,7 +612,7 @@ NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::s
 // T = T + 1
 // Jokaiselta rivilt‰ pit‰‰ siis lˆty‰ muuttuja johon sijoitetaan ja jotain laskuja
 // palauttaa true, jos lˆytyi laskuja ja false jos ei.
-bool NFmiSmartToolIntepreter::InterpretCalculationSection(std::string &theCalculationSectiontext, NFmiSmartToolCalculationSectionInfo* theSectionInfo)  throw (NFmiSmartToolIntepreter::Exception)
+bool NFmiSmartToolIntepreter::InterpretCalculationSection(std::string &theCalculationSectiontext, NFmiSmartToolCalculationSectionInfo* theSectionInfo)
 {
 	std::string::iterator pos = theCalculationSectiontext.begin();
 	std::string::iterator end = theCalculationSectiontext.end();
@@ -698,7 +698,7 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 }
 */
 
-NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(const std::string &theCalculationLineText) throw (NFmiSmartToolIntepreter::Exception)
+NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(const std::string &theCalculationLineText)
 {
 	string calculationLineText(theCalculationLineText);
 	NFmiSmartToolCalculationInfo *calculationInfo = new NFmiSmartToolCalculationInfo;
@@ -819,7 +819,7 @@ bool NFmiSmartToolIntepreter::IsDelim(char c)
 	return false;
 }
 
-NFmiAreaMask::CalculationOperator NFmiSmartToolIntepreter::InterpretCalculationOperator(const std::string &theOperatorText) throw (NFmiSmartToolIntepreter::Exception)
+NFmiAreaMask::CalculationOperator NFmiSmartToolIntepreter::InterpretCalculationOperator(const std::string &theOperatorText)
 {
 	if(theOperatorText == string(""))
 		return NFmiAreaMask::NotOperation;
@@ -839,7 +839,7 @@ NFmiAreaMask::CalculationOperator NFmiSmartToolIntepreter::InterpretCalculationO
 		throw NFmiSmartToolIntepreter::Exception(string("Lasku operaattori oli outo: ") + theOperatorText);
 }
 
-void NFmiSmartToolIntepreter::InterpretToken(const std::string &theTokenText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception)
+void NFmiSmartToolIntepreter::InterpretToken(const std::string &theTokenText, NFmiAreaMaskInfo *theMaskInfo)
 {
 	switch(tok_type)
 	{
@@ -856,7 +856,7 @@ void NFmiSmartToolIntepreter::InterpretToken(const std::string &theTokenText, NF
 }
 
 // HUOM!!!! Muuta k‰ytt‰m‰‰n itsCalculationOperations-mappia!!!!!!!!!!
-void NFmiSmartToolIntepreter::InterpretDelimiter(const std::string &theDelimText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception)
+void NFmiSmartToolIntepreter::InterpretDelimiter(const std::string &theDelimText, NFmiAreaMaskInfo *theMaskInfo)
 {
 	theMaskInfo->SetMaskText(theDelimText);
 	if(theDelimText == string(""))
@@ -908,7 +908,7 @@ void NFmiSmartToolIntepreter::InterpretDelimiter(const std::string &theDelimText
 // Voi olla myˆs vakio tai funktio systeemi.
 // HUOM!!! Ei viel‰ tuottajan handlausta.
 // HUOM!!! Ei hoida viel‰ vakioita tai funktio systeemej‰.
-void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fNewScriptVariable) throw (NFmiSmartToolIntepreter::Exception)
+void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fNewScriptVariable)
 {
 	theMaskInfo->SetMaskText(theVariableText);
 	string paramNameOnly;
@@ -939,7 +939,7 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 	throw NFmiSmartToolIntepreter::Exception(string("Outo muuttuja laskussa: " + theVariableText));
 }
 
-bool NFmiSmartToolIntepreter::InterpretPossibleScriptVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fNewScriptVariable) throw (NFmiSmartToolIntepreter::Exception)
+bool NFmiSmartToolIntepreter::InterpretPossibleScriptVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fNewScriptVariable)
 {
 	ScriptVariableMap::iterator it = itsTokenScriptVariableNames.find(theVariableText);
 	if(it != itsTokenScriptVariableNames.end() && fNewScriptVariable) // var x k‰ytetty uudestaan, esitell‰‰n muuttujat vain kerran
@@ -1034,7 +1034,7 @@ bool NFmiSmartToolIntepreter::IsProducerOrig(std::string &theProducerText)
 // ei ole muutujaa, koska se on pakollinen.
 void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariableText, std::string &theParamText,
 												  bool &fLevelExist, std::string &theLevelText,
-												  bool &fProducerExist, std::string &theProducerText) throw (NFmiSmartToolIntepreter::Exception)
+												  bool &fProducerExist, std::string &theProducerText)
 {
 	theParamText = theLevelText = theProducerText = "";
 	fLevelExist = fProducerExist = false;
@@ -1163,7 +1163,7 @@ bool NFmiSmartToolIntepreter::FindParamAndLevelAndProducerAndSetMaskInfo(const s
 }
 
 // Level tekstin (850, 500 jne.) luodaan NFmiLevel-otus.
-NFmiLevel NFmiSmartToolIntepreter::GetPossibleLevelInfo(const std::string &theLevelText) throw (NFmiSmartToolIntepreter::Exception)
+NFmiLevel NFmiSmartToolIntepreter::GetPossibleLevelInfo(const std::string &theLevelText)
 {
 	NFmiLevel level;
 	LevelMap::iterator it = itsTokenLevelNamesIdentsAndValues.find(theLevelText);
@@ -1175,7 +1175,7 @@ NFmiLevel NFmiSmartToolIntepreter::GetPossibleLevelInfo(const std::string &theLe
 }
 
 // Tuottaja tekstin (Ec, Hir jne.) luodaan NFmiProducer-otus.
-NFmiProducer NFmiSmartToolIntepreter::GetPossibleProducerInfo(const std::string &theProducerText) throw (NFmiSmartToolIntepreter::Exception)
+NFmiProducer NFmiSmartToolIntepreter::GetPossibleProducerInfo(const std::string &theProducerText)
 {
 	NFmiProducer producer;
 	ProducerMap::iterator it = itsTokenProducerNamesAndIds.find(theProducerText);
@@ -1336,7 +1336,7 @@ bool NFmiSmartToolIntepreter::IsVariableTMF(const std::string &theVariableText, 
 	return false;
 }
 
-bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception)
+bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
 {
 	MathFunctionMap::iterator it = itsMathFunctions.find(theVariableText);
 	if(it != itsMathFunctions.end())
@@ -1363,7 +1363,7 @@ bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVaria
 // Tai alue-'integroinnin' yhteydess‰:
 // MIN(T -1 -1 1 1)
 // eli 1. funktion nimi, sulku auki, parametri, aloitus x ja y paikkaoffset, lopetus x ja y paikkaoffset ja lopuksi suliku kiinni.
-bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception)
+bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
 {
 	FunctionMap::iterator it = itsTokenFunctions.find(theVariableText);
 	if(it != itsTokenFunctions.end())
@@ -1442,7 +1442,7 @@ std::string NFmiSmartToolIntepreter::HandlePossibleUnaryMarkers(const std::strin
 // N‰m‰ ovat muotoa:
 // RU(T 1 3)
 // eli 1. maskin/funktion nimi, sulku auki, parametri, alkuarvo, loppuarvo ja lopuksi suliku kiinni.
-bool NFmiSmartToolIntepreter::IsVariableRampFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception)
+bool NFmiSmartToolIntepreter::IsVariableRampFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
 {
 	if(FindAnyFromText(theVariableText, itsTokenRampFunctions))
 	{
@@ -1520,16 +1520,16 @@ bool NFmiSmartToolIntepreter::InterpretNextMask(const std::string &theMaskSectio
 // ExtractNextElseIfMaskSection
 // ExtractElseCalculationSection
 
-#ifdef UNIX
-std::string::const_iterator NFmiSmartToolIntepreter::ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition)
-#else
+#if (defined _MSC_VER) && (_MSC_VER < 1310) // 1310 eli k‰‰nt‰j‰n versio 13.1 eli MSVC++ 7.1  toteuttaa 1. kerran kunnolla standardia
 std::string::iterator NFmiSmartToolIntepreter::ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition)
+#else
+std::string::const_iterator NFmiSmartToolIntepreter::ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition)
 #endif
 {
-#ifdef UNIX
-  return theMacroText.end();
-#else
+#if (defined _MSC_VER) && (_MSC_VER < 1310) // 1310 eli k‰‰nt‰j‰n versio 13.1 eli MSVC++ 7.1  toteuttaa 1. kerran kunnolla standardia
   return const_cast<std::string::iterator>(theMacroText.end());
+#else
+  return theMacroText.end();
 #endif
 }
 
