@@ -198,15 +198,11 @@ void NFmiSmartToolCalculation::eval_exp2(double &result, const NFmiPoint &theLat
 	{
 		get_token();
 		eval_exp3(temp, theLatlon, theTime, theTimeIndex);
-		switch(op) 
-		{
-			case NFmiAreaMask::Sub:
-				result = result - temp;
-				break;
-			case NFmiAreaMask::Add:
-				result = result + temp;
-				break;
-		}
+
+		if(op == NFmiAreaMask::Sub)
+		  result = result - temp;
+		else	// Add
+		  result = result + temp;
 	}
 }
 
@@ -223,18 +219,13 @@ void NFmiSmartToolCalculation::eval_exp3(double &result, const NFmiPoint &theLat
 	{
 		get_token();
 		eval_exp4(temp, theLatlon, theTime, theTimeIndex);
-		switch(op) 
-		{
-			case NFmiAreaMask::Mul:
-				result = result * temp;
-				break;
-			case NFmiAreaMask::Div:
-				result = result / temp;
-				break;
-			case NFmiAreaMask::Mod:
-				result = static_cast<int>(result) % static_cast<int>(temp);
-				break;
-		}
+
+		if(op == NFmiAreaMask::Mul)
+		  result = result * temp;
+		else if(op == NFmiAreaMask::Div)
+		  result = result / temp;
+		else // NFmiAreaMask::Mod:
+		  result = static_cast<int>(result) % static_cast<int>(temp);
 	}
 }
 
@@ -545,15 +536,10 @@ void NFmiSmartToolCalculation::bin_eval_exp2(bool &maskresult, double &result, c
 	{
 		get_token();
 		bin_eval_exp3(maskresult, temp, theLatlon, theTime, theTimeIndex);
-		switch(op) 
-		{
-			case NFmiAreaMask::Sub:
-				result = result - temp;
-				break;
-			case NFmiAreaMask::Add:
-				result = result + temp;
-				break;
-		}
+		if(op == NFmiAreaMask::Sub)
+		  result = result - temp;
+		else // NFmiAreaMask::Add
+		  result = result + temp;
 	}
 }
 
@@ -570,18 +556,12 @@ void NFmiSmartToolCalculation::bin_eval_exp3(bool &maskresult, double &result, c
 	{
 		get_token();
 		bin_eval_exp4(maskresult, temp, theLatlon, theTime, theTimeIndex);
-		switch(op) 
-		{
-			case NFmiAreaMask::Mul:
-				result = result * temp;
-				break;
-			case NFmiAreaMask::Div:
-				result = result / temp;
-				break;
-			case NFmiAreaMask::Mod:
-				result = static_cast<int>(result) % static_cast<int>(temp);
-				break;
-		}
+		if(op == NFmiAreaMask::Mul)
+		  result = result * temp;
+		else if(op == NFmiAreaMask::Div)
+		  result = result / temp;
+		else // NFmiAreaMask::Mod
+		  result = static_cast<int>(result) % static_cast<int>(temp);
 	}
 }
 
