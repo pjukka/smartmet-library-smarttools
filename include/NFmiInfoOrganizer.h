@@ -40,6 +40,7 @@
 #include "NFmiParameterName.h"
 //#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiInfoData.h"
+#include "NFmiDataMatrix.h"
 #include <vector>
 
 class NFmiDrawParamFactory;
@@ -115,6 +116,8 @@ class NFmiInfoOrganizer
 	const NFmiString& WorkingDirectory(void) const {return itsWorkingDirectory;};
 	void WorkingDirectory(const NFmiString& newValue){itsWorkingDirectory = newValue;};
 	void UpdateEditedDataCopy(void); // 28.09.1999/Marko
+	NFmiSmartInfo* MacroParamData(void) {return itsMacroParamData;} // tätä tarvitaan asettamaan mm. aikadescriptoria ja ehkä muita descriptoreita
+	NFmiDataMatrix<float>& DefaultMissingValueMatrix(void){return itsDefaultMissingValueMatrix;}
  private:
 	int CountData(void);
  	bool Remove(void);	
@@ -130,6 +133,7 @@ class NFmiInfoOrganizer
   	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType); 
     bool Add (NFmiSmartInfo* theInfo);
 	NFmiParamBag GetParams(NFmiInfoData::Type theDataType);
+	void UpdateMacroParamData(void);
 
 // Attributes
   	NFmiSortedPtrList<NFmiSmartInfo> itsList; // error when compiling NFmiInfoOrganizer.cpp//binary '<' : 'class NFmiSmartInfo' does not define this operator or a conversion to a type acceptable to the predefined operator
@@ -138,6 +142,8 @@ class NFmiInfoOrganizer
 	NFmiString itsWorkingDirectory;
 	NFmiSmartInfo* itsEditedData; // editoitavaa dataa voi olla vain yksi kerrallaan, joten laitoin sen erilleen tehokkuuden takia.
 	NFmiSmartInfo* itsEditedDataCopy; // tämä on editoitavan datan kopio, mitä käyttäjä voi halutessaan päivittää, käytetään visualisoimaan tehtyjä muutoksia datassa
+	NFmiSmartInfo* itsMacroParamData; // makro-parametrien laskuja varten pitää pitää yllä yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
+	NFmiDataMatrix<float> itsDefaultMissingValueMatrix; // tähän talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi että sillä voi alustaa makroParam dataa ennen laskuja
 };
 
 #endif
