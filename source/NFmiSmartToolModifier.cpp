@@ -73,6 +73,7 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer
 //,itsElseAreaMaskSection(0)
 ,itsElseCalculationSection(0)
 ,fModifySelectedLocationsOnly(false)
+,itsIncludeDirectory()
 {
 	assert(itsInfoOrganizer);
 }
@@ -91,6 +92,7 @@ void NFmiSmartToolModifier::InitSmartTool(const std::string &theSmartToolText)
 	itsErrorText = "";
 	try
 	{
+		itsSmartToolIntepreter->IncludeDirectory(itsIncludeDirectory);
 		itsSmartToolIntepreter->Interpret(theSmartToolText);
 	}
 	catch(NFmiSmartToolIntepreter::Exception excep)

@@ -27,7 +27,7 @@
 #include "NFmiAreaMaskInfo.h"
 #include "NFmiSmartToolCalculationSectionInfo.h"
 #include "NFmiAreaMaskSectionInfo.h"
-#include "NFmiCommentStripper.h"
+#include "NFmiPreProcessor.h"
 #include "NFmiSmartToolCalculationInfo.h"
 #include "NFmiValueString.h"
 #include "NFmiLevelType.h"
@@ -493,7 +493,8 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationSection(NFmiSmartTo
 void NFmiSmartToolIntepreter::SetMacroTexts(const std::string &theMacroText)
 {
 	itsMacroText = theMacroText;
-	NFmiCommentStripper commentStripper;
+	NFmiPreProcessor commentStripper;
+	commentStripper.SetIncluding("#Include", itsIncludeDirectory);
 	commentStripper.SetString(theMacroText);
 	if(commentStripper.Strip())
 	{

@@ -101,6 +101,8 @@ public:
 	void Clear(void);
 	const std::string& GetMacroText(void) const {return itsMacroText;}
 	const std::string& GetStrippedMacroText(void) const {return itsStrippedMacroText;}
+	const std::string& IncludeDirectory(void) const {return itsIncludeDirectory;}
+	void IncludeDirectory(const std::string& newValue) {itsIncludeDirectory = newValue;}
 
 	std::vector<NFmiSmartToolCalculationBlock>& SmartToolCalculationBlocks(void){return itsSmartToolCalculationBlocks;}
 
@@ -186,6 +188,7 @@ private:
 	void SetMacroTexts(const std::string &theMacroText);
 	std::string itsMacroText;
 	std::string itsStrippedMacroText;
+	std::string itsIncludeDirectory; // mistä ladataan mahd. include filet
 
 	std::vector<NFmiSmartToolCalculationBlock> itsSmartToolCalculationBlocks;
 

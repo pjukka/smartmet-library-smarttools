@@ -63,6 +63,8 @@ public:
 
 	bool IsMacroRunnable(void) const {return fMacroRunnable;}
 	const std::string& GetErrorText(void) const {return itsErrorText;}
+	const std::string& IncludeDirectory(void) const {return itsIncludeDirectory;}
+	void IncludeDirectory(const std::string& newValue) {itsIncludeDirectory = newValue;}
 
 private:
 	NFmiSmartInfo* CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent);
@@ -106,5 +108,6 @@ private:
 	std::vector<double> itsModificationFactors; // mahdolliset aikasarja muokkaus kertoimet (ei omista, ei tuhoa)
 	bool fModifySelectedLocationsOnly;
 	std::vector<NFmiSmartInfo*> itsScriptVariableInfos; // mahdolliset skripti-muuttujat talletetaan tänne
+	std::string itsIncludeDirectory; // mistä ladataan mahd. include filet
 };
 #endif
