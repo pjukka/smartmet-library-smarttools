@@ -202,9 +202,9 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , fShowColors(false)
 , fShowColoredNumbers(false)
 , fZeroColorMean(false)
-//***********************************************
-//********** 'versio 2' parametreja *************
-//***********************************************
+// ***********************************************
+// ********** 'versio 2' parametreja *************
+// ***********************************************
 , itsStationSymbolColorShadeLowValue(0)
 , itsStationSymbolColorShadeMidValue(50)
 , itsStationSymbolColorShadeHighValue(100)
@@ -268,9 +268,9 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , itsIsoLineHatchColor2(0.5f,0.5f,0.5f)
 , itsIsoLineHatchBorderColor2(0.5f,0.5f,0.5f)
 , itsIsoLineLabelDigitCount(0)
-//***********************************************
-//********** 'versio 2' parametreja *************
-//***********************************************
+// ***********************************************
+// ********** 'versio 2' parametreja *************
+// ***********************************************
 , itsInitFileVersionNumber(itsFileVersionNumber)
 , itsInitFileName("")
 , fHidden(false)
