@@ -893,6 +893,8 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			file >> temp; // luetaan nimike pois
 			file >> itsPossibleViewTypeCount;
 			file >> temp; // luetaan nimike pois
+			if(!file)
+				return file;
 			for(int ind = 0; ind < itsPossibleViewTypeCount;ind++)
 			{
 				file >> number;
@@ -912,6 +914,8 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 
 			file >> temp; // luetaan nimike pois
 			file >> temp;
+			if(!file)
+				return file;
 			itsUnit = NFmiString(temp);
 
 
@@ -1010,11 +1014,15 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				file >> fUseCustomColorContouring;
 
 				file >> size;
+				if(!file)
+					return file;
 				itsSpecialColorContouringValues.resize(size);
 				for(i=0; i < size; i++)
 					file >> itsSpecialColorContouringValues[i];
 
 				file >> size;
+				if(!file)
+					return file;
 				itsSpecialColorContouringColorIndexies.resize(size);
 				for(i=0; i < size; i++)
 					file >> itsSpecialColorContouringColorIndexies[i];
@@ -1041,6 +1049,8 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				file >> itsIsoLineHatchColor2;
 				file >> itsIsoLineHatchBorderColor2;
 				file >> itsIsoLineLabelDigitCount;
+				if(!file)
+					return file;
 	//***********************************************
 	//********** 'versio 2' parametreja *************
 	//***********************************************
