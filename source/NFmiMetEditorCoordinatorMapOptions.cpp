@@ -19,6 +19,10 @@
 //  Change Log     : 
 // 
 //**********************************************************
+#ifdef WIN32
+#pragma warning(disable : 4786) // poistaa n kpl VC++ kääntäjän varoitusta (liian pitkä nimi >255 merkkiä joka johtuu 'puretuista' STL-template nimistä)
+#endif
+
 #include "NFmiMetEditorCoordinatorMapOptions.h"
 #include "NFmiLocationBag.h"
 //--------------------------------------------------------

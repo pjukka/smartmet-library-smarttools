@@ -33,6 +33,10 @@
 // 1999.09.22/Marko	Lisäsin EditedDatan kopion, jota käytetään visualisoimaan dataan tehtyjä muutoksia.
 // 
 //**********************************************************
+#ifdef WIN32
+#pragma warning(disable : 4786) // poistaa n kpl VC++ kääntäjän varoitusta (liian pitkä nimi >255 merkkiä joka johtuu 'puretuista' STL-template nimistä)
+#endif
+
 #include "NFmiInfoOrganizer.h"
 #include "NFmiSmartInfo.h"
 #include "NFmiDrawParamFactory.h"
