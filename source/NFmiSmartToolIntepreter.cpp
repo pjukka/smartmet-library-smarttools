@@ -494,7 +494,7 @@ void NFmiSmartToolIntepreter::SetMacroTexts(const std::string &theMacroText)
 {
 	itsMacroText = theMacroText;
 	NFmiPreProcessor commentStripper;
-	commentStripper.SetIncluding("#Include", itsIncludeDirectory);
+	commentStripper.SetIncluding("#include", itsIncludeDirectory);
 	commentStripper.SetString(theMacroText);
 	if(commentStripper.Strip())
 	{
