@@ -47,6 +47,14 @@
 #include <cassert>
 
 using namespace std;
+/*
+#include "stdafx.h"
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+*/
 
 //--------------------------------------------------------
 // Constructor/Destructor 
@@ -142,12 +150,15 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateConditionalSection(NFmiAr
 		if(size)
 		{
 			areaMaskHandler = new NFmiSmartToolCalculation;
+			auto_ptr<NFmiSmartToolCalculation> areaMaskHandlerPtr(areaMaskHandler);
 			for(int i=0; i<size; i++)  
 // HUOM!!!! editoitavaN DATAN QDatasta pitää tehdä kopiot, muuten maskit eivät toimi 
 // kaikissa tilanteissa oikein!! KORJAA TÄMÄ!!!!!
 				areaMaskHandler->AddCalculation(CreateAreaMask(*maskInfos[i]));
 			// loppuun lisätään vielä lopetus 'merkki'
 			areaMaskHandler->AddCalculation(CreateEndingAreaMask());
+
+			return areaMaskHandlerPtr.release();
 		}
 	}
 	return areaMaskHandler;
@@ -163,8 +174,12 @@ NFmiSmartToolCalculationSection* NFmiSmartToolModifier::CreateCalculationSection
 		if(size)
 		{
 			section = new NFmiSmartToolCalculationSection;
+			auto_ptr<NFmiSmartToolCalculationSection> sectionPtr(section);
 			for(int i=0; i<size; i++)
+			{
 				section->AddCalculations(CreateCalculation(calcInfos[i]));
+			}
+			return sectionPtr.release();
 		}
 	}
 	return section;
@@ -187,6 +202,7 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateCalculation(NFmiSmartTool
 		float upperLimit;
 		GetParamValueLimits(*theCalcInfo->GetResultDataInfo(), &lowerLimit, &upperLimit);
 		calculation->SetLimits(lowerLimit, upperLimit);
+		calculation->AllowMissingValueAssignment(theCalcInfo->AllowMissingValueAssignment());
 		for(int i=0; i<size; i++)
 //			calculation->AddCalculation(CreateAreaMask(*areaMaskInfos[i]), operators[i]);
 			calculation->AddCalculation(CreateAreaMask(*areaMaskInfos[i]));
