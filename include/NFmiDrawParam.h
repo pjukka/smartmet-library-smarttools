@@ -33,27 +33,23 @@
 #include "NFmiGlobals.h"
 #include "NFmiParameterName.h"
 #include "NFmiDataIdent.h"
-//#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiColor.h"
 #include "NFmiPoint.h"
+#include "NFmiLevel.h"
 #include "NFmiMetEditorTypes.h"
 #include "NFmiInfoData.h"
 
 #include <vector>
 
-class NFmiSmartInfo;
 class NFmiDrawingEnvironment;
 class NFmiString;
-class NFmiDataIdent;
-//class NFmiMetEditorCoordinatorMapOptions;
 
 class NFmiDrawParam
 {
 
 public:
     NFmiDrawParam (void);
-    NFmiDrawParam (NFmiSmartInfo* theInfo, const NFmiDataIdent& theParam, int thePriority, NFmiInfoData::Type theDataType = NFmiInfoData::kNoDataType);//, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0);
-	NFmiDrawParam (NFmiSmartInfo* theInfo, const FmiParameterName& theParam, int thePriority);//, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0); // NFmiDrawParamFactory::CreateDrawParam käyttää tätä
+    NFmiDrawParam (const NFmiDataIdent& theParam, const NFmiLevel &theLevel, int thePriority, NFmiInfoData::Type theDataType = NFmiInfoData::kNoDataType);//, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0);
 	virtual  ~NFmiDrawParam (void);
 
 	void Init(const NFmiDrawParam* theDrawParam);
@@ -74,11 +70,10 @@ public:
 // --------------- "set" ja "get" metodit -----------------
 	const NFmiString&	 ParameterAbbreviation (void) const;
 	void				 ParameterAbbreviation(NFmiString theParameterAbbreviation) { itsParameterAbbreviation = theParameterAbbreviation; }
-	NFmiDataIdent& Param (void) { return itsParameter; }; 
-//	const NFmiDataIdent& EditParam (void) const; 
+	NFmiDataIdent&		 Param (void) { return itsParameter; }; 
 	void                 Param (const NFmiDataIdent& theParameter) { itsParameter = theParameter; }; 
-	void                 Info (NFmiSmartInfo* theInfo){ itsInfo = theInfo; }; 
-	NFmiSmartInfo*       Info (void){ return itsInfo; } ; 
+	NFmiLevel&			 Level(void) {return itsLevel;}
+	void				 Level(const NFmiLevel& theLevel) {itsLevel = theLevel;}
 	void				 Priority (int thePriority){ itsPriority = thePriority; }; 
 	int					 Priority (void) const { return itsPriority; }; 
 	void				 ViewType (const NFmiMetEditorTypes::View& theViewType) { itsViewType = theViewType; };
@@ -152,8 +147,6 @@ public:
 	void ShowDifference(bool newState){fShowDifference = newState;};
 	bool ShowDifferenceToOriginalData(void) const {return fShowDifferenceToOriginalData;}
 	void ShowDifferenceToOriginalData(bool newValue){fShowDifferenceToOriginalData = newValue;}
-//	NFmiMetEditorCoordinatorMapOptions* MetEditorCoordinatorMapOptions(void){return itsMetEditorCoordinatorMapOptions;};
-//	void MetEditorCoordinatorMapOptions(NFmiMetEditorCoordinatorMapOptions* theNewOptions);
 
 //**************************************************************
 //********** 'versio 2' parametrien asetusfunktiot *************
@@ -303,6 +296,7 @@ public:
 protected:
 
     NFmiDataIdent itsParameter;
+    NFmiLevel itsLevel;
 	NFmiString itsParameterAbbreviation;
     int itsPriority;
 
@@ -440,7 +434,6 @@ private:
 	bool fEditedParam;	// vain yksi parametreista voidaan editoida yhtä aikaa
 	bool fEditableParam;	// onko parametri suoraan editoitavissa ollenkaan? (esim. HESSAA tai tuulivektori eivät ole)
 
-	NFmiSmartInfo* itsInfo;
 	NFmiString itsUnit;			
 	bool fActive;			// onko kyseinen parametri näytön aktiivinen parametri (jokaisella näyttörivillä aina yksi aktivoitunut parametri)
 	bool fShowDifference;	// näytetäänkö kartalla parametrin arvo, vai erotus edelliseen aikaan (ei ole vielä talletettu tiedostoon)

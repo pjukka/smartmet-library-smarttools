@@ -30,8 +30,6 @@
 // 
 //**********************************************************
 #include "NFmiDrawParam.h"
-#include "NFmiSmartInfo.h"
-//#include "NFmiMetEditorCoordinatorMapOptions.h"
 
 float NFmiDrawParam::itsFileVersionNumber=2.0;
 
@@ -40,6 +38,7 @@ float NFmiDrawParam::itsFileVersionNumber=2.0;
 //--------------------------------------------------------
 NFmiDrawParam::NFmiDrawParam()
 : itsParameter(NFmiParam(kFmiLastParameter))
+, itsLevel()
 , itsParameterAbbreviation("?")
 , itsPriority(1)
 , itsViewType							 (NFmiMetEditorTypes::kFmiIsoLineView)
@@ -146,7 +145,7 @@ NFmiDrawParam::NFmiDrawParam()
 , fHidden(false)
 , fEditedParam(false)
 , fEditableParam(true)
-, itsInfo(0)
+//, itsInfo(0)
 , itsUnit								("?")
 , fActive(false)
 , fShowDifference(false)
@@ -166,6 +165,7 @@ NFmiDrawParam::NFmiDrawParam()
 //-------------------------------------------------------
 // NFmiDrawParam, toistaiseksi käytössä oleva konstruktori 02.03.1999/Viljo
 //-------------------------------------------------------
+/*
 NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 							 , const FmiParameterName& theParam
 							 , int thePriority)
@@ -288,16 +288,16 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
 }
-
+*/
 //-------------------------------------------------------
 // NFmiDrawParam
 //-------------------------------------------------------
-NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
-							, const NFmiDataIdent& theParam
-							, int thePriority
-							, NFmiInfoData::Type theDataType)
-//							, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions)
+NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
+							,const NFmiLevel &theLevel
+							,int thePriority
+							,NFmiInfoData::Type theDataType)
 : itsParameter(theParam)
+, itsLevel(theLevel)
 , itsParameterAbbreviation("?")
 , itsPriority(thePriority)
 , itsViewType							 (NFmiMetEditorTypes::kFmiIsoLineView)
@@ -403,7 +403,6 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 , fHidden(false)
 , fEditedParam(false)
 , fEditableParam(true)
-, itsInfo(theInfo)
 , itsUnit								("?")
 , fActive(false)
 , fShowDifference(false)
@@ -420,8 +419,6 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 //-------------------------------------------------------
 NFmiDrawParam::~NFmiDrawParam(void)
 { 
-	delete itsInfo;
-//	delete itsMetEditorCoordinatorMapOptions;
 }
 
 //-------------------------------------------------------
@@ -1081,17 +1078,15 @@ void NFmiDrawParam::MetEditorCoordinatorMapOptions(NFmiMetEditorCoordinatorMapOp
 */
 const NFmiString& NFmiDrawParam::ParameterAbbreviation(void) const 
 {
-	if(!itsInfo || (itsParameterAbbreviation != NFmiString("") && itsParameterAbbreviation != NFmiString("?")))
+	if(itsParameterAbbreviation != NFmiString("") && itsParameterAbbreviation != NFmiString("?"))
 		return itsParameterAbbreviation;
 	else
-		return itsInfo->Param().GetParam()->GetName();
+		return itsParameter.GetParamName();
 }
 
 
 NFmiInfoData::Type NFmiDrawParam::DataType(void)
 {
-	if(itsInfo)
-		return itsInfo->DataType();
 	return itsDataType;
 }
 
