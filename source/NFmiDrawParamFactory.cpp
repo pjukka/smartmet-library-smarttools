@@ -83,7 +83,8 @@ NFmiDrawParamFactory::~NFmiDrawParamFactory(void)
 NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo 
 													 , const NFmiDataIdent& theIdent
 													 , bool& fSubParam
-													 , const NFmiLevel* theLevel)
+													 , const NFmiLevel* theLevel
+													 , bool setParam)
 
 //  Tässä metodissa valitaan sääparametrin theParam perusteella piirtoa
 //  varten sopiva drawParam. Kostruktorin NFmiDrawParam vaatima pointteri
@@ -95,6 +96,7 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo
 	if(!theInfo)
 		return 0;
 
+	if(setParam)
 	theInfo->Param(theIdent);
 	if(theLevel)
 		theInfo->Level(*theLevel);
@@ -105,7 +107,7 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo
 // 7.1.2002/Marko Muutin dataidentin alustuksen niin, että se otetaan annetusta
 // infosta, jolloin se on aina oikein. Info on aina asetettu halutun parametrin 
 // kohdalle, kun se tulee tänne.
-	NFmiDrawParam* drawParam = new NFmiDrawParam(theInfo, theInfo->Param(), 1); // 1 = priority
+	NFmiDrawParam* drawParam = new NFmiDrawParam(theInfo, setParam ? theInfo->Param() : theIdent, 1); // 1 = priority
 
 	if(drawParam)
 	{

@@ -45,7 +45,8 @@ public:
 	NFmiDrawParam * CreateDrawParam( NFmiSmartInfo* theInfo
                                    , const NFmiDataIdent& theIdent
 								   , bool& fSubParam 
-								   , const NFmiLevel* theLevel);
+								   , const NFmiLevel* theLevel
+								   , bool setParam = true);
 	NFmiDrawParam * CreateCrossSectionDrawParam( NFmiSmartInfo* theInfo
 												, const NFmiDataIdent& theIdent
 												, bool& fSubParam);	
