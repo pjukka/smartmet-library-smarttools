@@ -46,13 +46,17 @@ public:
 
 	bool InsertionSort (Type* theItem)
 	{
-		typename NFmiPtrList<Type>::Iterator tempIter = Start();
-		while(tempIter.Next())
+		if(theItem)
 		{
-			if(*theItem < tempIter.Current())
-				return tempIter.AddBefore(theItem);
+			typename NFmiPtrList<Type>::Iterator tempIter = Start();
+			while(tempIter.Next())
+			{
+				if(*theItem < tempIter.Current())
+					return tempIter.AddBefore(theItem);
+			}
+			return  AddEnd(theItem);
 		}
-		return  AddEnd(theItem);
+		return false;
 	};
 
 	bool Sort(bool fAscendingOrder = true)
