@@ -70,8 +70,8 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* ViewableInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
 	NFmiSmartInfo* ObservationInfo(void); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* ObservationInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
-	NFmiSmartInfo* CompareModelsInfo(void); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
-	NFmiSmartInfo* CompareModelsInfo(const NFmiProducer& theProducer);
+//	NFmiSmartInfo* CompareModelsInfo(void); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
+//	NFmiSmartInfo* CompareModelsInfo(const NFmiProducer& theProducer);
 	NFmiSmartInfo* KepaDataInfo(void); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* ClimatologyInfo(void); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* AnalyzeDataInfo(void); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
@@ -87,7 +87,7 @@ class NFmiInfoOrganizer
 	NFmiParamBag StaticParams(void); // kaikkien staattisten (ei muutu ajan mukana) datojen parambag (esim. topografia)
 	NFmiParamBag ObservationParams(void); // kaikkien staattisten (ei muutu ajan mukana) datojen parambag (esim. topografia)
 	NFmiParamBag ObservationParams(int theIndex); // vain halutun indeksin parametrit (HUONO VIRITYS KORJAA!!!!)
-	NFmiParamBag CompareModelsParams(void); // palauttaa vain 1. kyseisen datan parametrit!
+//	NFmiParamBag CompareModelsParams(void); // palauttaa vain 1. kyseisen datan parametrit!
 
 	NFmiSmartInfo* CreateInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	NFmiSmartInfo* CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);

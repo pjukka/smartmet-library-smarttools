@@ -794,6 +794,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, const
 }
 
 // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
+/*
 NFmiSmartInfo* NFmiInfoOrganizer::CompareModelsInfo(void)
 {
 	for(Reset(); Next();)
@@ -803,8 +804,9 @@ NFmiSmartInfo* NFmiInfoOrganizer::CompareModelsInfo(void)
 	}
 	return 0;
 }
-
+*/
 // palauttaa vain 1. kyseisen datan parametrit!
+/*
 NFmiParamBag NFmiInfoOrganizer::CompareModelsParams(void)
 {
 //	return GetParams(kFmiDataTypeCompareModels);
@@ -813,7 +815,8 @@ NFmiParamBag NFmiInfoOrganizer::CompareModelsParams(void)
 		return *(info->ParamDescriptor().ParamBag());
 	return NFmiParamBag();
 }
-
+*/
+/*
 NFmiSmartInfo* NFmiInfoOrganizer::CompareModelsInfo(const NFmiProducer& theProducer)
 {
 	for(Reset(); Next();)
@@ -831,3 +834,4 @@ NFmiSmartInfo* NFmiInfoOrganizer::CompareModelsInfo(const NFmiProducer& theProdu
 	}
 	return 0;
 }
+*/
