@@ -501,6 +501,8 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiSmartToolCalculationBlock 
 {
 	if(theCalculationBlock->itsIfAreaMaskSection && theCalculationBlock->itsIfCalculationBlocks)
 	{
+		if(theCalculationBlock->FirstVariableInfo() == 0)
+			throw runtime_error("Tuntematon virhe skriptissä.");
 		NFmiSmartInfo *info = theCalculationBlock->FirstVariableInfo()->Clone();
 		std::auto_ptr<NFmiSmartInfo> infoPtr(info);
 
