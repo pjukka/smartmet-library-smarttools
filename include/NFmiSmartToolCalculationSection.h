@@ -37,7 +37,7 @@ class NFmiSmartToolCalculationSection
 {
 
 public:
-	void Calculate(const NFmiPoint &theLatlon, int theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
+	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
 	void Clear(void);
 	void SetModificationFactors(std::vector<double> *theFactors);
 	void SetTime(const NFmiMetTime &theTime);

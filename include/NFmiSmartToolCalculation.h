@@ -44,7 +44,7 @@ public:
 	};
 
 	bool IsMasked(const NFmiPoint &theLatlon, int theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
-	void Calculate(const NFmiPoint &theLatlon, int theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
+	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
 	void SetTime(const NFmiMetTime &theTime); // optimointia laskuja varten
 	void SetModificationFactors(std::vector<double> *theFactors);
 
