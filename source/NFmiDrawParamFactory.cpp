@@ -44,11 +44,30 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 */
+
+static void InitDrawParam(NFmiDrawParam* theDrawParam, const NFmiString &theFileName, bool createDrawParamFileIfNotExist)
+{
+	if(theDrawParam)
+	{
+		if(!theDrawParam->Init(theFileName))
+		{
+			if(createDrawParamFileIfNotExist)
+			{
+				if(!theDrawParam->StoreData(theFileName))
+				{
+					// tiedostoa ei voitu luoda, mitä pitäisi tehdä?
+				}
+			}
+		}
+	}
+}
+
 //--------------------------------------------------------
 // NFmiDrawParamFactory(void) 
 //--------------------------------------------------------
-NFmiDrawParamFactory::NFmiDrawParamFactory(void) 
+NFmiDrawParamFactory::NFmiDrawParamFactory(bool createDrawParamFileIfNotExist) 
 :itsLoadDirectory("")
+,fCreateDrawParamFileIfNotExist(createDrawParamFileIfNotExist)
 {
 }
 //--------------------------------------------------------
@@ -91,11 +110,7 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo
 	if(drawParam)
 	{
 		NFmiString fileName = CreateFileName(drawParam);
-		if(!drawParam->Init(fileName))
-			if(!drawParam->StoreData(fileName))
-			  {
-				// tiedostoa ei voitu luoda, mitä pitäisi tehdä?
-			  }
+		InitDrawParam(drawParam, fileName, fCreateDrawParamFileIfNotExist);
 	}
 	return drawParam;
 }
@@ -114,11 +129,7 @@ NFmiDrawParam * NFmiDrawParamFactory::CreateCrossSectionDrawParam( NFmiSmartInfo
 	if(drawParam)
 	{
 		NFmiString fileName = CreateFileName(drawParam, true);
-		if(!drawParam->Init(fileName))
-			if(!drawParam->StoreData(fileName))
-			  {
-				// tiedostoa ei voitu luoda, mitä pitäisi tehdä?
-			  }
+		InitDrawParam(drawParam, fileName, fCreateDrawParamFileIfNotExist);
 	}
 	return drawParam;
 }
@@ -131,11 +142,7 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateEmptyInfoDrawParam(const NFmiDataIden
 	{
 		drawParam->Param(theIdent);
 		NFmiString fileName = CreateFileName(drawParam);
-		if(!drawParam->Init(fileName))
-			if(!drawParam->StoreData(fileName))
-			  {
-				// tiedostoa ei voitu luoda, mitä pitäisi tehdä?
-			  }
+		InitDrawParam(drawParam, fileName, fCreateDrawParamFileIfNotExist);
 	}
 	return drawParam;
 }

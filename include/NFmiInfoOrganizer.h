@@ -60,7 +60,7 @@ class NFmiInfoOrganizer
 	NFmiInfoOrganizer (void);
 	~NFmiInfoOrganizer (void); 
 
-	bool Init(const std::string &theDrawParamPath);
+	bool Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist);
 
 // n‰m‰ infon palauttavat metodit ovat toistaiseksi vain apu funktioita, jotka toimivat
 // vajavaisesti. Niist‰ pit‰‰ tehd‰ fiksumpia, kun tulee enemm‰n dataa talteen!

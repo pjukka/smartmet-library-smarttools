@@ -40,7 +40,7 @@ class NFmiDrawParamFactory
 {
 
 public:
-    NFmiDrawParamFactory(void);
+    NFmiDrawParamFactory(bool createDrawParamFileIfNotExist);
     ~NFmiDrawParamFactory(void);
 	NFmiDrawParam * CreateDrawParam( NFmiSmartInfo* theInfo
                                    , const NFmiDataIdent& theIdent
@@ -57,6 +57,8 @@ public:
 private:
 	NFmiString CreateFileName(NFmiDrawParam* drawParam, bool fCrossSectionCase = false);
 	NFmiString itsLoadDirectory;
+	bool fCreateDrawParamFileIfNotExist; // esim. metkun editori luo drawparam-tiedostot, 
+										 // mutta SmarToolFiltterin ei tarvitse.
 };
 
 #endif

@@ -22,16 +22,16 @@
   #include <unistd.h>
 #endif
 
-NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, const std::vector<std::string> *theHelperDataFileNames)
+NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, const std::vector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist)
 {
 	NFmiTimeDescriptor times(theModifiedData->Info()->TimeDescriptor());
-	return ModifyData(theMacroText, theModifiedData, &times, theHelperDataFileNames);
+	return ModifyData(theMacroText, theModifiedData, &times, theHelperDataFileNames, createDrawParamFileIfNotExist);
 }
 
-NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const std::vector<std::string> *theHelperDataFileNames)
+NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const std::vector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist)
 {
 	NFmiInfoOrganizer dataBase;
-	if(!InitDataBase(&dataBase, theModifiedData, theHelperDataFileNames))
+	if(!InitDataBase(&dataBase, theModifiedData, theHelperDataFileNames, createDrawParamFileIfNotExist))
 	{
 		std::cerr << "Tietokannan alustus epäonnistui, ei jatketa." << std::endl;
 		return 0;
@@ -65,15 +65,15 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	return data;
 }
 
-NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData)
+NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, bool createDrawParamFileIfNotExist)
 {
 	NFmiTimeDescriptor times(theModifiedData->Info()->TimeDescriptor());
-	return ModifyData(theMacroText, theModifiedData, &times);
+	return ModifyData(theMacroText, theModifiedData, &times, createDrawParamFileIfNotExist);
 }
 
-NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes)
+NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, bool createDrawParamFileIfNotExist)
 {
-	return ModifyData(theMacroText, theModifiedData, theTimes, 0); // 0=tyhjä apudata filename-lista
+	return ModifyData(theMacroText, theModifiedData, theTimes, 0, createDrawParamFileIfNotExist); // 0=tyhjä apudata filename-lista
 }
 
 std::string NFmiSmartToolUtil::GetWorkingDirectory(void)
@@ -92,12 +92,12 @@ std::string NFmiSmartToolUtil::GetWorkingDirectory(void)
 #endif
 }
 
-bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryData* theModifiedData, const std::vector<std::string> *theHelperDataFileNames)
+bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryData* theModifiedData, const std::vector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist)
 {
 	if(theDataBase)
 	{
 		theDataBase->WorkingDirectory(GetWorkingDirectory());
-		theDataBase->Init(std::string("")); // tähän annetaan drawparametrien lataus polku, mutta niitä ei käytetä tässä tapauksessa
+		theDataBase->Init(std::string(""), createDrawParamFileIfNotExist); // tähän annetaan drawparametrien lataus polku, mutta niitä ei käytetä tässä tapauksessa
 		theDataBase->AddData(theModifiedData, "xxxfileName", NFmiInfoData::kEditable, 0); // 0=undolevel
 		if(theHelperDataFileNames && theHelperDataFileNames->size())
 			InitDataBaseHelperData(*theDataBase, *theHelperDataFileNames);

@@ -98,9 +98,9 @@ NFmiInfoOrganizer::~NFmiInfoOrganizer (void)
 //--------------------------------------------------------
 // Init 
 //--------------------------------------------------------
-bool NFmiInfoOrganizer::Init(const std::string &theDrawParamPath)
+bool NFmiInfoOrganizer::Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist)
 {
- 	itsDrawParamFactory =new NFmiDrawParamFactory;
+ 	itsDrawParamFactory =new NFmiDrawParamFactory(createDrawParamFileIfNotExist);
 	itsDrawParamFactory->LoadDirectory(theDrawParamPath);
  	return itsDrawParamFactory->Init(); 
 }
