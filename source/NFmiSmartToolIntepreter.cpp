@@ -2269,9 +2269,9 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ANAL"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("mbe"), kFmiHIRMESO));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Mbe"), kFmiHIRMESO));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("MBE"), kFmiHIRMESO));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("mbe"), kFmiMTAHIRMESO));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Mbe"), kFmiMTAHIRMESO));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("MBE"), kFmiMTAHIRMESO));
 
 		itsTokenConstants.insert(ConstantMap::value_type(string("MISS"), kFloatMissing));
 		itsTokenConstants.insert(ConstantMap::value_type(string("Miss"), kFloatMissing));
