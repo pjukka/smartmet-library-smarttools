@@ -39,7 +39,7 @@ NFmiAreaMaskSectionInfo::~NFmiAreaMaskSectionInfo ()
 
 NFmiAreaMaskInfo* NFmiAreaMaskSectionInfo::MaskInfo(int theIndex)
 {
-	if(theIndex >= 0 && theIndex < itsAreaMaskInfoVector.size())
+	if(theIndex >= 0 && static_cast<unsigned int>(theIndex) < itsAreaMaskInfoVector.size())
 		return itsAreaMaskInfoVector[theIndex];
 	return 0;
 }
