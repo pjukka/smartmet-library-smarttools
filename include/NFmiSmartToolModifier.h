@@ -42,6 +42,7 @@ class NFmiAreaMask;
 class NFmiDataModifier;
 class NFmiDataIterator;
 class NFmiSmartToolCalculationBlock;
+class NFmiDataIdent;
 
 class NFmiSmartToolModifier 
 {
@@ -64,6 +65,10 @@ public:
 	const std::string& GetErrorText(void) const {return itsErrorText;}
 
 private:
+	NFmiSmartInfo* CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent);
+	NFmiSmartInfo* GetScriptVariableInfo(const NFmiDataIdent &theDataIdent);
+	void ClearScriptVariableInfos(void);
+	NFmiSmartInfo* CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 //	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculation *theMaskCondition, NFmiSmartToolCalculationSection *theConditionalCalculations);
 	NFmiAreaMask* CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception);
 	void GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit) throw (NFmiSmartToolModifier::Exception);
@@ -100,5 +105,6 @@ private:
 
 	std::vector<double> itsModificationFactors; // mahdolliset aikasarja muokkaus kertoimet (ei omista, ei tuhoa)
 	bool fModifySelectedLocationsOnly;
+	std::vector<NFmiSmartInfo*> itsScriptVariableInfos; // mahdolliset skripti-muuttujat talletetaan tänne
 };
 #endif

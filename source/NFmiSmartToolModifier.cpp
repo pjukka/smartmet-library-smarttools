@@ -42,10 +42,12 @@
 #include "NFmiRelativeTimeIntegrationIterator.h"
 #include "NFmiDrawParam.h"
 #include "NFmiMetEditorTypes.h"
+#include "NFmiQueryData.h"
 
 #include <cassert>
 
 using namespace std;
+
 //--------------------------------------------------------
 // Constructor/Destructor 
 //--------------------------------------------------------
@@ -178,6 +180,7 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateCalculation(NFmiSmartTool
 		std::vector<NFmiAreaMaskInfo*>& areaMaskInfos = *theCalcInfo->GetCalculationOperandInfoVector();
 //		std::vector<NFmiSmartToolCalculation::FmiCalculationOperators>& operators = *theCalcInfo->GetOperationVector();
 		calculation = new NFmiSmartToolCalculation;
+		auto_ptr<NFmiSmartToolCalculation> calculationPtr(calculation);
 		calculation->SetCalculationText(theCalcInfo->GetCalculationText());
 		calculation->SetResultInfo(CreateInfo(*theCalcInfo->GetResultDataInfo()));
 		float lowerLimit;
@@ -189,6 +192,7 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateCalculation(NFmiSmartTool
 			calculation->AddCalculation(CreateAreaMask(*areaMaskInfos[i]));
 		// loppuun lis‰t‰‰n viel‰ loputus 'merkki'
 		calculation->AddCalculation(CreateEndingAreaMask());
+		return calculationPtr.release();
 	}
 	return calculation;
 }
@@ -243,9 +247,11 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, con
 			ModifyConditionalData(theModifiedTimes);
 			ModifyData2(theModifiedTimes, itsLastCalculationSection);
 		}
+		ClearScriptVariableInfos(); // lopuksi n‰m‰ skripti-muuttujat tyhjennet‰‰n
 	}
 	catch(NFmiSmartToolCalculation::Exception excep)
 	{
+		ClearScriptVariableInfos(); // lopuksi n‰m‰ skripti-muuttujat tyhjennet‰‰n
 		fMacroRunnable = false;
 		itsErrorText = excep.What();
 		throw  NFmiSmartToolModifier::Exception(itsErrorText);
@@ -395,7 +401,8 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
 			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa. 
 			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
-			areaMask = new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, true);
+//			areaMask = new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, true);
+			areaMask = new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, true);
 			break;
 			}
 		case NFmiAreaMask::RampFunction:
@@ -548,7 +555,7 @@ NFmiDataIterator* NFmiSmartToolModifier::CreateIterator(const NFmiAreaMaskInfo &
 				NFmiPoint p(theAreaMaskInfo.GetOffsetPoint1());
 				iterator = new NFmiRelativeTimeIntegrationIterator(theInfo,
 																   static_cast<int>(p.Y() - p.X() + 1),
-																   static_cast<int>(p.X()));
+																   static_cast<int>(p.Y()));
 				break;
 			}
 	default:
@@ -567,7 +574,9 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateEndingAreaMask(void)
 NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception)
 {
 	NFmiSmartInfo* info = 0;
-	if(theAreaMaskInfo.GetUseDefaultProducer() || theAreaMaskInfo.GetDataType() == NFmiInfoData::kCopyOfEdited)
+	if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kScriptVariableData)
+		info = CreateScriptVariableInfo(theAreaMaskInfo.GetDataIdent());
+	else if(theAreaMaskInfo.GetUseDefaultProducer() || theAreaMaskInfo.GetDataType() == NFmiInfoData::kCopyOfEdited)
 		info = itsInfoOrganizer->CreateShallowCopyInfo(FmiParameterName(theAreaMaskInfo.GetDataIdent().GetParamIdent()), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
 	else
 		info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
@@ -589,3 +598,69 @@ void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaM
 		throw NFmiSmartToolModifier::Exception("Parametrin min ja max rajoja ei saatu.");
 }
 
+struct FindScriptVariable
+{
+	FindScriptVariable(int theParId):itsParId(theParId){}
+
+	bool operator()(NFmiSmartInfo* thePtr)
+	{return itsParId == thePtr->Param().GetParamIdent();}
+
+	int itsParId;
+};
+
+NFmiSmartInfo* NFmiSmartToolModifier::CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent)
+{
+	NFmiSmartInfo* tmp = GetScriptVariableInfo(theDataIdent);
+	if(tmp)
+		return new NFmiSmartInfo(*tmp);
+	else // pit‰‰ viel‰ luoda kyseinen skripti-muuttuja, koska sit‰ k‰ytet‰‰n nyt 1. kertaa
+	{
+		NFmiSmartInfo* tmp2 = CreateRealScriptVariableInfo(theDataIdent);
+		if(tmp2)
+		{
+			itsScriptVariableInfos.push_back(tmp2);
+			tmp = GetScriptVariableInfo(theDataIdent);
+			if(tmp)
+				return new NFmiSmartInfo(*tmp);
+		}
+	}
+
+	throw NFmiSmartToolModifier::Exception(string("Jotain vikaa NFmiSmartToolModifier:issa kun skripti-muuttujan ") + string(theDataIdent.GetParamName()) + string(" luominen ei onnistu."));
+}
+
+NFmiSmartInfo* NFmiSmartToolModifier::GetScriptVariableInfo(const NFmiDataIdent &theDataIdent)
+{
+	std::vector<NFmiSmartInfo*>::iterator it = std::find_if(itsScriptVariableInfos.begin(), itsScriptVariableInfos.end(), FindScriptVariable(theDataIdent.GetParamIdent()));
+	if(it != itsScriptVariableInfos.end())
+		return *it;
+	return 0;
+}
+
+
+struct SmartInfoDataDestroyer
+{
+	void operator()(NFmiSmartInfo* thePtr)
+	{thePtr->DestroyData();}
+};
+
+void NFmiSmartToolModifier::ClearScriptVariableInfos(void)
+{
+	std::for_each(itsScriptVariableInfos .begin(), itsScriptVariableInfos .end(), SmartInfoDataDestroyer());
+	std::for_each(itsScriptVariableInfos .begin(), itsScriptVariableInfos .end(), PointerDestroyer());
+	itsScriptVariableInfos.clear();
+}
+
+NFmiSmartInfo* NFmiSmartToolModifier::CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent)
+{
+	NFmiSmartInfo* editedInfo = itsInfoOrganizer->EditedInfo();
+	NFmiParamBag paramBag;
+	paramBag.Add(theDataIdent);
+	NFmiParamDescriptor paramDesc(paramBag);
+	NFmiQueryInfo innerInfo(paramDesc, editedInfo->TimeDescriptor(), editedInfo->HPlaceDescriptor(), editedInfo->VPlaceDescriptor());
+	NFmiQueryData *data = new NFmiQueryData(innerInfo);
+	data->Init();
+	NFmiQueryInfo info(data);
+	info.First();
+	NFmiSmartInfo *returnInfo = new NFmiSmartInfo(info, data);
+	return returnInfo;
+}

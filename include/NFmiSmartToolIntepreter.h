@@ -51,6 +51,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include <queue>
 
 class NFmiSmartToolCalculationSectionInfo; 
@@ -78,6 +79,8 @@ public:
 class NFmiSmartToolIntepreter 
 {
 public:
+	typedef std::map<std::string, FmiProducerName> ProducerMap;
+	typedef std::map<std::string, std::pair<unsigned long, unsigned long> > LevelMap; // nimi, ident, levelValue 
 	class Exception
 	{
 	public:
@@ -128,6 +131,14 @@ private:
 	std::string::iterator ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition);
 #endif
 	void InitCheckOut(void);
+	bool IsCaseInsensitiveEqual(const std::string &theStr1, const std::string &theStr2);
+	bool IsPossiblyLevelItem(const std::string &theText, LevelMap &theMap);
+	bool IsPossiblyProducerItem(const std::string &theText, ProducerMap &theMap);
+	bool GetProducerFromVariableById(const std::string &theVariableText, NFmiProducer &theProducer);
+	bool GetLevelFromVariableById(const std::string &theVariableText, NFmiLevel &theLevel);
+	bool IsWantedStart(const std::string &theText, const std::string &theWantedStart);
+	bool GetParamFromVariable(const std::string &theVariableText, ParamMap& theParamMap, NFmiParam &theParam, bool &fUseWildDataType);
+	bool GetParamFromVariableById(const std::string &theVariableText, NFmiParam &theParam);
 	bool CheckoutPossibleIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
 	bool CheckoutPossibleElseIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
 	bool CheckoutPossibleElseClauseSection(void);
@@ -145,12 +156,14 @@ private:
 	bool ConsistOnlyWhiteSpaces(const std::string &theText);
 	bool IsVariableBinaryOperator(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	NFmiAreaMask::CalculationOperator InterpretCalculationOperator(const std::string &theOperatorText) throw (NFmiSmartToolIntepreter::Exception);
-	void InterpretVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception);
+	void InterpretVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fNewScriptVariable = false) throw (NFmiSmartToolIntepreter::Exception);
+	bool InterpretVariableCheckTokens(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fOrigWanted, bool fLevelExist, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theLevelNameOnly, const std::string &theProducerNameOnly);
+	bool InterpretPossibleScriptVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fNewScriptVariable) throw (NFmiSmartToolIntepreter::Exception);
 	void CheckVariableString(const std::string &theVariableText, std::string &theParamText,
 							 bool &fLevelExist, std::string &theLevelText,
 							 bool &fProducerExist, std::string &theProducerText) throw (NFmiSmartToolIntepreter::Exception);
-	template<typename mapType, typename T>
-	bool IsInMap(mapType& theMap, const T &theSearchedItem);
+	template<typename mapType>
+	bool IsInMap(mapType& theMap, const std::string &theSearchedItem);
 	bool IsVariableConstantValue(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	std::string ExtractNextLine(std::string &theText, std::string::iterator theStartPos, std::string::iterator* theEndPos);
 	bool IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception);
@@ -171,7 +184,6 @@ private:
 	static void InitTokens(void);
 	static bool fTokensInitialized;
 	static ParamMap itsTokenParameterNamesAndIds;
-	typedef std::map<std::string, FmiProducerName> ProducerMap;
 	static ProducerMap itsTokenProducerNamesAndIds;
 	static std::vector<std::string> itsTokenConditionalCommands;
 	static std::vector<std::string> itsTokenIfCommands;
@@ -194,7 +206,6 @@ private:
 	static ParamMap itsTokenStaticParameterNamesAndIds;
 	static ParamMap itsTokenCalculatedParameterNamesAndIds; // mm. lat, lon ja elevAngle
 
-	typedef std::map<std::string, std::pair<unsigned long, unsigned long> > LevelMap; // nimi, ident, levelValue 
 	static LevelMap itsTokenLevelNamesIdentsAndValues;
 
 	typedef std::map<std::string, NFmiAreaMask::FunctionType> FunctionMap;
@@ -202,6 +213,10 @@ private:
 
 	typedef std::map<std::string, NFmiAreaMask::MathFunctionType> MathFunctionMap;
 	static MathFunctionMap itsMathFunctions;
+
+	typedef std::map<std::string, int> ScriptVariableMap;
+	ScriptVariableMap itsTokenScriptVariableNames; // skriptissä varatut muuttujat (var x = ?) talletetaan tänne, että voidaan tarkistaa niiden olemassa olo
+	int itsScriptVariableParamIdCounter; // pitää keksia muutujille id, joten tehdää juokseva counter
 
 // GetToken ja IsDelim otettu H. Schilbertin  C++: the Complete Refeference third ed.
 // jouduin muuttamaan niitä vähän sopimaan tähän ympäristöön.

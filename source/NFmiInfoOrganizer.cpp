@@ -107,13 +107,14 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 									   , const NFmiLevel* theLevel
 									   , NFmiInfoData::Type theType)
 {
+	bool anyDataOk = (theType == NFmiInfoData::kAnyData);
 	NFmiSmartInfo* aInfo = 0;
-	if(itsEditedData && itsEditedData->DataType() == theType && itsEditedData->Param(theParam) && (!theLevel || (theLevel && itsEditedData->Level(*theLevel))))
+	if(itsEditedData && (itsEditedData->DataType() == theType || anyDataOk) && itsEditedData->Param(theParam) && (!theLevel || (theLevel && itsEditedData->Level(*theLevel))))
 	{
 		fSubParameter = itsEditedData->UseSubParam();
 		aInfo = itsEditedData;
 	}
-	else if(itsEditedDataCopy && itsEditedDataCopy->DataType() == theType && itsEditedDataCopy->Param(theParam) && (!theLevel || (theLevel && itsEditedDataCopy->Level(*theLevel))))
+	else if(itsEditedDataCopy && (itsEditedDataCopy->DataType() == theType || anyDataOk) && itsEditedDataCopy->Param(theParam) && (!theLevel || (theLevel && itsEditedDataCopy->Level(*theLevel))))
 	{
 		fSubParameter = itsEditedDataCopy->UseSubParam();
 		aInfo = itsEditedDataCopy;
@@ -125,7 +126,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 		while(aIter.Next())
 		{
 			aInfo = aIter.CurrentPtr();
-			if(aInfo->DataType() == theType && aInfo->Param(theParam) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
+			if((aInfo->DataType() == theType  || anyDataOk) && aInfo->Param(theParam) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
 			{
 				fSubParameter = aInfo->UseSubParam();
 				break;
@@ -146,13 +147,14 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 									   , const NFmiLevel* theLevel
 									   , NFmiInfoData::Type theType)
 {
+	bool anyDataOk = (theType == NFmiInfoData::kAnyData);
 	NFmiSmartInfo* aInfo = 0;
-	if(itsEditedData && itsEditedData->DataType() == theType && itsEditedData->Param(theDataIdent) && (!theLevel || (theLevel && itsEditedData->Level(*theLevel))))
+	if(itsEditedData && (itsEditedData->DataType() == theType || anyDataOk) && itsEditedData->Param(theDataIdent) && (!theLevel || (theLevel && itsEditedData->Level(*theLevel))))
 	{
 		fSubParameter = itsEditedData->UseSubParam();
 		aInfo = itsEditedData;
 	}
-	else if(itsEditedDataCopy && itsEditedDataCopy->DataType() == theType && itsEditedDataCopy->Param(theDataIdent) && (!theLevel || (theLevel && itsEditedDataCopy->Level(*theLevel))))
+	else if(itsEditedDataCopy && (itsEditedDataCopy->DataType() == theType || anyDataOk) && itsEditedDataCopy->Param(theDataIdent) && (!theLevel || (theLevel && itsEditedDataCopy->Level(*theLevel))))
 	{
 		fSubParameter = itsEditedDataCopy->UseSubParam();
 		aInfo = itsEditedDataCopy;
@@ -163,7 +165,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 		for(Reset(); Next(); )
 		{
 			aInfo = Current();
-			if(aInfo->DataType() == theType && aInfo->Param(theDataIdent) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
+			if((aInfo->DataType() == theType || anyDataOk) && aInfo->Param(theDataIdent) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
 			{
 				fSubParameter = aInfo->UseSubParam();
 				break;
