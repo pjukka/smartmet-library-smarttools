@@ -56,12 +56,12 @@ public:
 	NFmiDrawParam (NFmiSmartInfo* theInfo, const FmiParameterName& theParam, int thePriority);//, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0); // NFmiDrawParamFactory::CreateDrawParam k‰ytt‰‰ t‰t‰
 	virtual  ~NFmiDrawParam (void);
 
-	void Init(NFmiDrawParam* theDrawParam);
+	void Init(const NFmiDrawParam* theDrawParam);
 	void HideParam(bool newValue){fHidden = newValue;};
 	void EditParam(bool newValue){fEditedParam = newValue;};
-	bool IsParamHidden(void){return fHidden;};
-	bool IsParamEdited(void){return fEditedParam;};
-	bool IsEditable(void){return fEditableParam;};
+	bool IsParamHidden(void) const {return fHidden;};
+	bool IsParamEdited(void) const {return fEditedParam;};
+	bool IsEditable(void) const {return fEditableParam;};
 	void EditableParam(bool newValue){fEditableParam = newValue;};
 
 	NFmiInfoData::Type DataType(void);
@@ -78,9 +78,9 @@ public:
 	void                 Info (NFmiSmartInfo* theInfo){ itsInfo = theInfo; }; 
 	NFmiSmartInfo*       Info (void){ return itsInfo; } ; 
 	void				 Priority (int thePriority){ itsPriority = thePriority; }; 
-	int					 Priority (void){ return itsPriority; }; 
+	int					 Priority (void) const { return itsPriority; }; 
 	void				 ViewType (const NFmiMetEditorTypes::View& theViewType) { itsViewType = theViewType; };
-	NFmiMetEditorTypes::View ViewType (void) {return itsViewType;};
+	NFmiMetEditorTypes::View ViewType (void) const {return itsViewType;};
 	void				 FrameColor (const NFmiColor& theFrameColor) { itsFrameColor = theFrameColor; };
 	const NFmiColor&	 FrameColor (void) const { return itsFrameColor; };
 	void				 FillColor (const NFmiColor& theFillColor) { itsFillColor = theFillColor; };
@@ -96,59 +96,59 @@ public:
 	void				 OnlyOneSymbolRelativePositionOffset (const NFmiPoint& theOnlyOneSymbolRelativePositionOffset) { itsOnlyOneSymbolRelativePositionOffset = theOnlyOneSymbolRelativePositionOffset; };
 	const NFmiPoint&	 OnlyOneSymbolRelativePositionOffset (void) const { return itsOnlyOneSymbolRelativePositionOffset; };
 	void				 ShowStationMarker (const bool newState) { fShowStationMarker = newState; };
-	bool			 ShowStationMarker (void) { return fShowStationMarker; };
+	bool			 ShowStationMarker (void) const { return fShowStationMarker; };
 	void				 IsoLineGab (const double theIsoLineGab) { itsIsoLineGab = theIsoLineGab; };
-	double				 IsoLineGab (void) { return itsIsoLineGab; };
+	double				 IsoLineGab (void) const { return itsIsoLineGab; };
 	void				 ModifyingStep (const double theModifyingStep) { itsModifyingStep = theModifyingStep; };
-	double				 ModifyingStep (void) { return itsModifyingStep; };
+	double				 ModifyingStep (void) const { return itsModifyingStep; };
 	void				 ModifyingUnit (bool theModifyingUnit) { fModifyingUnit = theModifyingUnit; }
-	bool			 ModifyingUnit (void) { return fModifyingUnit; }
-	NFmiMetEditorTypes::View* PossibleViewTypeList (void) {return itsPossibleViewTypeList;}
-	int					 PossibleViewTypeCount (void) { return itsPossibleViewTypeCount; };
-	NFmiString			 InitFileName(void) { return itsInitFileName; }
+	bool			 ModifyingUnit (void) const { return fModifyingUnit; }
+	const NFmiMetEditorTypes::View* PossibleViewTypeList (void) const {return itsPossibleViewTypeList;}
+	int					 PossibleViewTypeCount (void) const { return itsPossibleViewTypeCount; };
+	const NFmiString&	 InitFileName(void) const { return itsInitFileName; }
 	void				 InitFileName(NFmiString theFileName) { itsInitFileName = theFileName; }
 
-	double AbsoluteMinValue(void) {return itsAbsoluteMinValue;}
+	double AbsoluteMinValue(void) const {return itsAbsoluteMinValue;}
 	void AbsoluteMinValue(double theAbsoluteMinValue) {itsAbsoluteMinValue = theAbsoluteMinValue;}	
-	double AbsoluteMaxValue(void) {return itsAbsoluteMaxValue;}
+	double AbsoluteMaxValue(void) const {return itsAbsoluteMaxValue;}
 	void AbsoluteMaxValue(double theAbsoluteMaxValue) {itsAbsoluteMaxValue = theAbsoluteMaxValue;}
-	double TimeSeriesScaleMin(void){return itsTimeSeriesScaleMin;};
-	double TimeSeriesScaleMax(void){return itsTimeSeriesScaleMax;};
+	double TimeSeriesScaleMin(void) const {return itsTimeSeriesScaleMin;};
+	double TimeSeriesScaleMax(void) const {return itsTimeSeriesScaleMax;};
 	void TimeSeriesScaleMin(double theValue){itsTimeSeriesScaleMin = theValue;};
 	void TimeSeriesScaleMax(double theValue){itsTimeSeriesScaleMax = theValue;};
-	NFmiColor IsolineColor(void){return fUseSecondaryColors ? itsSecondaryIsolineColor : itsIsolineColor;};
-	NFmiColor IsolineTextColor(void){return fUseSecondaryColors ? itsSecondaryIsolineTextColor : itsIsolineTextColor;};
+	const NFmiColor& IsolineColor(void) const {return fUseSecondaryColors ? itsSecondaryIsolineColor : itsIsolineColor;};
+	const NFmiColor& IsolineTextColor(void) const {return fUseSecondaryColors ? itsSecondaryIsolineTextColor : itsIsolineTextColor;};
 	void IsolineColor(const NFmiColor& newColor){itsIsolineColor = newColor;};
 	void IsolineTextColor(const NFmiColor& newColor){itsIsolineTextColor = newColor;};
-	double TimeSerialModifyingLimit(void){return fModifyingUnit ? itsTimeSerialModifyingLimit : 100;};
-	NFmiMetEditorTypes::View StationDataViewType(void){return itsStationDataViewType;};
+	double TimeSerialModifyingLimit(void) const {return fModifyingUnit ? itsTimeSerialModifyingLimit : 100;};
+	NFmiMetEditorTypes::View StationDataViewType(void) const {return itsStationDataViewType;};
 	void TimeSerialModifyingLimit(double newValue){itsTimeSerialModifyingLimit = newValue;};
 	void StationDataViewType(NFmiMetEditorTypes::View newValue){itsStationDataViewType = newValue;};
 
 
 	void				 FileVersionNumber (const float theFileVersionNumber) { itsFileVersionNumber = theFileVersionNumber; };
-	float				 FileVersionNumber (void) { return itsFileVersionNumber; };
+	float				 FileVersionNumber (void) const { return itsFileVersionNumber; };
 
 	void				 Unit (const NFmiString& theUnit) { itsUnit = theUnit; };
-	const NFmiString&	 Unit (void) { return itsUnit; };
+	const NFmiString&	 Unit (void) const { return itsUnit; };
 
-	bool ShowNumbers(void) {return fShowNumbers;}
+	bool ShowNumbers(void) const {return fShowNumbers;}
 	void ShowNumbers(bool theValue) {fShowNumbers = theValue;}
-	bool	ShowMasks(void) {return fShowMasks;}
+	bool	ShowMasks(void) const {return fShowMasks;}
 	void	ShowMasks(bool theValue) {fShowMasks = theValue;}
-	bool	ShowColors(void) {return fShowColors;}
+	bool	ShowColors(void) const {return fShowColors;}
 	void	ShowColors(bool theValue) {fShowColors = theValue;}
-	bool	ShowColoredNumbers(void) {return fShowColoredNumbers;}
+	bool	ShowColoredNumbers(void) const {return fShowColoredNumbers;}
 	void	ShowColoredNumbers(bool theValue) {fShowColoredNumbers = theValue;}
-	bool	ZeroColorMean(void) {return fZeroColorMean;}
+	bool	ZeroColorMean(void) const {return fZeroColorMean;}
 	void	ZeroColorMean(bool theValue) {fZeroColorMean = theValue;}
-	bool IsActive(void){return fActive;};
+	bool IsActive(void) const {return fActive;};
 	void Activate(bool newState){fActive = newState;};
-	bool UseSecondaryColors(void){return fUseSecondaryColors;};
+	bool UseSecondaryColors(void) const {return fUseSecondaryColors;};
 	void UseSecondaryColors(bool newState){fUseSecondaryColors = newState;};
-	bool ShowDifference(void){return fShowDifference;};
+	bool ShowDifference(void) const {return fShowDifference;};
 	void ShowDifference(bool newState){fShowDifference = newState;};
-	bool ShowDifferenceToOriginalData(void) const{return fShowDifferenceToOriginalData;}
+	bool ShowDifferenceToOriginalData(void) const {return fShowDifferenceToOriginalData;}
 	void ShowDifferenceToOriginalData(bool newValue){fShowDifferenceToOriginalData = newValue;}
 //	NFmiMetEditorCoordinatorMapOptions* MetEditorCoordinatorMapOptions(void){return itsMetEditorCoordinatorMapOptions;};
 //	void MetEditorCoordinatorMapOptions(NFmiMetEditorCoordinatorMapOptions* theNewOptions);
@@ -156,133 +156,133 @@ public:
 //**************************************************************
 //********** 'versio 2' parametrien asetusfunktiot *************
 //**************************************************************
-	float StationSymbolColorShadeLowValue(void){return itsStationSymbolColorShadeLowValue;}
+	float StationSymbolColorShadeLowValue(void) const {return itsStationSymbolColorShadeLowValue;}
 	void StationSymbolColorShadeLowValue(float newValue){itsStationSymbolColorShadeLowValue = newValue;}
-	float StationSymbolColorShadeMidValue(void){return itsStationSymbolColorShadeMidValue;}
+	float StationSymbolColorShadeMidValue(void) const {return itsStationSymbolColorShadeMidValue;}
 	void StationSymbolColorShadeMidValue(float newValue){itsStationSymbolColorShadeMidValue = newValue;}
-	float StationSymbolColorShadeHighValue(void){return itsStationSymbolColorShadeHighValue;}
+	float StationSymbolColorShadeHighValue(void) const {return itsStationSymbolColorShadeHighValue;}
 	void StationSymbolColorShadeHighValue(float newValue){itsStationSymbolColorShadeHighValue = newValue;}
-	const NFmiColor& StationSymbolColorShadeLowValueColor(void){return itsStationSymbolColorShadeLowValueColor;}
+	const NFmiColor& StationSymbolColorShadeLowValueColor(void) const {return itsStationSymbolColorShadeLowValueColor;}
 	void StationSymbolColorShadeLowValueColor(const NFmiColor& newValue){itsStationSymbolColorShadeLowValueColor = newValue;}
-	const NFmiColor& StationSymbolColorShadeMidValueColor(void){return itsStationSymbolColorShadeMidValueColor;}
+	const NFmiColor& StationSymbolColorShadeMidValueColor(void) const {return itsStationSymbolColorShadeMidValueColor;}
 	void StationSymbolColorShadeMidValueColor(const NFmiColor& newValue){itsStationSymbolColorShadeMidValueColor = newValue;}
-	const NFmiColor& StationSymbolColorShadeHighValueColor(void){return itsStationSymbolColorShadeHighValueColor;}
+	const NFmiColor& StationSymbolColorShadeHighValueColor(void) const {return itsStationSymbolColorShadeHighValueColor;}
 	void StationSymbolColorShadeHighValueColor(const NFmiColor& newValue){itsStationSymbolColorShadeHighValueColor = newValue;}
-	int StationSymbolColorShadeClassCount(void){return itsStationSymbolColorShadeClassCount;}
+	int StationSymbolColorShadeClassCount(void) const {return itsStationSymbolColorShadeClassCount;}
 	void StationSymbolColorShadeClassCount(int newValue){itsStationSymbolColorShadeClassCount = newValue;}
-	bool UseSymbolsInTextMode(void){return fUseSymbolsInTextMode;}
+	bool UseSymbolsInTextMode(void) const {return fUseSymbolsInTextMode;}
 	void UseSymbolsInTextMode(bool newValue){fUseSymbolsInTextMode = newValue;}
-	int UsedSymbolListIndex(void){return itsUsedSymbolListIndex;}
+	int UsedSymbolListIndex(void) const {return itsUsedSymbolListIndex;}
 	void UsedSymbolListIndex(int newValue){itsUsedSymbolListIndex = newValue;}
-	int SymbolIndexingMapListIndex(void){return itsSymbolIndexingMapListIndex;}
+	int SymbolIndexingMapListIndex(void) const {return itsSymbolIndexingMapListIndex;}
 	void SymbolIndexingMapListIndex(int newValue){itsSymbolIndexingMapListIndex = newValue;}
 
-	int GridDataPresentationStyle(void){return itsGridDataPresentationStyle;}
+	int GridDataPresentationStyle(void) const {return itsGridDataPresentationStyle;}
 	void GridDataPresentationStyle(int newValue){itsGridDataPresentationStyle = newValue;}
-	bool UseIsoLineFeathering(void){return fUseIsoLineFeathering;}
+	bool UseIsoLineFeathering(void) const {return fUseIsoLineFeathering;}
 	void UseIsoLineFeathering(bool newValue){fUseIsoLineFeathering = newValue;}
-	bool IsoLineLabelsOverLapping(void){return fIsoLineLabelsOverLapping;}
+	bool IsoLineLabelsOverLapping(void) const {return fIsoLineLabelsOverLapping;}
 	void IsoLineLabelsOverLapping(bool newValue){fIsoLineLabelsOverLapping = newValue;}
-	bool ShowColorLegend(void){return fShowColorLegend;}
+	bool ShowColorLegend(void) const {return fShowColorLegend;}
 	void ShowColorLegend(bool newValue){fShowColorLegend = newValue;}
-	bool UseSimpleIsoLineDefinitions(void){return fUseSimpleIsoLineDefinitions;}
+	bool UseSimpleIsoLineDefinitions(void) const {return fUseSimpleIsoLineDefinitions;}
 	void UseSimpleIsoLineDefinitions(bool newValue){fUseSimpleIsoLineDefinitions = newValue;}
-	bool UseSeparatorLinesBetweenColorContourClasses(void){return fUseSeparatorLinesBetweenColorContourClasses;}
+	bool UseSeparatorLinesBetweenColorContourClasses(void) const {return fUseSeparatorLinesBetweenColorContourClasses;}
 	void UseSeparatorLinesBetweenColorContourClasses(bool newValue){fUseSeparatorLinesBetweenColorContourClasses = newValue;}
-	float SimpleIsoLineGap(void){return itsSimpleIsoLineGap;}
+	float SimpleIsoLineGap(void) const {return itsSimpleIsoLineGap;}
 	void SimpleIsoLineGap(float newValue){itsSimpleIsoLineGap = newValue;}
-	float SimpleIsoLineZeroValue(void){return itsSimpleIsoLineZeroValue;}
+	float SimpleIsoLineZeroValue(void) const {return itsSimpleIsoLineZeroValue;}
 	void SimpleIsoLineZeroValue(float newValue){itsSimpleIsoLineZeroValue = newValue;}
-	float SimpleIsoLineLabelHeight(void){return itsSimpleIsoLineLabelHeight;}
+	float SimpleIsoLineLabelHeight(void) const {return itsSimpleIsoLineLabelHeight;}
 	void SimpleIsoLineLabelHeight(float newValue){itsSimpleIsoLineLabelHeight = newValue;}
-	bool ShowSimpleIsoLineLabelBox(void){return fShowSimpleIsoLineLabelBox;}
+	bool ShowSimpleIsoLineLabelBox(void) const {return fShowSimpleIsoLineLabelBox;}
 	void ShowSimpleIsoLineLabelBox(bool newValue){fShowSimpleIsoLineLabelBox = newValue;}
-	float SimpleIsoLineWidth(void){return itsSimpleIsoLineWidth;}
+	float SimpleIsoLineWidth(void) const {return itsSimpleIsoLineWidth;}
 	void SimpleIsoLineWidth(float newValue){itsSimpleIsoLineWidth = newValue;}
-	int SimpleIsoLineLineStyle(void){return itsSimpleIsoLineLineStyle;}
+	int SimpleIsoLineLineStyle(void) const {return itsSimpleIsoLineLineStyle;}
 	void SimpleIsoLineLineStyle(int newValue){itsSimpleIsoLineLineStyle = newValue;}
-	float IsoLineSplineSmoothingFactor(void){return itsIsoLineSplineSmoothingFactor;}
+	float IsoLineSplineSmoothingFactor(void) const {return itsIsoLineSplineSmoothingFactor;}
 	void IsoLineSplineSmoothingFactor(float newValue){itsIsoLineSplineSmoothingFactor = newValue;}
-	bool UseSingleColorsWithSimpleIsoLines(void){return fUseSingleColorsWithSimpleIsoLines;}
+	bool UseSingleColorsWithSimpleIsoLines(void) const {return fUseSingleColorsWithSimpleIsoLines;}
 	void UseSingleColorsWithSimpleIsoLines(bool newValue){fUseSingleColorsWithSimpleIsoLines = newValue;}
-	float SimpleIsoLineColorShadeLowValue(void){return itsSimpleIsoLineColorShadeLowValue;}
+	float SimpleIsoLineColorShadeLowValue(void) const {return itsSimpleIsoLineColorShadeLowValue;}
 	void SimpleIsoLineColorShadeLowValue(float newValue){itsSimpleIsoLineColorShadeLowValue = newValue;}
-	float SimpleIsoLineColorShadeMidValue(void){return itsSimpleIsoLineColorShadeMidValue;}
+	float SimpleIsoLineColorShadeMidValue(void) const {return itsSimpleIsoLineColorShadeMidValue;}
 	void SimpleIsoLineColorShadeMidValue(float newValue){itsSimpleIsoLineColorShadeMidValue = newValue;}
-	float SimpleIsoLineColorShadeHighValue(void){return itsSimpleIsoLineColorShadeHighValue;}
+	float SimpleIsoLineColorShadeHighValue(void) const {return itsSimpleIsoLineColorShadeHighValue;}
 	void SimpleIsoLineColorShadeHighValue(float newValue){itsSimpleIsoLineColorShadeHighValue = newValue;}
-	const NFmiColor& SimpleIsoLineColorShadeLowValueColor(void){return itsSimpleIsoLineColorShadeLowValueColor;}
+	const NFmiColor& SimpleIsoLineColorShadeLowValueColor(void) const {return itsSimpleIsoLineColorShadeLowValueColor;}
 	void SimpleIsoLineColorShadeLowValueColor(const NFmiColor& newValue){itsSimpleIsoLineColorShadeLowValueColor = newValue;}
-	const NFmiColor& SimpleIsoLineColorShadeMidValueColor(void){return itsSimpleIsoLineColorShadeMidValueColor;}
+	const NFmiColor& SimpleIsoLineColorShadeMidValueColor(void) const {return itsSimpleIsoLineColorShadeMidValueColor;}
 	void SimpleIsoLineColorShadeMidValueColor(const NFmiColor& newValue){itsSimpleIsoLineColorShadeMidValueColor = newValue;}
-	const NFmiColor& SimpleIsoLineColorShadeHighValueColor(void){return itsSimpleIsoLineColorShadeHighValueColor;}
+	const NFmiColor& SimpleIsoLineColorShadeHighValueColor(void) const {return itsSimpleIsoLineColorShadeHighValueColor;}
 	void SimpleIsoLineColorShadeHighValueColor(const NFmiColor& newValue){itsSimpleIsoLineColorShadeHighValueColor = newValue;}
-	int SimpleIsoLineColorShadeClassCount(void){return itsSimpleIsoLineColorShadeClassCount;}
+	int SimpleIsoLineColorShadeClassCount(void) const {return itsSimpleIsoLineColorShadeClassCount;}
 	void SimpleIsoLineColorShadeClassCount(int newValue){itsSimpleIsoLineColorShadeClassCount = newValue;}
-	std::vector<float>& SpecialIsoLineValues(void){return itsSpecialIsoLineValues;}
+	const std::vector<float>& SpecialIsoLineValues(void) const {return itsSpecialIsoLineValues;}
 	void SpecialIsoLineValues(std::vector<float>& newValue){itsSpecialIsoLineValues = newValue;}
-	std::vector<float>& SpecialIsoLineLabelHeight(void){return itsSpecialIsoLineLabelHeight;}
+	const std::vector<float>& SpecialIsoLineLabelHeight(void) const {return itsSpecialIsoLineLabelHeight;}
 	void SpecialIsoLineLabelHeight(std::vector<float>& newValue){itsSpecialIsoLineLabelHeight = newValue;}
-	std::vector<float>& SpecialIsoLineWidth(void){return itsSpecialIsoLineWidth;}
+	const std::vector<float>& SpecialIsoLineWidth(void) const {return itsSpecialIsoLineWidth;}
 	void SpecialIsoLineWidth(std::vector<float>& newValue){itsSpecialIsoLineWidth = newValue;}
-	std::vector<int>& SpecialIsoLineStyle(void){return itsSpecialIsoLineStyle;}
+	const std::vector<int>& SpecialIsoLineStyle(void) const {return itsSpecialIsoLineStyle;}
 	void SpecialIsoLineStyle(std::vector<int>& newValue){itsSpecialIsoLineStyle = newValue;}
-	std::vector<int>& SpecialIsoLineColorIndexies(void){return itsSpecialIsoLineColorIndexies;}
+	const std::vector<int>& SpecialIsoLineColorIndexies(void) const {return itsSpecialIsoLineColorIndexies;}
 	void SpecialIsoLineColorIndexies(std::vector<int>& newValue){itsSpecialIsoLineColorIndexies = newValue;}
-	std::vector<bool>& SpecialIsoLineShowLabelBox(void){return itsSpecialIsoLineShowLabelBox;}
+	const std::vector<bool>& SpecialIsoLineShowLabelBox(void) const {return itsSpecialIsoLineShowLabelBox;}
 	void SpecialIsoLineShowLabelBox(std::vector<bool>& newValue){itsSpecialIsoLineShowLabelBox = newValue;}
-	bool UseDefaultRegioning(void){return fUseDefaultRegioning;}
+	bool UseDefaultRegioning(void) const {return fUseDefaultRegioning;}
 	void UseDefaultRegioning(bool newValue){fUseDefaultRegioning = newValue;}
-	bool UseCustomColorContouring(void){return fUseCustomColorContouring;}
+	bool UseCustomColorContouring(void) const {return fUseCustomColorContouring;}
 	void UseCustomColorContouring(bool newValue){fUseCustomColorContouring = newValue;}
-	std::vector<float>& SpecialColorContouringValues(void){return itsSpecialColorContouringValues;}
+	const std::vector<float>& SpecialColorContouringValues(void) const {return itsSpecialColorContouringValues;}
 	void SpecialColorContouringValues(std::vector<float>& newValue){itsSpecialColorContouringValues = newValue;}
-	std::vector<int>& SpecialColorContouringColorIndexies(void){return itsSpecialColorContouringColorIndexies;}
+	const std::vector<int>& SpecialColorContouringColorIndexies(void) const {return itsSpecialColorContouringColorIndexies;}
 	void SpecialColorContouringColorIndexies(std::vector<int>& newValue){itsSpecialColorContouringColorIndexies = newValue;}
-	float ColorContouringColorShadeLowValue(void){return itsColorContouringColorShadeLowValue;}
+	float ColorContouringColorShadeLowValue(void) const {return itsColorContouringColorShadeLowValue;}
 	void ColorContouringColorShadeLowValue(float newValue){itsColorContouringColorShadeLowValue = newValue;}
-	float ColorContouringColorShadeMidValue(void){return itsColorContouringColorShadeMidValue;}
+	float ColorContouringColorShadeMidValue(void) const {return itsColorContouringColorShadeMidValue;}
 	void ColorContouringColorShadeMidValue(float newValue){itsColorContouringColorShadeMidValue = newValue;}
-	float ColorContouringColorShadeHighValue(void){return itsColorContouringColorShadeHighValue;}
+	float ColorContouringColorShadeHighValue(void) const {return itsColorContouringColorShadeHighValue;}
 	void ColorContouringColorShadeHighValue(float newValue){itsColorContouringColorShadeHighValue = newValue;}
-	const NFmiColor& ColorContouringColorShadeLowValueColor(void){return itsColorContouringColorShadeLowValueColor;}
+	const NFmiColor& ColorContouringColorShadeLowValueColor(void) const {return itsColorContouringColorShadeLowValueColor;}
 	void ColorContouringColorShadeLowValueColor(const NFmiColor& newValue){itsColorContouringColorShadeLowValueColor = newValue;}
-	const NFmiColor& ColorContouringColorShadeMidValueColor(void){return itsColorContouringColorShadeMidValueColor;}
+	const NFmiColor& ColorContouringColorShadeMidValueColor(void) const {return itsColorContouringColorShadeMidValueColor;}
 	void ColorContouringColorShadeMidValueColor(const NFmiColor& newValue){itsColorContouringColorShadeMidValueColor = newValue;}
-	const NFmiColor& ColorContouringColorShadeHighValueColor(void){return itsColorContouringColorShadeHighValueColor;}
+	const NFmiColor& ColorContouringColorShadeHighValueColor(void) const {return itsColorContouringColorShadeHighValueColor;}
 	void ColorContouringColorShadeHighValueColor(const NFmiColor& newValue){itsColorContouringColorShadeHighValueColor = newValue;}
-	int ColorContouringColorShadeClassCount(void){return itsColorContouringColorShadeClassCount;}
+	int ColorContouringColorShadeClassCount(void) const {return itsColorContouringColorShadeClassCount;}
 	void ColorContouringColorShadeClassCount(int newValue){itsColorContouringColorShadeClassCount = newValue;}
-	bool UseWithIsoLineHatch1(void){return fUseWithIsoLineHatch1;}
+	bool UseWithIsoLineHatch1(void) const {return fUseWithIsoLineHatch1;}
 	void UseWithIsoLineHatch1(bool newValue){fUseWithIsoLineHatch1 = newValue;}
-	bool DrawIsoLineHatchWithBorders1(void){return fDrawIsoLineHatchWithBorders1;}
+	bool DrawIsoLineHatchWithBorders1(void) const {return fDrawIsoLineHatchWithBorders1;}
 	void DrawIsoLineHatchWithBorders1(bool newValue){fDrawIsoLineHatchWithBorders1 = newValue;}
-	float IsoLineHatchLowValue1(void){return itsIsoLineHatchLowValue1;}
+	float IsoLineHatchLowValue1(void) const {return itsIsoLineHatchLowValue1;}
 	void IsoLineHatchLowValue1(float newValue){itsIsoLineHatchLowValue1 = newValue;}
-	float IsoLineHatchHighValue1(void){return itsIsoLineHatchHighValue1;}
+	float IsoLineHatchHighValue1(void) const {return itsIsoLineHatchHighValue1;}
 	void IsoLineHatchHighValue1(float newValue){itsIsoLineHatchHighValue1 = newValue;}
-	int IsoLineHatchType1(void){return itsIsoLineHatchType1;}
+	int IsoLineHatchType1(void) const {return itsIsoLineHatchType1;}
 	void IsoLineHatchType1(int newValue){itsIsoLineHatchType1 = newValue;}
-	const NFmiColor& IsoLineHatchColor1(void){return itsIsoLineHatchColor1;}
+	const NFmiColor& IsoLineHatchColor1(void) const {return itsIsoLineHatchColor1;}
 	void IsoLineHatchColor1(const NFmiColor& newValue){itsIsoLineHatchColor1 = newValue;}
-	const NFmiColor& IsoLineHatchBorderColor1(void){return itsIsoLineHatchBorderColor1;}
+	const NFmiColor& IsoLineHatchBorderColor1(void) const {return itsIsoLineHatchBorderColor1;}
 	void IsoLineHatchBorderColor1(const NFmiColor& newValue){itsIsoLineHatchBorderColor1 = newValue;}
 
-	bool UseWithIsoLineHatch2(void){return fUseWithIsoLineHatch2;}
+	bool UseWithIsoLineHatch2(void) const {return fUseWithIsoLineHatch2;}
 	void UseWithIsoLineHatch2(bool newValue){fUseWithIsoLineHatch2 = newValue;}
-	bool DrawIsoLineHatchWithBorders2(void){return fDrawIsoLineHatchWithBorders2;}
+	bool DrawIsoLineHatchWithBorders2(void) const {return fDrawIsoLineHatchWithBorders2;}
 	void DrawIsoLineHatchWithBorders2(bool newValue){fDrawIsoLineHatchWithBorders2 = newValue;}
-	float IsoLineHatchLowValue2(void){return itsIsoLineHatchLowValue2;}
+	float IsoLineHatchLowValue2(void) const {return itsIsoLineHatchLowValue2;}
 	void IsoLineHatchLowValue2(float newValue){itsIsoLineHatchLowValue2 = newValue;}
-	float IsoLineHatchHighValue2(void){return itsIsoLineHatchHighValue2;}
+	float IsoLineHatchHighValue2(void) const {return itsIsoLineHatchHighValue2;}
 	void IsoLineHatchHighValue2(float newValue){itsIsoLineHatchHighValue2 = newValue;}
-	int IsoLineHatchType2(void){return itsIsoLineHatchType2;}
+	int IsoLineHatchType2(void) const {return itsIsoLineHatchType2;}
 	void IsoLineHatchType2(int newValue){itsIsoLineHatchType2 = newValue;}
-	const NFmiColor& IsoLineHatchColor2(void){return itsIsoLineHatchColor2;}
+	const NFmiColor& IsoLineHatchColor2(void) const {return itsIsoLineHatchColor2;}
 	void IsoLineHatchColor2(const NFmiColor& newValue){itsIsoLineHatchColor2 = newValue;}
-	const NFmiColor& IsoLineHatchBorderColor2(void){return itsIsoLineHatchBorderColor2;}
+	const NFmiColor& IsoLineHatchBorderColor2(void) const {return itsIsoLineHatchBorderColor2;}
 	void IsoLineHatchBorderColor2(const NFmiColor& newValue){itsIsoLineHatchBorderColor2 = newValue;}
-	int IsoLineLabelDigitCount(void){return itsIsoLineLabelDigitCount;}
+	int IsoLineLabelDigitCount(void) const {return itsIsoLineLabelDigitCount;}
 	void IsoLineLabelDigitCount(int newValue){itsIsoLineLabelDigitCount = newValue; if(itsIsoLineLabelDigitCount > 10)itsIsoLineLabelDigitCount = 10;}
 //**************************************************************
 //********** 'versio 2' parametrien asetusfunktiot *************

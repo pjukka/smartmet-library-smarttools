@@ -426,7 +426,7 @@ NFmiDrawParam::~NFmiDrawParam(void)
 //-------------------------------------------------------
 // Init
 //-------------------------------------------------------
-void NFmiDrawParam::Init(NFmiDrawParam* theDrawParam)
+void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam)
 {
 	if(theDrawParam)
 	{
@@ -466,7 +466,7 @@ void NFmiDrawParam::Init(NFmiDrawParam* theDrawParam)
 
 		itsPossibleViewTypeCount = theDrawParam->PossibleViewTypeCount();
 
-		NFmiMetEditorTypes::View* possibleViewTypeList = theDrawParam->PossibleViewTypeList();
+		const NFmiMetEditorTypes::View* possibleViewTypeList = theDrawParam->PossibleViewTypeList();
 		for (int typeNumber = 0; typeNumber < itsPossibleViewTypeCount; typeNumber++)
 		{
 			itsPossibleViewTypeList[typeNumber] = possibleViewTypeList[typeNumber];
