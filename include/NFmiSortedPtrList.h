@@ -48,20 +48,20 @@ public:
 	{
 		if(theItem)
 		{
-			typename NFmiPtrList<Type>::Iterator tempIter = Start();
+			typename NFmiPtrList<Type>::Iterator tempIter = this->Start();
 			while(tempIter.Next())
 			{
 				if(*theItem < tempIter.Current())
 					return tempIter.AddBefore(theItem);
 			}
-			return  AddEnd(theItem);
+			return this->AddEnd(theItem);
 		}
 		return false;
 	};
 
 	bool Sort(bool fAscendingOrder = true)
 	{
-		typename NFmiPtrList<Type>::Iterator theIter1 = Start();
+		typename NFmiPtrList<Type>::Iterator theIter1 = this->Start();
 		typename NFmiPtrList<Type>::Iterator theIter2;
 		while(theIter1.Next())
 		{
@@ -80,7 +80,7 @@ public:
 
 	typename NFmiPtrList<Type>::Iterator Find(Type* theItem)
 	{
-	    typename NFmiPtrList<Type>::Iterator theIter = Start();
+	    typename NFmiPtrList<Type>::Iterator theIter = this->Start();
 		while(theIter.Next())
 		{
 
