@@ -2131,6 +2131,9 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("FHour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia käytetty, koska ei ollut valmista parametria
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("Fhour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia käytetty, koska ei ollut valmista parametria
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("fhour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia käytetty, koska ei ollut valmista parametria
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("TIMESTEP"), kFmiDeltaTime)); // TIMESTEP eli timestep palauttaa datan currentin ajan aika stepin tunneissa
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("TimeStep"), kFmiDeltaTime)); // TIMESTEP eli timestep palauttaa datan currentin ajan aika stepin tunneissa
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("timestep"), kFmiDeltaTime)); // TIMESTEP eli timestep palauttaa datan currentin ajan aika stepin tunneissa
 
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("HIR"), kFmiMTAHIRLAM));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Hir"), kFmiMTAHIRLAM));
