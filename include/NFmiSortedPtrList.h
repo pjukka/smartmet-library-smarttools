@@ -78,9 +78,9 @@ public:
 		return true;
 	};
 
-	NFmiPtrList<Type>::Iterator Find(Type* theItem)
+	typename NFmiPtrList<Type>::Iterator Find(Type* theItem)
 	{
-		typename NFmiPtrList<Type>::Iterator theIter = Start();
+	    typename NFmiPtrList<Type>::Iterator theIter = Start();
 		while(theIter.Next())
 		{
 
