@@ -40,7 +40,6 @@
 #include "NFmiInfoOrganizer.h"
 #include "NFmiSmartInfo.h"
 #include "NFmiDrawParamFactory.h"
-#include "NFmiQueryData.h"
 #include "NFmiProducerList.h"
 #include "NFmiGrid.h"
 
@@ -107,7 +106,7 @@ bool NFmiInfoOrganizer::Init (void)
 NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 									   , bool& fSubParameter 
 									   , const NFmiLevel* theLevel
-									   , FmiQueryInfoDataType theType)
+									   , NFmiInfoData::Type theType)
 {
 	NFmiSmartInfo* aInfo = 0;
 	if(itsEditedData && itsEditedData->DataType() == theType && itsEditedData->Param(theParam) && (!theLevel || (theLevel && itsEditedData->Level(*theLevel))))
@@ -146,7 +145,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 									   , bool& fSubParameter 
 									   , const NFmiLevel* theLevel
-									   , FmiQueryInfoDataType theType)
+									   , NFmiInfoData::Type theType)
 {
 	NFmiSmartInfo* aInfo = 0;
 	if(itsEditedData && itsEditedData->DataType() == theType && itsEditedData->Param(theDataIdent) && (!theLevel || (theLevel && itsEditedData->Level(*theLevel))))
@@ -189,7 +188,7 @@ NFmiParamBag NFmiInfoOrganizer::EditedParams(void)
 // kaikkien apudatojen parametrit yhdessä bagissa (joita voidaan katsoa/maskata)
 NFmiParamBag NFmiInfoOrganizer::ViewableParams(void)
 {
-	return GetParams(kFmiDataTypeViewable);
+	return GetParams(NFmiInfoData::kViewable);
 }
 
 // vain halutun indeksin parametrit (HUONO VIRITYS KORJAA!!!!)
@@ -210,7 +209,7 @@ NFmiParamBag NFmiInfoOrganizer::ObservationParams(int theIndex)
 	return NFmiParamBag();
 }
 
-NFmiParamBag NFmiInfoOrganizer::GetParams(FmiQueryInfoDataType theDataType)
+NFmiParamBag NFmiInfoOrganizer::GetParams(NFmiInfoData::Type theDataType)
 {
 	NFmiParamBag paramBag;
 	for(Reset();Next();)
@@ -222,7 +221,7 @@ NFmiParamBag NFmiInfoOrganizer::GetParams(FmiQueryInfoDataType theDataType)
     return paramBag;
 }
 /*
-NFmiParamBag NFmiInfoOrganizer::GetParams(FmiQueryInfoDataType theDataType)
+NFmiParamBag NFmiInfoOrganizer::GetParams(NFmiInfoData::Type theDataType)
 {
 // Luodaan vektori NFmiDataIdent-pointtereille . Vektorin pituus
 // saadaan laskemalla kaikkien tietyn tyyppisten infojen parametrien lukumärät yhteen.	
@@ -256,11 +255,11 @@ NFmiParamBag NFmiInfoOrganizer::GetParams(FmiQueryInfoDataType theDataType)
 // kaikkien staattisten (ei muutu ajan mukana) datojen parambag (esim. topografia)
 NFmiParamBag NFmiInfoOrganizer::StaticParams(void)
 {
-	return GetParams(kFmiDataTypeStationary);
+	return GetParams(NFmiInfoData::kStationary);
 }
 
 // SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
-NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
+NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
 	bool aSubParam;	
 	NFmiSmartInfo* info = Info(theParamName, aSubParam, theLevel, theType);
@@ -276,7 +275,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(FmiParameterName thePara
 }
 
 // SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
-NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
+NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
 	bool aSubParam;	
 	NFmiSmartInfo* info = Info(theDataIdent, aSubParam, theLevel, theType);
@@ -291,7 +290,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& the
 	return 0;
 }
 
-NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
+NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
 	bool aSubParam;	
 	NFmiSmartInfo* info = Info(theParamName, aSubParam, theLevel, theType);
@@ -303,7 +302,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(FmiParameterName theParamName, cons
 	return 0;
 }
 
-NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
+NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
 	bool aSubParam;	
 	NFmiSmartInfo* info = Info(theDataIdent, aSubParam, theLevel, theType);
@@ -315,7 +314,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(const NFmiDataIdent& theDataIdent, 
 	return 0;
 }
 
-NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
+NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
 	bool aSubParam = false;	
 	if(theUsedInfo && theUsedInfo->DataType() == theType && theUsedInfo->Param(theDataIdent) && (!theLevel || (theLevel && theUsedInfo->Level(*theLevel))))
@@ -333,7 +332,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(NFmiSmartInfo* theUsedInfo, const N
 // Tutkii löytyykö listasta itsList infoa, jossa on theParam.
 // Jos tälläinen info löytyy, pyydetään itsDrawParamFactory luomaan
 // drawParam kyseiselle parametrille löydetyn infon avulla.
-NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(FmiParameterName theParamName, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
+NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
 // Huomaa, että palautettava pointteri drawParam luodaan attribuutin 
 // itsDrawParamFactory sisällä new:llä, joten drawParam  
@@ -367,7 +366,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(FmiParameterName theParamName,
 // etsitään info, jonka tuottaja ja parametri saadaan theDataIdent:stä.
 // Jos tälläinen info löytyy, pyydetään itsDrawParamFactory luomaan
 // drawParam kyseiselle parametrille löydetyn infon avulla.
-NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, FmiQueryInfoDataType theType)
+NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
 // Huomaa, että itsDrawParamFactory luo pointterin drawParam new:llä, joten   
 // drawParam pitää muistaa tuhota  NFmiInfoOrganizer:n ulkopuolella
@@ -390,7 +389,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(NFmiSmartInfo* theUsedInfo
 												 ,const NFmiDataIdent& theDataIdent
 												 ,const NFmiLevel* theLevel
 //												 ,FmiSmartInfoDataType theType)
-												 ,FmiQueryInfoDataType theType)
+												 ,NFmiInfoData::Type theType)
 {
 	NFmiDrawParam* drawParam = 0;
 	bool aSubParam = false;	
@@ -419,7 +418,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateEmptyInfoDrawParam(FmiParameterName theP
 bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 									 ,const NFmiString& theDataFileName
 //									 ,FmiSmartInfoDataType theDataType
-									 ,FmiQueryInfoDataType theDataType
+									 ,NFmiInfoData::Type theDataType
 									 ,int theUndoLevel)
 {
 	bool status = false;
@@ -433,7 +432,7 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 		if(aSmartInfo)
 			aSmartInfo->First();
 
-		if(theDataType == kFmiDataTypeEditable)
+		if(theDataType == NFmiInfoData::kEditable)
 		{
 			if(theUndoLevel)
 				aSmartInfo->UndoLevel(theUndoLevel);
@@ -455,9 +454,9 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 	return status;
 }
 
-void NFmiInfoOrganizer::ClearData(FmiQueryInfoDataType theDataType)
+void NFmiInfoOrganizer::ClearData(NFmiInfoData::Type theDataType)
 {
-	if(theDataType == kFmiDataTypeEditable)
+	if(theDataType == NFmiInfoData::kEditable)
 	{
 		if(itsEditedData)
 		{
@@ -521,7 +520,7 @@ int NFmiInfoOrganizer::CountData(void)
 bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiQueryInfo* theInfo2)
 {
 	// parametrit ja tuottajat samoja
-	if(theInfo1->ParamBag() == theInfo2->ParamBag()) 
+	if(theInfo1 && theInfo2 && theInfo1->ParamBag() == theInfo2->ParamBag()) 
 	{
 		// level jutut samoja
 		if(theInfo1->VPlaceDescriptor() == theInfo2->VPlaceDescriptor())
@@ -568,7 +567,9 @@ NFmiProducerList* NFmiInfoOrganizer::ProducerList(void)
 //   'omistukseen'. Tämän luokan destruktori tuhoaa infot.
 bool NFmiInfoOrganizer::Add (NFmiSmartInfo* theInfo)
 {
-	return itsList.InsertionSort(theInfo);
+	if(theInfo)
+		return itsList.InsertionSort(theInfo);
+	return false;
 }
 //--------------------------------------------------------
 // Clear 
@@ -621,7 +622,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::ViewableInfo(void)
 {
 	for(Reset(); Next();)
 	{
-		if(Current()->DataType() == kFmiDataTypeViewable)
+		if(Current()->DataType() == NFmiInfoData::kViewable)
 			return Current();
 	}
 	return 0;
@@ -634,7 +635,7 @@ NFmiLevelBag* NFmiInfoOrganizer::GetAndCreateViewableInfoWithManyLevelsOrZeroPoi
 	NFmiLevelBag* levels = 0;
 	for(Reset(); Next();)
 	{
-		if(Current()->DataType() == kFmiDataTypeViewable)
+		if(Current()->DataType() == NFmiInfoData::kViewable)
 			if(Current()->SizeLevels() > 1)
 			{
 				levels = new NFmiLevelBag(*Current()->VPlaceDescriptor().Levels());
@@ -650,7 +651,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::ViewableInfo(int theIndex)
 	int ind = 0;
 	for(Reset(); Next();)
 	{
-		if(Current()->DataType() == kFmiDataTypeViewable)
+		if(Current()->DataType() == NFmiInfoData::kViewable)
 		{
 			if(ind == theIndex)
 				return Current();
@@ -666,7 +667,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::ObservationInfo(int theIndex)
 	int ind = 0;
 	for(Reset(); Next();)
 	{
-		if(Current()->DataType() == kFmiDataTypeObservations)
+		if(Current()->DataType() == NFmiInfoData::kObservations)
 		{
 			if(ind == theIndex)
 				return Current();
@@ -685,14 +686,14 @@ void NFmiInfoOrganizer::UpdateEditedDataCopy(void)
 			itsEditedDataCopy->DestroySharedData();
 		delete itsEditedDataCopy;
 		itsEditedDataCopy = itsEditedData->Clone();
-		itsEditedDataCopy->DataType(kFmiDataTypeCopyOfEdited);
+		itsEditedDataCopy->DataType(NFmiInfoData::kCopyOfEdited);
 	}
 }
 
 // kaikkien staattisten (ei muutu ajan mukana) datojen parambag (esim. topografia)
 NFmiParamBag NFmiInfoOrganizer::ObservationParams(void)
 {
-	return GetParams(kFmiDataTypeObservations);
+	return GetParams(NFmiInfoData::kObservations);
 }
 
 // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
@@ -700,7 +701,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::ObservationInfo(void)
 {
 	for(Reset(); Next();)
 	{
-		if(Current()->DataType() == kFmiDataTypeObservations)
+		if(Current()->DataType() == NFmiInfoData::kObservations)
 			return Current();
 	}
 	return 0;
@@ -711,7 +712,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::KepaDataInfo(void)
 {
 	for(Reset(); Next();)
 	{
-		if(Current()->DataType() == kFmiDataTypeKepaData)
+		if(Current()->DataType() == NFmiInfoData::kKepaData)
 			return Current();
 	}
 	return 0;
@@ -722,7 +723,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::ClimatologyInfo(void)
 {
 	for(Reset(); Next();)
 	{
-		if(Current()->DataType() == kFmiDataTypeClimatologyData)
+		if(Current()->DataType() == NFmiInfoData::kClimatologyData)
 			return Current();
 	}
 	return 0;
@@ -730,15 +731,15 @@ NFmiSmartInfo* NFmiInfoOrganizer::ClimatologyInfo(void)
 
 NFmiSmartInfo* NFmiInfoOrganizer::AnalyzeDataInfo(void) // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 {
-	return FindInfo(kFmiDataTypeAnalyzeData);
+	return FindInfo(NFmiInfoData::kAnalyzeData);
 }
 
-NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(FmiQueryInfoDataType theDataType) // Hakee 1. tietyn datatyypin infon
+NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType) // Hakee 1. tietyn datatyypin infon
 {
 	return FindInfo(theDataType, 0); // indeksi alkaa 0:sta!!!
 }
 
-NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(FmiQueryInfoDataType theDataType, int theIndex) // Hakee indeksin mukaisen tietyn datatyypin infon
+NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, int theIndex) // Hakee indeksin mukaisen tietyn datatyypin infon
 {
 	int ind = 0;
 	for(Reset(); Next();)
@@ -755,7 +756,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(FmiQueryInfoDataType theDataType, int
 
 // Palauttaa vectorin viewable infoja, vectori ei omista pointtereita, 
 // joten infoja ei saa tuhota.
-std::vector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(FmiQueryInfoDataType theDataType)
+std::vector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type theDataType)
 {
 	std::vector<NFmiSmartInfo*> infoVector;
 	for(Reset(); Next();)
@@ -768,11 +769,11 @@ std::vector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(FmiQueryInfoDataType the
 
 // Haetaan halutun datatyypin, tuottajan joko pinta tai level dataa (mahd indeksi kertoo sitten konfliktin
 // yhteydessä, monesko otetaan)
-NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(FmiQueryInfoDataType theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex)
+NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex)
 {
-	if(theDataType == kFmiDataTypeEditable)
+	if(theDataType == NFmiInfoData::kEditable)
 		return EditedInfo();
-	else if(theDataType == kFmiDataTypeCopyOfEdited)
+	else if(theDataType == NFmiInfoData::kCopyOfEdited)
 		return EditedInfoCopy();
 	else
 	{
@@ -780,7 +781,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(FmiQueryInfoDataType theDataType, con
 		for(Reset(); Next();)
 		{
 			NFmiSmartInfo* info = Current();
-			if(info->DataType() == theDataType)
+			if(info && info->DataType() == theDataType)
 			{
 				info->FirstParam(); // pitää varmistaa, että producer löytyy
 				if(*(info->Producer()) == theProducer)
@@ -804,7 +805,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CompareModelsInfo(void)
 {
 	for(Reset(); Next();)
 	{
-		if(Current()->DataType() == kFmiDataTypeCompareModels)
+		if(Current()->DataType() == NFmiInfoData::kCompareModels)
 			return Current();
 	}
 	return 0;
@@ -825,11 +826,15 @@ NFmiSmartInfo* NFmiInfoOrganizer::CompareModelsInfo(const NFmiProducer& theProdu
 	for(Reset(); Next();)
 	{
 		NFmiSmartInfo* info = Current();
-		if(!info->IsParamUsable())
-			info->FirstParam();
-		NFmiProducer* producer = info->Producer();
-		if(info->DataType() == kFmiDataTypeCompareModels && (*producer == theProducer))
-			return Current();
+		if(info)
+		{
+			if(!info->IsParamUsable())
+				info->FirstParam();
+			NFmiProducer* producer = info->Producer();
+			if(producer)
+				if(info->DataType() == NFmiInfoData::kCompareModels && (*producer == theProducer))
+					return Current();
+		}
 	}
 	return 0;
 }
