@@ -37,6 +37,7 @@
 #include "NFmiColor.h"
 #include "NFmiPoint.h"
 #include "NFmiMetEditorTypes.h"
+#include "NFmiInfoData.h"
 
 #include <vector>
 
@@ -51,7 +52,7 @@ class NFmiDrawParam
 
 public:
     NFmiDrawParam (void);
-    NFmiDrawParam (NFmiSmartInfo* theInfo, const NFmiDataIdent& theParam, int thePriority);//, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0);
+    NFmiDrawParam (NFmiSmartInfo* theInfo, const NFmiDataIdent& theParam, int thePriority, NFmiInfoData::Type theDataType = NFmiInfoData::kNoDataType);//, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0);
 	NFmiDrawParam (NFmiSmartInfo* theInfo, const FmiParameterName& theParam, int thePriority);//, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0); // NFmiDrawParamFactory::CreateDrawParam käyttää tätä
 	virtual  ~NFmiDrawParam (void);
 
@@ -62,6 +63,8 @@ public:
 	bool IsParamEdited(void){return fEditedParam;};
 	bool IsEditable(void){return fEditableParam;};
 	void EditableParam(bool newValue){fEditableParam = newValue;};
+
+	NFmiInfoData::Type DataType(void);
 
 	bool              Init (const NFmiString& theFilename = NFmiString());
 	bool              StoreData (const NFmiString& theFilename = NFmiString());
@@ -441,6 +444,8 @@ private:
 	bool fActive;			// onko kyseinen parametri näytön aktiivinen parametri (jokaisella näyttörivillä aina yksi aktivoitunut parametri)
 	bool fShowDifference;	// näytetäänkö kartalla parametrin arvo, vai erotus edelliseen aikaan (ei ole vielä talletettu tiedostoon)
 	bool fShowDifferenceToOriginalData;
+
+	NFmiInfoData::Type itsDataType; // lisäsin tämän, kun laitoin editoriin satelliitti kuvien katselun mahdollisuuden (satel-datalla ei ole infoa)
 
 //	NFmiMetEditorCoordinatorMapOptions* itsMetEditorCoordinatorMapOptions; // tätä käytetään koordinaatio tarkasteluissa
 };

@@ -152,6 +152,7 @@ NFmiDrawParam::NFmiDrawParam()
 , fShowDifference(false)
 , fShowDifferenceToOriginalData(false)
 //, itsMetEditorCoordinatorMapOptions(0)
+, itsDataType(NFmiInfoData::kNoDataType)
 
 //***********************************************
 //********** 'versio 2' parametreja *************
@@ -280,6 +281,7 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , fShowDifference(false)
 , fShowDifferenceToOriginalData(false)
 //, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
+, itsDataType(NFmiInfoData::kNoDataType)
 
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
@@ -291,7 +293,8 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 //-------------------------------------------------------
 NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 							, const NFmiDataIdent& theParam
-							, int thePriority)
+							, int thePriority
+							, NFmiInfoData::Type theDataType)
 //							, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions)
 : itsParameter(theParam)
 , itsParameterAbbreviation("?")
@@ -405,6 +408,7 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 , fShowDifference(false)
 , fShowDifferenceToOriginalData(false)
 //, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
+, itsDataType(theDataType)
 
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
@@ -1023,8 +1027,11 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 }
 
 const NFmiDataIdent& NFmiDrawParam::EditParam(void) const 
-{ 
-	return itsInfo->Param(); 
+{
+	if(itsInfo) // satelliitti datalla ei ole infoa, joten tein tähän pika virityksen
+		return itsInfo->Param(); 
+	else
+		return itsParameter;
 }
 /* 
 void NFmiDrawParam::MetEditorCoordinatorMapOptions(NFmiMetEditorCoordinatorMapOptions* theNewOptions)
@@ -1045,4 +1052,10 @@ const NFmiString& NFmiDrawParam::ParameterAbbreviation(void) const
 }
 
 
+NFmiInfoData::Type NFmiDrawParam::DataType(void)
+{
+	if(itsInfo)
+		return itsInfo->DataType();
+	return itsDataType;
+}
 
