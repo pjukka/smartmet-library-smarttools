@@ -318,10 +318,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(const NFmiDataIdent& theDataIdent, 
 
 NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
-	bool aSubParam = false;	
 	if(theUsedInfo && theUsedInfo->DataType() == theType && theUsedInfo->Param(theDataIdent) && (!theLevel || (theLevel && theUsedInfo->Level(*theLevel))))
 	{
-		aSubParam = theUsedInfo->UseSubParam();
 		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*theUsedInfo);
 		return copyOfInfo;
 	}
