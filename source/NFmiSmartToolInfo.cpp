@@ -36,7 +36,8 @@ bool NFmiSmartToolInfo::Init(const std::string &theLoadDirectory)
 	itsLoadDirectory = theLoadDirectory;
 	if(LoadSettings())
 	{
-		return LoadScript(itsCurrentScriptName);
+		LoadScript(itsCurrentScriptName);
+		return true; // sillä ei ole väliä, vaikka viimeistä skriptiä ei saisikaan luettua kunhan asetukset on saatu
 	}
 	return false;
 }
