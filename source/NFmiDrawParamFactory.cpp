@@ -84,6 +84,24 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo
 	return drawParam;
 }
 
+NFmiDrawParam* NFmiDrawParamFactory::CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent, bool theIsToolMasterAvailable)
+{
+	fToolMasterAvailable = theIsToolMasterAvailable;
+	NFmiDrawParam* drawParam = new NFmiDrawParam;
+
+	if(drawParam)
+	{
+		drawParam->Param(theIdent);
+		NFmiString fileName = CreateFileName(drawParam);
+		if(!drawParam->Init(fileName))
+			if(!drawParam->StoreData(fileName))
+			  {
+				// tiedostoa ei voitu luoda, mitä pitäisi tehdä?
+			  }
+	}
+	return drawParam;
+}
+
 //--------------------------------------------------------
 // Init 
 //--------------------------------------------------------
@@ -109,7 +127,7 @@ NFmiString NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam)
 	int paramId = drawParam->Param().GetParam()->GetIdent();
 	NFmiValueString idStr(paramId, "%d");
 	fileName += idStr;
-	if(drawParam && drawParam->Info()->SizeLevels() > 1)
+	if(drawParam && drawParam->Info() && drawParam->Info()->SizeLevels() > 1)
 	{ // jos leveleitä on useita, niillä on omat tiedostot
 		fileName += "_level_";
 		const NFmiLevel* level = drawParam->Info()->Level();

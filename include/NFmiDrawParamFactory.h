@@ -46,6 +46,7 @@ public:
 								   , FmiBoolean& fSubParam 
 								   , const NFmiLevel* theLevel
 								   , bool theIsToolMasterAvailable);
+	NFmiDrawParam * CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent, bool theIsToolMasterAvailable);
 	FmiBoolean Init();
 	const NFmiString& WorkingDirectory(void) const {return itsWorkingDirectory;};
 	void WorkingDirectory(const NFmiString& newValue){itsWorkingDirectory = newValue;};
