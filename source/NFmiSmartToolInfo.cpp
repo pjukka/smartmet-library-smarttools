@@ -41,7 +41,7 @@ bool NFmiSmartToolInfo::Init(void)
 
 bool NFmiSmartToolInfo::LoadAsCurrentScript(const std::string &theFileName)
 {
-	if(::ReadFile2String(theFileName, itsCurrentScript))
+	if(NFmiFileSystem::ReadFile2String(theFileName, itsCurrentScript))
 	{
 		fHasCurrentScriptFileName = true;
 		itsCurrentScriptFileName = theFileName;
@@ -73,7 +73,7 @@ bool NFmiSmartToolInfo::SaveAsCurrentScript(const std::string &theFileName)
 
 bool NFmiSmartToolInfo::LoadDBChecker(void)
 {
-	if(::ReadFile2String(itsDBCheckerFileName, itsDBCheckerText))
+	if(NFmiFileSystem::ReadFile2String(itsDBCheckerFileName, itsDBCheckerText))
 	{
 		fIsThereDBCheckScript = true;
 		return true;
@@ -84,7 +84,7 @@ bool NFmiSmartToolInfo::LoadDBChecker(void)
 
 bool NFmiSmartToolInfo::LoadLastScript(void)
 {
-	if(::ReadFile2String(itsCurrentScriptFileName, itsCurrentScript))
+	if(NFmiFileSystem::ReadFile2String(itsCurrentScriptFileName, itsCurrentScript))
 	{
 		fHasCurrentScriptFileName = true;
 		return true;
