@@ -26,7 +26,7 @@
 #include "NFmiSmartToolCalculation.h"
 #include "NFmiAreaMaskInfo.h"
 //#include "NFmiFastQueryInfo.h"
-#include "NFmismartInfo.h"
+#include "NFmiSmartInfo.h"
 #include "NFmiCalculationChangeFactorArray.h"
 #include <algorithm>
 #include <cassert>
