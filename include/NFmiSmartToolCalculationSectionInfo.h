@@ -29,6 +29,7 @@
 #define  NFMISMARTTOOLCALCULATIONSECTIONINFO_H
 
 #include <vector>
+#include <set>
 
 class NFmiSmartToolCalculationInfo;
 
@@ -43,6 +44,7 @@ public:
 	void Clear(void);
 	void AddCalculationInfo(NFmiSmartToolCalculationInfo* value);
 	std::vector<NFmiSmartToolCalculationInfo*>* GetCalculationInfos(void){return &itsSmartToolCalculationInfoVector;}
+	void AddModifiedParams(std::set<int> &theModifiedParams);
 
 private:
 	std::vector<NFmiSmartToolCalculationInfo*> itsSmartToolCalculationInfoVector;

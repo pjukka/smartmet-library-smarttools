@@ -30,11 +30,38 @@
 #define  NFMISMARTINFO_H
 
 #include "NFmiFastQueryInfo.h"
+#include <deque>
+#include <set>
 //#include "FmiNMeteditLibraryDefinitions.h"
 
 class NFmiUndoableMultiLevelMask;
 class NFmiBitMask;
 class NFmiRect;
+
+// smartinfon pitää pitää kirjaa harmonisaattoriin liittyvistä asioista
+// mitkä parametrit ja ajat ovat olleet milläkin hetkellä muokatttuina
+struct NFmiHarmonizerBookKeepingData
+{
+	NFmiHarmonizerBookKeepingData(void)
+	:itsHarmonizerTimesSet()
+	,fHarmonizeAllTimes(false)
+	,itsHarmonizerParams()
+	{}
+
+	NFmiHarmonizerBookKeepingData(const std::set<NFmiMetTime> &theHarmonizerTimesSet, 
+								  bool fHarmonizeAllTimes,
+								  const NFmiParamBag &theHarmonizerParams)
+	:itsHarmonizerTimesSet()
+	,fHarmonizeAllTimes(false)
+	,itsHarmonizerParams()
+	{}
+
+	std::set<NFmiMetTime> itsHarmonizerTimesSet; // tänne laitetaan kaikki muokatut ajat jotta voidaan
+												// harmonisoinnin yhteydessä tehdä timedesc, jonka avulla ajetaan 
+												// harmonisaattori skripti
+	bool fHarmonizeAllTimes; // apuna edellisen set:in lisäksi, että jos käydään läpi koko data
+	NFmiParamBag itsHarmonizerParams; // tähän merkitään parametrit, joita on muokattu eri työkaluilla. 
+};
 
 class NFmiSmartInfo : public NFmiFastQueryInfo
 {
@@ -71,7 +98,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	const NFmiBitMask& LocationMask (unsigned long theMaskType) const; 
 	void LocationMask (const NFmiBitMask& theMask, unsigned long theMaskType);
    
-	bool SnapShotData (const NFmiString& theAction);
+	bool SnapShotData (const NFmiString& theAction, const NFmiHarmonizerBookKeepingData &theCurrentHarmonizerBookKeepingData);
 	void RearrangeUndoTable(void);
 	bool SnapShotData (const NFmiString& theAction,FmiParameterName theParameter);
 	NFmiString UndoText (void);
@@ -79,7 +106,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	bool Undo (void);
 	bool Redo (void);
 	void CommitData (void);
-	bool UndoData (void);
+	bool UndoData (const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData);
 	bool RedoData (void);
 	void UndoLevel (const long& theDepth);
 
@@ -127,6 +154,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	void LocationSelectionUndoLevel(int theNewUndoLevel); // undolevel asetetaan tällä
 	NFmiInfoData::Type DataType(void) const {return itsDataType;}; // 1999.08.24/Marko
 	void DataType(NFmiInfoData::Type newType){itsDataType = newType;}; // 1999.08.24/Marko
+	const NFmiHarmonizerBookKeepingData* CurrentHarmonizerBookKeepingData(void) const; // palauttaa nyt käytössä olevan harmonisaattori parambagin
 
  private:
 
@@ -164,6 +192,9 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	//parambag, siksi että tiedettäisiin mitä parametriä on muutettu
 	NFmiParamBag* itsEditedParamBag;
 	NFmiInfoData::Type itsDataType; // 1999.08.24/Marko
+	std::deque<NFmiHarmonizerBookKeepingData> *itsUndoRedoHarmonizerBookKeepingData; // tämän elin kaari seuraa tiiviisti itsUndoTable:a
+									// tähän talletetaan harmonisaatiossa 'likaantuvat' parametrit ja ajat ja koska
+									// editorissa on undo/redo toiminto, pitää myös tämän olla synkassa datan kanssa
 };
 
 #endif

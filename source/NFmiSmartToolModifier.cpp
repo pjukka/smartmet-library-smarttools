@@ -682,3 +682,13 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateRealScriptVariableInfo(const NFmiDat
 	NFmiSmartInfo *returnInfo = new NFmiSmartInfo(info, data);
 	return returnInfo;
 }
+
+NFmiParamBag NFmiSmartToolModifier::ModifiedParams(void)
+{
+	return itsSmartToolIntepreter->ModifiedParams();
+}
+
+const std::string& NFmiSmartToolModifier::GetStrippedMacroText(void) const
+{
+	return itsSmartToolIntepreter->GetStrippedMacroText();
+}

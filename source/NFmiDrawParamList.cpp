@@ -93,11 +93,11 @@ bool NFmiDrawParamList::Add(NFmiDrawParam * theParam, unsigned long theIndex)
 // Replace 
 //--------------------------------------------------------
 // tuhoaa vanhan, jos löytyy, ja lisää perään
-bool NFmiDrawParamList::Replace(NFmiDrawParam * theParam)
+bool NFmiDrawParamList::Replace(NFmiDrawParam * theParam, bool fUseOnlyParamId)
 {
 	if(theParam->Info())
 	{
-		if(Find(theParam->Param(), theParam->Info()->Level(), theParam->Info()->DataType()))
+		if(Find(theParam->Param(), theParam->Info()->Level(), theParam->Info()->DataType(), fUseOnlyParamId))
 			Remove(true);
 		return Add(theParam);
 	}

@@ -48,6 +48,7 @@
 //#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiProducer.h"
 #include "NFmiLevelType.h"
+#include "NFmiParamBag.h"
 
 #include <string>
 #include <vector>
@@ -67,6 +68,7 @@ public:
 	NFmiSmartToolCalculationBlock(void);
 	~NFmiSmartToolCalculationBlock(void);
 	void Clear(void);
+	void AddModifiedParams(std::set<int> &theModifiedParams);
 	
 	NFmiSmartToolCalculationSectionInfo* itsFirstCalculationSectionInfo;
 	NFmiSmartToolCalculationSectionInfo* itsLastCalculationSectionInfo;
@@ -105,6 +107,8 @@ public:
 	void IncludeDirectory(const std::string& newValue) {itsIncludeDirectory = newValue;}
 
 	std::vector<NFmiSmartToolCalculationBlock>& SmartToolCalculationBlocks(void){return itsSmartToolCalculationBlocks;}
+	NFmiParamBag ModifiedParams(void);
+	NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &theParamText);
 
 private:
 	typedef std::map<std::string, FmiParameterName> ParamMap;

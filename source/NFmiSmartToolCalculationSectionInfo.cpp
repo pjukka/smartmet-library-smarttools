@@ -50,3 +50,14 @@ void NFmiSmartToolCalculationSectionInfo::AddCalculationInfo(NFmiSmartToolCalcul
 		itsSmartToolCalculationInfoVector.push_back(value);
 }
 
+// Lis‰t‰‰n set:iin kaikki parametrit, joita t‰ss‰ sectioniossa voidaan muokata.
+// talteen otetaan vain identti, koska muu ei kiinnosta (ainakaan nyt)
+void NFmiSmartToolCalculationSectionInfo::AddModifiedParams(std::set<int> &theModifiedParams)
+{
+	std::vector<NFmiSmartToolCalculationInfo*>::size_type ssize = itsSmartToolCalculationInfoVector.size();
+	std::vector<NFmiSmartToolCalculationInfo*>::size_type i = 0;
+	for( ;i<ssize; i++)
+	{
+		theModifiedParams.insert(itsSmartToolCalculationInfoVector[i]->GetResultDataInfo()->GetDataIdent().GetParamIdent());
+	}
+}
