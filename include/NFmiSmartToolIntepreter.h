@@ -62,22 +62,22 @@ class NFmiAreaMaskInfo;
 class NFmiSmartToolCalculationInfo;
 class NFmiInfoOrganizer;
 
-class NFmiSmartToolCalculationBlock
+class NFmiSmartToolCalculationBlockInfo
 {
 public:
-	NFmiSmartToolCalculationBlock(void);
-	~NFmiSmartToolCalculationBlock(void);
+	NFmiSmartToolCalculationBlockInfo(void);
+	~NFmiSmartToolCalculationBlockInfo(void);
 	void Clear(void);
 	void AddModifiedParams(std::set<int> &theModifiedParams);
 	
 	NFmiSmartToolCalculationSectionInfo* itsFirstCalculationSectionInfo;
-	NFmiSmartToolCalculationSectionInfo* itsLastCalculationSectionInfo;
 	NFmiAreaMaskSectionInfo* itsIfAreaMaskSectionInfo;
-	NFmiSmartToolCalculationSectionInfo* itsIfCalculationSectionInfo;
+	NFmiSmartToolCalculationBlockInfo* itsIfCalculationBlockInfo;
 	NFmiAreaMaskSectionInfo* itsElseIfAreaMaskSectionInfo;
-	NFmiSmartToolCalculationSectionInfo* itsElseIfCalculationSectionInfo;
+	NFmiSmartToolCalculationBlockInfo* itsElseIfCalculationBlockInfo;
 	bool fElseSectionExist;
-	NFmiSmartToolCalculationSectionInfo* itsElseCalculationSectionInfo;
+	NFmiSmartToolCalculationBlockInfo* itsElseCalculationBlockInfo;
+	NFmiSmartToolCalculationSectionInfo* itsLastCalculationSectionInfo;
 };
 
 class NFmiSmartToolIntepreter 
@@ -86,6 +86,7 @@ public:
 	typedef std::map<std::string, FmiProducerName> ProducerMap;
 	typedef std::map<std::string, std::pair<unsigned long, unsigned long> > LevelMap; // nimi, ident, levelValue 
 	typedef std::map<std::string, double> ConstantMap; // esim. MISS 32700 tai PI 3.14159
+/*
 	class Exception
 	{
 	public:
@@ -94,7 +95,7 @@ public:
 	private:
 		const std::string itsText;
 	};
-
+*/
 	void Interpret(const std::string &theMacroText);
 
 	NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer);
@@ -106,14 +107,14 @@ public:
 	const std::string& IncludeDirectory(void) const {return itsIncludeDirectory;}
 	void IncludeDirectory(const std::string& newValue) {itsIncludeDirectory = newValue;}
 
-	std::vector<NFmiSmartToolCalculationBlock>& SmartToolCalculationBlocks(void){return itsSmartToolCalculationBlocks;}
+	std::vector<NFmiSmartToolCalculationBlockInfo>& SmartToolCalculationBlocks(void){return itsSmartToolCalculationBlocks;}
 	NFmiParamBag ModifiedParams(void);
 	NFmiParam GetParamFromString(const std::string &theParamText);
 
 private:
 	typedef std::map<std::string, FmiParameterName> ParamMap;
 
-	bool CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlock* theBlock);
+	bool CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlock, bool fFirstLevelCheckout);
 	std::string HandlePossibleUnaryMarkers(const std::string &theCurrentString);
 	NFmiLevel GetPossibleLevelInfo(const std::string &theLevelText, NFmiInfoData::Type theDataType);
 	NFmiProducer GetPossibleProducerInfo(const std::string &theProducerText);
@@ -155,8 +156,8 @@ private:
 	bool CheckoutPossibleIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
 	bool CheckoutPossibleElseIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
 	bool CheckoutPossibleElseClauseSection(void);
-	bool CheckoutPossibleNextCalculationSection(NFmiSmartToolCalculationSectionInfo* theSectionInfo);
-	bool ExtractPossibleNextCalculationSection(void);
+	bool CheckoutPossibleNextCalculationSection(NFmiSmartToolCalculationSectionInfo* theSectionInfo, bool &fWasBlockMarksFound);
+	bool ExtractPossibleNextCalculationSection(bool &fWasBlockMarksFound);
 	bool ExtractPossibleIfClauseSection(void);
 	bool ExtractPossibleElseIfClauseSection(void);
 	template<typename memfunction>
@@ -194,7 +195,7 @@ private:
 	std::string itsStrippedMacroText;
 	std::string itsIncludeDirectory; // mistä ladataan mahd. include filet
 
-	std::vector<NFmiSmartToolCalculationBlock> itsSmartToolCalculationBlocks;
+	std::vector<NFmiSmartToolCalculationBlockInfo> itsSmartToolCalculationBlocks;
 
 	int itsMaxCalculationSectionCount;
 
