@@ -592,7 +592,7 @@ NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::s
 bool NFmiSmartToolIntepreter::InterpretCalculationSection(std::string &theCalculationSectiontext, NFmiSmartToolCalculationSectionInfo* theSectionInfo)  throw (NFmiSmartToolIntepreter::Exception)
 {
 	std::string::iterator pos = theCalculationSectiontext.begin();
-	std::string::iterator end = theCalculationSectiontext.begin();
+	std::string::iterator end = theCalculationSectiontext.end();
 	NFmiSmartToolCalculationInfo *calculationInfo = 0;
 	do
 	{
@@ -719,12 +719,12 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 	temp = token;
 	*temp = '\0';
 
-	if(exp_ptr==exp_end) 
+	if(exp_ptr>=exp_end) 
 		return false; // at end of expression
 
-	while(isspace(*exp_ptr)) 
+	while(exp_ptr<exp_end && isspace(*exp_ptr)) 
 		++exp_ptr; // skip over white space
-	if(exp_ptr==exp_end) 
+	if(exp_ptr>=exp_end) 
 		return false; // at end of expression
 
 	if(strchr("+-*/%^=(){}<>&|!", *exp_ptr))
