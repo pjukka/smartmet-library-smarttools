@@ -73,6 +73,7 @@ NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 ,itsEditedDataCopy(0)
 ,itsMacroParamData(0)
 ,itsDefaultMissingValueMatrix()
+,fCreateEditedDataCopy(true)
 {
 }
 
@@ -98,8 +99,9 @@ NFmiInfoOrganizer::~NFmiInfoOrganizer (void)
 //--------------------------------------------------------
 // Init 
 //--------------------------------------------------------
-bool NFmiInfoOrganizer::Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist)
+bool NFmiInfoOrganizer::Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist, bool createEditedDataCopy)
 {
+	fCreateEditedDataCopy = createEditedDataCopy;
  	itsDrawParamFactory =new NFmiDrawParamFactory(createDrawParamFileIfNotExist);
 	itsDrawParamFactory->LoadDirectory(theDrawParamPath);
  	return itsDrawParamFactory->Init(); 
@@ -765,13 +767,16 @@ NFmiSmartInfo* NFmiInfoOrganizer::ObservationInfo(int theIndex)
 // 28.09.1999/Marko Tekee uuden kopion editoitavasta datasta
 void NFmiInfoOrganizer::UpdateEditedDataCopy(void)
 {
-	if(itsEditedData)
+	if(fCreateEditedDataCopy)
 	{
-		if(itsEditedDataCopy)
-			itsEditedDataCopy->DestroySharedData();
-		delete itsEditedDataCopy;
-		itsEditedDataCopy = itsEditedData->Clone();
-		itsEditedDataCopy->DataType(NFmiInfoData::kCopyOfEdited);
+		if(itsEditedData)
+		{
+			if(itsEditedDataCopy)
+				itsEditedDataCopy->DestroySharedData();
+			delete itsEditedDataCopy;
+			itsEditedDataCopy = itsEditedData->Clone();
+			itsEditedDataCopy->DataType(NFmiInfoData::kCopyOfEdited);
+		}
 	}
 }
 

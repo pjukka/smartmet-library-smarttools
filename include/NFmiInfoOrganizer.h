@@ -60,7 +60,7 @@ class NFmiInfoOrganizer
 	NFmiInfoOrganizer (void);
 	~NFmiInfoOrganizer (void); 
 
-	bool Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist);
+	bool Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist, bool createEditedDataCopy);
 
 // n‰m‰ infon palauttavat metodit ovat toistaiseksi vain apu funktioita, jotka toimivat
 // vajavaisesti. Niist‰ pit‰‰ tehd‰ fiksumpia, kun tulee enemm‰n dataa talteen!
@@ -146,6 +146,8 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* itsEditedDataCopy; // t‰m‰ on editoitavan datan kopio, mit‰ k‰ytt‰j‰ voi halutessaan p‰ivitt‰‰, k‰ytet‰‰n visualisoimaan tehtyj‰ muutoksia datassa
 	NFmiSmartInfo* itsMacroParamData; // makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
 	NFmiDataMatrix<float> itsDefaultMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
+
+	bool fCreateEditedDataCopy; // luodaanko vai eikˆ luoda kopiota editoidusta datasta
 };
 
 #endif
