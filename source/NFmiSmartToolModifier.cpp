@@ -23,7 +23,6 @@
 #pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
 #endif
 
-//#include "stdafx.h"
 
 #include "NFmiSmartToolModifier.h"
 #include "NFmiSmartToolIntepreter.h"
@@ -49,21 +48,78 @@
 #include <cassert>
 
 using namespace std;
-/*
+
+#include "stdafx.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
-*/
+
+
+NFmiSmartToolCalculationBlockVector::NFmiSmartToolCalculationBlockVector(void)
+:itsCalculationBlocks()
+{
+}
+
+NFmiSmartToolCalculationBlockVector::~NFmiSmartToolCalculationBlockVector(void)
+{
+	Clear();
+}
+
+void NFmiSmartToolCalculationBlockVector::Clear(void)
+{ // tuhoaa datan deletoimalla!
+	std::for_each(Begin(), End(), PointerDestroyer());
+	itsCalculationBlocks.clear();
+}
+
+NFmiSmartInfo* NFmiSmartToolCalculationBlockVector::FirstVariableInfo(void)
+{
+	Iterator it = Begin();
+	Iterator endIt = End();
+	for( ; it != endIt; ++it)
+		if((*it)->FirstVariableInfo()) // pit‰isi lˆyty‰ aina jotain!!!
+			return (*it)->FirstVariableInfo();
+	return 0;
+}
+
+void NFmiSmartToolCalculationBlockVector::SetTime(const NFmiMetTime &theTime)
+{
+	Iterator it = Begin();
+	Iterator endIt = End();
+	for( ; it != endIt; ++it)
+		(*it)->SetTime(theTime);
+}
+
+void NFmiSmartToolCalculationBlockVector::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
+{
+	Iterator it = Begin();
+	Iterator endIt = End();
+	for( ; it != endIt; ++it)
+		(*it)->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
+}
+
+void NFmiSmartToolCalculationBlockVector::SetModificationFactors(std::vector<double> *theFactors)
+{
+	Iterator it = Begin();
+	Iterator endIt = End();
+	for( ; it != endIt; ++it)
+		(*it)->SetModificationFactors(theFactors);
+}
+
+void NFmiSmartToolCalculationBlockVector::Add(NFmiSmartToolCalculationBlock* theBlock)
+{ // ottaa omistukseen theBlock:in!!
+	itsCalculationBlocks.push_back(theBlock);
+}
 
 NFmiSmartToolCalculationBlock::NFmiSmartToolCalculationBlock(void)
 :itsFirstCalculationSection(0)
 ,itsIfAreaMaskSection(0)
-,itsIfCalculationBlock(0)
+,itsIfCalculationBlocks(0)
 ,itsElseIfAreaMaskSection(0)
-,itsElseIfCalculationBlock(0)
-,itsElseCalculationBlock(0)
+,itsElseIfCalculationBlocks(0)
+,itsElseCalculationBlocks(0)
 ,itsLastCalculationSection(0)
 {
 }
@@ -85,25 +141,25 @@ void NFmiSmartToolCalculationBlock::Clear(void)
 		delete itsIfAreaMaskSection;
 		itsIfAreaMaskSection = 0;
 	}
-	if(itsIfCalculationBlock)
+	if(itsIfCalculationBlocks)
 	{
-		delete itsIfCalculationBlock;
-		itsIfCalculationBlock = 0;
+		delete itsIfCalculationBlocks;
+		itsIfCalculationBlocks = 0;
 	}
 	if(itsElseIfAreaMaskSection)
 	{
 		delete itsElseIfAreaMaskSection;
 		itsElseIfAreaMaskSection = 0;
 	}
-	if(itsElseIfCalculationBlock)
+	if(itsElseIfCalculationBlocks)
 	{
-		delete itsElseIfCalculationBlock;
-		itsElseIfCalculationBlock = 0;
+		delete itsElseIfCalculationBlocks;
+		itsElseIfCalculationBlocks = 0;
 	}
-	if(itsElseCalculationBlock)
+	if(itsElseCalculationBlocks)
 	{
-		delete itsElseCalculationBlock;
-		itsElseCalculationBlock = 0;
+		delete itsElseCalculationBlocks;
+		itsElseCalculationBlocks = 0;
 	}
 	if(itsLastCalculationSection)
 	{
@@ -117,12 +173,12 @@ NFmiSmartInfo* NFmiSmartToolCalculationBlock::FirstVariableInfo(void)
 	NFmiSmartInfo* info = 0;
 	if(itsFirstCalculationSection)
 		info = itsFirstCalculationSection->FirstVariableInfo();
-	if(info == 0 && itsIfCalculationBlock)
-		info = itsIfCalculationBlock->FirstVariableInfo();
-	if(info == 0 && itsElseIfCalculationBlock)
-		info = itsElseIfCalculationBlock->FirstVariableInfo();
-	if(info == 0 && itsElseCalculationBlock)
-		info = itsElseCalculationBlock->FirstVariableInfo();
+	if(info == 0 && itsIfCalculationBlocks)
+		info = itsIfCalculationBlocks->FirstVariableInfo();
+	if(info == 0 && itsElseIfCalculationBlocks)
+		info = itsElseIfCalculationBlocks->FirstVariableInfo();
+	if(info == 0 && itsElseCalculationBlocks)
+		info = itsElseCalculationBlocks->FirstVariableInfo();
 	if(info == 0 && itsLastCalculationSection)
 		info = itsLastCalculationSection->FirstVariableInfo();
 	return info;
@@ -134,14 +190,14 @@ void NFmiSmartToolCalculationBlock::SetTime(const NFmiMetTime &theTime)
 		itsFirstCalculationSection->SetTime(theTime);
 	if(itsIfAreaMaskSection)
 		itsIfAreaMaskSection->SetTime(theTime);
-	if(itsIfCalculationBlock)
-		itsIfCalculationBlock->SetTime(theTime);
+	if(itsIfCalculationBlocks)
+		itsIfCalculationBlocks->SetTime(theTime);
 	if(itsElseIfAreaMaskSection)
 		itsElseIfAreaMaskSection->SetTime(theTime);
-	if(itsElseIfCalculationBlock)
-		itsElseIfCalculationBlock->SetTime(theTime);
-	if(itsElseCalculationBlock)
-		itsElseCalculationBlock->SetTime(theTime);
+	if(itsElseIfCalculationBlocks)
+		itsElseIfCalculationBlocks->SetTime(theTime);
+	if(itsElseCalculationBlocks)
+		itsElseCalculationBlocks->SetTime(theTime);
 	if(itsLastCalculationSection)
 		itsLastCalculationSection->SetTime(theTime);
 }
@@ -152,14 +208,14 @@ void NFmiSmartToolCalculationBlock::SetModificationFactors(std::vector<double> *
 		itsFirstCalculationSection->SetModificationFactors(theFactors);
 	if(itsIfAreaMaskSection)
 		itsIfAreaMaskSection->SetModificationFactors(theFactors);
-	if(itsIfCalculationBlock)
-		itsIfCalculationBlock->SetModificationFactors(theFactors);
+	if(itsIfCalculationBlocks)
+		itsIfCalculationBlocks->SetModificationFactors(theFactors);
 	if(itsElseIfAreaMaskSection)
 		itsElseIfAreaMaskSection->SetModificationFactors(theFactors);
-	if(itsElseIfCalculationBlock)
-		itsElseIfCalculationBlock->SetModificationFactors(theFactors);
-	if(itsElseCalculationBlock)
-		itsElseCalculationBlock->SetModificationFactors(theFactors);
+	if(itsElseIfCalculationBlocks)
+		itsElseIfCalculationBlocks->SetModificationFactors(theFactors);
+	if(itsElseCalculationBlocks)
+		itsElseCalculationBlocks->SetModificationFactors(theFactors);
 	if(itsLastCalculationSection)
 		itsLastCalculationSection->SetModificationFactors(theFactors);
 }
@@ -170,11 +226,11 @@ void NFmiSmartToolCalculationBlock::Calculate(const NFmiPoint &theLatlon, unsign
 		itsFirstCalculationSection->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
 
 	if(itsIfAreaMaskSection && itsIfAreaMaskSection->IsMasked(theLatlon, theLocationIndex, theTime, theTimeIndex))
-		itsIfCalculationBlock->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
+		itsIfCalculationBlocks->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
 	else if(itsElseIfAreaMaskSection && itsElseIfAreaMaskSection->IsMasked(theLatlon, theLocationIndex, theTime, theTimeIndex))
-		itsElseIfCalculationBlock->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
-	else if(itsElseCalculationBlock)
-		itsElseCalculationBlock->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
+		itsElseIfCalculationBlocks->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
+	else if(itsElseCalculationBlocks)
+		itsElseCalculationBlocks->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
 
 	if(itsLastCalculationSection)
 		itsLastCalculationSection->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
@@ -225,42 +281,56 @@ void NFmiSmartToolModifier::InitSmartTool(const std::string &theSmartToolText)
 //	InitializeCalculationModifiers();
 }
 
-NFmiSmartToolCalculationBlock* NFmiSmartToolModifier::CreateCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlock)
+NFmiSmartToolCalculationBlockVector* NFmiSmartToolModifier::CreateCalculationBlockVector(NFmiSmartToolCalculationBlockInfoVector* theBlockInfoVector)
+{
+	if(theBlockInfoVector && (!theBlockInfoVector->Empty()))
+	{
+		NFmiSmartToolCalculationBlockVector *vec = new NFmiSmartToolCalculationBlockVector;
+		NFmiSmartToolCalculationBlockInfoVector::Iterator it = theBlockInfoVector->Begin();
+		NFmiSmartToolCalculationBlockInfoVector::Iterator endIt = theBlockInfoVector->End();
+		for( ; it != endIt; ++it)
+			vec->Add(CreateCalculationBlock(*it));
+		return vec;
+	}
+	return 0;
+}
+
+NFmiSmartToolCalculationBlock* NFmiSmartToolModifier::CreateCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlockInfo)
 {
 	NFmiSmartToolCalculationBlock *block = new NFmiSmartToolCalculationBlock;
 	auto_ptr<NFmiSmartToolCalculationBlock> blockPtr(block); // poikkeus tapauksessa tuhoaa automaattrisesti otuksen
 
-	block->itsFirstCalculationSection = CreateCalculationSection(theBlock->itsFirstCalculationSectionInfo);
-	block->itsIfAreaMaskSection = CreateConditionalSection(theBlock->itsIfAreaMaskSectionInfo);
+	block->itsFirstCalculationSection = CreateCalculationSection(theBlockInfo->itsFirstCalculationSectionInfo);
+	block->itsIfAreaMaskSection = CreateConditionalSection(theBlockInfo->itsIfAreaMaskSectionInfo);
 	if(block->itsIfAreaMaskSection)
 	{
-		block->itsIfCalculationBlock = CreateCalculationBlock(theBlock->itsIfCalculationBlockInfo);
-		if(!block->itsIfCalculationBlock)
+		block->itsIfCalculationBlocks = CreateCalculationBlockVector(theBlockInfo->itsIfCalculationBlockInfos);
+		if(!block->itsIfCalculationBlocks)
 		{
 			string errorText("IF-lauseen per‰ss‰ ei ollut lasku osiota?");
 			throw runtime_error(errorText);
 		}
-		block->itsElseIfAreaMaskSection = CreateConditionalSection(theBlock->itsElseIfAreaMaskSectionInfo);
+		block->itsElseIfAreaMaskSection = CreateConditionalSection(theBlockInfo->itsElseIfAreaMaskSectionInfo);
 		if(block->itsElseIfAreaMaskSection)
 		{
-			block->itsElseIfCalculationBlock = CreateCalculationBlock(theBlock->itsElseIfCalculationBlockInfo);
-			if(!block->itsElseIfCalculationBlock)
+			block->itsElseIfCalculationBlocks = CreateCalculationBlockVector(theBlockInfo->itsElseIfCalculationBlockInfos);
+			if(!block->itsElseIfCalculationBlocks)
 			{
 				string errorText("ELSEIF-lauseen per‰ss‰ ei ollut lasku osiota?");
 				throw runtime_error(errorText);
 			}
 		}
-		if(theBlock->fElseSectionExist)
+		if(theBlockInfo->fElseSectionExist)
 		{
-			block->itsElseCalculationBlock = CreateCalculationBlock(theBlock->itsElseCalculationBlockInfo);
-			if(!block->itsElseCalculationBlock)
+			block->itsElseCalculationBlocks = CreateCalculationBlockVector(theBlockInfo->itsElseCalculationBlockInfos);
+			if(!block->itsElseCalculationBlocks)
 			{
 				string errorText("ELSE-lauseen per‰ss‰ ei ollut lasku osiota?");
 				throw runtime_error(errorText);
 			}
 		}
 	}
-	block->itsLastCalculationSection = CreateCalculationSection(theBlock->itsLastCalculationSectionInfo);
+	block->itsLastCalculationSection = CreateCalculationSection(theBlockInfo->itsLastCalculationSectionInfo);
 	blockPtr.release();
 	return block;
 }
@@ -450,17 +520,17 @@ void NFmiSmartToolModifier::ModifyBlockData(NFmiTimeDescriptor *theModifiedTimes
 
 void NFmiSmartToolModifier::ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculationBlock *theCalculationBlock)
 {
-	if(theCalculationBlock->itsIfAreaMaskSection && theCalculationBlock->itsIfCalculationBlock)
+	if(theCalculationBlock->itsIfAreaMaskSection && theCalculationBlock->itsIfCalculationBlocks)
 	{
 		theCalculationBlock->itsIfAreaMaskSection->SetModificationFactors(&(this->itsModificationFactors)); // maskissakin voi olla tmf:i‰
-		theCalculationBlock->itsIfCalculationBlock->SetModificationFactors(&(this->itsModificationFactors)); // maskissakin voi olla tmf:i‰
-		if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlock)
+		theCalculationBlock->itsIfCalculationBlocks->SetModificationFactors(&(this->itsModificationFactors)); // maskissakin voi olla tmf:i‰
+		if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks)
 		{
 			theCalculationBlock->itsElseIfAreaMaskSection->SetModificationFactors(&(this->itsModificationFactors));
-			theCalculationBlock->itsElseIfCalculationBlock->SetModificationFactors(&(this->itsModificationFactors));
+			theCalculationBlock->itsElseIfCalculationBlocks->SetModificationFactors(&(this->itsModificationFactors));
 		}
-		if(theCalculationBlock->itsElseCalculationBlock)
-			theCalculationBlock->itsElseCalculationBlock->SetModificationFactors(&(this->itsModificationFactors));
+		if(theCalculationBlock->itsElseCalculationBlocks)
+			theCalculationBlock->itsElseCalculationBlocks->SetModificationFactors(&(this->itsModificationFactors));
 
 		NFmiSmartInfo *info = theCalculationBlock->FirstVariableInfo()->Clone();
 		std::auto_ptr<NFmiSmartInfo> infoPtr(info);
@@ -477,14 +547,14 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiTimeDescriptor *theModifie
 				NFmiMetTime time1(modifiedTimes.Time());
 				info->Time(time1); // asetetaan myˆs t‰m‰, ett‰ saadaan oikea timeindex
 				theCalculationBlock->itsIfAreaMaskSection->SetTime(time1); // yritet‰‰n optimoida laskuja hieman kun mahdollista
-				theCalculationBlock->itsIfCalculationBlock->SetTime(time1); // yritet‰‰n optimoida laskuja hieman kun mahdollista
-				if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlock)
+				theCalculationBlock->itsIfCalculationBlocks->SetTime(time1); // yritet‰‰n optimoida laskuja hieman kun mahdollista
+				if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks)
 				{
 					theCalculationBlock->itsElseIfAreaMaskSection->SetTime(time1);
-					theCalculationBlock->itsElseIfCalculationBlock->SetTime(time1);
+					theCalculationBlock->itsElseIfCalculationBlocks->SetTime(time1);
 				}
-				if(theCalculationBlock->itsElseCalculationBlock)
-					theCalculationBlock->itsElseCalculationBlock->SetTime(time1);
+				if(theCalculationBlock->itsElseCalculationBlocks)
+					theCalculationBlock->itsElseCalculationBlocks->SetTime(time1);
 
 				for(info->ResetLocation(); info->NextLocation(); )
 				{
@@ -492,13 +562,13 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiTimeDescriptor *theModifie
 					unsigned long locationIndex = info->LocationIndex();
 					int timeIndex = info->TimeIndex();
 					if(theCalculationBlock->itsIfAreaMaskSection->IsMasked(latlon, locationIndex, time1, timeIndex))
-						theCalculationBlock->itsIfCalculationBlock->Calculate(latlon, locationIndex, time1, timeIndex);
-					else if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlock && theCalculationBlock->itsElseIfAreaMaskSection->IsMasked(latlon, locationIndex, time1, timeIndex))
+						theCalculationBlock->itsIfCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex);
+					else if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks && theCalculationBlock->itsElseIfAreaMaskSection->IsMasked(latlon, locationIndex, time1, timeIndex))
 					{
-						theCalculationBlock->itsElseIfCalculationBlock->Calculate(latlon, locationIndex, time1, timeIndex);
+						theCalculationBlock->itsElseIfCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex);
 					}
-					else if(theCalculationBlock->itsElseCalculationBlock)
-						theCalculationBlock->itsElseCalculationBlock->Calculate(latlon, locationIndex, time1, timeIndex);
+					else if(theCalculationBlock->itsElseCalculationBlocks)
+						theCalculationBlock->itsElseCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex);
 				}
 			}
 		}

@@ -44,9 +44,32 @@ class NFmiAreaMask;
 class NFmiDataModifier;
 class NFmiDataIterator;
 class NFmiSmartToolCalculationBlockInfo;
+class NFmiSmartToolCalculationBlockInfoVector;
 class NFmiDataIdent;
 class NFmiMetTime;
 class NFmiPoint;
+class NFmiSmartToolCalculationBlock;
+
+class NFmiSmartToolCalculationBlockVector
+{
+public:
+	typedef std::vector<NFmiSmartToolCalculationBlock*>::iterator Iterator;
+
+	NFmiSmartToolCalculationBlockVector(void);
+	~NFmiSmartToolCalculationBlockVector(void);
+	void Clear(void);
+	NFmiSmartInfo* FirstVariableInfo(void);
+	void SetTime(const NFmiMetTime &theTime);
+	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
+	void SetModificationFactors(std::vector<double> *theFactors);
+	void Add(NFmiSmartToolCalculationBlock* theBlock);
+	Iterator Begin(void) {return itsCalculationBlocks.begin();}
+	Iterator End(void) {return itsCalculationBlocks.end();}
+
+private:
+	// luokka ei omista vektorissa olevia otuksia, Clear pit‰‰ kutsua erikseen!!!
+	std::vector<NFmiSmartToolCalculationBlock*> itsCalculationBlocks;
+};
 
 class NFmiSmartToolCalculationBlock
 {
@@ -61,10 +84,10 @@ public:
 
 	NFmiSmartToolCalculationSection* itsFirstCalculationSection;
 	NFmiSmartToolCalculation* itsIfAreaMaskSection;
-	NFmiSmartToolCalculationBlock* itsIfCalculationBlock;
+	NFmiSmartToolCalculationBlockVector* itsIfCalculationBlocks;
 	NFmiSmartToolCalculation* itsElseIfAreaMaskSection;
-	NFmiSmartToolCalculationBlock* itsElseIfCalculationBlock;
-	NFmiSmartToolCalculationBlock* itsElseCalculationBlock;;
+	NFmiSmartToolCalculationBlockVector* itsElseIfCalculationBlocks;
+	NFmiSmartToolCalculationBlockVector* itsElseCalculationBlocks;
 	NFmiSmartToolCalculationSection* itsLastCalculationSection;
 };
 
@@ -96,7 +119,8 @@ public:
 private:
 	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculationBlock *theCalculationBlock);
 	void ModifyBlockData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculationBlock *theCalculationBlock);
-	NFmiSmartToolCalculationBlock* CreateCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlock);
+	NFmiSmartToolCalculationBlockVector* CreateCalculationBlockVector(NFmiSmartToolCalculationBlockInfoVector* theBlockInfoVector);
+	NFmiSmartToolCalculationBlock* CreateCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlockInfo);
 	NFmiSmartInfo* CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 	NFmiSmartInfo* GetScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 	void ClearScriptVariableInfos(void);

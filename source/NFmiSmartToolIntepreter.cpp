@@ -23,6 +23,8 @@
 #pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
 #endif
 
+#include "stdafx.h"
+
 #include "NFmiSmartToolIntepreter.h"
 #include "NFmiAreaMaskInfo.h"
 #include "NFmiSmartToolCalculationSectionInfo.h"
@@ -46,6 +48,13 @@
 
 using namespace std;
 
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
 // globaali tarkistus luokka etsim‰‰n rivin lopetusta
 struct EndOfLineSearcher
 {
@@ -58,13 +67,52 @@ struct EndOfLineSearcher
 };
 
 //HUOM!!! vaarallinen luokka, pit‰‰ muistaa kutsua Clearia, muuten vuotaa!!!
+NFmiSmartToolCalculationBlockInfoVector::NFmiSmartToolCalculationBlockInfoVector(void)
+:itsCalculationBlockInfos()
+{
+}
+
+NFmiSmartToolCalculationBlockInfoVector::~NFmiSmartToolCalculationBlockInfoVector(void)
+{ // Huom! ei kutsu Clear:ia!!!
+}
+
+void NFmiSmartToolCalculationBlockInfoVector::Clear(void)
+{
+	Iterator it = Begin();
+	Iterator endIt = End();
+	for( ; it != endIt; ++it)
+	{
+		(*it)->Clear();
+	}
+	std::for_each(itsCalculationBlockInfos.begin(), itsCalculationBlockInfos.end(), PointerDestroyer());
+	itsCalculationBlockInfos.clear();
+}
+
+// Ottaa pointterin 'omistukseensa' eli pit‰‰ luoda ulkona new:ll‰ ja antaa t‰nne
+void NFmiSmartToolCalculationBlockInfoVector::Add(NFmiSmartToolCalculationBlockInfo* theBlockInfo)
+{
+	itsCalculationBlockInfos.push_back(theBlockInfo);
+}
+
+void NFmiSmartToolCalculationBlockInfoVector::AddModifiedParams(std::set<int> &theModifiedParams)
+{
+	Iterator it = Begin();
+	Iterator endIt = End();
+	for( ; it != endIt; ++it)
+	{
+		(*it)->AddModifiedParams(theModifiedParams);
+	}
+}
+
+
+//HUOM!!! vaarallinen luokka, pit‰‰ muistaa kutsua Clearia, muuten vuotaa!!!
 NFmiSmartToolCalculationBlockInfo::NFmiSmartToolCalculationBlockInfo(void)
 :itsFirstCalculationSectionInfo(new NFmiSmartToolCalculationSectionInfo)
 ,itsIfAreaMaskSectionInfo(new NFmiAreaMaskSectionInfo)
-,itsIfCalculationBlockInfo(0)
+,itsIfCalculationBlockInfos(0)
 ,itsElseIfAreaMaskSectionInfo(new NFmiAreaMaskSectionInfo)
-,itsElseIfCalculationBlockInfo(0)
-,itsElseCalculationBlockInfo(0)
+,itsElseIfCalculationBlockInfos(0)
+,itsElseCalculationBlockInfos(0)
 ,itsLastCalculationSectionInfo(new NFmiSmartToolCalculationSectionInfo)
 {
 }
@@ -82,25 +130,25 @@ void NFmiSmartToolCalculationBlockInfo::Clear(void)
 	itsLastCalculationSectionInfo = 0;
 	delete itsIfAreaMaskSectionInfo;
 	itsIfAreaMaskSectionInfo = 0;
-	if(itsIfCalculationBlockInfo)
+	if(itsIfCalculationBlockInfos)
 	{
-		itsIfCalculationBlockInfo->Clear();
-		delete itsIfCalculationBlockInfo;
-		itsIfCalculationBlockInfo = 0;
+		itsIfCalculationBlockInfos->Clear();
+		delete itsIfCalculationBlockInfos;
+		itsIfCalculationBlockInfos = 0;
 	}
 	delete itsElseIfAreaMaskSectionInfo;
 	itsElseIfAreaMaskSectionInfo = 0;
-	if(itsElseIfCalculationBlockInfo)
+	if(itsElseIfCalculationBlockInfos)
 	{
-		itsElseIfCalculationBlockInfo->Clear();
-		delete itsElseIfCalculationBlockInfo;
-		itsElseIfCalculationBlockInfo = 0;
+		itsElseIfCalculationBlockInfos->Clear();
+		delete itsElseIfCalculationBlockInfos;
+		itsElseIfCalculationBlockInfos = 0;
 	}
-	if(itsElseCalculationBlockInfo)
+	if(itsElseCalculationBlockInfos)
 	{
-		itsElseCalculationBlockInfo->Clear();
-		delete itsElseCalculationBlockInfo;
-		itsElseCalculationBlockInfo = 0;
+		itsElseCalculationBlockInfos->Clear();
+		delete itsElseCalculationBlockInfos;
+		itsElseCalculationBlockInfos = 0;
 	}
 	fElseSectionExist = false;
 }
@@ -112,12 +160,12 @@ void NFmiSmartToolCalculationBlockInfo::AddModifiedParams(std::set<int> &theModi
 {
 	if(itsFirstCalculationSectionInfo) // eka section
 		itsFirstCalculationSectionInfo->AddModifiedParams(theModifiedParams);
-	if(itsIfCalculationBlockInfo) // if section
-		itsIfCalculationBlockInfo->AddModifiedParams(theModifiedParams);
-	if(itsElseIfCalculationBlockInfo) // elseif section
-		itsElseIfCalculationBlockInfo->AddModifiedParams(theModifiedParams);
-	if(itsElseCalculationBlockInfo) // else section
-		itsElseCalculationBlockInfo->AddModifiedParams(theModifiedParams);
+	if(itsIfCalculationBlockInfos) // if section
+		itsIfCalculationBlockInfos->AddModifiedParams(theModifiedParams);
+	if(itsElseIfCalculationBlockInfos) // elseif section
+		itsElseIfCalculationBlockInfos->AddModifiedParams(theModifiedParams);
+	if(itsElseCalculationBlockInfos) // else section
+		itsElseCalculationBlockInfos->AddModifiedParams(theModifiedParams);
 	if(itsLastCalculationSectionInfo) // vika section
 		itsLastCalculationSectionInfo->AddModifiedParams(theModifiedParams);
 }
@@ -185,8 +233,8 @@ void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText)
 		NFmiSmartToolCalculationBlockInfo block;
 		try
 		{
-			if(index > 200)
-				throw runtime_error("Annetusta skriptist‰ tuli yli 200 lasku blokkia, lopetetaan...");
+			if(index > 500)
+				throw runtime_error("Annetusta skriptist‰ tuli yli 500 lasku blokkia, lopetetaan...");
 			fGoOn = CheckoutPossibleNextCalculationBlock(&block, true);
 			itsSmartToolCalculationBlocks.push_back(block);
 		}
@@ -227,34 +275,71 @@ NFmiParamBag NFmiSmartToolIntepreter::ModifiedParams(void)
 	return params;
 }
 
+bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlockVector(NFmiSmartToolCalculationBlockInfoVector* theBlockVector)
+{
+	bool fBlockFound = false;
+	int safetyIndex = 0;
+	NFmiSmartToolCalculationBlockInfo *block = new NFmiSmartToolCalculationBlockInfo;
+//	auto_ptr<NFmiSmartToolCalculationBlockInfo> blockPtr(block); // tuhoaa poikkeusten tapauksessa dynaamisen datan
+	try
+	{
+		for( ; fBlockFound = CheckoutPossibleNextCalculationBlock(block, false, safetyIndex); safetyIndex++)
+		{
+			theBlockVector->Add(block);
+			block = 0;
+			if(safetyIndex > 500)
+				throw runtime_error("Annetusta skriptist‰ tuli yli 500 lasku blokkia, lopetetaan...");
+
+			if(*itsCheckOutTextStartPosition == '}') // jos ollaan loppu merkiss‰, siirryt‰‰n sen yli ja jatketaan seuraavalle kierrokselle
+			{
+				++itsCheckOutTextStartPosition;
+				break; // lopetetaan blokki vektorin luku t‰h‰n kun loppu merkki tuli vastaan
+			}
+			block = new NFmiSmartToolCalculationBlockInfo;
+		}
+
+		if(!fBlockFound)
+			if(block)
+			{
+				block->Clear();
+				delete block;
+			}
+	}
+	catch(...)
+	{
+		if(block)
+		{
+			block->Clear();
+			delete block;
+		}
+		throw ;
+	}
+	return !theBlockVector->Empty();
+}
+
 // paluu arvo tarkoittaa, jatketaanko tekstin l‰pik‰ymist‰ viel‰, vai ollaanko tultu jo loppuun.
-bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlock, bool fFirstLevelCheckout)
+bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlock, bool fFirstLevelCheckout, int theBlockIndex)
 {
 	bool fWasBlockMarksFound = false;
 	CheckoutPossibleNextCalculationSection(theBlock->itsFirstCalculationSectionInfo, fWasBlockMarksFound);
-	if(fFirstLevelCheckout || fWasBlockMarksFound) // vain 1. tason kyselyss‰ jatketaan tai jos blokki merkit lˆytyiv‰t {}
+	if(fFirstLevelCheckout || (fWasBlockMarksFound && theBlockIndex == 0) || theBlockIndex > 0) // vain 1. tason kyselyss‰ jatketaan tai jos blokki merkit lˆytyiv‰t {}
 		// eli IF()-lauseen j‰lkeen pit‰‰ olla {}-blokki muuten ei oteta kuin 1. calc-sektio kun ollaan extraktoimassa if, else if tai else -blokkia
+		// tai jos useita blokkeja if-lauseen sis‰ll‰, jatketaan myˆs
 	{
 		if(CheckoutPossibleIfClauseSection(theBlock->itsIfAreaMaskSectionInfo))
 		{
 			// blokit voidaan luoda  vasta t‰‰ll‰ eik‰ konstruktorissa, koska muuten konstruktori joutuisi iki-looppiin
-			theBlock->itsIfCalculationBlockInfo = new NFmiSmartToolCalculationBlockInfo;
-			CheckoutPossibleNextCalculationBlock(theBlock->itsIfCalculationBlockInfo, false);
-	//		if(!CheckoutPossibleNextCalculationBlock(theBlock->itsIfCalculationBlockInfo))
-	//			throw NFmiSmartToolIntepreter::Exception(string("IF-haaran j‰lkeen ei lˆytynyt laskuja."));
+			theBlock->itsIfCalculationBlockInfos = new NFmiSmartToolCalculationBlockInfoVector;
+			CheckoutPossibleNextCalculationBlockVector(theBlock->itsIfCalculationBlockInfos);
 			if(CheckoutPossibleElseIfClauseSection(theBlock->itsElseIfAreaMaskSectionInfo))
 			{
-				theBlock->itsElseIfCalculationBlockInfo = new NFmiSmartToolCalculationBlockInfo;
-				CheckoutPossibleNextCalculationBlock(theBlock->itsElseIfCalculationBlockInfo, false);
-	//			if(!CheckoutPossibleNextCalculationBlock(theBlock->itsElseIfCalculationBlockInfo))
-	//				throw NFmiSmartToolIntepreter::Exception(string("ELSEIF-haaran j‰lkeen ei lˆytynyt laskuja."));
+				theBlock->itsElseIfCalculationBlockInfos = new NFmiSmartToolCalculationBlockInfoVector;
+				CheckoutPossibleNextCalculationBlockVector(theBlock->itsElseIfCalculationBlockInfos);
 			}
 			if((theBlock->fElseSectionExist = CheckoutPossibleElseClauseSection()) == true)
 			{
-				theBlock->itsElseCalculationBlockInfo = new NFmiSmartToolCalculationBlockInfo;
-				CheckoutPossibleNextCalculationBlock(theBlock->itsElseCalculationBlockInfo, false);
-	//			if(!CheckoutPossibleNextCalculationBlock(theBlock->itsElseCalculationBlockInfo))
-	//				throw NFmiSmartToolIntepreter::Exception(string("ELSE-haaran j‰lkeen ei lˆytynyt laskuja."));
+				theBlock->itsElseCalculationBlockInfos = new NFmiSmartToolCalculationBlockInfoVector;
+				CheckoutPossibleNextCalculationBlockVector(theBlock->itsElseCalculationBlockInfos);
 			}
 		}
 		CheckoutPossibleNextCalculationSection(theBlock->itsLastCalculationSectionInfo, fWasBlockMarksFound);
@@ -326,8 +411,8 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 			itsCheckOutSectionText += nextLine;
 			if(*eolPos == '{' || *eolPos == '}') // jos seuraavan blokin alkumerkki tai loppumerkki lˆytyi, lopetetaan t‰m‰ blokki t‰h‰n
 			{
-				if(*eolPos == '}') // jos ollaan loppu merkiss‰, siirryt‰‰n sen yli ja jatketaan seuraavalle kierrokselle
-					++itsCheckOutTextStartPosition;
+//				if(*eolPos == '}') // jos ollaan loppu merkiss‰, siirryt‰‰n sen yli ja jatketaan seuraavalle kierrokselle
+//					++itsCheckOutTextStartPosition;
 				if(itsCheckOutSectionText.empty())
 					return false;
 				else

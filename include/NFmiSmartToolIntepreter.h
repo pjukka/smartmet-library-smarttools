@@ -61,6 +61,26 @@ class NFmiAreaMaskSectionInfo;
 class NFmiAreaMaskInfo;
 class NFmiSmartToolCalculationInfo;
 class NFmiInfoOrganizer;
+class NFmiSmartToolCalculationBlockInfo;
+
+class NFmiSmartToolCalculationBlockInfoVector
+{
+public:
+	typedef std::vector<NFmiSmartToolCalculationBlockInfo*>::iterator Iterator;
+
+	NFmiSmartToolCalculationBlockInfoVector(void);
+	~NFmiSmartToolCalculationBlockInfoVector(void);
+	void Clear(void);
+	void Add(NFmiSmartToolCalculationBlockInfo* theBlockInfo);
+	void AddModifiedParams(std::set<int> &theModifiedParams);
+	Iterator Begin(void) {return itsCalculationBlockInfos.begin();};
+	Iterator End(void) {return itsCalculationBlockInfos.end();};
+	bool Empty(void) const{return itsCalculationBlockInfos.empty();}
+
+private:
+	// luokka ei omista vektorissa olevia otuksia, Clear pit‰‰ kutsua erikseen!!!
+	std::vector<NFmiSmartToolCalculationBlockInfo*> itsCalculationBlockInfos;
+};
 
 class NFmiSmartToolCalculationBlockInfo
 {
@@ -69,14 +89,15 @@ public:
 	~NFmiSmartToolCalculationBlockInfo(void);
 	void Clear(void);
 	void AddModifiedParams(std::set<int> &theModifiedParams);
-	
+
+	// luokka ei omista n‰it‰, Clear pit‰‰ kutsua erikseen!!!
 	NFmiSmartToolCalculationSectionInfo* itsFirstCalculationSectionInfo;
 	NFmiAreaMaskSectionInfo* itsIfAreaMaskSectionInfo;
-	NFmiSmartToolCalculationBlockInfo* itsIfCalculationBlockInfo;
+	NFmiSmartToolCalculationBlockInfoVector* itsIfCalculationBlockInfos;
 	NFmiAreaMaskSectionInfo* itsElseIfAreaMaskSectionInfo;
-	NFmiSmartToolCalculationBlockInfo* itsElseIfCalculationBlockInfo;
+	NFmiSmartToolCalculationBlockInfoVector* itsElseIfCalculationBlockInfos;
 	bool fElseSectionExist;
-	NFmiSmartToolCalculationBlockInfo* itsElseCalculationBlockInfo;
+	NFmiSmartToolCalculationBlockInfoVector* itsElseCalculationBlockInfos;
 	NFmiSmartToolCalculationSectionInfo* itsLastCalculationSectionInfo;
 };
 
@@ -114,7 +135,8 @@ public:
 private:
 	typedef std::map<std::string, FmiParameterName> ParamMap;
 
-	bool CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlock, bool fFirstLevelCheckout);
+	bool CheckoutPossibleNextCalculationBlockVector(NFmiSmartToolCalculationBlockInfoVector* theBlockVector);
+	bool CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlock, bool fFirstLevelCheckout, int theBlockIndex = -1);
 	std::string HandlePossibleUnaryMarkers(const std::string &theCurrentString);
 	NFmiLevel GetPossibleLevelInfo(const std::string &theLevelText, NFmiInfoData::Type theDataType);
 	NFmiProducer GetPossibleProducerInfo(const std::string &theProducerText);
