@@ -77,6 +77,28 @@ private:
 
 };
 
+// Ramppifunktioiden laskut AreaMask:ien avulla (mm. lat, lon ja elevationangle tapaukset).
+class NFmiCalculationRampFuctionWithAreaMask : public NFmiAreaMaskImpl
+{
+
+public:
+   double Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+
+   NFmiCalculationRampFuctionWithAreaMask(const NFmiCalculationCondition & theOperation,
+										   Type theMaskType,
+										   DataType theDataType,
+										   NFmiAreaMask * theAreaMask,
+										   bool ownsAreaMask = false,
+										   BinaryOperator thePostBinaryOperator = kNoValue);
+   ~NFmiCalculationRampFuctionWithAreaMask(void);
+
+private:
+	NFmiAreaMask* itsAreaMask;
+	bool fOwnsAreaMask;
+	bool fDestroySmartInfoData; // Jossain tilanteissa tälle luokalle annetaan smartinfo, josta pitää tuhota datat erikseen.
+	bool fIsTimeIntepolationNeededInValue; // erikois optimointia Value-metodin ja Time-metodin käytössä
+};
+
 // Avg, min ja max funktioiden laskut.
 class NFmiCalculationIntegrationFuction : public NFmiInfoAreaMask
 {

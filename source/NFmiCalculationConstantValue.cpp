@@ -88,3 +88,32 @@ double NFmiCalculationIntegrationFuction::Value(const NFmiPoint &theLatlon, cons
 	return kFloatMissing;
 }
 
+// Ramppifunktioiden laskut AreaMask:ien avulla (mm. lat, lon ja elevationangle tapaukset).
+double NFmiCalculationRampFuctionWithAreaMask::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+	itsAreaMask->Time(theTime);
+	double value = itsAreaMask->Value(theLatlon, theTime, theTimeIndex);
+	return itsMaskCondition.MaskValue(value);
+}
+
+NFmiCalculationRampFuctionWithAreaMask::NFmiCalculationRampFuctionWithAreaMask(const NFmiCalculationCondition & theOperation,
+																			   Type theMaskType,
+																			   DataType theDataType,
+																			   NFmiAreaMask * theAreaMask,
+																			   bool ownsAreaMask,
+																			   BinaryOperator thePostBinaryOperator)
+:NFmiAreaMaskImpl(theOperation, theMaskType, theDataType, thePostBinaryOperator)
+,itsAreaMask(theAreaMask)
+,fOwnsAreaMask(ownsAreaMask)
+,fIsTimeIntepolationNeededInValue(false)
+{
+}
+
+NFmiCalculationRampFuctionWithAreaMask::~NFmiCalculationRampFuctionWithAreaMask(void)
+{
+	if(itsAreaMask && fOwnsAreaMask)
+	{
+		delete itsAreaMask;
+	}
+}
+
