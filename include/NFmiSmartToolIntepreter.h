@@ -108,7 +108,7 @@ public:
 
 	std::vector<NFmiSmartToolCalculationBlock>& SmartToolCalculationBlocks(void){return itsSmartToolCalculationBlocks;}
 	NFmiParamBag ModifiedParams(void);
-	NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &theParamText);
+	NFmiParam GetParamFromString(const std::string &theParamText);
 
 private:
 	typedef std::map<std::string, FmiParameterName> ParamMap;
