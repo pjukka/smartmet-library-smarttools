@@ -46,7 +46,7 @@ NFmiDrawParam::NFmiDrawParam()
 , itsStationDataViewType				 (NFmiMetEditorTypes::kFmiTextView)
 , itsFrameColor						     (NFmiColor(0.,0.,0.)) // musta
 , itsFillColor						     (NFmiColor(0.,0.,0.)) // musta
-, itsNonModifiableColor				     (NFmiColor(0.,0.,0.)) // musta
+, itsIsolineLabelBoxFillColor		     (NFmiColor(1.,1.,0.)) // keltainen
 , itsRelativeSize                        (NFmiPoint(1,1))
 , itsRelativePositionOffset              (NFmiPoint(0,0))
 , itsOnlyOneSymbolRelativeSize           (NFmiPoint(1,1))
@@ -177,7 +177,7 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , itsStationDataViewType				 (NFmiMetEditorTypes::kFmiTextView)
 , itsFrameColor						     (NFmiColor(0.,0.,0.)) // musta
 , itsFillColor						     (NFmiColor(0.,0.,0.)) // musta
-, itsNonModifiableColor				     (NFmiColor(0.,0.,0.)) // musta
+, itsIsolineLabelBoxFillColor		     (NFmiColor(1.,1.,0.)) // keltainen
 , itsRelativeSize                        (NFmiPoint(1,1))
 , itsRelativePositionOffset              (NFmiPoint(0,0))
 , itsOnlyOneSymbolRelativeSize           (NFmiPoint(1,1))
@@ -304,7 +304,7 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 , itsStationDataViewType				 (NFmiMetEditorTypes::kFmiTextView)
 , itsFrameColor						     (NFmiColor(0.,0.,0.)) // musta
 , itsFillColor						     (NFmiColor(0.,0.,0.)) // musta
-, itsNonModifiableColor				     (NFmiColor(0.,0.,0.)) // musta
+, itsIsolineLabelBoxFillColor		     (NFmiColor(1.,1.,0.)) // keltainen
 , itsRelativeSize                        (NFmiPoint(1,1))
 , itsRelativePositionOffset              (NFmiPoint(0,0))
 , itsOnlyOneSymbolRelativeSize           (NFmiPoint(1,1))
@@ -439,7 +439,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam)
 
 		itsFrameColor = NFmiColor(theDrawParam->FrameColor());
 		itsFillColor = NFmiColor(theDrawParam->FillColor());
-		itsNonModifiableColor = NFmiColor(theDrawParam->NonModifiableColor());
+		itsIsolineLabelBoxFillColor = NFmiColor(theDrawParam->IsolineLabelBoxFillColor());
 
 		itsRelativeSize = NFmiPoint(theDrawParam->RelativeSize());
 		itsRelativePositionOffset = NFmiPoint(theDrawParam->RelativePositionOffset());
@@ -649,8 +649,8 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 	file << itsFrameColor << endl;
 	file << "'FillColor'" << endl;   // selittävä teksti
 	file << itsFillColor << endl;
-	file << "'NonModifiableColor'" << endl;   // selittävä teksti
-	file << itsNonModifiableColor << endl;
+	file << "'IsolineLabelBoxFillColor'" << endl;   // selittävä teksti
+	file << itsIsolineLabelBoxFillColor << endl;
 
 	file << "'itsAbsoluteMinValue'" << endl;	// selittävä testi
 	file << itsAbsoluteMinValue << endl;
@@ -866,7 +866,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			file >> temp; // luetaan nimike pois
 			file >> itsFillColor;
 			file >> temp; // luetaan nimike pois
-			file >> itsNonModifiableColor;
+			file >> itsIsolineLabelBoxFillColor;
 
 			file >> temp; // luetaan nimike pois
 			file >> itsAbsoluteMinValue;

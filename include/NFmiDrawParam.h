@@ -87,8 +87,8 @@ public:
 	const NFmiColor&	 FrameColor (void) const { return itsFrameColor; };
 	void				 FillColor (const NFmiColor& theFillColor) { itsFillColor = theFillColor; };
 	const NFmiColor&	 FillColor (void) const { return itsFillColor; };
-	void				 NonModifiableColor (const NFmiColor& theNonModifiableColor) { itsNonModifiableColor = theNonModifiableColor; };
-	const NFmiColor&	 NonModifiableColor (void) const { return itsNonModifiableColor; };
+	void				 IsolineLabelBoxFillColor(const NFmiColor& theColor) { itsIsolineLabelBoxFillColor = theColor; };
+	const NFmiColor&	 IsolineLabelBoxFillColor(void) const { return itsIsolineLabelBoxFillColor; };
 	void				 RelativeSize (const NFmiPoint& theRelativeSize) { itsRelativeSize = theRelativeSize; };
 	const NFmiPoint&	 RelativeSize (void) const { return itsRelativeSize; };
 	void				 RelativePositionOffset (const NFmiPoint& theRelativePositionOffset) { itsRelativePositionOffset = theRelativePositionOffset; };
@@ -313,11 +313,7 @@ protected:
 	NFmiColor itsFrameColor;
 	NFmiColor itsFillColor;
 
-//   Jos jonkin paikan arvo on ei-maskattu, eli 
-//   sitä ei voi muuttaa koska
-//   parametrimaskaus ei salli, väritetään data 
-//   tällä värillä (oletusarvo).
-	NFmiColor itsNonModifiableColor;
+	NFmiColor itsIsolineLabelBoxFillColor;
 //   Minkä kokoinen näyttöön piirrettävä 'symbolidata' 
 //   on suhteessa
 //   annettuun asemalle/hilalle varattuun 'datalaatikkoon'. 
