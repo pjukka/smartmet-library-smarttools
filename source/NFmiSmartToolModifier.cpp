@@ -46,10 +46,9 @@
 #include "NFmiQueryData.h"
 
 #include <cassert>
+#include <stdexcept>
 
 using namespace std;
-
-#include "stdafx.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
