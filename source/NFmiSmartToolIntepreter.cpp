@@ -1604,6 +1604,21 @@ bool NFmiSmartToolIntepreter::InterpretNextMask(const std::string &theMaskSectio
 {
 	return false;
 }
+
+NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &theParamText)
+{
+	NFmiParam param;
+	ParamMap::iterator it = itsTokenParameterNamesAndIds.find(theParamText);
+	if(it == itsTokenParameterNamesAndIds.end())
+	{
+		if(!GetParamFromVariableById(theParamText, param))
+			throw runtime_error(string("Haluttua parametria '") + theParamText + "'ei löytynyt listoilta, eikä sitä voinut johtaa mistään.");
+	}
+	else
+		param = NFmiParam((*it).second, (*it).first);
+	return param; 
+}
+
 //--------------------------------------------------------
 // ExtractFirstCalculationSection 
 //--------------------------------------------------------
@@ -2013,6 +2028,7 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsCalculationOperations.insert(CalcOperMap::value_type(string("%"), NFmiAreaMask::Mod));
 
 
+		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("1000"), make_pair(kFmiPressureLevel, 1000)));
 		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("925"), make_pair(kFmiPressureLevel, 925)));
 		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("850"), make_pair(kFmiPressureLevel, 850)));
 		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("700"), make_pair(kFmiPressureLevel, 700)));
