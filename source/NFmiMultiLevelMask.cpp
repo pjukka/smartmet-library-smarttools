@@ -232,7 +232,7 @@ FmiBoolean NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask)
 {
 	if ((itsMaskType & kFmiNoMask) == kFmiNoMask)
 		return kTrue;
-	if (itsMaskSize == unsigned long(theMask.Size()))
+	if (itsMaskSize == (unsigned long)(theMask.Size()))
 	{
 		if ((itsMaskType & kFmiActivationMask) == kFmiActivationMask)
 			itsActivationMask = theMask;
@@ -255,7 +255,7 @@ FmiBoolean NFmiMultiLevelMask::Mask (const NFmiBitMask& theMask, const unsigned 
 {
 	if ((theMaskType & kFmiNoMask) == kFmiNoMask)
 		return kTrue;
-	if (itsMaskSize == unsigned long(theMask.Size()))
+	if (itsMaskSize == (unsigned long)(theMask.Size()))
 	{
 		if ((theMaskType & kFmiActivationMask) == kFmiActivationMask)
 			itsActivationMask = theMask;
@@ -323,10 +323,10 @@ int NFmiMultiLevelMask::MaskedCount(unsigned long theMaskType, unsigned long the
 	int indexYPos = theIndex/theXGridSize;
 	int indexXPos = theIndex%theXGridSize;
 	int count = 0;
-	int endRow = indexYPos + theSearchArea.Bottom();
-	int startRow = indexYPos + theSearchArea.Top();
-	int startColumn = indexXPos + theSearchArea.Left();
-	int endColumn = indexXPos + theSearchArea.Right();
+	int endRow = static_cast<int>(indexYPos + theSearchArea.Bottom());
+	int startRow = static_cast<int>(indexYPos + theSearchArea.Top());
+	int startColumn = static_cast<int>(indexXPos + theSearchArea.Left());
+	int endColumn = static_cast<int>(indexXPos + theSearchArea.Right());
 
 	for(int i=startRow; i<=endRow; i++)
 	{

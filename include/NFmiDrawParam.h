@@ -35,7 +35,7 @@
 #include "NFmiSaveBase.h"
 #include "NFmiDataIdent.h"
 #include "FmiNMeteditLibraryDefinitions.h"
-#include "FCOLOR.H"
+#include "TFmiColor.h"
 #include "NFmiPoint.h"
 
 #include <vector>

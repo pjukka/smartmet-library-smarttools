@@ -77,7 +77,9 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo
 		NFmiString fileName = CreateFileName(drawParam);
 		if(!drawParam->Init(fileName))
 			if(!drawParam->StoreData(fileName))
-				int x = 0; // tiedostoa ei voitu luoda, mitä pitäisi tehdä?
+			  {
+				// tiedostoa ei voitu luoda, mitä pitäisi tehdä?
+			  }
 	}
 	return drawParam;
 }

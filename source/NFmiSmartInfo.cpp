@@ -33,7 +33,9 @@
 #include "NFmiGrid.h"
 #include "NFmiCombinedParam.h"
 
-#include "stdafx.h"
+#ifndef UNIX
+ #include "stdafx.h"
+#endif
 
 NFmiSmartInfo::NFmiSmartInfo()
 :NFmiFastQueryInfo()
@@ -90,8 +92,8 @@ NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theDa
 
 NFmiSmartInfo::NFmiSmartInfo (const NFmiSmartInfo & theInfo)
 :NFmiFastQueryInfo(theInfo)
-,itsDataType(theInfo.itsDataType)
 ,itsDataFileName(theInfo.itsDataFileName)
+,itsDataType(theInfo.itsDataType)
 {
 	this->itsPriority = theInfo.itsPriority;
 	this->fEditable = theInfo.fEditable;
@@ -695,8 +697,8 @@ void NFmiSmartInfo::LocationMaskStepGrid(FmiBoolean newStatus, FmiBoolean fReset
 	if(fResetAllFirst)
 		MaskAllLocations(!newStatus);
 
-	unsigned long midX = unsigned long(theXStep/2); // sijoittaa näkyvät hilat 'keskemmälle'
-	unsigned long midY = unsigned long(theYStep/2);
+	unsigned long midX = (unsigned long)(theXStep/2); // sijoittaa näkyvät hilat 'keskemmälle'
+	unsigned long midY = (unsigned long)(theYStep/2);
 
 	ResetLocation();
 	for(unsigned int j=0; j<y; j++)
@@ -720,8 +722,8 @@ void NFmiSmartInfo::LocationMaskStepGrid(FmiBoolean newStatus, unsigned long the
 	if(fResetAllFirst)
 		MaskAllLocations(!newStatus, theMaskType);
 
-	unsigned long midX = unsigned long(theXStep/2); // sijoittaa näkyvät hilat 'keskemmälle'
-	unsigned long midY = unsigned long(theYStep/2);
+	unsigned long midX = (unsigned long)(theXStep/2); // sijoittaa näkyvät hilat 'keskemmälle'
+	unsigned long midY = (unsigned long)(theYStep/2);
 
 	ResetLocation();
 	for(unsigned int j=0; j<y; j++)

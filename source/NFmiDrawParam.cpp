@@ -39,8 +39,7 @@ float NFmiDrawParam::itsFileVersionNumber=2.0;
 // NFmiDrawParam(void)
 //--------------------------------------------------------
 NFmiDrawParam::NFmiDrawParam()
-: itsInfo(0)
-, itsParameter(NFmiParam(kFmiLastParameter))
+: itsParameter(NFmiParam(kFmiLastParameter))
 , itsParameterAbbreviation("?")
 , itsPriority(1)
 , itsViewType							 (kFmiIsoLineView)
@@ -59,6 +58,9 @@ NFmiDrawParam::NFmiDrawParam()
 , itsTimeSerialModifyingLimit(10)
 , itsIsolineColor						(TFmiColor(0.,0.,0.))
 , itsIsolineTextColor					(TFmiColor(0.,0.,0.))
+, itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
+, itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
+, fUseSecondaryColors(kFalse)
 , itsAbsoluteMinValue(-10000)
 , itsAbsoluteMaxValue(10000)
 , itsTimeSeriesScaleMin(0)
@@ -69,19 +71,6 @@ NFmiDrawParam::NFmiDrawParam()
 , fShowColors(kFalse)
 , fShowColoredNumbers(kFalse)
 , fZeroColorMean(kFalse)
-, itsInitFileVersionNumber(itsFileVersionNumber)
-, itsInitFileName("")
-, fHidden(kFalse)
-, fEditedParam(kFalse)
-, fEditableParam(kTrue)
-, itsUnit								("?")
-, fActive(kFalse)
-, itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
-, itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
-, fUseSecondaryColors(kFalse)
-, fShowDifference(kFalse)
-, itsMetEditorCoordinatorMapOptions(0)
-
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
@@ -151,6 +140,18 @@ NFmiDrawParam::NFmiDrawParam()
 , itsIsoLineHatchColor2(0.5f,0.5f,0.5f)
 , itsIsoLineHatchBorderColor2(0.5f,0.5f,0.5f)
 , itsIsoLineLabelDigitCount(0)
+// protected osa
+, itsInitFileVersionNumber(itsFileVersionNumber)
+, itsInitFileName("")
+, fHidden(kFalse)
+, fEditedParam(kFalse)
+, fEditableParam(kTrue)
+, itsInfo(0)
+, itsUnit								("?")
+, fActive(kFalse)
+, fShowDifference(kFalse)
+, itsMetEditorCoordinatorMapOptions(0)
+
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
@@ -166,8 +167,7 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 							 , const FmiParameterName& theParam
 							 , int thePriority
 							 , NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions)
-: itsInfo(theInfo)
-, itsParameter(NFmiParam(theParam))
+: itsParameter(NFmiParam(theParam))
 , itsParameterAbbreviation("?")
 , itsPriority(thePriority)
 , itsViewType							 (kFmiIsoLineView)
@@ -186,6 +186,9 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , itsTimeSerialModifyingLimit(10)
 , itsIsolineColor						(TFmiColor(0.,0.,0.))
 , itsIsolineTextColor					(TFmiColor(0.,0.,0.))
+, itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
+, itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
+, fUseSecondaryColors(kFalse)
 , itsAbsoluteMinValue(-10000)
 , itsAbsoluteMaxValue(10000)
 , itsTimeSeriesScaleMin(0)
@@ -196,19 +199,6 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , fShowColors(kFalse)
 , fShowColoredNumbers(kFalse)
 , fZeroColorMean(kFalse)
-, itsInitFileVersionNumber(itsFileVersionNumber)
-, itsInitFileName("")
-, fHidden(kFalse)
-, fEditedParam(kFalse)
-, fEditableParam(kTrue)
-, itsUnit								("?")
-, fActive(kFalse)
-, itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
-, itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
-, fUseSecondaryColors(kFalse)
-, fShowDifference(kFalse)
-, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
-
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
@@ -278,6 +268,17 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
+, itsInitFileVersionNumber(itsFileVersionNumber)
+, itsInitFileName("")
+, fHidden(kFalse)
+, fEditedParam(kFalse)
+, fEditableParam(kTrue)
+, itsInfo(theInfo)
+, itsUnit								("?")
+, fActive(kFalse)
+, fShowDifference(kFalse)
+, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
+
 {
 	itsPossibleViewTypeList[0] = kFmiTextView;
 	itsPossibleViewTypeList[1] = kFmiIsoLineView;
@@ -290,8 +291,7 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 							, const NFmiDataIdent& theParam
 							, int thePriority
 							, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions)
-: itsInfo(theInfo)
-, itsParameter(theParam)
+: itsParameter(theParam)
 , itsParameterAbbreviation("?")
 , itsPriority(thePriority)
 , itsViewType							 (kFmiIsoLineView)
@@ -310,6 +310,9 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 , itsTimeSerialModifyingLimit(10)
 , itsIsolineColor						(TFmiColor(0.,0.,0.))
 , itsIsolineTextColor					(TFmiColor(0.,0.,0.))
+, itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
+, itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
+, fUseSecondaryColors(kFalse)
 , itsAbsoluteMinValue(-10000)
 , itsAbsoluteMaxValue(10000)
 , itsTimeSeriesScaleMin(0)
@@ -320,19 +323,6 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 , fShowColors(kFalse)
 , fShowColoredNumbers(kFalse)
 , fZeroColorMean(kFalse)
-, itsInitFileVersionNumber(itsFileVersionNumber)
-, itsInitFileName("")
-, fHidden(kFalse)
-, fEditedParam(kFalse)
-, fEditableParam(kTrue)
-, itsUnit								("?")
-, fActive(kFalse)
-, itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
-, itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
-, fUseSecondaryColors(kFalse)
-, fShowDifference(kFalse)
-, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
-
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
@@ -402,6 +392,17 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
+, itsInitFileVersionNumber(itsFileVersionNumber)
+, itsInitFileName("")
+, fHidden(kFalse)
+, fEditedParam(kFalse)
+, fEditableParam(kTrue)
+, itsInfo(theInfo)
+, itsUnit								("?")
+, fActive(kFalse)
+, fShowDifference(kFalse)
+, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
+
 {
 	itsPossibleViewTypeList[0] = kFmiTextView;
 	itsPossibleViewTypeList[1] = kFmiIsoLineView;
@@ -960,8 +961,12 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				file >> size;
 				itsSpecialIsoLineShowLabelBox.resize(size);
 				for(i=0; i < size; i++)
-					file >> itsSpecialIsoLineShowLabelBox[i];
-
+				  {
+				    // Mika: g++ 2.95 ei salli suoraa sijoitusta
+				    bool temp;
+				    file >> temp;
+				    itsSpecialIsoLineShowLabelBox[i] = temp;
+				  }
 				file >> fUseDefaultRegioning;
 				file >> fUseCustomColorContouring;
 

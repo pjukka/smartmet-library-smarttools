@@ -90,7 +90,7 @@ bool NFmiMetEditorCoordinatorMapOptions::IsLocationBagUsed (void)
 // Palauttaa locationbagin johon asetus osoittaa
 NFmiLocationBag* NFmiMetEditorCoordinatorMapOptions::WantedLocations (void)
 {
-	if(itsLocationBagVector && itsLocationBagVector->size() >= itsLocationViewingSetting)
+	if(itsLocationBagVector && static_cast<long>(itsLocationBagVector->size()) >= itsLocationViewingSetting)
 		return (*itsLocationBagVector)[itsLocationViewingSetting-1];
 	else
 		return 0;
@@ -104,7 +104,7 @@ bool NFmiMetEditorCoordinatorMapOptions::ReadLocationBags (std::vector<NFmiStrin
 	itsLocationBagVector = new std::vector<NFmiLocationBag*>;
 
 	bool status = false;
-	for(int i=0; i < theFileNameList.size(); i++)
+	for(unsigned int i=0; i < theFileNameList.size(); i++)
 		status |= ReadLocationBagToVector(theFileNameList[i]);
 	return false;
 }
@@ -132,7 +132,7 @@ void NFmiMetEditorCoordinatorMapOptions::DestroyLocationBags (void)
 	if(itsLocationBagVector)
 	{
 		NFmiLocationBag* locs = 0;
-		for(int i=0; i < itsLocationBagVector->size(); i++)
+		for(unsigned int i=0; i < itsLocationBagVector->size(); i++)
 		{
 			locs = itsLocationBagVector->at(i);
 			delete locs;

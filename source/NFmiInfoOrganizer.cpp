@@ -40,7 +40,9 @@
 #include "NFmiProducerList.h"
 #include "NFmiGrid.h"
 
-#include "stdafx.h" // TRACE-kutsu
+#ifndef UNIX
+  #include "stdafx.h" // TRACE-kutsu
+#endif
 
 //--------------------------------------------------------
 // Constructor/Destructor 
@@ -328,7 +330,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 {
 // Huomaa, ett‰ itsDrawParamFactory luo pointterin drawParam new:ll‰, joten   
 // drawParam pit‰‰ muistaa tuhota  NFmiInfoOrganizer:n ulkopuolella
-	int thePriority = 1;// toistaiseksi HARDCODE, thePriority m‰‰ritys tehd‰‰n myˆhemmin
+	// int thePriority = 1;// toistaiseksi HARDCODE, thePriority m‰‰ritys tehd‰‰n myˆhemmin
 	NFmiDrawParam* drawParam = 0;
 	FmiBoolean aSubParam;	
 	NFmiSmartInfo* info = Info(theIdent, aSubParam, theLevel, theType);
@@ -372,7 +374,9 @@ FmiBoolean NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 									 ,int theUndoLevel)
 {
 	FmiBoolean status = kFalse;
+#ifndef UNIX
 	TRACE("Dataa NFmiInfoOrganizerissa ennen AddData:a %d kpl.\n", CountData());
+#endif
 	if(theData)
 	{
 		NFmiQueryInfo aQueryInfo(theData);
@@ -396,7 +400,9 @@ FmiBoolean NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 		else
 			status = Add(aSmartInfo); // muun tyyppiset datat kuin editoitavat menev‰t listaan
 	}
+#ifndef UNIX
 	TRACE("Dataa NFmiInfoOrganizerissa j‰lkeen AddData:a %d kpl.\n", CountData());
+#endif
 	return status;
 }
 
