@@ -367,3 +367,26 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pa
 		}
 	}
 }
+
+/*!
+ * Poistaa halutun macroParamin listalta. Eli DrawParamin tyyppi pitää olla oikein
+ * Ja sitten tutkitaan drawParamin nimen lyhennystä, joka on macroparametrien tunnus.
+ * Palauttaa true, jos poistettiin mitään, muuten false.
+ */
+bool NFmiDrawParamList::RemoveMacroParam(const std::string &theName)
+{
+	bool status = false;
+	NFmiString wantedName(theName);
+	for(Reset(); Next();)
+	{
+		if(Current()->DataType() == NFmiInfoData::kMacroParam)
+		{
+			if(Current()->ParameterAbbreviation() == wantedName)
+			{
+				status = true;
+				Remove(true); // true=deletoi drawparamin
+			}
+		}
+	}
+	return status;
+}

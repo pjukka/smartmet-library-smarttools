@@ -81,6 +81,7 @@ public:
 	bool      IsDirty (void){ return fDirtyList; }; 
 	void            Dirty (bool fDirty){ fDirtyList = fDirty; }; 
 	unsigned long NumberOfItems(void){return itsList.NumberOfItems();};
+	bool RemoveMacroParam(const std::string &theName);
 
 private:
 	NFmiSortedPtrList < NFmiDrawParam > itsList;
