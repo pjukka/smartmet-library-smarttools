@@ -606,7 +606,7 @@ bool NFmiDrawParam::operator< (const NFmiDrawParam& theDrawParam) const
 //--------------------------------------------------------
 // Write
 //--------------------------------------------------------
-std::ostream& NFmiDrawParam::Write (std::ostream &file)
+std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 {
 	using namespace std;
 

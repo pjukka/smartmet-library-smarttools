@@ -32,7 +32,6 @@
 
 #include "NFmiGlobals.h"
 #include "NFmiParameterName.h"
-#include "NFmiSaveBase.h"
 #include "NFmiDataIdent.h"
 #include "FmiNMeteditLibraryDefinitions.h"
 #include "TFmiColor.h"
@@ -46,7 +45,7 @@ class NFmiString;
 class NFmiDataIdent;
 class NFmiMetEditorCoordinatorMapOptions;
 
-class NFmiDrawParam : public NFmiSaveBase
+class NFmiDrawParam
 {
 
 public:
@@ -288,7 +287,7 @@ public:
 // ---------------------- operators ------------------------
 	bool operator == (const NFmiDrawParam & theDrawParam) const;
 	bool operator < (const NFmiDrawParam & theDrawParam) const;
-	virtual std::ostream & Write (std::ostream &file);
+	virtual std::ostream & Write (std::ostream &file) const;
 	virtual std::istream & Read (std::istream &file);
 
 
@@ -444,5 +443,9 @@ private:
 
 	NFmiMetEditorCoordinatorMapOptions* itsMetEditorCoordinatorMapOptions; // tätä käytetään koordinaatio tarkasteluissa
 };
+//@{ \name Globaalit NFmiDrawParam-luokan uudelleenohjaus-operaatiot
+inline std::ostream& operator<<(std::ostream& os, const NFmiDrawParam& item){return item.Write(os);}
+inline std::istream& operator>>(std::istream& is, NFmiDrawParam& item){return item.Read(is);}
+//@}
 
 #endif
