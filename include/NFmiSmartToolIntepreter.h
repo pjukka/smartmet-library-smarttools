@@ -122,7 +122,11 @@ private:
 	NFmiAreaMaskInfo* CreateWantedAreaMaskInfo(const std::string &theMaskSectionText, std::queue<NFmiAreaMaskInfo *> &theMaskQueue) throw (NFmiSmartToolIntepreter::Exception);
 	NFmiSmartToolCalculationInfo* InterpretCalculationLine(const std::string &theCalculationLineText) throw (NFmiSmartToolIntepreter::Exception);
 	bool InterpretNextMask(const std::string &theMaskSectionText);
+#ifdef UNIX
+	std::string::const_iterator ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition);
+#else
 	std::string::iterator ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition);
+#endif
 	void InitCheckOut(void);
 	bool CheckoutPossibleIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
 	bool CheckoutPossibleElseIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
@@ -205,7 +209,8 @@ private:
 	bool IsDelim(char c);
 	// Ed. funktiot käyttävät seuraavia muuttujia:
 	enum types { NOTYPE=0, DELIMITER = 1, VARIABLE, NUMBER};
-	char *exp_ptr;  // points to the expression
+    std::string::iterator exp_ptr;  // points to the expression
+    std::string::iterator exp_end;
 	char token[128]; // holds current token
 	types tok_type;  // holds token's type
 	

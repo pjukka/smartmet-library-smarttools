@@ -489,6 +489,7 @@ bool NFmiSmartToolIntepreter::InterpretMaskSection(const std::string &theMaskSec
 	theAreaMaskSectionInfo->SetCalculationText(theMaskSectorText);
 	string maskText(theMaskSectorText);
 	exp_ptr = maskText.begin();
+	exp_end = maskText.end();
 
 	string tmp;
 	if(GetToken()) // luetaan komento tähän esim. if, else jne
@@ -716,14 +717,12 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 	temp = token;
 	*temp = '\0';
 
-	if(exp_ptr == 0) 
-		return false; // 0-pointteri, tässä on joku virhe
-	if(!*exp_ptr) 
+	if(exp_ptr==exp_end) 
 		return false; // at end of expression
 
 	while(isspace(*exp_ptr)) 
 		++exp_ptr; // skip over white space
-	if(!*exp_ptr) 
+	if(exp_ptr==exp_end) 
 		return false; // at end of expression
 
 	if(strchr("+-*/%^=(){}<>&|!", *exp_ptr))
@@ -934,7 +933,7 @@ bool NFmiSmartToolIntepreter::IsProducerOrig(std::string &theProducerText)
 {
 	// Normalize the type name
 	string name(theProducerText);
-	transform(name.begin(), name.end(), name.begin(), tolower);
+	transform(name.begin(), name.end(), name.begin(), ::tolower);
 	if(name == "orig")
 		return true;
 	return false;
@@ -1323,9 +1322,18 @@ bool NFmiSmartToolIntepreter::InterpretNextMask(const std::string &theMaskSectio
 // ExtractIfMaskSection
 // ExtractNextElseIfMaskSection
 // ExtractElseCalculationSection
+
+#ifdef UNIX
+std::string::const_iterator NFmiSmartToolIntepreter::ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition)
+#else
 std::string::iterator NFmiSmartToolIntepreter::ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition)
+#endif
 {
-   return const_cast<std::string::iterator>(theMacroText.end());
+#ifdef UNIX
+  return theMacroText.end();
+#else
+  return const_cast<std::string::iterator>(theMacroText.end());
+#endif
 }
 
 void NFmiSmartToolIntepreter::Clear(void)
