@@ -727,7 +727,7 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 		NFmiAreaMaskInfo *assignedVariable = new NFmiAreaMaskInfo;
 		auto_ptr<NFmiAreaMaskInfo> assignedVariablePtr(assignedVariable); // tuhoaa automaattisesti esim. exceptionin yhteydess‰ 
 		InterpretVariable(tmp, assignedVariable, fNewScriptVariable);  // ei saa antaa auto_ptr-otust‰ t‰ss‰, muuten se menett‰‰ omistuksen!
-		if(!(assignedVariable->GetDataType() == NFmiInfoData::kEditable || assignedVariable->GetDataType() == NFmiInfoData::kScriptVariableData))
+		if(!(assignedVariable->GetDataType() == NFmiInfoData::kEditable || assignedVariable->GetDataType() == NFmiInfoData::kScriptVariableData || assignedVariable->GetDataType() == NFmiInfoData::kAnyData))
 			throw NFmiSmartToolIntepreter::Exception(string("Sijoitusta ei voi tehd‰ kuin editoitavaan dataan tai skripti-muuttujaan: \n") + calculationLineText);
 		calculationInfo->SetResultDataInfo(assignedVariablePtr.release());// auto_ptr menett‰‰ omistuksen t‰ss‰
 
