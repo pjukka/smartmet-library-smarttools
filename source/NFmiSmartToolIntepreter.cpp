@@ -1160,6 +1160,7 @@ bool NFmiSmartToolIntepreter::InterpretPossibleScriptVariable(const std::string 
 		theMaskInfo->SetOperationType(NFmiAreaMask::InfoVariable);
 		theMaskInfo->SetDataIdent(dataIdent);
 		theMaskInfo->SetDataType(NFmiInfoData::kScriptVariableData);
+		theMaskInfo->SetUseDefaultProducer(false); // tämä ei todellakaan ole default tuottajan dataa (tämä vaikuttaa siihen mm. että tehdäänkö datasta kopioita tietyissä tilanteissa)
 		return true;
 	}
 	else if(fNewScriptVariable) // var x, eli 1. alustus
@@ -1172,6 +1173,7 @@ bool NFmiSmartToolIntepreter::InterpretPossibleScriptVariable(const std::string 
 		theMaskInfo->SetOperationType(NFmiAreaMask::InfoVariable);
 		theMaskInfo->SetDataIdent(dataIdent);
 		theMaskInfo->SetDataType(NFmiInfoData::kScriptVariableData);
+		theMaskInfo->SetUseDefaultProducer(false); // tämä ei todellakaan ole default tuottajan dataa (tämä vaikuttaa siihen mm. että tehdäänkö datasta kopioita tietyissä tilanteissa)
 		return true;
 	}
 	return false;
