@@ -236,12 +236,12 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 	return false;
 }
 
-bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType)
+bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId)
 {
 	for(Reset(); Next();)
 	{
 		NFmiSmartInfo* info = Current()->Info();
-		if(info && info->Param() == theParam)
+		if(info && (fUseOnlyParamId ? info->Param().GetParamIdent() == theParam.GetParamIdent() : info->Param() == theParam))
 		{
 			if(info->DataType() == theDataType)
 			{

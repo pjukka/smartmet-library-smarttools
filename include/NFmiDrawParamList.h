@@ -74,7 +74,7 @@ public:
 	void			DeactivateAll(void);
 	bool		Find(const NFmiDataIdent& theParam, bool fIgnoreProducer = false);
 	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel);
-	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType);
+	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId = false);
 	bool		SyncronizeTimes(const NFmiMetTime& theTime);
 
 	void            Update(void);
