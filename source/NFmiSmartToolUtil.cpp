@@ -43,9 +43,9 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	{
 		smartToolModifier.InitSmartTool(theMacroText);
 	}
-	catch(NFmiSmartToolModifier::Exception exc)
+	catch(exception &e)
 	{
-		std::cerr << exc.What() << std::endl;
+		std::cerr << e.what() << std::endl;
 		return 0;
 	}
 
@@ -54,9 +54,9 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 		std::vector<double> dummyFactors(theTimes->Size(), 0);
 		smartToolModifier.ModifyData(theTimes, dummyFactors, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
 	}
-	catch(NFmiSmartToolModifier::Exception exc)
+	catch(exception &e)
 	{
-		std::cerr << exc.What() << std::endl;
+		std::cerr << e.what() << std::endl;
 		return 0;
 	}
 
