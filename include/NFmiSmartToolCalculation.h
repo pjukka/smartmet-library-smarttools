@@ -81,7 +81,8 @@ private:
 	void eval_exp5(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 	void eval_exp6(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 	void eval_math_function(double &result, int theFunction);
-	void eval_ThreeArgumentFunction(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+	void eval_ThreeArgumentFunction(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+	void eval_ThreeArgumentFunctionZ(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 	NFmiDataModifier* CreateIntegrationFuction(NFmiAreaMask::FunctionType func);
 	void atom(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 	void get_token(void);
@@ -101,9 +102,11 @@ private:
 
 	NFmiSmartInfo* itsResultInfo; // omistaa+tuhoaa
 	std::vector<NFmiAreaMask*> itsCalculations; // omistaa+tuhoaa
+	float itsHeightValue;
 
 	bool fUseTimeInterpolationAlways; // uudet MINT, MAXT, jne vaativat aina aikainterpolointia, ja t‰m‰ flagi laitetaan silloin p‰‰lle 
 									  // (t‰m‰ on jo k‰ytˆss‰ olevan optimoinnin toimivuuden kannalta pakko tehd‰ n‰in)
+	bool fUseHeightCalculation; // atom-metodi kutsuu HeightValue-metodia, jos t‰m‰ on p‰‰ll‰
 	bool fAllowMissingValueAssignment; 
 
 	// tuulen suuntaa varten pit‰‰ tehd‰ virityksi‰, ett‰ esim. 350 + 20 olisi 10 eik‰ 360 (eli maksimi) jne.
