@@ -61,8 +61,8 @@ NFmiDrawParam::NFmiDrawParam()
 , itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehd‰‰n secondary v‰reist‰ aina harmaita
 , itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehd‰‰n secondary v‰reist‰ aina harmaita
 , fUseSecondaryColors(false)
-, itsAbsoluteMinValue(-10000)
-, itsAbsoluteMaxValue(10000)
+, itsAbsoluteMinValue(-1000000000)
+, itsAbsoluteMaxValue(1000000000)
 , itsTimeSeriesScaleMin(0)
 , itsTimeSeriesScaleMax(100)
 , itsPossibleViewTypeCount(2)
