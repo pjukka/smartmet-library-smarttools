@@ -344,11 +344,13 @@ void NFmiSmartToolModifier::ModifyData2(NFmiTimeDescriptor* theModifiedTimes, NF
 			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 			{
 				NFmiMetTime time1(modifiedTimes.Time());
-				info->Time(time1); // asetetaan myös tämä, että saadaan oikea timeindex
-				theCalculationSection->SetTime(time1); // yritetään optimoida laskuja hieman kun mahdollista
-				for(info->ResetLocation(); info->NextLocation(); )
+				if(info->Time(time1)) // asetetaan myös tämä, että saadaan oikea timeindex
 				{
-					theCalculationSection->Calculate(info->LatLon(), info->LocationIndex(), time1, info->TimeIndex());
+					theCalculationSection->SetTime(time1); // yritetään optimoida laskuja hieman kun mahdollista
+					for(info->ResetLocation(); info->NextLocation(); )
+					{
+						theCalculationSection->Calculate(info->LatLon(), info->LocationIndex(), time1, info->TimeIndex());
+					}
 				}
 			}
 		}
