@@ -44,6 +44,8 @@
 #include <functional>
 #include <cctype>
 
+const static int gMesanProdId = 104;
+
 using namespace std;
 /*
 #include "stdafx.h"
@@ -1088,6 +1090,7 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 	string producerNameOnly;
 	bool levelExist = false;
 	bool producerExist = false;
+	fUseAnyDataTypeBecauseUsingProdID = false; // alustetaan falseksi, asetus true:ksi tapahtuu siell‰, miss‰ katsotaan onko tuottaja annettu PROD104 tyyliin
 
 	// tutkitaan ensin onko mahdollisesti variable-muuttuja, jolloin voimme sallia _-merkin k‰ytˆn muuttujissa
 	if(InterpretPossibleScriptVariable(theVariableText, theMaskInfo, fNewScriptVariable))
@@ -1105,7 +1108,11 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 		if(fNewScriptVariable)
 			throw runtime_error(string("Varattua sanaa yritettiin k‰ytt‰‰ \"skripti muuttujana\": " + theVariableText));
 		else
+		{
+			if(fUseAnyDataTypeBecauseUsingProdID)
+				theMaskInfo->SetDataType(NFmiInfoData::kAnyData);
 			return ;
+		}
 	}
 
 	throw runtime_error(string("Outo muuttuja laskussa: " + theVariableText));
@@ -1319,6 +1326,8 @@ bool NFmiSmartToolIntepreter::FindParamAndLevelAndSetMaskInfo(const std::string 
 bool NFmiSmartToolIntepreter::FindParamAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo)
 {
 	NFmiProducer producer(GetPossibleProducerInfo(theProducerText));
+	if(producer.GetIdent() == gMesanProdId)
+		theDataType = NFmiInfoData::kAnalyzeData; // ik‰v‰‰ koodia, mutta analyysi data tyyppi pit‰‰ asettaa jos ANAL-tuottajaa k‰ytetty
 	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer))
 		return true;
 	return false;
@@ -1327,6 +1336,8 @@ bool NFmiSmartToolIntepreter::FindParamAndProducerAndSetMaskInfo(const std::stri
 bool NFmiSmartToolIntepreter::FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo)
 {
 	NFmiProducer producer(GetPossibleProducerInfo(theProducerText));
+	if(producer.GetIdent() == gMesanProdId)
+		theDataType = NFmiInfoData::kAnalyzeData; // ik‰v‰‰ koodia, mutta analyysi data tyyppi pit‰‰ asettaa jos ANAL-tuottajaa k‰ytetty
 	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer))
 	{
 		NFmiLevel level(GetPossibleLevelInfo(theLevelText, theDataType));
@@ -1404,6 +1415,7 @@ bool NFmiSmartToolIntepreter::GetProducerFromVariableById(const std::string &the
 		if(numericPart.IsNumeric())
 		{
 			theProducer = NFmiProducer((long)numericPart, theVariableText);
+			fUseAnyDataTypeBecauseUsingProdID = true; // laitetaan trueksi, koska tuottaja annettu PROD104 tyyliin
 			return true;
 		}
 	}
@@ -2090,6 +2102,9 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ORIG"), kFmiMETEOR)); // tuottaja id:ll‰ ei ole v‰li‰ t‰ss‰ oikeasti
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Orig"), kFmiMETEOR));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("orig"), kFmiMETEOR));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ANAL"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 
 		itsTokenConstants.insert(ConstantMap::value_type(string("MISS"), kFloatMissing));
 		itsTokenConstants.insert(ConstantMap::value_type(string("Miss"), kFloatMissing));

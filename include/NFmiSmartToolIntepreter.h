@@ -258,6 +258,7 @@ private:
 	typedef std::map<std::string, int> ScriptVariableMap;
 	ScriptVariableMap itsTokenScriptVariableNames; // skriptiss‰ varatut muuttujat (var x = ?) talletetaan t‰nne, ett‰ voidaan tarkistaa niiden olemassa olo
 	int itsScriptVariableParamIdCounter; // pit‰‰ keksia muutujille id, joten tehd‰‰ juokseva counter
+	bool fUseAnyDataTypeBecauseUsingProdID; // jos skripti muuttujan tuottaja annetaan id:n‰ (T_PROD104 eli analyysi), pit‰‰ data tyypiksi laittaa anydata
 
 // GetToken ja IsDelim otettu H. Schilbertin  C++: the Complete Refeference third ed.
 // jouduin muuttamaan niit‰ v‰h‰n sopimaan t‰h‰n ymp‰ristˆˆn.
