@@ -2116,7 +2116,11 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("PoP"), kFmiPoP));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Pop"), kFmiPoP));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pop"), kFmiPoP));
-		
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("MIST"), kFmiMist));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Mist"), kFmiMist));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("mist"), kFmiMist));
+
 /*
 
   ,
@@ -2209,6 +2213,9 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ANAL"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("mbe"), kFmiHIRMESO));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Mbe"), kFmiHIRMESO));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("MBE"), kFmiHIRMESO));
 
 		itsTokenConstants.insert(ConstantMap::value_type(string("MISS"), kFloatMissing));
 		itsTokenConstants.insert(ConstantMap::value_type(string("Miss"), kFloatMissing));
