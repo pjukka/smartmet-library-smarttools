@@ -104,7 +104,6 @@ void NFmiSmartToolCalculationBlockInfoVector::AddModifiedParams(std::set<int> &t
 	}
 }
 
-
 //HUOM!!! vaarallinen luokka, pit‰‰ muistaa kutsua Clearia, muuten vuotaa!!!
 NFmiSmartToolCalculationBlockInfo::NFmiSmartToolCalculationBlockInfo(void)
 :itsFirstCalculationSectionInfo(new NFmiSmartToolCalculationSectionInfo)
@@ -187,6 +186,7 @@ std::vector<std::string> NFmiSmartToolIntepreter::itsTokenRampDownFunctions;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenDoubleRampFunctions;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenRampFunctions;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenTMFs;
+std::vector<std::string> NFmiSmartToolIntepreter::itsTokenMacroParamIdentifiers;
 
 NFmiSmartToolIntepreter::MaskOperMap NFmiSmartToolIntepreter::itsTokenMaskOperations;
 NFmiSmartToolIntepreter::CalcOperMap NFmiSmartToolIntepreter::itsCalculationOperations;
@@ -203,6 +203,9 @@ NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctio
 NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer)
 :itsInfoOrganizer(theInfoOrganizer)
 ,itsSmartToolCalculationBlocks()
+,fNormalAssigmentFound(false)
+,fMacroParamFound(false)
+,fMacroParamSkriptInProgress(false)
 {
 	NFmiSmartToolIntepreter::InitTokens();
 }
@@ -216,14 +219,22 @@ NFmiSmartToolIntepreter::~NFmiSmartToolIntepreter(void)
 // Tulkitsee annetun macro-tekstin. Erottelee eri calculationSectionit, mahdolliset ehto rakenteet ja niiden maskit ja rakentaa sen 
 // mukaiset maski ja calculation infot, ett‰ SmartToolModifier osaa rakentaa oikeat systeemit (areamaskit ja lasku-oliot).
 // Jos macrossa virhe, heitt‰‰ poikkeuksen.
-void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText)
+// fThisIsMacroParamSkript -parametrin avulla voidaan tarkistaa, ettei ajeta tavallista sijoitusta macroParamin
+// RESULT = ... sijoitusten sijaan. Tulkin pit‰‰ olla tietoinen 'moodista' ett‰ voi heitt‰‰ poikkeuksen
+// huomatessaan t‰ll‰isen tilanteen.
+void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText, bool fThisIsMacroParamSkript)
 {
+	fMacroParamSkriptInProgress = fThisIsMacroParamSkript;
 	Clear();
 	itsTokenScriptVariableNames.clear(); // tyhjennetaan aluksi kaikki skripti muuttujat
 	itsScriptVariableParamIdCounter = 1000000; // alustetaan isoksi, ettei mene p‰‰llekk‰in todellisten param id::::ien kanssa
 //	InitSectionInfos();
 	SetMacroTexts(theMacroText);
 	InitCheckOut();
+
+	// nollataan tulkinnan aluksi, mink‰ tyyppisi‰ parametri sijoituksia sijoituksia lˆytyy
+	fNormalAssigmentFound = false;
+	fMacroParamFound = false;
 
 	bool fGoOn = true;
 	int index = 0;
@@ -895,7 +906,8 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 		NFmiAreaMaskInfo *assignedVariable = new NFmiAreaMaskInfo;
 		auto_ptr<NFmiAreaMaskInfo> assignedVariablePtr(assignedVariable); // tuhoaa automaattisesti esim. exceptionin yhteydess‰ 
 		InterpretVariable(tmp, assignedVariable, fNewScriptVariable);  // ei saa antaa auto_ptr-otust‰ t‰ss‰, muuten se menett‰‰ omistuksen!
-		if(!(assignedVariable->GetDataType() == NFmiInfoData::kEditable || assignedVariable->GetDataType() == NFmiInfoData::kScriptVariableData || assignedVariable->GetDataType() == NFmiInfoData::kAnyData))
+		NFmiInfoData::Type dType = assignedVariable->GetDataType();
+		if(!(dType == NFmiInfoData::kEditable || dType == NFmiInfoData::kScriptVariableData || dType == NFmiInfoData::kAnyData || dType == NFmiInfoData::kMacroParam))
 			throw runtime_error(string("Sijoitusta ei voi tehd‰ kuin editoitavaan dataan tai skripti-muuttujaan: \n") + calculationLineText);
 		calculationInfo->SetResultDataInfo(assignedVariablePtr.release());// auto_ptr menett‰‰ omistuksen t‰ss‰
 
@@ -916,6 +928,18 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 			return 0;
 	}
 	calculationInfo->CheckIfAllowMissingValueAssignment();
+	if(calculationInfo->GetResultDataInfo()->GetDataType() == NFmiInfoData::kMacroParam)
+		fMacroParamFound = true;
+	else
+	{
+		fNormalAssigmentFound = true;
+		if(fMacroParamSkriptInProgress)
+			throw runtime_error(string("Tarkoitus on tehd‰ ns. macroParam sijoituksia (RESULT = ...). \nMutta tehd‰‰nkin tavallinen sijoitus (T = ...).\nSellainen ei k‰y, lopetetaan..."));
+	}
+	// tarkistetaan saman tien, onko sijoituksia tehty molempiin tyyppeihin ja heitet‰‰n poikkeus jos on
+	if(fMacroParamFound && fNormalAssigmentFound)
+		throw runtime_error(string("T‰ss‰ skriptiss‰ on tehty sijoituksia sek‰ tavallisiin parametreihin (T = ...),\nett‰ ns. macroParametreihin (RESULT = ...). \nSellainen ei k‰y, lopetetaan..."));
+
 	calculationInfoPtr.release();
 	return calculationInfo;
 }
@@ -1192,6 +1216,9 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &th
 	if(IsVariableTMF(theVariableText, theMaskInfo))
 		return true;
 
+	if(IsVariableMacroParam(theVariableText, theMaskInfo))
+		return true;
+
 	if(IsVariableBinaryOperator(theVariableText, theMaskInfo)) // t‰m‰ on and ja or tapausten k‰sittelyyn
 		return true;
 
@@ -1374,6 +1401,11 @@ NFmiProducer NFmiSmartToolIntepreter::GetPossibleProducerInfo(const std::string 
 	return producer;
 }
 
+bool NFmiSmartToolIntepreter::IsInterpretedSkriptMacroParam(void) 
+{
+	return (fNormalAssigmentFound == false) && (fMacroParamFound == true);
+}
+
 bool NFmiSmartToolIntepreter::GetParamFromVariable(const std::string &theVariableText, ParamMap& theParamMap, NFmiParam &theParam, bool &fUseWildDataType)
 {
 	ParamMap::iterator it = theParamMap.find(theVariableText);
@@ -1552,6 +1584,17 @@ bool NFmiSmartToolIntepreter::IsVariableTMF(const std::string &theVariableText, 
 	if(FindAnyFromText(theVariableText, itsTokenTMFs))
 	{
 		theMaskInfo->SetOperationType(NFmiAreaMask::ModifyFactor);
+		return true;
+	}
+	return false;
+}
+
+bool NFmiSmartToolIntepreter::IsVariableMacroParam(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
+{
+	if(FindAnyFromText(theVariableText, itsTokenMacroParamIdentifiers))
+	{
+		theMaskInfo->SetOperationType(NFmiAreaMask::InfoVariable);
+		theMaskInfo->SetDataType(NFmiInfoData::kMacroParam);
 		return true;
 	}
 	return false;
@@ -1853,6 +1896,8 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("hessaa"), kFmiWeatherSymbol3));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("W"), kFmiVerticalVelocityMMS));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("w"), kFmiVerticalVelocityMMS));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Z"), kFmiGeopHeight));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("z"), kFmiGeopHeight));
 
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1BASE"), kFmi_FL_1_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1Base"), kFmi_FL_1_Base));
@@ -2204,6 +2249,10 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenTMFs.push_back(string("TMF"));
 		itsTokenTMFs.push_back(string("Tmf"));
 		itsTokenTMFs.push_back(string("tmf"));
+
+		itsTokenMacroParamIdentifiers.push_back(string("result"));
+		itsTokenMacroParamIdentifiers.push_back(string("Result"));
+		itsTokenMacroParamIdentifiers.push_back(string("RESULT"));
 
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("EXP"), NFmiAreaMask::Exp));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("Exp"), NFmiAreaMask::Exp));

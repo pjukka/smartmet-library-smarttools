@@ -117,7 +117,7 @@ public:
 		const std::string itsText;
 	};
 */
-	void Interpret(const std::string &theMacroText);
+	void Interpret(const std::string &theMacroText, bool fThisIsMacroParamSkript = false);
 
 	NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer);
 	~NFmiSmartToolIntepreter(void);
@@ -131,6 +131,7 @@ public:
 	std::vector<NFmiSmartToolCalculationBlockInfo>& SmartToolCalculationBlocks(void){return itsSmartToolCalculationBlocks;}
 	NFmiParamBag ModifiedParams(void);
 	NFmiParam GetParamFromString(const std::string &theParamText);
+	bool IsInterpretedSkriptMacroParam(void); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns. macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
 
 private:
 	typedef std::map<std::string, FmiParameterName> ParamMap;
@@ -146,6 +147,7 @@ private:
 	bool FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
 	bool ExtractParamAndLevel(const std::string &theVariableText, std::string *theParamNameOnly, std::string *theLevelNameOnly);
 	bool IsVariableTMF(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
+	bool IsVariableMacroParam(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariableRampFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
 	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo, const NFmiProducer &theProducer);
@@ -237,6 +239,7 @@ private:
 	static std::vector<std::string> itsTokenDoubleRampFunctions;
 	static std::vector<std::string> itsTokenRampFunctions;
 	static std::vector<std::string> itsTokenTMFs; // aikasarjamuokkauskerroin
+	static std::vector<std::string> itsTokenMacroParamIdentifiers; // tänne listataan result jne. sanat joita käytetään makrojen visualisoinnissa
 
 	typedef std::map<std::string, FmiMaskOperation> MaskOperMap;
 	static MaskOperMap itsTokenMaskOperations;
@@ -259,6 +262,11 @@ private:
 	ScriptVariableMap itsTokenScriptVariableNames; // skriptissä varatut muuttujat (var x = ?) talletetaan tänne, että voidaan tarkistaa niiden olemassa olo
 	int itsScriptVariableParamIdCounter; // pitää keksia muutujille id, joten tehdää juokseva counter
 	bool fUseAnyDataTypeBecauseUsingProdID; // jos skripti muuttujan tuottaja annetaan id:nä (T_PROD104 eli analyysi), pitää data tyypiksi laittaa anydata
+
+	// normaali ja macroParam sijoituksia halutaan seurata, että ei tapahdu vahinkoja eli niitä olisi sekaisin, jolloin seuramukset ovat vahingollisia
+	bool fNormalAssigmentFound; // loytyykö skriptistä normaaleja sijoituksia esim. T = ???
+	bool fMacroParamFound; // loytyykö skriptistä ns. macroParameri sijoituksia eli RESULT = ?????
+	bool fMacroParamSkriptInProgress; // Tieto siitä tulkitaanko macroParam-skriptiä vai tavallista skriptiä. Poikkeus heitetään jos macrpParam-skripti päällä, mutta tehdään tavallinen sijoitus
 
 // GetToken ja IsDelim otettu H. Schilbertin  C++: the Complete Refeference third ed.
 // jouduin muuttamaan niitä vähän sopimaan tähän ympäristöön.
