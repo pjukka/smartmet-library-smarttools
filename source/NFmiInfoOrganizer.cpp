@@ -372,10 +372,14 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(FmiParameterName thePara
 */
 
 // SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
-NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly)
+NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData)
 {
 	bool aSubParam;	
-	NFmiSmartInfo* info = fUseParIdOnly ? Info(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), aSubParam, theLevel, theType) : Info(theDataIdent, aSubParam, theLevel, theType);
+	NFmiSmartInfo* info = 0;
+	if(fLevelData)
+		info = CrossSectionInfo(theDataIdent, aSubParam, theType);
+	else
+		info = fUseParIdOnly ? Info(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), aSubParam, theLevel, theType) : Info(theDataIdent, aSubParam, theLevel, theType);
 	if(info)
 	{
 		if(theType == NFmiInfoData::kMacroParam || (fUseParIdOnly ?  info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) : info->Param(theDataIdent)))  // makroparamille ei tarvitse laittaa parametria kohdalleen!

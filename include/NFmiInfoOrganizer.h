@@ -101,7 +101,7 @@ class NFmiInfoOrganizer
 
 	// SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
 //	NFmiSmartInfo* CreateShallowCopyInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
-	NFmiSmartInfo* CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly);
+	NFmiSmartInfo* CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData);
 
 //	NFmiDrawParam* CreateDrawParam(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 //	NFmiDrawParam* CreateEmptyInfoDrawParam(const NFmiDataIdent& theDataIdent); // luo drawparam ilman infoa
