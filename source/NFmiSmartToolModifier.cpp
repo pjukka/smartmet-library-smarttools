@@ -224,6 +224,7 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer
 //,itsElseCalculationSection(0)
 ,fModifySelectedLocationsOnly(false)
 ,itsIncludeDirectory()
+,itsModifiedTimes(0)
 {
 	assert(itsInfoOrganizer);
 }
@@ -449,6 +450,7 @@ void NFmiSmartToolModifier::ClearCalculationModifiers(void)
 // datan ajoille.
 void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly)
 {
+	itsModifiedTimes = theModifiedTimes;
 	fModifySelectedLocationsOnly = fSelectedLocationsOnly;
 	try
 	{
@@ -465,7 +467,7 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, boo
 			auto_ptr<NFmiSmartToolCalculationBlock> blockPtr(block); // tuhoaa block-otuksen automaattisesti
 			if(block)
 			{
-				ModifyBlockData(theModifiedTimes, block);
+				ModifyBlockData(block);
 //			InitializeCalculationModifiers(&blockInfo);
 			}
 //			ModifyData2(theModifiedTimes, itsFirstCalculationSection);
@@ -488,14 +490,14 @@ bool NFmiSmartToolModifier::IsInterpretedSkriptMacroParam(void)
 	return itsSmartToolIntepreter ? itsSmartToolIntepreter->IsInterpretedSkriptMacroParam() : false;
 }
 
-void NFmiSmartToolModifier::ModifyBlockData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculationBlock *theCalculationBlock)
+void NFmiSmartToolModifier::ModifyBlockData(NFmiSmartToolCalculationBlock *theCalculationBlock)
 {
-	ModifyData2(theModifiedTimes, theCalculationBlock->itsFirstCalculationSection);
-	ModifyConditionalData(theModifiedTimes, theCalculationBlock);
-	ModifyData2(theModifiedTimes, theCalculationBlock->itsLastCalculationSection);
+	ModifyData2(theCalculationBlock->itsFirstCalculationSection);
+	ModifyConditionalData(theCalculationBlock);
+	ModifyData2(theCalculationBlock->itsLastCalculationSection);
 }
 
-void NFmiSmartToolModifier::ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculationBlock *theCalculationBlock)
+void NFmiSmartToolModifier::ModifyConditionalData(NFmiSmartToolCalculationBlock *theCalculationBlock)
 {
 	if(theCalculationBlock->itsIfAreaMaskSection && theCalculationBlock->itsIfCalculationBlocks)
 	{
@@ -508,7 +510,7 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiTimeDescriptor *theModifie
 				info->MaskType(NFmiMetEditorTypes::kFmiSelectionMask);
 			else
 				info->MaskType(NFmiMetEditorTypes::kFmiNoMask);
-			NFmiTimeDescriptor modifiedTimes(theModifiedTimes ? *theModifiedTimes : info->TimeDescriptor());
+			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
 			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 			{
 				NFmiMetTime time1(modifiedTimes.Time());
@@ -614,7 +616,7 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiTimeDescriptor *theModifie
 	::ModifyConditionalData(fModifySelectedLocationsOnly, theModifiedTimes, itsModificationFactors, itsIfAreaMaskSection, itsIfCalculationSection, itsElseIfAreaMaskSection, itsElseIfCalculationSection, itsElseCalculationSection);
 }
 */
-void NFmiSmartToolModifier::ModifyData2(NFmiTimeDescriptor* theModifiedTimes, NFmiSmartToolCalculationSection* theCalculationSection)
+void NFmiSmartToolModifier::ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection)
 {
 	if(theCalculationSection && theCalculationSection->FirstVariableInfo())
 	{
@@ -627,19 +629,34 @@ void NFmiSmartToolModifier::ModifyData2(NFmiTimeDescriptor* theModifiedTimes, NF
 				info->MaskType(NFmiMetEditorTypes::kFmiSelectionMask);
 			else
 				info->MaskType(NFmiMetEditorTypes::kFmiNoMask);
-			NFmiTimeDescriptor modifiedTimes(theModifiedTimes ? *theModifiedTimes : info->TimeDescriptor());
-			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
+			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
+
+			// Muutin lasku systeemin suoritusta, koska tuli ongelmia mm. muuttujien kanssa, kun niitä käytettiin samassa calculationSectionissa
+			// CalculationSection = lasku rivejä peräkkäin esim.
+			// T = T + 1
+			// P = P + 1
+			// jne. ilman IF-lauseita
+			// ENNEN laskettiin tälläinen sectio siten että käytiin läpi koko sectio samalla paikalla ja ajalla ja sitten siirryttiin eteenpäin.
+			// NYT lasketaan aina yksi laskurivi läpi kaikkien aikojen ja paikkojen, ja sitten siirrytään seuraavalle lasku riville.
+			int size = theCalculationSection->GetCalculations()->size();
+			for(int i=0; i<size; i++)
 			{
-				NFmiMetTime time1(modifiedTimes.Time());
-				if(info->Time(time1)) // asetetaan myös tämä, että saadaan oikea timeindex
+				for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 				{
-					theCalculationSection->SetTime(time1); // yritetään optimoida laskuja hieman kun mahdollista
-					for(info->ResetLocation(); info->NextLocation(); )
+					NFmiMetTime time1(modifiedTimes.Time());
+					if(info->Time(time1)) // asetetaan myös tämä, että saadaan oikea timeindex
 					{
-						theCalculationSection->Calculate(info->LatLon(), info->LocationIndex(), time1, info->TimeIndex());
+						theCalculationSection->SetTime(time1); // yritetään optimoida laskuja hieman kun mahdollista
+						for(info->ResetLocation(); info->NextLocation(); )
+						{
+//							theCalculationSection->Calculate(info->LatLon(), info->LocationIndex(), time1, info->TimeIndex());
+							(*theCalculationSection->GetCalculations())[i]->Calculate(info->LatLon(), info->LocationIndex(), time1, info->TimeIndex());
+						}
 					}
 				}
+
 			}
+
 		}
 		catch(...)
 		{
@@ -951,7 +968,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateRealScriptVariableInfo(const NFmiDat
 	NFmiParamBag paramBag;
 	paramBag.Add(theDataIdent);
 	NFmiParamDescriptor paramDesc(paramBag);
-	NFmiQueryInfo innerInfo(paramDesc, editedInfo->TimeDescriptor(), editedInfo->HPlaceDescriptor(), editedInfo->VPlaceDescriptor());
+	NFmiQueryInfo innerInfo(paramDesc, itsModifiedTimes ? *itsModifiedTimes : editedInfo->TimeDescriptor(), editedInfo->HPlaceDescriptor(), editedInfo->VPlaceDescriptor());
 	NFmiQueryData *data = new NFmiQueryData(innerInfo);
 	data->Init();
 	NFmiQueryInfo info(data);

@@ -116,21 +116,21 @@ public:
 	bool IsInterpretedSkriptMacroParam(void); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns. macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
 
 private:
-	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculationBlock *theCalculationBlock);
-	void ModifyBlockData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculationBlock *theCalculationBlock);
+	void ModifyConditionalData(NFmiSmartToolCalculationBlock *theCalculationBlock);
+	void ModifyBlockData(NFmiSmartToolCalculationBlock *theCalculationBlock);
 	NFmiSmartToolCalculationBlockVector* CreateCalculationBlockVector(NFmiSmartToolCalculationBlockInfoVector* theBlockInfoVector);
 	NFmiSmartToolCalculationBlock* CreateCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlockInfo);
 	NFmiSmartInfo* CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 	NFmiSmartInfo* GetScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 	void ClearScriptVariableInfos(void);
 	NFmiSmartInfo* CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent);
-//	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculation *theMaskCondition, NFmiSmartToolCalculationSection *theConditionalCalculations);
+//	void ModifyConditionalData(NFmiSmartToolCalculation *theMaskCondition, NFmiSmartToolCalculationSection *theConditionalCalculations);
 	NFmiAreaMask* CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	void GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit);
 	NFmiDataModifier* CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	NFmiDataIterator* CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo);
-//	void ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes);
-	void ModifyData2(NFmiTimeDescriptor* theModifiedTimes, NFmiSmartToolCalculationSection* theCalculationSection);
+//	void ModifyConditionalData(void);
+	void ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection);
 //	void InitializeCalculationModifiers(NFmiSmartToolCalculationBlockInfo* theBlock);
 //	void ClearCalculationModifiers(void);
 	NFmiAreaMask* CreateAreaMask(const NFmiAreaMaskInfo &theInfo);
@@ -158,5 +158,7 @@ private:
 	bool fModifySelectedLocationsOnly;
 	std::vector<NFmiSmartInfo*> itsScriptVariableInfos; // mahdolliset skripti-muuttujat talletetaan tänne
 	std::string itsIncludeDirectory; // mistä ladataan mahd. include filet
+
+	NFmiTimeDescriptor *itsModifiedTimes; // ei omista/tuhoa
 };
 #endif
