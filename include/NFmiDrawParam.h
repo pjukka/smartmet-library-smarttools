@@ -65,6 +65,8 @@ public:
 	void EditableParam(bool newValue){fEditableParam = newValue;};
 
 	NFmiInfoData::Type DataType(void);
+	// huom! tämä asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppiä!!!!!!
+	void DataType(NFmiInfoData::Type newValue){itsDataType = newValue;};
 
 	bool              Init (const NFmiString& theFilename = NFmiString());
 	bool              StoreData (const NFmiString& theFilename = NFmiString());
