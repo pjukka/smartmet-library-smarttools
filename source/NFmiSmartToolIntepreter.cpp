@@ -194,6 +194,7 @@ NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenStaticParamet
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenCalculatedParameterNamesAndIds;
 NFmiSmartToolIntepreter::LevelMap NFmiSmartToolIntepreter::itsTokenLevelNamesIdentsAndValues;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenFunctions;
+std::vector<std::string> NFmiSmartToolIntepreter::itsTokenPeekXYFunctions;
 NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctions;
 
 //--------------------------------------------------------
@@ -247,6 +248,8 @@ void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText, bool fT
 				throw runtime_error("Annetusta skriptistä tuli yli 500 lasku blokkia, lopetetaan...");
 			fGoOn = CheckoutPossibleNextCalculationBlock(&block, true);
 			itsSmartToolCalculationBlocks.push_back(block);
+			if(*itsCheckOutTextStartPosition == '}') // jos ollaan blokin loppu merkissä, siirrytään sen yli ja jatketaan seuraavalle kierrokselle
+				++itsCheckOutTextStartPosition;
 		}
 		catch(exception & /* e */ )
 		{
@@ -352,6 +355,7 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlock(NFmiSmartTool
 				CheckoutPossibleNextCalculationBlockVector(theBlock->itsElseCalculationBlockInfos);
 			}
 		}
+		if(!fWasBlockMarksFound) // jos 1. checkoutiss ei törmätty blokin alkumerkkiin '{' voidaan kokeilla löytyykö tästä lasku-sektiota
 		CheckoutPossibleNextCalculationSection(theBlock->itsLastCalculationSectionInfo, fWasBlockMarksFound);
 	}
 	if(itsCheckOutTextStartPosition == itsStrippedMacroText.end())
@@ -389,7 +393,7 @@ static std::string::iterator EatWhiteSpaces(std::string::iterator it)
 // Päivittää myös luokan sisäisiä iteraattoreita macro-tekstiin.
 bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBlockMarksFound)
 {
-	fWasBlockMarksFound = 0;
+	fWasBlockMarksFound = false;
 	itsCheckOutSectionText = "";
 	string nextLine;
 //	std::string::iterator eolPos = itsStrippedMacroText.begin();
@@ -403,7 +407,7 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 			throw runtime_error(string("Lasku blokin loppumerkkiä '}' ei löytynyt"));
 		else
 		{
-			fWasBlockMarksFound = 1;
+			fWasBlockMarksFound = true;
 			++itsCheckOutTextStartPosition; // hypätään alkumerkin ohi
 			eolPos = itsCheckOutTextStartPosition;
 //			itsCheckOutSectionText = string(itsCheckOutTextStartPosition, eolPos);
@@ -421,6 +425,8 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 			itsCheckOutSectionText += nextLine;
 			if(*eolPos == '{' || *eolPos == '}') // jos seuraavan blokin alkumerkki tai loppumerkki löytyi, lopetetaan tämä blokki tähän
 			{
+				if(*eolPos == '{') // jos löytyy alkumerkki, ilmoitetaan siitä ulos täältä
+					fWasBlockMarksFound = true;
 //				if(*eolPos == '}') // jos ollaan loppu merkissä, siirrytään sen yli ja jatketaan seuraavalle kierrokselle
 //					++itsCheckOutTextStartPosition;
 				if(itsCheckOutSectionText.empty())
@@ -1615,6 +1621,10 @@ bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVaria
 // eli 1. funktion nimi, sulku auki, parametri, aloitus x ja y paikkaoffset, lopetus x ja y paikkaoffset ja lopuksi suliku kiinni.
 bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
 {
+	// katsotaan onko jokin peek-funktioista
+	if(IsVariablePeekFunction(theVariableText, theMaskInfo))
+		return true;
+	// sitten katsotaan onko jokin integraatio funktioista
 	FunctionMap::iterator it = itsTokenFunctions.find(theVariableText);
 	if(it != itsTokenFunctions.end())
 	{
@@ -1672,6 +1682,43 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 			}
 		}
 		throw runtime_error(string("Integrointi funktion parametrit väärin: ") + theVariableText);
+	}
+	return false;
+}
+
+bool NFmiSmartToolIntepreter::IsVariablePeekFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
+{
+	if(FindAnyFromText(theVariableText, itsTokenPeekXYFunctions))
+	{
+		string tmp;
+		vector<pair<string, types> > tokens;
+		int i;
+		for(i=0; i<7 && GetToken(); i++) // maksimissaan 7 kertaa
+		{
+			tmp = token; // luetaan muuttuja/vakio/funktio tai mikä lie
+			tmp = HandlePossibleUnaryMarkers(tmp);
+			tokens.push_back(std::make_pair(tmp, tok_type));
+			if(tmp == string(")")) // etsitään lopetus sulkua
+				break;
+		}
+		// ensin tutkitaan, onko kyseessä peekxy eli yhteensä 5 'tokenia' peekxy(T 1 1)
+		if(i==4 && (tokens[0].first == string("(")) && (tokens[4].first == string(")")))
+		{
+			if(tokens[1].second == VARIABLE && tokens[2].second == NUMBER && tokens[3].second == NUMBER)
+			{
+				InterpretVariable(tokens[1].first, theMaskInfo);
+				if(theMaskInfo->GetOperationType() == NFmiAreaMask::InfoVariable)
+				{
+					theMaskInfo->SetOperationType(NFmiAreaMask::FunctionPeekXY);
+					NFmiValueString valueString1(tokens[2].first);
+					double value1 = (double)valueString1;
+					NFmiValueString valueString2(tokens[3].first);
+					double value2 = (double)valueString2;
+					theMaskInfo->SetOffsetPoint1(NFmiPoint(value1, value2));
+					return true;
+				}
+			}
+		}
 	}
 	return false;
 }
@@ -2225,6 +2272,11 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 //		itsTokenFunctions.insert(FunctionMap::value_type(string("WAvg"), NFmiAreaMask::WAvg));
 //		itsTokenFunctions.insert(FunctionMap::value_type(string("Wavg"), NFmiAreaMask::WAvg));
 //		itsTokenFunctions.insert(FunctionMap::value_type(string("wavg"), NFmiAreaMask::WAvg));
+
+		itsTokenPeekXYFunctions.push_back(string("PEEKXY"));
+		itsTokenPeekXYFunctions.push_back(string("PeekXY"));
+		itsTokenPeekXYFunctions.push_back(string("Peekxy"));
+		itsTokenPeekXYFunctions.push_back(string("peekxy"));
 
 		itsTokenRampUpFunctions.push_back(string("RU"));
 		itsTokenRampUpFunctions.push_back(string("Ru"));

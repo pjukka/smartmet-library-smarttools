@@ -204,6 +204,7 @@ private:
 	bool IsVariableConstantValue(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	std::string ExtractNextLine(std::string &theText, std::string::iterator theStartPos, std::string::iterator* theEndPos);
 	bool IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
+	bool IsVariablePeekFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	FmiLevelType GetLevelType(NFmiInfoData::Type theDataType, long levelValue);
 
@@ -252,6 +253,8 @@ private:
 
 	typedef std::map<std::string, NFmiAreaMask::FunctionType> FunctionMap;
 	static FunctionMap itsTokenFunctions;
+
+	static std::vector<std::string> itsTokenPeekXYFunctions;
 
 	typedef std::map<std::string, NFmiAreaMask::MathFunctionType> MathFunctionMap;
 	static MathFunctionMap itsMathFunctions;
