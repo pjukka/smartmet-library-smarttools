@@ -1413,6 +1413,184 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Hessaa"), kFmiWeatherSymbol3));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("hessaa"), kFmiWeatherSymbol3));
 
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1BASE"), kFmi_FL_1_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1Base"), kFmi_FL_1_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl1Base"), kFmi_FL_1_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1base"), kFmi_FL_1_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1TOP"), kFmi_FL_1_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1Top"), kFmi_FL_1_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl1Top"), kFmi_FL_1_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1top"), kFmi_FL_1_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1COVER"), kFmi_FL_1_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1Cover"), kFmi_FL_1_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl1Cover"), kFmi_FL_1_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1cover"), kFmi_FL_1_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1CLOUDTYPE"), kFmi_FL_1_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1CloudType"), kFmi_FL_1_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl1CloudType"), kFmi_FL_1_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1cloudtype"), kFmi_FL_1_CloudType));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2BASE"), kFmi_FL_2_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2Base"), kFmi_FL_2_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl2Base"), kFmi_FL_2_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl2base"), kFmi_FL_2_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2TOP"), kFmi_FL_2_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2Top"), kFmi_FL_2_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl2Top"), kFmi_FL_2_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl2top"), kFmi_FL_2_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2COVER"), kFmi_FL_2_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2Cover"), kFmi_FL_2_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl2Cover"), kFmi_FL_2_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl2cover"), kFmi_FL_2_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2CLOUDTYPE"), kFmi_FL_2_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2CloudType"), kFmi_FL_2_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl2CloudType"), kFmi_FL_2_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl2cloudtype"), kFmi_FL_2_CloudType));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3BASE"), kFmi_FL_3_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3Base"), kFmi_FL_3_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl3Base"), kFmi_FL_3_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl3base"), kFmi_FL_3_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3TOP"), kFmi_FL_3_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3Top"), kFmi_FL_3_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl3Top"), kFmi_FL_3_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl3top"), kFmi_FL_3_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3COVER"), kFmi_FL_3_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3Cover"), kFmi_FL_3_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl3Cover"), kFmi_FL_3_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl3cover"), kFmi_FL_3_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3CLOUDTYPE"), kFmi_FL_3_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3CloudType"), kFmi_FL_3_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl3CloudType"), kFmi_FL_3_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl3cloudtype"), kFmi_FL_3_CloudType));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4BASE"), kFmi_FL_4_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4Base"), kFmi_FL_4_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl4Base"), kFmi_FL_4_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl4base"), kFmi_FL_4_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4TOP"), kFmi_FL_4_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4Top"), kFmi_FL_4_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl4Top"), kFmi_FL_4_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl4top"), kFmi_FL_4_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4COVER"), kFmi_FL_4_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4Cover"), kFmi_FL_4_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl4Cover"), kFmi_FL_4_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl4cover"), kFmi_FL_4_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4CLOUDTYPE"), kFmi_FL_4_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4CloudType"), kFmi_FL_4_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl4CloudType"), kFmi_FL_4_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl4cloudtype"), kFmi_FL_4_CloudType));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5BASE"), kFmi_FL_5_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5Base"), kFmi_FL_5_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl5Base"), kFmi_FL_5_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl5base"), kFmi_FL_5_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5TOP"), kFmi_FL_5_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5Top"), kFmi_FL_5_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl5Top"), kFmi_FL_5_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl5top"), kFmi_FL_5_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5COVER"), kFmi_FL_5_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5Cover"), kFmi_FL_5_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl5Cover"), kFmi_FL_5_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl5cover"), kFmi_FL_5_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5CLOUDTYPE"), kFmi_FL_5_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5CloudType"), kFmi_FL_5_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl5CloudType"), kFmi_FL_5_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl5cloudtype"), kFmi_FL_5_CloudType));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6BASE"), kFmi_FL_6_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6Base"), kFmi_FL_6_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl6Base"), kFmi_FL_6_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl6base"), kFmi_FL_6_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6TOP"), kFmi_FL_6_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6Top"), kFmi_FL_6_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl6Top"), kFmi_FL_6_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl6top"), kFmi_FL_6_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6COVER"), kFmi_FL_6_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6Cover"), kFmi_FL_6_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl6Cover"), kFmi_FL_6_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl6cover"), kFmi_FL_6_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6CLOUDTYPE"), kFmi_FL_6_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6CloudType"), kFmi_FL_6_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl6CloudType"), kFmi_FL_6_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl6cloudtype"), kFmi_FL_6_CloudType));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7BASE"), kFmi_FL_7_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7Base"), kFmi_FL_7_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl7Base"), kFmi_FL_7_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl7base"), kFmi_FL_7_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7TOP"), kFmi_FL_7_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7Top"), kFmi_FL_7_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl7Top"), kFmi_FL_7_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl7top"), kFmi_FL_7_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7COVER"), kFmi_FL_7_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7Cover"), kFmi_FL_7_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl7Cover"), kFmi_FL_7_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl7cover"), kFmi_FL_7_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7CLOUDTYPE"), kFmi_FL_7_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7CloudType"), kFmi_FL_7_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl7CloudType"), kFmi_FL_7_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl7cloudtype"), kFmi_FL_7_CloudType));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8BASE"), kFmi_FL_8_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8Base"), kFmi_FL_8_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl8Base"), kFmi_FL_8_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl8base"), kFmi_FL_8_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8TOP"), kFmi_FL_8_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8Top"), kFmi_FL_8_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl8Top"), kFmi_FL_8_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl8top"), kFmi_FL_8_Top));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8COVER"), kFmi_FL_8_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8Cover"), kFmi_FL_8_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl8Cover"), kFmi_FL_8_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl8cover"), kFmi_FL_8_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8CLOUDTYPE"), kFmi_FL_8_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8CloudType"), kFmi_FL_8_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl8CloudType"), kFmi_FL_8_CloudType));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl8cloudtype"), kFmi_FL_8_CloudType));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FLCBBASE"), kFmi_FL_Cb_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FlCbBase"), kFmi_FL_Cb_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("flcbbase"), kFmi_FL_Cb_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FLCBCOVER"), kFmi_FL_Cb_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FlCbCover"), kFmi_FL_Cb_Cover));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("flcbcover"), kFmi_FL_Cb_Cover));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FLMINBASE"), kFmi_FL_Min_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FlMinBase"), kFmi_FL_Min_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("flminbase"), kFmi_FL_Min_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FLMAXBASE"), kFmi_FL_Max_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FlMaxBase"), kFmi_FL_Max_Base));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("flmaxbase"), kFmi_FL_Max_Base));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("AVIVIS"), kFmiAviationVisibility));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("AviVis"), kFmiAviationVisibility));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("avivis"), kFmiAviationVisibility));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("VERVIS"), kFmiVerticalVisibility));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("VerVis"), kFmiVerticalVisibility));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("vervis"), kFmiVerticalVisibility));
+		
+/*
+
+  ,
+  ,
+
+  ,
+  ,
+	kFmiPacked_FL_1 = 625,
+	kFmiPacked_FL_2,
+	kFmiPacked_FL_3,
+	kFmiPacked_FL_4,
+	kFmiPacked_FL_5,
+	kFmiPacked_FL_6,
+	kFmiPacked_FL_7,
+	kFmiPacked_FL_8,
+	kFmiPacked_FL_9,
+	kFmiPacked_FL_10,
+	kFmiPacked_FL_11,
+	kFmiPacked_FL_12,
+*/
+
 		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("TOPO"), kFmiTopoGraf));
 		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("Topo"), kFmiTopoGraf));
 		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("topo"), kFmiTopoGraf));
