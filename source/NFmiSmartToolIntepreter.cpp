@@ -1553,6 +1553,11 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RH"), kFmiHumidity));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Rh"), kFmiHumidity));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rh"), kFmiHumidity));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("THETAW"), kFmiPseudoAdiabaticPotentialTemperature));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("ThetaW"), kFmiPseudoAdiabaticPotentialTemperature));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("thetaW"), kFmiPseudoAdiabaticPotentialTemperature));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Thetaw"), kFmiPseudoAdiabaticPotentialTemperature));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("thetaw"), kFmiPseudoAdiabaticPotentialTemperature));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("KIND"), kFmiKIndex));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("KInd"), kFmiKIndex));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Kind"), kFmiKIndex));
