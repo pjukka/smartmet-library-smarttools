@@ -1771,6 +1771,11 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("VERVIS"), kFmiVerticalVisibility));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("VerVis"), kFmiVerticalVisibility));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("vervis"), kFmiVerticalVisibility));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("POP"), kFmiPoP));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("PoP"), kFmiPoP));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Pop"), kFmiPoP));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pop"), kFmiPoP));
 		
 /*
 
