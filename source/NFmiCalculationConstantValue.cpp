@@ -1,0 +1,90 @@
+//**********************************************************
+// C++ Class Name : NFmiCalculationConstantValue 
+// ---------------------------------------------------------
+// Filetype: (SOURCE)
+// Filepath: G:/siirto/marko/oc/NFmiCalculationConstantValue.cpp 
+// 
+// 
+// GDPro Properties 
+// ---------------------------------------------------
+//  - GD Symbol Type    : CLD_Class 
+//  - GD Method         : UML ( 4.0 ) 
+//  - GD System Name    : aSmartTools 
+//  - GD View Type      : Class Diagram 
+//  - GD View Name      : smarttools 1 
+// ---------------------------------------------------  
+//  Author         : pietarin 
+//  Creation Date  : Thur - Jun 20, 2002 
+// 
+//  Change Log     : 
+// 
+//**********************************************************
+#include "NFmiCalculationConstantValue.h"
+#include "NFmiDataModifier.h"
+#include "NFmiDataIterator.h"
+//--------------------------------------------------------
+// Constructor/Destructor 
+//--------------------------------------------------------
+NFmiCalculationConstantValue::NFmiCalculationConstantValue(double value)
+:itsValue(value)
+{
+}
+NFmiCalculationConstantValue::~NFmiCalculationConstantValue()
+{
+}
+//--------------------------------------------------------
+// Value 
+//--------------------------------------------------------
+double NFmiCalculationConstantValue::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+	return itsValue;
+}
+
+NFmiCalculationSpecialCase::NFmiCalculationSpecialCase(NFmiAreaMask::CalculationOperator theValue)
+:NFmiAreaMaskImpl()
+{
+	SetCalculationOperator(theValue);
+}
+
+
+
+NFmiCalculationRampFuction::NFmiCalculationRampFuction(const NFmiCalculationCondition& theOperation, Type theMaskType, DataType theDataType, NFmiQueryInfo* theInfo, bool ownsInfo, BinaryOperator thePostBinaryOperator)
+:NFmiInfoAreaMask(theOperation, theMaskType, theDataType, theInfo, ownsInfo, thePostBinaryOperator)
+{
+}
+
+NFmiCalculationRampFuction::~NFmiCalculationRampFuction(void)
+{}
+
+double NFmiCalculationRampFuction::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+	double value = NFmiInfoAreaMask::Value(theLatlon, theTime, theTimeIndex);
+	return itsMaskCondition.MaskValue(value);
+}
+
+
+NFmiCalculationIntegrationFuction::NFmiCalculationIntegrationFuction(NFmiDataIterator *theDataIterator, NFmiDataModifier *theDataModifier, Type theMaskType, DataType theDataType, NFmiQueryInfo* theInfo, bool ownsInfo, bool destroySmartInfoData)
+:NFmiInfoAreaMask(NFmiCalculationCondition(), theMaskType, theDataType, theInfo, ownsInfo, NFmiAreaMask::BinaryOperator::kNoValue, destroySmartInfoData)
+,itsDataModifier(theDataModifier)
+,itsDataIterator(theDataIterator)
+{
+}
+
+NFmiCalculationIntegrationFuction::~NFmiCalculationIntegrationFuction(void)
+{
+	delete itsDataModifier;
+	delete itsDataIterator;
+}
+
+double NFmiCalculationIntegrationFuction::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+	// HUOM!!! Tähän tuli pikaviritys:
+	// asetan vain lähimmän pisteen ja ajan kohdalleen.
+	if(itsInfo->NearestPoint(theLatlon) && itsInfo->TimeToNearestStep(theTime, kForward))
+	{
+		itsDataIterator->DoForEach(itsDataModifier);
+		return itsDataModifier->CalculationResult();
+	}
+	return kFloatMissing;
+}
+

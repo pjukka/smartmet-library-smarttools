@@ -1,0 +1,701 @@
+//**********************************************************
+// C++ Class Name : NFmiSmartToolCalculation 
+// ---------------------------------------------------------
+// Filetype: (SOURCE)
+// Filepath: G:/siirto/marko/oc/NFmiSmartToolCalculation.cpp 
+// 
+// 
+// GDPro Properties 
+// ---------------------------------------------------
+//  - GD Symbol Type    : CLD_Class 
+//  - GD Method         : UML ( 4.0 ) 
+//  - GD System Name    : aSmartTools 
+//  - GD View Type      : Class Diagram 
+//  - GD View Name      : smarttools 1 
+// ---------------------------------------------------  
+//  Author         : pietarin 
+//  Creation Date  : Thur - Jun 20, 2002 
+// 
+//  Change Log     : 
+// 
+//**********************************************************
+#ifdef WIN32
+#pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
+#endif
+
+#include "NFmiSmartToolCalculation.h"
+#include "NFmiAreaMaskInfo.h"
+//#include "NFmiFastQueryInfo.h"
+#include "NFmismartInfo.h"
+#include "NFmiCalculationChangeFactorArray.h"
+#include <algorithm>
+#include <cassert>
+
+using namespace std;
+
+//--------------------------------------------------------
+// Constructor/Destructor 
+//--------------------------------------------------------
+NFmiSmartToolCalculation::NFmiSmartToolCalculation(void)
+:itsResultInfo(0)
+,itsCalculations()
+//,itsOperators()
+,itsModificationFactors(0)
+,itsLowerLimit(0)
+,itsUpperLimit(1)
+{
+}
+
+NFmiSmartToolCalculation::~NFmiSmartToolCalculation(void)
+{
+	Clear();
+}
+//--------------------------------------------------------
+// Calculate 
+//--------------------------------------------------------
+void NFmiSmartToolCalculation::Calculate(const NFmiPoint &theLatlon, int theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
+{
+
+	double value = eval_exp(theLatlon, theTime, theTimeIndex);
+	if(value != kFloatMissing)
+	{
+		assert(itsResultInfo->LocationIndex(theLocationIndex)); // kohde dataa juoksutetaan, joten lokaatio indeksien pit‰‰ olla synkassa!!!
+		value = GetInsideLimitsValue(value); // asetetaan value viel‰ drawparamista satuihin rajoihin, ettei esim. RH voi olla alle 0 tai yli 100 %
+		itsResultInfo->FloatValue(value); // miten info saadaan osoittamaan oikeaan kohtaan?!?
+	}
+}
+
+// ei ota huomioon missing arvoa, koska se pit‰‰ ottaa huomioon jo ennen t‰m‰n kutsua.
+float NFmiSmartToolCalculation::GetInsideLimitsValue(float theValue)  
+{
+	if(theValue < itsLowerLimit)
+		return itsLowerLimit;
+	else if(theValue > itsUpperLimit)
+		return itsUpperLimit;
+	return theValue;			
+}
+
+void NFmiSmartToolCalculation::SetLimits(float theLowerLimit, float theUpperLimit) throw (NFmiSmartToolCalculation::Exception)
+{
+	if(theLowerLimit >= theUpperLimit)
+		 throw NFmiSmartToolCalculation::Exception("Parametrin max ja min rajat ovat v‰‰rin p‰in.");
+	else
+	{
+		itsLowerLimit = theLowerLimit;
+		itsUpperLimit = theUpperLimit;
+	}
+}
+
+bool NFmiSmartToolCalculation::IsMasked(const NFmiPoint &theLatlon, int theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
+{
+	return bin_eval_exp(theLatlon, theTime, theTimeIndex);
+}
+
+void NFmiSmartToolCalculation::Clear(void)
+{
+	delete itsResultInfo;
+	itsResultInfo = 0;
+	std::for_each(itsCalculations.begin(), itsCalculations.end(), PointerDestroyer());
+	itsCalculations.clear();
+//	itsOperators.clear();
+}
+
+//void NFmiSmartToolCalculation::AddCalculation(NFmiAreaMask* theCalculation, NFmiSmartToolCalculation::FmiCalculationOperators theOperation)
+void NFmiSmartToolCalculation::AddCalculation(NFmiAreaMask* theCalculation)
+{
+	if(theCalculation)
+	{
+		itsCalculations.push_back(theCalculation);
+//		itsOperators.push_back(theOperation);
+	}
+}
+
+// globaali asetus luokka for_each-funktioon
+struct TimeSetter
+{
+	TimeSetter(const NFmiMetTime &theTime):itsTime(theTime){}
+	void operator()(NFmiAreaMask* theMask){theMask->Time(itsTime);}
+
+	const NFmiMetTime &itsTime;
+};
+
+void NFmiSmartToolCalculation::SetTime(const NFmiMetTime &theTime)
+{
+	if(itsResultInfo) // maskin tapauksessa t‰m‰ on 0-pointteri (ja tulevaisuudessa t‰m‰ sijoitus info poistuu kokonaisuudessaan)
+		itsResultInfo->Time(theTime); // t‰m‰n ajan asetuksen pit‰‰ onnistua editoitavalle datalle
+
+	std::for_each(itsCalculations.begin(), itsCalculations.end(), TimeSetter(theTime));
+}
+
+// eval_exp-metodit otettu H. Schilbertin  C++: the Complete Refeference third ed.
+// jouduin muuttamaan niit‰ v‰h‰n sopimaan t‰h‰n ymp‰ristˆˆn.
+double NFmiSmartToolCalculation::eval_exp(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+{
+	double result = kFloatMissing;
+
+//  exp_ptr = exp;
+	token = 0; // nollataan aluksi 'token'
+	itsCalcIterator = itsCalculations.begin(); 
+
+	get_token();
+	if(!token || token->GetCalculationOperationType() == NFmiAreaMask::CalculationOperationType::NoType || token->GetCalculationOperationType() == NFmiAreaMask::CalculationOperationType::EndOfOperations) 
+		throw  NFmiSmartToolCalculation::Exception(string("Virheellinen laskusuoritus yritys, ei laskuja ollenkaan: \n") + GetCalculationText());
+
+	eval_exp1(result, theLatlon, theTime, theTimeIndex);
+	if(token->GetCalculationOperationType() != NFmiAreaMask::CalculationOperationType::EndOfOperations) 
+		throw  NFmiSmartToolCalculation::Exception(string("Virheellinen laskusuoritus yritys, lasku ei loppunut kuin olisi pit‰nyt: \n") + GetCalculationText());
+	return result;
+}
+
+// Process an assignment.
+// T‰m‰ on jo hoidettu toisella tavalla omassa koodissa, joten ohitan t‰m‰n,
+// mutta j‰t‰n kommentteihin, jos tarvitsen tulevaisuudessa.
+void NFmiSmartToolCalculation::eval_exp1(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+/*
+	int slot;
+	char ttok_type;
+	char temp_token[80];
+
+	if(tok_type==VARIABLE) 
+	{
+		// save old token
+		strcpy(temp_token, token);
+		ttok_type = tok_type;
+
+		// compute the index of the variable
+		slot = toupper(*token) - 'A';
+
+		get_token();
+		if(*token != '=') 
+		{
+			putback(); // return current token
+			// restore old token - not assignment
+			strcpy(token, temp_token);
+			tok_type = ttok_type;
+		}
+		else 
+		{
+			get_token(); // get next part of exp
+			eval_exp2(result);
+			vars[slot] = result;
+			return;
+		}
+	}
+*/
+	eval_exp2(result, theLatlon, theTime, theTimeIndex);
+}
+
+// Add or subtract two terms.
+void NFmiSmartToolCalculation::eval_exp2(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+//	register char op;
+	using NFmiAreaMask::CalculationOperator;
+	CalculationOperator op;
+	double temp;
+
+	eval_exp3(result, theLatlon, theTime, theTimeIndex);
+	while((op = token->GetCalculationOperator()) == CalculationOperator::Add || op == CalculationOperator::Sub) 
+	{
+		get_token();
+		eval_exp3(temp, theLatlon, theTime, theTimeIndex);
+		switch(op) 
+		{
+			case CalculationOperator::Sub:
+				result = result - temp;
+				break;
+			case CalculationOperator::Add:
+				result = result + temp;
+				break;
+		}
+	}
+}
+
+// Multiply or divide two factors.
+void NFmiSmartToolCalculation::eval_exp3(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+//	register char op;
+	using NFmiAreaMask::CalculationOperator;
+	CalculationOperator op;
+	double temp;
+
+	eval_exp4(result, theLatlon, theTime, theTimeIndex);
+//	while((op = *token) == '*' || op == '/' || op == '%') 
+	while((op = token->GetCalculationOperator()) == CalculationOperator::Mul || op == CalculationOperator::Div || op == CalculationOperator::Mod) 
+	{
+		get_token();
+		eval_exp4(temp, theLatlon, theTime, theTimeIndex);
+		switch(op) 
+		{
+			case CalculationOperator::Mul:
+				result = result * temp;
+				break;
+			case CalculationOperator::Div:
+				result = result / temp;
+				break;
+			case CalculationOperator::Mod:
+				result = (int) result % (int) temp;
+				break;
+		}
+	}
+}
+
+// Process an exponent
+void NFmiSmartToolCalculation::eval_exp4(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+	using NFmiAreaMask::CalculationOperator;
+	double temp, ex;
+
+	eval_exp5(result, theLatlon, theTime, theTimeIndex);
+//	if(*token== '^')
+	if(token->GetCalculationOperator() == CalculationOperator::Pow)
+	{
+		get_token();
+		eval_exp4(temp, theLatlon, theTime, theTimeIndex);
+		ex = result;
+		if(temp==0.0) 
+		{
+			result = 1.0;
+			return;
+		}
+//		for(t=(int)temp-1; t>0; --t) 
+//			result = result * (double)ex;
+		result = pow(result, temp);
+	}
+}
+
+// Evaluate a unary + or -.
+void NFmiSmartToolCalculation::eval_exp5(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+	using NFmiAreaMask::CalculationOperator;
+	CalculationOperator op = token->GetCalculationOperator();
+	if(op == CalculationOperator::Add || op == CalculationOperator::Sub) 
+		get_token();
+	eval_exp6(result, theLatlon, theTime, theTimeIndex);
+
+	if(op == CalculationOperator::Sub) 
+		result = -result;
+}
+
+// Process a parenthesized expression.
+void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+{
+	using NFmiAreaMask::CalculationOperationType;
+//	if((*token == '(')) 
+	if(token->GetCalculationOperationType() == CalculationOperationType::StartParenthesis)
+	{
+		get_token();
+		eval_exp2(result, theLatlon, theTime, theTimeIndex);
+//		if(*token != ')')
+		if(token->GetCalculationOperationType() != CalculationOperationType::EndParenthesis)
+			throw  NFmiSmartToolCalculation::Exception(string("Sulut eiv‰t ole oikein laskussa: \n") + GetCalculationText());
+		get_token();
+	}
+	else if(token->GetCalculationOperationType() == CalculationOperationType::MathFunctionStart)
+	{
+		NFmiAreaMask::MathFunctionType function = token->GetMathFunctionType();
+		get_token();
+		eval_exp2(result, theLatlon, theTime, theTimeIndex);
+//		if(*token != ')')
+		if(token->GetCalculationOperationType() != CalculationOperationType::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
+			throw  NFmiSmartToolCalculation::Exception(string("Sulut eiv‰t ole oikein laskussa matemaattisen funktion yhteydess‰: \n") + GetCalculationText());
+		eval_math_function(result, function);
+		get_token();
+	}
+	else 
+		atom(result, theLatlon, theTime, theTimeIndex);
+}
+
+// HUOM! trigonometriset funktiot tehd‰‰n asteille, joten annettu luku pit‰‰ konvertoida
+// c++ funktioille jotka odottavat kulmaa radiaaneille.
+void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunction) throw (NFmiSmartToolCalculation::Exception)
+{
+	using NFmiAreaMask::MathFunctionType;
+	static const double trigFactor = 2 * kPii / 360;
+	NFmiAreaMask::MathFunctionType func = (NFmiAreaMask::MathFunctionType) theFunction;
+	if(result != kFloatMissing)
+	{
+		switch(theFunction)
+		{
+		case MathFunctionType::Exp:
+			result = exp(result);
+			break;
+		case MathFunctionType::Sqrt:
+			result = sqrt(result);
+			break;
+		case MathFunctionType::Log:
+			result = log(result);
+			break;
+		case MathFunctionType::Log10:
+			result = log10(result);
+			break;
+		case MathFunctionType::Sin:
+			result = sin(result * trigFactor); // konversio asteista radiaaneiksi teht‰v‰
+			break;
+		case MathFunctionType::Cos:
+			result = cos(result * trigFactor); // konversio asteista radiaaneiksi teht‰v‰
+			break;
+		case MathFunctionType::Tan:
+			result = tan(result * trigFactor); // konversio asteista radiaaneiksi teht‰v‰
+			break;
+		case MathFunctionType::Sinh:
+			result = sinh(result);
+			break;
+		case MathFunctionType::Cosh:
+			result = cosh(result);
+			break;
+		case MathFunctionType::Tanh:
+			result = tanh(result);
+			break;
+		case MathFunctionType::Asin:
+			if(result >= -1 && result <= 1)
+				result = asin(result)/trigFactor; // konversio radiaaneista asteiksi teht‰v‰
+			break;
+		case MathFunctionType::Acos:
+			if(result >= -1 && result <= 1)
+				result = acos(result)/trigFactor; // konversio radiaaneista asteiksi teht‰v‰
+			break;
+		case MathFunctionType::Atan:
+			result = atan(result)/trigFactor; // konversio radiaaneista asteiksi teht‰v‰
+			break;
+		case MathFunctionType::Ceil:
+			result = ceil(result);
+			break;
+		case MathFunctionType::Floor:
+			result = floor(result);
+			break;
+		case MathFunctionType::Round:
+			result = FmiRound(result);
+			break;
+		case MathFunctionType::Abs:
+			result = fabs(result);
+			break;
+		case MathFunctionType::Rand:
+			result = ((double)rand() / RAND_MAX) * result; // palauttaa luvun 0 ja result:in v‰lilt‰
+			break;
+		default:
+			throw  NFmiSmartToolCalculation::Exception(string("Outo matemaattinen funktio, ohjelmointi vika: \n") + GetCalculationText());
+		}
+	}
+}
+
+void NFmiSmartToolCalculation::atom(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+{
+	using NFmiAreaMask::CalculationOperationType;
+	NFmiAreaMask::CalculationOperationType opType = token->GetCalculationOperationType();
+//	switch(tok_type) 
+	switch(opType)
+	{
+	case CalculationOperationType::InfoVariable:
+	case CalculationOperationType::Constant:
+	case CalculationOperationType::CalculatedVariable:
+	case CalculationOperationType::ModifyFactor:
+	case CalculationOperationType::RampFunction:
+	case CalculationOperationType::FunctionAreaIntergration:
+	case CalculationOperationType::FunctionTimeIntergration:
+//		result = find_var(token);
+		result = token->Value(theLatlon, theTime, theTimeIndex);
+		get_token();
+		return;
+	default:
+		throw  NFmiSmartToolCalculation::Exception(string("Muutuja/funktio puuttuu laskusta: ") + GetCalculationText());
+	}
+}
+
+// ottaa seuraavan 'tokenin' kohdalle, mutta koska aluksi 
+// itsCalcIterator osoittaa jo 1. tokeniin, tehd‰‰n ensin
+// sijoitus tokeniin ja sitten siirret‰‰n iteraattoria eteenp‰in.
+// T‰ll‰ lailla C++: Compl. Ref. kirjasta kopioitu koodi toimii 'sellaisenaan'.
+void NFmiSmartToolCalculation::get_token(void)
+{
+	token = *itsCalcIterator;
+	++itsCalcIterator;
+}
+
+// Laskun alustus, alustetaan iteraattori ja token.
+bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+{
+	bool maskresult = true;
+	double result = kFloatMissing;
+
+//  exp_ptr = exp;
+	token = 0; // nollataan aluksi 'token'
+	itsCalcIterator = itsCalculations.begin(); 
+
+	get_token();
+	if(!token || token->GetCalculationOperationType() == NFmiAreaMask::CalculationOperationType::NoType || token->GetCalculationOperationType() == NFmiAreaMask::CalculationOperationType::EndOfOperations) 
+		throw  NFmiSmartToolCalculation::Exception(string("Virheellinen laskusuoritus yritys, ei laskuja ollenkaan: \n") + GetCalculationText());
+
+	bin_eval_exp1(maskresult, result, theLatlon, theTime, theTimeIndex);
+	if(token->GetCalculationOperationType() != NFmiAreaMask::CalculationOperationType::EndOfOperations) 
+		throw  NFmiSmartToolCalculation::Exception(string("Virheellinen maskin-laskusuoritus yritys, Lasku ei loppunutkaan kuin olisi pit‰nyt: \n") + GetCalculationText());
+	return maskresult;
+}
+
+// Process an assignment.
+// T‰m‰ on jo hoidettu toisella tavalla omassa koodissa, joten ohitan t‰m‰n,
+// mutta j‰t‰n kommentteihin, jos tarvitsen tulevaisuudessa.
+void NFmiSmartToolCalculation::bin_eval_exp1(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+/*
+	int slot;
+	char ttok_type;
+	char temp_token[80];
+
+	if(tok_type==VARIABLE) 
+	{
+		// save old token
+		strcpy(temp_token, token);
+		ttok_type = tok_type;
+
+		// compute the index of the variable
+		slot = toupper(*token) - 'A';
+
+		get_token();
+		if(*token != '=') 
+		{
+			putback(); // return current token
+			// restore old token - not assignment
+			strcpy(token, temp_token);
+			tok_type = ttok_type;
+		}
+		else 
+		{
+			get_token(); // get next part of exp
+			eval_exp2(result);
+			vars[slot] = result;
+			return;
+		}
+	}
+*/
+	bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
+}
+
+// T‰m‰ pit‰‰ siirt‰‰ prioriteetissa alle yhteen laskun
+// Process a binary expression. && ja || eli AND ja OR
+void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+{
+//	register char op;
+	using NFmiAreaMask::BinaryOperator;
+	NFmiAreaMask::BinaryOperator op;
+	bool tempmask;
+	double temp;
+
+	bin_eval_exp1_2(maskresult, result, theLatlon, theTime, theTimeIndex);
+	while((op = token->PostBinaryOperator()) == BinaryOperator::kAnd || op == BinaryOperator::kOr) 
+	{
+		get_token();
+		bin_eval_exp1_2(tempmask, temp, theLatlon, theTime, theTimeIndex);
+		switch(op) 
+		{
+		case BinaryOperator::kAnd:
+			maskresult = (maskresult && tempmask);
+			break;
+		case BinaryOperator::kOr:
+			maskresult = (maskresult || tempmask);
+			break;
+		default:
+			throw  NFmiSmartToolCalculation::Exception(string("Outo  bin‰‰ri-operaattori maskissa:\n") + GetCalculationText());
+		}
+	}
+}
+
+// T‰m‰ pit‰‰ siirt‰‰ prioriteetissa alle yhteen laskun
+// Process a comparison expression <, >, ==, <=, >=
+void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+{
+//	register char op;
+//	using NFmiAreaMask::CalculationOperator;
+	FmiMaskOperation op;
+	bool tempmask;
+	double temp;
+
+	bin_eval_exp2(maskresult, result, theLatlon, theTime, theTimeIndex);
+//	while((op = *token) == '>' || op == '<' || op == '=') 
+	while((op = token->Condition().Condition()) != kFmiNoMaskOperation) 
+	{
+		get_token();
+		bin_eval_exp2(tempmask, temp, theLatlon, theTime, theTimeIndex);
+		switch(op) 
+		{
+		case kFmiMaskEqual:
+			maskresult = (result == temp);
+			break;
+		case kFmiMaskGreaterThan:
+			maskresult = (result > temp);
+			break;
+		case kFmiMaskLessThan:
+			maskresult = (result < temp);
+			break;
+		case kFmiMaskGreaterOrEqualThan:
+			maskresult = (result >= temp);
+			break;
+		case kFmiMaskLessOrEqualThan:
+			maskresult = (result <= temp);
+			break;
+		case kFmiMaskNotEqual:
+			maskresult = (result != temp);
+			break;
+		default:
+			throw  NFmiSmartToolCalculation::Exception(string("Outo vertailu operaattori maskissa:\n") + GetCalculationText());
+		}
+	}
+}
+
+// Add or subtract two terms.
+void NFmiSmartToolCalculation::bin_eval_exp2(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+//	register char op;
+	using NFmiAreaMask::CalculationOperator;
+	CalculationOperator op;
+	double temp;
+
+	bin_eval_exp3(maskresult, result, theLatlon, theTime, theTimeIndex);
+	while((op = token->GetCalculationOperator()) == CalculationOperator::Add || op == CalculationOperator::Sub) 
+	{
+		get_token();
+		bin_eval_exp3(maskresult, temp, theLatlon, theTime, theTimeIndex);
+		switch(op) 
+		{
+			case CalculationOperator::Sub:
+				result = result - temp;
+				break;
+			case CalculationOperator::Add:
+				result = result + temp;
+				break;
+		}
+	}
+}
+
+// Multiply or divide two factors.
+void NFmiSmartToolCalculation::bin_eval_exp3(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+//	register char op;
+	using NFmiAreaMask::CalculationOperator;
+	CalculationOperator op;
+	double temp;
+
+	bin_eval_exp4(maskresult, result, theLatlon, theTime, theTimeIndex);
+//	while((op = *token) == '*' || op == '/' || op == '%') 
+	while((op = token->GetCalculationOperator()) == CalculationOperator::Mul || op == CalculationOperator::Div || op == CalculationOperator::Mod) 
+	{
+		get_token();
+		bin_eval_exp4(maskresult, temp, theLatlon, theTime, theTimeIndex);
+		switch(op) 
+		{
+			case CalculationOperator::Mul:
+				result = result * temp;
+				break;
+			case CalculationOperator::Div:
+				result = result / temp;
+				break;
+			case CalculationOperator::Mod:
+				result = (int) result % (int) temp;
+				break;
+		}
+	}
+}
+
+// Process an exponent
+void NFmiSmartToolCalculation::bin_eval_exp4(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+	using NFmiAreaMask::CalculationOperator;
+	double temp, ex;
+
+	bin_eval_exp5(maskresult, result, theLatlon, theTime, theTimeIndex);
+//	if(*token== '^')
+	if(token->GetCalculationOperator() == CalculationOperator::Pow)
+	{
+		get_token();
+		bin_eval_exp4(maskresult, temp, theLatlon, theTime, theTimeIndex);
+		ex = result;
+		if(temp==0.0) 
+		{
+			result = 1.0;
+			return;
+		}
+//		for(t=(int)temp-1; t>0; --t) 
+//			result = result * (double)ex;
+		result = pow(result, temp);
+	}
+}
+
+// Evaluate a unary + or -.
+void NFmiSmartToolCalculation::bin_eval_exp5(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+	using NFmiAreaMask::CalculationOperator;
+	CalculationOperator op = token->GetCalculationOperator();
+	if(op == CalculationOperator::Add || op == CalculationOperator::Sub) 
+		get_token();
+	bin_eval_exp6(maskresult, result, theLatlon, theTime, theTimeIndex);
+
+	if(op == CalculationOperator::Sub) 
+		result = -result;
+}
+
+// Process a parenthesized expression.
+void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+{
+	using NFmiAreaMask::CalculationOperationType;
+//	if((*token == '(')) 
+	if(token->GetCalculationOperationType() == CalculationOperationType::StartParenthesis)
+	{
+		get_token();
+		bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
+//		if(*token != ')')
+		if(token->GetCalculationOperationType() != CalculationOperationType::EndParenthesis)
+			throw  NFmiSmartToolCalculation::Exception(string("Sulut eiv‰t ole oikein laskussa: ") + GetCalculationText());
+		get_token();
+	}
+	else if(token->GetCalculationOperationType() == CalculationOperationType::MathFunctionStart)
+	{
+		NFmiAreaMask::MathFunctionType function = token->GetMathFunctionType();
+		get_token();
+		bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
+//		if(*token != ')')
+		if(token->GetCalculationOperationType() != CalculationOperationType::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
+			throw  NFmiSmartToolCalculation::Exception(string("Sulut eiv‰t ole oikein laskussa matemaattisen funktion yhteydess‰: \n") + GetCalculationText());
+		eval_math_function(result, function);
+		get_token();
+	}
+	else 
+		bin_atom(maskresult, result, theLatlon, theTime, theTimeIndex);
+}
+
+
+void NFmiSmartToolCalculation::bin_atom(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) throw (NFmiSmartToolCalculation::Exception)
+{
+	using NFmiAreaMask::CalculationOperationType;
+	NFmiAreaMask::CalculationOperationType opType = token->GetCalculationOperationType();
+//	switch(tok_type) 
+	switch(opType)
+	{
+	case CalculationOperationType::InfoVariable:
+	case CalculationOperationType::Constant:
+	case CalculationOperationType::CalculatedVariable:
+	case CalculationOperationType::ModifyFactor:
+	case CalculationOperationType::RampFunction:
+	case CalculationOperationType::FunctionAreaIntergration:
+	case CalculationOperationType::FunctionTimeIntergration:
+//		result = find_var(token);
+		result = token->Value(theLatlon, theTime, theTimeIndex);
+		get_token();
+		return;
+	default:
+		throw  NFmiSmartToolCalculation::Exception(string("Muutuja/funktio puuttuu laskusta: ") + GetCalculationText());
+	}
+}
+
+void NFmiSmartToolCalculation::SetModificationFactors(std::vector<double> *theFactors)
+{
+	itsModificationFactors = theFactors;
+	if(theFactors)
+	{
+		int size = itsCalculations.size();
+		for(int i=0; i<size; i++)
+		{
+			if(itsCalculations[i] && itsCalculations[i]->GetCalculationOperationType() == NFmiAreaMask::CalculationOperationType::ModifyFactor)
+				((NFmiCalculationChangeFactorArray*)itsCalculations[i])->SetChangeFactors(*theFactors);
+		}
+	}
+}

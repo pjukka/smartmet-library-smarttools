@@ -1,0 +1,527 @@
+//**********************************************************
+// C++ Class Name : NFmiSmartToolModifier 
+// ---------------------------------------------------------
+// Filetype: (SOURCE)
+// Filepath: G:/siirto/marko/oc/NFmiSmartToolModifier.cpp 
+// 
+// 
+// GDPro Properties 
+// ---------------------------------------------------
+//  - GD Symbol Type    : CLD_Class 
+//  - GD Method         : UML ( 4.0 ) 
+//  - GD System Name    : aSmartTools 
+//  - GD View Type      : Class Diagram 
+//  - GD View Name      : smarttools 1 
+// ---------------------------------------------------  
+//  Author         : pietarin 
+//  Creation Date  : Thur - Jun 20, 2002 
+// 
+//  Change Log     : 
+// 
+//**********************************************************
+#ifdef WIN32
+#pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
+#endif
+
+#include "NFmiSmartToolModifier.h"
+#include "NFmiSmartToolIntepreter.h"
+#include "NFmiSmartToolCalculationSection.h"
+#include "NFmiSmartToolCalculationSectionInfo.h"
+#include "NFmiSmartToolCalculationInfo.h"
+#include "NFmiAreaMaskInfo.h"
+#include "NFmiCalculationConstantValue.h"
+#include "NFmiInfoAreaMask.h"
+#include "NFmiSmartInfo.h"
+#include "NFmiInfoOrganizer.h"
+#include "NFmiAreaMaskSectionInfo.h"
+#include "NFmiCalculatedAreaMask.h"
+#include "NFmiCalculationChangeFactorArray.h"
+#include "NFmiDataModifierClasses.h"
+#include "NFmiRelativeDataIterator.h"
+#include "NFmiRelativeTimeIntegrationIterator.h"
+#include "NFmiDrawParam.h"
+
+#include <cassert>
+
+using namespace std;
+//--------------------------------------------------------
+// Constructor/Destructor 
+//--------------------------------------------------------
+NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer)
+:itsInfoOrganizer(theInfoOrganizer)
+,itsSmartToolIntepreter(new NFmiSmartToolIntepreter)
+,itsFirstCalculationSection(0)
+,itsLastCalculationSection(0)
+,itsIfAreaMaskSection(0)
+,itsIfCalculationSection(0)
+//,itsElseIfAreaMaskSectionVector()
+//,itsElseIfCalculationSectionVector()
+,itsElseIfAreaMaskSection(0)
+,itsElseIfCalculationSection(0)
+//,itsElseAreaMaskSection(0)
+,itsElseCalculationSection(0)
+,fModifySelectedLocationsOnly(false)
+{
+	assert(itsInfoOrganizer);
+}
+NFmiSmartToolModifier::~NFmiSmartToolModifier(void)
+{
+	delete itsSmartToolIntepreter;
+	ClearCalculationModifiers();
+}
+//--------------------------------------------------------
+// InitSmartTool 
+//--------------------------------------------------------
+// Tulkitsee macron, luo tavittavat systeemit, ett‰ makro voidaan suorittaa.
+void NFmiSmartToolModifier::InitSmartTool(const std::string &theSmartToolText)  throw (NFmiSmartToolModifier::Exception)
+{
+	fMacroRunnable = true;
+	itsErrorText = "";
+	try
+	{
+		itsSmartToolIntepreter->Interpret(theSmartToolText);
+	}
+	catch(NFmiSmartToolIntepreter::Exception excep)
+	{
+		fMacroRunnable = false;
+		itsErrorText = excep.What();
+		throw  NFmiSmartToolModifier::Exception(itsErrorText);
+	}
+
+	InitializeCalculationModifiers();
+}
+
+void NFmiSmartToolModifier::InitializeCalculationModifiers(void)
+{
+	ClearCalculationModifiers();
+
+	itsFirstCalculationSection = CreateCalculationSection(itsSmartToolIntepreter->FirstCalculationSectionInfo());
+	itsIfAreaMaskSection = CreateConditionalSection(itsSmartToolIntepreter->IfAreaMaskSectionInfo());
+	if(itsIfAreaMaskSection)
+	{
+		itsIfCalculationSection = CreateCalculationSection(itsSmartToolIntepreter->IfCalculationSectionInfo());
+		if(!itsIfCalculationSection)
+		{
+			string errorText("IF-lauseen per‰ss‰ ei ollut lasku osiota?");
+			throw NFmiSmartToolModifier::Exception(errorText);
+		}
+		itsElseIfAreaMaskSection = CreateConditionalSection(itsSmartToolIntepreter->ElseIfAreaMaskSectionInfo());
+		if(itsElseIfAreaMaskSection)
+		{
+			itsElseIfCalculationSection = CreateCalculationSection(itsSmartToolIntepreter->ElseIfCalculationSectionInfo());
+			if(!itsElseIfCalculationSection)
+			{
+				string errorText("ELSEIF-lauseen per‰ss‰ ei ollut lasku osiota?");
+				throw NFmiSmartToolModifier::Exception(errorText);
+			}
+		}
+		if(itsSmartToolIntepreter->ElseSectionExist())
+		{
+			itsElseCalculationSection = CreateCalculationSection(itsSmartToolIntepreter->ElseCalculationSectionInfo());
+			if(!itsElseCalculationSection)
+			{
+				string errorText("ELSE-lauseen per‰ss‰ ei ollut lasku osiota?");
+				throw NFmiSmartToolModifier::Exception(errorText);
+			}
+		}
+	}
+	itsLastCalculationSection = CreateCalculationSection(itsSmartToolIntepreter->LastCalculationSectionInfo());
+
+/*
+	NFmiSmartToolCalculationSection* itsLastCalculationSection;
+	NFmiAreaMaskSection* itsIfAreaMaskSection;
+	NFmiSmartToolCalculationSection* itsIfCalculationSection;
+	std::vector<NFmiAreaMaskSection*> itsElseIfAreaMaskSectionVector;
+	std::vector<NFmiSmartToolCalculationSection*> itsElseIfCalculationSectionVector;
+	NFmiAreaMaskSection* itsElseAreaMaskSection;
+	NFmiSmartToolCalculationSection* itsElseCalculationSection;
+*/
+}
+
+NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateConditionalSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo)
+{
+	NFmiSmartToolCalculation* areaMaskHandler = 0;
+	if(theAreaMaskSectionInfo)
+	{
+		std::vector<NFmiAreaMaskInfo*>& maskInfos = *theAreaMaskSectionInfo->GetAreaMaskInfoVector();
+		int size = maskInfos.size();
+		if(size)
+		{
+			areaMaskHandler = new NFmiSmartToolCalculation;
+			for(int i=0; i<size; i++)  
+// HUOM!!!! editoitavaN DATAN QDatasta pit‰‰ tehd‰ kopiot, muuten maskit eiv‰t toimi 
+// kaikissa tilanteissa oikein!! KORJAA TƒMƒ!!!!!
+				areaMaskHandler->AddCalculation(CreateAreaMask(*maskInfos[i]));
+			// loppuun lis‰t‰‰n viel‰ lopetus 'merkki'
+			areaMaskHandler->AddCalculation(CreateEndingAreaMask());
+		}
+	}
+	return areaMaskHandler;
+}
+
+NFmiSmartToolCalculationSection* NFmiSmartToolModifier::CreateCalculationSection(NFmiSmartToolCalculationSectionInfo *theCalcSectionInfo)
+{
+	NFmiSmartToolCalculationSection *section = 0;
+	if(theCalcSectionInfo)
+	{
+		std::vector<NFmiSmartToolCalculationInfo*>& calcInfos = *theCalcSectionInfo->GetCalculationInfos();
+		int size = calcInfos.size();
+		if(size)
+		{
+			section = new NFmiSmartToolCalculationSection;
+			for(int i=0; i<size; i++)
+				section->AddCalculations(CreateCalculation(calcInfos[i]));
+		}
+	}
+	return section;
+}
+
+NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateCalculation(NFmiSmartToolCalculationInfo *theCalcInfo)
+{
+	assert(theCalcInfo);
+	NFmiSmartToolCalculation* calculation = 0;
+	int size = theCalcInfo->GetCalculationOperandInfoVector()->size();
+	if(size)
+	{
+		std::vector<NFmiAreaMaskInfo*>& areaMaskInfos = *theCalcInfo->GetCalculationOperandInfoVector();
+//		std::vector<NFmiSmartToolCalculation::FmiCalculationOperators>& operators = *theCalcInfo->GetOperationVector();
+		calculation = new NFmiSmartToolCalculation;
+		calculation->SetCalculationText(theCalcInfo->GetCalculationText());
+		calculation->SetResultInfo(CreateInfo(*theCalcInfo->GetResultDataInfo()));
+		float lowerLimit;
+		float upperLimit;
+		GetParamValueLimits(*theCalcInfo->GetResultDataInfo(), &lowerLimit, &upperLimit);
+		calculation->SetLimits(lowerLimit, upperLimit);
+		for(int i=0; i<size; i++)
+//			calculation->AddCalculation(CreateAreaMask(*areaMaskInfos[i]), operators[i]);
+			calculation->AddCalculation(CreateAreaMask(*areaMaskInfos[i]));
+		// loppuun lis‰t‰‰n viel‰ loputus 'merkki'
+		calculation->AddCalculation(CreateEndingAreaMask());
+	}
+	return calculation;
+}
+
+void NFmiSmartToolModifier::ClearCalculationModifiers(void)
+{
+	delete itsFirstCalculationSection;
+	itsFirstCalculationSection = 0;
+	delete itsLastCalculationSection;
+	itsLastCalculationSection = 0;
+	delete itsIfAreaMaskSection;
+	itsIfAreaMaskSection = 0;
+	delete itsIfCalculationSection;
+	itsIfCalculationSection = 0;
+//	itsElseIfAreaMaskSectionVector.clear(); // vuotavat, k‰yt‰ PointerDestructoria
+//	itsElseIfCalculationSectionVector.clear();
+	delete itsElseIfAreaMaskSection;
+	itsElseIfAreaMaskSection = 0;
+	delete itsElseIfCalculationSection;
+	itsElseIfCalculationSection = 0;
+//	delete itsElseAreaMaskSection;
+//	itsElseAreaMaskSection = 0;
+	delete itsElseCalculationSection;
+	itsElseCalculationSection = 0;
+}
+
+//--------------------------------------------------------
+// ModifyData 
+//--------------------------------------------------------
+// Suorittaa varsinaiset modifikaatiot. K‰ytt‰j‰ voi antaa parametrina rajoitetun ajan
+// modifioinneille, jos theModifiedTimes on 0-pointteri, tehd‰‰n operaatiot kaikille
+// datan ajoille.
+void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, const std::vector<double> &theModificationFactors, bool fSelectedLocationsOnly) throw (NFmiSmartToolModifier::Exception)
+{
+	fModifySelectedLocationsOnly = fSelectedLocationsOnly;
+	try
+	{
+		// Seed the random-number generator with current time so that
+		// the numbers will be different every time we run.
+		srand( (unsigned)time( NULL ) ); // mahd. satunnais funktion k‰ytˆn takia, pit‰‰ 'sekoittaa' random generaattori
+
+		itsModificationFactors = theModificationFactors; // huom! t‰ss‰ tehd‰‰n kopio
+		ModifyData2(theModifiedTimes, itsFirstCalculationSection);
+//		ModifyConditionalData(theModifiedTimes, itsIfAreaMaskSection, itsIfCalculationSection);
+		ModifyConditionalData(theModifiedTimes);
+		ModifyData2(theModifiedTimes, itsLastCalculationSection);
+	}
+	catch(NFmiSmartToolCalculation::Exception excep)
+	{
+		fMacroRunnable = false;
+		itsErrorText = excep.What();
+		throw  NFmiSmartToolModifier::Exception(itsErrorText);
+	}
+}
+
+// Miten t‰h‰n sapluunaan saa ujutettua myˆs elseif ja else haarat j‰rkev‰sti??????
+// Tee ensin kuitenkin vain IF-haara testausta varten.
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX T‰st‰ jatkuu!!!!!!!
+//void NFmiSmartToolModifier::ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculation *theMaskCondition, NFmiSmartToolCalculationSection *theConditionalCalculations)
+void NFmiSmartToolModifier::ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes)
+{
+	if(itsIfAreaMaskSection && itsIfCalculationSection && itsIfCalculationSection->FirstVariableInfo())
+	{
+		itsIfAreaMaskSection->SetModificationFactors(&itsModificationFactors); // maskissakin voi olla tmf:i‰
+		itsIfCalculationSection->SetModificationFactors(&itsModificationFactors);
+		if(itsElseIfAreaMaskSection && itsElseIfCalculationSection)
+		{
+			itsElseIfAreaMaskSection->SetModificationFactors(&itsModificationFactors);
+			itsElseIfCalculationSection->SetModificationFactors(&itsModificationFactors);
+		}
+		if(itsElseCalculationSection)
+			itsElseCalculationSection->SetModificationFactors(&itsModificationFactors);
+		NFmiFastQueryInfo info(*itsIfCalculationSection->FirstVariableInfo());
+		NFmiTimeDescriptor modifiedTimes(theModifiedTimes ? *theModifiedTimes : info.TimeDescriptor());
+		for(modifiedTimes.Reset(); modifiedTimes.Next(); )
+		{
+			NFmiMetTime time1(modifiedTimes.Time());
+			info.Time(time1); // asetetaan myˆs t‰m‰, ett‰ saadaan oikea timeindex
+			itsIfAreaMaskSection->SetTime(time1); // yritet‰‰n optimoida laskuja hieman kun mahdollista
+			itsIfCalculationSection->SetTime(time1); // yritet‰‰n optimoida laskuja hieman kun mahdollista
+			if(itsElseIfAreaMaskSection && itsElseIfCalculationSection)
+			{
+				itsElseIfAreaMaskSection->SetTime(time1);
+				itsElseIfCalculationSection->SetTime(time1);
+			}
+			if(itsElseCalculationSection)
+				itsElseCalculationSection->SetTime(time1);
+			for(info.ResetLocation(); info.NextLocation(); )
+			{
+				NFmiPoint latlon(info.LatLon());
+				int locationIndex = info.LocationIndex();
+				int timeIndex = info.TimeIndex();
+				if(itsIfAreaMaskSection->IsMasked(latlon, locationIndex, time1, timeIndex))
+					itsIfCalculationSection->Calculate(latlon, locationIndex, time1, timeIndex);
+				else if(itsElseIfAreaMaskSection && itsElseIfCalculationSection && itsElseIfAreaMaskSection->IsMasked(latlon, locationIndex, time1, timeIndex))
+				{
+					itsElseIfCalculationSection->Calculate(latlon, locationIndex, time1, timeIndex);
+				}
+				else if(itsElseCalculationSection)
+					itsElseCalculationSection->Calculate(latlon, locationIndex, time1, timeIndex);
+			}
+		}
+	}
+}
+
+void NFmiSmartToolModifier::ModifyData2(NFmiTimeDescriptor* theModifiedTimes, NFmiSmartToolCalculationSection* theCalculationSection)
+{
+	if(theCalculationSection && theCalculationSection->FirstVariableInfo())
+	{
+		theCalculationSection->SetModificationFactors(&itsModificationFactors);
+//		NFmiFastQueryInfo info(*theCalculationSection->FirstVariableInfo());
+		NFmiSmartInfo *info = theCalculationSection->FirstVariableInfo()->Clone();
+		std::auto_ptr<NFmiSmartInfo> infoPtr(info);
+		if(fModifySelectedLocationsOnly)
+			info->MaskType(kFmiSelectionMask);
+		NFmiTimeDescriptor modifiedTimes(theModifiedTimes ? *theModifiedTimes : info->TimeDescriptor());
+		for(modifiedTimes.Reset(); modifiedTimes.Next(); )
+		{
+			NFmiMetTime time1(modifiedTimes.Time());
+			info->Time(time1); // asetetaan myˆs t‰m‰, ett‰ saadaan oikea timeindex
+			theCalculationSection->SetTime(time1); // yritet‰‰n optimoida laskuja hieman kun mahdollista
+			for(info->ResetLocation(); info->NextLocation(); )
+			{
+				theCalculationSection->Calculate(info->LatLon(), info->LocationIndex(), time1, info->TimeIndex());
+			}
+		}
+		info->DestroyData();
+	}
+}
+
+// pakko oli v‰‰nt‰‰ t‰m‰ konvertteri, koska nuo datatyyppi jutut ovat karanneet k‰sist‰
+static NFmiAreaMask::DataType ConvertType(FmiQueryInfoDataType theType)
+{
+	switch (theType)
+	{
+	case kFmiDataTypeEditable:
+		return NFmiAreaMask::DataType::kEditable;
+	case kFmiDataTypeStationary:
+		return NFmiAreaMask::DataType::kStationary;
+	default:
+		return NFmiAreaMask::DataType::kNoDataType;
+	}
+}
+//--------------------------------------------------------
+// CreateAreaMask 
+//--------------------------------------------------------
+// HUOM!! Ei osaa hoitaa kuin editoitavia datoja!!!!
+// HUOM!! Vuotaa exception tilanteissa.
+NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception)
+{
+	using NFmiAreaMask::CalculationOperationType;
+	NFmiAreaMask::CalculationOperationType maskType = theAreaMaskInfo.GetOperationType();
+	NFmiAreaMask* areaMask = 0;
+
+	switch(maskType)
+	{
+		case CalculationOperationType::InfoVariable:
+			{
+			// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
+			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa. 
+			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
+			areaMask = new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::Type::kInfo, ConvertType(theAreaMaskInfo.GetDataType()), info, true);
+			break;
+			}
+		case CalculationOperationType::RampFunction:
+			{
+			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
+			areaMask = new NFmiCalculationRampFuction(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::Type::kInfo, ConvertType(theAreaMaskInfo.GetDataType()), info, true);
+			break;
+			}
+		case CalculationOperationType::FunctionAreaIntergration:
+		case CalculationOperationType::FunctionTimeIntergration:
+			{
+			// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
+			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa. 
+			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
+			bool deepCopyCreated = false;
+			if(theAreaMaskInfo.GetUseDefaultProducer())
+			{ // Pit‰‰ tehd‰ syv‰ kopio datasta, ett‰ datan muuttuminen ei vaikuta laskuihin.
+				deepCopyCreated = true;
+				NFmiSmartInfo* tmp = info->Clone();
+				delete info;
+				info = tmp;
+			}
+			NFmiDataModifier *modifier = CreateIntegrationFuction(theAreaMaskInfo);
+			NFmiDataIterator *iterator = CreateIterator(theAreaMaskInfo, info);
+			areaMask = new NFmiCalculationIntegrationFuction(iterator, modifier, NFmiAreaMask::Type::kInfo, ConvertType(theAreaMaskInfo.GetDataType()), info, true, deepCopyCreated);
+			break;
+			}
+		case CalculationOperationType::CalculatedVariable:
+			{
+				FmiParameterName parId = (FmiParameterName)theAreaMaskInfo.GetDataIdent().GetParamIdent();
+				if(parId == kFmiLatitude || parId == kFmiLongitude)
+					areaMask = new NFmiLatLonAreaMask(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
+				else if(parId == kFmiElevationAngle)
+					areaMask = new NFmiElevationAngleAreaMask(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
+				else if(parId == kFmiDay)
+					areaMask = new NFmiJulianDayAreaMask(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
+				else if(parId == kFmiHour)
+					areaMask = new NFmiLocalHourAreaMask(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
+				else
+					throw NFmiSmartToolModifier::Exception(string("Outo laskettava muuttuja/data tyyppi (ohjelmointi vika?)."));
+			break;
+			}
+		case CalculationOperationType::Constant:
+			{
+			areaMask = new NFmiCalculationConstantValue(theAreaMaskInfo.GetMaskCondition().LowerLimit());
+			break;
+			}
+		case CalculationOperationType::ModifyFactor:
+			{
+			areaMask = new NFmiCalculationChangeFactorArray;
+			break;
+			}
+		case CalculationOperationType::Operator:
+		case CalculationOperationType::StartParenthesis:
+		case CalculationOperationType::EndParenthesis:
+			{
+			areaMask = new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator());
+			break;
+			}
+		case CalculationOperationType::Comparison:
+			{
+			areaMask = new NFmiCalculationSpecialCase;
+			areaMask->Condition(theAreaMaskInfo.GetMaskCondition());
+			break;
+			}
+		case CalculationOperationType::BinaryOperatorType:
+			{
+			areaMask = new NFmiCalculationSpecialCase;
+			areaMask->PostBinaryOperator(theAreaMaskInfo.GetBinaryOperator());
+			break;
+			}
+		case CalculationOperationType::MathFunctionStart:
+			{
+			areaMask = new NFmiCalculationSpecialCase;
+			areaMask->SetMathFunctionType(theAreaMaskInfo.GetMathFunctionType());
+			break;
+			}
+		default:
+			throw NFmiSmartToolModifier::Exception("Outo data tyyppi yritett‰ess‰ tehd‰ laskuja.");
+	}
+	areaMask->SetCalculationOperationType(maskType);
+
+	return areaMask;
+}
+
+NFmiDataModifier* NFmiSmartToolModifier::CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception)
+{
+	using NFmiAreaMask::FunctionType;
+	NFmiDataModifier* modifier = 0;
+	NFmiAreaMask::FunctionType func = theAreaMaskInfo.GetFunctionType();
+	switch(func)
+	{
+	case FunctionType::Avg:
+		modifier = new NFmiDataModifierAvg;
+		break;
+	case FunctionType::Min:
+		modifier = new NFmiDataModifierMin;
+		break;
+	case FunctionType::Max:
+		modifier = new NFmiDataModifierMax;
+		break;
+	case FunctionType::Sum:
+		modifier = new NFmiDataModifierSum;
+		break;
+		// HUOM!!!! Tee WAvg-modifier myˆs, joka on peritty Avg-modifierist‰ ja tee joku kerroin juttu painotukseen.
+	default:
+		throw NFmiSmartToolModifier::Exception("Outo integraatio-funktio tyyppi yritett‰ess‰ tehd‰ laskuja.");
+	}
+	return modifier;
+}
+
+NFmiDataIterator* NFmiSmartToolModifier::CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo) throw (NFmiSmartToolModifier::Exception)
+{
+	using NFmiAreaMask::CalculationOperationType;
+	NFmiDataIterator* iterator = 0;
+	NFmiAreaMask::CalculationOperationType mType = theAreaMaskInfo.GetOperationType();
+	switch(mType)
+	{
+		case CalculationOperationType::FunctionAreaIntergration:
+			// HUOM!! NFmiRelativeDataIterator:iin pit‰‰ tehd‰ joustavampi 'laatikon' s‰‰tˆ systeemi, ett‰ laatikko ei olisi aina keskitetty
+			iterator = new NFmiRelativeDataIterator(theInfo, theAreaMaskInfo.GetOffsetPoint1().X(), theAreaMaskInfo.GetOffsetPoint1().Y(), 0, theAreaMaskInfo.GetOffsetPoint2().X(), theAreaMaskInfo.GetOffsetPoint2().Y(), 0);
+			break;
+		case CalculationOperationType::FunctionTimeIntergration:
+			{
+				NFmiPoint p(theAreaMaskInfo.GetOffsetPoint1());
+				iterator = new NFmiRelativeTimeIntegrationIterator(theInfo, p.Y() - p.X() + 1, p.X());
+				break;
+			}
+	default:
+		throw NFmiSmartToolModifier::Exception("Outo iteraattori-tyyppi yritett‰ess‰ tehd‰ laskuja.");
+	}
+	return iterator;
+}
+
+NFmiAreaMask* NFmiSmartToolModifier::CreateEndingAreaMask(void)
+{
+	NFmiAreaMask *areaMask = new NFmiCalculationSpecialCase;
+	areaMask->SetCalculationOperationType(NFmiAreaMask::CalculationOperationType::EndOfOperations);
+	return areaMask;
+}
+
+NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo) throw (NFmiSmartToolModifier::Exception)
+{
+	NFmiSmartInfo* info = 0;
+	if(theAreaMaskInfo.GetUseDefaultProducer() || theAreaMaskInfo.GetDataType() == kFmiDataTypeCopyOfEdited)
+		info = itsInfoOrganizer->CreateShallowCopyInfo((FmiParameterName)theAreaMaskInfo.GetDataIdent().GetParamIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
+	else
+		info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
+	if(!info)
+		throw NFmiSmartToolModifier::Exception("Haluttua parametria ei lˆytynyt tietokannasta.\n" + theAreaMaskInfo.GetMaskText());
+	return info;
+}
+
+void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit) throw (NFmiSmartToolModifier::Exception)
+{
+	NFmiDrawParam* drawParam = itsInfoOrganizer->CreateEmptyInfoDrawParam((FmiParameterName)theAreaMaskInfo.GetDataIdent().GetParamIdent());
+	if(drawParam)
+	{
+		*theLowerLimit = drawParam->AbsoluteMinValue();
+		*theUpperLimit = drawParam->AbsoluteMaxValue();
+		delete drawParam;
+	}
+	else
+		throw NFmiSmartToolModifier::Exception("Parametrin min ja max rajoja ei saatu.");
+}
+
