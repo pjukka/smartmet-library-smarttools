@@ -29,6 +29,7 @@
 #include "NFmiCalculationChangeFactorArray.h"
 #include <algorithm>
 #include <cassert>
+#include <stdexcept>
 
 using namespace std;
 
