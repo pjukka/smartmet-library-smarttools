@@ -35,7 +35,7 @@ NFmiCalculationConstantValue::~NFmiCalculationConstantValue()
 //--------------------------------------------------------
 // Value 
 //--------------------------------------------------------
-double NFmiCalculationConstantValue::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+double NFmiCalculationConstantValue::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex, bool fUseTimeInterpolationAlways)
 {
 	return itsValue;
 }
@@ -56,9 +56,9 @@ NFmiCalculationRampFuction::NFmiCalculationRampFuction(const NFmiCalculationCond
 NFmiCalculationRampFuction::~NFmiCalculationRampFuction(void)
 {}
 
-double NFmiCalculationRampFuction::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+double NFmiCalculationRampFuction::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex, bool fUseTimeInterpolationAlways)
 {
-	double value = NFmiInfoAreaMask::Value(theLatlon, theTime, theTimeIndex);
+	double value = NFmiInfoAreaMask::Value(theLatlon, theTime, theTimeIndex, fUseTimeInterpolationAlways);
 	return itsMaskCondition.MaskValue(value);
 }
 
@@ -76,7 +76,7 @@ NFmiCalculationIntegrationFuction::~NFmiCalculationIntegrationFuction(void)
 	delete itsDataIterator;
 }
 
-double NFmiCalculationIntegrationFuction::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+double NFmiCalculationIntegrationFuction::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex, bool fUseTimeInterpolationAlways)
 {
 	// HUOM!!! Tähän tuli pikaviritys:
 	// asetan vain lähimmän pisteen ja ajan kohdalleen.
@@ -89,10 +89,10 @@ double NFmiCalculationIntegrationFuction::Value(const NFmiPoint &theLatlon, cons
 }
 
 // Ramppifunktioiden laskut AreaMask:ien avulla (mm. lat, lon ja elevationangle tapaukset).
-double NFmiCalculationRampFuctionWithAreaMask::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+double NFmiCalculationRampFuctionWithAreaMask::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex, bool fUseTimeInterpolationAlways)
 {
 	itsAreaMask->Time(theTime);
-	double value = itsAreaMask->Value(theLatlon, theTime, theTimeIndex);
+	double value = itsAreaMask->Value(theLatlon, theTime, theTimeIndex, fUseTimeInterpolationAlways);
 	return itsMaskCondition.MaskValue(value);
 }
 

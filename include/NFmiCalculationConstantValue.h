@@ -33,7 +33,7 @@ class NFmiCalculationConstantValue : public NFmiAreaMaskImpl
 {
 
 public:
-   double Value (const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex) ;
+   double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
 
    NFmiCalculationConstantValue(double value = 0);
    ~NFmiCalculationConstantValue();
@@ -67,7 +67,7 @@ class NFmiCalculationRampFuction : public NFmiInfoAreaMask
 {
 
 public:
-   double Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+   double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
 
    NFmiCalculationRampFuction(const NFmiCalculationCondition& theOperation, Type theMaskType, NFmiInfoData::Type theDataType, NFmiQueryInfo* theInfo, bool ownsInfo = false, BinaryOperator thePostBinaryOperator = kNoValue);
    ~NFmiCalculationRampFuction(void);
@@ -81,7 +81,7 @@ class NFmiCalculationRampFuctionWithAreaMask : public NFmiAreaMaskImpl
 {
 
 public:
-   double Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+   double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
 
    NFmiCalculationRampFuctionWithAreaMask(const NFmiCalculationCondition & theOperation,
 										   Type theMaskType,
@@ -103,7 +103,7 @@ class NFmiCalculationIntegrationFuction : public NFmiInfoAreaMask
 {
 
 public:
-   double Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+   double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
 
    NFmiCalculationIntegrationFuction(NFmiDataIterator *theDataIterator, NFmiDataModifier *theDataModifier, Type theMaskType, NFmiInfoData::Type theDataType, NFmiQueryInfo* theInfo, bool ownsInfo = false, bool destroySmartInfoData = false);
    ~NFmiCalculationIntegrationFuction(void);
