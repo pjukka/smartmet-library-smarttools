@@ -617,9 +617,9 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 	file << "'Priority'" << endl;  // selittävä teksti
 	file << itsPriority << endl;
 	file << "'ViewType'" << endl;   // selittävä teksti
-	file << (int)itsViewType << endl;
+	file << static_cast<int>(itsViewType) << endl;
 	file << "'ShowStationMarker'" << endl;   // selittävä teksti
-	file << (int)fShowStationMarker << endl;
+	file << static_cast<int>(fShowStationMarker) << endl;
 	file << "'IsoLineGab'" << endl;   // selittävä teksti
 	file << itsIsoLineGab << endl;
 	file << "'IsolineColor'" << endl;   // selittävä teksti
@@ -661,12 +661,12 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 	file << itsPossibleViewTypeCount << endl;
 	file << "'PossibleViewTypeList'" << endl;   // selittävä teksti
 	for(int ind = 0; ind < itsPossibleViewTypeCount;ind++)
-		file << ((int)itsPossibleViewTypeList[ind]) << endl;
+		file << static_cast<int>(itsPossibleViewTypeList[ind]) << endl;
 
 	file << "'TimeSerialModifyingLimit'" << endl;   // selittävä teksti
 	file << itsTimeSerialModifyingLimit << endl;
 	file << "'StationDataViewType'" << endl;   // selittävä teksti
-	file << itsStationDataViewType << endl;
+	file << static_cast<int>(itsStationDataViewType) << endl;
 	file << "'EditableParam'" << endl;   // selittävä teksti
 	file << fEditableParam << endl;
 	file << "'Unit'" << endl;   // selittävä teksti
@@ -823,7 +823,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			file >> itsPriority;
 			file >> temp; // luetaan nimike pois
 			file >> number;
-			itsViewType = (NFmiMetEditorTypes::View)number;
+			itsViewType = NFmiMetEditorTypes::View(number);
 			
 			file >> temp; // luetaan nimike pois
 			file >> number;
@@ -871,14 +871,14 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			for(int ind = 0; ind < itsPossibleViewTypeCount;ind++)
 			{
 				file >> number;
-				itsPossibleViewTypeList[ind] = (NFmiMetEditorTypes::View)number;
+				itsPossibleViewTypeList[ind] = NFmiMetEditorTypes::View(number);
 			}
 
 			file >> temp; // luetaan nimike pois
 			file >> itsTimeSerialModifyingLimit;
 			file >> temp; // luetaan nimike pois
 			file >> number;
-			itsStationDataViewType = (NFmiMetEditorTypes::View)number;
+			itsStationDataViewType = NFmiMetEditorTypes::View(number);
 			file >> temp; // luetaan nimike pois
 			file >> fEditableParam;
 
