@@ -819,16 +819,24 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 std::istream & NFmiDrawParam::Read (std::istream &file)
 {
 	char temp[80];
+	std::string tmpStr;
 	int number;
+	if(!file)
+		return file;
 	file >> temp;
 	if(NFmiString(temp) == NFmiString("Version"))
 	{
 		file >> itsInitFileVersionNumber;
 		if(itsInitFileVersionNumber >= 1.) // tämä on vain esimerkki siitä mitä joskus tulee olemaan
 		{
+			if(!file)
+				return file;
 			file >> temp; // luetaan nimike pois
-			file >> temp;
-			itsParameterAbbreviation = NFmiString(temp);
+			std::getline(file, tmpStr); // luetaan ed. rivinvaihto pois jaloista
+			std::getline(file, tmpStr); // luetaan rivin loppuun, jos lyhenteessä spaceja mahdollisesti
+//			file >> temp;
+//			itsParameterAbbreviation = NFmiString(temp);
+			itsParameterAbbreviation = tmpStr;
 			file >> temp; // luetaan nimike pois
 			file >> itsPriority;
 			file >> temp; // luetaan nimike pois
@@ -861,6 +869,9 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			file >> temp; // luetaan nimike pois
 			file >> itsAbsoluteMaxValue;
 
+			if(!file)
+				return file;
+
 			file >> temp; // luetaan nimike pois
 			file >> itsTimeSeriesScaleMin;
 			file >> temp; // luetaan nimike pois
@@ -883,6 +894,9 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				file >> number;
 				itsPossibleViewTypeList[ind] = NFmiMetEditorTypes::View(number);
 			}
+
+			if(!file)
+				return file;
 
 			file >> temp; // luetaan nimike pois
 			file >> itsTimeSerialModifyingLimit;
@@ -913,6 +927,8 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 //***********************************************
 			if(itsInitFileVersionNumber >= 2.) // tämä on vain esimerkki siitä mitä joskus tulee olemaan
 			{
+				if(!file)
+					return file;
 				file >> itsStationSymbolColorShadeLowValue;
 				file >> itsStationSymbolColorShadeMidValue;
 				file >> itsStationSymbolColorShadeHighValue;
@@ -945,6 +961,8 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				file >> itsSimpleIsoLineColorShadeHighValueColor;
 				file >> itsSimpleIsoLineColorShadeClassCount;
 
+				if(!file)
+					return file;
 				int i = 0;
 				int size;
 				file >> size;
@@ -981,6 +999,9 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				    file >> temp;
 				    itsSpecialIsoLineShowLabelBox[i] = temp;
 				  }
+
+				if(!file)
+					return file;
 				file >> fUseDefaultRegioning;
 				file >> fUseCustomColorContouring;
 
