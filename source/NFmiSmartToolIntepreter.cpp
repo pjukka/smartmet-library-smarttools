@@ -548,7 +548,6 @@ bool NFmiSmartToolIntepreter::InterpretMaskSection(const std::string &theMaskSec
 // HUOM!!!! Tämä vuotaa exceptionin yhteydessä, pino ei tuhoa AreaMaskInfoja!!!!! (korjaa)
 bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo) throw (NFmiSmartToolIntepreter::Exception)
 {
-	using NFmiAreaMask::CalculationOperationType;
 	string maskText(theMaskSectionText);
 	exp_ptr = maskText.begin();
 	int maskCount = 0;
@@ -609,7 +608,6 @@ bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, NF
 */
 NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::string &theMaskSectionText, queue<NFmiAreaMaskInfo *> &theMaskQueue) throw (NFmiSmartToolIntepreter::Exception)
 {
-	using NFmiAreaMask::CalculationOperationType;
 	NFmiAreaMaskInfo *maskInfo1 = theMaskQueue.front(); // tässä pitää olla muuttuja esim T, p, jne.
 	auto_ptr<NFmiAreaMaskInfo> maskInfoPtr1(maskInfo1); // tuhoaa automaattisesti maskInfon
 	theMaskQueue.pop();
@@ -623,17 +621,17 @@ NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::s
 	// (T < DP), (T > T_850 - 15), (T/2.2 > T_850) jne.
 	// ************************************************************************
 	theMaskQueue.pop();
-	if(maskInfo1->GetOperationType() == CalculationOperationType::InfoMask || maskInfo1->GetOperationType() == CalculationOperationType::CalculationMask)
+	if(maskInfo1->GetOperationType() == NFmiAreaMask::InfoMask || maskInfo1->GetOperationType() == NFmiAreaMask::CalculationMask)
 	{
-		if(maskInfo2->GetOperationType() == CalculationOperationType::Comparison)
+		if(maskInfo2->GetOperationType() == NFmiAreaMask::Comparison)
 		{
-			if(maskInfo3->GetOperationType() == CalculationOperationType::Constant)
+			if(maskInfo3->GetOperationType() == NFmiAreaMask::Constant)
 			{
 				NFmiAreaMaskInfo *finalMaskInfo = new NFmiAreaMaskInfo;
-				if(maskInfo1->GetOperationType() == CalculationOperationType::InfoMask)
-					finalMaskInfo->SetOperationType(CalculationOperationType::InfoMask);
+				if(maskInfo1->GetOperationType() == NFmiAreaMask::InfoMask)
+					finalMaskInfo->SetOperationType(NFmiAreaMask::InfoMask);
 				else
-					finalMaskInfo->SetOperationType(CalculationOperationType::CalculationMask);
+					finalMaskInfo->SetOperationType(NFmiAreaMask::CalculationMask);
 				finalMaskInfo->SetDataIdent(maskInfo1->GetDataIdent());
 				finalMaskInfo->SetUseDefaultProducer(maskInfo1->GetUseDefaultProducer());
 				NFmiCalculationCondition maskCondition(maskInfo2->GetMaskCondition().Condition(), maskInfo3->GetMaskCondition().LowerLimit());
@@ -735,7 +733,8 @@ std::string NFmiSmartToolIntepreter::ExtractNextLine(std::string &theText, std::
 // Riviltä pitää siis lötyä muuttuja johon sijoitetaan ja jotain laskuja
 // HUOM! Oletus aluksi, pitää olla scape aina välissä, yksinkertaistaa ohjelmointia.
 // HUOM!! Tämä vuotaa, jos tapahtuu exception!!!!!!
-/*
+
+#if 0
 NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(const std::string &theCalculationLineText) throw (NFmiSmartToolIntepreter::Exception)
 {
 	NFmiSmartToolCalculationInfo *calculationInfo = new NFmiSmartToolCalculationInfo;
@@ -769,7 +768,8 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 	}
 	return calculationInfo;
 }
-*/
+#endif // 0
+
 NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(const std::string &theCalculationLineText) throw (NFmiSmartToolIntepreter::Exception)
 {
 	string calculationLineText(theCalculationLineText);
@@ -888,19 +888,19 @@ bool NFmiSmartToolIntepreter::IsDelim(char c)
 NFmiAreaMask::CalculationOperator NFmiSmartToolIntepreter::InterpretCalculationOperator(const std::string &theOperatorText) throw (NFmiSmartToolIntepreter::Exception)
 {
 	if(theOperatorText == string(""))
-		return NFmiAreaMask::CalculationOperator::NotOperation;
+		return NFmiAreaMask::NotOperation;
 	else if(theOperatorText == "+")
-		return NFmiAreaMask::CalculationOperator::Add;
+		return NFmiAreaMask::Add;
 	else if(theOperatorText == "-")
-		return NFmiAreaMask::CalculationOperator::Sub;
+		return NFmiAreaMask::Sub;
 	else if(theOperatorText == "/")
-		return NFmiAreaMask::CalculationOperator::Div;
+		return NFmiAreaMask::Div;
 	else if(theOperatorText == "*")
-		return NFmiAreaMask::CalculationOperator::Mul;
+		return NFmiAreaMask::Mul;
 	else if(theOperatorText == "^")
-		return NFmiAreaMask::CalculationOperator::Pow;
+		return NFmiAreaMask::Pow;
 	else if(theOperatorText == "%")
-		return NFmiAreaMask::CalculationOperator::Mod;
+		return NFmiAreaMask::Mod;
 	else
 		throw NFmiSmartToolIntepreter::Exception(string("Lasku operaattori oli outo: ") + theOperatorText);
 }
@@ -927,14 +927,14 @@ void NFmiSmartToolIntepreter::InterpretDelimiter(const std::string &theDelimText
 	theMaskInfo->SetMaskText(theDelimText);
 	if(theDelimText == string(""))
 	{
-		theMaskInfo->SetOperationType(NFmiAreaMask::CalculationOperationType::NoType);
+		theMaskInfo->SetOperationType(NFmiAreaMask::NoType);
 		return;
 	}
 
 	CalcOperMap::iterator it = itsCalculationOperations.find(theDelimText);
 	if(it != itsCalculationOperations.end())
 	{
-		theMaskInfo->SetOperationType(NFmiAreaMask::CalculationOperationType::Operator);
+		theMaskInfo->SetOperationType(NFmiAreaMask::Operator);
 		theMaskInfo->SetCalculationOperator((*it).second);
 		return ;
 	}
@@ -942,7 +942,7 @@ void NFmiSmartToolIntepreter::InterpretDelimiter(const std::string &theDelimText
 	MaskOperMap::iterator it2 = itsTokenMaskOperations.find(theDelimText);
 	if(it2 != itsTokenMaskOperations.end())
 	{
-		theMaskInfo->SetOperationType(NFmiAreaMask::CalculationOperationType::Comparison);
+		theMaskInfo->SetOperationType(NFmiAreaMask::Comparison);
 		NFmiCalculationCondition maskCondition((*it2).second, 0);
 		theMaskInfo->SetMaskCondition(maskCondition);
 		return ;
@@ -951,18 +951,18 @@ void NFmiSmartToolIntepreter::InterpretDelimiter(const std::string &theDelimText
 	BinaOperMap::iterator it3 = itsBinaryOperator.find(theDelimText);
 	if(it3 != itsBinaryOperator.end())
 	{
-		theMaskInfo->SetOperationType(NFmiAreaMask::CalculationOperationType::BinaryOperatorType);
+		theMaskInfo->SetOperationType(NFmiAreaMask::BinaryOperatorType);
 		theMaskInfo->SetBinaryOperator((*it3).second);
 		return ;
 	}
 
 	if(theDelimText == "(")
 	{
-		theMaskInfo->SetOperationType(NFmiAreaMask::CalculationOperationType::StartParenthesis);
+		theMaskInfo->SetOperationType(NFmiAreaMask::StartParenthesis);
 	}
 	else if(theDelimText == ")")
 	{
-		theMaskInfo->SetOperationType(NFmiAreaMask::CalculationOperationType::EndParenthesis);
+		theMaskInfo->SetOperationType(NFmiAreaMask::EndParenthesis);
 	}
 	else
 		throw NFmiSmartToolIntepreter::Exception(string("Lasku operaattori oli outo: ") + theDelimText);
@@ -976,8 +976,6 @@ void NFmiSmartToolIntepreter::InterpretDelimiter(const std::string &theDelimText
 // HUOM!!! Ei hoida vielä vakioita tai funktio systeemejä.
 void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception)
 {
-	using NFmiAreaMask::CalculationOperationType;
-
 	theMaskInfo->SetMaskText(theVariableText);
 	string paramNameOnly;
 	string levelNameOnly;
@@ -993,27 +991,27 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 //	bool levelInVariableName = ExtractParamAndLevel(theVariableText, &paramNameOnly, &levelNameOnly);
 	if(levelExist && producerExist) // kokeillaan ensin, löytyykö param+level+producer
 	{
-		if(FindParamAndLevelAndProducerAndSetMaskInfo(paramNameOnly, levelNameOnly, producerNameOnly, CalculationOperationType::InfoVariable, origWanted ? kFmiDataTypeCopyOfEdited : kFmiDataTypeViewable, theMaskInfo))
+		if(FindParamAndLevelAndProducerAndSetMaskInfo(paramNameOnly, levelNameOnly, producerNameOnly, NFmiAreaMask::InfoVariable, origWanted ? kFmiDataTypeCopyOfEdited : kFmiDataTypeViewable, theMaskInfo))
 			return;
 	}
 	else if(levelExist) // kokeillaan ensin, löytyykö param+level+producer
 	{
-		if(FindParamAndLevelAndSetMaskInfo(paramNameOnly, levelNameOnly, CalculationOperationType::InfoVariable, kFmiDataTypeViewable, theMaskInfo))
+		if(FindParamAndLevelAndSetMaskInfo(paramNameOnly, levelNameOnly, NFmiAreaMask::InfoVariable, kFmiDataTypeViewable, theMaskInfo))
 			return;
 	}
 	else if(producerExist) // kokeillaan ensin, löytyykö param+level+producer
 	{
-		if(FindParamAndProducerAndSetMaskInfo(paramNameOnly, producerNameOnly, CalculationOperationType::InfoVariable, origWanted ? kFmiDataTypeCopyOfEdited : kFmiDataTypeViewable, theMaskInfo))
+		if(FindParamAndProducerAndSetMaskInfo(paramNameOnly, producerNameOnly, NFmiAreaMask::InfoVariable, origWanted ? kFmiDataTypeCopyOfEdited : kFmiDataTypeViewable, theMaskInfo))
 			return;
 	}
 
-	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, CalculationOperationType::InfoVariable, kFmiDataTypeEditable, theMaskInfo))
+	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, NFmiAreaMask::InfoVariable, kFmiDataTypeEditable, theMaskInfo))
 		return;
 
-	if(FindParamAndSetMaskInfo(theVariableText, itsTokenStaticParameterNamesAndIds, CalculationOperationType::InfoVariable, kFmiDataTypeStationary, theMaskInfo))
+	if(FindParamAndSetMaskInfo(theVariableText, itsTokenStaticParameterNamesAndIds, NFmiAreaMask::InfoVariable, kFmiDataTypeStationary, theMaskInfo))
 		return;
 
-	if(FindParamAndSetMaskInfo(theVariableText, itsTokenCalculatedParameterNamesAndIds, CalculationOperationType::CalculatedVariable, kFmiDataTypeCalculatedValue, theMaskInfo))
+	if(FindParamAndSetMaskInfo(theVariableText, itsTokenCalculatedParameterNamesAndIds, NFmiAreaMask::CalculatedVariable, kFmiDataTypeCalculatedValue, theMaskInfo))
 		return;
 	
 	if(IsVariableConstantValue(theVariableText, theMaskInfo))
@@ -1112,7 +1110,7 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 template<typename mapType, typename T>
 bool NFmiSmartToolIntepreter::IsInMap(mapType& theMap, const T &theSearchedItem)
 {
-	mapType::iterator it = theMap.find(theSearchedItem);
+    mapType::iterator it = theMap.find(theSearchedItem);
 	if(it != theMap.end())
 		return true;
 	return false;
@@ -1229,7 +1227,7 @@ bool NFmiSmartToolIntepreter::IsVariableConstantValue(const std::string &theVari
 	if(valueString.IsNumeric())
 	{
 		double value = (double)valueString;
-		theMaskInfo->SetOperationType(NFmiAreaMask::CalculationOperationType::Constant);
+		theMaskInfo->SetOperationType(NFmiAreaMask::Constant);
 		NFmiCalculationCondition calcCond(kFmiMaskEqual, value);
 		theMaskInfo->SetMaskCondition(calcCond);
 		return true;
@@ -1241,7 +1239,7 @@ bool NFmiSmartToolIntepreter::IsVariableTMF(const std::string &theVariableText, 
 {
 	if(FindAnyFromText(theVariableText, itsTokenTMFs))
 	{
-		theMaskInfo->SetOperationType(NFmiAreaMask::CalculationOperationType::ModifyFactor);
+		theMaskInfo->SetOperationType(NFmiAreaMask::ModifyFactor);
 		return true;
 	}
 	return false;
@@ -1258,7 +1256,7 @@ bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVaria
 			tmp = token; // luetaan muuttuja/vakio/funktio tai mikä lie
 			if(tmp == string("(")) // etsitään fuktion aloitus sulkua (lopetus sulku tulee sitten aikanaan, välissä voi olla mitä vain!)
 			{
-				theMaskInfo->SetOperationType(NFmiAreaMask::CalculationOperationType::MathFunctionStart);
+				theMaskInfo->SetOperationType(NFmiAreaMask::MathFunctionStart);
 				theMaskInfo->SetMathFunctionType((*it).second);
 				return true;
 			}
@@ -1276,8 +1274,6 @@ bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVaria
 // eli 1. funktion nimi, sulku auki, parametri, aloitus x ja y paikkaoffset, lopetus x ja y paikkaoffset ja lopuksi suliku kiinni.
 bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception)
 {
-	using NFmiAreaMask::CalculationOperationType;
-	using NFmiAreaMask::FunctionType;
 	FunctionMap::iterator it = itsTokenFunctions.find(theVariableText);
 	if(it != itsTokenFunctions.end())
 	{
@@ -1298,9 +1294,9 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 			if(tokens[1].second == VARIABLE && tokens[2].second == NUMBER && tokens[3].second == NUMBER)
 			{
 				InterpretVariable(tokens[1].first, theMaskInfo);
-				if(theMaskInfo->GetOperationType() == CalculationOperationType::InfoVariable)
+				if(theMaskInfo->GetOperationType() == NFmiAreaMask::InfoVariable)
 				{
-					theMaskInfo->SetOperationType(CalculationOperationType::FunctionTimeIntergration);
+					theMaskInfo->SetOperationType(NFmiAreaMask::FunctionTimeIntergration);
 					NFmiValueString valueString1(tokens[2].first);
 					double value1 = (double)valueString1;
 					NFmiValueString valueString2(tokens[3].first);
@@ -1316,9 +1312,9 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 			if(tokens[1].second == VARIABLE && tokens[2].second == NUMBER && tokens[3].second == NUMBER && tokens[4].second == NUMBER && tokens[5].second == NUMBER)
 			{
 				InterpretVariable(tokens[1].first, theMaskInfo);
-				if(theMaskInfo->GetOperationType() == CalculationOperationType::InfoVariable)
+				if(theMaskInfo->GetOperationType() == NFmiAreaMask::InfoVariable)
 				{
-					theMaskInfo->SetOperationType(CalculationOperationType::FunctionAreaIntergration);
+					theMaskInfo->SetOperationType(NFmiAreaMask::FunctionAreaIntergration);
 					NFmiValueString valueString1(tokens[2].first);
 					double value1 = (double)valueString1;
 					NFmiValueString valueString2(tokens[3].first);
@@ -1356,7 +1352,6 @@ std::string NFmiSmartToolIntepreter::HandlePossibleUnaryMarkers(const std::strin
 // eli 1. maskin/funktion nimi, sulku auki, parametri, alkuarvo, loppuarvo ja lopuksi suliku kiinni.
 bool NFmiSmartToolIntepreter::IsVariableRampFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception)
 {
-	using NFmiAreaMask::CalculationOperationType;
 	if(FindAnyFromText(theVariableText, itsTokenRampFunctions))
 	{
 		string tmp;
@@ -1374,10 +1369,10 @@ bool NFmiSmartToolIntepreter::IsVariableRampFunction(const std::string &theVaria
 			if(tokens[1].second == VARIABLE && tokens[2].second == NUMBER && tokens[3].second == NUMBER)
 			{
 				InterpretVariable(tokens[1].first, theMaskInfo);
-				CalculationOperationType type = theMaskInfo->GetOperationType();
-				if(type == CalculationOperationType::InfoVariable || type == CalculationOperationType::CalculatedVariable)
+				NFmiAreaMask::CalculationOperationType type = theMaskInfo->GetOperationType();
+				if(type == NFmiAreaMask::InfoVariable || type == NFmiAreaMask::CalculatedVariable)
 				{
-					theMaskInfo->SetOperationType(CalculationOperationType::RampFunction);
+					theMaskInfo->SetOperationType(NFmiAreaMask::RampFunction);
 					NFmiValueString valueString1(tokens[2].first);
 					double value1 = (double)valueString1;
 					NFmiValueString valueString2(tokens[3].first);
@@ -1398,7 +1393,7 @@ bool NFmiSmartToolIntepreter::IsVariableRampFunction(const std::string &theVaria
 //			InterpretToken(tmp, variableInfo); // ei saa antaa auto_ptr-otustä tässä, muuten se menettää omistuksen!
 //			calculationInfo->AddCalculationInfo(variableInfoPtr.release()); // auto_ptr menettää omistuksen tässä
 
-//		theMaskInfo->SetOperationType(NFmiAreaMask::CalculationOperationType::ModifyFactor);
+//		theMaskInfo->SetOperationType(NFmiAreaMask::ModifyFactor);
 					return true;
 				}
 			}
@@ -1413,7 +1408,7 @@ bool NFmiSmartToolIntepreter::IsVariableBinaryOperator(const std::string &theVar
 	BinaOperMap::iterator it = itsBinaryOperator.find(theVariableText);
 	if(it != itsBinaryOperator.end())
 	{
-		theMaskInfo->SetOperationType(NFmiAreaMask::CalculationOperationType::BinaryOperatorType);
+		theMaskInfo->SetOperationType(NFmiAreaMask::BinaryOperatorType);
 		theMaskInfo->SetBinaryOperator((*it).second);
 		return true;
 	}
@@ -1632,21 +1627,21 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenMaskOperations.insert(MaskOperMap::value_type(string(">="), kFmiMaskGreaterOrEqualThan));
 		itsTokenMaskOperations.insert(MaskOperMap::value_type(string("<="), kFmiMaskLessOrEqualThan));
 
-		itsBinaryOperator.insert(BinaOperMap::value_type(string("&&"), NFmiAreaMask::BinaryOperator::kAnd));
-		itsBinaryOperator.insert(BinaOperMap::value_type(string("And"), NFmiAreaMask::BinaryOperator::kAnd));
-		itsBinaryOperator.insert(BinaOperMap::value_type(string("and"), NFmiAreaMask::BinaryOperator::kAnd));
-		itsBinaryOperator.insert(BinaOperMap::value_type(string("AND"), NFmiAreaMask::BinaryOperator::kAnd));
-		itsBinaryOperator.insert(BinaOperMap::value_type(string("||"), NFmiAreaMask::BinaryOperator::kOr));
-		itsBinaryOperator.insert(BinaOperMap::value_type(string("Or"), NFmiAreaMask::BinaryOperator::kOr));
-		itsBinaryOperator.insert(BinaOperMap::value_type(string("or"), NFmiAreaMask::BinaryOperator::kOr));
-		itsBinaryOperator.insert(BinaOperMap::value_type(string("OR"), NFmiAreaMask::BinaryOperator::kOr));
+		itsBinaryOperator.insert(BinaOperMap::value_type(string("&&"), NFmiAreaMask::kAnd));
+		itsBinaryOperator.insert(BinaOperMap::value_type(string("And"), NFmiAreaMask::kAnd));
+		itsBinaryOperator.insert(BinaOperMap::value_type(string("and"), NFmiAreaMask::kAnd));
+		itsBinaryOperator.insert(BinaOperMap::value_type(string("AND"), NFmiAreaMask::kAnd));
+		itsBinaryOperator.insert(BinaOperMap::value_type(string("||"), NFmiAreaMask::kOr));
+		itsBinaryOperator.insert(BinaOperMap::value_type(string("Or"), NFmiAreaMask::kOr));
+		itsBinaryOperator.insert(BinaOperMap::value_type(string("or"), NFmiAreaMask::kOr));
+		itsBinaryOperator.insert(BinaOperMap::value_type(string("OR"), NFmiAreaMask::kOr));
 		
-		itsCalculationOperations.insert(CalcOperMap::value_type(string("+"), NFmiAreaMask::CalculationOperator::Add));
-		itsCalculationOperations.insert(CalcOperMap::value_type(string("-"), NFmiAreaMask::CalculationOperator::Sub));
-		itsCalculationOperations.insert(CalcOperMap::value_type(string("/"), NFmiAreaMask::CalculationOperator::Div));
-		itsCalculationOperations.insert(CalcOperMap::value_type(string("*"), NFmiAreaMask::CalculationOperator::Mul));
-		itsCalculationOperations.insert(CalcOperMap::value_type(string("^"), NFmiAreaMask::CalculationOperator::Pow));
-		itsCalculationOperations.insert(CalcOperMap::value_type(string("%"), NFmiAreaMask::CalculationOperator::Mod));
+		itsCalculationOperations.insert(CalcOperMap::value_type(string("+"), NFmiAreaMask::Add));
+		itsCalculationOperations.insert(CalcOperMap::value_type(string("-"), NFmiAreaMask::Sub));
+		itsCalculationOperations.insert(CalcOperMap::value_type(string("/"), NFmiAreaMask::Div));
+		itsCalculationOperations.insert(CalcOperMap::value_type(string("*"), NFmiAreaMask::Mul));
+		itsCalculationOperations.insert(CalcOperMap::value_type(string("^"), NFmiAreaMask::Pow));
+		itsCalculationOperations.insert(CalcOperMap::value_type(string("%"), NFmiAreaMask::Mod));
 
 
 		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("925"), make_pair(kFmiPressureLevel, 925)));
@@ -1662,22 +1657,22 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenMaskBlockMarkers.push_back(string("("));
 		itsTokenMaskBlockMarkers.push_back(string(")"));
 
-		itsTokenFunctions.insert(FunctionMap::value_type(string("AVG"), NFmiAreaMask::FunctionType::Avg));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("Avg"), NFmiAreaMask::FunctionType::Avg));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("avg"), NFmiAreaMask::FunctionType::Avg));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("MIN"), NFmiAreaMask::FunctionType::Min));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("Min"), NFmiAreaMask::FunctionType::Min));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("min"), NFmiAreaMask::FunctionType::Min));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("MAX"), NFmiAreaMask::FunctionType::Max));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("Max"), NFmiAreaMask::FunctionType::Max));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("max"), NFmiAreaMask::FunctionType::Max));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("SUM"), NFmiAreaMask::FunctionType::Sum));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("Sum"), NFmiAreaMask::FunctionType::Sum));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("sum"), NFmiAreaMask::FunctionType::Sum));
-//		itsTokenFunctions.insert(FunctionMap::value_type(string("WAVG"), NFmiAreaMask::FunctionType::WAvg));
-//		itsTokenFunctions.insert(FunctionMap::value_type(string("WAvg"), NFmiAreaMask::FunctionType::WAvg));
-//		itsTokenFunctions.insert(FunctionMap::value_type(string("Wavg"), NFmiAreaMask::FunctionType::WAvg));
-//		itsTokenFunctions.insert(FunctionMap::value_type(string("wavg"), NFmiAreaMask::FunctionType::WAvg));
+		itsTokenFunctions.insert(FunctionMap::value_type(string("AVG"), NFmiAreaMask::Avg));
+		itsTokenFunctions.insert(FunctionMap::value_type(string("Avg"), NFmiAreaMask::Avg));
+		itsTokenFunctions.insert(FunctionMap::value_type(string("avg"), NFmiAreaMask::Avg));
+		itsTokenFunctions.insert(FunctionMap::value_type(string("MIN"), NFmiAreaMask::Min));
+		itsTokenFunctions.insert(FunctionMap::value_type(string("Min"), NFmiAreaMask::Min));
+		itsTokenFunctions.insert(FunctionMap::value_type(string("min"), NFmiAreaMask::Min));
+		itsTokenFunctions.insert(FunctionMap::value_type(string("MAX"), NFmiAreaMask::Max));
+		itsTokenFunctions.insert(FunctionMap::value_type(string("Max"), NFmiAreaMask::Max));
+		itsTokenFunctions.insert(FunctionMap::value_type(string("max"), NFmiAreaMask::Max));
+		itsTokenFunctions.insert(FunctionMap::value_type(string("SUM"), NFmiAreaMask::Sum));
+		itsTokenFunctions.insert(FunctionMap::value_type(string("Sum"), NFmiAreaMask::Sum));
+		itsTokenFunctions.insert(FunctionMap::value_type(string("sum"), NFmiAreaMask::Sum));
+//		itsTokenFunctions.insert(FunctionMap::value_type(string("WAVG"), NFmiAreaMask::WAvg));
+//		itsTokenFunctions.insert(FunctionMap::value_type(string("WAvg"), NFmiAreaMask::WAvg));
+//		itsTokenFunctions.insert(FunctionMap::value_type(string("Wavg"), NFmiAreaMask::WAvg));
+//		itsTokenFunctions.insert(FunctionMap::value_type(string("wavg"), NFmiAreaMask::WAvg));
 
 		itsTokenRampUpFunctions.push_back(string("RU"));
 		itsTokenRampUpFunctions.push_back(string("Ru"));
@@ -1697,63 +1692,63 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenTMFs.push_back(string("Tmf"));
 		itsTokenTMFs.push_back(string("tmf"));
 
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("EXP"), NFmiAreaMask::MathFunctionType::Exp));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Exp"), NFmiAreaMask::MathFunctionType::Exp));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("exp"), NFmiAreaMask::MathFunctionType::Exp));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("SQRT"), NFmiAreaMask::MathFunctionType::Sqrt));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Sqrt"), NFmiAreaMask::MathFunctionType::Sqrt));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("sqrt"), NFmiAreaMask::MathFunctionType::Sqrt));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("LN"), NFmiAreaMask::MathFunctionType::Log));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Ln"), NFmiAreaMask::MathFunctionType::Log));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ln"), NFmiAreaMask::MathFunctionType::Log));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("LG"), NFmiAreaMask::MathFunctionType::Log10));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Lg"), NFmiAreaMask::MathFunctionType::Log10));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("lg"), NFmiAreaMask::MathFunctionType::Log10));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("SIN"), NFmiAreaMask::MathFunctionType::Sin));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Sin"), NFmiAreaMask::MathFunctionType::Sin));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("sin"), NFmiAreaMask::MathFunctionType::Sin));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("COS"), NFmiAreaMask::MathFunctionType::Cos));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Cos"), NFmiAreaMask::MathFunctionType::Cos));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("cos"), NFmiAreaMask::MathFunctionType::Cos));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("TAN"), NFmiAreaMask::MathFunctionType::Tan));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Tan"), NFmiAreaMask::MathFunctionType::Tan));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("tan"), NFmiAreaMask::MathFunctionType::Tan));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("SINH"), NFmiAreaMask::MathFunctionType::Sinh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Sinh"), NFmiAreaMask::MathFunctionType::Sinh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("sinh"), NFmiAreaMask::MathFunctionType::Sinh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("COSH"), NFmiAreaMask::MathFunctionType::Cosh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Cosh"), NFmiAreaMask::MathFunctionType::Cosh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("cosh"), NFmiAreaMask::MathFunctionType::Cosh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("TANH"), NFmiAreaMask::MathFunctionType::Tanh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Tanh"), NFmiAreaMask::MathFunctionType::Tanh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("tanh"), NFmiAreaMask::MathFunctionType::Tanh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ASIN"), NFmiAreaMask::MathFunctionType::Asin));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ASin"), NFmiAreaMask::MathFunctionType::Asin));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Asin"), NFmiAreaMask::MathFunctionType::Asin));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("asin"), NFmiAreaMask::MathFunctionType::Asin));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ACOS"), NFmiAreaMask::MathFunctionType::Acos));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ACos"), NFmiAreaMask::MathFunctionType::Acos));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Acos"), NFmiAreaMask::MathFunctionType::Acos));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("acos"), NFmiAreaMask::MathFunctionType::Acos));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ATAN"), NFmiAreaMask::MathFunctionType::Atan));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ATan"), NFmiAreaMask::MathFunctionType::Atan));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Atan"), NFmiAreaMask::MathFunctionType::Atan));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("atan"), NFmiAreaMask::MathFunctionType::Atan));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("CEIL"), NFmiAreaMask::MathFunctionType::Ceil));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Ceil"), NFmiAreaMask::MathFunctionType::Ceil));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ceil"), NFmiAreaMask::MathFunctionType::Ceil));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("FLOOR"), NFmiAreaMask::MathFunctionType::Floor));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Floor"), NFmiAreaMask::MathFunctionType::Floor));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("floor"), NFmiAreaMask::MathFunctionType::Floor));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ROUND"), NFmiAreaMask::MathFunctionType::Round));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Round"), NFmiAreaMask::MathFunctionType::Round));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("round"), NFmiAreaMask::MathFunctionType::Round));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ABS"), NFmiAreaMask::MathFunctionType::Abs));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Abs"), NFmiAreaMask::MathFunctionType::Abs));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("abs"), NFmiAreaMask::MathFunctionType::Abs));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("RAND"), NFmiAreaMask::MathFunctionType::Rand));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Rand"), NFmiAreaMask::MathFunctionType::Rand));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("rand"), NFmiAreaMask::MathFunctionType::Rand));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("EXP"), NFmiAreaMask::Exp));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Exp"), NFmiAreaMask::Exp));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("exp"), NFmiAreaMask::Exp));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("SQRT"), NFmiAreaMask::Sqrt));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Sqrt"), NFmiAreaMask::Sqrt));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("sqrt"), NFmiAreaMask::Sqrt));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("LN"), NFmiAreaMask::Log));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Ln"), NFmiAreaMask::Log));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("ln"), NFmiAreaMask::Log));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("LG"), NFmiAreaMask::Log10));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Lg"), NFmiAreaMask::Log10));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("lg"), NFmiAreaMask::Log10));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("SIN"), NFmiAreaMask::Sin));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Sin"), NFmiAreaMask::Sin));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("sin"), NFmiAreaMask::Sin));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("COS"), NFmiAreaMask::Cos));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Cos"), NFmiAreaMask::Cos));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("cos"), NFmiAreaMask::Cos));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("TAN"), NFmiAreaMask::Tan));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Tan"), NFmiAreaMask::Tan));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("tan"), NFmiAreaMask::Tan));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("SINH"), NFmiAreaMask::Sinh));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Sinh"), NFmiAreaMask::Sinh));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("sinh"), NFmiAreaMask::Sinh));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("COSH"), NFmiAreaMask::Cosh));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Cosh"), NFmiAreaMask::Cosh));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("cosh"), NFmiAreaMask::Cosh));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("TANH"), NFmiAreaMask::Tanh));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Tanh"), NFmiAreaMask::Tanh));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("tanh"), NFmiAreaMask::Tanh));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("ASIN"), NFmiAreaMask::Asin));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("ASin"), NFmiAreaMask::Asin));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Asin"), NFmiAreaMask::Asin));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("asin"), NFmiAreaMask::Asin));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("ACOS"), NFmiAreaMask::Acos));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("ACos"), NFmiAreaMask::Acos));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Acos"), NFmiAreaMask::Acos));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("acos"), NFmiAreaMask::Acos));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("ATAN"), NFmiAreaMask::Atan));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("ATan"), NFmiAreaMask::Atan));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Atan"), NFmiAreaMask::Atan));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("atan"), NFmiAreaMask::Atan));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("CEIL"), NFmiAreaMask::Ceil));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Ceil"), NFmiAreaMask::Ceil));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("ceil"), NFmiAreaMask::Ceil));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("FLOOR"), NFmiAreaMask::Floor));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Floor"), NFmiAreaMask::Floor));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("floor"), NFmiAreaMask::Floor));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("ROUND"), NFmiAreaMask::Round));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Round"), NFmiAreaMask::Round));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("round"), NFmiAreaMask::Round));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("ABS"), NFmiAreaMask::Abs));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Abs"), NFmiAreaMask::Abs));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("abs"), NFmiAreaMask::Abs));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("RAND"), NFmiAreaMask::Rand));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("Rand"), NFmiAreaMask::Rand));
+		itsMathFunctions.insert(MathFunctionMap::value_type(string("rand"), NFmiAreaMask::Rand));
 
 	}
 }
