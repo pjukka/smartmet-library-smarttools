@@ -101,6 +101,7 @@ class NFmiInfoOrganizer
 	NFmiDrawParam* CreateDrawParam(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	NFmiDrawParam* CreateEmptyInfoDrawParam(FmiParameterName theParamName); // luo drawparam ilman infoa
 	NFmiDrawParam* CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+	NFmiDrawParam* CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
 	NFmiDrawParam* CreateDrawParam(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	bool AddData(NFmiQueryData* theData
 					  ,const NFmiString& theDataFileName
@@ -131,6 +132,7 @@ class NFmiInfoOrganizer
  private:
 	NFmiSmartInfo* Info (const FmiParameterName& theParam, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
   	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType); 
+	NFmiSmartInfo* CrossSectionInfo(const NFmiDataIdent& theDataIdent, bool& fSubParameter, NFmiInfoData::Type theType);
     bool Add (NFmiSmartInfo* theInfo);
 	NFmiParamBag GetParams(NFmiInfoData::Type theDataType);
 	void UpdateMacroParamData(void);

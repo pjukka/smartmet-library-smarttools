@@ -46,13 +46,16 @@ public:
                                    , const NFmiDataIdent& theIdent
 								   , bool& fSubParam 
 								   , const NFmiLevel* theLevel);
+	NFmiDrawParam * CreateCrossSectionDrawParam( NFmiSmartInfo* theInfo
+												, const NFmiDataIdent& theIdent
+												, bool& fSubParam);	
 	NFmiDrawParam * CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent);
 	bool Init();
 	const NFmiString& LoadDirectory(void) const {return itsLoadDirectory;};
 	void LoadDirectory(const NFmiString& newValue){itsLoadDirectory = newValue;};
 
 private:
-	NFmiString CreateFileName(NFmiDrawParam* drawParam);
+	NFmiString CreateFileName(NFmiDrawParam* drawParam, bool fCrossSectionCase = false);
 	NFmiString itsLoadDirectory;
 };
 

@@ -1,4 +1,4 @@
-//**********************************************************
+/**********************************************************
 // C++ Class Name : NFmiDrawParamFactory 
 // ---------------------------------------------------------
 // Filetype: (SOURCE)
@@ -86,6 +86,29 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo
 	return drawParam;
 }
 
+// luodaan drawparam crossSectionDataa varten. Huom k‰ytetyt tiedostonimet
+// poikkeavat muista drawparamien tiedostonimist‰.
+// Eli esim. DrawParam_4_CrossSection.dpa
+NFmiDrawParam * NFmiDrawParamFactory::CreateCrossSectionDrawParam( NFmiSmartInfo* theInfo
+																, const NFmiDataIdent& theIdent
+																, bool& fSubParam)
+{
+	if(!theInfo)
+		return 0;
+	theInfo->Param(theIdent);
+	NFmiDrawParam* drawParam = new NFmiDrawParam(theInfo, theInfo->Param(), 1); // 1 = priority
+	if(drawParam)
+	{
+		NFmiString fileName = CreateFileName(drawParam, true);
+		if(!drawParam->Init(fileName))
+			if(!drawParam->StoreData(fileName))
+			  {
+				// tiedostoa ei voitu luoda, mit‰ pit‰isi tehd‰?
+			  }
+	}
+	return drawParam;
+}
+
 NFmiDrawParam* NFmiDrawParamFactory::CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent)
 {
 	NFmiDrawParam* drawParam = new NFmiDrawParam;
@@ -114,7 +137,7 @@ bool NFmiDrawParamFactory::Init()
 //--------------------------------------------------------
 // CreateFileName, private 
 //--------------------------------------------------------
-NFmiString NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam)
+NFmiString NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool fCrossSectionCase)
 {
 	NFmiString fileName(itsLoadDirectory);
 	fileName += "DrawParam_";
@@ -124,23 +147,28 @@ NFmiString NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam)
 		int paramId = drawParam->Param().GetParam()->GetIdent();
 		NFmiValueString idStr(paramId, "%d");
 		fileName += idStr;
-		if(drawParam && drawParam->Info() && drawParam->Info()->SizeLevels() > 1)
-		{ // jos leveleit‰ on useita, niill‰ on omat tiedostot
-			fileName += "_level_";
-			const NFmiLevel* level = drawParam->Info()->Level();
-			int levelTypeId = 0;
-			if(level)
-				levelTypeId = level->LevelTypeId();
-			NFmiValueString levelTypeIdStr(levelTypeId, "%d");
-			fileName += levelTypeIdStr;
-			fileName += "_";
-			int levelValue = level->LevelValue();
-			NFmiValueString levelValueStr(levelValue, "%d");
-			fileName += levelValueStr;
-		}
+		if(fCrossSectionCase)
+			fileName += "_CrossSection";
 		else
 		{
-			// normaali parametrille ei taida olla tiedosto nimess‰ mit‰‰n ekstraa
+			if(drawParam && drawParam->Info() && drawParam->Info()->SizeLevels() > 1)
+			{ // jos leveleit‰ on useita, niill‰ on omat tiedostot
+				fileName += "_level_";
+				const NFmiLevel* level = drawParam->Info()->Level();
+				int levelTypeId = 0;
+				if(level)
+					levelTypeId = level->LevelTypeId();
+				NFmiValueString levelTypeIdStr(levelTypeId, "%d");
+				fileName += levelTypeIdStr;
+				fileName += "_";
+				int levelValue = level->LevelValue();
+				NFmiValueString levelValueStr(levelValue, "%d");
+				fileName += levelValueStr;
+			}
+			else
+			{
+				// normaali parametrille ei taida olla tiedosto nimess‰ mit‰‰n ekstraa
+			}
 		}
 		fileName +=".dpa";
 	}

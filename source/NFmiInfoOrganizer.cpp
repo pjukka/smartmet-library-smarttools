@@ -1,4 +1,4 @@
-//**********************************************************
+/**********************************************************
 // C++ Class Name : NFmiInfoOrganizer 
 // ---------------------------------------------------------
 // Filetype: (SOURCE)
@@ -199,6 +199,36 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 	}
 	if(aInfo && aInfo->SizeLevels() == 1)
 		aInfo->FirstLevel();
+	return aInfo; // theParam ei löytynyt edes aliparametrina miltään listassa olevalta aInfo-pointterilta
+}
+
+// Etsi haluttu crossSection-data. Eli pitää olla yli 1 leveliä
+// eikä etsitä tiettyä leveliä.
+NFmiSmartInfo* NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataIdent
+													, bool& fSubParameter 
+													, NFmiInfoData::Type theType)
+{
+	bool anyDataOk = (theType == NFmiInfoData::kAnyData);
+	NFmiSmartInfo* aInfo = 0;
+	if(itsEditedData && (itsEditedData->DataType() == theType || anyDataOk) && itsEditedData->SizeLevels() > 1 && itsEditedData->Param(theDataIdent))
+	{
+		fSubParameter = itsEditedData->UseSubParam();
+		aInfo = itsEditedData;
+	}
+	else
+	{
+		// tutkitaan ensin löytyykö theParam suoraan joltain listassa olevalta NFmiSmartInfo-pointterilta
+		for(Reset(); Next(); )
+		{
+			aInfo = Current();
+			if((aInfo->DataType() == theType || anyDataOk) && aInfo->SizeLevels() > 1 && aInfo->Param(theDataIdent))
+			{
+				fSubParameter = aInfo->UseSubParam();
+				break;
+			}
+			aInfo = 0; // pitää aina tässä nollata, muuten viimeisen jälkeen jää voimaan
+		}
+	}
 	return aInfo; // theParam ei löytynyt edes aliparametrina miltään listassa olevalta aInfo-pointterilta
 }
 
@@ -406,6 +436,20 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 	{
 		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
 		drawParam = itsDrawParamFactory->CreateDrawParam(copyOfInfo, theIdent, aSubParam, theLevel);	
+	}
+	return drawParam;
+}
+
+// hakee poikkileikkausta varten haluttua dataa ja luo siihen sopivan drawparamin
+NFmiDrawParam* NFmiInfoOrganizer::CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType)
+{
+	NFmiDrawParam* drawParam = 0;
+	bool aSubParam;
+	NFmiSmartInfo* info = CrossSectionInfo(theDataIdent, aSubParam, theType);
+	if(info)
+	{
+		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
+		drawParam = itsDrawParamFactory->CreateCrossSectionDrawParam(copyOfInfo, theDataIdent, aSubParam);	
 	}
 	return drawParam;
 }
