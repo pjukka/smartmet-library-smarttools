@@ -48,12 +48,12 @@ public:
 								   , const NFmiLevel* theLevel);
 	NFmiDrawParam * CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent);
 	bool Init();
-	const NFmiString& WorkingDirectory(void) const {return itsWorkingDirectory;};
-	void WorkingDirectory(const NFmiString& newValue){itsWorkingDirectory = newValue;};
+	const NFmiString& LoadDirectory(void) const {return itsLoadDirectory;};
+	void LoadDirectory(const NFmiString& newValue){itsLoadDirectory = newValue;};
 
 private:
 	NFmiString CreateFileName(NFmiDrawParam* drawParam);
-	NFmiString itsWorkingDirectory;
+	NFmiString itsLoadDirectory;
 };
 
 #endif

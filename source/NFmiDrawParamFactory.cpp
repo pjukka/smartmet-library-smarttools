@@ -34,7 +34,7 @@
 // NFmiDrawParamFactory(void) 
 //--------------------------------------------------------
 NFmiDrawParamFactory::NFmiDrawParamFactory(void) 
-:itsWorkingDirectory("")
+:itsLoadDirectory("")
 {
 }
 //--------------------------------------------------------
@@ -116,8 +116,8 @@ bool NFmiDrawParamFactory::Init()
 //--------------------------------------------------------
 NFmiString NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam)
 {
-	NFmiString fileName(itsWorkingDirectory);
-	fileName += "/TMDrawParams/DrawParam_";
+	NFmiString fileName(itsLoadDirectory);
+	fileName += "DrawParam_";
 
 	if(drawParam)
 	{

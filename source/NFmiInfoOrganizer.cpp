@@ -87,10 +87,10 @@ NFmiInfoOrganizer::~NFmiInfoOrganizer (void)
 //--------------------------------------------------------
 // Init 
 //--------------------------------------------------------
-bool NFmiInfoOrganizer::Init (void)
+bool NFmiInfoOrganizer::Init(const std::string &theDrawParamPath)
 {
  	itsDrawParamFactory =new NFmiDrawParamFactory;
-	itsDrawParamFactory->WorkingDirectory(WorkingDirectory());
+	itsDrawParamFactory->LoadDirectory(theDrawParamPath);
  	return itsDrawParamFactory->Init(); 
 }
 

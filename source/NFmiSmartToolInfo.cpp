@@ -10,18 +10,19 @@
 #include "NFmiSettings.h"
 #include <fstream>
 #include <iterator>
+#include <algorithm>
 
 using namespace std;
 
 NFmiSmartToolInfo::NFmiSmartToolInfo(void)
 :itsCurrentScript()
-,itsCurrentScriptFileName()
-,itsLastLoadDirectory()
+,itsScriptFileExtension()
+,itsCurrentScriptName()
+,itsLoadDirectory()
 ,itsDBCheckerFileName()
 ,itsDBCheckerText()
 ,fMakeDBCheckAtSend(false)
 ,fIsThereDBCheckScript(false)
-,fHasCurrentScriptFileName(false)
 {
 }
 
@@ -30,42 +31,33 @@ NFmiSmartToolInfo::~NFmiSmartToolInfo(void)
 }
 
 // luetaan  asetukset nyky‰‰n NFmiSetting-luokasta
-bool NFmiSmartToolInfo::Init(void)
+bool NFmiSmartToolInfo::Init(const std::string &theLoadDirectory)
 {
+	itsLoadDirectory = theLoadDirectory;
 	if(LoadSettings())
 	{
-		return LoadAsCurrentScript(itsCurrentScriptFileName);
+		return LoadScript(itsCurrentScriptName);
 	}
 	return false;
 }
 
-bool NFmiSmartToolInfo::LoadAsCurrentScript(const std::string &theFileName)
+bool NFmiSmartToolInfo::LoadScript(const std::string &theScriptName)
 {
-	if(NFmiFileSystem::ReadFile2String(theFileName, itsCurrentScript))
+	string fullFileName(GetFullScriptFileName(theScriptName));
+	if(NFmiFileSystem::ReadFile2String(fullFileName, itsCurrentScript))
 	{
-		fHasCurrentScriptFileName = true;
-		itsCurrentScriptFileName = theFileName;
-		itsLastLoadDirectory = ExtractPath(theFileName);
+		itsCurrentScriptName = theScriptName;
 		return SaveSettings();
 	}
 	return false;
 }
 
-bool NFmiSmartToolInfo::SaveCurrentScript(void)
+bool NFmiSmartToolInfo::SaveScript(const std::string &theScriptName)
 {
-	if(fHasCurrentScriptFileName)
-		return SaveAsCurrentScript(itsCurrentScriptFileName);
-	else
-		return false;
-}
-
-bool NFmiSmartToolInfo::SaveAsCurrentScript(const std::string &theFileName)
-{
-	if(WriteScript2File(theFileName, itsCurrentScript))
+	string fullFileName(GetFullScriptFileName(theScriptName));
+	if(WriteScript2File(fullFileName, itsCurrentScript))
 	{
-		fHasCurrentScriptFileName = true;
-		itsCurrentScriptFileName = theFileName;
-		itsLastLoadDirectory = ExtractPath(theFileName);
+		itsCurrentScriptName = theScriptName;
 		return SaveSettings();
 	}
 	return false;
@@ -82,30 +74,9 @@ bool NFmiSmartToolInfo::LoadDBChecker(void)
 	return false;
 }
 
-bool NFmiSmartToolInfo::LoadLastScript(void)
-{
-	if(NFmiFileSystem::ReadFile2String(itsCurrentScriptFileName, itsCurrentScript))
-	{
-		fHasCurrentScriptFileName = true;
-		return true;
-	}
-	return false;
-}
-
 bool NFmiSmartToolInfo::SaveDBChecker(void)
 {
 	return WriteScript2File(itsDBCheckerFileName, itsDBCheckerText);
-}
-
-std::string NFmiSmartToolInfo::ExtractPath(const std::string &theFullFileName)
-{
-	NFmiFileString fileString(theFullFileName);
-	NFmiString path(fileString.Device());
-	path += kFmiDirectorySeparator;
-	path += fileString.Path();
-	path += kFmiDirectorySeparator;
-	string path2(path);
-	return path2;
 }
 
 bool NFmiSmartToolInfo::WriteScript2File(const std::string &theFileName, const std::string &theScript)
@@ -126,8 +97,8 @@ bool NFmiSmartToolInfo::LoadSettings(void)
 {
 	try
 	{
-		itsCurrentScriptFileName = NFmiSettings::Require<string>("MetEditor::SmartToolInfo::CurrentScriptFileName");
-		itsLastLoadDirectory = NFmiSettings::Require<string>("MetEditor::SmartToolInfo::LastLoadDirectory");
+		itsScriptFileExtension = NFmiSettings::Require<string>("MetEditor::SmartToolInfo::ScriptFileExtension");
+		itsCurrentScriptName = NFmiSettings::Require<string>("MetEditor::SmartToolInfo::CurrentScriptName");
 		fMakeDBCheckAtSend = NFmiSettings::Require<bool>("MetEditor::SmartToolInfo::MakeDBCheckAtSend");
 		return true;
 	}
@@ -141,8 +112,8 @@ bool NFmiSmartToolInfo::SaveSettings(void)
 {
 	try
 	{
-		NFmiSettings::Set("MetEditor::SmartToolInfo::CurrentScriptFileName", itsCurrentScriptFileName);
-		NFmiSettings::Set("MetEditor::SmartToolInfo::LastLoadDirectory", itsLastLoadDirectory);
+		NFmiSettings::Set("MetEditor::SmartToolInfo::ScriptFileExtension", itsScriptFileExtension);
+		NFmiSettings::Set("MetEditor::SmartToolInfo::CurrentScriptName", itsCurrentScriptName);
 		NFmiSettings::Set("MetEditor::SmartToolInfo::MakeDBCheckAtSend", fMakeDBCheckAtSend ? "true" : "false");
 		return true;
 	}
@@ -150,4 +121,49 @@ bool NFmiSmartToolInfo::SaveSettings(void)
 	{
 		return false;
 	}
+}
+
+bool NFmiSmartToolInfo::ScriptExist(const std::string &theScriptName)
+{
+	vector<string> names = GetScriptNames();
+	vector<string>::iterator it = std::find(names.begin(), names.end(), theScriptName);
+	if(it != names.end())
+		return true;
+	return false;
+}
+std::vector<std::string> NFmiSmartToolInfo::GetScriptNames(void)
+{
+	string pattern(itsLoadDirectory);
+	pattern += "*.";
+	pattern += itsScriptFileExtension;
+	list<string> tmpList = NFmiFileSystem::PatternFiles(pattern);
+
+	if(tmpList.empty())
+		return vector<string>();
+	else
+	{
+		vector<string> names;
+		list<string>::iterator it = tmpList.begin();
+		for( ; it != tmpList.end(); ++it)
+		{
+			NFmiFileString fileString(*it);
+			names.push_back(string(static_cast<char*>(fileString.Header())));
+		}
+		return names;
+	}
+}
+
+std::string NFmiSmartToolInfo::GetFullScriptFileName(const std::string &theScriptName)
+{
+	string fullFileName(itsLoadDirectory);
+	fullFileName += theScriptName;
+	fullFileName += ".";
+	fullFileName += itsScriptFileExtension;
+	return fullFileName;
+}
+
+bool NFmiSmartToolInfo::RemoveScript(const std::string &theScriptName)
+{
+	string fullFileName(GetFullScriptFileName(theScriptName));
+	return NFmiFileSystem::RemoveFile(fullFileName);
 }
