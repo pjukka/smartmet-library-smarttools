@@ -290,6 +290,9 @@ public:
 //********** 'versio 2' parametrien asetusfunktiot *************
 //**************************************************************
 
+	bool ViewMacroDrawParam(void) const {return fViewMacroDrawParam;}
+	void ViewMacroDrawParam(bool newState) {fViewMacroDrawParam = newState;}
+
 // ---------------------- operators ------------------------
 	bool operator == (const NFmiDrawParam & theDrawParam) const;
 	bool operator < (const NFmiDrawParam & theDrawParam) const;
@@ -448,6 +451,9 @@ private:
 	bool fShowDifferenceToOriginalData;
 
 	NFmiInfoData::Type itsDataType; // lisäsin tämän, kun laitoin editoriin satelliitti kuvien katselun mahdollisuuden (satel-datalla ei ole infoa)
+	bool fViewMacroDrawParam; // is this DrawParam from viewmacro, if it is, then some things are handled 
+							  // differently when modifying options, default value is false
+							  // This is not stored in file!
 
 //	NFmiMetEditorCoordinatorMapOptions* itsMetEditorCoordinatorMapOptions; // tätä käytetään koordinaatio tarkasteluissa
 };

@@ -157,6 +157,7 @@ NFmiDrawParam::NFmiDrawParam()
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
+, fViewMacroDrawParam(false)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -282,7 +283,7 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , fShowDifferenceToOriginalData(false)
 //, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 , itsDataType(NFmiInfoData::kNoDataType)
-
+, fViewMacroDrawParam(false)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -409,7 +410,7 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 , fShowDifferenceToOriginalData(false)
 //, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 , itsDataType(theDataType)
-
+, fViewMacroDrawParam(false)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -554,6 +555,8 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam)
 	//***********************************************
 	//********** 'versio 2' parametreja *************
 	//***********************************************
+		fViewMacroDrawParam = theDrawParam->ViewMacroDrawParam();
+
 	}
 	return;
 }
@@ -573,6 +576,7 @@ bool NFmiDrawParam::Init (const NFmiString& theFilename)
 			in >> *this;
 			in.close();
 			itsInitFileName = theFilename;
+			fViewMacroDrawParam = false;
 			return true;
 		}
 	}
