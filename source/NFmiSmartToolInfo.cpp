@@ -6,6 +6,8 @@
 
 #include "NFmiSmartToolInfo.h"
 #include "NFmiFileString.h"
+#include "NFmiFileSystem.h"
+#include "NFmiSettings.h"
 #include <fstream>
 #include <iterator>
 
@@ -27,43 +29,24 @@ NFmiSmartToolInfo::~NFmiSmartToolInfo(void)
 {
 }
 
-bool NFmiSmartToolInfo::Init(const std::string &theFileName)
+// luetaan  asetukset nykyään NFmiSetting-luokasta
+bool NFmiSmartToolInfo::Init(void)
 {
-	ifstream in(theFileName.c_str());
-	if(in)
+	if(LoadSettings())
 	{
-		in >> *this;
-//		in.close(); // ei tarvitse sulkea, koska in sulkeutuu automaattisesti poistuttaessa scoopista.
-		if(!in.fail())
-		{
-			itsCurrentInfoFile = theFileName;
-			LoadLastScript();
-			return true;
-		}
-	}
-	return false;
-}
-
-bool NFmiSmartToolInfo::Store(const std::string &theFileName)
-{
-	ofstream out(theFileName.c_str());
-	if(out)
-	{
-		out << *this;
-//		out.close(); // ei tarvitse sulkea, koska out sulkeutuu automaattisesti poistuttaessa scoopista.
-		return !out.fail();
+		return LoadAsCurrentScript(itsCurrentScriptFileName);
 	}
 	return false;
 }
 
 bool NFmiSmartToolInfo::LoadAsCurrentScript(const std::string &theFileName)
 {
-	if(ReadFileToString(theFileName, &itsCurrentScript))
+	if(::ReadFile2String(theFileName, itsCurrentScript))
 	{
 		fHasCurrentScriptFileName = true;
 		itsCurrentScriptFileName = theFileName;
 		itsLastLoadDirectory = ExtractPath(theFileName);
-		return Store(itsCurrentInfoFile);
+		return SaveSettings();
 	}
 	return false;
 }
@@ -78,25 +61,19 @@ bool NFmiSmartToolInfo::SaveCurrentScript(void)
 
 bool NFmiSmartToolInfo::SaveAsCurrentScript(const std::string &theFileName)
 {
-	ofstream out(theFileName.c_str());
-	if(out)
+	if(WriteScript2File(theFileName, itsCurrentScript))
 	{
-		out << itsCurrentScript;
-//		out.close(); // ei tarvitse sulkea, koska out sulkeutuu automaattisesti poistuttaessa scoopista.
-		if(!out.fail())
-		{
-			fHasCurrentScriptFileName = true;
-			itsCurrentScriptFileName = theFileName;
-			itsLastLoadDirectory = ExtractPath(theFileName);
-			return Store(itsCurrentInfoFile);
-		}
+		fHasCurrentScriptFileName = true;
+		itsCurrentScriptFileName = theFileName;
+		itsLastLoadDirectory = ExtractPath(theFileName);
+		return SaveSettings();
 	}
 	return false;
 }
 
 bool NFmiSmartToolInfo::LoadDBChecker(void)
 {
-	if(ReadFileToString(itsDBCheckerFileName, &itsDBCheckerText))
+	if(::ReadFile2String(itsDBCheckerFileName, itsDBCheckerText))
 	{
 		fIsThereDBCheckScript = true;
 		return true;
@@ -107,7 +84,7 @@ bool NFmiSmartToolInfo::LoadDBChecker(void)
 
 bool NFmiSmartToolInfo::LoadLastScript(void)
 {
-	if(ReadFileToString(itsCurrentScriptFileName, &itsCurrentScript))
+	if(::ReadFile2String(itsCurrentScriptFileName, itsCurrentScript))
 	{
 		fHasCurrentScriptFileName = true;
 		return true;
@@ -115,62 +92,9 @@ bool NFmiSmartToolInfo::LoadLastScript(void)
 	return false;
 }
 
-bool NFmiSmartToolInfo::ReadFileToString(const std::string &theFileName, std::string *theString)
-{
-	if(theFileName != "")
-	{
-		ifstream in(theFileName.c_str());
-		if(in)
-		{
-			in.unsetf(std::ios::skipws);
-			istream_iterator<char> it(in);
-			istream_iterator<char> endFile;
-			*theString = "";
-			for(; it != endFile; ++it)
-				*theString += *it;
-	//		in.close(); // ei tarvitse sulkea, koska in sulkeutuu automaattisesti poistuttaessa scoopista.
-			return true;
-		}
-	}
-	return false;
-}
-
 bool NFmiSmartToolInfo::SaveDBChecker(void)
 {
-	ofstream out(itsDBCheckerFileName.c_str());
-	if(out)
-	{
-		out << itsDBCheckerText;
-//		out.close(); // ei tarvitse sulkea, koska out sulkeutuu automaattisesti poistuttaessa scoopista.
-		return !out.fail();
-	}
-	return false;
-}
-
-std::ostream& NFmiSmartToolInfo::Write(std::ostream &file) const
-{
-	file << itsCurrentScriptFileName << endl;
-	file << itsLastLoadDirectory << endl;
-	file << fMakeDBCheckAtSend << endl;
-	return file;
-}
-
-/*!
- *  Oletus, että luettavat jutut ovat aina omilla riveillään.
- *  Tämä sen takia, että polussa tai tiedoston nimessä voi olla spaceja.
- */
-std::istream& NFmiSmartToolInfo::Read(std::istream &file)
-{
-	string buffer;
-	buffer.resize(512);
-	file.getline(&buffer[0], buffer.size());
-	itsCurrentScriptFileName = buffer;
-
-	file.getline(&buffer[0], buffer.size());
-	itsLastLoadDirectory = buffer;
-
-	file >> fMakeDBCheckAtSend;
-	return file;
+	return WriteScript2File(itsDBCheckerFileName, itsDBCheckerText);
 }
 
 std::string NFmiSmartToolInfo::ExtractPath(const std::string &theFullFileName)
@@ -184,3 +108,46 @@ std::string NFmiSmartToolInfo::ExtractPath(const std::string &theFullFileName)
 	return path2;
 }
 
+bool NFmiSmartToolInfo::WriteScript2File(const std::string &theFileName, const std::string &theScript)
+{
+	if(!theFileName.empty())
+	{
+		ofstream out(theFileName.c_str());
+		if(out)
+		{
+			out << theScript;
+			return !out.fail();
+		}
+	}
+	return false;
+}
+
+bool NFmiSmartToolInfo::LoadSettings(void)
+{
+	try
+	{
+		itsCurrentScriptFileName = NFmiSettings::Require<string>("MetEditor::SmartToolInfo::CurrentScriptFileName");
+		itsLastLoadDirectory = NFmiSettings::Require<string>("MetEditor::SmartToolInfo::LastLoadDirectory");
+		fMakeDBCheckAtSend = NFmiSettings::Require<bool>("MetEditor::SmartToolInfo::MakeDBCheckAtSend");
+		return true;
+	}
+	catch(exception & /* e */)
+	{
+		return false;
+	}
+}
+
+bool NFmiSmartToolInfo::SaveSettings(void)
+{
+	try
+	{
+		NFmiSettings::Set("MetEditor::SmartToolInfo::CurrentScriptFileName", itsCurrentScriptFileName);
+		NFmiSettings::Set("MetEditor::SmartToolInfo::LastLoadDirectory", itsLastLoadDirectory);
+		NFmiSettings::Set("MetEditor::SmartToolInfo::MakeDBCheckAtSend", fMakeDBCheckAtSend ? "true" : "false");
+		return true;
+	}
+	catch(exception & /* e */)
+	{
+		return false;
+	}
+}
