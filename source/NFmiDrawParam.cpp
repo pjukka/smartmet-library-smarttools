@@ -1060,7 +1060,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 	}
     return file;
 }
-
+/*
 const NFmiDataIdent& NFmiDrawParam::EditParam(void) const 
 {
 	if(itsInfo) // satelliitti datalla ei ole infoa, joten tein tähän pika virityksen
@@ -1068,6 +1068,7 @@ const NFmiDataIdent& NFmiDrawParam::EditParam(void) const
 	else
 		return itsParameter;
 }
+*/
 /* 
 void NFmiDrawParam::MetEditorCoordinatorMapOptions(NFmiMetEditorCoordinatorMapOptions* theNewOptions)
 {

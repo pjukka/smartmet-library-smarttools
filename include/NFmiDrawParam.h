@@ -74,8 +74,8 @@ public:
 // --------------- "set" ja "get" metodit -----------------
 	const NFmiString&	 ParameterAbbreviation (void) const;
 	void				 ParameterAbbreviation(NFmiString theParameterAbbreviation) { itsParameterAbbreviation = theParameterAbbreviation; }
-	const NFmiDataIdent& Param (void) const { return itsParameter; }; 
-	const NFmiDataIdent& EditParam (void) const; 
+	NFmiDataIdent& Param (void) { return itsParameter; }; 
+//	const NFmiDataIdent& EditParam (void) const; 
 	void                 Param (const NFmiDataIdent& theParameter) { itsParameter = theParameter; }; 
 	void                 Info (NFmiSmartInfo* theInfo){ itsInfo = theInfo; }; 
 	NFmiSmartInfo*       Info (void){ return itsInfo; } ; 
