@@ -122,14 +122,6 @@ NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctio
 //--------------------------------------------------------
 NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(void)
 :itsSmartToolCalculationBlocks()
-//itsFirstCalculationSectionInfo(0)
-//,itsLastCalculationSectionInfo(0)
-//,itsIfAreaMaskSectionInfo(0)
-//,itsIfCalculationSectionInfo(0)
-//,fElseSectionExist(false)
-//,itsElseCalculationSectionInfo(0)
-//,itsElseIfAreaMaskSectionInfo(0)
-//,itsElseIfCalculationSectionInfo(0)
 {
 	NFmiSmartToolIntepreter::InitTokens();
 }
@@ -198,18 +190,7 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlock(NFmiSmartTool
 		return false;
 	return true;
 }
-/*
-void NFmiSmartToolIntepreter::InitSectionInfos(void)
-{
-	itsFirstCalculationSectionInfo = new NFmiSmartToolCalculationSectionInfo;
-	itsLastCalculationSectionInfo = new NFmiSmartToolCalculationSectionInfo;
-	itsIfAreaMaskSectionInfo = new NFmiAreaMaskSectionInfo;
-	itsIfCalculationSectionInfo = new NFmiSmartToolCalculationSectionInfo;
-	itsElseIfAreaMaskSectionInfo = new NFmiAreaMaskSectionInfo;
-	itsElseIfCalculationSectionInfo = new NFmiSmartToolCalculationSectionInfo;
-	itsElseCalculationSectionInfo = new NFmiSmartToolCalculationSectionInfo;
-}
-*/
+
 void NFmiSmartToolIntepreter::InitCheckOut(void)
 {
 	itsCheckOutSectionText = "";
@@ -217,13 +198,7 @@ void NFmiSmartToolIntepreter::InitCheckOut(void)
 	itsCheckOutTextEndPosition = itsStrippedMacroText.begin(); // t‰ll‰ ei viel‰ v‰li‰
 	fContinueCurrentSectionCheckOut = true;
 }
-/*
-void NFmiSmartToolIntepreter::CheckoutPossibleFirstCalculationSection(void)
-{
-	if(ExtractPossibleNextCalculationSection())
-		InterpretCalculationSection(itsCheckOutSectionText, itsFirstCalculationSectionInfo);
-}
-*/
+
 static std::string::iterator EatWhiteSpaces(std::string::iterator it)
 {
 	for(; ::isspace(*it) ; ++it)
@@ -479,12 +454,7 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationSection(NFmiSmartTo
 		return InterpretCalculationSection(itsCheckOutSectionText, theSectionInfo);
 	return false;
 }
-/*
-void NFmiSmartToolIntepreter::CheckoutPossibleLastCalculationSection(void)
-{
-	CheckoutPossibleNextCalculationSection(itsLastCalculationSectionInfo);
-}
-*/
+
 void NFmiSmartToolIntepreter::SetMacroTexts(const std::string &theMacroText) throw (NFmiSmartToolIntepreter::Exception)
 {
 	itsMacroText = theMacroText;
@@ -567,44 +537,7 @@ bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, NF
 	throw NFmiSmartToolIntepreter::Exception(string("Maski-ehto lause oli puutteellinen: " + theMaskSectionText));
 	return false;
 }
-/*
-bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo) throw (NFmiSmartToolIntepreter::Exception)
-{
-	using NFmiAreaMask::CalculationOperationType;
-	string maskText(theMaskSectionText);
-	exp_ptr = maskText.begin();
-	int maskCount = 0;
-	queue<NFmiAreaMaskInfo *> maskQueue; // t‰h‰n talletetaan osa-maskit, joista rakennetaan lopulliset maskit, koostuu aina kolmesta osasta (par, comp, arvo eli T, >, 1)
 
-	string tmp;
-	for(; GetToken(); )
-	{
-		tmp = token; // luetaan muuttuja/vakio/funktio tai mik‰ lie
-		NFmiAreaMaskInfo *maskInfo = new NFmiAreaMaskInfo;
-		auto_ptr<NFmiAreaMaskInfo> maskInfoPtr(maskInfo);
-		InterpretToken(tmp, maskInfo); // ei saa antaa auto_ptr-otusta t‰ss‰, muuten se menett‰‰ omistuksen!
-		if(maskInfo->GetOperationType() == CalculationOperationType::StartParenthesis || maskInfo->GetOperationType() == CalculationOperationType::EndParenthesis)
-			theAreaMaskSectionInfo->Add(maskInfoPtr.release()); // auto_ptr menett‰‰ omistuksen t‰ss‰
-		else if(maskInfo->GetOperationType() == CalculationOperationType::BinaryOperatorType) // esim. &&, ||
-			theAreaMaskSectionInfo->Add(maskInfoPtr.release()); // auto_ptr menett‰‰ omistuksen t‰ss‰
-		else // laitetaan maskInfo jonoon lopullisen maskin rakennusta varten
-		{
-			maskQueue.push(maskInfoPtr.release());
-			if(maskQueue.size() >= 3) // ei saisi olla oikeasti 3:a suurempi
-			{
-				theAreaMaskSectionInfo->Add(CreateWantedAreaMaskInfo(theMaskSectionText, maskQueue));
-				maskCount++;
-			}
-		}
-
-	}
-
-	if(maskCount)
-		return true;
-	throw NFmiSmartToolIntepreter::Exception(string("Maski-ehto lauseessa oli vikaa, ei ollut yht‰‰n ehtoja: " + theMaskSectionText));
-	return false;
-}
-*/
 NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::string &theMaskSectionText, queue<NFmiAreaMaskInfo *> &theMaskQueue) throw (NFmiSmartToolIntepreter::Exception)
 {
 	NFmiAreaMaskInfo *maskInfo1 = theMaskQueue.front(); // t‰ss‰ pit‰‰ olla muuttuja esim T, p, jne.
@@ -643,43 +576,6 @@ NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::s
 	return 0;
 }
 
-/*	
-	string calculationLineText(theCalculationLineText);
-	NFmiSmartToolCalculationInfo *calculationInfo = new NFmiSmartToolCalculationInfo;
-	calculationInfo->SetCalculationText(theCalculationLineText);
-	auto_ptr<NFmiSmartToolCalculationInfo> calculationInfoPtr(calculationInfo); // tuhoaa automaattisesti esim. exceptionin yhteydess‰ 
-
-	exp_ptr = calculationLineText.begin();
-
-	string tmp;
-	if(GetToken()) // luetaan muuttuja johon sijoitetaan esim. T
-	{
-		tmp = token; 
-		NFmiAreaMaskInfo *assignedVariable = new NFmiAreaMaskInfo;
-		auto_ptr<NFmiAreaMaskInfo> assignedVariablePtr(assignedVariable); // tuhoaa automaattisesti esim. exceptionin yhteydess‰ 
-		InterpretVariable(tmp, assignedVariable);  // ei saa antaa auto_ptr-otust‰ t‰ss‰, muuten se menett‰‰ omistuksen!
-		calculationInfo->SetResultDataInfo(assignedVariablePtr.release());// auto_ptr menett‰‰ omistuksen t‰ss‰
-
-		GetToken(); // luetaan sijoitus operaattori =
-		if(string(token) != string("="))
-			throw NFmiSmartToolIntepreter::Exception(string("Laskurivill‰ ei ollut sijoitus operaattoria '=': " + theCalculationLineText));
-		NFmiAreaMaskInfo *variableInfo = 0;
-		for(; GetToken(); )
-		{
-			tmp = token; // luetaan muuttuja/vakio/funktio tai mik‰ lie
-			variableInfo = new NFmiAreaMaskInfo;
-			auto_ptr<NFmiAreaMaskInfo> variableInfoPtr(variableInfo);
-			InterpretToken(tmp, variableInfo); // ei saa antaa auto_ptr-otust‰ t‰ss‰, muuten se menett‰‰ omistuksen!
-			calculationInfo->AddCalculationInfo(variableInfoPtr.release()); // auto_ptr menett‰‰ omistuksen t‰ss‰
-		}
-
-		if(calculationInfo->GetCalculationOperandInfoVector()->empty())
-			return 0;
-	}
-	calculationInfoPtr.release();
-	return calculationInfo;
-*/
-
 //--------------------------------------------------------
 // InterpretCalculationSection 
 //--------------------------------------------------------
@@ -717,10 +613,6 @@ bool NFmiSmartToolIntepreter::ConsistOnlyWhiteSpaces(const std::string &theText)
 
 std::string NFmiSmartToolIntepreter::ExtractNextLine(std::string &theText, std::string::iterator theStartPos, std::string::iterator* theEndPos)
 {
-	// en ymm‰rr‰ miten rivin vaihto etsit‰‰n tyylikk‰‰sti, nyt pit‰‰ hakea kahdessa osassa!!!
-//	*theEndPos = std::find(theStartPos, theText.end(), '\n');
-//	if(*theEndPos == theText.end())
-//		*theEndPos = std::find(theStartPos, theText.end(), '\r');
 	*theEndPos = std::find_if(theStartPos, theText.end(), EndOfLineSearcher());
 	
 	string str(theStartPos, *theEndPos);
@@ -785,7 +677,7 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 		NFmiAreaMaskInfo *assignedVariable = new NFmiAreaMaskInfo;
 		auto_ptr<NFmiAreaMaskInfo> assignedVariablePtr(assignedVariable); // tuhoaa automaattisesti esim. exceptionin yhteydess‰ 
 		InterpretVariable(tmp, assignedVariable);  // ei saa antaa auto_ptr-otust‰ t‰ss‰, muuten se menett‰‰ omistuksen!
-		if(assignedVariable->GetDataType() != kFmiDataTypeEditable)
+		if(assignedVariable->GetDataType() != NFmiInfoData::kEditable)
 			throw NFmiSmartToolIntepreter::Exception(string("Sijoitusta ei voi tehd‰ kuin editoitavaan dataan: \n") + calculationLineText);
 		calculationInfo->SetResultDataInfo(assignedVariablePtr.release());// auto_ptr menett‰‰ omistuksen t‰ss‰
 
@@ -990,27 +882,27 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 //	bool levelInVariableName = ExtractParamAndLevel(theVariableText, &paramNameOnly, &levelNameOnly);
 	if(levelExist && producerExist) // kokeillaan ensin, lˆytyykˆ param+level+producer
 	{
-		if(FindParamAndLevelAndProducerAndSetMaskInfo(paramNameOnly, levelNameOnly, producerNameOnly, NFmiAreaMask::InfoVariable, origWanted ? kFmiDataTypeCopyOfEdited : kFmiDataTypeViewable, theMaskInfo))
+		if(FindParamAndLevelAndProducerAndSetMaskInfo(paramNameOnly, levelNameOnly, producerNameOnly, NFmiAreaMask::InfoVariable, origWanted ? NFmiInfoData::kCopyOfEdited : NFmiInfoData::kViewable, theMaskInfo))
 			return;
 	}
 	else if(levelExist) // kokeillaan ensin, lˆytyykˆ param+level+producer
 	{
-		if(FindParamAndLevelAndSetMaskInfo(paramNameOnly, levelNameOnly, NFmiAreaMask::InfoVariable, kFmiDataTypeViewable, theMaskInfo))
+		if(FindParamAndLevelAndSetMaskInfo(paramNameOnly, levelNameOnly, NFmiAreaMask::InfoVariable, NFmiInfoData::kViewable, theMaskInfo))
 			return;
 	}
 	else if(producerExist) // kokeillaan ensin, lˆytyykˆ param+level+producer
 	{
-		if(FindParamAndProducerAndSetMaskInfo(paramNameOnly, producerNameOnly, NFmiAreaMask::InfoVariable, origWanted ? kFmiDataTypeCopyOfEdited : kFmiDataTypeViewable, theMaskInfo))
+		if(FindParamAndProducerAndSetMaskInfo(paramNameOnly, producerNameOnly, NFmiAreaMask::InfoVariable, origWanted ? NFmiInfoData::kCopyOfEdited : NFmiInfoData::kViewable, theMaskInfo))
 			return;
 	}
 
-	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, NFmiAreaMask::InfoVariable, kFmiDataTypeEditable, theMaskInfo))
+	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, NFmiAreaMask::InfoVariable, NFmiInfoData::kEditable, theMaskInfo))
 		return;
 
-	if(FindParamAndSetMaskInfo(theVariableText, itsTokenStaticParameterNamesAndIds, NFmiAreaMask::InfoVariable, kFmiDataTypeStationary, theMaskInfo))
+	if(FindParamAndSetMaskInfo(theVariableText, itsTokenStaticParameterNamesAndIds, NFmiAreaMask::InfoVariable, NFmiInfoData::kStationary, theMaskInfo))
 		return;
 
-	if(FindParamAndSetMaskInfo(theVariableText, itsTokenCalculatedParameterNamesAndIds, NFmiAreaMask::CalculatedVariable, kFmiDataTypeCalculatedValue, theMaskInfo))
+	if(FindParamAndSetMaskInfo(theVariableText, itsTokenCalculatedParameterNamesAndIds, NFmiAreaMask::CalculatedVariable, NFmiInfoData::kCalculatedValue, theMaskInfo))
 		return;
 	
 	if(IsVariableConstantValue(theVariableText, theMaskInfo))
@@ -1128,7 +1020,7 @@ bool NFmiSmartToolIntepreter::ExtractParamAndLevel(const std::string &theVariabl
 	return false;
 }
 
-bool NFmiSmartToolIntepreter::FindParamAndLevelAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText, NFmiAreaMask::CalculationOperationType theOperType, FmiQueryInfoDataType theDataType, NFmiAreaMaskInfo *theMaskInfo)
+bool NFmiSmartToolIntepreter::FindParamAndLevelAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo)
 {
 	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo))
 	{
@@ -1139,7 +1031,7 @@ bool NFmiSmartToolIntepreter::FindParamAndLevelAndSetMaskInfo(const std::string 
 	return false;
 }
 
-bool NFmiSmartToolIntepreter::FindParamAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, FmiQueryInfoDataType theDataType, NFmiAreaMaskInfo *theMaskInfo)
+bool NFmiSmartToolIntepreter::FindParamAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo)
 {
 	NFmiProducer producer(GetPossibleProducerInfo(theProducerText));
 	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer))
@@ -1147,7 +1039,7 @@ bool NFmiSmartToolIntepreter::FindParamAndProducerAndSetMaskInfo(const std::stri
 	return false;
 }
 
-bool NFmiSmartToolIntepreter::FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, FmiQueryInfoDataType theDataType, NFmiAreaMaskInfo *theMaskInfo)
+bool NFmiSmartToolIntepreter::FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo)
 {
 	NFmiProducer producer(GetPossibleProducerInfo(theProducerText));
 	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer))
@@ -1187,7 +1079,7 @@ NFmiProducer NFmiSmartToolIntepreter::GetPossibleProducerInfo(const std::string 
 	return NFmiProducer();
 }
 
-bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, FmiQueryInfoDataType theDataType, NFmiAreaMaskInfo *theMaskInfo)
+bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo)
 {
 	ParamMap::iterator it = theParamMap.find(theVariableText);
 	if(it != theParamMap.end())
@@ -1204,7 +1096,7 @@ bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVari
 	return false;
 }
 
-bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, FmiQueryInfoDataType theDataType, NFmiAreaMaskInfo *theMaskInfo, const NFmiProducer &theProducer)
+bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo, const NFmiProducer &theProducer)
 {
 	ParamMap::iterator it = theParamMap.find(theVariableText);
 	if(it != theParamMap.end())
@@ -1388,13 +1280,6 @@ bool NFmiSmartToolIntepreter::IsVariableRampFunction(const std::string &theVaria
 					NFmiCalculationCondition condition(maskOper, value1, value2);
 					theMaskInfo->SetMaskCondition(condition);
 
-//		NFmiAreaMaskInfo *variableInfo = 0;
-//			variableInfo = new NFmiAreaMaskInfo;
-//			auto_ptr<NFmiAreaMaskInfo> variableInfoPtr(variableInfo);
-//			InterpretToken(tmp, variableInfo); // ei saa antaa auto_ptr-otust‰ t‰ss‰, muuten se menett‰‰ omistuksen!
-//			calculationInfo->AddCalculationInfo(variableInfoPtr.release()); // auto_ptr menett‰‰ omistuksen t‰ss‰
-
-//		theMaskInfo->SetOperationType(NFmiAreaMask::ModifyFactor);
 					return true;
 				}
 			}
@@ -1444,30 +1329,6 @@ void NFmiSmartToolIntepreter::Clear(void)
 	int size = itsSmartToolCalculationBlocks.size();
 	for(int i=0; i<size; i++)
 		itsSmartToolCalculationBlocks[i].Clear();
-/*
-	delete itsFirstCalculationSectionInfo;
-	itsFirstCalculationSectionInfo = 0;
-	delete itsLastCalculationSectionInfo;
-	itsLastCalculationSectionInfo = 0;
-	delete itsIfAreaMaskSectionInfo;
-	itsIfAreaMaskSectionInfo = 0;
-	delete itsIfCalculationSectionInfo;
-	itsIfCalculationSectionInfo = 0;
-//	delete itsElseAreaMaskSectionInfo;
-//	itsElseAreaMaskSectionInfo = 0;
-	delete itsElseCalculationSectionInfo;
-	itsElseCalculationSectionInfo = 0;
-	delete itsElseIfAreaMaskSectionInfo;
-	itsElseIfAreaMaskSectionInfo = 0;
-	delete itsElseIfCalculationSectionInfo;
-	itsElseIfCalculationSectionInfo = 0;
-*/
-/*
-	std::for_each(itsElseIfAreaMaskSectionInfoVector.begin(), itsElseIfAreaMaskSectionInfoVector.end(), PointerDestroyer());
-	itsElseIfAreaMaskSectionInfoVector.clear();
-	std::for_each(itsElseIfCalculationSectionInfoVector.begin(), itsElseIfCalculationSectionInfoVector.end(), PointerDestroyer());
-	itsElseIfCalculationSectionInfoVector.clear();
-*/
 }
 
 void NFmiSmartToolIntepreter::InitTokens(void)

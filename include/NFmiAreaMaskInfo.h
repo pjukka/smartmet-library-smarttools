@@ -25,7 +25,6 @@
 #include "NFmiAreaMask.h"
 #include "NFmiDataIdent.h"
 #include "NFmiCalculationCondition.h"
-#include "NFmiSmartToolCalculation.h"
 #include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiPoint.h"
 
@@ -59,8 +58,8 @@ public:
 	void SetCalculationOperator(NFmiAreaMask::CalculationOperator newValue) {itsCalculationOperator = newValue;}
 	NFmiAreaMask::BinaryOperator GetBinaryOperator(void) const{return itsBinaryOperator;}
 	void SetBinaryOperator(NFmiAreaMask::BinaryOperator theValue) {itsBinaryOperator = theValue;}
-	FmiQueryInfoDataType GetDataType(void) const {return itsDataType;}
-	void SetDataType(FmiQueryInfoDataType newValue){itsDataType = newValue;}
+	NFmiInfoData::Type GetDataType(void) const {return itsDataType;}
+	void SetDataType(NFmiInfoData::Type newValue){itsDataType = newValue;}
 	NFmiLevel* GetLevel(void) const {return itsLevel;}
 	void SetLevel(NFmiLevel *theLevel);
 	const std::string& GetMaskText(void) const{return itsMaskText;}
@@ -82,7 +81,7 @@ private:
 						   // smarttooleja varten vielä tämmöinen mm. hoitamaan laskujärjestyksiä ja sulkuja jne.
 	NFmiAreaMask::CalculationOperator itsCalculationOperator; // jos operation, tässä tieto mistä niistä on kyse esim. +, -, * jne.
 	NFmiAreaMask::BinaryOperator itsBinaryOperator;
-	FmiQueryInfoDataType itsDataType; // jos kyseessä infoVariable, tarvitaan vielä datan tyyppi, että parametri saadaan tietokannasta (=infoOrganizerista)
+	NFmiInfoData::Type itsDataType; // jos kyseessä infoVariable, tarvitaan vielä datan tyyppi, että parametri saadaan tietokannasta (=infoOrganizerista)
 	NFmiLevel *itsLevel; // mahd. level tieto, omistaa ja tuhoaa
 	std::string itsMaskText; // originaali teksti, mistä tämä maskinfo on tulkittu
 	NFmiAreaMask::FunctionType itsFunctionType; // onko mahd. funktio esim. min, max jne. (ei matemaattisia funktioita kuten sin, cos, pow, jne.)

@@ -48,7 +48,7 @@ NFmiCalculationSpecialCase::NFmiCalculationSpecialCase(NFmiAreaMask::Calculation
 
 
 
-NFmiCalculationRampFuction::NFmiCalculationRampFuction(const NFmiCalculationCondition& theOperation, Type theMaskType, DataType theDataType, NFmiQueryInfo* theInfo, bool ownsInfo, BinaryOperator thePostBinaryOperator)
+NFmiCalculationRampFuction::NFmiCalculationRampFuction(const NFmiCalculationCondition& theOperation, Type theMaskType, NFmiInfoData::Type theDataType, NFmiQueryInfo* theInfo, bool ownsInfo, BinaryOperator thePostBinaryOperator)
 :NFmiInfoAreaMask(theOperation, theMaskType, theDataType, theInfo, ownsInfo, thePostBinaryOperator)
 {
 }
@@ -63,7 +63,7 @@ double NFmiCalculationRampFuction::Value(const NFmiPoint &theLatlon, const NFmiM
 }
 
 
-NFmiCalculationIntegrationFuction::NFmiCalculationIntegrationFuction(NFmiDataIterator *theDataIterator, NFmiDataModifier *theDataModifier, Type theMaskType, DataType theDataType, NFmiQueryInfo* theInfo, bool ownsInfo, bool destroySmartInfoData)
+NFmiCalculationIntegrationFuction::NFmiCalculationIntegrationFuction(NFmiDataIterator *theDataIterator, NFmiDataModifier *theDataModifier, Type theMaskType, NFmiInfoData::Type theDataType, NFmiQueryInfo* theInfo, bool ownsInfo, bool destroySmartInfoData)
 :NFmiInfoAreaMask(NFmiCalculationCondition(), theMaskType, theDataType, theInfo, ownsInfo, NFmiAreaMask::kNoValue, destroySmartInfoData)
 ,itsDataModifier(theDataModifier)
 ,itsDataIterator(theDataIterator)
@@ -98,7 +98,7 @@ double NFmiCalculationRampFuctionWithAreaMask::Value(const NFmiPoint &theLatlon,
 
 NFmiCalculationRampFuctionWithAreaMask::NFmiCalculationRampFuctionWithAreaMask(const NFmiCalculationCondition & theOperation,
 																			   Type theMaskType,
-																			   DataType theDataType,
+																			   NFmiInfoData::Type theDataType,
 																			   NFmiAreaMask * theAreaMask,
 																			   bool ownsAreaMask,
 																			   BinaryOperator thePostBinaryOperator)
