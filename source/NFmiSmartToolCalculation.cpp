@@ -37,12 +37,12 @@ using namespace std;
 // Constructor/Destructor 
 //--------------------------------------------------------
 NFmiSmartToolCalculation::NFmiSmartToolCalculation(void)
-:itsResultInfo(0)
+:itsLowerLimit(0)
+,itsUpperLimit(1)
+,itsResultInfo(0)
 ,itsCalculations()
 //,itsOperators()
 ,itsModificationFactors(0)
-,itsLowerLimit(0)
-,itsUpperLimit(1)
 {
 }
 
