@@ -431,7 +431,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam)
 {
 	if(theDrawParam)
 	{
-		itsParameterAbbreviation = NFmiString(theDrawParam->ParameterAbbreviation());
+		itsParameterAbbreviation = theDrawParam->ParameterAbbreviation();
 		itsPriority = theDrawParam->Priority();
 
 		itsViewType = theDrawParam->ViewType();
