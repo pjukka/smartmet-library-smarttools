@@ -25,7 +25,6 @@
 #ifndef  NFMISMARTTOOLMODIFIER_H
 #define  NFMISMARTTOOLMODIFIER_H
 
-#include "NFmiAreaMask.h"
 #include <string>
 #include <vector>
 
@@ -39,6 +38,7 @@ class NFmiSmartToolCalculation;
 class NFmiSmartToolCalculationInfo;
 class NFmiSmartInfo;
 class NFmiAreaMaskSectionInfo;
+class NFmiAreaMask;
 class NFmiDataModifier;
 class NFmiDataIterator;
 class NFmiSmartToolCalculationBlock;

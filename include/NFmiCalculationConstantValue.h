@@ -23,7 +23,6 @@
 #define  NFMICALCULATIONCONSTANTVALUE_H
 
 #include "NFmiAreaMaskImpl.h"
-#include "NFmiSmartToolCalculation.h"
 #include "NFmiInfoAreaMask.h"
 
 class NFmiDataModifier;
@@ -70,7 +69,7 @@ class NFmiCalculationRampFuction : public NFmiInfoAreaMask
 public:
    double Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 
-   NFmiCalculationRampFuction(const NFmiCalculationCondition& theOperation, Type theMaskType, DataType theDataType, NFmiQueryInfo* theInfo, bool ownsInfo = false, BinaryOperator thePostBinaryOperator = kNoValue);
+   NFmiCalculationRampFuction(const NFmiCalculationCondition& theOperation, Type theMaskType, NFmiInfoData::Type theDataType, NFmiQueryInfo* theInfo, bool ownsInfo = false, BinaryOperator thePostBinaryOperator = kNoValue);
    ~NFmiCalculationRampFuction(void);
 
 private:
@@ -86,7 +85,7 @@ public:
 
    NFmiCalculationRampFuctionWithAreaMask(const NFmiCalculationCondition & theOperation,
 										   Type theMaskType,
-										   DataType theDataType,
+										   NFmiInfoData::Type theDataType,
 										   NFmiAreaMask * theAreaMask,
 										   bool ownsAreaMask = false,
 										   BinaryOperator thePostBinaryOperator = kNoValue);
@@ -106,7 +105,7 @@ class NFmiCalculationIntegrationFuction : public NFmiInfoAreaMask
 public:
    double Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 
-   NFmiCalculationIntegrationFuction(NFmiDataIterator *theDataIterator, NFmiDataModifier *theDataModifier, Type theMaskType, DataType theDataType, NFmiQueryInfo* theInfo, bool ownsInfo = false, bool destroySmartInfoData = false);
+   NFmiCalculationIntegrationFuction(NFmiDataIterator *theDataIterator, NFmiDataModifier *theDataModifier, Type theMaskType, NFmiInfoData::Type theDataType, NFmiQueryInfo* theInfo, bool ownsInfo = false, bool destroySmartInfoData = false);
    ~NFmiCalculationIntegrationFuction(void);
 
 private:

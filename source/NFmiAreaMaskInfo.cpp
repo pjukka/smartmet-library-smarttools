@@ -35,7 +35,7 @@ NFmiAreaMaskInfo::NFmiAreaMaskInfo()
 ,itsOperationType(NFmiAreaMask::NoType)
 ,itsCalculationOperator(NFmiAreaMask::NotOperation)
 ,itsBinaryOperator(NFmiAreaMask::kNoValue)
-,itsDataType(kFmiDataTypeNoDataType)
+,itsDataType(NFmiInfoData::kNoDataType)
 ,itsLevel(0)
 {
 }

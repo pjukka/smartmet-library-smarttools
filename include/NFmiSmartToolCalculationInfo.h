@@ -28,8 +28,7 @@
 #ifndef  NFMISMARTTOOLCALCULATIONINFO_H
 #define  NFMISMARTTOOLCALCULATIONINFO_H
 
-#include "NFmiSmartToolCalculation.h"
-#include "NFmiDataIdent.h"
+#include <vector>
 
 class NFmiAreaMaskInfo;
 

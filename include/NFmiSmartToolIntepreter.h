@@ -69,8 +69,6 @@ public:
 	NFmiSmartToolCalculationSectionInfo* itsLastCalculationSectionInfo;
 	NFmiAreaMaskSectionInfo* itsIfAreaMaskSectionInfo;
 	NFmiSmartToolCalculationSectionInfo* itsIfCalculationSectionInfo;
-//	std::vector<NFmiAreaMaskSectionInfo*> itsElseIfAreaMaskSectionInfoVector;
-//	std::vector<NFmiSmartToolCalculationSectionInfo*> itsElseIfCalculationSectionInfoVector;
 	NFmiAreaMaskSectionInfo* itsElseIfAreaMaskSectionInfo;
 	NFmiSmartToolCalculationSectionInfo* itsElseIfCalculationSectionInfo;
 	bool fElseSectionExist;
@@ -99,19 +97,7 @@ public:
 	const std::string& GetStrippedMacroText(void) const {return itsStrippedMacroText;}
 
 	std::vector<NFmiSmartToolCalculationBlock>& SmartToolCalculationBlocks(void){return itsSmartToolCalculationBlocks;}
-/*
-	NFmiSmartToolCalculationSectionInfo* FirstCalculationSectionInfo(void){return itsFirstCalculationSectionInfo;}
-	NFmiSmartToolCalculationSectionInfo* LastCalculationSectionInfo(void){return itsLastCalculationSectionInfo;}
-	NFmiAreaMaskSectionInfo* IfAreaMaskSectionInfo(void){return itsIfAreaMaskSectionInfo;}
-	NFmiSmartToolCalculationSectionInfo* IfCalculationSectionInfo(void){return itsIfCalculationSectionInfo;}
-//	std::vector<NFmiAreaMaskSectionInfo*>& ElseIfAreaMaskSectionInfoVector(void){return itsElseIfAreaMaskSectionInfoVector;}
-//	std::vector<NFmiSmartToolCalculationSectionInfo*>& ElseIfCalculationSectionInfoVector(void){return itsElseIfCalculationSectionInfoVector;}
-	NFmiAreaMaskSectionInfo* ElseIfAreaMaskSectionInfo(void){return itsElseIfAreaMaskSectionInfo;}
-	NFmiSmartToolCalculationSectionInfo* ElseIfCalculationSectionInfo(void){return itsElseIfCalculationSectionInfo;}
-//	NFmiAreaMaskSectionInfo* ElseAreaMaskSectionInfo(void){return itsElseAreaMaskSectionInfo;}
-	bool ElseSectionExist(void){return fElseSectionExist;}
-	NFmiSmartToolCalculationSectionInfo* ElseCalculationSectionInfo(void){return itsElseCalculationSectionInfo;}
-*/
+
 private:
 	typedef std::map<std::string, FmiParameterName> ParamMap;
 
@@ -120,14 +106,14 @@ private:
 	NFmiLevel GetPossibleLevelInfo(const std::string &theLevelText) throw (NFmiSmartToolIntepreter::Exception);
 	NFmiProducer GetPossibleProducerInfo(const std::string &theProducerText) throw (NFmiSmartToolIntepreter::Exception);
 	bool IsProducerOrig(std::string &theProducerText);
-	bool FindParamAndLevelAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText, NFmiAreaMask::CalculationOperationType theOperType, FmiQueryInfoDataType theDataType, NFmiAreaMaskInfo *theMaskInfo);
-	bool FindParamAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, FmiQueryInfoDataType theDataType, NFmiAreaMaskInfo *theMaskInfo);
-	bool FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, FmiQueryInfoDataType theDataType, NFmiAreaMaskInfo *theMaskInfo);
+	bool FindParamAndLevelAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
+	bool FindParamAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
+	bool FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
 	bool ExtractParamAndLevel(const std::string &theVariableText, std::string *theParamNameOnly, std::string *theLevelNameOnly);
 	bool IsVariableTMF(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariableRampFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception);
-	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, FmiQueryInfoDataType theDataType, NFmiAreaMaskInfo *theMaskInfo);
-	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, FmiQueryInfoDataType theDataType, NFmiAreaMaskInfo *theMaskInfo, const NFmiProducer &theProducer);
+	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo);
+	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, NFmiAreaMaskInfo *theMaskInfo, const NFmiProducer &theProducer);
 	void InterpretDelimiter(const std::string &theDelimText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception);
 	void InterpretToken(const std::string &theTokenText, NFmiAreaMaskInfo *theMaskInfo) throw (NFmiSmartToolIntepreter::Exception);
 	bool InterpretMaskSection(const std::string &theMaskSectorText, NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo) throw (NFmiSmartToolIntepreter::Exception);
@@ -137,14 +123,11 @@ private:
 	NFmiSmartToolCalculationInfo* InterpretCalculationLine(const std::string &theCalculationLineText) throw (NFmiSmartToolIntepreter::Exception);
 	bool InterpretNextMask(const std::string &theMaskSectionText);
 	std::string::iterator ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition);
-//	void InitSectionInfos(void);
 	void InitCheckOut(void);
-//	void CheckoutPossibleFirstCalculationSection(void);
 	bool CheckoutPossibleIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
 	bool CheckoutPossibleElseIfClauseSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
 	bool CheckoutPossibleElseClauseSection(void);
 	bool CheckoutPossibleNextCalculationSection(NFmiSmartToolCalculationSectionInfo* theSectionInfo);
-//	void CheckoutPossibleLastCalculationSection(void);
 	bool ExtractPossibleNextCalculationSection(void) throw (NFmiSmartToolIntepreter::Exception);
 	bool ExtractPossibleIfClauseSection(void);
 	bool ExtractPossibleElseIfClauseSection(void);
@@ -192,7 +175,6 @@ private:
 	static std::vector<std::string> itsTokenElseCommands;
 	static std::vector<std::string> itsTokenCalculationBlockMarkers;
 	static std::vector<std::string> itsTokenMaskBlockMarkers;
-//	static std::vector<std::string> itsTokenFunctions;
 	static std::vector<std::string> itsTokenRampUpFunctions;
 	static std::vector<std::string> itsTokenRampDownFunctions;
 	static std::vector<std::string> itsTokenDoubleRampFunctions;

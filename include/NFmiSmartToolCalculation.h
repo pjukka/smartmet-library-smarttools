@@ -28,7 +28,6 @@
 
 class NFmiPoint;
 class NFmiMetTime;
-//class NFmiFastQueryInfo;
 class NFmiSmartInfo;
 class NFmiAreaMask;
 
@@ -56,9 +55,7 @@ public:
 	void SetResultInfo(NFmiSmartInfo* value) {itsResultInfo = value;}
 	NFmiSmartInfo* GetResultInfo(void) {return itsResultInfo;}
 	std::vector<NFmiAreaMask*>* GetCalculations(void) {return &itsCalculations;}
-//	void AddCalculation(NFmiAreaMask* theCalculation, CalculationOperators theOperation);
 	void AddCalculation(NFmiAreaMask* theCalculation);
-//	std::vector<CalculationOperators>* GetOperators(void) {return &itsOperators;}
 	const std::string& GetCalculationText(void){return itsCalculationText;}
 	void SetCalculationText(const std::string& theText){itsCalculationText = theText;}
 	void SetLimits(float theLowerLimit, float theUpperLimit) throw (NFmiSmartToolCalculation::Exception);
@@ -99,7 +96,6 @@ private:
 
 	NFmiSmartInfo* itsResultInfo; // omistaa+tuhoaa
 	std::vector<NFmiAreaMask*> itsCalculations; // omistaa+tuhoaa
-//	std::vector<CalculationOperators> itsOperators;
 
 	std::vector<double> *itsModificationFactors; // mahdolliset aikasarja muokkaus kertoimet (ei omista, ei tuhoa)
 };

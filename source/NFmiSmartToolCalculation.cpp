@@ -25,7 +25,6 @@
 
 #include "NFmiSmartToolCalculation.h"
 #include "NFmiAreaMaskInfo.h"
-//#include "NFmiFastQueryInfo.h"
 #include "NFmiSmartInfo.h"
 #include "NFmiCalculationChangeFactorArray.h"
 #include <algorithm>
@@ -680,7 +679,7 @@ void NFmiSmartToolCalculation::SetModificationFactors(std::vector<double> *theFa
 		int size = itsCalculations.size();
 		for(int i=0; i<size; i++)
 		{
-			if(itsCalculations[i] && itsCalculations[i]->GetCalculationOperationType() == NFmiAreaMask::NFmiAreaMask::ModifyFactor)
+			if(itsCalculations[i] && itsCalculations[i]->GetCalculationOperationType() == NFmiAreaMask::ModifyFactor)
 				((NFmiCalculationChangeFactorArray*)itsCalculations[i])->SetChangeFactors(*theFactors);
 		}
 	}
