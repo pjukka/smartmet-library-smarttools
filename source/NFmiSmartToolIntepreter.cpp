@@ -38,6 +38,7 @@
 #include <memory>
 #include <sstream>
 #include <functional>
+#include <cctype>
 
 using namespace std;
 
@@ -155,10 +156,21 @@ void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText)  throw 
 	{
 		index++;
 		NFmiSmartToolCalculationBlock block;
-		fGoOn = CheckoutPossibleNextCalculationBlock(&block);
-		itsSmartToolCalculationBlocks.push_back(block);
-		if(index > 10000)
-			break; // huvin vuoksi laitoin iki loopin eston, tai jos yli 10000 lasku blokkia niin sorry!
+		try
+		{
+			fGoOn = CheckoutPossibleNextCalculationBlock(&block);
+			itsSmartToolCalculationBlocks.push_back(block);
+			if(index > 10000)
+				break; // huvin vuoksi laitoin iki loopin eston, tai jos yli 10000 lasku blokkia niin sorry!
+		}
+		catch(NFmiSmartToolIntepreter::Exception e)
+		{
+			block.Clear();
+			for(int i=0; i<itsSmartToolCalculationBlocks.size(); i++)
+				itsSmartToolCalculationBlocks[i].Clear();
+			itsSmartToolCalculationBlocks.clear();
+			throw e;
+		}
 	}
 }
 
@@ -277,6 +289,9 @@ bool NFmiSmartToolIntepreter::IsPossibleCalculationLine(const std::string &theTe
 			return false;
 	if(theTextLine.find(string("=")) != string::npos)
 		return true;
+
+	if(std::find_if(theTextLine.begin(), theTextLine.end(), std::not1(std::ptr_fun(::isspace))) != theTextLine.end())
+		throw NFmiSmartToolIntepreter::Exception(string("Riviltä löytyi jotain outoa tekstiä: \n") + theTextLine);
 	return false;
 }
 
