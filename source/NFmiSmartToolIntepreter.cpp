@@ -1460,7 +1460,11 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("LHour"), kFmiHour)); // local hour oikeasti
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("Lhour"), kFmiHour)); // local hour oikeasti
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("lhour"), kFmiHour)); // local hour oikeasti
-
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("FHOUR"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia käytetty, koska ei ollut valmista parametria
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("FHour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia käytetty, koska ei ollut valmista parametria
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("Fhour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia käytetty, koska ei ollut valmista parametria
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("fhour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia käytetty, koska ei ollut valmista parametria
+		
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("HIR"), kFmiMTAHIRMESO));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Hir"), kFmiMTAHIRMESO));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("hir"), kFmiMTAHIRMESO));
