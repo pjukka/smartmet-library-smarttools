@@ -324,13 +324,36 @@ bool NFmiSmartToolIntepreter::IsPossibleElseConditionLine(const std::string &the
 	return false;
 }
 
+static bool IsWordContinuing(char ch)
+{
+	if(::isalnum(ch) || ch == '_')
+		return true;
+	return false;
+}
+
+// Pit‰‰ olla kokonainen sana eli juuri ennen sanaa ei saa olla kirjaimia,numeroita tai _-merkki‰, eik‰ heti sen j‰lkeenk‰‰n.
 bool NFmiSmartToolIntepreter::FindAnyFromText(const std::string &theText, const std::vector<std::string>& theSearchedItems)
 {
 	int size = theSearchedItems.size();
 	for(int i = 0; i < size; i++)
 	{
-		if(theText.find(theSearchedItems[i]) != string::npos)
+		string::size_type pos = string::npos;
+		if((pos = theText.find(theSearchedItems[i])) != string::npos)
+		{
+			if(pos > 0)
+			{
+				char ch1 = theText[pos-1];
+				if(IsWordContinuing(ch1))
+					continue;
+			}
+			if(pos + theSearchedItems[i].size() < theText.size())
+			{
+				char ch2 = theText[pos + theSearchedItems[i].size()];
+				if(IsWordContinuing(ch2))
+					continue;
+			}
 			return true;
+		}
 	}
 	return false;
 }
@@ -893,6 +916,11 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 	string producerNameOnly;
 	bool levelExist = false;
 	bool producerExist = false;
+
+	// tutkitaan ensin onko mahdollisesti variable-muuttuja, jolloin voimme sallia _-merkin k‰ytˆn muuttujissa
+	if(InterpretPossibleScriptVariable(theVariableText, theMaskInfo, fNewScriptVariable))
+		return ;
+
 	CheckVariableString(theVariableText, paramNameOnly,
 						  levelExist, levelNameOnly,
 						  producerExist, producerNameOnly);
@@ -907,9 +935,6 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 		else
 			return ;
 	}
-
-	if(InterpretPossibleScriptVariable(theVariableText, theMaskInfo, fNewScriptVariable))
-		return ;
 
 	throw NFmiSmartToolIntepreter::Exception(string("Outo muuttuja laskussa: " + theVariableText));
 }
