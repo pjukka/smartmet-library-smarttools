@@ -1110,7 +1110,7 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 template<typename mapType, typename T>
 bool NFmiSmartToolIntepreter::IsInMap(mapType& theMap, const T &theSearchedItem)
 {
-    mapType::iterator it = theMap.find(theSearchedItem);
+    typename mapType::iterator it = theMap.find(theSearchedItem);
 	if(it != theMap.end())
 		return true;
 	return false;
