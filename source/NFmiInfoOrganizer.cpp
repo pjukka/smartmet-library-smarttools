@@ -978,7 +978,7 @@ std::vector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type theDa
 // Palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota.
 // Ei katso tuottaja datoja editable infosta eikä sen kopioista!
 // voi antaa kaksi eri tuottaja id:tä jos haluaa, jos esim. hirlamia voi olla kahden eri tuottaja id:n alla
-std::vector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(int theProducerId, int theProducerId2)
+std::vector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(int theProducerId, int theProducerId2, int theProducerId3, int theProducerId4)
 {
 	std::vector<NFmiSmartInfo*> infoVector;
 	for(Reset(); Next();)
@@ -987,6 +987,10 @@ std::vector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(int theProducerId, int t
 		if(currentProdId == theProducerId)
 			infoVector.push_back(Current());
 		else if(theProducerId2 != -1 && currentProdId == theProducerId2)
+			infoVector.push_back(Current());
+		else if(theProducerId3 != -1 && currentProdId == theProducerId3)
+			infoVector.push_back(Current());
+		else if(theProducerId4 != -1 && currentProdId == theProducerId4)
 			infoVector.push_back(Current());
 	}
 	return infoVector;
@@ -1026,45 +1030,16 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, const
 	return 0;
 }
 
-// tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
-/*
-NFmiSmartInfo* NFmiInfoOrganizer::CompareModelsInfo(void)
+void NFmiInfoOrganizer::SetDrawParamPath(const std::string &theDrawParamPath)
 {
-	for(Reset(); Next();)
-	{
-		if(Current()->DataType() == NFmiInfoData::kCompareModels)
-			return Current();
-	}
-	return 0;
+	if(itsDrawParamFactory)
+		itsDrawParamFactory->LoadDirectory(theDrawParamPath);
 }
-*/
-// palauttaa vain 1. kyseisen datan parametrit!
-/*
-NFmiParamBag NFmiInfoOrganizer::CompareModelsParams(void)
+
+const std::string NFmiInfoOrganizer::GetDrawParamPath(void)
 {
-//	return GetParams(kFmiDataTypeCompareModels);
-	NFmiSmartInfo* info = CompareModelsInfo();
-	if(info)
-		return *(info->ParamDescriptor().ParamBag());
-	return NFmiParamBag();
+	std::string retValue;
+	if(itsDrawParamFactory)
+		retValue = static_cast<char*>(itsDrawParamFactory->LoadDirectory());
+	return retValue;
 }
-*/
-/*
-NFmiSmartInfo* NFmiInfoOrganizer::CompareModelsInfo(const NFmiProducer& theProducer)
-{
-	for(Reset(); Next();)
-	{
-		NFmiSmartInfo* info = Current();
-		if(info)
-		{
-			if(!info->IsParamUsable())
-				info->FirstParam();
-			NFmiProducer* producer = info->Producer();
-			if(producer)
-				if(info->DataType() == NFmiInfoData::kCompareModels && (*producer == theProducer))
-					return Current();
-		}
-	}
-	return 0;
-}
-*/
