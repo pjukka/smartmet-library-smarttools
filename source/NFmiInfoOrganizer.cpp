@@ -376,7 +376,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 	NFmiDrawParam* drawParam = 0;
 	if(theType == NFmiInfoData::kSatelData) // spesiaali keissi satelliitti kuville, niillä ei ole infoa
 	{
-		drawParam = new NFmiDrawParam(0, theIdent, 1);
+		drawParam = new NFmiDrawParam(0, theIdent, 1, theType);
 		return drawParam;
 	}
 	bool aSubParam;	
