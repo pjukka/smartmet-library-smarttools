@@ -138,7 +138,12 @@ void NFmiMetEditorCoordinatorMapOptions::DestroyLocationBags (void)
 		NFmiLocationBag* locs = 0;
 		for(unsigned int i=0; i < itsLocationBagVector->size(); i++)
 		{
+#ifndef UNIX
 			locs = itsLocationBagVector->at(i);
+#else
+			// Ei aavistustakaan miksi at ei toimi
+			locs = itsLocationBagVector->operator[](i);
+#endif
 			delete locs;
 		}
 		delete itsLocationBagVector;
