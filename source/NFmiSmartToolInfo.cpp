@@ -19,6 +19,7 @@ NFmiSmartToolInfo::NFmiSmartToolInfo(void)
 ,itsScriptFileExtension()
 ,itsCurrentScriptName()
 ,itsLoadDirectory()
+,itsRootLoadDirectory()
 ,itsDBCheckerFileName()
 ,itsDBCheckerText()
 ,fMakeDBCheckAtSend(false)
@@ -33,7 +34,7 @@ NFmiSmartToolInfo::~NFmiSmartToolInfo(void)
 // luetaan  asetukset nyky‰‰n NFmiSetting-luokasta
 bool NFmiSmartToolInfo::Init(const std::string &theLoadDirectory)
 {
-	itsLoadDirectory = theLoadDirectory;
+	LoadDirectory(theLoadDirectory, false);
 	if(LoadSettings())
 	{
 		LoadScript(itsCurrentScriptName);
@@ -134,24 +135,38 @@ bool NFmiSmartToolInfo::ScriptExist(const std::string &theScriptName)
 }
 std::vector<std::string> NFmiSmartToolInfo::GetScriptNames(void)
 {
+	vector<string> names;
+
+	// listataan alkuun hakemistot ja jos ei olla rootissa, laitetaan viel‰ ..-hakemsito mukaan
+	std::list<std::string> directories = NFmiFileSystem::Directories(itsLoadDirectory);
+	std::list<std::string>::iterator itDir = directories.begin();
+	std::list<std::string>::iterator itEndDir = directories.end();
+	for( ; itDir != itEndDir; ++itDir)
+	{
+		// "this"-hakemistoa ei laiteta
+		if(*itDir == ".")
+			continue;
+		// jos ollaan ns. root hakemistossa, ei up-hakemistoa laiteta
+		if(itsLoadDirectory == itsRootLoadDirectory && *itDir == "..")
+			continue;
+		std::string name("<");
+		name += *itDir;
+		name += ">";
+		names.push_back(name);
+	}
+
 	string pattern(itsLoadDirectory);
 	pattern += "*.";
 	pattern += itsScriptFileExtension;
 	list<string> tmpList = NFmiFileSystem::PatternFiles(pattern);
 
-	if(tmpList.empty())
-		return vector<string>();
-	else
+	list<string>::iterator it = tmpList.begin();
+	for( ; it != tmpList.end(); ++it)
 	{
-		vector<string> names;
-		list<string>::iterator it = tmpList.begin();
-		for( ; it != tmpList.end(); ++it)
-		{
-			NFmiFileString fileString(*it);
-			names.push_back(string(static_cast<char*>(fileString.Header())));
-		}
-		return names;
+		NFmiFileString fileString(*it);
+		names.push_back(string(static_cast<char*>(fileString.Header())));
 	}
+	return names;
 }
 
 std::string NFmiSmartToolInfo::GetFullScriptFileName(const std::string &theScriptName)
@@ -167,4 +182,60 @@ bool NFmiSmartToolInfo::RemoveScript(const std::string &theScriptName)
 {
 	string fullFileName(GetFullScriptFileName(theScriptName));
 	return NFmiFileSystem::RemoveFile(fullFileName);
+}
+
+void NFmiSmartToolInfo::LoadDirectory(const std::string& newValue, bool fSaveSettings)
+{
+	itsLoadDirectory = newValue;
+	if(itsLoadDirectory[itsLoadDirectory.size()-1] == '/')
+		itsLoadDirectory[itsLoadDirectory.size()-1] = '\\';
+	else if(itsLoadDirectory[itsLoadDirectory.size()-1] != '\\')
+		itsLoadDirectory += "\\";
+	itsRootLoadDirectory = itsLoadDirectory;
+	if(fSaveSettings)
+		SaveSettings();
+}
+
+// poistaa viimeisen osan polusta
+// c:\data\src\inc\ -> c:\data\src\
+// eli inc pois esimerkist‰
+static void RemoveLastPartOfDirectory(string &thePath)
+{
+	NFmiStringTools::TrimR(thePath, '\\');
+	NFmiStringTools::TrimR(thePath, '/');
+	string::size_type pos1 = thePath.find_last_of('/');
+	string::size_type pos2 = thePath.find_last_of('\\');
+	string::size_type usedPos = string::npos;
+	if(pos1 != string::npos && pos2 != string::npos)
+	{
+		if(pos1 < pos2)
+			usedPos = pos2;
+		else
+			usedPos = pos1;
+	}
+	else if(pos1 != string::npos)
+		usedPos = pos1;
+	else if(pos2 != string::npos)
+		usedPos = pos2;
+
+	if(usedPos != string::npos)
+		thePath = string(thePath.begin(), thePath.begin()+usedPos+1);
+}
+
+void NFmiSmartToolInfo::SetCurrentLoadDirectory(const std::string& newValue)
+{ // t‰ss‰ ei aseteta root-directoria
+		// nimi tulee <> sulkujen sis‰ll‰ joten ne on poistettava ensin
+	std::string usedDirectoryName(newValue);
+	NFmiStringTools::TrimL(usedDirectoryName, '<');
+	NFmiStringTools::TrimR(usedDirectoryName, '>');
+
+	if(usedDirectoryName == "..")
+	{
+		RemoveLastPartOfDirectory(itsLoadDirectory);
+	}
+	else
+	{
+		itsLoadDirectory += usedDirectoryName;
+		itsLoadDirectory += "\\";
+	}
 }

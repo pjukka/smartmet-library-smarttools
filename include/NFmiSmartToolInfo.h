@@ -1,10 +1,10 @@
 /*!
- *  \file NFmiSmartToolInfo.h 
+ *  \file NFmiSmartToolInfo.h
  *  C++ Class Name : NFmiSmartToolInfo \par
  *  ---------------------------------------------------------
  *  Luokka pit‰‰ sis‰ll‰‰n SmartTool:ia ja SmartToolDialogia
  *  koskevia tietoja.
- * 
+ *
  */
 
 #ifndef  NFMISMARTTOOLINFO_H
@@ -37,7 +37,8 @@ public:
 
 	void CurrentScript(const std::string& newValue) {itsCurrentScript = newValue; SaveSettings();}
 	void CurrentScriptName(const std::string &newValue) {itsCurrentScriptName = newValue; SaveSettings();}
-	void LoadDirectory(const std::string& newValue) {itsLoadDirectory = newValue; SaveSettings();}
+	void LoadDirectory(const std::string& newValue, bool fSaveSettings);
+	void SetCurrentLoadDirectory(const std::string& newValue); // t‰ss‰ ei aseteta root-directoria
 	void DBCheckerFileName(const std::string& newValue) {itsDBCheckerFileName = newValue;}
 	void DBCheckerText(const std::string& newValue) {itsDBCheckerText = newValue;}
 	void MakeDBCheckAtSend(bool newValue) {fMakeDBCheckAtSend = newValue; SaveSettings();}
@@ -54,12 +55,13 @@ private:
 	bool SaveSettings(void);
 	std::string GetFullScriptFileName(const std::string &theScriptName);
 
-	std::string itsCurrentScript; //! Dialogissa oleva scripti. 
-	std::string itsScriptFileExtension; //! smarttool-macrot talletetaan tiedostoihin t‰ll‰ extensiolla (.st). 
-	std::string itsCurrentScriptName; //! (talleta init-fileen) Dialogissa olevan scriptin polku ja tiedostonnimi kokonaisuudessaan. 
-	std::string itsLoadDirectory; //! (talleta init-fileen) Viimeisin hakemisto, mist‰ on ladattu/talletettu smarttool scripti. 
-	std::string itsDBCheckerFileName; //! Tiedoston nimi (polkuineen), mist‰ ladataan DBChecker smarttool scripti. 
-	std::string itsDBCheckerText; //! Itse DBChecker smarttool scripti. 
+	std::string itsCurrentScript; //! Dialogissa oleva scripti.
+	std::string itsScriptFileExtension; //! smarttool-macrot talletetaan tiedostoihin t‰ll‰ extensiolla (.st).
+	std::string itsCurrentScriptName; //! (talleta init-fileen) Dialogissa olevan scriptin polku ja tiedostonnimi kokonaisuudessaan.
+	std::string itsLoadDirectory; //! (talleta init-fileen) Viimeisin hakemisto, mist‰ on ladattu/talletettu smarttool scripti.
+	std::string itsRootLoadDirectory; //! t‰m‰n avulla otetaan kansiot k‰yttˆˆn, jos ollaan t‰ss‰, ei listata parent-hakemistoa
+	std::string itsDBCheckerFileName; //! Tiedoston nimi (polkuineen), mist‰ ladataan DBChecker smarttool scripti.
+	std::string itsDBCheckerText; //! Itse DBChecker smarttool scripti.
 	bool fMakeDBCheckAtSend; //! (talleta init-fileen) Tehd‰‰nkˆ tarkistus scripti automaattisesti, kun dataa l‰hetet‰‰n tietokantaan.
 	bool fIsThereDBCheckScript; //! Onko ylip‰‰t‰‰n ollenkaan oletus tiedostossa tallessa DBChecker scripti‰.
 };
