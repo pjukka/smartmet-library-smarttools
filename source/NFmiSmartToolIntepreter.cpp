@@ -48,9 +48,7 @@ struct EndOfLineSearcher
 	template<typename T>
 	bool operator()(T theChar)
 	{
-		if(theChar == 10 || theChar == 13)
-			return true;
-		return false;
+	  return(theChar == '\r' || theChar == '\n');
 	}
 
 };
