@@ -559,15 +559,18 @@ void NFmiDrawParam::Init(NFmiDrawParam* theDrawParam)
 //--------------------------------------------------------
 bool NFmiDrawParam::Init (const NFmiString& theFilename)
 {
-	std::ifstream in(theFilename, std::ios::in);
-	if(in)
+	if(theFilename != NFmiString(""))
 	{
-//		istream_withassign pin;
-//		pin = in;
-		in >> *this;
-		in.close();
-		itsInitFileName = theFilename;
-		return true;
+		std::ifstream in(theFilename, std::ios::in);
+		if(in)
+		{
+	//		istream_withassign pin;
+	//		pin = in;
+			in >> *this;
+			in.close();
+			itsInitFileName = theFilename;
+			return true;
+		}
 	}
 	return false;
 }
@@ -577,12 +580,15 @@ bool NFmiDrawParam::Init (const NFmiString& theFilename)
 //--------------------------------------------------------
 bool NFmiDrawParam::StoreData (const NFmiString& theFilename)
 {
-	std::ofstream out(theFilename);
-	if(out)
+	if(theFilename != NFmiString(""))
 	{
-		out << *this;
-		out.close();
-		return true;
+		std::ofstream out(theFilename);
+		if(out)
+		{
+			out << *this;
+			out.close();
+			return true;
+		}
 	}
 	return false;
 }
