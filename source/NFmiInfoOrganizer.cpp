@@ -248,9 +248,9 @@ NFmiSmartInfo* NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataI
 													, bool& fSubParameter 
 													, NFmiInfoData::Type theType)
 {
-	bool anyDataOk = (theType == NFmiInfoData::kAnyData);
+	bool anyDataOk = (theType == NFmiInfoData::kAnyData || theType == NFmiInfoData::kEditable);
 	NFmiSmartInfo* aInfo = 0;
-	if(itsEditedData && (itsEditedData->DataType() == theType || anyDataOk) && itsEditedData->SizeLevels() > 1 && itsEditedData->Param(theDataIdent))
+	if(itsEditedData && (itsEditedData->DataType() == theType || anyDataOk) && itsEditedData->SizeLevels() > 1 && itsEditedData->Param(static_cast<FmiParameterName>(theDataIdent.GetParam()->GetIdent())))
 	{
 		fSubParameter = itsEditedData->UseSubParam();
 		aInfo = itsEditedData;
@@ -577,6 +577,7 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 				delete itsEditedData;
 			}
 			itsEditedData = aSmartInfo;
+			fCreateEditedDataCopy = theUndoLevel ? true : false; // pit‰‰ p‰ivitt‰‰ kopion luomiseen vaikuttavaa muuttujaa undo-levelin mukaan
 			UpdateEditedDataCopy();
 			UpdateMacroParamData();
 
