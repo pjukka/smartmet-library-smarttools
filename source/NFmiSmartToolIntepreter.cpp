@@ -194,6 +194,7 @@ NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenStaticParamet
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenCalculatedParameterNamesAndIds;
 NFmiSmartToolIntepreter::LevelMap NFmiSmartToolIntepreter::itsTokenLevelNamesIdentsAndValues;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenFunctions;
+NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenThreeArgumentFunctions;
 std::vector<std::string> NFmiSmartToolIntepreter::itsTokenPeekXYFunctions;
 NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctions;
 
@@ -968,7 +969,8 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 	if(exp_ptr>=exp_end) 
 		return false; // at end of expression
 
-	if(strchr("+-*/%^=(){}<>&|!", *exp_ptr))
+	// HUOM! tässä delimiter rimpsussa ei ole spacea, joten ei voi tehdä yhteistä stringiä, muista päivittää myös IsDelim-metodi
+	if(strchr("+-*/%^=(){}<>&|!,", *exp_ptr))
 	{
 /*
 		if(strchr("+-", *exp_ptr) && isdigit(exp_ptr[1])) // etumerkilliset vakiot otetaan tässä
@@ -1016,8 +1018,8 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 
 // Return true if c is a delimiter.
 bool NFmiSmartToolIntepreter::IsDelim(char c)
-{
-	if(strchr(" +-/*%^=(){}<>!", c) || c==9 || c=='\r' || c=='\t' || c==0) // lisäsin muutaman delimiter merkin
+{ // HUOM! tässä delimiter rimpsussa on space muiden lisäksi, joten ei voi tehdä yhteistä stringiä, muista päivittää myös GetToken-metodi
+	if(strchr(" +-*/%^=(){}<>&|!,", c) || c==9 || c=='\r' || c=='\t' || c==0) // lisäsin muutaman delimiter merkin
 		return true;
 	return false;
 }
@@ -1100,6 +1102,10 @@ void NFmiSmartToolIntepreter::InterpretDelimiter(const std::string &theDelimText
 	else if(theDelimText == ")")
 	{
 		theMaskInfo->SetOperationType(NFmiAreaMask::EndParenthesis);
+	}
+	else if(theDelimText == ",")
+	{
+		theMaskInfo->SetOperationType(NFmiAreaMask::CommaOperator);
 	}
 	else
 		throw runtime_error(string("Lasku operaattori oli outo: ") + theDelimText);
@@ -1209,6 +1215,9 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &th
 		return true;
 	
 	if(IsVariableConstantValue(theVariableText, theMaskInfo))
+		return true;
+
+	if(IsVariableThreeArgumentFunction(theVariableText, theMaskInfo))
 		return true;
 
 	if(IsVariableFunction(theVariableText, theMaskInfo))
@@ -1611,6 +1620,33 @@ bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVaria
 			}
 		}
 		throw runtime_error(string("Matemaattisen funktion parametrit väärin: ") + theVariableText);
+	}
+	return false;
+}
+
+bool NFmiSmartToolIntepreter::IsVariableThreeArgumentFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
+{
+	// sitten katsotaan onko jokin integraatio funktioista
+	FunctionMap::iterator it = itsTokenThreeArgumentFunctions.find(theVariableText);
+	if(it != itsTokenThreeArgumentFunctions.end())
+	{
+		// Tee tarkistus, onko muodollisesti oikea funktio kutsu 
+		// (tämä tutkitaan myös suoritus osiossa, joten voi olla turhaa tarkistaa tässä)
+		// 1. pitää olla kaksi pilkkua
+		// 2. alkaa ja loppuu sulkuun esim. SUMT(... , ... , ...)
+
+		theMaskInfo->SetFunctionType((*it).second); // min, max jne. asetus
+		string tmp;
+		if(GetToken())
+		{
+			tmp = token; // luetaan muuttuja/vakio/funktio tai mikä lie
+			if(tmp == string("(")) // etsitään fuktion aloitus sulkua (lopetus sulku tulee sitten aikanaan, välissä voi olla mitä vain!)
+			{
+				theMaskInfo->SetOperationType(NFmiAreaMask::ThreeArgumentFunctionStart);
+				return true;
+			}
+		}
+		throw runtime_error(string("Aika/korkeus integraattori funktion parametrit väärin: \n") + theVariableText);
 	}
 	return false;
 }
@@ -2302,6 +2338,19 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 //		itsTokenFunctions.insert(FunctionMap::value_type(string("WAvg"), NFmiAreaMask::WAvg));
 //		itsTokenFunctions.insert(FunctionMap::value_type(string("Wavg"), NFmiAreaMask::WAvg));
 //		itsTokenFunctions.insert(FunctionMap::value_type(string("wavg"), NFmiAreaMask::WAvg));
+
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("sumt"), NFmiAreaMask::Sum));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("SumT"), NFmiAreaMask::Sum));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("SUMT"), NFmiAreaMask::Sum));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxt"), NFmiAreaMask::Max));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MaxT"), NFmiAreaMask::Max));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MAXT"), NFmiAreaMask::Max));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("mint"), NFmiAreaMask::Min));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MinT"), NFmiAreaMask::Min));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MINT"), NFmiAreaMask::Min));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("avgt"), NFmiAreaMask::Avg));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("AvgT"), NFmiAreaMask::Avg));
+		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("AVGT"), NFmiAreaMask::Avg));
 
 		itsTokenPeekXYFunctions.push_back(string("PEEKXY"));
 		itsTokenPeekXYFunctions.push_back(string("PeekXY"));

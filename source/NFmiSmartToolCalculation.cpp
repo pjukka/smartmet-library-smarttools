@@ -30,9 +30,19 @@
 #include "NFmiSmartToolCalculation.h"
 #include "NFmiAreaMaskInfo.h"
 #include "NFmiSmartInfo.h"
+#include "NFmiDataModifierClasses.h"
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
+
+
+#include "stdafx.h"
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
 
 using namespace std;
 
@@ -45,6 +55,7 @@ NFmiSmartToolCalculation::NFmiSmartToolCalculation(void)
 ,itsResultInfo(0)
 ,itsCalculations()
 //,itsOperators()
+,fUseTimeInterpolationAlways(false)
 ,fAllowMissingValueAssignment(false)
 ,fCircularValue(false)
 ,itsCircularValueModulor(kFloatMissing)
@@ -309,8 +320,106 @@ void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLat
 		eval_math_function(result, function);
 		get_token();
 	}
+	else if(token->GetCalculationOperationType() == NFmiAreaMask::ThreeArgumentFunctionStart)
+	{
+		NFmiAreaMask::FunctionType func = token->GetFunctionType(); // eli onko kyse min, max vai mist‰ funktiosta
+		get_token();
+		double argument1 = kFloatMissing;
+		eval_exp2(argument1, theLatlon, theTime, theTimeIndex);
+		if(token->GetCalculationOperationType() != NFmiAreaMask::CommaOperator) // n‰iden funktioiden argumentit erotetaan pilkuilla
+			throw  runtime_error(string("Funktion yhteydess‰ olevat argumentit eiv‰t olleet eroteltu pilkuilla oikein: \n") + GetCalculationText());
+		get_token();
+		double argument2 = kFloatMissing;
+		eval_exp2(argument2, theLatlon, theTime, theTimeIndex);
+		if(token->GetCalculationOperationType() != NFmiAreaMask::CommaOperator) // n‰iden funktioiden argumentit erotetaan pilkuilla
+			throw  runtime_error(string("Funktion yhteydess‰ olevat argumentit eiv‰t olleet eroteltu pilkuilla oikein: \n") + GetCalculationText());
+		eval_ThreeArgumentFunction(result, argument1, argument2, func, theLatlon, theTime, theTimeIndex);
+
+		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
+			throw  runtime_error(string("Sulut eiv‰t ole oikein laskussa matemaattisen funktion yhteydess‰: \n") + GetCalculationText());
+		get_token();
+	}
 	else 
 		atom(result, theLatlon, theTime, theTimeIndex);
+}
+
+void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+{
+	result = kFloatMissing;
+	if(argument1 != kFloatMissing && argument2 != kFloatMissing)
+	{
+		double value = kFloatMissing;
+		// 1. ota talteen token tai se iteraattori, ett‰ samoja laskuja voidaan k‰yd‰ l‰pi uudestaan ja uudestaan
+		CalcIter startCalcIterator = itsCalcIterator; // pit‰‰kˆ olla edellinen??, pit‰‰ olla ep‰selv‰‰, mutta pakko
+		// 2. katso onko kyseess‰ aika- vai korkeus lasku ja haaraudu
+		// 3. jos aikalasku, laske alkuaika ja loppu aika
+		NFmiMetTime startTime(theTime);
+		startTime.ChangeByHours(static_cast<long>(argument1));
+		NFmiMetTime endTime(theTime);
+		endTime.ChangeByHours(static_cast<long>(argument2));
+		NFmiMetTime currentTime(startTime);
+		// 4. mieti mik‰ on aikahyppy (oletus 1h) jos pelkk‰‰ EC-dataa, voisi aikahyppy olla 3h tai 6h
+		int usedTimeResolutionInMinutes = 60;
+		if(startTime <= endTime)
+		{
+			if(endTime.DifferenceInMinutes(startTime)/usedTimeResolutionInMinutes > 250)
+				throw runtime_error("Aikalaskuun tuli laskusuorituksia yli 250 aika-askeleen, ei toteuteta laskuja.");
+			// 5. funktiosta riippuva datamodifier min, max jne.
+			NFmiDataModifier* modifier = CreateIntegrationFuction(func); // t‰m‰ palauttaa aina jotain, tai heitt‰‰ poikkeuksen
+			try
+			{
+				fUseTimeInterpolationAlways = true;
+				do
+				{
+					// 6. muista aina asettaa token/laskuiteraattori 'alkuun'
+					itsCalcIterator = startCalcIterator;
+					get_token(); // pit‰‰ tehd‰ viel‰ t‰m‰, muuten osoittaa edelliseen pilkku-operaattoriin
+					// 7. k‰y aika-loopissa l‰pi eval_exp2-laskut
+					eval_exp2(value, theLatlon, currentTime, theTimeIndex); // theTimeIndex on nyt puppua
+					// 8. sijoita tulos datamodifier:iin
+					modifier->Calculate(static_cast<float>(value));
+					// 9. 'next'
+					currentTime.ChangeByMinutes(usedTimeResolutionInMinutes); 
+				} while(currentTime <= endTime);
+				// 10. loopin lopuksi pyyd‰ result datamodifier:ilta
+				result = modifier->CalculationResult();
+				delete modifier;
+				fUseTimeInterpolationAlways = false;
+			}
+			catch(...)
+			{
+				fUseTimeInterpolationAlways = false;
+				delete modifier;
+				throw ;
+			}
+		}
+		// Jos kyse level laskuista, juoksuta korkeuksia/leveleit‰ jotenkin ja tee samaa
+	}
+}
+
+// Muista jos tulee p‰ivityksi‰, smanlainen funktio lˆytyy myˆs NFmiSmartToolModifier-luokasta
+NFmiDataModifier* NFmiSmartToolCalculation::CreateIntegrationFuction(NFmiAreaMask::FunctionType func)
+{
+	NFmiDataModifier* modifier = 0;
+	switch(func)
+	{
+	case NFmiAreaMask::Avg:
+		modifier = new NFmiDataModifierAvg;
+		break;
+	case NFmiAreaMask::Min:
+		modifier = new NFmiDataModifierMin;
+		break;
+	case NFmiAreaMask::Max:
+		modifier = new NFmiDataModifierMax;
+		break;
+	case NFmiAreaMask::Sum:
+		modifier = new NFmiDataModifierSum;
+		break;
+		// HUOM!!!! Tee WAvg-modifier myˆs, joka on peritty Avg-modifierist‰ ja tee joku kerroin juttu painotukseen.
+	default:
+		throw runtime_error("Outo integraatio-funktio tyyppi yritett‰ess‰ tehd‰ laskuja.");
+	}
+	return modifier;
 }
 
 // HUOM! trigonometriset funktiot tehd‰‰n asteille, joten annettu luku pit‰‰ konvertoida
@@ -391,7 +500,7 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
 
 void NFmiSmartToolCalculation::atom(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-	result = token->Value(theLatlon, theTime, theTimeIndex);
+	result = token->Value(theLatlon, theTime, theTimeIndex, fUseTimeInterpolationAlways);
 	get_token();
 }
 
@@ -648,6 +757,25 @@ void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, c
 		eval_math_function(result, function);
 		get_token();
 	}
+	else if(token->GetCalculationOperationType() == NFmiAreaMask::ThreeArgumentFunctionStart)
+	{ // huom! t‰ss‰ ei k‰ytet‰ bin_eval-kutsuja, koska t‰ss‰ lasketaan vain yksi luku, mik‰ palautetaan bin_eval-systeemiin
+		NFmiAreaMask::FunctionType func = token->GetFunctionType(); // eli onko kyse min, max vai mist‰ funktiosta
+		get_token();
+		double argument1 = kFloatMissing;
+		eval_exp2(argument1, theLatlon, theTime, theTimeIndex);
+		if(token->GetCalculationOperationType() != NFmiAreaMask::CommaOperator) // n‰iden funktioiden argumentit erotetaan pilkuilla
+			throw  runtime_error(string("Funktion yhteydess‰ olevat argumentit eiv‰t olleet eroteltu pilkuilla oikein: \n") + GetCalculationText());
+		get_token();
+		double argument2 = kFloatMissing;
+		eval_exp2(argument2, theLatlon, theTime, theTimeIndex);
+		if(token->GetCalculationOperationType() != NFmiAreaMask::CommaOperator) // n‰iden funktioiden argumentit erotetaan pilkuilla
+			throw  runtime_error(string("Funktion yhteydess‰ olevat argumentit eiv‰t olleet eroteltu pilkuilla oikein: \n") + GetCalculationText());
+		eval_ThreeArgumentFunction(result, argument1, argument2, func, theLatlon, theTime, theTimeIndex);
+
+		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
+			throw  runtime_error(string("Sulut eiv‰t ole oikein laskussa matemaattisen funktion yhteydess‰: \n") + GetCalculationText());
+		get_token();
+	}
 	else 
 		bin_atom(maskresult, result, theLatlon, theTime, theTimeIndex);
 }
@@ -655,7 +783,7 @@ void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, c
 
 void NFmiSmartToolCalculation::bin_atom(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-	result = token->Value(theLatlon, theTime, theTimeIndex);
+	result = token->Value(theLatlon, theTime, theTimeIndex, fUseTimeInterpolationAlways);
 	get_token();
 }
 

@@ -25,11 +25,12 @@
 
 #include <vector>
 #include <string>
+#include "NFmiAreaMask.h"
 
 class NFmiPoint;
 class NFmiMetTime;
 class NFmiSmartInfo;
-class NFmiAreaMask;
+class NFmiDataModifier;
 
 class NFmiSmartToolCalculation 
 {
@@ -80,6 +81,8 @@ private:
 	void eval_exp5(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 	void eval_exp6(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 	void eval_math_function(double &result, int theFunction);
+	void eval_ThreeArgumentFunction(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+	NFmiDataModifier* CreateIntegrationFuction(NFmiAreaMask::FunctionType func);
 	void atom(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 	void get_token(void);
 	NFmiAreaMask* token; // tässä on kulloinenkin laskun osa tarkastelussa
@@ -99,6 +102,8 @@ private:
 	NFmiSmartInfo* itsResultInfo; // omistaa+tuhoaa
 	std::vector<NFmiAreaMask*> itsCalculations; // omistaa+tuhoaa
 
+	bool fUseTimeInterpolationAlways; // uudet MINT, MAXT, jne vaativat aina aikainterpolointia, ja tämä flagi laitetaan silloin päälle 
+									  // (tämä on jo käytössä olevan optimoinnin toimivuuden kannalta pakko tehdä näin)
 	bool fAllowMissingValueAssignment; 
 
 	// tuulen suuntaa varten pitää tehdä virityksiä, että esim. 350 + 20 olisi 10 eikä 360 (eli maksimi) jne.

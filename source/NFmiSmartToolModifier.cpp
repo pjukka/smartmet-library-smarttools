@@ -737,6 +737,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			NFmiDataModifier *modifier = CreateIntegrationFuction(theAreaMaskInfo);
 			NFmiDataIterator *iterator = CreateIterator(theAreaMaskInfo, info);
 			areaMask = new NFmiCalculationIntegrationFuction(iterator, modifier, NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, true, deepCopyCreated);
+			areaMask->SetFunctionType(theAreaMaskInfo.GetFunctionType());
 			break;
 			}
 		case NFmiAreaMask::FunctionPeekXY:
@@ -769,6 +770,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 		case NFmiAreaMask::Operator:
 		case NFmiAreaMask::StartParenthesis:
 		case NFmiAreaMask::EndParenthesis:
+		case NFmiAreaMask::CommaOperator:
 			{
 			areaMask = new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator());
 			break;
@@ -789,6 +791,12 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			{
 			areaMask = new NFmiCalculationSpecialCase;
 			areaMask->SetMathFunctionType(theAreaMaskInfo.GetMathFunctionType());
+			break;
+			}
+		case NFmiAreaMask::ThreeArgumentFunctionStart:
+			{
+			areaMask = new NFmiCalculationSpecialCase;
+			areaMask->SetFunctionType(theAreaMaskInfo.GetFunctionType());
 			break;
 			}
 		default:
@@ -823,6 +831,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateCalculatedAreaMask(const NFmiAreaMask
 	throw runtime_error(string("Outo laskettava muuttuja/data tyyppi (ohjelmointi vika?)."));
 }
 
+// Muista jos tulee päivityksiä, smanlainen funktio löytyy myös NFmiSmartToolCalculation-luokasta
 NFmiDataModifier* NFmiSmartToolModifier::CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo)
 {
 	NFmiDataModifier* modifier = 0;
