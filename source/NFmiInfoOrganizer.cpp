@@ -521,23 +521,29 @@ int NFmiInfoOrganizer::CountData(void)
 bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiQueryInfo* theInfo2)
 {
 	// parametrit ja tuottajat samoja
-	if(theInfo1 && theInfo2 && theInfo1->ParamBag() == theInfo2->ParamBag()) 
+	if(theInfo1 && theInfo2)
 	{
-		// level jutut samoja
-		if(theInfo1->VPlaceDescriptor() == theInfo2->VPlaceDescriptor())
+		if(theInfo1->DataType() == theInfo2->DataType())
 		{
-			// mahdollinen gridi samoja
-			bool status3 = true;
-			if(theInfo1->Grid() && theInfo2->Grid())
+			if(theInfo1->ParamBag() == theInfo2->ParamBag()) 
 			{
-				status3 = (theInfo1->Grid()->AreGridsIdentical(*theInfo2->Grid())) == true;
-			}
-			if(status3)
-			{
-				theInfo1->FirstParam(); // varmistaa, että producer löytyy
-				theInfo2->FirstParam();
-				if(*theInfo1->Producer() == *theInfo2->Producer())
-					return true;
+				// level jutut samoja
+				if(theInfo1->VPlaceDescriptor() == theInfo2->VPlaceDescriptor())
+				{
+					// mahdollinen gridi samoja
+					bool status3 = true;
+					if(theInfo1->Grid() && theInfo2->Grid())
+					{
+						status3 = (theInfo1->Grid()->AreGridsIdentical(*theInfo2->Grid())) == true;
+					}
+					if(status3)
+					{
+						theInfo1->FirstParam(); // varmistaa, että producer löytyy
+						theInfo2->FirstParam();
+						if(*theInfo1->Producer() == *theInfo2->Producer())
+							return true;
+					}
+				}
 			}
 		}
 	}
