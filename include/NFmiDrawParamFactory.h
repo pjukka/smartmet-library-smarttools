@@ -32,7 +32,6 @@
 #include "NFmiString.h"
 
 class NFmiDrawParam;
-class NFmiSmartInfo;
 class NFmiLevel;
 class NFmiDataIdent;
 
@@ -42,14 +41,9 @@ class NFmiDrawParamFactory
 public:
     NFmiDrawParamFactory(bool createDrawParamFileIfNotExist);
     ~NFmiDrawParamFactory(void);
-	NFmiDrawParam * CreateDrawParam( NFmiSmartInfo* theInfo
-                                   , const NFmiDataIdent& theIdent
-								   , bool& fSubParam 
-								   , const NFmiLevel* theLevel
-								   , bool setParam = true);
-	NFmiDrawParam * CreateCrossSectionDrawParam( NFmiSmartInfo* theInfo
-												, const NFmiDataIdent& theIdent
-												, bool& fSubParam);	
+	NFmiDrawParam * CreateDrawParam(const NFmiDataIdent& theIdent
+								   ,const NFmiLevel* theLevel);
+	NFmiDrawParam * CreateCrossSectionDrawParam( const NFmiDataIdent& theIdent);	
 	NFmiDrawParam * CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent);
 	bool Init();
 	const NFmiString& LoadDirectory(void) const {return itsLoadDirectory;};

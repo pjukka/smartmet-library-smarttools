@@ -80,11 +80,8 @@ NFmiDrawParamFactory::~NFmiDrawParamFactory(void)
 //--------------------------------------------------------
 // DrawParam 
 //--------------------------------------------------------
-NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo 
-													 , const NFmiDataIdent& theIdent
-													 , bool& fSubParam
-													 , const NFmiLevel* theLevel
-													 , bool setParam)
+NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam (const NFmiDataIdent& theIdent
+													 ,const NFmiLevel* theLevel)
 
 //  Tässä metodissa valitaan sääparametrin theParam perusteella piirtoa
 //  varten sopiva drawParam. Kostruktorin NFmiDrawParam vaatima pointteri
@@ -93,21 +90,12 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo
 //  pitää muistaa tuhota ulkopuolella.
 
 {
-	if(!theInfo)
-		return 0;
-
-	if(setParam)
-	theInfo->Param(theIdent);
-	if(theLevel)
-		theInfo->Level(*theLevel);
-	else
-		theInfo->FirstLevel();
 
 //	NFmiDrawParam* drawParam = new NFmiDrawParam(theInfo, theIdent, 1); // 1 = priority
 // 7.1.2002/Marko Muutin dataidentin alustuksen niin, että se otetaan annetusta
 // infosta, jolloin se on aina oikein. Info on aina asetettu halutun parametrin 
 // kohdalle, kun se tulee tänne.
-	NFmiDrawParam* drawParam = new NFmiDrawParam(theInfo, setParam ? theInfo->Param() : theIdent, 1); // 1 = priority
+	NFmiDrawParam* drawParam = new NFmiDrawParam(theIdent, theLevel ? *theLevel : NFmiLevel(), 1); // 1 = priority
 
 	if(drawParam)
 	{
@@ -120,14 +108,9 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam ( NFmiSmartInfo* theInfo
 // luodaan drawparam crossSectionDataa varten. Huom käytetyt tiedostonimet
 // poikkeavat muista drawparamien tiedostonimistä.
 // Eli esim. DrawParam_4_CrossSection.dpa
-NFmiDrawParam * NFmiDrawParamFactory::CreateCrossSectionDrawParam( NFmiSmartInfo* theInfo
-																, const NFmiDataIdent& theIdent
-																, bool& fSubParam)
+NFmiDrawParam * NFmiDrawParamFactory::CreateCrossSectionDrawParam(const NFmiDataIdent& theIdent)
 {
-	if(!theInfo)
-		return 0;
-	theInfo->Param(theIdent);
-	NFmiDrawParam* drawParam = new NFmiDrawParam(theInfo, theInfo->Param(), 1); // 1 = priority
+	NFmiDrawParam* drawParam = new NFmiDrawParam(theIdent, NFmiLevel(), 1); // 1 = priority
 	if(drawParam)
 	{
 		NFmiString fileName = CreateFileName(drawParam, true);
@@ -176,19 +159,25 @@ NFmiString NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool f
 			fileName += "_CrossSection";
 		else
 		{
-			if(drawParam && drawParam->Info() && drawParam->Info()->SizeLevels() > 1)
+			if(drawParam && drawParam->Level().LevelType() == kFmiPressureLevel)
 			{ // jos leveleitä on useita, niillä on omat tiedostot
 				fileName += "_level_";
-				const NFmiLevel* level = drawParam->Info()->Level();
-				int levelTypeId = 0;
-				if(level)
-					levelTypeId = level->LevelTypeId();
+				NFmiLevel& level = drawParam->Level();
+				int levelTypeId = level.LevelTypeId();
 				NFmiValueString levelTypeIdStr(levelTypeId, "%d");
 				fileName += levelTypeIdStr;
 				fileName += "_";
-				int levelValue = level->LevelValue();
+				int levelValue = level.LevelValue();
 				NFmiValueString levelValueStr(levelValue, "%d");
 				fileName += levelValueStr;
+			}
+			else if(drawParam && drawParam->Level().LevelType() == kFmiHybridLevel)
+			{ // hybrideillä on ain yksi piirtotapa
+				fileName += "_hybrid";
+			}
+			else if(drawParam && drawParam->Level().LevelType() == 50) // tämä on luotaus dataa
+			{ // luotaus parametreilla on ain yksi piirtotapa kartalla
+				fileName += "_temp";
 			}
 			else
 			{
