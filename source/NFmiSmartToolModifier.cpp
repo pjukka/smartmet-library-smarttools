@@ -603,7 +603,7 @@ struct FindScriptVariable
 	FindScriptVariable(int theParId):itsParId(theParId){}
 
 	bool operator()(NFmiSmartInfo* thePtr)
-	{return itsParId == thePtr->Param().GetParamIdent();}
+	{return itsParId == static_cast<int>(thePtr->Param().GetParamIdent());}
 
 	int itsParId;
 };
