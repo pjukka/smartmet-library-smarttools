@@ -116,7 +116,7 @@ private:
 	typedef std::map<std::string, FmiParameterName> ParamMap;
 
 	bool CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlock* theBlock);
-	std::string NFmiSmartToolIntepreter::HandlePossibleUnaryMarkers(const std::string &theCurrentString);
+	std::string HandlePossibleUnaryMarkers(const std::string &theCurrentString);
 	NFmiLevel GetPossibleLevelInfo(const std::string &theLevelText) throw (NFmiSmartToolIntepreter::Exception);
 	NFmiProducer GetPossibleProducerInfo(const std::string &theProducerText) throw (NFmiSmartToolIntepreter::Exception);
 	bool IsProducerOrig(std::string &theProducerText);
