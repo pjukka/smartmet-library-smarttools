@@ -1279,7 +1279,8 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 		theMaskInfo->SetFunctionType((*it).second);
 		string tmp;
 		vector<pair<string, types> > tokens;
-		for(int i=0; i<7 && GetToken(); i++) // maksimissaan 7 kertaa
+		int i;
+		for(i=0; i<7 && GetToken(); i++) // maksimissaan 7 kertaa
 		{
 			tmp = token; // luetaan muuttuja/vakio/funktio tai mikä lie
 			tmp = HandlePossibleUnaryMarkers(tmp);
@@ -1355,7 +1356,8 @@ bool NFmiSmartToolIntepreter::IsVariableRampFunction(const std::string &theVaria
 	{
 		string tmp;
 		vector<pair<string, types> > tokens;
-		for(int i=0; i<5 && GetToken(); i++)
+		int i;
+		for(i=0; i<5 && GetToken(); i++)
 		{
 			tmp = token; // luetaan muuttuja/vakio/funktio tai mikä lie
 			tmp = HandlePossibleUnaryMarkers(tmp);
