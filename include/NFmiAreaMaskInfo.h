@@ -35,7 +35,7 @@ class NFmiLevel;
 struct PointerDestroyer
 {
 	template<typename T>
-	operator()(T* thePtr)
+	void operator()(T* thePtr)
 	{delete thePtr;}
 };
 
