@@ -196,9 +196,11 @@ void NFmiSmartToolInfo::LoadDirectory(const std::string& newValue, bool fSaveSet
 		SaveSettings();
 }
 
-// poistaa viimeisen osan polusta
-// c:\data\src\inc\ -> c:\data\src\
-// eli inc pois esimerkistä
+/*
+ * poistaa viimeisen osan polusta c:\data\src\inc\ -> c:\data\src\
+ * eli inc pois esimerkistä
+ */
+
 static void RemoveLastPartOfDirectory(string &thePath)
 {
 	NFmiStringTools::TrimR(thePath, '\\');
