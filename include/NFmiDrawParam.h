@@ -44,15 +44,15 @@ class NFmiSmartInfo;
 class NFmiDrawingEnvironment;
 class NFmiString;
 class NFmiDataIdent;
-class NFmiMetEditorCoordinatorMapOptions;
+//class NFmiMetEditorCoordinatorMapOptions;
 
 class NFmiDrawParam
 {
 
 public:
     NFmiDrawParam (void);
-    NFmiDrawParam (NFmiSmartInfo* theInfo, const NFmiDataIdent& theParam, int thePriority, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0);
-	NFmiDrawParam (NFmiSmartInfo* theInfo, const FmiParameterName& theParam, int thePriority, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0); // NFmiDrawParamFactory::CreateDrawParam k‰ytt‰‰ t‰t‰
+    NFmiDrawParam (NFmiSmartInfo* theInfo, const NFmiDataIdent& theParam, int thePriority);//, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0);
+	NFmiDrawParam (NFmiSmartInfo* theInfo, const FmiParameterName& theParam, int thePriority);//, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0); // NFmiDrawParamFactory::CreateDrawParam k‰ytt‰‰ t‰t‰
 	virtual  ~NFmiDrawParam (void);
 
 	void Init(NFmiDrawParam* theDrawParam);
@@ -147,8 +147,8 @@ public:
 	void ShowDifference(bool newState){fShowDifference = newState;};
 	bool ShowDifferenceToOriginalData(void) const{return fShowDifferenceToOriginalData;}
 	void ShowDifferenceToOriginalData(bool newValue){fShowDifferenceToOriginalData = newValue;}
-	NFmiMetEditorCoordinatorMapOptions* MetEditorCoordinatorMapOptions(void){return itsMetEditorCoordinatorMapOptions;};
-	void MetEditorCoordinatorMapOptions(NFmiMetEditorCoordinatorMapOptions* theNewOptions);
+//	NFmiMetEditorCoordinatorMapOptions* MetEditorCoordinatorMapOptions(void){return itsMetEditorCoordinatorMapOptions;};
+//	void MetEditorCoordinatorMapOptions(NFmiMetEditorCoordinatorMapOptions* theNewOptions);
 
 //**************************************************************
 //********** 'versio 2' parametrien asetusfunktiot *************
@@ -442,7 +442,7 @@ private:
 	bool fShowDifference;	// n‰ytet‰‰nkˆ kartalla parametrin arvo, vai erotus edelliseen aikaan (ei ole viel‰ talletettu tiedostoon)
 	bool fShowDifferenceToOriginalData;
 
-	NFmiMetEditorCoordinatorMapOptions* itsMetEditorCoordinatorMapOptions; // t‰t‰ k‰ytet‰‰n koordinaatio tarkasteluissa
+//	NFmiMetEditorCoordinatorMapOptions* itsMetEditorCoordinatorMapOptions; // t‰t‰ k‰ytet‰‰n koordinaatio tarkasteluissa
 };
 //@{ \name Globaalit NFmiDrawParam-luokan uudelleenohjaus-operaatiot
 inline std::ostream& operator<<(std::ostream& os, const NFmiDrawParam& item){return item.Write(os);}

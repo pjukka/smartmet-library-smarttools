@@ -31,7 +31,7 @@
 //**********************************************************
 #include "NFmiDrawParam.h"
 #include "NFmiSmartInfo.h"
-#include "NFmiMetEditorCoordinatorMapOptions.h"
+//#include "NFmiMetEditorCoordinatorMapOptions.h"
 
 float NFmiDrawParam::itsFileVersionNumber=2.0;
 
@@ -151,7 +151,7 @@ NFmiDrawParam::NFmiDrawParam()
 , fActive(false)
 , fShowDifference(false)
 , fShowDifferenceToOriginalData(false)
-, itsMetEditorCoordinatorMapOptions(0)
+//, itsMetEditorCoordinatorMapOptions(0)
 
 //***********************************************
 //********** 'versio 2' parametreja *************
@@ -166,8 +166,8 @@ NFmiDrawParam::NFmiDrawParam()
 //-------------------------------------------------------
 NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 							 , const FmiParameterName& theParam
-							 , int thePriority
-							 , NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions)
+							 , int thePriority)
+//							 , NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions)
 : itsParameter(NFmiParam(theParam))
 , itsParameterAbbreviation("?")
 , itsPriority(thePriority)
@@ -279,7 +279,7 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 , fActive(false)
 , fShowDifference(false)
 , fShowDifferenceToOriginalData(false)
-, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
+//, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
@@ -291,8 +291,8 @@ NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
 //-------------------------------------------------------
 NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 							, const NFmiDataIdent& theParam
-							, int thePriority
-							, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions)
+							, int thePriority)
+//							, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions)
 : itsParameter(theParam)
 , itsParameterAbbreviation("?")
 , itsPriority(thePriority)
@@ -404,7 +404,7 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 , fActive(false)
 , fShowDifference(false)
 , fShowDifferenceToOriginalData(false)
-, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
+//, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
@@ -416,7 +416,7 @@ NFmiDrawParam::NFmiDrawParam( NFmiSmartInfo* theInfo
 NFmiDrawParam::~NFmiDrawParam(void)
 { 
 	delete itsInfo;
-	delete itsMetEditorCoordinatorMapOptions;
+//	delete itsMetEditorCoordinatorMapOptions;
 }
 
 //-------------------------------------------------------
@@ -1020,7 +1020,7 @@ const NFmiDataIdent& NFmiDrawParam::EditParam(void) const
 { 
 	return itsInfo->Param(); 
 }
- 
+/* 
 void NFmiDrawParam::MetEditorCoordinatorMapOptions(NFmiMetEditorCoordinatorMapOptions* theNewOptions)
 {
 	if(theNewOptions)
@@ -1029,7 +1029,7 @@ void NFmiDrawParam::MetEditorCoordinatorMapOptions(NFmiMetEditorCoordinatorMapOp
 		itsMetEditorCoordinatorMapOptions = new NFmiMetEditorCoordinatorMapOptions(*theNewOptions);
 	}
 }
-
+*/
 const NFmiString& NFmiDrawParam::ParameterAbbreviation(void) const 
 {
 	if(!itsInfo || (itsParameterAbbreviation != NFmiString("") && itsParameterAbbreviation != NFmiString("?")))
