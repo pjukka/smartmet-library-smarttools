@@ -46,7 +46,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 				 ,NFmiQueryData* theData=0,NFmiString theDataFileName=""
 				 ,FmiQueryInfoDataType theType = kFmiDataTypeEditable);
 	NFmiSmartInfo (const NFmiSmartInfo & theInfo); 
-	virtual ~NFmiSmartInfo();
+	~NFmiSmartInfo();
 	
 	NFmiSmartInfo* Clone(void);
 	void AreaMask(NFmiUndoableMultiLevelMask* theAreaMask);
@@ -56,7 +56,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	void MaskAllLocations (const FmiBoolean& newState, unsigned long theMaskType);
 	void MaskAllLocations (const FmiBoolean& newState);
 	
-	virtual FmiBoolean NextLocation (void);
+	FmiBoolean NextLocation (void);
    
 	unsigned long LocationMaskedCount(unsigned long theMaskType);
 
