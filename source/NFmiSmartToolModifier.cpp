@@ -720,6 +720,23 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			areaMask = new NFmiCalculationIntegrationFuction(iterator, modifier, NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, true, deepCopyCreated);
 			break;
 			}
+		case NFmiAreaMask::FunctionPeekXY:
+			{
+			// HUOM!! Tähän vaaditaan syvä data kopio!!!
+			// JOS kyseessä on ehtolauseen muuttujasta, joka on editoitavaa dataa. 
+			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
+			bool deepCopyCreated = false;
+			if(theAreaMaskInfo.GetUseDefaultProducer())
+			{ // Pitää tehdä syvä kopio datasta, että datan muuttuminen ei vaikuta laskuihin.
+				deepCopyCreated = true;
+				NFmiSmartInfo* tmp = info->Clone();
+				delete info;
+				info = tmp;
+			}
+			areaMask = new NFmiInfoAreaMaskPeekXY(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, 
+				static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), true, NFmiAreaMask::BinaryOperator::kNoValue, deepCopyCreated);
+			break;
+			}
 		case NFmiAreaMask::CalculatedVariable:
 			{
 			areaMask = CreateCalculatedAreaMask(theAreaMaskInfo);
