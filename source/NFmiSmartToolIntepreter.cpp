@@ -674,6 +674,7 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 	auto_ptr<NFmiSmartToolCalculationInfo> calculationInfoPtr(calculationInfo); // tuhoaa automaattisesti esim. exceptionin yhteydessä 
 
 	exp_ptr = calculationLineText.begin();
+	exp_end = calculationLineText.end();
 
 	string tmp;
 	if(GetToken()) // luetaan muuttuja johon sijoitetaan esim. T
