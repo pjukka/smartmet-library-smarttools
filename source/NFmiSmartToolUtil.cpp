@@ -97,7 +97,8 @@ bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryDa
 	if(theDataBase)
 	{
 		theDataBase->WorkingDirectory(GetWorkingDirectory());
-		theDataBase->Init(std::string(""), createDrawParamFileIfNotExist); // tähän annetaan drawparametrien lataus polku, mutta niitä ei käytetä tässä tapauksessa
+		theDataBase->Init(std::string(""), createDrawParamFileIfNotExist, false); // tähän annetaan drawparametrien lataus polku, mutta niitä ei käytetä tässä tapauksessa
+																		// false tarkoittaa että ei tehdä kopiota editoidusta datasta, tässä se on turhaa
 		theDataBase->AddData(theModifiedData, "xxxfileName", NFmiInfoData::kEditable, 0); // 0=undolevel
 		if(theHelperDataFileNames && theHelperDataFileNames->size())
 			InitDataBaseHelperData(*theDataBase, *theHelperDataFileNames);
