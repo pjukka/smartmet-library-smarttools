@@ -58,8 +58,8 @@ struct EndOfLineSearcher
 {
 	template<typename T>
 	bool operator()(T theChar)
-	{
-	  return(theChar == '\r' || theChar == '\n');
+	{ // tarkistetaan myös blokin loppu merkki '}' koska blokki-koodi voi olla seuraavanlaista "{T = T + 1}" eli blokin loppu merkki samalla rivillä
+	  return(theChar == '\r' || theChar == '\n' || theChar == '}');
 	}
 
 };
