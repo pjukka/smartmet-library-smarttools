@@ -137,6 +137,14 @@ class NFmiInfoOrganizer
     bool Add (NFmiSmartInfo* theInfo);
 	NFmiParamBag GetParams(NFmiInfoData::Type theDataType);
 	void UpdateMacroParamData(void);
+	NFmiSmartInfo* GetSynopPlotParamInfo( const FmiParameterName& theParam
+										, bool& fSubParameter 
+										, const NFmiLevel* theLevel
+										, NFmiInfoData::Type theType);
+	NFmiDrawParam* CreateSynopPlotDrawParam(NFmiSmartInfo* theUsedInfo
+											,const NFmiDataIdent& theDataIdent
+											,const NFmiLevel* theLevel
+											,NFmiInfoData::Type theType);
 
 // Attributes
   	NFmiSortedPtrList<NFmiSmartInfo> itsList; // error when compiling NFmiInfoOrganizer.cpp//binary '<' : 'class NFmiSmartInfo' does not define this operator or a conversion to a type acceptable to the predefined operator

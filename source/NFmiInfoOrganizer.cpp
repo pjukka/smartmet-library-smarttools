@@ -107,6 +107,29 @@ bool NFmiInfoOrganizer::Init(const std::string &theDrawParamPath, bool createDra
  	return itsDrawParamFactory->Init(); 
 }
 
+NFmiSmartInfo* NFmiInfoOrganizer::GetSynopPlotParamInfo( const FmiParameterName& theParam
+														, bool& fSubParameter 
+														, const NFmiLevel* theLevel
+														, NFmiInfoData::Type theType)
+{
+	fSubParameter = false;
+	if(theType == NFmiInfoData::kEditable)
+		return itsEditedData;
+	else
+	{
+		NFmiSmartInfo * aInfo = 0;
+		NFmiPtrList<NFmiSmartInfo>::Iterator aIter = itsList.Start();
+		// tutkitaan ensin lˆytyykˆ theParam suoraan joltain listassa olevalta NFmiSmartInfo-pointterilta
+		while(aIter.Next())
+		{
+			aInfo = aIter.CurrentPtr();
+			if(aInfo->DataType() == theType && aInfo->Producer()->GetIdent() == 1001) // 1001 on synop tuottaja
+				return aInfo;
+		}
+	}
+	return 0;
+}
+
 //--------------------------------------------------------
 // Info 
 //--------------------------------------------------------
@@ -128,6 +151,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 									   , const NFmiLevel* theLevel
 									   , NFmiInfoData::Type theType)
 {
+	if(theParam == 997) // synop plot paramille pit‰‰ tehd‰ kikka
+		return GetSynopPlotParamInfo(theParam, fSubParameter, theLevel, theType);
 	if(theType == NFmiInfoData::kMacroParam)
 		return itsMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
@@ -176,6 +201,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 									   , const NFmiLevel* theLevel
 									   , NFmiInfoData::Type theType)
 {
+	if(theDataIdent.GetParamIdent() == 997) // synop plot paramille pit‰‰ tehd‰ kikka
+		return GetSynopPlotParamInfo(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), fSubParameter, theLevel, theType);
 	if(theType == NFmiInfoData::kMacroParam)
 		return itsMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
@@ -414,6 +441,14 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(FmiParameterName theParamName,
 			NFmiDataIdent dataIdent(info->Param());
 			return CreateDrawParam(dataIdent, theLevel, theType);
 		}
+		else if(theParamName == 997) // synop plottia varten taas kikkailua
+		{
+			info->FirstParam();
+			NFmiDataIdent dataIdent(info->Param());
+			dataIdent.GetParam()->SetIdent(theParamName);
+			dataIdent.GetParam()->SetName("Synop");
+			return CreateSynopPlotDrawParam(info, dataIdent, theLevel, theType);
+		}
 		if(aSubParam)
 		{
 			info->FirstParam();
@@ -447,6 +482,14 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 	NFmiSmartInfo* info = Info(theIdent, aSubParam, theLevel, theType);
 	if(info)
 	{
+		if(theIdent.GetParamIdent() == 997) // synop plottia varten taas kikkailua
+		{
+//			info->FirstParam();
+//			NFmiDataIdent dataIdent(info->Param());
+//			dataIdent.GetParam()->SetIdent(theParamName);
+//			dataIdent.GetParam()->SetName("Synop");
+			return CreateSynopPlotDrawParam(info, theIdent, theLevel, theType);
+		}
 		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
 		drawParam = itsDrawParamFactory->CreateDrawParam(copyOfInfo, theIdent, aSubParam, theLevel);	
 	}
@@ -483,6 +526,22 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(NFmiSmartInfo* theUsedInfo
 		aSubParam = theUsedInfo->UseSubParam();
 		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*theUsedInfo);
 		drawParam = itsDrawParamFactory->CreateDrawParam(copyOfInfo, theDataIdent, aSubParam, theLevel);	
+	}
+	return drawParam;
+}
+
+NFmiDrawParam* NFmiInfoOrganizer::CreateSynopPlotDrawParam(NFmiSmartInfo* theUsedInfo
+															,const NFmiDataIdent& theDataIdent
+															,const NFmiLevel* theLevel
+															,NFmiInfoData::Type theType)
+{
+	NFmiDrawParam* drawParam = 0;
+	bool aSubParam = false;	
+	if(theUsedInfo && theUsedInfo->DataType() == theType)
+	{
+		aSubParam = theUsedInfo->UseSubParam();
+		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*theUsedInfo);
+		drawParam = itsDrawParamFactory->CreateDrawParam(copyOfInfo, theDataIdent, aSubParam, theLevel, false); // false merkitsee, ett‰ parametria ei taas aseteta tuolla metodissa
 	}
 	return drawParam;
 }
