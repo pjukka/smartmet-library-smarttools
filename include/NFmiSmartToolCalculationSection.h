@@ -26,7 +26,7 @@
 #ifndef  NFMISMARTTOOLCALCULATIONSECTION_H
 #define  NFMISMARTTOOLCALCULATIONSECTION_H
 
-#include <vector>
+#include "NFmiDataMatrix.h"
 
 class NFmiPoint;
 class NFmiMetTime;
@@ -46,10 +46,10 @@ public:
 	~NFmiSmartToolCalculationSection(void);
 
 	void AddCalculations(NFmiSmartToolCalculation* value);
-	std::vector<NFmiSmartToolCalculation*>* GetCalculations(void){return &itsCalculations;}
+	checkedVector<NFmiSmartToolCalculation*>* GetCalculations(void){return &itsCalculations;}
 
 private:
-	std::vector<NFmiSmartToolCalculation*> itsCalculations; // omistaa+tuhoaa
+	checkedVector<NFmiSmartToolCalculation*> itsCalculations; // omistaa+tuhoaa
 
 };
 #endif

@@ -54,8 +54,8 @@ void NFmiSmartToolCalculationSectionInfo::AddCalculationInfo(NFmiSmartToolCalcul
 // talteen otetaan vain identti, koska muu ei kiinnosta (ainakaan nyt)
 void NFmiSmartToolCalculationSectionInfo::AddModifiedParams(std::set<int> &theModifiedParams)
 {
-	std::vector<NFmiSmartToolCalculationInfo*>::size_type ssize = itsSmartToolCalculationInfoVector.size();
-	std::vector<NFmiSmartToolCalculationInfo*>::size_type i = 0;
+	checkedVector<NFmiSmartToolCalculationInfo*>::size_type ssize = itsSmartToolCalculationInfoVector.size();
+	checkedVector<NFmiSmartToolCalculationInfo*>::size_type i = 0;
 	for( ;i<ssize; i++)
 	{
 		theModifiedParams.insert(itsSmartToolCalculationInfoVector[i]->GetResultDataInfo()->GetDataIdent().GetParamIdent());

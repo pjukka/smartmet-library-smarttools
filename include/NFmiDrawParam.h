@@ -38,11 +38,9 @@
 #include "NFmiLevel.h"
 #include "NFmiMetEditorTypes.h"
 #include "NFmiInfoData.h"
-
-#include <vector>
+#include "NFmiDataMatrix.h" // täältä tulee myös checkedVector
 
 class NFmiDrawingEnvironment;
-class NFmiString;
 
 class NFmiDrawParam
 {
@@ -64,12 +62,12 @@ public:
 	// huom! tämä asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppiä!!!!!!
 	void DataType(NFmiInfoData::Type newValue){itsDataType = newValue;};
 
-	bool              Init (const NFmiString& theFilename = NFmiString());
-	bool              StoreData (const NFmiString& theFilename = NFmiString());
+	bool              Init (const std::string& theFilename = std::string());
+	bool              StoreData (const std::string& theFilename = std::string());
 
 // --------------- "set" ja "get" metodit -----------------
-	const NFmiString&	 ParameterAbbreviation (void) const;
-	void				 ParameterAbbreviation(NFmiString theParameterAbbreviation) { itsParameterAbbreviation = theParameterAbbreviation; }
+	const std::string&	 ParameterAbbreviation (void) const;
+	void				 ParameterAbbreviation(std::string theParameterAbbreviation) { itsParameterAbbreviation = theParameterAbbreviation; }
 	NFmiDataIdent&		 Param (void) { return itsParameter; }; 
 	void                 Param (const NFmiDataIdent& theParameter) { itsParameter = theParameter; }; 
 	NFmiLevel&			 Level(void) {return itsLevel;}
@@ -102,8 +100,8 @@ public:
 	bool			 ModifyingUnit (void) const { return fModifyingUnit; }
 	const NFmiMetEditorTypes::View* PossibleViewTypeList (void) const {return itsPossibleViewTypeList;}
 	int					 PossibleViewTypeCount (void) const { return itsPossibleViewTypeCount; };
-	const NFmiString&	 InitFileName(void) const { return itsInitFileName; }
-	void				 InitFileName(NFmiString theFileName) { itsInitFileName = theFileName; }
+	const std::string&	 InitFileName(void) const { return itsInitFileName; }
+	void				 InitFileName(std::string theFileName) { itsInitFileName = theFileName; }
 
 	double AbsoluteMinValue(void) const {return itsAbsoluteMinValue;}
 	void AbsoluteMinValue(double theAbsoluteMinValue) {itsAbsoluteMinValue = theAbsoluteMinValue;}	
@@ -126,8 +124,8 @@ public:
 	void				 FileVersionNumber (const float theFileVersionNumber) { itsFileVersionNumber = theFileVersionNumber; };
 	float				 FileVersionNumber (void) const { return itsFileVersionNumber; };
 
-	void				 Unit (const NFmiString& theUnit) { itsUnit = theUnit; };
-	const NFmiString&	 Unit (void) const { return itsUnit; };
+	void				 Unit (const std::string& theUnit) { itsUnit = theUnit; };
+	const std::string&	 Unit (void) const { return itsUnit; };
 
 	bool ShowNumbers(void) const {return fShowNumbers;}
 	void ShowNumbers(bool theValue) {fShowNumbers = theValue;}
@@ -214,26 +212,26 @@ public:
 	void SimpleIsoLineColorShadeHighValueColor(const NFmiColor& newValue){itsSimpleIsoLineColorShadeHighValueColor = newValue;}
 	int SimpleIsoLineColorShadeClassCount(void) const {return itsSimpleIsoLineColorShadeClassCount;}
 	void SimpleIsoLineColorShadeClassCount(int newValue){itsSimpleIsoLineColorShadeClassCount = newValue;}
-	const std::vector<float>& SpecialIsoLineValues(void) const {return itsSpecialIsoLineValues;}
-	void SpecialIsoLineValues(std::vector<float>& newValue){itsSpecialIsoLineValues = newValue;}
-	const std::vector<float>& SpecialIsoLineLabelHeight(void) const {return itsSpecialIsoLineLabelHeight;}
-	void SpecialIsoLineLabelHeight(std::vector<float>& newValue){itsSpecialIsoLineLabelHeight = newValue;}
-	const std::vector<float>& SpecialIsoLineWidth(void) const {return itsSpecialIsoLineWidth;}
-	void SpecialIsoLineWidth(std::vector<float>& newValue){itsSpecialIsoLineWidth = newValue;}
-	const std::vector<int>& SpecialIsoLineStyle(void) const {return itsSpecialIsoLineStyle;}
-	void SpecialIsoLineStyle(std::vector<int>& newValue){itsSpecialIsoLineStyle = newValue;}
-	const std::vector<int>& SpecialIsoLineColorIndexies(void) const {return itsSpecialIsoLineColorIndexies;}
-	void SpecialIsoLineColorIndexies(std::vector<int>& newValue){itsSpecialIsoLineColorIndexies = newValue;}
-	const std::vector<bool>& SpecialIsoLineShowLabelBox(void) const {return itsSpecialIsoLineShowLabelBox;}
-	void SpecialIsoLineShowLabelBox(std::vector<bool>& newValue){itsSpecialIsoLineShowLabelBox = newValue;}
+	const checkedVector<float>& SpecialIsoLineValues(void) const {return itsSpecialIsoLineValues;}
+	void SpecialIsoLineValues(checkedVector<float>& newValue){itsSpecialIsoLineValues = newValue;}
+	const checkedVector<float>& SpecialIsoLineLabelHeight(void) const {return itsSpecialIsoLineLabelHeight;}
+	void SpecialIsoLineLabelHeight(checkedVector<float>& newValue){itsSpecialIsoLineLabelHeight = newValue;}
+	const checkedVector<float>& SpecialIsoLineWidth(void) const {return itsSpecialIsoLineWidth;}
+	void SpecialIsoLineWidth(checkedVector<float>& newValue){itsSpecialIsoLineWidth = newValue;}
+	const checkedVector<int>& SpecialIsoLineStyle(void) const {return itsSpecialIsoLineStyle;}
+	void SpecialIsoLineStyle(checkedVector<int>& newValue){itsSpecialIsoLineStyle = newValue;}
+	const checkedVector<int>& SpecialIsoLineColorIndexies(void) const {return itsSpecialIsoLineColorIndexies;}
+	void SpecialIsoLineColorIndexies(checkedVector<int>& newValue){itsSpecialIsoLineColorIndexies = newValue;}
+	const checkedVector<bool>& SpecialIsoLineShowLabelBox(void) const {return itsSpecialIsoLineShowLabelBox;}
+	void SpecialIsoLineShowLabelBox(checkedVector<bool>& newValue){itsSpecialIsoLineShowLabelBox = newValue;}
 	bool UseDefaultRegioning(void) const {return fUseDefaultRegioning;}
 	void UseDefaultRegioning(bool newValue){fUseDefaultRegioning = newValue;}
 	bool UseCustomColorContouring(void) const {return fUseCustomColorContouring;}
 	void UseCustomColorContouring(bool newValue){fUseCustomColorContouring = newValue;}
-	const std::vector<float>& SpecialColorContouringValues(void) const {return itsSpecialColorContouringValues;}
-	void SpecialColorContouringValues(std::vector<float>& newValue){itsSpecialColorContouringValues = newValue;}
-	const std::vector<int>& SpecialColorContouringColorIndexies(void) const {return itsSpecialColorContouringColorIndexies;}
-	void SpecialColorContouringColorIndexies(std::vector<int>& newValue){itsSpecialColorContouringColorIndexies = newValue;}
+	const checkedVector<float>& SpecialColorContouringValues(void) const {return itsSpecialColorContouringValues;}
+	void SpecialColorContouringValues(checkedVector<float>& newValue){itsSpecialColorContouringValues = newValue;}
+	const checkedVector<int>& SpecialColorContouringColorIndexies(void) const {return itsSpecialColorContouringColorIndexies;}
+	void SpecialColorContouringColorIndexies(checkedVector<int>& newValue){itsSpecialColorContouringColorIndexies = newValue;}
 	float ColorContouringColorShadeLowValue(void) const {return itsColorContouringColorShadeLowValue;}
 	void ColorContouringColorShadeLowValue(float newValue){itsColorContouringColorShadeLowValue = newValue;}
 	float ColorContouringColorShadeMidValue(void) const {return itsColorContouringColorShadeMidValue;}
@@ -297,7 +295,7 @@ protected:
 
     NFmiDataIdent itsParameter;
     NFmiLevel itsLevel;
-	NFmiString itsParameterAbbreviation;
+	std::string itsParameterAbbreviation;
     int itsPriority;
 
 //  Parametrin oletus näyttötyyppi (symboli, 
@@ -382,17 +380,17 @@ protected:
 	NFmiColor itsSimpleIsoLineColorShadeHighValueColor;
 	int itsSimpleIsoLineColorShadeClassCount; // kuinka monta väri luokkaa tehdään skaalaukseen
 // speciaali isoviiva asetukset (otetaan käyttöön, jos fUseSimpleIsoLineDefinitions=false)
-	std::vector<float> itsSpecialIsoLineValues; // tähän laitetaan kaikki arvot, johon halutaan isoviiva
-	std::vector<float> itsSpecialIsoLineLabelHeight; // isoviivalabeleiden korkeudet (0=ei labelia)
-	std::vector<float> itsSpecialIsoLineWidth; // viivan paksuudet
-	std::vector<int> itsSpecialIsoLineStyle; // viiva tyylit
-	std::vector<int> itsSpecialIsoLineColorIndexies; // eri viivojen väri indeksit (pitää tehdä näyttö taulukko käyttäjälle)
-	std::vector<bool> itsSpecialIsoLineShowLabelBox; // eri viivojen väri indeksit (pitää tehdä näyttö taulukko käyttäjälle)
+	checkedVector<float> itsSpecialIsoLineValues; // tähän laitetaan kaikki arvot, johon halutaan isoviiva
+	checkedVector<float> itsSpecialIsoLineLabelHeight; // isoviivalabeleiden korkeudet (0=ei labelia)
+	checkedVector<float> itsSpecialIsoLineWidth; // viivan paksuudet
+	checkedVector<int> itsSpecialIsoLineStyle; // viiva tyylit
+	checkedVector<int> itsSpecialIsoLineColorIndexies; // eri viivojen väri indeksit (pitää tehdä näyttö taulukko käyttäjälle)
+	checkedVector<bool> itsSpecialIsoLineShowLabelBox; // eri viivojen väri indeksit (pitää tehdä näyttö taulukko käyttäjälle)
 // colorcontouring ja quick contouring asetukset
 	bool fUseDefaultRegioning; // jos true, data piirretään vain defaultregionin (maan) päälle
 	bool fUseCustomColorContouring; // true ja saa määritellä luokka rajat ja värit
-	std::vector<float> itsSpecialColorContouringValues; // tähän laitetaan kaikki arvot, johon halutaan color contour luokka rajoiksi
-	std::vector<int> itsSpecialColorContouringColorIndexies; // eri viivojen väri indeksit (pitää tehdä näyttö taulukko käyttäjälle)
+	checkedVector<float> itsSpecialColorContouringValues; // tähän laitetaan kaikki arvot, johon halutaan color contour luokka rajoiksi
+	checkedVector<int> itsSpecialColorContouringColorIndexies; // eri viivojen väri indeksit (pitää tehdä näyttö taulukko käyttäjälle)
 	float itsColorContouringColorShadeLowValue; //väri skaalaus alkaa tästä arvosta
 	float itsColorContouringColorShadeMidValue; //väri skaalauksen keskiarvo
 	float itsColorContouringColorShadeHighValue; //väri skaalaus loppuu tähän arvoon
@@ -428,13 +426,13 @@ private:
 //   Tähän talletetaan tiedoston nimi, mistä luetaan/mihin 
 //   kirjoitetaan 
 //   kyseisen luokan tiedot.
-	NFmiString itsInitFileName;
+	std::string itsInitFileName;
 
 	bool fHidden;			// näyttö voidaan piiloittaa tämän mukaisesti
 	bool fEditedParam;	// vain yksi parametreista voidaan editoida yhtä aikaa
 	bool fEditableParam;	// onko parametri suoraan editoitavissa ollenkaan? (esim. HESSAA tai tuulivektori eivät ole)
 
-	NFmiString itsUnit;			
+	std::string itsUnit;			
 	bool fActive;			// onko kyseinen parametri näytön aktiivinen parametri (jokaisella näyttörivillä aina yksi aktivoitunut parametri)
 	bool fShowDifference;	// näytetäänkö kartalla parametrin arvo, vai erotus edelliseen aikaan (ei ole vielä talletettu tiedostoon)
 	bool fShowDifferenceToOriginalData;

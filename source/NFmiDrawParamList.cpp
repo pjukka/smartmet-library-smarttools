@@ -256,7 +256,7 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 // Ei poista niitä parametreja, jotka ovat theParamIdsNotRemoved-listalla. Löy-
 // tynyt paramId poistetaan theParamIdsNotRemoved-listalta, että niitä ei
 // lisättäisi myöhemmin tähän listaan.
-void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::vector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel, bool fDeleteData)
+void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel, bool fDeleteData)
 {
 	std::list<int> tmpParIdList;
 //	std::copy(theParamIdsNotRemoved.begin(), theParamIdsNotRemoved.end(), tmpParIdList.begin());
@@ -353,7 +353,7 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pa
 bool NFmiDrawParamList::RemoveMacroParam(const std::string &theName)
 {
 	bool status = false;
-	NFmiString wantedName(theName);
+	std::string wantedName(theName);
 	for(Reset(); Next();)
 	{
 		if(Current()->DataType() == NFmiInfoData::kMacroParam)
@@ -383,8 +383,8 @@ bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 		if(index)
 		{
 			index += theMovement;
-			index = std::max(index, 1);
-			index = std::min(index, paramCount);
+			index = FmiMax(index, 1);
+			index = FmiMin(index, paramCount);
 			if(index != oldIndex) // jos todella tapahtuu siirto, tehdään se ja laitetaan lista likaiseksi
 			{
 				itsList.Swap(index, oldIndex);

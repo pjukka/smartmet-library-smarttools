@@ -183,37 +183,6 @@ double NFmiSmartToolCalculation::eval_exp(const NFmiPoint &theLatlon, const NFmi
 // mutta jätän kommentteihin, jos tarvitsen tulevaisuudessa.
 void NFmiSmartToolCalculation::eval_exp1(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-/*
-	int slot;
-	char ttok_type;
-	char temp_token[80];
-
-	if(tok_type==VARIABLE) 
-	{
-		// save old token
-		strcpy(temp_token, token);
-		ttok_type = tok_type;
-
-		// compute the index of the variable
-		slot = toupper(*token) - 'A';
-
-		get_token();
-		if(*token != '=') 
-		{
-			putback(); // return current token
-			// restore old token - not assignment
-			strcpy(token, temp_token);
-			tok_type = ttok_type;
-		}
-		else 
-		{
-			get_token(); // get next part of exp
-			eval_exp2(result);
-			vars[slot] = result;
-			return;
-		}
-	}
-*/
 	eval_exp2(result, theLatlon, theTime, theTimeIndex);
 }
 
@@ -632,37 +601,6 @@ bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiPoint &theLatlon, const NF
 // mutta jätän kommentteihin, jos tarvitsen tulevaisuudessa.
 void NFmiSmartToolCalculation::bin_eval_exp1(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-/*
-	int slot;
-	char ttok_type;
-	char temp_token[80];
-
-	if(tok_type==VARIABLE) 
-	{
-		// save old token
-		strcpy(temp_token, token);
-		ttok_type = tok_type;
-
-		// compute the index of the variable
-		slot = toupper(*token) - 'A';
-
-		get_token();
-		if(*token != '=') 
-		{
-			putback(); // return current token
-			// restore old token - not assignment
-			strcpy(token, temp_token);
-			tok_type = ttok_type;
-		}
-		else 
-		{
-			get_token(); // get next part of exp
-			eval_exp2(result);
-			vars[slot] = result;
-			return;
-		}
-	}
-*/
 	bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
 }
 

@@ -163,133 +163,6 @@ NFmiDrawParam::NFmiDrawParam()
 }
 
 //-------------------------------------------------------
-// NFmiDrawParam, toistaiseksi käytössä oleva konstruktori 02.03.1999/Viljo
-//-------------------------------------------------------
-/*
-NFmiDrawParam::NFmiDrawParam(  NFmiSmartInfo* theInfo
-							 , const FmiParameterName& theParam
-							 , int thePriority)
-//							 , NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions)
-: itsParameter(NFmiParam(theParam))
-, itsParameterAbbreviation("?")
-, itsPriority(thePriority)
-, itsViewType							 (NFmiMetEditorTypes::kFmiIsoLineView)
-, itsStationDataViewType				 (NFmiMetEditorTypes::kFmiTextView)
-, itsFrameColor						     (NFmiColor(0.,0.,0.)) // musta
-, itsFillColor						     (NFmiColor(0.,0.,0.)) // musta
-, itsIsolineLabelBoxFillColor		     (NFmiColor(1.,1.,0.)) // keltainen
-, itsRelativeSize                        (NFmiPoint(1,1))
-, itsRelativePositionOffset              (NFmiPoint(0,0))
-, itsOnlyOneSymbolRelativeSize           (NFmiPoint(1,1))
-, itsOnlyOneSymbolRelativePositionOffset (NFmiPoint(0,0))
-, fShowStationMarker(false)
-, itsIsoLineGab						     (1.)
-, itsModifyingStep                       (1.)
-, fModifyingUnit						 (true)
-, itsTimeSerialModifyingLimit(10)
-, itsIsolineColor						(NFmiColor(0.,0.,0.))
-, itsIsolineTextColor					(NFmiColor(0.,0.,0.))
-, itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
-, itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
-, fUseSecondaryColors(false)
-, itsAbsoluteMinValue(-10000)
-, itsAbsoluteMaxValue(10000)
-, itsTimeSeriesScaleMin(0)
-, itsTimeSeriesScaleMax(100)
-, itsPossibleViewTypeCount(2)
-, fShowNumbers(true)
-, fShowMasks(false) // tämä on turha
-, fShowColors(false)
-, fShowColoredNumbers(false)
-, fZeroColorMean(false)
-// ***********************************************
-// ********** 'versio 2' parametreja *************
-// ***********************************************
-, itsStationSymbolColorShadeLowValue(0)
-, itsStationSymbolColorShadeMidValue(50)
-, itsStationSymbolColorShadeHighValue(100)
-, itsStationSymbolColorShadeLowValueColor(0,0,1)
-, itsStationSymbolColorShadeMidValueColor(0,1,0)
-, itsStationSymbolColorShadeHighValueColor(0,1,0)
-, itsStationSymbolColorShadeClassCount(9)
-, fUseSymbolsInTextMode(false)
-, itsUsedSymbolListIndex(0)
-, itsSymbolIndexingMapListIndex(-1)
-, itsGridDataPresentationStyle(2)
-, fUseIsoLineFeathering(false)
-, fIsoLineLabelsOverLapping(true)
-, fShowColorLegend(false)
-, fUseSimpleIsoLineDefinitions(true)
-, fUseSeparatorLinesBetweenColorContourClasses(true)
-, itsSimpleIsoLineGap(1)
-, itsSimpleIsoLineZeroValue(0)
-, itsSimpleIsoLineLabelHeight(4)
-, fShowSimpleIsoLineLabelBox(false)
-, itsSimpleIsoLineWidth(0.2f)
-, itsSimpleIsoLineLineStyle(0)
-, itsIsoLineSplineSmoothingFactor(6)
-, fUseSingleColorsWithSimpleIsoLines(true)
-, itsSimpleIsoLineColorShadeLowValue(0)
-, itsSimpleIsoLineColorShadeMidValue(50)
-, itsSimpleIsoLineColorShadeHighValue(100)
-, itsSimpleIsoLineColorShadeLowValueColor(0,0,1)
-, itsSimpleIsoLineColorShadeMidValueColor(0,1,0)
-, itsSimpleIsoLineColorShadeHighValueColor(0,1,0)
-, itsSimpleIsoLineColorShadeClassCount(9)
-, itsSpecialIsoLineValues()
-, itsSpecialIsoLineLabelHeight()
-, itsSpecialIsoLineWidth()
-, itsSpecialIsoLineStyle()
-, itsSpecialIsoLineColorIndexies()
-, itsSpecialIsoLineShowLabelBox()
-, fUseDefaultRegioning(false)
-, fUseCustomColorContouring(false)
-, itsSpecialColorContouringValues()
-, itsSpecialColorContouringColorIndexies()
-, itsColorContouringColorShadeLowValue(0)
-, itsColorContouringColorShadeMidValue(50)
-, itsColorContouringColorShadeHighValue(100)
-, itsColorContouringColorShadeLowValueColor(0,0,1)
-, itsColorContouringColorShadeMidValueColor(0,1,0)
-, itsColorContouringColorShadeHighValueColor(0,1,0)
-, itsColorContouringColorShadeClassCount(9)
-, fUseWithIsoLineHatch1(false)
-, fDrawIsoLineHatchWithBorders1(false)
-, itsIsoLineHatchLowValue1(0)
-, itsIsoLineHatchHighValue1(10)
-, itsIsoLineHatchType1(1)
-, itsIsoLineHatchColor1(0,0,0)
-, itsIsoLineHatchBorderColor1(0,0,0)
-, fUseWithIsoLineHatch2(false)
-, fDrawIsoLineHatchWithBorders2(false)
-, itsIsoLineHatchLowValue2(50)
-, itsIsoLineHatchHighValue2(60)
-, itsIsoLineHatchType2(2)
-, itsIsoLineHatchColor2(0.5f,0.5f,0.5f)
-, itsIsoLineHatchBorderColor2(0.5f,0.5f,0.5f)
-, itsIsoLineLabelDigitCount(0)
-// ***********************************************
-// ********** 'versio 2' parametreja *************
-// ***********************************************
-, itsInitFileVersionNumber(itsFileVersionNumber)
-, itsInitFileName("")
-, fHidden(false)
-, fEditedParam(false)
-, fEditableParam(true)
-, itsInfo(theInfo)
-, itsUnit								("?")
-, fActive(false)
-, fShowDifference(false)
-, fShowDifferenceToOriginalData(false)
-//, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
-, itsDataType(NFmiInfoData::kNoDataType)
-, fViewMacroDrawParam(false)
-{
-	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
-	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
-}
-*/
-//-------------------------------------------------------
 // NFmiDrawParam
 //-------------------------------------------------------
 NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
@@ -561,15 +434,13 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam)
 //--------------------------------------------------------
 // Init
 //--------------------------------------------------------
-bool NFmiDrawParam::Init (const NFmiString& theFilename)
+bool NFmiDrawParam::Init (const std::string& theFilename)
 {
-	if(theFilename != NFmiString(""))
+	if(theFilename != std::string(""))
 	{
-		std::ifstream in(theFilename, std::ios::in);
+		std::ifstream in(theFilename.c_str(), std::ios::in);
 		if(in)
 		{
-	//		istream_withassign pin;
-	//		pin = in;
 			in >> *this;
 			in.close();
 			itsInitFileName = theFilename;
@@ -583,11 +454,11 @@ bool NFmiDrawParam::Init (const NFmiString& theFilename)
 //--------------------------------------------------------
 // StoreData
 //--------------------------------------------------------
-bool NFmiDrawParam::StoreData (const NFmiString& theFilename)
+bool NFmiDrawParam::StoreData (const std::string& theFilename)
 {
-	if(theFilename != NFmiString(""))
+	if(theFilename != std::string(""))
 	{
-		std::ofstream out(theFilename);
+		std::ofstream out(theFilename.c_str());
 		if(out)
 		{
 			out << *this;
@@ -624,7 +495,7 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 	file << "Version ";
 	file << itsFileVersionNumber << endl;
 	file << "'ParameterAbbreviation'" << endl;  // selittävä teksti
-	file << itsParameterAbbreviation.CharPtr() << endl;
+	file << itsParameterAbbreviation << endl;
 	file << "'Priority'" << endl;  // selittävä teksti
 	file << itsPriority << endl;
 	file << "'ViewType'" << endl;   // selittävä teksti
@@ -681,7 +552,7 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 	file << "'EditableParam'" << endl;   // selittävä teksti
 	file << fEditableParam << endl;
 	file << "'Unit'" << endl;   // selittävä teksti
-	file << itsUnit.CharPtr() << endl;
+	file << itsUnit << endl;
 
 	file << "'ShowNumbers'" << endl;   // selittävä teksti
 	file << fShowNumbers << endl;
@@ -825,7 +696,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 	if(!file)
 		return file;
 	file >> temp;
-	if(NFmiString(temp) == NFmiString("Version"))
+	if(std::string(temp) == std::string("Version"))
 	{
 		file >> itsInitFileVersionNumber;
 		if(itsInitFileVersionNumber >= 1.) // tämä on vain esimerkki siitä mitä joskus tulee olemaan
@@ -836,7 +707,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			std::getline(file, tmpStr); // luetaan ed. rivinvaihto pois jaloista
 			std::getline(file, tmpStr); // luetaan rivin loppuun, jos lyhenteessä spaceja mahdollisesti
 //			file >> temp;
-//			itsParameterAbbreviation = NFmiString(temp);
+//			itsParameterAbbreviation = std::string(temp);
 			itsParameterAbbreviation = tmpStr;
 			file >> temp; // luetaan nimike pois
 			file >> itsPriority;
@@ -913,7 +784,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			file >> temp;
 			if(!file)
 				return file;
-			itsUnit = NFmiString(temp);
+			itsUnit = std::string(temp);
 
 
 			file >> temp; // luetaan nimike pois
@@ -1057,31 +928,17 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 	}
     return file;
 }
-/*
-const NFmiDataIdent& NFmiDrawParam::EditParam(void) const 
+
+const std::string& NFmiDrawParam::ParameterAbbreviation(void) const 
 {
-	if(itsInfo) // satelliitti datalla ei ole infoa, joten tein tähän pika virityksen
-		return itsInfo->Param(); 
-	else
-		return itsParameter;
-}
-*/
-/* 
-void NFmiDrawParam::MetEditorCoordinatorMapOptions(NFmiMetEditorCoordinatorMapOptions* theNewOptions)
-{
-	if(theNewOptions)
-	{
-		delete itsMetEditorCoordinatorMapOptions;
-		itsMetEditorCoordinatorMapOptions = new NFmiMetEditorCoordinatorMapOptions(*theNewOptions);
-	}
-}
-*/
-const NFmiString& NFmiDrawParam::ParameterAbbreviation(void) const 
-{
-	if(itsParameterAbbreviation != NFmiString("") && itsParameterAbbreviation != NFmiString("?"))
+	static std::string dummy;
+	if(itsParameterAbbreviation != std::string("") && itsParameterAbbreviation != std::string("?"))
 		return itsParameterAbbreviation;
 	else
-		return itsParameter.GetParamName();
+	{
+		dummy = std::string(static_cast<char*>(itsParameter.GetParamName()));
+		return dummy;
+	}
 }
 
 

@@ -28,7 +28,6 @@
 // 
 //**********************************************************
 #include "NFmiUndoableMultiLevelMask.h"
-#include "NFmiString.h"
 #include "NFmiMultiLevelMask.h"
 
 //--------------------------------------------------------

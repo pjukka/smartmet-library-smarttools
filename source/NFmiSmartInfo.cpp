@@ -66,7 +66,7 @@ NFmiSmartInfo::NFmiSmartInfo()
 }
 
 NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theData
-							 ,NFmiString theDataFileName
+							 ,std::string theDataFileName
 							 ,NFmiInfoData::Type theType)
 :NFmiFastQueryInfo(theInfo)
 ,itsDataType(theType) // 1999.08.24/Marko
@@ -405,7 +405,7 @@ void NFmiSmartInfo::LocationMask (const NFmiBitMask& theMask, unsigned long theM
 //   toiminnosta ("aikasarjamuutos", "kursori 
 //   ylös", "aluemuutos")
 
-bool NFmiSmartInfo::SnapShotData (const NFmiString& theAction, const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
+bool NFmiSmartInfo::SnapShotData (const std::string& theAction, const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
 {
 	if(itsCurrentUndoLevelPtr == 0)
 		return false;
@@ -439,7 +439,7 @@ void NFmiSmartInfo::RearrangeUndoTable(void)
 	if(itsCurrentUndoLevelPtr == 0)
 		return ;
 	char* undoTmp = itsUndoTable[0];
-	NFmiString undoTmpText = itsUndoTextTable[0];
+	std::string undoTmpText = itsUndoTextTable[0];
 
 	for (int i = 0; i < (*itsMaxUndoLevelPtr) - 1; i++)
 	{
@@ -468,7 +468,7 @@ void NFmiSmartInfo::RearrangeUndoTable(void)
 //   tehdystä toiminnosta ("aikasarjamuutos", 
 //   "kursori ylös", "aluemuutos").
 
-bool NFmiSmartInfo::SnapShotData (const NFmiString& theAction
+bool NFmiSmartInfo::SnapShotData (const std::string& theAction
  ,FmiParameterName theParameter)
 {
    bool returnVal = false;
@@ -482,14 +482,14 @@ bool NFmiSmartInfo::SnapShotData (const NFmiString& theAction
 //   that undo will revert next. E.g.
 //   "Undo temperature at 1998-12-09-12:00"
 
-NFmiString NFmiSmartInfo::UndoText (void)
+std::string NFmiSmartInfo::UndoText (void)
 {
-	NFmiString undoText("");
+	std::string undoText("");
 	if(itsCurrentUndoLevelPtr == 0)
 		return undoText;
 	if (*itsCurrentUndoLevelPtr >= 0)
 	{
-		undoText += NFmiString("Undo ");
+		undoText += std::string("Undo ");
 		undoText += itsUndoTextTable[*itsCurrentUndoLevelPtr];
 	}		
 	return undoText;
@@ -497,15 +497,15 @@ NFmiString NFmiSmartInfo::UndoText (void)
 //--------------------------------------------------------
 // RedoText			M.K. 
 //--------------------------------------------------------
-NFmiString NFmiSmartInfo::RedoText (void)
+std::string NFmiSmartInfo::RedoText (void)
 {
-	NFmiString undoText("");
+	std::string undoText("");
 	if(itsCurrentUndoLevelPtr == 0)
 		return undoText;
 	if(!((*itsCurrentRedoLevelPtr) == (*itsCurrentUndoLevelPtr) 
 	   || (*itsCurrentRedoLevelPtr) == ((*itsCurrentUndoLevelPtr) + 1)))
 	{
-		undoText += NFmiString("Redo ");
+		undoText += std::string("Redo ");
 		undoText += itsUndoTextTable[(*itsCurrentUndoLevelPtr) + 1];
 	}
 	return undoText;
@@ -574,7 +574,7 @@ bool NFmiSmartInfo::UndoData (const NFmiHarmonizerBookKeepingData &theHarmonizer
 		return false;
 	if ((*itsCurrentUndoLevelPtr) == (*itsCurrentRedoLevelPtr))
 	{
-		NFmiString action("");
+		std::string action("");
 		/// KORJAA TÄMÄ **************************************
 		SnapShotData(action, theHarmonizerBookKeepingData);		// "Ottaa kuvan" undo-toimintoa edeltäneestä tilanteesta,
 		(*itsCurrentUndoLevelPtr)--;		// jos siihen halutaankin myöhemmin palata redo:lla.
@@ -643,7 +643,7 @@ void NFmiSmartInfo::UndoLevel (const long& theDepth)	// theDepth kuvaa kuinka mo
 			*itsCurrentRedoLevelPtr = -1;
 			*itsMaxUndoLevelPtr = theDepth + 1;		// Redon tekemisen mahdollistamiseksi yksi
 			itsUndoTable = new char* [*itsMaxUndoLevelPtr];				// taso lisää.
-			itsUndoTextTable = new NFmiString [*itsMaxUndoLevelPtr];
+			itsUndoTextTable = new std::string [*itsMaxUndoLevelPtr];
 
 			for (int level = 0; level < (*itsMaxUndoLevelPtr); level++)
 			{

@@ -23,9 +23,9 @@
 #ifndef  NFMISMARTTOOLCALCULATION_H
 #define  NFMISMARTTOOLCALCULATION_H
 
-#include <vector>
 #include <string>
 #include "NFmiAreaMask.h"
+#include "NFmiDataMatrix.h"
 
 class NFmiPoint;
 class NFmiMetTime;
@@ -35,16 +35,6 @@ class NFmiDataModifier;
 class NFmiSmartToolCalculation 
 {
 public:
-/*
-	class Exception
-	{
-	public:
-		Exception(const std::string &theText):itsText(theText){}
-		const std::string& What(void){return itsText;}
-	private:
-		const std::string itsText;
-	};
-*/
 	bool IsMasked(const NFmiPoint &theLatlon, int theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
 	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
 	void SetTime(const NFmiMetTime &theTime); // optimointia laskuja varten
@@ -55,7 +45,7 @@ public:
 
 	void SetResultInfo(NFmiSmartInfo* value) {itsResultInfo = value; CheckIfModularParameter();}
 	NFmiSmartInfo* GetResultInfo(void) {return itsResultInfo;}
-	std::vector<NFmiAreaMask*>* GetCalculations(void) {return &itsCalculations;}
+	checkedVector<NFmiAreaMask*>* GetCalculations(void) {return &itsCalculations;}
 	void AddCalculation(NFmiAreaMask* theCalculation);
 	const std::string& GetCalculationText(void){return itsCalculationText;}
 	void SetCalculationText(const std::string& theText){itsCalculationText = theText;}
@@ -65,7 +55,7 @@ public:
 
 private:
 	std::string itsCalculationText; // originaali teksti, mist‰ t‰m‰ lasku on tulkittu
-	typedef std::vector<NFmiAreaMask*>::iterator CalcIter;
+	typedef checkedVector<NFmiAreaMask*>::iterator CalcIter;
 
 	float GetInsideLimitsValue(float theValue);
 	float itsLowerLimit; // n‰iden avulla kontrolloidaan mahdollisia min ja max arvoja
@@ -101,7 +91,7 @@ private:
 	void bin_atom(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 
 	NFmiSmartInfo* itsResultInfo; // omistaa+tuhoaa
-	std::vector<NFmiAreaMask*> itsCalculations; // omistaa+tuhoaa
+	checkedVector<NFmiAreaMask*> itsCalculations; // omistaa+tuhoaa
 	float itsHeightValue;
 
 	bool fUseTimeInterpolationAlways; // uudet MINT, MAXT, jne vaativat aina aikainterpolointia, ja t‰m‰ flagi laitetaan silloin p‰‰lle 

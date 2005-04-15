@@ -356,7 +356,7 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateConditionalSection(NFmiAr
 	NFmiSmartToolCalculation* areaMaskHandler = 0;
 	if(theAreaMaskSectionInfo)
 	{
-		std::vector<NFmiAreaMaskInfo*>& maskInfos = *theAreaMaskSectionInfo->GetAreaMaskInfoVector();
+		checkedVector<NFmiAreaMaskInfo*>& maskInfos = *theAreaMaskSectionInfo->GetAreaMaskInfoVector();
 		int size = maskInfos.size();
 		if(size)
 		{
@@ -380,7 +380,7 @@ NFmiSmartToolCalculationSection* NFmiSmartToolModifier::CreateCalculationSection
 	NFmiSmartToolCalculationSection *section = 0;
 	if(theCalcSectionInfo)
 	{
-		std::vector<NFmiSmartToolCalculationInfo*>& calcInfos = *theCalcSectionInfo->GetCalculationInfos();
+		checkedVector<NFmiSmartToolCalculationInfo*>& calcInfos = *theCalcSectionInfo->GetCalculationInfos();
 		int size = calcInfos.size();
 		if(size)
 		{
@@ -403,8 +403,7 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateCalculation(NFmiSmartTool
 	int size = theCalcInfo->GetCalculationOperandInfoVector()->size();
 	if(size)
 	{
-		std::vector<NFmiAreaMaskInfo*>& areaMaskInfos = *theCalcInfo->GetCalculationOperandInfoVector();
-//		std::vector<NFmiSmartToolCalculation::FmiCalculationOperators>& operators = *theCalcInfo->GetOperationVector();
+		checkedVector<NFmiAreaMaskInfo*>& areaMaskInfos = *theCalcInfo->GetCalculationOperandInfoVector();
 		calculation = new NFmiSmartToolCalculation;
 		auto_ptr<NFmiSmartToolCalculation> calculationPtr(calculation);
 		calculation->SetCalculationText(theCalcInfo->GetCalculationText());
@@ -462,7 +461,7 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, boo
 		// the numbers will be different every time we run.
 		srand( static_cast<unsigned int>(time( NULL ))); // mahd. satunnais funktion käytön takia, pitää 'sekoittaa' random generaattori
 
-		std::vector<NFmiSmartToolCalculationBlockInfo>& smartToolCalculationBlockInfos = itsSmartToolIntepreter->SmartToolCalculationBlocks();
+		checkedVector<NFmiSmartToolCalculationBlockInfo>& smartToolCalculationBlockInfos = itsSmartToolIntepreter->SmartToolCalculationBlocks();
 		int size = smartToolCalculationBlockInfos.size();
 		for(int i=0; i<size; i++)
 		{
@@ -555,73 +554,7 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiSmartToolCalculationBlock 
 		info->DestroyData();
 	}
 }
-/*
-static void ModifyConditionalData(bool modifySelectedOnly, NFmiTimeDescriptor *theModifiedTimes, std::vector<double> &theModificationFactors
-								 ,NFmiSmartToolCalculation* theIfAreaMaskSection, NFmiSmartToolCalculationSection* theIfCalculationSection
-								 ,NFmiSmartToolCalculation* theElseIfAreaMaskSection, NFmiSmartToolCalculationSection* theElseIfCalculationSection
-								 ,NFmiSmartToolCalculationSection* theElseCalculationSection)
-{
-	if(theIfAreaMaskSection && theIfCalculationSection && theIfCalculationSection->FirstVariableInfo())
-	{
-//		NFmiFastQueryInfo info(*theIfCalculationSection->FirstVariableInfo());
-		NFmiSmartInfo *info = theIfCalculationSection->FirstVariableInfo()->Clone();
-		std::auto_ptr<NFmiSmartInfo> infoPtr(info);
 
-		try
-		{
-			if(modifySelectedOnly)
-				info->MaskType(NFmiMetEditorTypes::kFmiSelectionMask);
-			else
-				info->MaskType(NFmiMetEditorTypes::kFmiNoMask);
-			NFmiTimeDescriptor modifiedTimes(theModifiedTimes ? *theModifiedTimes : info->TimeDescriptor());
-			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
-			{
-				NFmiMetTime time1(modifiedTimes.Time());
-				info->Time(time1); // asetetaan myös tämä, että saadaan oikea timeindex
-				theIfAreaMaskSection->SetTime(time1); // yritetään optimoida laskuja hieman kun mahdollista
-				theIfCalculationSection->SetTime(time1); // yritetään optimoida laskuja hieman kun mahdollista
-				if(theElseIfAreaMaskSection && theElseIfCalculationSection)
-				{
-					theElseIfAreaMaskSection->SetTime(time1);
-					theElseIfCalculationSection->SetTime(time1);
-				}
-				if(theElseCalculationSection)
-					theElseCalculationSection->SetTime(time1);
-				for(info->ResetLocation(); info->NextLocation(); )
-				{
-					NFmiPoint latlon(info->LatLon());
-					unsigned long locationIndex = info->LocationIndex();
-					int timeIndex = info->TimeIndex();
-					if(theIfAreaMaskSection->IsMasked(latlon, locationIndex, time1, timeIndex))
-						theIfCalculationSection->Calculate(latlon, locationIndex, time1, timeIndex);
-					else if(theElseIfAreaMaskSection && theElseIfCalculationSection && theElseIfAreaMaskSection->IsMasked(latlon, locationIndex, time1, timeIndex))
-					{
-						theElseIfCalculationSection->Calculate(latlon, locationIndex, time1, timeIndex);
-					}
-					else if(theElseCalculationSection)
-						theElseCalculationSection->Calculate(latlon, locationIndex, time1, timeIndex);
-				}
-			}
-		}
-		catch(NFmiSmartToolIntepreter::Exception excep)
-		{
-			info->DestroyData();
-			throw excep;
-		}
-		info->DestroyData();
-	}
-}
-*/
-// Miten tähän sapluunaan saa ujutettua myös elseif ja else haarat järkevästi??????
-// Tee ensin kuitenkin vain IF-haara testausta varten.
-// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Tästä jatkuu!!!!!!!
-//void NFmiSmartToolModifier::ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes, NFmiSmartToolCalculation *theMaskCondition, NFmiSmartToolCalculationSection *theConditionalCalculations)
-/*
-void NFmiSmartToolModifier::ModifyConditionalData(NFmiTimeDescriptor *theModifiedTimes)
-{
-	::ModifyConditionalData(fModifySelectedLocationsOnly, theModifiedTimes, itsModificationFactors, itsIfAreaMaskSection, itsIfCalculationSection, itsElseIfAreaMaskSection, itsElseIfCalculationSection, itsElseCalculationSection);
-}
-*/
 void NFmiSmartToolModifier::ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection)
 {
 	if(theCalculationSection && theCalculationSection->FirstVariableInfo())
@@ -1017,7 +950,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateScriptVariableInfo(const NFmiDataIde
 
 NFmiSmartInfo* NFmiSmartToolModifier::GetScriptVariableInfo(const NFmiDataIdent &theDataIdent)
 {
-	std::vector<NFmiSmartInfo*>::iterator it = std::find_if(itsScriptVariableInfos.begin(), itsScriptVariableInfos.end(), FindScriptVariable(theDataIdent.GetParamIdent()));
+	checkedVector<NFmiSmartInfo*>::iterator it = std::find_if(itsScriptVariableInfos.begin(), itsScriptVariableInfos.end(), FindScriptVariable(theDataIdent.GetParamIdent()));
 	if(it != itsScriptVariableInfos.end())
 		return *it;
 	return 0;

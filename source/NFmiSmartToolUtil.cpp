@@ -22,13 +22,13 @@
   #include <unistd.h>
 #endif
 
-NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, const std::vector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist)
+NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist)
 {
 	NFmiTimeDescriptor times(theModifiedData->Info()->TimeDescriptor());
 	return ModifyData(theMacroText, theModifiedData, &times, theHelperDataFileNames, createDrawParamFileIfNotExist);
 }
 
-NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const std::vector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist)
+NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist)
 {
 	NFmiInfoOrganizer dataBase;
 	if(!InitDataBase(&dataBase, theModifiedData, theHelperDataFileNames, createDrawParamFileIfNotExist))
@@ -92,7 +92,7 @@ std::string NFmiSmartToolUtil::GetWorkingDirectory(void)
 #endif
 }
 
-bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryData* theModifiedData, const std::vector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist)
+bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist)
 {
 	if(theDataBase)
 	{
@@ -107,7 +107,7 @@ bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryDa
 	return false;
 }
 
-bool NFmiSmartToolUtil::InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, const std::vector<std::string> &theHelperDataFileNames)
+bool NFmiSmartToolUtil::InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, const checkedVector<std::string> &theHelperDataFileNames)
 {
 	NFmiStreamQueryData sQData;
 	for(unsigned int i=0; i<theHelperDataFileNames.size(); i++)

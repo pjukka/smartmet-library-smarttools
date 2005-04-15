@@ -28,7 +28,7 @@
 #include "NFmiParamBag.h"
 
 #include <string>
-#include <vector>
+#include "NFmiDataMatrix.h"
 
 class NFmiInfoOrganizer;
 class NFmiSmartToolIntepreter;
@@ -53,7 +53,7 @@ class NFmiSmartToolCalculationBlock;
 class NFmiSmartToolCalculationBlockVector
 {
 public:
-	typedef std::vector<NFmiSmartToolCalculationBlock*>::iterator Iterator;
+	typedef checkedVector<NFmiSmartToolCalculationBlock*>::iterator Iterator;
 
 	NFmiSmartToolCalculationBlockVector(void);
 	~NFmiSmartToolCalculationBlockVector(void);
@@ -67,7 +67,7 @@ public:
 
 private:
 	// luokka ei omista vektorissa olevia otuksia, Clear pit‰‰ kutsua erikseen!!!
-	std::vector<NFmiSmartToolCalculationBlock*> itsCalculationBlocks;
+	checkedVector<NFmiSmartToolCalculationBlock*> itsCalculationBlocks;
 };
 
 class NFmiSmartToolCalculationBlock
@@ -92,16 +92,6 @@ public:
 class NFmiSmartToolModifier 
 {
 public:
-/*
-	class Exception
-	{
-	public:
-		Exception(const std::string &theText):itsText(theText){}
-		const std::string& What(void){return itsText;}
-	private:
-		const std::string itsText;
-	};
-*/
 	void InitSmartTool(const std::string &theSmartToolText, bool fThisIsMacroParamSkript = false);
 	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly);
 	NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer);
@@ -124,15 +114,11 @@ private:
 	NFmiSmartInfo* GetScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 	void ClearScriptVariableInfos(void);
 	NFmiSmartInfo* CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent);
-//	void ModifyConditionalData(NFmiSmartToolCalculation *theMaskCondition, NFmiSmartToolCalculationSection *theConditionalCalculations);
 	NFmiAreaMask* CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	void GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit);
 	NFmiDataModifier* CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	NFmiDataIterator* CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo);
-//	void ModifyConditionalData(void);
 	void ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection);
-//	void InitializeCalculationModifiers(NFmiSmartToolCalculationBlockInfo* theBlock);
-//	void ClearCalculationModifiers(void);
 	NFmiAreaMask* CreateAreaMask(const NFmiAreaMaskInfo &theInfo);
 	NFmiAreaMask* CreateEndingAreaMask(void);
 	NFmiSmartInfo* CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo);
@@ -147,16 +133,8 @@ private:
 	bool fMacroRunnable;
 	std::string itsErrorText;
 
-//	NFmiSmartToolCalculationSection* itsFirstCalculationSection;
-//	NFmiSmartToolCalculation* itsIfAreaMaskSection;
-//	NFmiSmartToolCalculationSection* itsIfCalculationSection;
-//	NFmiSmartToolCalculation* itsElseIfAreaMaskSection;
-//	NFmiSmartToolCalculationSection* itsElseIfCalculationSection;
-//	NFmiSmartToolCalculationSection* itsElseCalculationSection;
-//	NFmiSmartToolCalculationSection* itsLastCalculationSection;
-
 	bool fModifySelectedLocationsOnly;
-	std::vector<NFmiSmartInfo*> itsScriptVariableInfos; // mahdolliset skripti-muuttujat talletetaan t‰nne
+	checkedVector<NFmiSmartInfo*> itsScriptVariableInfos; // mahdolliset skripti-muuttujat talletetaan t‰nne
 	std::string itsIncludeDirectory; // mist‰ ladataan mahd. include filet
 
 	NFmiTimeDescriptor *itsModifiedTimes; // ei omista/tuhoa
@@ -170,4 +148,5 @@ private:
 							  // pit‰‰ laskea sulkujen avulla, milloin funktio loppuu.
 							  // HUOM! sulkujen lis‰ksi pit‰‰ laskea myˆs erilaisten funktioiden alut.
 };
+
 #endif

@@ -24,7 +24,7 @@
 #ifndef  NFMIAREAMASKSECTIONINFO_H
 #define  NFMIAREAMASKSECTIONINFO_H
 
-#include <vector>
+#include "NFmiDataMatrix.h" // täältä tulee myös checkedVector
 #include <string>
 
 class NFmiAreaMaskInfo;
@@ -39,14 +39,14 @@ public:
 
 	NFmiAreaMaskInfo* MaskInfo(int theIndex);
 	void Add(NFmiAreaMaskInfo* theMask);
-	std::vector<NFmiAreaMaskInfo*>* GetAreaMaskInfoVector(void) {return &itsAreaMaskInfoVector;}
+	checkedVector<NFmiAreaMaskInfo*>* GetAreaMaskInfoVector(void) {return &itsAreaMaskInfoVector;}
 	const std::string& GetCalculationText(void){return itsCalculationText;}
 	void SetCalculationText(const std::string& theText){itsCalculationText = theText;}
 
 private:
 	void Clear(void);
 
-	std::vector<NFmiAreaMaskInfo*> itsAreaMaskInfoVector;
+	checkedVector<NFmiAreaMaskInfo*> itsAreaMaskInfoVector;
 	std::string itsCalculationText; // originaali teksti, mistä tämä lasku on tulkittu
 
 };

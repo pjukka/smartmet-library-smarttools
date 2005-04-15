@@ -28,7 +28,7 @@
 #ifndef  NFMISMARTTOOLCALCULATIONSECTIONINFO_H
 #define  NFMISMARTTOOLCALCULATIONSECTIONINFO_H
 
-#include <vector>
+#include "NFmiDataMatrix.h"
 #include <set>
 
 class NFmiSmartToolCalculationInfo;
@@ -43,11 +43,11 @@ public:
 
 	void Clear(void);
 	void AddCalculationInfo(NFmiSmartToolCalculationInfo* value);
-	std::vector<NFmiSmartToolCalculationInfo*>* GetCalculationInfos(void){return &itsSmartToolCalculationInfoVector;}
+	checkedVector<NFmiSmartToolCalculationInfo*>* GetCalculationInfos(void){return &itsSmartToolCalculationInfoVector;}
 	void AddModifiedParams(std::set<int> &theModifiedParams);
 
 private:
-	std::vector<NFmiSmartToolCalculationInfo*> itsSmartToolCalculationInfoVector;
+	checkedVector<NFmiSmartToolCalculationInfo*> itsSmartToolCalculationInfoVector;
 
 };
 #endif

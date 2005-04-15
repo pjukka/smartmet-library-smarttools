@@ -69,7 +69,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	 
 	NFmiSmartInfo(void);
 	NFmiSmartInfo(const NFmiQueryInfo & theInfo
-				 ,NFmiQueryData* theData=0,NFmiString theDataFileName=""
+				 ,NFmiQueryData* theData=0, std::string theDataFileName=""
 				 ,NFmiInfoData::Type theType = NFmiInfoData::kEditable);
 	NFmiSmartInfo (const NFmiSmartInfo & theInfo); 
 	~NFmiSmartInfo();
@@ -98,11 +98,11 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	const NFmiBitMask& LocationMask (unsigned long theMaskType) const; 
 	void LocationMask (const NFmiBitMask& theMask, unsigned long theMaskType);
    
-	bool SnapShotData (const NFmiString& theAction, const NFmiHarmonizerBookKeepingData &theCurrentHarmonizerBookKeepingData);
+	bool SnapShotData (const std::string& theAction, const NFmiHarmonizerBookKeepingData &theCurrentHarmonizerBookKeepingData);
 	void RearrangeUndoTable(void);
-	bool SnapShotData (const NFmiString& theAction,FmiParameterName theParameter);
-	NFmiString UndoText (void);
-	NFmiString RedoText (void);
+	bool SnapShotData (const std::string& theAction,FmiParameterName theParameter);
+	std::string UndoText (void);
+	std::string RedoText (void);
 	bool Undo (void);
 	bool Redo (void);
 	void CommitData (void);
@@ -119,8 +119,8 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	NFmiGrid* AreaFactors(void){return itsAreaFactors;};
 	void AreaFactors(NFmiGrid* theAreaFactor);
 
-	const NFmiString& DataFileName(void){return itsDataFileName;}
-	void DataFileName(const NFmiString& theDataFileName){itsDataFileName = theDataFileName;}
+	const std::string& DataFileName(void){return itsDataFileName;}
+	void DataFileName(const std::string& theDataFileName){itsDataFileName = theDataFileName;}
 	NFmiSmartInfo& operator=(const NFmiSmartInfo& theSmartInfo);
 	
 	bool operator==(const NFmiSmartInfo& theSmartInfo) const;
@@ -173,7 +173,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	NFmiGrid* itsAreaFactors;//tämän gridin avulla yhdistetään eri aluetoimistojen datat
 	NFmiQueryData* itsDataReference;
 	
-	NFmiString itsDataFileName;
+	std::string itsDataFileName;
 	int itsPriority;
 	bool fEditable;
 	
@@ -183,7 +183,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	int* itsCurrentRedoLevelPtr;
 
 	char** itsUndoTable;
-	NFmiString* itsUndoTextTable;
+	std::string* itsUndoTextTable;
 
 	//(kertoo onko data ladattu tiedostosta vai työlistan mukaisesti)
 	bool* fLoadedFromFile;

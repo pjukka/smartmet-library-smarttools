@@ -28,7 +28,7 @@
 #ifndef  NFMISMARTTOOLCALCULATIONINFO_H
 #define  NFMISMARTTOOLCALCULATIONINFO_H
 
-#include <vector>
+#include "NFmiDataMatrix.h"
 #include <string>
 
 class NFmiAreaMaskInfo;
@@ -45,8 +45,7 @@ public:
 	void SetResultDataInfo(NFmiAreaMaskInfo *value) {itsResultDataInfo = value;}
 	NFmiAreaMaskInfo* GetResultDataInfo(void) {return itsResultDataInfo;}
 	void AddCalculationInfo(NFmiAreaMaskInfo* theAreaMaskInfo); 
-	std::vector<NFmiAreaMaskInfo*>* GetCalculationOperandInfoVector(void) {return &itsCalculationOperandInfoVector;}
-//	std::vector<NFmiSmartToolCalculation::FmiCalculationOperators>* GetOperationVector(void) {return &itsOperationVector;}
+	checkedVector<NFmiAreaMaskInfo*>* GetCalculationOperandInfoVector(void) {return &itsCalculationOperandInfoVector;}
 	const std::string& GetCalculationText(void){return itsCalculationText;}
 	void SetCalculationText(const std::string& theText){itsCalculationText = theText;}
 	void CheckIfAllowMissingValueAssignment(void);
@@ -57,8 +56,7 @@ private:
 	// osaksi laskentaketjua (itsCalculationOperandInfoVector:iin).
 	// Silloin voi mm. ottaa tämän luokan käyttöön NFmiAreaMaskSectionInfo-luokan sijasta.
 	NFmiAreaMaskInfo *itsResultDataInfo; // omistaa+tuhoaa
-	std::vector<NFmiAreaMaskInfo*> itsCalculationOperandInfoVector;  // omistaa+tuhoaa
-//	std::vector<NFmiSmartToolCalculation::FmiCalculationOperators> itsOperationVector;
+	checkedVector<NFmiAreaMaskInfo*> itsCalculationOperandInfoVector;  // omistaa+tuhoaa
 	std::string itsCalculationText; // originaali teksti, mistä tämä lasku on tulkittu
 	bool fAllowMissingValueAssignment; 
 };

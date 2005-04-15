@@ -36,7 +36,7 @@
 #include "NFmiGlobals.h"
 #include "NFmiParameterName.h"
 #include <list>
-#include <vector>
+#include "NFmiDataMatrix.h"
 #include "NFmiInfoData.h"
 
 class NFmiMetTime;
@@ -59,7 +59,7 @@ public:
 	bool      Next (void);
 	bool      Previous (void);
 	void            Clear (bool fDeleteData = false);
-	void            Clear (const NFmiProducer& theProducer, std::vector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel = 0, bool fDeleteData = false);
+	void            Clear (const NFmiProducer& theProducer, checkedVector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel = 0, bool fDeleteData = false);
 	void            Clear (const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved, bool fDeleteData = false);
 	bool      Add (NFmiDrawParam * theParam);
 	bool      Add (NFmiDrawParam * theParam, unsigned long theIndex);

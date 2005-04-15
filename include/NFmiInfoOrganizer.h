@@ -71,8 +71,8 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* EditedInfo(void){return itsEditedData;}; // t‰m‰ toimii jos rajoitetaan editoitavien infojen m‰‰r‰‰
 	NFmiSmartInfo* EditedInfoCopy(void){return itsEditedDataCopy;}; 
 	NFmiSmartInfo* ViewableInfo(void); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
-	std::vector<NFmiSmartInfo*> GetInfos(NFmiInfoData::Type theDataType); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
-	std::vector<NFmiSmartInfo*> GetInfos(int theProducerId, int theProducerId2 = -1, int theProducerId3 = -1, int theProducerId4 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
+	checkedVector<NFmiSmartInfo*> GetInfos(NFmiInfoData::Type theDataType); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
+	checkedVector<NFmiSmartInfo*> GetInfos(int theProducerId, int theProducerId2 = -1, int theProducerId3 = -1, int theProducerId4 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
 	NFmiSmartInfo* ViewableInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
 	NFmiSmartInfo* ObservationInfo(void); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* ObservationInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
@@ -109,7 +109,7 @@ class NFmiInfoOrganizer
 	NFmiDrawParam* CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
 	NFmiDrawParam* CreateDrawParam(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	bool AddData(NFmiQueryData* theData
-					  ,const NFmiString& theDataFileName
+					  ,const std::string& theDataFileName
 					  ,NFmiInfoData::Type theDataType
 					  ,int theUndoLevel = 0);
 
@@ -119,8 +119,8 @@ class NFmiInfoOrganizer
  	NFmiProducerList* ProducerList(void); // k‰y l‰pi kaikki SmartInfot ja pyyt‰‰ ensimm‰iselt‰ parametrilta tuottajan (viel‰ ainakaan SmartInfolla ei ole montaa tuottajaa)
 	NFmiLevelBag* GetAndCreateViewableInfoWithManyLevelsOrZeroPointer(void);
 
-	const NFmiString& WorkingDirectory(void) const {return itsWorkingDirectory;};
-	void WorkingDirectory(const NFmiString& newValue){itsWorkingDirectory = newValue;};
+	const std::string& WorkingDirectory(void) const {return itsWorkingDirectory;};
+	void WorkingDirectory(const std::string& newValue){itsWorkingDirectory = newValue;};
 	void UpdateEditedDataCopy(void); // 28.09.1999/Marko
 	NFmiSmartInfo* MacroParamData(void) {return itsMacroParamData;} // t‰t‰ tarvitaan asettamaan mm. aikadescriptoria ja ehk‰ muita descriptoreita
 	NFmiDataMatrix<float>& DefaultMissingValueMatrix(void){return itsDefaultMissingValueMatrix;}
@@ -155,7 +155,7 @@ class NFmiInfoOrganizer
   	NFmiSortedPtrList<NFmiSmartInfo> itsList; // error when compiling NFmiInfoOrganizer.cpp//binary '<' : 'class NFmiSmartInfo' does not define this operator or a conversion to a type acceptable to the predefined operator
 	NFmiPtrList<NFmiSmartInfo>::Iterator itsIter;
  	NFmiDrawParamFactory* itsDrawParamFactory;
-	NFmiString itsWorkingDirectory;
+	std::string itsWorkingDirectory;
 	NFmiSmartInfo* itsEditedData; // editoitavaa dataa voi olla vain yksi kerrallaan, joten laitoin sen erilleen tehokkuuden takia.
 	NFmiSmartInfo* itsEditedDataCopy; // t‰m‰ on editoitavan datan kopio, mit‰ k‰ytt‰j‰ voi halutessaan p‰ivitt‰‰, k‰ytet‰‰n visualisoimaan tehtyj‰ muutoksia datassa
 	NFmiSmartInfo* itsMacroParamData; // makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)

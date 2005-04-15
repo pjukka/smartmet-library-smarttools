@@ -29,7 +29,7 @@
 
 #include "NFmiParameterName.h"
 #include "NFmiGlobals.h"
-#include "NFmiString.h"
+#include <string>
 
 class NFmiDrawParam;
 class NFmiLevel;
@@ -46,12 +46,12 @@ public:
 	NFmiDrawParam * CreateCrossSectionDrawParam( const NFmiDataIdent& theIdent);	
 	NFmiDrawParam * CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent);
 	bool Init();
-	const NFmiString& LoadDirectory(void) const {return itsLoadDirectory;};
-	void LoadDirectory(const NFmiString& newValue){itsLoadDirectory = newValue;};
+	const std::string& LoadDirectory(void) const {return itsLoadDirectory;};
+	void LoadDirectory(const std::string& newValue){itsLoadDirectory = newValue;};
 
 private:
-	NFmiString CreateFileName(NFmiDrawParam* drawParam, bool fCrossSectionCase = false);
-	NFmiString itsLoadDirectory;
+	std::string CreateFileName(NFmiDrawParam* drawParam, bool fCrossSectionCase = false);
+	std::string itsLoadDirectory;
 	bool fCreateDrawParamFileIfNotExist; // esim. metkun editori luo drawparam-tiedostot, 
 										 // mutta SmarToolFiltterin ei tarvitse.
 };

@@ -45,7 +45,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 */
 
-static void InitDrawParam(NFmiDrawParam* theDrawParam, const NFmiString &theFileName, bool createDrawParamFileIfNotExist)
+static void InitDrawParam(NFmiDrawParam* theDrawParam, const std::string &theFileName, bool createDrawParamFileIfNotExist)
 {
 	if(theDrawParam)
 	{
@@ -99,7 +99,7 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam (const NFmiDataIdent& theId
 
 	if(drawParam)
 	{
-		NFmiString fileName = CreateFileName(drawParam);
+		std::string fileName = CreateFileName(drawParam);
 		InitDrawParam(drawParam, fileName, fCreateDrawParamFileIfNotExist);
 	}
 	return drawParam;
@@ -113,7 +113,7 @@ NFmiDrawParam * NFmiDrawParamFactory::CreateCrossSectionDrawParam(const NFmiData
 	NFmiDrawParam* drawParam = new NFmiDrawParam(theIdent, NFmiLevel(), 1); // 1 = priority
 	if(drawParam)
 	{
-		NFmiString fileName = CreateFileName(drawParam, true);
+		std::string fileName = CreateFileName(drawParam, true);
 		InitDrawParam(drawParam, fileName, fCreateDrawParamFileIfNotExist);
 	}
 	return drawParam;
@@ -126,7 +126,7 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateEmptyInfoDrawParam(const NFmiDataIden
 	if(drawParam)
 	{
 		drawParam->Param(theIdent);
-		NFmiString fileName = CreateFileName(drawParam);
+		std::string fileName = CreateFileName(drawParam);
 		InitDrawParam(drawParam, fileName, fCreateDrawParamFileIfNotExist);
 	}
 	return drawParam;
@@ -143,10 +143,10 @@ bool NFmiDrawParamFactory::Init()
 //--------------------------------------------------------
 // CreateFileName, private 
 //--------------------------------------------------------
-NFmiString NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool fCrossSectionCase)
+std::string NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool fCrossSectionCase)
 {
-	NFmiString fileName(itsLoadDirectory);
-	if(itsLoadDirectory.GetLen() > 0)
+	std::string fileName(itsLoadDirectory);
+	if(!itsLoadDirectory.empty())
 		fileName += "/";  // laitetaan varmuuden vuoksi keno, jos asetetun polun lopussa ei ole kenoa
 	fileName += "DrawParam_";
 
