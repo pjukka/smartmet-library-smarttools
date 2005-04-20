@@ -288,11 +288,14 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int
 		{
 			if(*(Current()->Param().GetProducer()) == theProducer)
 			{
-				it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->Param().GetParamIdent()));
-				if(it == tmpParIdList.end())
-					Remove(fDeleteData);
-				else
-					tmpParIdList.erase(it);
+				if(Current()->Level().LevelType() == 0) // jos drawParamilla on joku 'oikea' leveli, ei kosketa siihen, koska nyt käsittelemme pinta datoja
+				{
+					it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->Param().GetParamIdent()));
+					if(it == tmpParIdList.end())
+						Remove(fDeleteData);
+					else
+						tmpParIdList.erase(it);
+				}
 			}
 		}
 	}
