@@ -572,8 +572,15 @@ void NFmiSmartToolCalculation::atom(double &result, const NFmiPoint &theLatlon, 
 // Tällä lailla C++: Compl. Ref. kirjasta kopioitu koodi toimii 'sellaisenaan'.
 void NFmiSmartToolCalculation::get_token(void)
 {
-	token = *itsCalcIterator;
-	++itsCalcIterator;
+	if(itsCalcIterator != itsCalculations.end())
+	{
+		token = *itsCalcIterator;
+		++itsCalcIterator;
+	}
+	else
+	{
+		throw  runtime_error(string("Lasku loppuu kesken: \n") + GetCalculationText());
+	}
 }
 
 // Laskun alustus, alustetaan iteraattori ja token.
