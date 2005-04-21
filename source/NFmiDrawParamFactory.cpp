@@ -153,8 +153,8 @@ std::string NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool 
 	if(drawParam)
 	{
 		int paramId = drawParam->Param().GetParam()->GetIdent();
-		NFmiValueString idStr(paramId, "%d");
-		fileName += idStr;
+		
+		fileName += NFmiStringTools::Convert(paramId);
 		if(fCrossSectionCase)
 			fileName += "_CrossSection";
 		else
@@ -164,12 +164,10 @@ std::string NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool 
 				fileName += "_level_";
 				NFmiLevel& level = drawParam->Level();
 				int levelTypeId = level.LevelTypeId();
-				NFmiValueString levelTypeIdStr(levelTypeId, "%d");
-				fileName += levelTypeIdStr;
+				fileName += NFmiStringTools::Convert(levelTypeId);
 				fileName += "_";
 				int levelValue = level.LevelValue();
-				NFmiValueString levelValueStr(levelValue, "%d");
-				fileName += levelValueStr;
+				fileName += NFmiStringTools::Convert(levelValue);
 			}
 			else if(drawParam && drawParam->Level().LevelType() == kFmiHybridLevel)
 			{ // hybrideillä on ain yksi piirtotapa
