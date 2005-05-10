@@ -301,6 +301,8 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam)
 {
 	if(theDrawParam)
 	{
+		itsInitFileName = theDrawParam->InitFileName();
+		// HUOM! itsMacroParamRelativePath-dataosaa ei saa initialisoida, koska sitä käytetään vain viewmakrojen yhteydessä
 		itsParameterAbbreviation = theDrawParam->ParameterAbbreviation();
 		itsPriority = theDrawParam->Priority();
 
@@ -495,7 +497,16 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 	file << "Version ";
 	file << itsFileVersionNumber << endl;
 	file << "'ParameterAbbreviation'" << endl;  // selittävä teksti
-	file << itsParameterAbbreviation << endl;
+	if(fViewMacroDrawParam)
+	{ // jos viewmacro tapaus ja siinä oleva macroParam, sen drawParamin nimen lyhenteeseen talletetaan suhteellinen polku 
+	  // ('optimointia', näin minun ei vielä tarvitse muuttaa minkään macrosysteemien data tiedoston rakennetta)
+		std::string tmpStr(itsMacroParamRelativePath);
+		tmpStr += tmpStr.empty() ? "" : "\\";
+		tmpStr += itsParameterAbbreviation;
+		file << tmpStr << endl;
+	}
+	else
+		file << itsParameterAbbreviation << endl;
 	file << "'Priority'" << endl;  // selittävä teksti
 	file << itsPriority << endl;
 	file << "'ViewType'" << endl;   // selittävä teksti
@@ -706,9 +717,20 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			file >> temp; // luetaan nimike pois
 			std::getline(file, tmpStr); // luetaan ed. rivinvaihto pois jaloista
 			std::getline(file, tmpStr); // luetaan rivin loppuun, jos lyhenteessä spaceja mahdollisesti
-//			file >> temp;
-//			itsParameterAbbreviation = std::string(temp);
-			itsParameterAbbreviation = tmpStr;
+			std::string::size_type pos = tmpStr.find_last_of('/');
+			if(pos == std::string::npos)
+				pos = tmpStr.find_last_of('\\'); // kokeillaan varmuuden vuoksi slasyä molempiin suuntiin
+
+			if(pos != std::string::npos)
+			{ // jos löytyi kenoviiva lyhenteestä, laitetaan viemacrossa olevan macroparamin suhteellinen polku talteen
+				itsMacroParamRelativePath = std::string(tmpStr.begin(), tmpStr.begin()+pos); // huom! kenoa ei oteta talteen
+				itsParameterAbbreviation = std::string(tmpStr.begin()+pos+1, tmpStr.end());
+			}
+			else
+			{
+				itsMacroParamRelativePath = "";
+				itsParameterAbbreviation = tmpStr;
+			}
 			file >> temp; // luetaan nimike pois
 			file >> itsPriority;
 			file >> temp; // luetaan nimike pois

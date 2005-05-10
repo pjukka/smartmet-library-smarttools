@@ -283,6 +283,8 @@ public:
 
 	bool ViewMacroDrawParam(void) const {return fViewMacroDrawParam;}
 	void ViewMacroDrawParam(bool newState) {fViewMacroDrawParam = newState;}
+	const std::string& MacroParamRelativePath(void) const {return itsMacroParamRelativePath;}
+	void MacroParamRelativePath(const std::string &newValue) {itsMacroParamRelativePath = newValue;}
 
 // ---------------------- operators ------------------------
 	bool operator == (const NFmiDrawParam & theDrawParam) const;
@@ -297,6 +299,15 @@ protected:
     NFmiLevel itsLevel;
 	std::string itsParameterAbbreviation;
     int itsPriority;
+
+//   Tähän talletetaan tiedoston nimi, mistä luetaan/mihin 
+//   kirjoitetaan 
+//   kyseisen luokan tiedot.
+	std::string itsInitFileName;
+	std::string itsMacroParamRelativePath; // tätä tarvitaan kun viewMacrojen yhteydessä on macroParametreja ja 
+								// ne ovat alihakemistossa. Eli Kun viewMacro talletetaan tiedostoon, lisätään tämä
+								// tieto itsParameterAbbreviation-tiedosn yhteyteen ja se myös puretaan luettaessa tähän.
+								// Tämä avulla voidaan rakentaa oikea suhteellinen polku haluttuun macroParamiin
 
 //  Parametrin oletus näyttötyyppi (symboli, 
 //  isoviiva, teksti...)
@@ -423,10 +434,6 @@ private:
 	static float itsFileVersionNumber;
 	float itsInitFileVersionNumber;
 
-//   Tähän talletetaan tiedoston nimi, mistä luetaan/mihin 
-//   kirjoitetaan 
-//   kyseisen luokan tiedot.
-	std::string itsInitFileName;
 
 	bool fHidden;			// näyttö voidaan piiloittaa tämän mukaisesti
 	bool fEditedParam;	// vain yksi parametreista voidaan editoida yhtä aikaa
