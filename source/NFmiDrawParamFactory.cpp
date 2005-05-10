@@ -147,7 +147,7 @@ std::string NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool 
 {
 	std::string fileName(itsLoadDirectory);
 	if(!itsLoadDirectory.empty())
-		fileName += "/";  // laitetaan varmuuden vuoksi keno, jos asetetun polun lopussa ei ole kenoa
+		fileName += kFmiDirectorySeparator;  // laitetaan varmuuden vuoksi keno, jos asetetun polun lopussa ei ole kenoa
 	fileName += "DrawParam_";
 
 	if(drawParam)
