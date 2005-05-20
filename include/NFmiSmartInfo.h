@@ -49,11 +49,11 @@ struct NFmiHarmonizerBookKeepingData
 	{}
 
 	NFmiHarmonizerBookKeepingData(const std::set<NFmiMetTime> &theHarmonizerTimesSet, 
-								  bool foobar,
+								  bool /* foobar */ ,
 								  const NFmiParamBag &theHarmonizerParams)
-	:itsHarmonizerTimesSet()
+	:itsHarmonizerTimesSet(theHarmonizerTimesSet)
 	,fHarmonizeAllTimes(false)
-	,itsHarmonizerParams()
+	,itsHarmonizerParams(theHarmonizerParams)
 	{}
 
 	std::set<NFmiMetTime> itsHarmonizerTimesSet; // tänne laitetaan kaikki muokatut ajat jotta voidaan
