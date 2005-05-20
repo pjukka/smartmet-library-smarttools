@@ -528,8 +528,15 @@ bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoDat
 		{
 			if(theInfo1->ParamBag() == theInfo2->ParamBag()) 
 			{
-				// level jutut samoja
-				if(theInfo1->VPlaceDescriptor() == theInfo2->VPlaceDescriptor())
+				// Level tyypit pitääolla samoja ja niiden lukumäärät niin että joko leveleitä on molemmissa 
+				// tasan yksi tai molemmissa on yli yksi.
+				// Ongelmia muuten data päivityksen kanssa jos esim. luotaus datoissa on eri määrä leveleitä
+				// tai päivitetään hybridi dataa ja level määrä muuttuu tms.
+				FmiLevelType levelType1 = theInfo1->VPlaceDescriptor().Level(0)->LevelType();
+				FmiLevelType levelType2 = theInfo2->VPlaceDescriptor().Level(0)->LevelType();
+				unsigned long size1 = theInfo1->VPlaceDescriptor().Size();
+				unsigned long size2 = theInfo2->VPlaceDescriptor().Size();
+				if(levelType1 == levelType2 && (size1 == size2 || (size1 > 1 && size2 > 1)))
 				{
 					// mahdollinen gridi samoja
 					bool status3 = true;
