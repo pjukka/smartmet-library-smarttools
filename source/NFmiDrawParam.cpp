@@ -41,6 +41,7 @@ NFmiDrawParam::NFmiDrawParam()
 , itsLevel()
 , itsParameterAbbreviation("?")
 , itsPriority(1)
+, itsInitFileName("")
 , itsViewType							 (NFmiMetEditorTypes::kFmiIsoLineView)
 , itsStationDataViewType				 (NFmiMetEditorTypes::kFmiTextView)
 , itsFrameColor						     (NFmiColor(0.,0.,0.)) // musta
@@ -138,10 +139,9 @@ NFmiDrawParam::NFmiDrawParam()
 , itsIsoLineHatchType2(2)
 , itsIsoLineHatchColor2(0.5f,0.5f,0.5f)
 , itsIsoLineHatchBorderColor2(0.5f,0.5f,0.5f)
-, itsIsoLineLabelDigitCount(0)
 // protected osa
+, itsIsoLineLabelDigitCount(0)
 , itsInitFileVersionNumber(itsFileVersionNumber)
-, itsInitFileName("")
 , fHidden(false)
 , fEditedParam(false)
 , fEditableParam(true)
@@ -173,6 +173,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 , itsLevel(theLevel)
 , itsParameterAbbreviation("?")
 , itsPriority(thePriority)
+, itsInitFileName("")
 , itsViewType							 (NFmiMetEditorTypes::kFmiIsoLineView)
 , itsStationDataViewType				 (NFmiMetEditorTypes::kFmiTextView)
 , itsFrameColor						     (NFmiColor(0.,0.,0.)) // musta
@@ -272,7 +273,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 //********** 'versio 2' parametreja *************
 //***********************************************
 , itsInitFileVersionNumber(itsFileVersionNumber)
-, itsInitFileName("")
 , fHidden(false)
 , fEditedParam(false)
 , fEditableParam(true)
