@@ -229,7 +229,7 @@ void NFmiSmartToolCalculation::eval_exp3(double &result, const NFmiPoint &theLat
 		else if(op == NFmiAreaMask::Div)
 		  result = (temp == 0 ? kFloatMissing : result / temp);
 		else // NFmiAreaMask::Mod:
-		  result = static_cast<int>(result) % static_cast<int>(temp);
+		  result = temp == 0 ? kFloatMissing : static_cast<int>(result) % static_cast<int>(temp);
 	}
 }
 
@@ -495,13 +495,22 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
 		  result = exp(result);
 		  break;
 		case NFmiAreaMask::Sqrt:
-		  result = sqrt(result);
+		  if(result >= 0) // neliˆjuurta ei saa ottaa negatiivisesta luvusta
+		    result = sqrt(result);
+		  else
+			result = kFloatMissing;
 		  break;
 		case NFmiAreaMask::Log:
-		  result = log(result);
+		  if(result > 0) // logaritmi pit‰‰ ottaa positiivisesta luvusta
+		    result = log(result);
+		  else
+			result = kFloatMissing;
 		  break;
 		case NFmiAreaMask::Log10:
-		  result = log10(result);
+		  if(result > 0) // logaritmi pit‰‰ ottaa positiivisesta luvusta
+		    result = log10(result);
+		  else
+			result = kFloatMissing;
 		  break;
 		case NFmiAreaMask::Sin:
 		  result = sin(result * trigFactor); // konversio asteista radiaaneiksi teht‰v‰
@@ -733,7 +742,7 @@ void NFmiSmartToolCalculation::bin_eval_exp3(bool &maskresult, double &result, c
 		else if(op == NFmiAreaMask::Div)
 		  result = (temp==0 ? kFloatMissing : result / temp);
 		else // NFmiAreaMask::Mod
-		  result = static_cast<int>(result) % static_cast<int>(temp);
+		  result = temp==0 ? kFloatMissing : static_cast<int>(result) % static_cast<int>(temp);
 	}
 }
 
