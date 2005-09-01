@@ -29,8 +29,8 @@ public:
 
 	static NFmiQueryData* ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, bool createDrawParamFileIfNotExist);
 	static NFmiQueryData* ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, bool createDrawParamFileIfNotExist);
-	static NFmiQueryData* ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist);
-	static NFmiQueryData* ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist);
+	static NFmiQueryData* ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool goThroughLevels = false);
+	static NFmiQueryData* ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool goThroughLevels = false);
 
 private:
 	static bool InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist);

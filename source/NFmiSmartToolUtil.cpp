@@ -22,13 +22,13 @@
   #include <unistd.h>
 #endif
 
-NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist)
+NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool goThroughLevels)
 {
 	NFmiTimeDescriptor times(theModifiedData->Info()->TimeDescriptor());
-	return ModifyData(theMacroText, theModifiedData, &times, theHelperDataFileNames, createDrawParamFileIfNotExist);
+	return ModifyData(theMacroText, theModifiedData, &times, theHelperDataFileNames, createDrawParamFileIfNotExist, goThroughLevels);
 }
 
-NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist)
+NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool goThroughLevels)
 {
 	NFmiInfoOrganizer dataBase;
 	if(!InitDataBase(&dataBase, theModifiedData, theHelperDataFileNames, createDrawParamFileIfNotExist))
@@ -51,7 +51,14 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 
 	try // suoritetaan macro sitten
 	{
-		smartToolModifier.ModifyData(theTimes, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
+		if(goThroughLevels == false)
+			smartToolModifier.ModifyData(theTimes, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
+		else
+		{
+			NFmiSmartInfo *editedInfo = dataBase.EditedInfo();
+			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
+				smartToolModifier.ModifyData(theTimes, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
+		}
 	}
 	catch(std::exception &e)
 	{
