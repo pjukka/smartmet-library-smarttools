@@ -226,13 +226,14 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 			aInfo = Current();
 			if((aInfo->DataType() == theType || anyDataOk) && aInfo->Param(theDataIdent) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
 			{
-				if(theLevel == 0 && aInfo->SizeLevels() > 1) // en osaa nyt laittaa t‰t‰ ehtoa edell‰ olevaan if-lauseeseen, mutta pelkk‰ edellinen ei toimi, jos leveldata lˆytyy ennen pintadataa
+				if(!(theLevel == 0 && aInfo->SizeLevels() > 1))
 				{
-					aInfo = 0; // pit‰‰ aina t‰ss‰ nollata, muuten viimeisen j‰lkeen j‰‰ voimaan
-					continue;
+					if(theDataIdent.GetProducer()->GetName() == aInfo->Param().GetProducer()->GetName())
+					{
+						fSubParameter = aInfo->UseSubParam();
+						break;
+					}
 				}
-				fSubParameter = aInfo->UseSubParam();
-				break;
 			}
 			aInfo = 0; // pit‰‰ aina t‰ss‰ nollata, muuten viimeisen j‰lkeen j‰‰ voimaan
 		}
@@ -263,8 +264,11 @@ NFmiSmartInfo* NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataI
 			aInfo = Current();
 			if((aInfo->DataType() == theType || anyDataOk) && aInfo->SizeLevels() > 1 && aInfo->Param(theDataIdent))
 			{
-				fSubParameter = aInfo->UseSubParam();
-				break;
+				if(theDataIdent.GetProducer()->GetName() == aInfo->Param().GetProducer()->GetName())
+				{
+					fSubParameter = aInfo->UseSubParam();
+					break;
+				}
 			}
 			aInfo = 0; // pit‰‰ aina t‰ss‰ nollata, muuten viimeisen j‰lkeen j‰‰ voimaan
 		}
@@ -939,3 +943,20 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info(const NFmiDataIdent& theIdent, const NFmi
 		return Info(theIdent, subParameter, theLevel, theType);
 }
 
+NFmiParamBag NFmiInfoOrganizer::GetParams(int theProducerId1, int theProducerId2, NFmiInfoData::Type theIgnoreDataType1, NFmiInfoData::Type theIgnoreDataType2, NFmiInfoData::Type theIgnoreDataType3)
+{
+	NFmiParamBag paramBag;
+	checkedVector<NFmiSmartInfo*> infos(GetInfos(theProducerId1, theProducerId2));
+	int size = infos.size();
+	if(size > 0)
+	{
+		for(int i=0; i<size; i++)
+		{
+			if(infos[i]->DataType() == theIgnoreDataType1 || infos[i]->DataType() == theIgnoreDataType2 || infos[i]->DataType() == theIgnoreDataType3)
+				continue; // tiettyj‰ data tyyppeja ei haluttukkaan listaan
+			paramBag = paramBag.Combine(infos[i]->ParamBag());
+		}
+	}
+
+    return paramBag;
+}
