@@ -199,7 +199,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 									   , bool& fSubParameter 
 									   , const NFmiLevel* theLevel
-									   , NFmiInfoData::Type theType)
+									   , NFmiInfoData::Type theType
+									   , bool fIgnoreProducerName)
 {
 	if(theDataIdent.GetParamIdent() == 997) // synop plot paramille pit‰‰ tehd‰ kikka
 		return GetSynopPlotParamInfo(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), fSubParameter, theLevel, theType);
@@ -228,7 +229,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 			{
 				if(!(theLevel == 0 && aInfo->SizeLevels() > 1))
 				{
-					if(theDataIdent.GetProducer()->GetName() == aInfo->Param().GetProducer()->GetName())
+					if(fIgnoreProducerName || (theDataIdent.GetProducer()->GetName() == aInfo->Param().GetProducer()->GetName()))
 					{
 						fSubParameter = aInfo->UseSubParam();
 						break;
@@ -247,7 +248,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 // eik‰ etsit‰ tietty‰ leveli‰.
 NFmiSmartInfo* NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataIdent
 													, bool& fSubParameter 
-													, NFmiInfoData::Type theType)
+													, NFmiInfoData::Type theType
+													, bool fIgnoreProducerName)
 {
 	bool anyDataOk = (theType == NFmiInfoData::kAnyData || theType == NFmiInfoData::kEditable);
 	NFmiSmartInfo* aInfo = 0;
@@ -264,7 +266,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataI
 			aInfo = Current();
 			if((aInfo->DataType() == theType || anyDataOk) && aInfo->SizeLevels() > 1 && aInfo->Param(theDataIdent))
 			{
-				if(theDataIdent.GetProducer()->GetName() == aInfo->Param().GetProducer()->GetName())
+				if(fIgnoreProducerName || (theDataIdent.GetProducer()->GetName() == aInfo->Param().GetProducer()->GetName()))
 				{
 					fSubParameter = aInfo->UseSubParam();
 					break;
@@ -327,14 +329,16 @@ NFmiParamBag NFmiInfoOrganizer::StaticParams(void)
 }
 
 // SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
+// T‰m‰ ignooraa aina tuottajien nimet, koska t‰t‰ k‰ytet‰‰n SmartToolModifierissa
+// ja siell‰ k‰ytet‰‰n tuottajista aina jotain default nimi‰
 NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData)
 {
 	bool aSubParam;	
 	NFmiSmartInfo* info = 0;
 	if(fLevelData)
-		info = CrossSectionInfo(theDataIdent, aSubParam, theType);
+		info = CrossSectionInfo(theDataIdent, aSubParam, theType, true);
 	else
-		info = fUseParIdOnly ? Info(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), aSubParam, theLevel, theType) : Info(theDataIdent, aSubParam, theLevel, theType);
+		info = fUseParIdOnly ? Info(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), aSubParam, theLevel, theType) : Info(theDataIdent, aSubParam, theLevel, theType, true);
 	if(info)
 	{
 		if(theType == NFmiInfoData::kMacroParam || (fUseParIdOnly ?  info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) : info->Param(theDataIdent)))  // makroparamille ei tarvitse laittaa parametria kohdalleen!
@@ -848,22 +852,30 @@ checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type the
 	return infoVector;
 }
 
+static bool IsProducerWanted(int theCurrentProdId, int theProducerId1, int theProducerId2, int theProducerId3, int theProducerId4)
+{
+	if(theCurrentProdId == theProducerId1)
+		return true;
+	else if(theProducerId2 != -1 && theCurrentProdId == theProducerId2)
+		return true;
+	else if(theProducerId3 != -1 && theCurrentProdId == theProducerId3)
+		return true;
+	else if(theProducerId4 != -1 && theCurrentProdId == theProducerId4)
+		return true;
+	return false;
+}
+
 // Palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota.
 // Ei katso tuottaja datoja editable infosta eik‰ sen kopioista!
 // voi antaa kaksi eri tuottaja id:t‰ jos haluaa, jos esim. hirlamia voi olla kahden eri tuottaja id:n alla
 checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(int theProducerId, int theProducerId2, int theProducerId3, int theProducerId4)
 {
 	checkedVector<NFmiSmartInfo*> infoVector;
+
 	for(Reset(); Next();)
 	{
 		int currentProdId = static_cast<int>(Current()->Producer()->GetIdent());
-		if(currentProdId == theProducerId)
-			infoVector.push_back(Current());
-		else if(theProducerId2 != -1 && currentProdId == theProducerId2)
-			infoVector.push_back(Current());
-		else if(theProducerId3 != -1 && currentProdId == theProducerId3)
-			infoVector.push_back(Current());
-		else if(theProducerId4 != -1 && currentProdId == theProducerId4)
+		if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
 			infoVector.push_back(Current());
 	}
 	return infoVector;
