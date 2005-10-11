@@ -392,6 +392,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 	if(theType == NFmiInfoData::kSatelData) // spesiaali keissi satelliitti kuville, niillä ei ole infoa
 	{
 		drawParam = new NFmiDrawParam(theIdent, NFmiLevel(), 1, theType);
+		drawParam->ParameterAbbreviation(static_cast<char*>(theIdent.GetParamName()));
 		return drawParam;
 	}
 	if(theIdent.GetParamIdent() == 997) // synop plottia varten taas kikkailua
