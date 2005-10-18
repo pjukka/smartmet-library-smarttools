@@ -516,7 +516,7 @@ bool NFmiSmartToolIntepreter::IsPossibleElseConditionLine(const std::string &the
 
 static bool IsWordContinuing(char ch)
 {
-	if(::isalnum(ch) || ch == '_')
+	if(isalnum(ch) || ch == '_')
 		return true;
 	return false;
 }
