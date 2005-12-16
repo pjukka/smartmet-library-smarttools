@@ -163,6 +163,10 @@ class NFmiInfoOrganizer
 	NFmiDataMatrix<float> itsDefaultMissingValueMatrix; // tähän talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi että sillä voi alustaa makroParam dataa ennen laskuja
 
 	bool fCreateEditedDataCopy; // luodaanko vai eikö luoda kopiota editoidusta datasta
+
+	// estetään kopi konstruktorin ja sijoitus operaattoreiden luonti
+	NFmiInfoOrganizer& operator=(const NFmiInfoOrganizer&);
+	NFmiInfoOrganizer(const NFmiInfoOrganizer&);
 };
 
 #endif
