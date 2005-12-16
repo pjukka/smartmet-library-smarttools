@@ -2269,6 +2269,9 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ANAL"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ANA"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Ana"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ana"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("mbe"), kFmiMTAHIRMESO));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Mbe"), kFmiMTAHIRMESO));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("MBE"), kFmiMTAHIRMESO));
