@@ -115,7 +115,7 @@ private:
 	void ClearScriptVariableInfos(void);
 	NFmiSmartInfo* CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 	NFmiAreaMask* CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
-	void GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit);
+	void GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit, bool *fCheckLimits);
 	NFmiDataModifier* CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	NFmiDataIterator* CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo);
 	void ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection);

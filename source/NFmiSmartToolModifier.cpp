@@ -410,8 +410,9 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateCalculation(NFmiSmartTool
 		calculation->SetResultInfo(CreateInfo(*theCalcInfo->GetResultDataInfo()));
 		float lowerLimit;
 		float upperLimit;
-		GetParamValueLimits(*theCalcInfo->GetResultDataInfo(), &lowerLimit, &upperLimit);
-		calculation->SetLimits(lowerLimit, upperLimit);
+		bool checkLimits = true; // yleensä parametreille käytetdään min/max rajoja, mutta ei esim TotalWind tai W&C:lle
+		GetParamValueLimits(*theCalcInfo->GetResultDataInfo(), &lowerLimit, &upperLimit, &checkLimits);
+		calculation->SetLimits(lowerLimit, upperLimit, checkLimits);
 		calculation->AllowMissingValueAssignment(theCalcInfo->AllowMissingValueAssignment());
 		for(int i=0; i<size; i++)
 //			calculation->AddCalculation(CreateAreaMask(*areaMaskInfos[i]), operators[i]);
@@ -905,17 +906,22 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 	return info;
 }
 
-void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit)
+void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit, bool *fCheckLimits)
 {
-	NFmiDrawParam* drawParam = itsInfoOrganizer->CreateDrawParam(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
-	if(drawParam)
-	{
-		*theLowerLimit = static_cast<float>(drawParam->AbsoluteMinValue());
-		*theUpperLimit = static_cast<float>(drawParam->AbsoluteMaxValue());
-		delete drawParam;
-	}
+	if(theAreaMaskInfo.GetDataIdent().GetParamIdent() == kFmiTotalWindMS || theAreaMaskInfo.GetDataIdent().GetParamIdent() == kFmiWeatherAndCloudiness)
+		*fCheckLimits = false;
 	else
-		throw runtime_error("Parametrin min ja max rajoja ei saatu.");
+	{
+		NFmiDrawParam* drawParam = itsInfoOrganizer->CreateDrawParam(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
+		if(drawParam)
+		{
+			*theLowerLimit = static_cast<float>(drawParam->AbsoluteMinValue());
+			*theUpperLimit = static_cast<float>(drawParam->AbsoluteMaxValue());
+			delete drawParam;
+		}
+		else
+			throw runtime_error("Parametrin min ja max rajoja ei saatu.");
+	}
 }
 
 struct FindScriptVariable

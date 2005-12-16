@@ -49,7 +49,7 @@ public:
 	void AddCalculation(NFmiAreaMask* theCalculation);
 	const std::string& GetCalculationText(void){return itsCalculationText;}
 	void SetCalculationText(const std::string& theText){itsCalculationText = theText;}
-	void SetLimits(float theLowerLimit, float theUpperLimit);
+	void SetLimits(float theLowerLimit, float theUpperLimit, bool theDoLimitCheck);
 	bool AllowMissingValueAssignment(void){return fAllowMissingValueAssignment;};
 	void AllowMissingValueAssignment(bool newState){fAllowMissingValueAssignment = newState;};
 
@@ -60,6 +60,7 @@ private:
 	float GetInsideLimitsValue(float theValue);
 	float itsLowerLimit; // näiden avulla kontrolloidaan mahdollisia min ja max arvoja
 	float itsUpperLimit;
+	bool fDoLimitCheck; // kaikille parametreille ei tehdä rajojen tarkistusta, esim. TotalWind ja W&C
 
 // eval_exp-metodit otettu H. Schilbertin  C++: the Complete Refeference third ed.
 // jouduin muuttamaan niitä vähän sopimaan tähän ympäristöön.

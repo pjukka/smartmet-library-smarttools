@@ -45,6 +45,7 @@ using namespace std;
 NFmiSmartToolCalculation::NFmiSmartToolCalculation(void)
 :itsLowerLimit(0)
 ,itsUpperLimit(1)
+,fDoLimitCheck(true)
 ,itsResultInfo(0)
 ,itsCalculations()
 ,itsHeightValue(0)
@@ -92,21 +93,28 @@ float NFmiSmartToolCalculation::GetInsideLimitsValue(float theValue)
 	if(theValue == kFloatMissing)
 		return theValue;			
 
-	if(theValue < itsLowerLimit)
-		return itsLowerLimit;
-	else if(theValue > itsUpperLimit)
-		return itsUpperLimit;
+	if(fDoLimitCheck)
+	{
+		if(theValue < itsLowerLimit)
+			return itsLowerLimit;
+		else if(theValue > itsUpperLimit)
+			return itsUpperLimit;
+	}
 	return theValue;			
 }
 
-void NFmiSmartToolCalculation::SetLimits(float theLowerLimit, float theUpperLimit)
+void NFmiSmartToolCalculation::SetLimits(float theLowerLimit, float theUpperLimit, bool theDoLimitCheck)
 {
-	if(theLowerLimit >= theUpperLimit)
-		 throw runtime_error("Parametrin max ja min rajat ovat v‰‰rin p‰in.");
-	else
+	fDoLimitCheck = theDoLimitCheck;
+	if(fDoLimitCheck)
 	{
-		itsLowerLimit = theLowerLimit;
-		itsUpperLimit = theUpperLimit;
+		if(theLowerLimit >= theUpperLimit)
+			throw runtime_error("Parametrin max ja min rajat ovat v‰‰rin p‰in.");
+		else
+		{
+			itsLowerLimit = theLowerLimit;
+			itsUpperLimit = theUpperLimit;
+		}
 	}
 }
 
