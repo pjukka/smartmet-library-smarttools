@@ -153,7 +153,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 {
 	if(theParam == 997) // synop plot paramille pit‰‰ tehd‰ kikka
 		return GetSynopPlotParamInfo(theParam, fSubParameter, theLevel, theType);
-	if(theType == NFmiInfoData::kMacroParam)
+	if(theType == NFmiInfoData::kMacroParam || theType >= NFmiInfoData::kSoundingParameterData) // macro- ja sounding parametrit lasketaan samalla periaatteella
 		return itsMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
 	bool anyDataOk = (theType == NFmiInfoData::kAnyData);
@@ -204,7 +204,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 {
 	if(theDataIdent.GetParamIdent() == 997) // synop plot paramille pit‰‰ tehd‰ kikka
 		return GetSynopPlotParamInfo(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), fSubParameter, theLevel, theType);
-	if(theType == NFmiInfoData::kMacroParam)
+	if(theType == NFmiInfoData::kMacroParam || theType >= NFmiInfoData::kSoundingParameterData) // macro- ja sounding parametrit lasketaan samalla periaatteella
 		return itsMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
 	bool anyDataOk = (theType == NFmiInfoData::kAnyData);
@@ -341,7 +341,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& the
 		info = fUseParIdOnly ? Info(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), aSubParam, theLevel, theType) : Info(theDataIdent, aSubParam, theLevel, theType, true);
 	if(info)
 	{
-		if(theType == NFmiInfoData::kMacroParam || (fUseParIdOnly ?  info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) : info->Param(theDataIdent)))  // makroparamille ei tarvitse laittaa parametria kohdalleen!
+		if(theType == NFmiInfoData::kMacroParam || theType >= NFmiInfoData::kSoundingParameterData || (fUseParIdOnly ?  info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) : info->Param(theDataIdent)))  // makroparamille ei tarvitse laittaa parametria kohdalleen!
 		{
 			NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
 			return copyOfInfo;
@@ -461,6 +461,7 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 		}
 		else
 			status = Add(aSmartInfo); // muun tyyppiset datat kuin editoitavat menev‰t listaan
+
 	}
 	return status;
 }
