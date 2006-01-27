@@ -35,6 +35,7 @@
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
+#include <float.h>
 
 
 using namespace std;
@@ -62,13 +63,34 @@ NFmiSmartToolCalculation::~NFmiSmartToolCalculation(void)
 {
 	Clear();
 }
+
+template<typename T>
+static bool IsValidNumber(T theValue)
+{
+	if(_isnan(theValue))
+		return false;
+	if(!_finite(theValue))
+		return false;
+	return true;
+}
+
+template<typename T>
+static T MakeValidNumber(T theValue)
+{
+	if(IsValidNumber(theValue))
+		return theValue;
+	return kFloatMissing;
+}
+
+
 //--------------------------------------------------------
 // Calculate 
 //--------------------------------------------------------
 void NFmiSmartToolCalculation::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
 {
-
 	double value = eval_exp(theLatlon, theTime, theTimeIndex);
+
+	value = MakeValidNumber(value); // muuttaa luvun missingiksi, jos nan tai +-inf
 	if(value != kFloatMissing) // tuli ongelmia missing asetuksissa, pit‰‰ mietti vaikka jokin funktio, jolla asetetaan puuttuva arvo // pit‰‰ pysty‰ sittenkin asettamaan arvoksi kFloatMissing:in!!!
 	{
 		itsResultInfo->LocationIndex(theLocationIndex); // kohde dataa juoksutetaan, joten lokaatio indeksien pit‰‰ olla synkassa!!!
