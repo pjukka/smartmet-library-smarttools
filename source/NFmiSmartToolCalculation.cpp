@@ -67,10 +67,17 @@ NFmiSmartToolCalculation::~NFmiSmartToolCalculation(void)
 template<typename T>
 static bool IsValidNumber(T theValue)
 {
+#ifdef UNIX
+	if(isnan(theValue))
+		return false;
+	if(!finite(theValue))
+		return false;
+#else
 	if(_isnan(theValue))
 		return false;
 	if(!_finite(theValue))
 		return false;
+#endif
 	return true;
 }
 
