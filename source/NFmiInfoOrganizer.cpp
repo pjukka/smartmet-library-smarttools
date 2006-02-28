@@ -51,7 +51,7 @@
 #include "NFmiProducerList.h"
 #include "NFmiGrid.h"
 #include "NFmiQueryDataUtil.h"
-
+#include "NFmiQueryData.h"
 
 /*
 #ifdef _DEBUG
