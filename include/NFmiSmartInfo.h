@@ -1,30 +1,30 @@
 //**********************************************************
-// C++ Class Name : NFmiSmartInfo 
+// C++ Class Name : NFmiSmartInfo
 // ---------------------------------------------------------
 // Filetype: (HEADER)
-// Filepath: D:/projekti/GDPro/GDTemp/NFmiSmartInfo.h 
-// 
-// 
-// GDPro Properties 
+// Filepath: D:/projekti/GDPro/GDTemp/NFmiSmartInfo.h
+//
+//
+// GDPro Properties
 // ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 2.1.4 ) 
-//  - GD System Name    : Met-editor Plan 2 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : Markon ehdotus 
-// ---------------------------------------------------  
-//  Author         : pietarin 
-//  Creation Date  : Tues - Feb 9, 1999 
-// 
-// 
-//  Description: 
-// 
-//  Change Log: 
+//  - GD Symbol Type    : CLD_Class
+//  - GD Method         : UML ( 2.1.4 )
+//  - GD System Name    : Met-editor Plan 2
+//  - GD View Type      : Class Diagram
+//  - GD View Name      : Markon ehdotus
+// ---------------------------------------------------
+//  Author         : pietarin
+//  Creation Date  : Tues - Feb 9, 1999
+//
+//
+//  Description:
+//
+//  Change Log:
 // Changed 1999.08.25/Marko	Lis‰sin itsDataType dataosan, jonka avulla smartinfoja voidaan
 //							j‰rjest‰‰ NFmiInfoOrganizer:in avulla.
-// Changed 1999.09.06/Marko Muutin LocationMaskStep()-metodien rajapintaa niin, ett‰ voidaan 
+// Changed 1999.09.06/Marko Muutin LocationMaskStep()-metodien rajapintaa niin, ett‰ voidaan
 //							m‰‰r‰t‰ resetoidaanko ensin arvot vai ei.
-// 
+//
 //**********************************************************
 #ifndef  NFMISMARTINFO_H
 #define  NFMISMARTINFO_H
@@ -48,7 +48,7 @@ struct NFmiHarmonizerBookKeepingData
 	,itsHarmonizerParams()
 	{}
 
-	NFmiHarmonizerBookKeepingData(const std::set<NFmiMetTime> &theHarmonizerTimesSet, 
+	NFmiHarmonizerBookKeepingData(const std::set<NFmiMetTime> &theHarmonizerTimesSet,
 								  bool /* foobar */ ,
 								  const NFmiParamBag &theHarmonizerParams)
 	:itsHarmonizerTimesSet(theHarmonizerTimesSet)
@@ -57,23 +57,23 @@ struct NFmiHarmonizerBookKeepingData
 	{}
 
 	std::set<NFmiMetTime> itsHarmonizerTimesSet; // t‰nne laitetaan kaikki muokatut ajat jotta voidaan
-												// harmonisoinnin yhteydess‰ tehd‰ timedesc, jonka avulla ajetaan 
+												// harmonisoinnin yhteydess‰ tehd‰ timedesc, jonka avulla ajetaan
 												// harmonisaattori skripti
 	bool fHarmonizeAllTimes; // apuna edellisen set:in lis‰ksi, ett‰ jos k‰yd‰‰n l‰pi koko data
-	NFmiParamBag itsHarmonizerParams; // t‰h‰n merkit‰‰n parametrit, joita on muokattu eri tyˆkaluilla. 
+	NFmiParamBag itsHarmonizerParams; // t‰h‰n merkit‰‰n parametrit, joita on muokattu eri tyˆkaluilla.
 };
 
 class NFmiSmartInfo : public NFmiFastQueryInfo
 {
  public:
-	 
+
 	NFmiSmartInfo(void);
 	NFmiSmartInfo(const NFmiQueryInfo & theInfo
-				 ,NFmiQueryData* theData=0, std::string theDataFileName=""
+				 ,NFmiQueryData* theData, std::string theDataFileName, std::string theDataFilePattern
 				 ,NFmiInfoData::Type theType = NFmiInfoData::kEditable);
-	NFmiSmartInfo (const NFmiSmartInfo & theInfo); 
+	NFmiSmartInfo (const NFmiSmartInfo & theInfo);
 	~NFmiSmartInfo();
-	
+
 	NFmiSmartInfo* Clone(void) const;
 	void AreaMask(NFmiUndoableMultiLevelMask* theAreaMask);
 	int MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea);
@@ -81,9 +81,9 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 
 	void MaskAllLocations (const bool& newState, unsigned long theMaskType);
 	void MaskAllLocations (const bool& newState);
-	
+
 	bool NextLocation (void);
-   
+
 	unsigned long LocationMaskedCount(unsigned long theMaskType);
 
 	//toimii vaan, jos on yksi info
@@ -95,9 +95,9 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	void MaskType(unsigned long theMaskType);
 	unsigned long MaskType(void);
 
-	const NFmiBitMask& LocationMask (unsigned long theMaskType) const; 
+	const NFmiBitMask& LocationMask (unsigned long theMaskType) const;
 	void LocationMask (const NFmiBitMask& theMask, unsigned long theMaskType);
-   
+
 	bool SnapShotData (const std::string& theAction, const NFmiHarmonizerBookKeepingData &theCurrentHarmonizerBookKeepingData);
 	void RearrangeUndoTable(void);
 	bool SnapShotData (const std::string& theAction,FmiParameterName theParameter);
@@ -121,18 +121,20 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 
 	const std::string& DataFileName(void){return itsDataFileName;}
 	void DataFileName(const std::string& theDataFileName){itsDataFileName = theDataFileName;}
+	const std::string& DataFilePattern(void) const {return itsDataFilePattern;}
+	void DataFilePattern(const std::string &theDataFilePattern) {itsDataFilePattern = theDataFilePattern;}
 	NFmiSmartInfo& operator=(const NFmiSmartInfo& theSmartInfo);
-	
+
 	bool operator==(const NFmiSmartInfo& theSmartInfo) const;
 	bool operator< (const NFmiSmartInfo& theSmartInfo) const;
-	
+
 	void DestroyData(void);
 	void DestroySharedData(void){DestroyData();};
 	NFmiQueryData* DataReference(void);
 
 	bool IsEditable(void){return fEditable;}
 	void Editable(bool newState){fEditable = newState;}
-	
+
 	int Priority(void){return itsPriority;}
 	void Priority(int thePriority){itsPriority = thePriority;}
 
@@ -160,23 +162,24 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 
 	void LocationMaskStepGrid(bool newStatus, bool fResetAllFirst, const long& theXStep, const long& theYStep);
 	void LocationMaskStepGrid(bool newStatus, unsigned long theMaskType, bool fResetAllFirst, const long& theXStep, const long& theYStep);
-	
+
 	void LocationMaskStepLocation(bool newStatus, bool fResetAllFirst, const long& theXStep);
 	void LocationMaskStepLocation(bool newStatus, unsigned long theMaskType, bool fResetAllFirst, const long& theXStep);
 
 
-//   Vain pointteri, ei tuhota destruktorissa. 
-//   smartinfo k‰ytt‰‰ oliota maskaamaan aktivaation, 
+//   Vain pointteri, ei tuhota destruktorissa.
+//   smartinfo k‰ytt‰‰ oliota maskaamaan aktivaation,
 //	 valinnan ja parametrimaskin.
-   
+
 	NFmiUndoableMultiLevelMask* itsAreaMask;
 	NFmiGrid* itsAreaFactors;//t‰m‰n gridin avulla yhdistet‰‰n eri aluetoimistojen datat
 	NFmiQueryData* itsDataReference;
-	
+
 	std::string itsDataFileName;
+	std::string itsDataFilePattern; // t‰t‰ k‰ytet‰‰n tunnistamaan mm. info-organizerissa, ett‰ onko data samanlaista, eli pyyhit‰‰nkˆ vanha t‰ll‰inen data pois alta
 	int itsPriority;
 	bool fEditable;
-	
+
 	long* itsMaxUndoLevelPtr;
 	long* itsMaxRedoLevelPtr;
 	int* itsCurrentUndoLevelPtr;

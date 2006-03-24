@@ -106,7 +106,7 @@ bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryDa
 		theDataBase->WorkingDirectory(GetWorkingDirectory());
 		theDataBase->Init(std::string(""), createDrawParamFileIfNotExist, false); // tähän annetaan drawparametrien lataus polku, mutta niitä ei käytetä tässä tapauksessa
 																		// false tarkoittaa että ei tehdä kopiota editoidusta datasta, tässä se on turhaa
-		theDataBase->AddData(theModifiedData, "xxxfileName", NFmiInfoData::kEditable, 0); // 0=undolevel
+		theDataBase->AddData(theModifiedData, "xxxfileName", "", NFmiInfoData::kEditable, 0); // 0=undolevel
 		if(theHelperDataFileNames && theHelperDataFileNames->size())
 			InitDataBaseHelperData(*theDataBase, *theHelperDataFileNames);
 		return true;
@@ -124,7 +124,7 @@ bool NFmiSmartToolUtil::InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, c
 			NFmiInfoData::Type dataType = NFmiInfoData::kViewable;
 			if(sQData.QueryData()->Info()->SizeTimes() == 1)
 				dataType = NFmiInfoData::kStationary;
-			theDataBase.AddData(sQData.QueryData(true), theHelperDataFileNames[i], dataType, 0); // 0=undolevel
+			theDataBase.AddData(sQData.QueryData(true), theHelperDataFileNames[i], "", dataType, 0); // 0=undolevel
 		}
 	}
 	return true;

@@ -1,23 +1,23 @@
 //**********************************************************
-// C++ Class Name : NFmiSmartToolModifier 
+// C++ Class Name : NFmiSmartToolModifier
 // ---------------------------------------------------------
 // Filetype: (SOURCE)
-// Filepath: G:/siirto/marko/oc/NFmiSmartToolModifier.cpp 
-// 
-// 
-// GDPro Properties 
+// Filepath: G:/siirto/marko/oc/NFmiSmartToolModifier.cpp
+//
+//
+// GDPro Properties
 // ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 4.0 ) 
-//  - GD System Name    : aSmartTools 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : smarttools 1 
-// ---------------------------------------------------  
-//  Author         : pietarin 
-//  Creation Date  : Thur - Jun 20, 2002 
-// 
-//  Change Log     : 
-// 
+//  - GD Symbol Type    : CLD_Class
+//  - GD Method         : UML ( 4.0 )
+//  - GD System Name    : aSmartTools
+//  - GD View Type      : Class Diagram
+//  - GD View Name      : smarttools 1
+// ---------------------------------------------------
+//  Author         : pietarin
+//  Creation Date  : Thur - Jun 20, 2002
+//
+//  Change Log     :
+//
 //**********************************************************
 #ifdef WIN32
 #pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
@@ -210,7 +210,7 @@ void NFmiSmartToolCalculationBlock::Calculate(const NFmiPoint &theLatlon, unsign
 }
 
 //--------------------------------------------------------
-// Constructor/Destructor 
+// Constructor/Destructor
 //--------------------------------------------------------
 NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer)
 :itsInfoOrganizer(theInfoOrganizer)
@@ -238,7 +238,7 @@ NFmiSmartToolModifier::~NFmiSmartToolModifier(void)
 //	ClearCalculationModifiers();
 }
 //--------------------------------------------------------
-// InitSmartTool 
+// InitSmartTool
 //--------------------------------------------------------
 // Tulkitsee macron, luo tavittavat systeemit, ett‰ makro voidaan suorittaa.
 void NFmiSmartToolModifier::InitSmartTool(const std::string &theSmartToolText, bool fThisIsMacroParamSkript)
@@ -362,8 +362,8 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateConditionalSection(NFmiAr
 		{
 			areaMaskHandler = new NFmiSmartToolCalculation;
 			auto_ptr<NFmiSmartToolCalculation> areaMaskHandlerPtr(areaMaskHandler);
-			for(int i=0; i<size; i++)  
-// HUOM!!!! editoitavaN DATAN QDatasta pit‰‰ tehd‰ kopiot, muuten maskit eiv‰t toimi 
+			for(int i=0; i<size; i++)
+// HUOM!!!! editoitavaN DATAN QDatasta pit‰‰ tehd‰ kopiot, muuten maskit eiv‰t toimi
 // kaikissa tilanteissa oikein!! KORJAA TƒMƒ!!!!!
 				areaMaskHandler->AddCalculation(CreateAreaMask(*maskInfos[i]));
 			// loppuun lis‰t‰‰n viel‰ lopetus 'merkki'
@@ -447,7 +447,7 @@ void NFmiSmartToolModifier::ClearCalculationModifiers(void)
 }
 */
 //--------------------------------------------------------
-// ModifyData 
+// ModifyData
 //--------------------------------------------------------
 // Suorittaa varsinaiset modifikaatiot. K‰ytt‰j‰ voi antaa parametrina rajoitetun ajan
 // modifioinneille, jos theModifiedTimes on 0-pointteri, tehd‰‰n operaatiot kaikille
@@ -489,7 +489,7 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, boo
 }
 
 // Kun intepreter on tulkinnut smarttool-tekstin, voidaan kysy‰, onko kyseinen makro ns. macroParam-skripti eli sis‰lt‰‰kˆ se RESULT = ??? tapaista teksti‰
-bool NFmiSmartToolModifier::IsInterpretedSkriptMacroParam(void) 
+bool NFmiSmartToolModifier::IsInterpretedSkriptMacroParam(void)
 {
 	return itsSmartToolIntepreter ? itsSmartToolIntepreter->IsInterpretedSkriptMacroParam() : false;
 }
@@ -623,7 +623,7 @@ static NFmiAreaMask::DataType ConvertType(NFmiInfoData::Type theType)
 }
 */
 //--------------------------------------------------------
-// CreateAreaMask 
+// CreateAreaMask
 //--------------------------------------------------------
 // HUOM!! Ei osaa hoitaa kuin editoitavia datoja!!!!
 // HUOM!! Vuotaa exception tilanteissa.
@@ -637,7 +637,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 		case NFmiAreaMask::InfoVariable:
 			{
 			// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
-			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa. 
+			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
 			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
 //			areaMask = new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, true);
 			areaMask = new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, true);
@@ -664,7 +664,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 		case NFmiAreaMask::FunctionTimeIntergration:
 			{
 			// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
-			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa. 
+			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
 			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
 			bool deepCopyCreated = false;
 			if(theAreaMaskInfo.GetUseDefaultProducer())
@@ -685,7 +685,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 		case NFmiAreaMask::FunctionPeekXY:
 			{
 			// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
-			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa. 
+			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
 			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
 			bool deepCopyCreated = false;
 			if(theAreaMaskInfo.GetUseDefaultProducer())
@@ -695,7 +695,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 				delete info;
 				info = tmp;
 			}
-			areaMask = new NFmiInfoAreaMaskPeekXY(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, 
+			areaMask = new NFmiInfoAreaMaskPeekXY(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info,
 				static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), true, NFmiAreaMask::kNoValue, deepCopyCreated);
 			if(fUseLevelData)
 				itsParethesisCounter++;
@@ -746,7 +746,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 				if(itsCommaCounter >= 2)
 				{  // kun pilkku-laskuri tuli t‰yteen
 					fUseLevelData = true; // on aika ruveta k‰ytt‰m‰‰n level-dataa infoissa
-					itsParethesisCounter = 1; // lis‰ksi ruvetaan mets‰st‰m‰‰n sulkuja, 
+					itsParethesisCounter = 1; // lis‰ksi ruvetaan mets‰st‰m‰‰n sulkuja,
 											  // ett‰ tiedet‰‰n milloin funktio ja level datan k‰yttˆ loppuu
 				}
 			}
@@ -814,7 +814,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateCalculatedAreaMask(const NFmiAreaMask
 		areaMask = new NFmiForecastHourAreaMask(itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
 	else if(parId == kFmiDeltaTime)
 		areaMask = new NFmiTimeStepAreaMask(itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
-	
+
 
 	if(areaMask)
 		return areaMask;
@@ -987,7 +987,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateRealScriptVariableInfo(const NFmiDat
 	data->Init();
 	NFmiQueryInfo info(data);
 	info.First();
-	NFmiSmartInfo *returnInfo = new NFmiSmartInfo(info, data);
+	NFmiSmartInfo *returnInfo = new NFmiSmartInfo(info, data, "", "");
 	return returnInfo;
 }
 

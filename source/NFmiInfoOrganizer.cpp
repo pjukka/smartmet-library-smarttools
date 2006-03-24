@@ -1,38 +1,38 @@
 // ======================================================================
 /*!
- * C++ Class Name : NFmiInfoOrganizer 
+ * C++ Class Name : NFmiInfoOrganizer
  * ---------------------------------------------------------
  * Filetype: (SOURCE)
- * Filepath: D:/projekti/GDPro/GDTemp/NFmiInfoOrganizer.cpp 
- * 
- * 
- * GDPro Properties 
+ * Filepath: D:/projekti/GDPro/GDTemp/NFmiInfoOrganizer.cpp
+ *
+ *
+ * GDPro Properties
  * ---------------------------------------------------
- *  - GD Symbol Type    : CLD_Class 
- *  - GD Method         : UML ( 2.1.4 ) 
- *  - GD System Name    : Met-editor Plan 2 
- *  - GD View Type      : Class Diagram 
- *  - GD View Name      : Markon ehdotus 
- * ---------------------------------------------------  
- *  Author         : pietarin 
- *  Creation Date  : Tues - Feb 9, 1999 
- * 
- * 
- *  Description: 
- *   Sisältää mahdollisesti listan infoja, joista 
+ *  - GD Symbol Type    : CLD_Class
+ *  - GD Method         : UML ( 2.1.4 )
+ *  - GD System Name    : Met-editor Plan 2
+ *  - GD View Type      : Class Diagram
+ *  - GD View Name      : Markon ehdotus
+ * ---------------------------------------------------
+ *  Author         : pietarin
+ *  Creation Date  : Tues - Feb 9, 1999
+ *
+ *
+ *  Description:
+ *   Sisältää mahdollisesti listan infoja, joista
  *   luokka osaa antaa tarvittavan
- *   infon pointterin parametrin nimellä. Listalla 
+ *   infon pointterin parametrin nimellä. Listalla
  *   ei ole järjestystä.
- * 
- *  Change Log: 
+ *
+ *  Change Log:
  * 1999.08.26/Marko	Laitoin organizeriin eri tyyppisten datojen talletuksen
- *					mahdollisuuden. Editoitavaa dataa voi olla vain yksi, mutta 
+ *					mahdollisuuden. Editoitavaa dataa voi olla vain yksi, mutta
  *					katsottavaa/maskattavaa dataa voi olla useita erilaisia ja statio-
- *					näärisiä (esim. topografia) datoja voi olla myös useita erilaisia. 
+ *					näärisiä (esim. topografia) datoja voi olla myös useita erilaisia.
  * 1999.08.26/Marko	Laitoin level tiedon DrawParam:in luonti-kutsuun varten.
  * 1999.09.22/Marko	DrawParamin luonnissa otetaan huomioon datan tyyppi tästälähtien.
  * 1999.09.22/Marko	Lisäsin EditedDatan kopion, jota käytetään visualisoimaan dataan tehtyjä muutoksia.
- * 
+ *
  */
 // ======================================================================
 
@@ -61,7 +61,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 */
 //--------------------------------------------------------
-// Constructor/Destructor 
+// Constructor/Destructor
 //--------------------------------------------------------
 // luodaan tyhjä lista
 NFmiInfoOrganizer::NFmiInfoOrganizer(void)
@@ -97,18 +97,18 @@ NFmiInfoOrganizer::~NFmiInfoOrganizer (void)
 
 
 //--------------------------------------------------------
-// Init 
+// Init
 //--------------------------------------------------------
 bool NFmiInfoOrganizer::Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist, bool createEditedDataCopy)
 {
 	fCreateEditedDataCopy = createEditedDataCopy;
  	itsDrawParamFactory =new NFmiDrawParamFactory(createDrawParamFileIfNotExist);
 	itsDrawParamFactory->LoadDirectory(theDrawParamPath);
- 	return itsDrawParamFactory->Init(); 
+ 	return itsDrawParamFactory->Init();
 }
 
 NFmiSmartInfo* NFmiInfoOrganizer::GetSynopPlotParamInfo( const FmiParameterName& theParam
-														, bool& fSubParameter 
+														, bool& fSubParameter
 														, const NFmiLevel* theLevel
 														, NFmiInfoData::Type theType)
 {
@@ -131,10 +131,10 @@ NFmiSmartInfo* NFmiInfoOrganizer::GetSynopPlotParamInfo( const FmiParameterName&
 }
 
 //--------------------------------------------------------
-// Info 
+// Info
 //--------------------------------------------------------
 
-//  Palauttaa smartinfon pointterin, jossa on annettu parametri 
+//  Palauttaa smartinfon pointterin, jossa on annettu parametri
 //  joko kokonaisena tai jonkin parametrin osaparametrina.
 //	Kysytään ensimmäisenä listassa olevalta infolta, onko infolla theParam
 //	suoraan. Jos miltään infolta ei suoraan saada theParam:a, tutkitaan
@@ -142,12 +142,12 @@ NFmiSmartInfo* NFmiInfoOrganizer::GetSynopPlotParamInfo( const FmiParameterName&
 //	kWeatherAndCloudiness aliparametrina). Periaatteessa theParam voisi löytyä
 //	myös aliparametrin aliparametrilta jne - tutkittavia aliparametri-tasoja
 //	ei ole rajoitettu. Tässä metodissa tutkitaan vain parameri ja tarvittaessa
-//  parametrin aliparametri. 
+//  parametrin aliparametri.
 
 //  22.02.1999 lisättiin  tunnistin bool fSubParameter, josta saadaan tieto
 //  siitä, oliko löydetty parametri itsenäinen vaiko jonkin parametrin aliparametri.
 NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
-									   , bool& fSubParameter 
+									   , bool& fSubParameter
 									   , const NFmiLevel* theLevel
 									   , NFmiInfoData::Type theType)
 {
@@ -193,11 +193,11 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 	return aInfo; // theParam ei löytynyt edes aliparametrina miltään listassa olevalta aInfo-pointterilta
 }
 //--------------------------------------------------------
-// Info 
+// Info
 //--------------------------------------------------------
 
 NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
-									   , bool& fSubParameter 
+									   , bool& fSubParameter
 									   , const NFmiLevel* theLevel
 									   , NFmiInfoData::Type theType
 									   , bool fIgnoreProducerName)
@@ -247,7 +247,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 // Etsi haluttu crossSection-data. Eli pitää olla yli 1 leveliä
 // eikä etsitä tiettyä leveliä.
 NFmiSmartInfo* NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataIdent
-													, bool& fSubParameter 
+													, bool& fSubParameter
 													, NFmiInfoData::Type theType
 													, bool fIgnoreProducerName)
 {
@@ -333,7 +333,7 @@ NFmiParamBag NFmiInfoOrganizer::StaticParams(void)
 // ja siellä käytetään tuottajista aina jotain default nimiä
 NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData)
 {
-	bool aSubParam;	
+	bool aSubParam;
 	NFmiSmartInfo* info = 0;
 	if(fLevelData)
 		info = CrossSectionInfo(theDataIdent, aSubParam, theType, true);
@@ -353,7 +353,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& the
 // Tämä luo SmartInfosta syvä kopion eli käyttää Clone-metodia, eli datakin kopioituu ja se pitää tuhota!!
 NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fTryParIdAlso)
 {
-	bool aSubParam;	
+	bool aSubParam;
 	NFmiSmartInfo* info = Info(theDataIdent, aSubParam, theLevel, theType);
 	if(info == 0 && fTryParIdAlso)
 		info = Info(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), aSubParam, theLevel, theType);
@@ -385,7 +385,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(NFmiSmartInfo* theUsedInfo, const N
 // drawParam kyseiselle parametrille löydetyn infon avulla.
 NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
-// Huomaa, että itsDrawParamFactory luo pointterin drawParam new:llä, joten   
+// Huomaa, että itsDrawParamFactory luo pointterin drawParam new:llä, joten
 // drawParam pitää muistaa tuhota  NFmiInfoOrganizer:n ulkopuolella
 	// int thePriority = 1;// toistaiseksi HARDCODE, thePriority määritys tehdään myöhemmin
 	NFmiDrawParam* drawParam = 0;
@@ -399,7 +399,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 	{
 		return CreateSynopPlotDrawParam(theIdent, theLevel, theType);
 	}
-	drawParam = itsDrawParamFactory->CreateDrawParam(theIdent, theLevel);	
+	drawParam = itsDrawParamFactory->CreateDrawParam(theIdent, theLevel);
 	if(drawParam)
 		drawParam->DataType(theType); // data tyyppi pitää myös asettaa!!
 	return drawParam;
@@ -409,7 +409,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 NFmiDrawParam* NFmiInfoOrganizer::CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType)
 {
 	NFmiDrawParam* drawParam = 0;
-	drawParam = itsDrawParamFactory->CreateCrossSectionDrawParam(theDataIdent);	
+	drawParam = itsDrawParamFactory->CreateCrossSectionDrawParam(theDataIdent);
 	if(drawParam)
 		drawParam->DataType(theType); // data tyyppi pitää myös asettaa!!
 	return drawParam;
@@ -426,12 +426,13 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateSynopPlotDrawParam(const NFmiDataIdent& 
 }
 
 //--------------------------------------------------------
-// AddData 
+// AddData
 //--------------------------------------------------------
 // HUOM!!!! Tänne ei ole sitten tarkoitus antaa kFmiDataTypeCopyOfEdited-tyyppistä
 // dataa, koska se luodaan kun tänne annetaan editoitavaa dataa.
 bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 									 ,const std::string& theDataFileName
+									 ,const std::string& theDataFilePattern
 									 ,NFmiInfoData::Type theDataType
 									 ,int theUndoLevel)
 {
@@ -439,7 +440,7 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 	if(theData)
 	{
 		NFmiQueryInfo aQueryInfo(theData);
-		NFmiSmartInfo* aSmartInfo = new NFmiSmartInfo(aQueryInfo, theData, theDataFileName, theDataType);// ...otetaan käyttöön myöhemmin
+		NFmiSmartInfo* aSmartInfo = new NFmiSmartInfo(aQueryInfo, theData, theDataFileName, theDataFilePattern, theDataType);// ...otetaan käyttöön myöhemmin
 		if(aSmartInfo)
 			aSmartInfo->First();
 
@@ -490,13 +491,13 @@ void NFmiInfoOrganizer::ClearData(NFmiInfoData::Type theDataType)
 	}
 }
 
-void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData::Type theDataType)
+void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData::Type theDataType, const std::string &theFileNamePattern)
 {
 	if(theInfo)
 	{
 		if(itsEditedData)
 		{
-			if(IsInfosTwoOfTheKind(theInfo, theDataType, itsEditedData, itsEditedData->DataType()))
+			if(IsInfosTwoOfTheKind(theInfo, theDataType, theFileNamePattern, itsEditedData))
 			{
 				itsEditedData->DestroySharedData();
 				delete itsEditedData;
@@ -507,7 +508,7 @@ void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData
 
 		for(Reset(); Next(); )
 		{
-			if(IsInfosTwoOfTheKind(theInfo, theDataType, Current(), Current()->DataType()))
+			if(IsInfosTwoOfTheKind(theInfo, theDataType, theFileNamePattern, Current()))
 			{
 				Current()->DestroySharedData();
 				Remove();
@@ -529,36 +530,38 @@ int NFmiInfoOrganizer::CountData(void)
 
 // this kind of määritellään tällä hetkellä:
 // parametrien, leveleiden ja mahdollisen gridin avulla (ei location bagin avulla)
-bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, NFmiQueryInfo* theInfo2, NFmiInfoData::Type theType2)
+bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, NFmiSmartInfo* theSmartInfo2)
 {
 	// parametrit ja tuottajat samoja
-	if(theInfo1 && theInfo2)
+	if(theInfo1 && theSmartInfo2)
 	{
-		if(theType1 == theType2)
+		if(theType1 == theSmartInfo2->DataType())
 		{
-			if(theInfo1->ParamBag() == theInfo2->ParamBag()) 
+			if(theFileNamePattern.empty() == false && theSmartInfo2->DataFilePattern().empty() == false && theFileNamePattern == theSmartInfo2->DataFilePattern())
+				return true; // jos filepatternit eivät olleet tyhjiä ja ne ovat samanlaisia, pidetään datoja samanlaisina (tämä auttaa, jos datat muuttuvat (paramereja lisää, asemia lisää jne.))
+			if(theInfo1->ParamBag() == theSmartInfo2->ParamBag())
 			{
-				// Level tyypit pitääolla samoja ja niiden lukumäärät niin että joko leveleitä on molemmissa 
+				// Level tyypit pitääolla samoja ja niiden lukumäärät niin että joko leveleitä on molemmissa
 				// tasan yksi tai molemmissa on yli yksi.
 				// Ongelmia muuten data päivityksen kanssa jos esim. luotaus datoissa on eri määrä leveleitä
 				// tai päivitetään hybridi dataa ja level määrä muuttuu tms.
 				FmiLevelType levelType1 = theInfo1->VPlaceDescriptor().Level(0)->LevelType();
-				FmiLevelType levelType2 = theInfo2->VPlaceDescriptor().Level(0)->LevelType();
+				FmiLevelType levelType2 = theSmartInfo2->VPlaceDescriptor().Level(0)->LevelType();
 				unsigned long size1 = theInfo1->VPlaceDescriptor().Size();
-				unsigned long size2 = theInfo2->VPlaceDescriptor().Size();
+				unsigned long size2 = theSmartInfo2->VPlaceDescriptor().Size();
 				if(levelType1 == levelType2 && (size1 == size2 || (size1 > 1 && size2 > 1)))
 				{
 					// mahdollinen gridi samoja
 					bool status3 = true;
-					if(theInfo1->Grid() && theInfo2->Grid())
+					if(theInfo1->Grid() && theSmartInfo2->Grid())
 					{
-						status3 = (theInfo1->Grid()->AreGridsIdentical(*theInfo2->Grid())) == true;
+						status3 = (theInfo1->Grid()->AreGridsIdentical(*theSmartInfo2->Grid())) == true;
 					}
 					if(status3)
 					{
 						theInfo1->FirstParam(); // varmistaa, että producer löytyy
-						theInfo2->FirstParam();
-						if(*theInfo1->Producer() == *theInfo2->Producer())
+						theSmartInfo2->FirstParam();
+						if(*theInfo1->Producer() == *theSmartInfo2->Producer())
 							return true;
 					}
 				}
@@ -569,7 +572,7 @@ bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoDat
 }
 
 //--------------------------------------------------------
-// ProducerList 
+// ProducerList
 //--------------------------------------------------------
 // EI TOIMI TEHTYJEN MUUTOSTEN JÄLKEEN (1999.08.26/Marko), KORJAA!!!
 NFmiProducerList* NFmiInfoOrganizer::ProducerList(void)
@@ -585,10 +588,10 @@ NFmiProducerList* NFmiInfoOrganizer::ProducerList(void)
 }
 
 //--------------------------------------------------------
-// Add 
+// Add
 //--------------------------------------------------------
 //   Laittaa alkuperäisen pointterin listaan - uutta pointteria
-//   ei luoda vaan NFmiInfoOrganizer::itsList ottaa pointterin 
+//   ei luoda vaan NFmiInfoOrganizer::itsList ottaa pointterin
 //   'omistukseen'. Tämän luokan destruktori tuhoaa infot.
 bool NFmiInfoOrganizer::Add (NFmiSmartInfo* theInfo)
 {
@@ -597,22 +600,22 @@ bool NFmiInfoOrganizer::Add (NFmiSmartInfo* theInfo)
 	return false;
 }
 //--------------------------------------------------------
-// Clear 
+// Clear
 //--------------------------------------------------------
 // tuhoaa aina datan
 bool NFmiInfoOrganizer::Clear (void)
-{ 
+{
 	for( Reset(); Next(); )
 	{
 		Current()->DestroySharedData();
 		delete Current();
 	}
 	itsList.Clear(false);
-	return true; // jotain pitäsi varmaan tsekatakin? 
+	return true; // jotain pitäsi varmaan tsekatakin?
 }
- 
+
 //--------------------------------------------------------
-// Reset 
+// Reset
 //--------------------------------------------------------
 bool NFmiInfoOrganizer::Reset (void)
 {
@@ -620,14 +623,14 @@ bool NFmiInfoOrganizer::Reset (void)
    return true;
 }
 //--------------------------------------------------------
-// Next 
+// Next
 //--------------------------------------------------------
 bool NFmiInfoOrganizer::Next (void)
 {
    return itsIter.Next();
 }
 //--------------------------------------------------------
-// Current 
+// Current
 //--------------------------------------------------------
 NFmiSmartInfo* NFmiInfoOrganizer::Current (void)
 {
@@ -635,7 +638,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Current (void)
 }
 
 //--------------------------------------------------------
-// Remove 
+// Remove
 //--------------------------------------------------------
 bool NFmiInfoOrganizer::Remove(void)
 {
@@ -718,7 +721,7 @@ void NFmiInfoOrganizer::UpdateEditedDataCopy(void)
 	}
 }
 
-// luo makroparametri dataa varten tyhjä qdatan, jossa on yksi aika,parametri ja leveli 
+// luo makroparametri dataa varten tyhjä qdatan, jossa on yksi aika,parametri ja leveli
 // ja editoidun datan hplaceDescriptori
 static NFmiQueryData* CreateDefaultMacroParamQueryData(NFmiQueryInfo & theEditedInfo)
 {
@@ -754,7 +757,7 @@ void NFmiInfoOrganizer::UpdateMacroParamData(void)
 		if(data)
 		{
 			NFmiQueryInfo infoIter(data);
-			itsMacroParamData = new NFmiSmartInfo(infoIter, data, "", NFmiInfoData::kMacroParam);
+			itsMacroParamData = new NFmiSmartInfo(infoIter, data, "", "", NFmiInfoData::kMacroParam);
 			if(itsMacroParamData && itsMacroParamData->IsGrid())
 			{ // alustetaan missing matriisi, että sillä voidaan alustaa ennen makroparamin piirtoa kenttä ensin puuttuvaksi (tämä tehdään NFmiStationView-luokassa)
 				itsDefaultMissingValueMatrix.Resize(itsMacroParamData->Grid()->XNumber(), itsMacroParamData->Grid()->YNumber(), kFloatMissing);
@@ -827,7 +830,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, int t
 	return 0;
 }
 
-// Palauttaa vectorin viewable infoja, vectori ei omista pointtereita, 
+// Palauttaa vectorin viewable infoja, vectori ei omista pointtereita,
 // joten infoja ei saa tuhota.
 checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type theDataType)
 {
@@ -843,7 +846,7 @@ checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type the
 		if(itsEditedDataCopy)
 			infoVector.push_back(itsEditedDataCopy);
 	}
-	else 
+	else
 	{
 		for(Reset(); Next();)
 		{
