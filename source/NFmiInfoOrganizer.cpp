@@ -805,9 +805,9 @@ NFmiSmartInfo* NFmiInfoOrganizer::ClimatologyInfo(void)
 	return 0;
 }
 
-NFmiSmartInfo* NFmiInfoOrganizer::AnalyzeDataInfo(void) // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
+NFmiSmartInfo* NFmiInfoOrganizer::AnalyzeDataInfo(const NFmiProducer& theProducer) // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 {
-	return FindInfo(NFmiInfoData::kAnalyzeData);
+	return FindInfo(NFmiInfoData::kAnalyzeData, theProducer, true);
 }
 
 NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType) // Hakee 1. tietyn datatyypin infon
