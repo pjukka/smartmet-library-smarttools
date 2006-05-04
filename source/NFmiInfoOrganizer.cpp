@@ -71,6 +71,8 @@ NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 ,itsWorkingDirectory("")
 ,itsEditedData(0)
 ,itsEditedDataCopy(0)
+,itsMacroParamGridSizeX(40)
+,itsMacroParamGridSizeY(40)
 ,itsMacroParamData(0)
 ,itsDefaultMissingValueMatrix()
 ,fCreateEditedDataCopy(true)
@@ -456,7 +458,7 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 			itsEditedData = aSmartInfo;
 			fCreateEditedDataCopy = theUndoLevel ? true : false; // pitää päivittää kopion luomiseen vaikuttavaa muuttujaa undo-levelin mukaan
 			UpdateEditedDataCopy();
-			UpdateMacroParamData();
+//			UpdateMacroParamData();
 
 			status = true;
 		}
@@ -721,6 +723,28 @@ void NFmiInfoOrganizer::UpdateEditedDataCopy(void)
 	}
 }
 
+static NFmiQueryData* CreateDefaultMacroParamQueryData(const NFmiArea *theArea, int gridSizeX, int gridSizeY)
+{
+	NFmiLevelBag levelBag;
+	levelBag.AddLevel(NFmiLevel(kFmiGroundSurface, 0)); // ihan mitä puppua vain, ei väliä
+	NFmiVPlaceDescriptor vPlace(levelBag);
+
+	NFmiParamBag parBag;
+	parBag.Add(NFmiDataIdent(NFmiParam(998, "macroParam", kFloatMissing, kFloatMissing, 1, 0, NFmiString("%.1f"), kLinearly)));
+	NFmiParamDescriptor parDesc(parBag);
+
+	NFmiMetTime originTime;
+	NFmiTimeBag validTimes(originTime, originTime, 60); // yhden kokoinen feikki timebagi
+	NFmiTimeDescriptor timeDesc(originTime, validTimes);
+
+	NFmiGrid grid(theArea, gridSizeX, gridSizeY);
+	NFmiHPlaceDescriptor hPlace(grid);
+
+	NFmiQueryInfo info(parDesc, timeDesc, hPlace, vPlace);
+	return NFmiQueryDataUtil::CreateEmptyData(info);
+}
+
+/*
 // luo makroparametri dataa varten tyhjä qdatan, jossa on yksi aika,parametri ja leveli
 // ja editoidun datan hplaceDescriptori
 static NFmiQueryData* CreateDefaultMacroParamQueryData(NFmiQueryInfo & theEditedInfo)
@@ -740,9 +764,35 @@ static NFmiQueryData* CreateDefaultMacroParamQueryData(NFmiQueryInfo & theEdited
 	NFmiQueryInfo info(parDesc, timeDesc, theEditedInfo.HPlaceDescriptor(), vPlace);
 	return NFmiQueryDataUtil::CreateEmptyData(info);
 }
+*/
 
+void NFmiInfoOrganizer::SetMacroParamDataGridSize(int x, int y)
+{
+	itsMacroParamGridSizeX = x;
+	itsMacroParamGridSizeY = y;
+}
+
+// aina kun editorin area muuttuu, pitää macroData päivittää
+void NFmiInfoOrganizer::UpdateMacroParamDataArea(const NFmiArea *theArea)
+{
+	// tuhoa ensin vanha pois alta
+	if(itsMacroParamData)
+		itsMacroParamData->DestroySharedData();
+	delete itsMacroParamData;
+	itsMacroParamData = 0;
+
+	// Luo sitten uusi data jossa on yksi aika,param ja level ja luo hplaceDesc annetusta areasta ja hila koosta
+	NFmiQueryData* data = CreateDefaultMacroParamQueryData(theArea, itsMacroParamGridSizeX, itsMacroParamGridSizeY);
+	if(data)
+	{
+		NFmiQueryInfo infoIter(data);
+		itsMacroParamData = new NFmiSmartInfo(infoIter, data, "", "", NFmiInfoData::kMacroParam);
+		itsDefaultMissingValueMatrix.Resize(itsMacroParamData->Grid()->XNumber(), itsMacroParamData->Grid()->YNumber(), kFloatMissing);
+	}
+}
+/*
 // Aina kun on asetettu uusi editoitu data, on makroparam-data päivitettävä
-void NFmiInfoOrganizer::UpdateMacroParamData(void)
+void NFmiInfoOrganizer::UpdateMacroParamDataArea(void)
 {
 	if(itsEditedData)
 	{
@@ -765,7 +815,7 @@ void NFmiInfoOrganizer::UpdateMacroParamData(void)
 		}
 	}
 }
-
+*/
 // kaikkien staattisten (ei muutu ajan mukana) datojen parambag (esim. topografia)
 NFmiParamBag NFmiInfoOrganizer::ObservationParams(void)
 {

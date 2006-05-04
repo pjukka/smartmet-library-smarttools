@@ -52,6 +52,7 @@ class NFmiSmartInfo;
 class NFmiLevel;
 class NFmiQueryInfo;
 class NFmiLevelBag;
+class NFmiArea;
 
 class NFmiInfoOrganizer
 {
@@ -128,6 +129,8 @@ class NFmiInfoOrganizer
 	NFmiDataMatrix<float>& DefaultMissingValueMatrix(void){return itsDefaultMissingValueMatrix;}
 	void SetDrawParamPath(const std::string &theDrawParamPath);
 	const std::string GetDrawParamPath(void);
+	void SetMacroParamDataGridSize(int x, int y);
+	void UpdateMacroParamDataArea(const NFmiArea *theArea);
  private:
 	int CountData(void);
  	bool Remove(void);
@@ -144,7 +147,6 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* CrossSectionInfo(const NFmiDataIdent& theDataIdent, bool& fSubParameter, NFmiInfoData::Type theType, bool fIgnoreProducerName = false);
     bool Add (NFmiSmartInfo* theInfo);
 	NFmiParamBag GetParams(NFmiInfoData::Type theDataType);
-	void UpdateMacroParamData(void);
 	NFmiSmartInfo* GetSynopPlotParamInfo( const FmiParameterName& theParam
 										, bool& fSubParameter
 										, const NFmiLevel* theLevel
@@ -160,6 +162,9 @@ class NFmiInfoOrganizer
 	std::string itsWorkingDirectory;
 	NFmiSmartInfo* itsEditedData; // editoitavaa dataa voi olla vain yksi kerrallaan, joten laitoin sen erilleen tehokkuuden takia.
 	NFmiSmartInfo* itsEditedDataCopy; // t‰m‰ on editoitavan datan kopio, mit‰ k‰ytt‰j‰ voi halutessaan p‰ivitt‰‰, k‰ytet‰‰n visualisoimaan tehtyj‰ muutoksia datassa
+
+	int itsMacroParamGridSizeX;
+	int itsMacroParamGridSizeY;
 	NFmiSmartInfo* itsMacroParamData; // makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
 	NFmiDataMatrix<float> itsDefaultMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
 
