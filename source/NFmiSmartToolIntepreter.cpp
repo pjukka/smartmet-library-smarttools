@@ -194,6 +194,7 @@ NFmiSmartToolIntepreter::BinaOperMap NFmiSmartToolIntepreter::itsBinaryOperator;
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenStaticParameterNamesAndIds;
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenCalculatedParameterNamesAndIds;
 NFmiSmartToolIntepreter::LevelMap NFmiSmartToolIntepreter::itsTokenLevelNamesIdentsAndValues;
+NFmiSmartToolIntepreter::SoundingIndexMap NFmiSmartToolIntepreter::itsTokenSoundingIndexFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenThreeArgumentFunctions;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenPeekXYFunctions;
@@ -1239,6 +1240,9 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &th
 	if(IsVariableBinaryOperator(theVariableText, theMaskInfo)) // t‰m‰ on and ja or tapausten k‰sittelyyn
 		return true;
 
+	if(IsVariableSoundingParameter(theVariableText, theMaskInfo, fProducerExist, theParamNameOnly, theProducerNameOnly))
+		return true;
+
 	return false;
 }
 bool NFmiSmartToolIntepreter::IsProducerOrig(std::string &theProducerText)
@@ -1634,6 +1638,32 @@ bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVaria
 			}
 		}
 		throw runtime_error(string("Matemaattisen funktion parametrit v‰‰rin: ") + theVariableText);
+	}
+	return false;
+}
+
+bool NFmiSmartToolIntepreter::IsVariableSoundingParameter(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theProducerNameOnly)
+{
+	std::string tmp(fProducerExist ? theParamNameOnly : theVariableText);
+	SoundingIndexMap::iterator it = itsTokenSoundingIndexFunctions.find(NFmiStringTools::LowerCase(tmp)); // t‰ss‰ tarkastellaan case insensitiivisesti
+	if(it != itsTokenSoundingIndexFunctions.end())
+	{
+		theMaskInfo->SetOperationType(NFmiAreaMask::SoundingIndexFunction);
+		theMaskInfo->SoundingParameter((*it).second);
+		NFmiParam param(4, "T"); // l‰mpˆtila on lˆydytt‰v‰ datasta, muuten ei voi laskea mit‰‰n
+		NFmiProducer producer;
+		if(fProducerExist)
+		{
+			producer = GetPossibleProducerInfo(theProducerNameOnly);
+			theMaskInfo->SetUseDefaultProducer(false);
+		}
+		else
+		{
+			theMaskInfo->SetUseDefaultProducer(true);
+		}
+		theMaskInfo->SetDataType(NFmiInfoData::kSoundingParameterData);
+		theMaskInfo->SetDataIdent(NFmiDataIdent(param, producer));
+		return true;
 	}
 	return false;
 }
@@ -2333,6 +2363,40 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("500"), make_pair(kFmiPressureLevel, 500)));
 		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("300"), make_pair(kFmiPressureLevel, 300)));
 
+		// ****** sounding index funktiot  HUOM! ne k‰sitell‰‰n case insensitivein‰!! *************************
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclsur"), kSoundingParLCLSur));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfcsur"), kSoundingParLFCSur));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elsur"), kSoundingParELSur));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("capesur"), kSoundingParCAPESur));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape03kmsur"), kSoundingParCAPE0_3kmSur));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cinsur"), kSoundingParCINSur));
+
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lcl500m"), kSoundingParLCL500m));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfc500m"), kSoundingParLFC500m));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("el500m"), kSoundingParEL500m));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape500m"), kSoundingParCAPE500m));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape03km500m"), kSoundingParCAPE0_3km500m));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cin500m"), kSoundingParCIN500m));
+
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclmostun"), kSoundingParLCLMostUn));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfcmostun"), kSoundingParLFCMostUn));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elmostun"), kSoundingParELMostUn));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("capemostun"), kSoundingParCAPEMostUn));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape03kmmostun"), kSoundingParCAPE0_3kmMostUn));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cinmostun"), kSoundingParCINMostUn));
+
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("show"), kSoundingParSHOW));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lift"), kSoundingParLIFT));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("kinx"), kSoundingParKINX));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("ctot"), kSoundingParCTOT));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("vtot"), kSoundingParVTOT));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("totl"), kSoundingParTOTL));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("bulkshear06km"), kSoundingParBS0_6km));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("bulkshear01km"), kSoundingParBS0_1km));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("srh03km"), kSoundingParSRH0_3km));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("srh01km"), kSoundingParSRH0_1km));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("thetae03km"), kSoundingParThetaE0_3km));
+		// ****** sounding index funktiot *************************
 		
 		itsTokenCalculationBlockMarkers.push_back(string("{"));
 		itsTokenCalculationBlockMarkers.push_back(string("}"));

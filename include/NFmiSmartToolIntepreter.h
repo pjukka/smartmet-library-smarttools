@@ -49,6 +49,7 @@
 #include "NFmiLevelType.h"
 #include "NFmiParamBag.h"
 #include "NFmiDataMatrix.h"
+#include "NFmiSoundingIndexCalculator.h"
 
 #include <string>
 #include <map>
@@ -207,6 +208,7 @@ private:
 	bool IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariablePeekFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
+	bool IsVariableSoundingParameter(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theProducerNameOnly);
 	FmiLevelType GetLevelType(NFmiInfoData::Type theDataType, long levelValue);
 
 	NFmiInfoOrganizer* itsInfoOrganizer; // ei omista
@@ -252,6 +254,9 @@ private:
 	static ParamMap itsTokenCalculatedParameterNamesAndIds; // mm. lat, lon ja elevAngle
 
 	static LevelMap itsTokenLevelNamesIdentsAndValues;
+
+	typedef std::map<std::string, FmiSoundingParameters> SoundingIndexMap;
+	static SoundingIndexMap itsTokenSoundingIndexFunctions;
 
 	typedef std::map<std::string, NFmiAreaMask::FunctionType> FunctionMap;
 	static FunctionMap itsTokenFunctions;
