@@ -43,6 +43,7 @@ NFmiAreaMaskInfo::NFmiAreaMaskInfo()
 ,itsOffsetPoint2()
 ,itsMathFunctionType(NFmiAreaMask::NotMathFunction)
 ,itsIntegrationFunctionType(0)
+,itsSoundingParameter(kSoundingParNone)
 {
 }
 

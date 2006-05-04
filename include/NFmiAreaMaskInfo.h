@@ -25,8 +25,8 @@
 #include "NFmiAreaMask.h"
 #include "NFmiDataIdent.h"
 #include "NFmiCalculationCondition.h"
-//#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiPoint.h"
+#include "NFmiSoundingIndexCalculator.h"
 
 class NFmiLevel;
 
@@ -74,6 +74,8 @@ public:
 	void SetMathFunctionType(NFmiAreaMask::MathFunctionType newValue) {itsMathFunctionType = newValue;};
 	int IntegrationFunctionType(void) const {return itsIntegrationFunctionType;}
 	void IntegrationFunctionType(int newValue) {itsIntegrationFunctionType = newValue;}
+	FmiSoundingParameters SoundingParameter(void) const {return itsSoundingParameter;}
+	void SoundingParameter(FmiSoundingParameters newValue) {itsSoundingParameter = newValue;}
 private:
 	NFmiDataIdent itsDataIdent;
 	bool fUseDefaultProducer;
@@ -90,5 +92,6 @@ private:
 	NFmiPoint itsOffsetPoint2; // paikkaoffset (loppu x ja y offset)
 	NFmiAreaMask::MathFunctionType itsMathFunctionType;
 	int itsIntegrationFunctionType; // 1=SumT tyylinen ja 2=SumZ tyylinen ja 3=MinH tyylinen funktio
+	FmiSoundingParameters itsSoundingParameter;
 };
 #endif
