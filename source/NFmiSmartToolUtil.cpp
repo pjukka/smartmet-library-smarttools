@@ -52,12 +52,12 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	try // suoritetaan macro sitten
 	{
 		if(goThroughLevels == false)
-			smartToolModifier.ModifyData(theTimes, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
+			smartToolModifier.ModifyData(theTimes, false, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
 		else
 		{
 			NFmiSmartInfo *editedInfo = dataBase.EditedInfo();
 			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
-				smartToolModifier.ModifyData(theTimes, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
+				smartToolModifier.ModifyData(theTimes, false, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
 		}
 	}
 	catch(std::exception &e)
