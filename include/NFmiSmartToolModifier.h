@@ -93,7 +93,7 @@ class NFmiSmartToolModifier
 {
 public:
 	void InitSmartTool(const std::string &theSmartToolText, bool fThisIsMacroParamSkript = false);
-	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly);
+	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation);
 	NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer);
 	~NFmiSmartToolModifier(void);
 
@@ -127,6 +127,8 @@ private:
 	NFmiSmartToolCalculationSection* CreateCalculationSection(NFmiSmartToolCalculationSectionInfo *theCalcSectionInfo);
 	NFmiSmartToolCalculation* CreateCalculation(NFmiSmartToolCalculationInfo *theCalcInfo);
 	NFmiSmartToolCalculation* CreateConditionalSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
+	NFmiAreaMask* CreateSoundingIndexFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
+	NFmiSmartInfo* CreateSoundingParamInfo(const NFmiDataIdent &theDataIdent, bool useEditedData);
 
 	NFmiInfoOrganizer *itsInfoOrganizer; // eli database, ei omista ei tuhoa
 	NFmiSmartToolIntepreter *itsSmartToolIntepreter; // omistaa, tuhoaa
@@ -138,6 +140,7 @@ private:
 	std::string itsIncludeDirectory; // mist‰ ladataan mahd. include filet
 
 	NFmiTimeDescriptor *itsModifiedTimes; // ei omista/tuhoa
+	bool fMacroParamCalculation; // t‰m‰ tieto tarvitaan scriptVariablejen kanssa, jos true, k‰ytet‰‰n pohjana macroParam-infoa, muuten editoitua dataa
 
 	// N‰m‰ muuttujat ovat sit‰ varten ett‰ SumZ ja MinH tyyppisiss‰ funktoissa
 	// k‰ytet‰‰n parasta mahdollista level-dataa. Eli ensin hybridi ja sitten painepinta dataa.

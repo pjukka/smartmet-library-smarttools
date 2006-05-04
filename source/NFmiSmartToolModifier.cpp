@@ -43,6 +43,7 @@
 #include "NFmiDrawParam.h"
 #include "NFmiMetEditorTypes.h"
 #include "NFmiQueryData.h"
+#include "NFmiInfoAreaMaskSoundingIndex.h"
 
 #include <cassert>
 #include <stdexcept>
@@ -225,6 +226,7 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer
 ,fModifySelectedLocationsOnly(false)
 ,itsIncludeDirectory()
 ,itsModifiedTimes(0)
+,fMacroParamCalculation(false)
 ,fHeightFunctionFlag(false)
 ,fUseLevelData(false)
 ,itsCommaCounter(0)
@@ -452,9 +454,10 @@ void NFmiSmartToolModifier::ClearCalculationModifiers(void)
 // Suorittaa varsinaiset modifikaatiot. Käyttäjä voi antaa parametrina rajoitetun ajan
 // modifioinneille, jos theModifiedTimes on 0-pointteri, tehdään operaatiot kaikille
 // datan ajoille.
-void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly)
+void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation)
 {
 	itsModifiedTimes = theModifiedTimes;
+	fMacroParamCalculation = isMacroParamCalculation;
 	fModifySelectedLocationsOnly = fSelectedLocationsOnly;
 	try
 	{
@@ -790,11 +793,33 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			areaMask = new NFmiCalculationDeltaZValue;
 			break;
 			}
+		case NFmiAreaMask::SoundingIndexFunction:
+			{
+			areaMask = CreateSoundingIndexFunctionAreaMask(theAreaMaskInfo);
+			break;
+			}
 		default:
 			throw runtime_error("Outo data tyyppi yritettäessä tehdä laskuja.");
 	}
 	areaMask->SetCalculationOperationType(maskType);
 
+	return areaMask;
+}
+
+NFmiAreaMask*  NFmiSmartToolModifier::CreateSoundingIndexFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo)
+{
+	// HUOM!! Tähän vaaditaan syvä data kopio!!!
+	// JOS kyseessä on ehtolauseen muuttujasta, joka on editoitavaa dataa.
+	NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
+	bool deepCopyCreated = false;
+	if(theAreaMaskInfo.GetUseDefaultProducer())
+	{ // Pitää tehdä syvä kopio datasta, että datan muuttuminen ei vaikuta laskuihin.
+		deepCopyCreated = true;
+		NFmiSmartInfo* tmp = info->Clone();
+		delete info;
+		info = tmp;
+	}
+	NFmiAreaMask *areaMask = new NFmiInfoAreaMaskSoundingIndex(info, theAreaMaskInfo.SoundingParameter(), true, deepCopyCreated);
 	return areaMask;
 }
 
@@ -890,6 +915,8 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 	NFmiSmartInfo* info = 0;
 	if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kScriptVariableData)
 		info = CreateScriptVariableInfo(theAreaMaskInfo.GetDataIdent());
+	else if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kSoundingParameterData)
+		info = CreateSoundingParamInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetUseDefaultProducer());
 	else if(theAreaMaskInfo.GetUseDefaultProducer() || theAreaMaskInfo.GetDataType() == NFmiInfoData::kCopyOfEdited)
 		info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), true, fUseLevelData);
 	else
@@ -933,6 +960,29 @@ struct FindScriptVariable
 
 	int itsParId;
 };
+
+NFmiSmartInfo* NFmiSmartToolModifier::CreateSoundingParamInfo(const NFmiDataIdent &theDataIdent, bool useEditedData)
+{
+	NFmiSmartInfo* info = 0;
+	if(useEditedData) // halutaanko editoitua dataa
+	{
+		info = itsInfoOrganizer->EditedInfo();
+		if(info->SizeLevels() > 1)
+			return info->Clone(); // vain level data kelpaa ja koska kyse editoidusta datasta, pitää siitä tehdä kopio
+		else
+			throw runtime_error(string("NFmiSmartToolModifier::CreateSoundingParamInfo - datassa ei ollut kuin yksi level, ei voi laskea luotaus indeksejä."));
+	}
+	else
+	{
+		// muuten yritetään ensin tuottajalta hybridi dataa, ja sitten lopuksi painepinta dataa
+		info = itsInfoOrganizer->CreateShallowCopyInfo(theDataIdent, 0, NFmiInfoData::kHybridData, false, true); // ensin yritetään hybrid dataa
+		if(info == 0)
+			info = itsInfoOrganizer->CreateShallowCopyInfo(theDataIdent, 0, NFmiInfoData::kViewable, false, true); // jos ei löytynyt hybrid-dataa, sitten painepinta dataa
+		if(info)
+			return info;
+	}
+	throw runtime_error(string("NFmiSmartToolModifier::CreateSoundingParamInfo - dataa/parametria ei löytynyt: ") + string(theDataIdent.GetParamName()));
+}
 
 NFmiSmartInfo* NFmiSmartToolModifier::CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent)
 {
@@ -978,11 +1028,11 @@ void NFmiSmartToolModifier::ClearScriptVariableInfos(void)
 
 NFmiSmartInfo* NFmiSmartToolModifier::CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent)
 {
-	NFmiSmartInfo* editedInfo = itsInfoOrganizer->EditedInfo();
+	NFmiSmartInfo* baseInfo = fMacroParamCalculation ? itsInfoOrganizer->MacroParamData() : itsInfoOrganizer->EditedInfo();
 	NFmiParamBag paramBag;
 	paramBag.Add(theDataIdent);
 	NFmiParamDescriptor paramDesc(paramBag);
-	NFmiQueryInfo innerInfo(paramDesc, itsModifiedTimes ? *itsModifiedTimes : editedInfo->TimeDescriptor(), editedInfo->HPlaceDescriptor(), editedInfo->VPlaceDescriptor());
+	NFmiQueryInfo innerInfo(paramDesc, itsModifiedTimes ? *itsModifiedTimes : baseInfo->TimeDescriptor(), baseInfo->HPlaceDescriptor(), baseInfo->VPlaceDescriptor());
 	NFmiQueryData *data = new NFmiQueryData(innerInfo);
 	data->Init();
 	NFmiQueryInfo info(data);
