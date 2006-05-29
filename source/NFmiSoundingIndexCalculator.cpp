@@ -175,6 +175,9 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 	case kSoundingParThetaE0_3km:
 		value = CalcThetaEDiffIndex(theSoundingData, 0, 3);
 		break;
+	case kSoundingParNone:
+		value = kFloatMissing;
+		break;
 	}
 
 	return static_cast<float>(value);
