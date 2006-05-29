@@ -615,9 +615,9 @@ checkedVector<float>& NFmiSoundingData::GetParamData(FmiParameterName theId)
 		return itsWindComponentUData;
 	case kFmiWindVMS:
 		return itsWindComponentVData;
-
+	default:
+	  throw std::runtime_error(std::string("NFmiSoundingData::GetParamData - v‰‰r‰ paramId annettu: ") + NFmiStringTools::Convert<int>(theId));
 	}
-	throw std::runtime_error(std::string("NFmiSoundingData::GetParamData - v‰‰r‰ paramId annettu: ") + NFmiStringTools::Convert<int>(theId));
 }
 
 void NFmiSoundingData::ClearDatas(void)
