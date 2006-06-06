@@ -71,8 +71,9 @@ NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 ,itsWorkingDirectory("")
 ,itsEditedData(0)
 ,itsEditedDataCopy(0)
-,itsMacroParamGridSizeX(40)
-,itsMacroParamGridSizeY(40)
+,itsMacroParamGridSize(50, 50)
+,itsMacroParamMinGridSize(10, 10)
+,itsMacroParamMaxGridSize(200, 200)
 ,itsMacroParamData(0)
 ,itsDefaultMissingValueMatrix()
 ,fCreateEditedDataCopy(true)
@@ -768,8 +769,19 @@ static NFmiQueryData* CreateDefaultMacroParamQueryData(NFmiQueryInfo & theEdited
 
 void NFmiInfoOrganizer::SetMacroParamDataGridSize(int x, int y)
 {
-	itsMacroParamGridSizeX = x;
-	itsMacroParamGridSizeY = y;
+	x = FmiMin(x, static_cast<int>(itsMacroParamMaxGridSize.X()));
+	y = FmiMin(y, static_cast<int>(itsMacroParamMaxGridSize.Y()));
+	x = FmiMax(x, static_cast<int>(itsMacroParamMinGridSize.X()));
+	y = FmiMax(y, static_cast<int>(itsMacroParamMinGridSize.Y()));
+	itsMacroParamGridSize = NFmiPoint(x, y);
+}
+void NFmiInfoOrganizer::SetMacroParamDataMinGridSize(int x, int y)
+{
+	itsMacroParamMinGridSize = NFmiPoint(x, y);
+}
+void NFmiInfoOrganizer::SetMacroParamDataMaxGridSize(int x, int y)
+{
+	itsMacroParamMaxGridSize = NFmiPoint(x, y);
 }
 
 // aina kun editorin area muuttuu, pit‰‰ macroData p‰ivitt‰‰
@@ -782,7 +794,7 @@ void NFmiInfoOrganizer::UpdateMacroParamDataArea(const NFmiArea *theArea)
 	itsMacroParamData = 0;
 
 	// Luo sitten uusi data jossa on yksi aika,param ja level ja luo hplaceDesc annetusta areasta ja hila koosta
-	NFmiQueryData* data = CreateDefaultMacroParamQueryData(theArea, itsMacroParamGridSizeX, itsMacroParamGridSizeY);
+	NFmiQueryData* data = CreateDefaultMacroParamQueryData(theArea, static_cast<int>(itsMacroParamGridSize.X()), static_cast<int>(itsMacroParamGridSize.Y()));
 	if(data)
 	{
 		NFmiQueryInfo infoIter(data);
