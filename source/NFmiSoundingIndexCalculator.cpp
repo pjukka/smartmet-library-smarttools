@@ -105,6 +105,9 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 	case kSoundingParCINSur:
 		value = CalcCINIndex(theSoundingData, kLCLCalcSurface);
 		break;
+	case kSoundingParLCLHeightSur:
+		value = CalcLCLHeightIndex(theSoundingData, kLCLCalcSurface);
+		break;
 
 	// **** 500 m mixing ****
 	case kSoundingParLCL500m:
@@ -118,6 +121,9 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 		break;
 	case kSoundingParCIN500m:
 		value = CalcCINIndex(theSoundingData, kLCLCalc500m2);
+		break;
+	case kSoundingParLCLHeight500m:
+		value = CalcLCLHeightIndex(theSoundingData, kLCLCalc500m2);
 		break;
 
 	// **** most unstable case ****
@@ -133,6 +139,9 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 	case kSoundingParCINMostUn:
 		value = CalcCINIndex(theSoundingData, kLCLCalcMostUnstable);
 		break;
+	case kSoundingParLCLHeightMostUn:
+		value = CalcLCLHeightIndex(theSoundingData, kLCLCalcMostUnstable);
+		break;
 
 	// **** 3. indeksit jotka lasketaan jonkun muun indeksin yhteydessä, tarvitaan myös mahdollisesti pintakerros lasku tyyppi ja soundingdata ***
 	case kSoundingParLFCSur:
@@ -141,6 +150,12 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 	case kSoundingParELSur:
 		xxxxValue = CalcLFCIndex(theSoundingData, kLCLCalcSurface, value);
 		break;
+	case kSoundingParLFCHeightSur:
+		value = CalcLFCHeightIndex(theSoundingData, kLCLCalcSurface, xxxxValue);
+		break;
+	case kSoundingParELHeightSur:
+		xxxxValue = CalcLFCHeightIndex(theSoundingData, kLCLCalcSurface, value);
+		break;
 
 	case kSoundingParLFC500m:
 		value = CalcLFCIndex(theSoundingData, kLCLCalc500m2, xxxxValue);
@@ -148,12 +163,24 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 	case kSoundingParEL500m:
 		xxxxValue = CalcLFCIndex(theSoundingData, kLCLCalc500m2, value);
 		break;
+	case kSoundingParLFCHeight500m:
+		value = CalcLFCHeightIndex(theSoundingData, kLCLCalc500m2, xxxxValue);
+		break;
+	case kSoundingParELHeight500m:
+		xxxxValue = CalcLFCHeightIndex(theSoundingData, kLCLCalc500m2, value);
+		break;
 
 	case kSoundingParLFCMostUn:
 		value = CalcLFCIndex(theSoundingData, kLCLCalcMostUnstable, xxxxValue);
 		break;
 	case kSoundingParELMostUn:
 		xxxxValue = CalcLFCIndex(theSoundingData, kLCLCalcMostUnstable, value);
+		break;
+	case kSoundingParLFCHeightMostUn:
+		value = CalcLFCHeightIndex(theSoundingData, kLCLCalcMostUnstable, xxxxValue);
+		break;
+	case kSoundingParELHeightMostUn:
+		xxxxValue = CalcLFCHeightIndex(theSoundingData, kLCLCalcMostUnstable, value);
 		break;
 
 	// **** 4. indeksit joiden laskuissa tarvitaan korkeus parametreja ja soundingdata ***

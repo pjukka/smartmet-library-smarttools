@@ -610,6 +610,11 @@ double CalcLCLIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType)
 {
 	return CalcLCLPressureLevel(theData, theLCLCalcType);
 }
+// palauttaa LCL:n korkeuden metreissä
+double CalcLCLHeightIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType)
+{
+	return theData.GetValueAtPressure(kFmiGeomHeight, static_cast<float>(CalcLCLPressureLevel(theData, theLCLCalcType)));
+}
 
 // Claculates LFC (Level of Free Convection)
 // which is the level above which the lifted parcel is warmer than environment
@@ -663,6 +668,14 @@ double CalcLFCIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, do
 	if(foundPValue != kFloatMissing && LCLValue < foundPValue)
 		foundPValue = LCLValue; // LFC:n pitää olla ainakin LCL korkeudessa tai korkeammalla eli kun paineesta kysymys LCL >= LFC 
 	return foundPValue;
+}
+
+// palauttaa LFC:n ja  EL:n korkeuden metreissä
+double CalcLFCHeightIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double &ELheigth)
+{
+	double tmpValue = CalcLFCIndex(theData, theLCLCalcType, ELheigth);
+	ELheigth = theData.GetValueAtPressure(kFmiGeomHeight, static_cast<float>(ELheigth));
+	return theData.GetValueAtPressure(kFmiGeomHeight, static_cast<float>(tmpValue));
 }
 
 // Calculates CAPE (500 m mix)

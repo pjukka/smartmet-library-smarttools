@@ -37,7 +37,9 @@ namespace NFmiSoundingFunctions
 	double CalcTOTLIndex(NFmiSoundingData &theData);
 	double CalcLCLPressureLevel(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType);
 	double CalcLCLIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType);
+	double CalcLCLHeightIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType);
 	double CalcLFCIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double &EL);
+	double CalcLFCHeightIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double &ELheigth);
 	double CalcCAPE500Index(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double theHeightLimit = kFloatMissing);
 	double CalcCINIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType);
 	double CalcBulkShearIndex(NFmiSoundingData &theData, double startH, double endH);
