@@ -968,7 +968,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateSoundingParamInfo(const NFmiDataIden
 	{
 		info = itsInfoOrganizer->EditedInfo();
 		if(info->SizeLevels() > 1)
-			return info->Clone(); // vain level data kelpaa ja koska kyse editoidusta datasta, pit‰‰ siit‰ tehd‰ kopio
+			return new NFmiSmartInfo(*info); // vain level data kelpaa ja koska kyse editoidusta datasta, pit‰‰ siit‰ tehd‰ kopio
 		else
 			throw runtime_error(string("NFmiSmartToolModifier::CreateSoundingParamInfo - datassa ei ollut kuin yksi level, ei voi laskea luotaus indeksej‰."));
 	}
