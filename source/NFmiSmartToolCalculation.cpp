@@ -36,6 +36,7 @@
 #include <cassert>
 #include <stdexcept>
 #include <float.h>
+#include "NFmiDictionaryFunction.h"
 
 
 using namespace std;
@@ -138,7 +139,7 @@ void NFmiSmartToolCalculation::SetLimits(float theLowerLimit, float theUpperLimi
 	if(fDoLimitCheck)
 	{
 		if(theLowerLimit >= theUpperLimit)
-			throw runtime_error("Parametrin max ja min rajat ovat v‰‰rin p‰in.");
+			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorMinMaxLimits"));
 		else
 		{
 			itsLowerLimit = theLowerLimit;
@@ -200,11 +201,11 @@ double NFmiSmartToolCalculation::eval_exp(const NFmiPoint &theLatlon, const NFmi
 
 	get_token();
 	if(!token || token->GetCalculationOperationType() == NFmiAreaMask::NoType || token->GetCalculationOperationType() == NFmiAreaMask::EndOfOperations) 
-		throw  runtime_error(string("Virheellinen laskusuoritus yritys, ei laskuja ollenkaan: \n") + GetCalculationText());
+		throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorNoCalculations") + ":\n" + GetCalculationText());
 
 	eval_exp1(result, theLatlon, theTime, theTimeIndex);
 	if(token->GetCalculationOperationType() != NFmiAreaMask::EndOfOperations) 
-		throw  runtime_error(string("Virheellinen laskusuoritus yritys, lasku ei loppunut kuin olisi pit‰nyt: \n") + GetCalculationText());
+		throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidEnding") + ":\n" + GetCalculationText());
 	return result;
 }
 
@@ -307,7 +308,7 @@ void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLat
 		eval_exp2(result, theLatlon, theTime, theTimeIndex);
 //		if(*token != ')')
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis)
-			throw  runtime_error(string("Sulut eiv‰t ole oikein laskussa: \n") + GetCalculationText());
+			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParenthesis") + ":\n" + GetCalculationText());
 		get_token();
 	}
 	else if(token->GetCalculationOperationType() == NFmiAreaMask::MathFunctionStart)
@@ -317,7 +318,7 @@ void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLat
 		eval_exp2(result, theLatlon, theTime, theTimeIndex);
 //		if(*token != ')')
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
-			throw  runtime_error(string("Sulut eiv‰t ole oikein laskussa matemaattisen funktion yhteydess‰: \n") + GetCalculationText());
+			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") + ":\n" + GetCalculationText());
 		eval_math_function(result, function);
 		get_token();
 	}
@@ -329,16 +330,16 @@ void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLat
 		double argument1 = kFloatMissing;
 		eval_exp2(argument1, theLatlon, theTime, theTimeIndex);
 		if(token->GetCalculationOperationType() != NFmiAreaMask::CommaOperator) // n‰iden funktioiden argumentit erotetaan pilkuilla
-			throw  runtime_error(string("Funktion yhteydess‰ olevat argumentit eiv‰t olleet eroteltu pilkuilla oikein: \n") + GetCalculationText());
+			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParamSeparation") + ":\n" + GetCalculationText());
 		get_token();
 		double argument2 = kFloatMissing;
 		eval_exp2(argument2, theLatlon, theTime, theTimeIndex);
 		if(token->GetCalculationOperationType() != NFmiAreaMask::CommaOperator) // n‰iden funktioiden argumentit erotetaan pilkuilla
-			throw  runtime_error(string("Funktion yhteydess‰ olevat argumentit eiv‰t olleet eroteltu pilkuilla oikein: \n") + GetCalculationText());
+			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParamSeparation") + ":\n" + GetCalculationText());
 		eval_ThreeArgumentFunction(result, argument1, argument2, func, integrationFunctionType, theLatlon, theTime, theTimeIndex);
 
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
-			throw  runtime_error(string("Sulut eiv‰t ole oikein laskussa matemaattisen funktion yhteydess‰: \n") + GetCalculationText());
+			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") + ":\n" + GetCalculationText());
 		get_token();
 	}
 	else 
@@ -369,7 +370,7 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(double &result, double
 			if(startTime <= endTime)
 			{
 				if(endTime.DifferenceInMinutes(startTime)/usedTimeResolutionInMinutes > 250)
-					throw runtime_error("Aikalaskuun tuli laskusuorituksia yli 250 aika-askeleen, ei toteuteta laskuja.");
+					throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorTimeCalcOverRun"));
 				// 5. funktiosta riippuva datamodifier min, max jne.
 				NFmiDataModifier* modifier = CreateIntegrationFuction(func); // t‰m‰ palauttaa aina jotain, tai heitt‰‰ poikkeuksen
 				try
@@ -442,7 +443,7 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(double &result, doubl
 		if(argument1 >= 0 && argument1 <= argument2)
 		{
 			if((argument2 - argument2) > 35000)
-				throw runtime_error("Korkeuslaskuun tuli laskusuorituksia yli 35 km korkeudelta, tulee liikaa laskemista, ei toteuteta laskuja.");
+				throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorHeightCalcOverRun"));
 			// 5. funktiosta riippuva datamodifier min, max jne.
 			NFmiDataModifier* modifier = CreateIntegrationFuction(func); // t‰m‰ palauttaa aina jotain, tai heitt‰‰ poikkeuksen
 			try
@@ -506,7 +507,7 @@ NFmiDataModifier* NFmiSmartToolCalculation::CreateIntegrationFuction(NFmiAreaMas
 		break;
 		// HUOM!!!! Tee WAvg-modifier myˆs, joka on peritty Avg-modifierist‰ ja tee joku kerroin juttu painotukseen.
 	default:
-		throw runtime_error("Outo integraatio-funktio tyyppi yritett‰ess‰ tehd‰ laskuja.");
+		throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorIntegrationFunction"));
 	}
 	return modifier;
 }
@@ -591,7 +592,7 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
 		  result = (static_cast<double>(rand()) / RAND_MAX) * result; // palauttaa luvun 0 ja result:in v‰lilt‰
 		  break;
 		default:
-		  throw  runtime_error(string("Outo matemaattinen funktio, ohjelmointi vika: \n") + GetCalculationText());
+		  throw  runtime_error(::GetDictionaryString("SmartToolCalculationErrorMathFunction") + ":\n" + GetCalculationText());
 		}
 	}
 }
@@ -618,7 +619,7 @@ void NFmiSmartToolCalculation::get_token(void)
 	}
 	else
 	{
-		throw  runtime_error(string("Lasku loppuu kesken: \n") + GetCalculationText());
+		throw  runtime_error(::GetDictionaryString("SmartToolCalculationErrorWrongEnding") + ":\n" + GetCalculationText());
 	}
 }
 
@@ -634,11 +635,11 @@ bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiPoint &theLatlon, const NF
 
 	get_token();
 	if(!token || token->GetCalculationOperationType() == NFmiAreaMask::NoType || token->GetCalculationOperationType() == NFmiAreaMask::EndOfOperations) 
-		throw  runtime_error(string("Virheellinen laskusuoritus yritys, ei laskuja ollenkaan: \n") + GetCalculationText());
+		throw  runtime_error(::GetDictionaryString("SmartToolCalculationErrorNoCalculations") + ":\n" + GetCalculationText());
 
 	bin_eval_exp1(maskresult, result, theLatlon, theTime, theTimeIndex);
 	if(token->GetCalculationOperationType() != NFmiAreaMask::EndOfOperations) 
-		throw  runtime_error(string("Virheellinen maskin-laskusuoritus yritys, Lasku ei loppunutkaan kuin olisi pit‰nyt: \n") + GetCalculationText());
+		throw  runtime_error(::GetDictionaryString("SmartToolCalculationErrorConditionalEnding") + ":\n" + GetCalculationText());
 	return maskresult;
 }
 
@@ -673,7 +674,7 @@ void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult, double &result,
 			maskresult = (maskresult || tempmask);
 			break;
 		default:
-			throw  runtime_error(string("Outo  bin‰‰ri-operaattori maskissa:\n") + GetCalculationText());
+			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorStrangeConditional") + ":\n" + GetCalculationText());
 		}
 	}
 }
@@ -725,7 +726,7 @@ void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result,
 				maskresult = (result != temp);
 				break;
 			  default:
-				throw  runtime_error(string("Outo vertailu operaattori maskissa:\n") + GetCalculationText());
+				throw  runtime_error(::GetDictionaryString("SmartToolCalculationErrorStrangeComparison") + ":\n" + GetCalculationText());
 			  }
 		  }
 	}
@@ -820,7 +821,7 @@ void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, c
 		bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
 //		if(*token != ')')
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis)
-			throw  runtime_error(string("Sulut eiv‰t ole oikein laskussa: ") + GetCalculationText());
+			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParenthesis") + ":\n" + GetCalculationText());
 		get_token();
 	}
 	else if(token->GetCalculationOperationType() == NFmiAreaMask::MathFunctionStart)
@@ -830,7 +831,7 @@ void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, c
 		bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
 //		if(*token != ')')
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
-			throw  runtime_error(string("Sulut eiv‰t ole oikein laskussa matemaattisen funktion yhteydess‰: \n") + GetCalculationText());
+			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") + ":\n" + GetCalculationText());
 		eval_math_function(result, function);
 		get_token();
 	}
@@ -842,16 +843,16 @@ void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, c
 		double argument1 = kFloatMissing;
 		eval_exp2(argument1, theLatlon, theTime, theTimeIndex);
 		if(token->GetCalculationOperationType() != NFmiAreaMask::CommaOperator) // n‰iden funktioiden argumentit erotetaan pilkuilla
-			throw  runtime_error(string("Funktion yhteydess‰ olevat argumentit eiv‰t olleet eroteltu pilkuilla oikein: \n") + GetCalculationText());
+			throw  runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParamSeparation") + ":\n" + GetCalculationText());
 		get_token();
 		double argument2 = kFloatMissing;
 		eval_exp2(argument2, theLatlon, theTime, theTimeIndex);
 		if(token->GetCalculationOperationType() != NFmiAreaMask::CommaOperator) // n‰iden funktioiden argumentit erotetaan pilkuilla
-			throw  runtime_error(string("Funktion yhteydess‰ olevat argumentit eiv‰t olleet eroteltu pilkuilla oikein: \n") + GetCalculationText());
+			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParamSeparation") + ":\n" + GetCalculationText());
 		eval_ThreeArgumentFunction(result, argument1, argument2, func, integrationFunctionType, theLatlon, theTime, theTimeIndex);
 
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
-			throw  runtime_error(string("Sulut eiv‰t ole oikein laskussa matemaattisen funktion yhteydess‰: \n") + GetCalculationText());
+			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") + ":\n" + GetCalculationText());
 		get_token();
 	}
 	else 

@@ -44,6 +44,7 @@
 #include "NFmiMetEditorTypes.h"
 #include "NFmiQueryData.h"
 #include "NFmiInfoAreaMaskSoundingIndex.h"
+#include "NFmiDictionaryFunction.h"
 
 #include <cassert>
 #include <stdexcept>
@@ -287,7 +288,7 @@ NFmiSmartToolCalculationBlock* NFmiSmartToolModifier::CreateCalculationBlock(NFm
 		block->itsIfCalculationBlocks = CreateCalculationBlockVector(theBlockInfo->itsIfCalculationBlockInfos);
 		if(!block->itsIfCalculationBlocks)
 		{
-			string errorText("IF-lauseen perässä ei ollut lasku osiota?");
+			string errorText(::GetDictionaryString("SmartToolModifierErrorIfClause"));
 			throw runtime_error(errorText);
 		}
 		block->itsElseIfAreaMaskSection = CreateConditionalSection(theBlockInfo->itsElseIfAreaMaskSectionInfo);
@@ -296,7 +297,7 @@ NFmiSmartToolCalculationBlock* NFmiSmartToolModifier::CreateCalculationBlock(NFm
 			block->itsElseIfCalculationBlocks = CreateCalculationBlockVector(theBlockInfo->itsElseIfCalculationBlockInfos);
 			if(!block->itsElseIfCalculationBlocks)
 			{
-				string errorText("ELSEIF-lauseen perässä ei ollut lasku osiota?");
+				string errorText(::GetDictionaryString("SmartToolModifierErrorElseIfClause"));
 				throw runtime_error(errorText);
 			}
 		}
@@ -305,7 +306,7 @@ NFmiSmartToolCalculationBlock* NFmiSmartToolModifier::CreateCalculationBlock(NFm
 			block->itsElseCalculationBlocks = CreateCalculationBlockVector(theBlockInfo->itsElseCalculationBlockInfos);
 			if(!block->itsElseCalculationBlocks)
 			{
-				string errorText("ELSE-lauseen perässä ei ollut lasku osiota?");
+				string errorText(::GetDictionaryString("SmartToolModifierErrorElseClause"));
 				throw runtime_error(errorText);
 			}
 		}
@@ -509,7 +510,7 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiSmartToolCalculationBlock 
 	if(theCalculationBlock->itsIfAreaMaskSection && theCalculationBlock->itsIfCalculationBlocks)
 	{
 		if(theCalculationBlock->FirstVariableInfo() == 0)
-			throw runtime_error("Tuntematon virhe skriptissä.");
+			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorUnknownProblem"));
 		NFmiSmartInfo *info = theCalculationBlock->FirstVariableInfo()->Clone();
 		std::auto_ptr<NFmiSmartInfo> infoPtr(info);
 
@@ -799,7 +800,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			break;
 			}
 		default:
-			throw runtime_error("Outo data tyyppi yritettäessä tehdä laskuja.");
+			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorStrangeDataType"));
 	}
 	areaMask->SetCalculationOperationType(maskType);
 
@@ -844,7 +845,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateCalculatedAreaMask(const NFmiAreaMask
 	if(areaMask)
 		return areaMask;
 
-	throw runtime_error(string("Outo laskettava muuttuja/data tyyppi (ohjelmointi vika?)."));
+	throw runtime_error(::GetDictionaryString("SmartToolModifierErrorStrangeVariable"));
 }
 
 // Muista jos tulee päivityksiä, smanlainen funktio löytyy myös NFmiSmartToolCalculation-luokasta
@@ -868,7 +869,7 @@ NFmiDataModifier* NFmiSmartToolModifier::CreateIntegrationFuction(const NFmiArea
 		break;
 		// HUOM!!!! Tee WAvg-modifier myös, joka on peritty Avg-modifieristä ja tee joku kerroin juttu painotukseen.
 	default:
-		throw runtime_error("Outo integraatio-funktio tyyppi yritettäessä tehdä laskuja.");
+		throw runtime_error(::GetDictionaryString("SmartToolModifierErrorStrangeIntegrationFunction"));
 	}
 	return modifier;
 }
@@ -898,7 +899,7 @@ NFmiDataIterator* NFmiSmartToolModifier::CreateIterator(const NFmiAreaMaskInfo &
 				break;
 			}
 	default:
-		throw runtime_error("Outo iteraattori-tyyppi yritettäessä tehdä laskuja.");
+		throw runtime_error(::GetDictionaryString("SmartToolModifierErrorStrangeIteratorType"));
 	}
 	return iterator;
 }
@@ -922,14 +923,14 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 	else
 	{
 		if(fUseLevelData && theAreaMaskInfo.GetLevel() != 0) // jos pitää käyttää level dataa (SumZ ja MinH funktiot), ei saa antaa level infoa parametrin yhteydessä
-			throw runtime_error("Nyt pitää antaa parametri ilman level tietoa.\n" + theAreaMaskInfo.GetMaskText());
+			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNoLevel") + "\n" + theAreaMaskInfo.GetMaskText());
 		if(fUseLevelData) // jos leveldata-flagi päällä, yritetään ensin, löytyykö hybridi dataa
 			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), NFmiInfoData::kHybridData, false, fUseLevelData); // tähän pieni hybrid-koukku, jos haluttiin level dataa
 		if(info == 0)
 			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData);
 	}
 	if(!info)
-		throw runtime_error("Haluttua parametria ei löytynyt tietokannasta.\n" + theAreaMaskInfo.GetMaskText());
+		throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNotFound") + "\n" + theAreaMaskInfo.GetMaskText());
 	return info;
 }
 
@@ -947,7 +948,7 @@ void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaM
 			delete drawParam;
 		}
 		else
-			throw runtime_error("Parametrin min ja max rajoja ei saatu.");
+			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorNoMinMaxLimits"));
 	}
 }
 
@@ -970,7 +971,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateSoundingParamInfo(const NFmiDataIden
 		if(info->SizeLevels() > 1)
 			return new NFmiSmartInfo(*info); // vain level data kelpaa ja koska kyse editoidusta datasta, pitää siitä tehdä kopio
 		else
-			throw runtime_error(string("NFmiSmartToolModifier::CreateSoundingParamInfo - datassa ei ollut kuin yksi level, ei voi laskea luotaus indeksejä."));
+			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorSoundingIndexNoLevels"));
 	}
 	else
 	{
@@ -981,7 +982,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateSoundingParamInfo(const NFmiDataIden
 		if(info)
 			return info;
 	}
-	throw runtime_error(string("NFmiSmartToolModifier::CreateSoundingParamInfo - dataa/parametria ei löytynyt: ") + string(theDataIdent.GetParamName()));
+	throw runtime_error(::GetDictionaryString("SmartToolModifierErrorSoundingIndexParam") + ": " + string(theDataIdent.GetParamName()));
 }
 
 NFmiSmartInfo* NFmiSmartToolModifier::CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent)
@@ -1001,7 +1002,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateScriptVariableInfo(const NFmiDataIde
 		}
 	}
 
-	throw runtime_error(string("Jotain vikaa NFmiSmartToolModifier:issa kun skripti-muuttujan ") + string(theDataIdent.GetParamName()) + string(" luominen ei onnistu."));
+	throw runtime_error(::GetDictionaryString("SmartToolModifierErrorStrange1") + " " + string(theDataIdent.GetParamName()) + " " + ::GetDictionaryString("SmartToolModifierErrorStrange2"));
 }
 
 NFmiSmartInfo* NFmiSmartToolModifier::GetScriptVariableInfo(const NFmiDataIdent &theDataIdent)

@@ -35,6 +35,7 @@
 #include "NFmiInfoOrganizer.h"
 #include "NFmiSmartInfo.h"
 #include "NFmiEnumConverter.h"
+#include "NFmiDictionaryFunction.h"
 
 #include <algorithm>
 #include <utility>
@@ -248,7 +249,7 @@ void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText, bool fT
 		try
 		{
 			if(index > 500)
-				throw runtime_error("Annetusta skriptist‰ tuli yli 500 lasku blokkia, lopetetaan...");
+				throw runtime_error(::GetDictionaryString("SmartToolErrorTooManyBlocks"));
 			fGoOn = CheckoutPossibleNextCalculationBlock(&block, true);
 			itsSmartToolCalculationBlocks.push_back(block);
 			if(*itsCheckOutTextStartPosition == '}') // jos ollaan blokin loppu merkiss‰, siirryt‰‰n sen yli ja jatketaan seuraavalle kierrokselle
@@ -304,7 +305,7 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlockVector(NFmiSma
 			theBlockVector->Add(block);
 			block = 0;
 			if(safetyIndex > 500)
-				throw runtime_error("Annetusta skriptist‰ tuli yli 500 lasku blokkia, lopetetaan...");
+				throw runtime_error(::GetDictionaryString("SmartToolErrorTooManyBlocks"));
 
 			if(*itsCheckOutTextStartPosition == '}') // jos ollaan loppu merkiss‰, siirryt‰‰n sen yli ja jatketaan seuraavalle kierrokselle
 			{
@@ -407,7 +408,7 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 	{
 		eolPos = std::find(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), '}');
 		if(eolPos == itsStrippedMacroText.end())
-			throw runtime_error(string("Lasku blokin loppumerkki‰ '}' ei lˆytynyt"));
+			throw runtime_error(::GetDictionaryString("SmartToolErrorEndOfBlockNotFound"));
 		else
 		{
 			fWasBlockMarksFound = true;
@@ -463,7 +464,7 @@ bool NFmiSmartToolIntepreter::IsPossibleCalculationLine(const std::string &theTe
 		return true;
 
 	if(std::find_if(theTextLine.begin(), theTextLine.end(), std::not1(std::ptr_fun(::isspace))) != theTextLine.end())
-		throw runtime_error(string("Rivilt‰ lˆytyi jotain outoa teksti‰: \n") + theTextLine);
+		throw runtime_error(::GetDictionaryString("SmartToolErrorIllegalTextFound") + ": \n" + theTextLine);
 	return false;
 }
 
@@ -511,7 +512,7 @@ bool NFmiSmartToolIntepreter::IsPossibleElseConditionLine(const std::string &the
 	if(tmp.empty())
 		return true;
 	else
-		throw runtime_error(string("Else rivilt‰ lˆytyi jotain outoa: \n") + theTextLine);
+		throw runtime_error(::GetDictionaryString("SmartToolErrorIllegalElseLine") + ": \n" + theTextLine);
 	return false;
 }
 
@@ -688,7 +689,7 @@ void NFmiSmartToolIntepreter::SetMacroTexts(const std::string &theMacroText)
 	}
 	else
 	{
-		throw runtime_error(string("Kommenttien poisto makrosta ei onnistunut: ") + commentStripper.GetMessage());
+		throw runtime_error(::GetDictionaryString("SmartToolErrorCommentRemovalFailed") + ":\n" + commentStripper.GetMessage());
 	}
 }
 //--------------------------------------------------------
@@ -730,7 +731,7 @@ bool NFmiSmartToolIntepreter::InterpretMaskSection(const std::string &theMaskSec
 			}
 		}
 	}
-	throw runtime_error(string("Maski-ehto lauseessa oli vikaa: \n" + maskText));
+	throw runtime_error(::GetDictionaryString("SmartToolErrorIllegalConditional") + ":\n" + maskText);
 }	
 
 // t‰ss‰ on en‰‰ ehtolauseen sulkujen sis‰lt‰v‰ oleva teksti esim.
@@ -757,7 +758,7 @@ bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, NF
 	// minimiss‰‰n erilaisia lasku elementtej‰ pit‰‰ olla vahint‰in 3 (esim. T > 15)
 	if(theAreaMaskSectionInfo->GetAreaMaskInfoVector()->size() >= 3)
 		return true;
-	throw runtime_error(string("Maski-ehto lause oli puutteellinen: " + theMaskSectionText));
+	throw runtime_error(::GetDictionaryString("SmartToolErrorConditionalWasNotComplete") + ":\n" + theMaskSectionText);
 }
 
 NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::string &theMaskSectionText, queue<NFmiAreaMaskInfo *> &theMaskQueue)
@@ -794,7 +795,7 @@ NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::s
 			}
 		}
 	}
-	throw runtime_error(string("Ei ollut laillinen maski: ") + theMaskSectionText);
+	throw runtime_error(::GetDictionaryString("SmartToolErrorConditionalWasIllegal") + ":\n" + theMaskSectionText);
 }
 
 //--------------------------------------------------------
@@ -916,12 +917,12 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 		InterpretVariable(tmp, assignedVariable, fNewScriptVariable);  // ei saa antaa auto_ptr-otust‰ t‰ss‰, muuten se menett‰‰ omistuksen!
 		NFmiInfoData::Type dType = assignedVariable->GetDataType();
 		if(!(dType == NFmiInfoData::kEditable || dType == NFmiInfoData::kScriptVariableData || dType == NFmiInfoData::kAnyData || dType == NFmiInfoData::kMacroParam))
-			throw runtime_error(string("Sijoitusta ei voi tehd‰ kuin editoitavaan dataan tai skripti-muuttujaan: \n") + calculationLineText);
+			throw runtime_error(::GetDictionaryString("SmartToolErrorAssignmentError") + ":\n" + calculationLineText);
 		calculationInfo->SetResultDataInfo(assignedVariablePtr.release());// auto_ptr menett‰‰ omistuksen t‰ss‰
 
 		GetToken(); // luetaan sijoitus operaattori =
 		if(string(token) != string("="))
-			throw runtime_error(string("Laskurivill‰ ei ollut sijoitus operaattoria '=': " + theCalculationLineText));
+			throw runtime_error(::GetDictionaryString("SmartToolErrorNoAssignmentOperator") + ":\n" + theCalculationLineText);
 		NFmiAreaMaskInfo *variableInfo = 0;
 		for(; GetToken(); )
 		{
@@ -942,11 +943,11 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 	{
 		fNormalAssigmentFound = true;
 		if(fMacroParamSkriptInProgress)
-			throw runtime_error(string("Tarkoitus on tehd‰ ns. macroParam sijoituksia (RESULT = ...). \nMutta tehd‰‰nkin tavallinen sijoitus (T = ...).\nSellainen ei k‰y, lopetetaan..."));
+			throw runtime_error(::GetDictionaryString("SmartToolErrorMacroParamAssignmentError1") + "\n" + ::GetDictionaryString("SmartToolErrorMacroParamAssignmentError2") + "\n" + ::GetDictionaryString("SmartToolErrorThatWontWorkEnding"));
 	}
 	// tarkistetaan saman tien, onko sijoituksia tehty molempiin tyyppeihin ja heitet‰‰n poikkeus jos on
 	if(fMacroParamFound && fNormalAssigmentFound)
-		throw runtime_error(string("T‰ss‰ skriptiss‰ on tehty sijoituksia sek‰ tavallisiin parametreihin (T = ...),\nett‰ ns. macroParametreihin (RESULT = ...). \nSellainen ei k‰y, lopetetaan..."));
+		throw runtime_error(::GetDictionaryString("SmartToolErrorMacroParamAssignmentError3") + "\n" + ::GetDictionaryString("SmartToolErrorMacroParamAssignmentError4") + "\n" + ::GetDictionaryString("SmartToolErrorThatWontWorkEnding"));
 
 	calculationInfoPtr.release();
 	return calculationInfo;
@@ -1043,7 +1044,7 @@ NFmiAreaMask::CalculationOperator NFmiSmartToolIntepreter::InterpretCalculationO
 	else if(theOperatorText == "%")
 		return NFmiAreaMask::Mod;
 	else
-		throw runtime_error(string("Lasku operaattori oli outo: ") + theOperatorText);
+		throw runtime_error(::GetDictionaryString("SmartToolErrorCalculationOperatorError") + ": " + theOperatorText);
 }
 
 void NFmiSmartToolIntepreter::InterpretToken(const std::string &theTokenText, NFmiAreaMaskInfo *theMaskInfo)
@@ -1058,7 +1059,7 @@ void NFmiSmartToolIntepreter::InterpretToken(const std::string &theTokenText, NF
 		InterpretVariable(theTokenText, theMaskInfo);
 		break;
 	default:
-		throw runtime_error(string("Sana oli outo tai se oli oudossa paikassa: ") + theTokenText);
+		throw runtime_error(::GetDictionaryString("SmartToolErrorStrangeWord") + ": " + theTokenText);
 	}
 }
 
@@ -1110,7 +1111,7 @@ void NFmiSmartToolIntepreter::InterpretDelimiter(const std::string &theDelimText
 		theMaskInfo->SetOperationType(NFmiAreaMask::CommaOperator);
 	}
 	else
-		throw runtime_error(string("Lasku operaattori oli outo: ") + theDelimText);
+		throw runtime_error(::GetDictionaryString("SmartToolErrorCalculationOperatorError") + ": " + theDelimText);
 
 }
 
@@ -1143,7 +1144,7 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 	if(InterpretVariableCheckTokens(theVariableText, theMaskInfo, origWanted, levelExist, producerExist, paramNameOnly, levelNameOnly, producerNameOnly))
 	{
 		if(fNewScriptVariable)
-			throw runtime_error(string("Varattua sanaa yritettiin k‰ytt‰‰ \"skripti muuttujana\": " + theVariableText));
+			throw runtime_error(::GetDictionaryString("SmartToolErrorTokenWordUsedAsVariable") + ": " + theVariableText);
 		else
 		{
 			if(fUseAnyDataTypeBecauseUsingProdID)
@@ -1152,14 +1153,14 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 		}
 	}
 
-	throw runtime_error(string("Outo muuttuja laskussa: " + theVariableText));
+	throw runtime_error(::GetDictionaryString("SmartToolErrorStrangeVariable") + ": " + theVariableText);
 }
 
 bool NFmiSmartToolIntepreter::InterpretPossibleScriptVariable(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fNewScriptVariable)
 {
 	ScriptVariableMap::iterator it = itsTokenScriptVariableNames.find(theVariableText);
 	if(it != itsTokenScriptVariableNames.end() && fNewScriptVariable) // var x k‰ytetty uudestaan, esitell‰‰n muuttujat vain kerran
-		throw runtime_error(string("\"skripti muuttujaa\" yritettiin alustaa uudestaan, k‰yt‰ var-sanaa vain kerran yht‰ muuttujaa kohden: " + theVariableText));
+		throw runtime_error(::GetDictionaryString("SmartToolErrorScriptVariableSecondTime") + ": " + theVariableText);
 	else if(it != itsTokenScriptVariableNames.end()) // muuttujaa x k‰ytetty uudestaan
 	{
 		NFmiParam param((*it).second, (*it).first);
@@ -1286,7 +1287,7 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 			theProducerText = tmp;
 		}
 		else
-			throw runtime_error(string("Muuttujassa alaviivan j‰lkeen ei level eik‰ tuottaja  tietoa: \n") + theVariableText);
+			throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithUndescore") + ":\n" + theVariableText);
 
 		if(pos2 != string::npos)
 		{
@@ -1300,7 +1301,7 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 					theLevelText = tmp;
 				}
 				else
-					throw runtime_error(string("Muuttuja tekstiss‰ level kahdesti: \n") + theVariableText);
+					throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithTwoLevels") + ":\n" + theVariableText);
 			}
 			else if(IsPossiblyProducerItem(tmp, itsTokenProducerNamesAndIds))
 			{
@@ -1310,12 +1311,11 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 					theProducerText = tmp;
 				}
 				else
-					throw runtime_error(string("Muuttuja tekstiss‰ tuottaja kahdesti: \n") + theVariableText);
+					throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithTwoProducers") + ":\n" + theVariableText);
 			}
 			else
-				throw runtime_error(string("Muuttujassa alaviivan j‰lkeen ei level eik‰ tuottaja  tietoa: \n") + theVariableText);
+				throw runtime_error(::GetDictionaryString("SmartToolErrorVariableNoLevelOrProducer") + ":\n" + theVariableText);
 		}
-	
 	}
 	else
 		theParamText = theVariableText;
@@ -1403,7 +1403,7 @@ NFmiLevel NFmiSmartToolIntepreter::GetPossibleLevelInfo(const std::string &theLe
 	if(it != itsTokenLevelNamesIdentsAndValues.end())
 		level = NFmiLevel((*it).second.first, (*it).first, (*it).second.second);
 	else if(!GetLevelFromVariableById(theLevelText, level, theDataType))
-		throw runtime_error(string("Level tietoa ei saatu rakennettua (vika ohjelmassa): \n") + theLevelText);
+		throw runtime_error(::GetDictionaryString("SmartToolErrorLevelInfoFailed") + ":\n" + theLevelText);
 	return level;
 }
 
@@ -1418,7 +1418,7 @@ NFmiProducer NFmiSmartToolIntepreter::GetPossibleProducerInfo(const std::string 
 		return producer;
 	}
 	else if(!GetProducerFromVariableById(theProducerText, producer))
-		throw runtime_error(string("Producer tietoa ei saatu rakennettua (vika ohjelmassa): \n") + theProducerText);
+		throw runtime_error(::GetDictionaryString("SmartToolErrorProducerInfoFailed") + ":\n" + theProducerText);
 	return producer;
 }
 
@@ -1637,7 +1637,7 @@ bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVaria
 				return true;
 			}
 		}
-		throw runtime_error(string("Matemaattisen funktion parametrit v‰‰rin: ") + theVariableText);
+		throw runtime_error(::GetDictionaryString("SmartToolErrorMathFunctionParams") + ": " + theVariableText);
 	}
 	return false;
 }
@@ -1691,7 +1691,7 @@ bool NFmiSmartToolIntepreter::IsVariableThreeArgumentFunction(const std::string 
 				return true;
 			}
 		}
-		throw runtime_error(string("Aika/korkeus integraattori funktion parametrit v‰‰rin: \n") + theVariableText);
+		throw runtime_error(::GetDictionaryString("SmartToolErrorTimeFunctionParams") + ":\n" + theVariableText);
 	}
 	return false;
 }
@@ -1764,7 +1764,7 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 				}
 			}
 		}
-		throw runtime_error(string("Integrointi funktion parametrit v‰‰rin: ") + theVariableText);
+		throw runtime_error(::GetDictionaryString("SmartToolErrorIntegrationFunctionParams") + ": " + theVariableText);
 	}
 	return false;
 }
@@ -1864,7 +1864,7 @@ bool NFmiSmartToolIntepreter::IsVariableRampFunction(const std::string &theVaria
 				}
 			}
 		}
-		throw runtime_error(string("Ramppimaskin parametrit v‰‰rin: ") + theVariableText);
+		throw runtime_error(::GetDictionaryString("SmartToolErrorRampFunctionParams") + ": " + theVariableText);
 	}
 	return false;
 }
@@ -1896,7 +1896,7 @@ NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &thePara
 	if(it == itsTokenParameterNamesAndIds.end())
 	{
 		if(!GetParamFromVariableById(theParamText, param))
-			throw runtime_error(string("Haluttua parametria '") + theParamText + "'ei lˆytynyt listoilta, eik‰ sit‰ voinut johtaa mist‰‰n.");
+			throw runtime_error(::GetDictionaryString("SmartToolErrorWantedParam1") + " '" + theParamText + "' " + ::GetDictionaryString("SmartToolErrorWantedParam2"));
 	}
 	else
 		param = NFmiParam((*it).second, (*it).first);
@@ -2035,6 +2035,9 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape"), kFmiCAPE));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Cape"), kFmiCAPE));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("CAPE"), kFmiCAPE));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("tke"), kFmiTurbulentKineticEnergy));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Tke"), kFmiTurbulentKineticEnergy));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("TKE"), kFmiTurbulentKineticEnergy));
 
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1BASE"), kFmi_FL_1_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1Base"), kFmi_FL_1_Base));
