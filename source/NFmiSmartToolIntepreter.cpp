@@ -2309,6 +2309,10 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Mbe"), kFmiMTAHIRMESO));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("MBE"), kFmiMTAHIRMESO));
 
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ala"), static_cast<FmiProducerName>(555))); // aladdinille laitetaan pikaviritys 555
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Ala"), static_cast<FmiProducerName>(555))); // aladdinille laitetaan pikaviritys 555
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ALA"), static_cast<FmiProducerName>(555))); // aladdinille laitetaan pikaviritys 555
+
 		itsTokenConstants.insert(ConstantMap::value_type(string("MISS"), kFloatMissing));
 		itsTokenConstants.insert(ConstantMap::value_type(string("Miss"), kFloatMissing));
 		itsTokenConstants.insert(ConstantMap::value_type(string("miss"), kFloatMissing));
