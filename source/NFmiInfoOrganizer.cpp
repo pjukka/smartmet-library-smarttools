@@ -524,11 +524,28 @@ void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData
 int NFmiInfoOrganizer::CountData(void)
 {
 	int count = 0;
-	if(itsEditedData)
+	if(this->itsEditedData)
+		count++;
+	if(this->itsEditedDataCopy)
 		count++;
 
 	count += itsList.NumberOfItems();
 	return count;
+}
+
+int NFmiInfoOrganizer::CountDataSize(void)
+{
+	int dataSize = 0;
+	if(itsEditedData)
+		dataSize += itsEditedData->Size() * sizeof(float);
+	if(itsEditedDataCopy)
+		dataSize += itsEditedDataCopy->Size() * sizeof(float);
+
+	for(Reset(); Next(); )
+	{
+		dataSize += Current()->Size() * sizeof(float);
+	}
+	return dataSize;
 }
 
 // this kind of m‰‰ritell‰‰n t‰ll‰ hetkell‰:

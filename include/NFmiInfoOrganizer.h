@@ -137,8 +137,9 @@ class NFmiInfoOrganizer
 	const NFmiPoint& GetMacroParamDataGridSize(void) const {return itsMacroParamGridSize;}
 	const NFmiPoint& GetMacroParamDataMaxGridSize(void) const {return itsMacroParamMaxGridSize;}
 	const NFmiPoint& GetMacroParamDataMinGridSize(void) const {return itsMacroParamMinGridSize;}
- private:
 	int CountData(void);
+	int CountDataSize(void);
+ private:
  	bool Remove(void);
 	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, NFmiSmartInfo* theSmartInfo2);
 
