@@ -16,7 +16,7 @@
 using namespace NFmiSoundingFunctions;
 
 // hakee l‰himm‰n sopivan painepinnan, mist‰ lˆytyy halutuille parametreille arvot
-// Mutta ei sallita muokkausta ennen 1. validia leveli‰! 
+// Mutta ei sallita muokkausta ennen 1. validia leveli‰!
 bool NFmiSoundingData::GetTandTdValuesFromNearestPressureLevel(double P, double &theFoundP, double &theT, double &theTd)
 {
 	if(P != kFloatMissing)
@@ -226,7 +226,7 @@ float NFmiSoundingData::GetValueAtPressure(FmiParameterName theId, float P)
 }
 
 // Laskee u ja v komponenttien keskiarvot halutulla v‰lill‰
-// Huom! z korkeudet interpoloidaan, koska havaituissa luotauksissa niit‰ ei ole aina ja varsinkaan samoissa 
+// Huom! z korkeudet interpoloidaan, koska havaituissa luotauksissa niit‰ ei ole aina ja varsinkaan samoissa
 // v‰leiss‰ kuin tuulia
 bool NFmiSoundingData::CalcAvgWindComponentValues(double fromZ, double toZ, double &u, double &v)
 {
@@ -290,7 +290,7 @@ float NFmiSoundingData::FindPressureWhereHighestValue(FmiParameterName theId, fl
 
 // K‰y l‰pi luotausta ja etsi sen kerroksen arvot, jolta lˆytyy suurin theta-E ja
 // palauta sen kerroksen T, Td ja P ja laskettu max Theta-e.
-// Etsit‰‰n arvoja jos pinta on alle theMinP-tason (siis alle tuon tason fyysisesti). 
+// Etsit‰‰n arvoja jos pinta on alle theMinP-tason (siis alle tuon tason fyysisesti).
 // HUOM! theMinP ei voi olla kFloatMissing, jos haluat ett‰ kaikki levelit k‰yd‰‰n l‰pi laita sen arvoksi 0.
 bool NFmiSoundingData::FindHighestThetaE(double &T, double &Td, double &P, double &theMaxThetaE, double theMinP)
 {
@@ -630,4 +630,176 @@ void NFmiSoundingData::ClearDatas(void)
 	checkedVector<float>().swap(itsWindDirectionData);
 	checkedVector<float>().swap(itsWindComponentUData);
 	checkedVector<float>().swap(itsWindComponentVData);
+}
+
+bool NFmiSoundingData::ModifyT2DryAdiapaticBelowGivenP(double P, double T)
+{
+	if(P == kFloatMissing || T == kFloatMissing)
+		return false;
+
+	checkedVector<float>&pV = GetParamData(kFmiPressure);
+	checkedVector<float>&tV = GetParamData(kFmiTemperature);
+	if(pV.size() > 0 && pV.size() == tV.size())
+	{
+		unsigned int ssize = pV.size();
+		float wantedTPot = static_cast<float>(::T2tpot(T, P));
+		float currentP = 1000;
+		for(unsigned int i=0; i<ssize; i++)
+		{
+			currentP = pV[i];
+			if(currentP >= P)
+			{ // muutoksia siis tehtiin niin kauan kuin oltiin alle annetun paineen
+				float wantedT = static_cast<float>(::Tpot2t(wantedTPot, currentP));
+				tV[i] = wantedT;
+			}
+			else
+				break;
+		}
+		return true;
+	}
+	return false;
+}
+
+bool NFmiSoundingData::ModifyTd2MoistAdiapaticBelowGivenP(double P, double Td)
+{
+	if(P == kFloatMissing || Td == kFloatMissing)
+		return false;
+
+	checkedVector<float>&pV = GetParamData(kFmiPressure);
+	checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
+	if(pV.size() > 0 && pV.size() == tdV.size())
+	{
+		unsigned int ssize = pV.size();
+
+//		float wantedTPot = static_cast<float>(::T2tpot(Td, P));
+		float AOS = static_cast<float>(NFmiSoundingFunctions::OS(Td, P));
+		float currentP = 1000;
+		for(unsigned int i=0; i<ssize; i++)
+		{
+			currentP = pV[i];
+			if(currentP >= P)
+			{ // muutoksia siis tehtiin niin kauan kuin oltiin alle annetun paineen
+				float ATSA  = static_cast<float>(NFmiSoundingFunctions::TSA(AOS, currentP));
+//				float wantedT = static_cast<float>(::Tpot2t(wantedTPot, currentP));
+				tdV[i] = ATSA;
+			}
+			else
+				break;
+		}
+		return true;
+	}
+	return false;
+}
+
+static float FixCircularValues(float theValue, float modulorValue)
+{
+	if(theValue != kFloatMissing)
+	{
+		if(theValue < 0)
+			return modulorValue - ::fmod(-theValue, modulorValue);
+		else
+			return ::fmod(theValue, modulorValue);
+	}
+	return theValue;
+}
+
+static float FixValuesWithLimits(float theValue, float minValue, float maxValue)
+{
+	if(theValue != kFloatMissing)
+	{
+		if(minValue != kFloatMissing)
+			theValue = FmiMax(theValue, minValue);
+		if(maxValue != kFloatMissing)
+			theValue = FmiMin(theValue, maxValue);
+	}
+	return theValue;
+}
+
+bool NFmiSoundingData::Add2ParamAtNearestP(float P, FmiParameterName parId, float addValue, float minValue, float maxValue, bool fCircularValue)
+{
+	if(P == kFloatMissing)
+		return false;
+
+	checkedVector<float>&pV = GetParamData(kFmiPressure);
+	checkedVector<float>&paramV = GetParamData(parId);
+	if(pV.size() > 0 && pV.size() == paramV.size())
+	{
+		float currentP = kFloatMissing;
+		float currentParam = kFloatMissing;
+		float lastP = kFloatMissing;
+		float lastParam = kFloatMissing;
+		float closestPdiff = kFloatMissing;
+		unsigned int closestIndex = 0;
+		unsigned int ssize = pV.size();
+		for(unsigned int i=0; i<ssize; i++)
+		{
+			currentP = pV[i];
+			currentParam = paramV[i];
+			if(currentP != kFloatMissing && currentParam != kFloatMissing)
+			{
+				if(closestPdiff > ::fabs(P-currentP))
+				{
+					closestPdiff = ::fabs(P-currentP);
+					closestIndex = i;
+				}
+			}
+			if(currentP < P && closestPdiff != kFloatMissing)
+				break;
+		}
+
+		if(closestPdiff != kFloatMissing)
+		{
+			float closestParamValue = paramV[closestIndex];
+			closestParamValue += addValue;
+			if(fCircularValue)
+				closestParamValue = ::FixCircularValues(closestParamValue, maxValue);
+			else
+				closestParamValue = ::FixValuesWithLimits(closestParamValue, minValue, maxValue);
+
+			paramV[closestIndex] = closestParamValue;
+			return true;
+		}
+	}
+	return false;
+}
+
+static float CalcU(float WS, float WD)
+{
+	if(WD == 999) // jos tuulensuunta on vaihtelevaa (999), palautetaan 0 arvo (voisi olla myˆs puuttuvaa)
+		return 0.f;
+	float value = kFloatMissing;
+	if(WS != kFloatMissing && WD != kFloatMissing)
+	{
+		value = WS * sin(((static_cast<int>(180 + WD) % 360)/360.f)*(2.f*static_cast<float>(kPii))); // huom! tuulen suunta pit‰‰ ensin k‰‰nt‰‰ 180 astetta ja sitten muuttaa radiaaneiksi kulma/360 * 2*pii
+	}
+	return value;
+}
+
+static float CalcV(float WS, float WD)
+{
+	if(WD == 999) // jos tuulensuunta on vaihtelevaa (999), palautetaan 0 arvo (voisi olla myˆs puuttuvaa)
+		return 0;
+	float value = kFloatMissing;
+	if(WS != kFloatMissing && WD != kFloatMissing)
+	{
+		value = WS * cos(((static_cast<int>(180 + WD) % 360)/360.f)*(2.f*static_cast<float>(kPii))); // huom! tuulen suunta pit‰‰ ensin k‰‰nt‰‰ 180 astetta ja sitten muuttaa radiaaneiksi kulma/360 * 2*pii
+	}
+	return value;
+}
+
+void NFmiSoundingData::UpdateUandVParams(void)
+{
+	checkedVector<float>&wsV = GetParamData(kFmiWindSpeedMS);
+	checkedVector<float>&wdV = GetParamData(kFmiWindDirection);
+	checkedVector<float>&uV = GetParamData(kFmiWindUMS);
+	checkedVector<float>&vV = GetParamData(kFmiWindVMS);
+	if(wsV.size() > 0 && wsV.size() == wdV.size() && wsV.size() == uV.size() && wsV.size() == vV.size())
+	{
+		unsigned int ssize = wsV.size();
+		for(unsigned int i=0; i<ssize; i++)
+		{
+			uV[i] = ::CalcU(wsV[i], wdV[i]);
+			vV[i] = ::CalcV(wsV[i], wdV[i]);
+		}
+	}
 }

@@ -45,6 +45,10 @@ public:
 	bool SetValueToPressureLevel(float P, float theParamValue, FmiParameterName theId);
 	bool FindHighestThetaE(double &T, double &Td, double &P, double &theMaxThetaE, double theMinP);
 	float FindPressureWhereHighestValue(FmiParameterName theId, float theMaxP, float theMinP);
+	bool ModifyT2DryAdiapaticBelowGivenP(double P, double T);
+	bool ModifyTd2MoistAdiapaticBelowGivenP(double P, double Td);
+	bool Add2ParamAtNearestP(float P, FmiParameterName parId, float addValue, float minValue, float maxValue, bool fCircularValue);
+	void UpdateUandVParams(void);
 private:
 	float GetPressureAtHeight(double H);
 	void ClearDatas(void);
