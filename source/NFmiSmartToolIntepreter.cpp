@@ -1,23 +1,23 @@
 //**********************************************************
-// C++ Class Name : NFmiSmartToolIntepreter 
+// C++ Class Name : NFmiSmartToolIntepreter
 // ---------------------------------------------------------
 // Filetype: (SOURCE)
-// Filepath: G:/siirto/marko/oc/NFmiSmartToolIntepreter.cpp 
-// 
-// 
-// GDPro Properties 
+// Filepath: G:/siirto/marko/oc/NFmiSmartToolIntepreter.cpp
+//
+//
+// GDPro Properties
 // ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 4.0 ) 
-//  - GD System Name    : aSmartTools 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : smarttools 1 
-// ---------------------------------------------------  
-//  Author         : pietarin 
-//  Creation Date  : Thur - Jun 20, 2002 
-// 
-//  Change Log     : 
-// 
+//  - GD Symbol Type    : CLD_Class
+//  - GD Method         : UML ( 4.0 )
+//  - GD System Name    : aSmartTools
+//  - GD View Type      : Class Diagram
+//  - GD View Name      : smarttools 1
+// ---------------------------------------------------
+//  Author         : pietarin
+//  Creation Date  : Thur - Jun 20, 2002
+//
+//  Change Log     :
+//
 //**********************************************************
 #ifdef WIN32
 #pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
@@ -36,6 +36,7 @@
 #include "NFmiSmartInfo.h"
 #include "NFmiEnumConverter.h"
 #include "NFmiDictionaryFunction.h"
+#include "NFmiProducerSystem.h"
 
 #include <algorithm>
 #include <utility>
@@ -153,8 +154,8 @@ void NFmiSmartToolCalculationBlockInfo::Clear(void)
 	fElseSectionExist = false;
 }
 
-// Lis‰t‰‰n set:iin kaikki parametrit, joita t‰ss‰ calculationblokissa 
-// voidaan muokata. Talteen otetaan vain identti, koska muu ei 
+// Lis‰t‰‰n set:iin kaikki parametrit, joita t‰ss‰ calculationblokissa
+// voidaan muokata. Talteen otetaan vain identti, koska muu ei
 // kiinnosta (ainakaan nyt).
 void NFmiSmartToolCalculationBlockInfo::AddModifiedParams(std::set<int> &theModifiedParams)
 {
@@ -174,7 +175,7 @@ void NFmiSmartToolCalculationBlockInfo::AddModifiedParams(std::set<int> &theModi
 bool NFmiSmartToolIntepreter::fTokensInitialized = false;
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenParameterNamesAndIds;
 NFmiSmartToolIntepreter::ProducerMap NFmiSmartToolIntepreter::itsTokenProducerNamesAndIds;
-NFmiSmartToolIntepreter::ConstantMap NFmiSmartToolIntepreter::itsTokenConstants; 
+NFmiSmartToolIntepreter::ConstantMap NFmiSmartToolIntepreter::itsTokenConstants;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenConditionalCommands;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenIfCommands;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenElseIfCommands;
@@ -198,29 +199,30 @@ NFmiSmartToolIntepreter::LevelMap NFmiSmartToolIntepreter::itsTokenLevelNamesIde
 NFmiSmartToolIntepreter::SoundingIndexMap NFmiSmartToolIntepreter::itsTokenSoundingIndexFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenThreeArgumentFunctions;
-checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenPeekXYFunctions;
+NFmiSmartToolIntepreter::PeekFunctionMap NFmiSmartToolIntepreter::itsTokenPeekFunctions;
 NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctions;
 
 //--------------------------------------------------------
-// Constructor/Destructor 
+// Constructor/Destructor
 //--------------------------------------------------------
-NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer)
+NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer, NFmiProducerSystem *theProducerSystem)
 :itsInfoOrganizer(theInfoOrganizer)
+,itsProducerSystem(theProducerSystem)
 ,itsSmartToolCalculationBlocks()
 ,fNormalAssigmentFound(false)
 ,fMacroParamFound(false)
 ,fMacroParamSkriptInProgress(false)
 {
-	NFmiSmartToolIntepreter::InitTokens();
+	NFmiSmartToolIntepreter::InitTokens(itsProducerSystem);
 }
 NFmiSmartToolIntepreter::~NFmiSmartToolIntepreter(void)
 {
 	Clear();
 }
 //--------------------------------------------------------
-// Interpret 
+// Interpret
 //--------------------------------------------------------
-// Tulkitsee annetun macro-tekstin. Erottelee eri calculationSectionit, mahdolliset ehto rakenteet ja niiden maskit ja rakentaa sen 
+// Tulkitsee annetun macro-tekstin. Erottelee eri calculationSectionit, mahdolliset ehto rakenteet ja niiden maskit ja rakentaa sen
 // mukaiset maski ja calculation infot, ett‰ SmartToolModifier osaa rakentaa oikeat systeemit (areamaskit ja lasku-oliot).
 // Jos macrossa virhe, heitt‰‰ poikkeuksen.
 // fThisIsMacroParamSkript -parametrin avulla voidaan tarkistaa, ettei ajeta tavallista sijoitusta macroParamin
@@ -370,7 +372,7 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlock(NFmiSmartTool
 void NFmiSmartToolIntepreter::InitCheckOut(void)
 {
 	itsCheckOutSectionText = "";
-	itsCheckOutTextStartPosition = itsStrippedMacroText.begin(); 
+	itsCheckOutTextStartPosition = itsStrippedMacroText.begin();
 	itsCheckOutTextEndPosition = itsStrippedMacroText.begin(); // t‰ll‰ ei viel‰ v‰li‰
 	fContinueCurrentSectionCheckOut = true;
 }
@@ -441,7 +443,7 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 
 //			eolPos = std::find(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), '\n');
 			eolPos = std::find_if(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), EndOfLineSearcher());
-			
+
 			nextLine = string(itsCheckOutTextStartPosition, eolPos);
 			nextLine += '\n';
 			if(*eolPos == '\n' || *eolPos == '\r')
@@ -693,7 +695,7 @@ void NFmiSmartToolIntepreter::SetMacroTexts(const std::string &theMacroText)
 	}
 }
 //--------------------------------------------------------
-// InterpretMaskSection 
+// InterpretMaskSection
 //--------------------------------------------------------
 // Koko Section on yhdell‰ rivill‰!!!
 // Esim:
@@ -710,12 +712,12 @@ bool NFmiSmartToolIntepreter::InterpretMaskSection(const std::string &theMaskSec
 	string tmp;
 	if(GetToken()) // luetaan komento t‰h‰n esim. if, else jne
 	{
-		tmp = token; 
+		tmp = token;
 		if(FindAnyFromText(tmp, itsTokenConditionalCommands))
 		{
 			if(GetToken()) // luetaan komento t‰h‰n esim. if, else jne
 			{
-				tmp = token; 
+				tmp = token;
 				if(tmp == "(") // pit‰‰ lˆyty‰ alku sulku
 				{
 					string::size_type startPos = exp_ptr - maskText.begin();
@@ -732,7 +734,7 @@ bool NFmiSmartToolIntepreter::InterpretMaskSection(const std::string &theMaskSec
 		}
 	}
 	throw runtime_error(::GetDictionaryString("SmartToolErrorIllegalConditional") + ":\n" + maskText);
-}	
+}
 
 // t‰ss‰ on en‰‰ ehtolauseen sulkujen sis‰lt‰v‰ oleva teksti esim.
 // T<1
@@ -799,7 +801,7 @@ NFmiAreaMaskInfo* NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::s
 }
 
 //--------------------------------------------------------
-// InterpretCalculationSection 
+// InterpretCalculationSection
 //--------------------------------------------------------
 // Jokainen rivi tekstiss‰ on mahdollinen laskuoperaatio esim.
 // T = T + 1
@@ -836,7 +838,7 @@ bool NFmiSmartToolIntepreter::ConsistOnlyWhiteSpaces(const std::string &theText)
 std::string NFmiSmartToolIntepreter::ExtractNextLine(std::string &theText, std::string::iterator theStartPos, std::string::iterator* theEndPos)
 {
 	*theEndPos = std::find_if(theStartPos, theText.end(), EndOfLineSearcher());
-	
+
 	string str(theStartPos, *theEndPos);
 	return str;
 }
@@ -896,7 +898,7 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 	string calculationLineText(theCalculationLineText);
 	NFmiSmartToolCalculationInfo *calculationInfo = new NFmiSmartToolCalculationInfo;
 	calculationInfo->SetCalculationText(theCalculationLineText);
-	auto_ptr<NFmiSmartToolCalculationInfo> calculationInfoPtr(calculationInfo); // tuhoaa automaattisesti esim. exceptionin yhteydess‰ 
+	auto_ptr<NFmiSmartToolCalculationInfo> calculationInfoPtr(calculationInfo); // tuhoaa automaattisesti esim. exceptionin yhteydess‰
 
 	exp_ptr = calculationLineText.begin();
 	exp_end = calculationLineText.end();
@@ -904,16 +906,16 @@ NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(
 	string tmp;
 	if(GetToken()) // luetaan muuttuja johon sijoitetaan esim. T
 	{
-		tmp = token; 
+		tmp = token;
 		bool fNewScriptVariable = false;
 		if(IsCaseInsensitiveEqual(tmp, "var"))
 		{
 			GetToken(); // ollaan alustamassa uutta skripti muuttujaa, luetaan nimi talteen
-			tmp = token; 
+			tmp = token;
 			fNewScriptVariable = true;
 		}
 		NFmiAreaMaskInfo *assignedVariable = new NFmiAreaMaskInfo;
-		auto_ptr<NFmiAreaMaskInfo> assignedVariablePtr(assignedVariable); // tuhoaa automaattisesti esim. exceptionin yhteydess‰ 
+		auto_ptr<NFmiAreaMaskInfo> assignedVariablePtr(assignedVariable); // tuhoaa automaattisesti esim. exceptionin yhteydess‰
 		InterpretVariable(tmp, assignedVariable, fNewScriptVariable);  // ei saa antaa auto_ptr-otust‰ t‰ss‰, muuten se menett‰‰ omistuksen!
 		NFmiInfoData::Type dType = assignedVariable->GetDataType();
 		if(!(dType == NFmiInfoData::kEditable || dType == NFmiInfoData::kScriptVariableData || dType == NFmiInfoData::kAnyData || dType == NFmiInfoData::kMacroParam))
@@ -964,12 +966,12 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 	temp = token;
 	*temp = '\0';
 
-	if(exp_ptr>=exp_end) 
+	if(exp_ptr>=exp_end)
 		return false; // at end of expression
 
-	while(exp_ptr<exp_end && isspace(*exp_ptr)) 
+	while(exp_ptr<exp_end && isspace(*exp_ptr))
 		++exp_ptr; // skip over white space
-	if(exp_ptr>=exp_end) 
+	if(exp_ptr>=exp_end)
 		return false; // at end of expression
 
 	// HUOM! t‰ss‰ delimiter rimpsussa ei ole spacea, joten ei voi tehd‰ yhteist‰ stringi‰, muista p‰ivitt‰‰ myˆs IsDelim-metodi
@@ -979,7 +981,7 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 		if(strchr("+-", *exp_ptr) && isdigit(exp_ptr[1])) // etumerkilliset vakiot otetaan t‰ss‰
 		{
 			*temp++ = *exp_ptr++;
-			while(!IsDelim(*exp_ptr)) 
+			while(!IsDelim(*exp_ptr))
 				*temp++ = *exp_ptr++;
 			tok_type = NUMBER;
 		}
@@ -1002,15 +1004,15 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 		}
 //		}
 	}
-	else if(isalpha(*exp_ptr)) 
+	else if(isalpha(*exp_ptr))
 	{
-		while(!IsDelim(*exp_ptr)) 
+		while(!IsDelim(*exp_ptr))
 			*temp++ = *exp_ptr++;
 		tok_type = VARIABLE;
 	}
-	else if(isdigit(*exp_ptr)) 
+	else if(isdigit(*exp_ptr))
 	{
-		while(!IsDelim(*exp_ptr)) 
+		while(!IsDelim(*exp_ptr))
 			*temp++ = *exp_ptr++;
 		tok_type = NUMBER;
 	}
@@ -1216,7 +1218,7 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &th
 
 	if(FindParamAndSetMaskInfo(theVariableText, itsTokenCalculatedParameterNamesAndIds, NFmiAreaMask::CalculatedVariable, NFmiInfoData::kCalculatedValue, theMaskInfo))
 		return true;
-	
+
 	if(IsVariableConstantValue(theVariableText, theMaskInfo))
 		return true;
 
@@ -1268,7 +1270,7 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 {
 	theParamText = theLevelText = theProducerText = "";
 	fLevelExist = fProducerExist = false;
-												  
+
 	string::size_type pos1 = theVariableText.find(string("_"));
 	string::size_type pos2 = theVariableText.find(string("_"), pos1+1);
 	if(pos1 != string::npos)
@@ -1338,10 +1340,13 @@ bool NFmiSmartToolIntepreter::IsPossiblyLevelItem(const std::string &theText, Le
 	return false;
 }
 
+// HUOM! tekee lower case tarkasteluja, joten theMap pit‰‰ myˆs alustaa lower case stringeill‰
 template<typename mapType>
 bool NFmiSmartToolIntepreter::IsInMap(mapType& theMap, const std::string &theSearchedItem)
 {
-    typename mapType::iterator it = theMap.find(theSearchedItem);
+	std::string lowerCaseItem(theSearchedItem);
+	NFmiStringTools::LowerCase(lowerCaseItem);
+    typename mapType::iterator it = theMap.find(lowerCaseItem);
 	if(it != theMap.end())
 		return true;
 	return false;
@@ -1411,7 +1416,9 @@ NFmiLevel NFmiSmartToolIntepreter::GetPossibleLevelInfo(const std::string &theLe
 NFmiProducer NFmiSmartToolIntepreter::GetPossibleProducerInfo(const std::string &theProducerText)
 {
 	NFmiProducer producer;
-	ProducerMap::iterator it = itsTokenProducerNamesAndIds.find(theProducerText);
+	std::string lowerCaseProdName(theProducerText);
+	NFmiStringTools::LowerCase(lowerCaseProdName);
+	ProducerMap::iterator it = itsTokenProducerNamesAndIds.find(lowerCaseProdName);
 	if(it != itsTokenProducerNamesAndIds.end())
 	{
 		producer = NFmiProducer((*it).second, (*it).first);
@@ -1422,14 +1429,15 @@ NFmiProducer NFmiSmartToolIntepreter::GetPossibleProducerInfo(const std::string 
 	return producer;
 }
 
-bool NFmiSmartToolIntepreter::IsInterpretedSkriptMacroParam(void) 
+bool NFmiSmartToolIntepreter::IsInterpretedSkriptMacroParam(void)
 {
 	return (fNormalAssigmentFound == false) && (fMacroParamFound == true);
 }
 
 bool NFmiSmartToolIntepreter::GetParamFromVariable(const std::string &theVariableText, ParamMap& theParamMap, NFmiParam &theParam, bool &fUseWildDataType)
 {
-	ParamMap::iterator it = theParamMap.find(theVariableText);
+	std::string tmp(theVariableText);
+	ParamMap::iterator it = theParamMap.find(NFmiStringTools::LowerCase(tmp));
 	if(it == theParamMap.end())
 	{
 		if(GetParamFromVariableById(theVariableText, theParam))
@@ -1589,7 +1597,8 @@ bool NFmiSmartToolIntepreter::IsVariableConstantValue(const std::string &theVari
 	}
 
 	// sitten katsotaan onko se esim. MISS tai PI tms esi m‰‰ritelty vakio
-	ConstantMap::iterator it = itsTokenConstants.find(theVariableText);
+	std::string tmp(theVariableText);
+	ConstantMap::iterator it = itsTokenConstants.find(NFmiStringTools::LowerCase(tmp));
 	if(it != itsTokenConstants.end())
 	{
 		theMaskInfo->SetOperationType(NFmiAreaMask::Constant);
@@ -1623,7 +1632,8 @@ bool NFmiSmartToolIntepreter::IsVariableDeltaZ(const std::string &theVariableTex
 
 bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
 {
-	MathFunctionMap::iterator it = itsMathFunctions.find(theVariableText);
+	std::string tmp(theVariableText);
+	MathFunctionMap::iterator it = itsMathFunctions.find(NFmiStringTools::LowerCase(tmp));
 	if(it != itsMathFunctions.end())
 	{
 		string tmp;
@@ -1671,7 +1681,8 @@ bool NFmiSmartToolIntepreter::IsVariableSoundingParameter(const std::string &the
 bool NFmiSmartToolIntepreter::IsVariableThreeArgumentFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
 {
 	// sitten katsotaan onko jokin integraatio funktioista
-	FunctionMap::iterator it = itsTokenThreeArgumentFunctions.find(theVariableText);
+	std::string tmp(theVariableText);
+	FunctionMap::iterator it = itsTokenThreeArgumentFunctions.find(NFmiStringTools::LowerCase(tmp));
 	if(it != itsTokenThreeArgumentFunctions.end())
 	{
 		int functionUsed = 1; // 1 = T-funktio, 2 = Z-funktio ja 3 = H-funktio
@@ -1708,7 +1719,8 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 	if(IsVariablePeekFunction(theVariableText, theMaskInfo))
 		return true;
 	// sitten katsotaan onko jokin integraatio funktioista
-	FunctionMap::iterator it = itsTokenFunctions.find(theVariableText);
+	std::string tmp(theVariableText);
+	FunctionMap::iterator it = itsTokenFunctions.find(NFmiStringTools::LowerCase(tmp));
 	if(it != itsTokenFunctions.end())
 	{
 		theMaskInfo->SetFunctionType((*it).second);
@@ -1771,7 +1783,10 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 
 bool NFmiSmartToolIntepreter::IsVariablePeekFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
 {
-	if(FindAnyFromText(theVariableText, itsTokenPeekXYFunctions))
+	std::string aVariableText(theVariableText);
+	PeekFunctionMap::iterator it = itsTokenPeekFunctions.find(NFmiStringTools::LowerCase(aVariableText)); // t‰ss‰ tarkastellaan case insensitiivisesti
+	if(it != itsTokenPeekFunctions.end())
+//	if(FindAnyFromText(theVariableText, itsTokenPeekXYFunctions))
 	{
 		string tmp;
 		checkedVector<pair<string, types> > tokens;
@@ -1792,7 +1807,7 @@ bool NFmiSmartToolIntepreter::IsVariablePeekFunction(const std::string &theVaria
 				InterpretVariable(tokens[1].first, theMaskInfo);
 				if(theMaskInfo->GetOperationType() == NFmiAreaMask::InfoVariable)
 				{
-					theMaskInfo->SetOperationType(NFmiAreaMask::FunctionPeekXY);
+					theMaskInfo->SetOperationType((*it).second);
 					NFmiValueString valueString1(tokens[2].first);
 					double value1 = (double)valueString1;
 					NFmiValueString valueString2(tokens[3].first);
@@ -1882,7 +1897,7 @@ bool NFmiSmartToolIntepreter::IsVariableBinaryOperator(const std::string &theVar
 }
 
 //--------------------------------------------------------
-// InterpretNextMask 
+// InterpretNextMask
 //--------------------------------------------------------
 bool NFmiSmartToolIntepreter::InterpretNextMask(const std::string &theMaskSectionText)
 {
@@ -1900,11 +1915,11 @@ NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &thePara
 	}
 	else
 		param = NFmiParam((*it).second, (*it).first);
-	return param; 
+	return param;
 }
 
 //--------------------------------------------------------
-// ExtractFirstCalculationSection 
+// ExtractFirstCalculationSection
 //--------------------------------------------------------
 // Metodi saa parametrina stripatun macro-tekstin ja etsii siit‰ 1. calculation sectionin.
 // Jos lˆytyy, palauta sen positio, jos ei lˆydy, palauta string.end().
@@ -1936,280 +1951,97 @@ void NFmiSmartToolIntepreter::Clear(void)
 		itsSmartToolCalculationBlocks[i].Clear();
 }
 
-void NFmiSmartToolIntepreter::InitTokens(void)
+void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 {
 	if(!NFmiSmartToolIntepreter::fTokensInitialized)
 	{
 		NFmiSmartToolIntepreter::fTokensInitialized = true;
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("T"), kFmiTemperature));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("t"), kFmiTemperature));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("P"), kFmiPressure));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("p"), kFmiPressure));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RH"), kFmiHumidity));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Rh"), kFmiHumidity));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rh"), kFmiHumidity));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("THETAW"), kFmiPseudoAdiabaticPotentialTemperature));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("ThetaW"), kFmiPseudoAdiabaticPotentialTemperature));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("thetaW"), kFmiPseudoAdiabaticPotentialTemperature));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Thetaw"), kFmiPseudoAdiabaticPotentialTemperature));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("thetaw"), kFmiPseudoAdiabaticPotentialTemperature));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("KIND"), kFmiKIndex));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("KInd"), kFmiKIndex));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Kind"), kFmiKIndex));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("kind"), kFmiKIndex));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("DP"), kFmiDewPoint));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Dp"), kFmiDewPoint));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("dp"), kFmiDewPoint));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("LRAD"), kFmiRadiationLW));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("LRad"), kFmiRadiationLW));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Lrad"), kFmiRadiationLW));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lrad"), kFmiRadiationLW));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("SRAD"), kFmiRadiationGlobal));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("SRad"), kFmiRadiationGlobal));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Srad"), kFmiRadiationGlobal));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("srad"), kFmiRadiationGlobal));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("WS"), kFmiWindSpeedMS));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Ws"), kFmiWindSpeedMS));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("ws"), kFmiWindSpeedMS));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("WD"), kFmiWindDirection));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Wd"), kFmiWindDirection));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wd"), kFmiWindDirection));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("u"), kFmiWindUMS));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("U"), kFmiWindUMS));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("v"), kFmiWindVMS));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("V"), kFmiWindVMS));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("N"), kFmiTotalCloudCover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("n"), kFmiTotalCloudCover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("CL"), kFmiLowCloudCover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Cl"), kFmiLowCloudCover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cl"), kFmiLowCloudCover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("CM"), kFmiMediumCloudCover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Cm"), kFmiMediumCloudCover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cm"), kFmiMediumCloudCover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("CH"), kFmiHighCloudCover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Ch"), kFmiHighCloudCover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("ch"), kFmiHighCloudCover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RR"), kFmiPrecipitation1h));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Rr"), kFmiPrecipitation1h));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rr"), kFmiPrecipitation1h));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pref"), kFmiPrecipitationForm));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Pref"), kFmiPrecipitationForm));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("PreF"), kFmiPrecipitationForm));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("PREF"), kFmiPrecipitationForm));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pret"), kFmiPrecipitationType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Pret"), kFmiPrecipitationType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("PreT"), kFmiPrecipitationType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("PRET"), kFmiPrecipitationType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("THUND"), kFmiProbabilityThunderstorm));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Thund"), kFmiProbabilityThunderstorm));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("thund"), kFmiProbabilityThunderstorm));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FOG"), kFmiFogIntensity));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fog"), kFmiFogIntensity));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fog"), kFmiFogIntensity));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("HSADE"), kFmiWeatherSymbol1));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("HSade"), kFmiWeatherSymbol1));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Hsade"), kFmiWeatherSymbol1));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("hsade"), kFmiWeatherSymbol1));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("HESSAA"), kFmiWeatherSymbol3));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Hessaa"), kFmiWeatherSymbol3));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("hessaa"), kFmiWeatherSymbol3));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("W"), kFmiVerticalVelocityMMS));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("w"), kFmiVerticalVelocityMMS));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Z"), kFmiGeopHeight));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("z"), kFmiGeopHeight));
 
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrcon"), kFmiPrecipitationConv));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrCon"), kFmiPrecipitationConv));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RRCon"), kFmiPrecipitationConv));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RRcon"), kFmiPrecipitationConv));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrCON"), kFmiPrecipitationConv));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RRCON"), kFmiPrecipitationConv));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrlar"), kFmiPrecipitationLarge));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrLar"), kFmiPrecipitationLarge));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RRlar"), kFmiPrecipitationLarge));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RRLar"), kFmiPrecipitationLarge));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrLAR"), kFmiPrecipitationLarge));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("RRLAR"), kFmiPrecipitationLarge));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape"), kFmiCAPE));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Cape"), kFmiCAPE));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("CAPE"), kFmiCAPE));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("tke"), kFmiTurbulentKineticEnergy));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Tke"), kFmiTurbulentKineticEnergy));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("TKE"), kFmiTurbulentKineticEnergy));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1BASE"), kFmi_FL_1_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1Base"), kFmi_FL_1_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl1Base"), kFmi_FL_1_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1base"), kFmi_FL_1_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1TOP"), kFmi_FL_1_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1Top"), kFmi_FL_1_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl1Top"), kFmi_FL_1_Top));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1top"), kFmi_FL_1_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1COVER"), kFmi_FL_1_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1Cover"), kFmi_FL_1_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl1Cover"), kFmi_FL_1_Cover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1cover"), kFmi_FL_1_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1CLOUDTYPE"), kFmi_FL_1_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL1CloudType"), kFmi_FL_1_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl1CloudType"), kFmi_FL_1_CloudType));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1cloudtype"), kFmi_FL_1_CloudType));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2BASE"), kFmi_FL_2_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2Base"), kFmi_FL_2_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl2Base"), kFmi_FL_2_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl2base"), kFmi_FL_2_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2TOP"), kFmi_FL_2_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2Top"), kFmi_FL_2_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl2Top"), kFmi_FL_2_Top));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl2top"), kFmi_FL_2_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2COVER"), kFmi_FL_2_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2Cover"), kFmi_FL_2_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl2Cover"), kFmi_FL_2_Cover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl2cover"), kFmi_FL_2_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2CLOUDTYPE"), kFmi_FL_2_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL2CloudType"), kFmi_FL_2_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl2CloudType"), kFmi_FL_2_CloudType));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl2cloudtype"), kFmi_FL_2_CloudType));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3BASE"), kFmi_FL_3_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3Base"), kFmi_FL_3_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl3Base"), kFmi_FL_3_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl3base"), kFmi_FL_3_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3TOP"), kFmi_FL_3_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3Top"), kFmi_FL_3_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl3Top"), kFmi_FL_3_Top));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl3top"), kFmi_FL_3_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3COVER"), kFmi_FL_3_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3Cover"), kFmi_FL_3_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl3Cover"), kFmi_FL_3_Cover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl3cover"), kFmi_FL_3_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3CLOUDTYPE"), kFmi_FL_3_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL3CloudType"), kFmi_FL_3_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl3CloudType"), kFmi_FL_3_CloudType));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl3cloudtype"), kFmi_FL_3_CloudType));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4BASE"), kFmi_FL_4_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4Base"), kFmi_FL_4_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl4Base"), kFmi_FL_4_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl4base"), kFmi_FL_4_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4TOP"), kFmi_FL_4_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4Top"), kFmi_FL_4_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl4Top"), kFmi_FL_4_Top));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl4top"), kFmi_FL_4_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4COVER"), kFmi_FL_4_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4Cover"), kFmi_FL_4_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl4Cover"), kFmi_FL_4_Cover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl4cover"), kFmi_FL_4_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4CLOUDTYPE"), kFmi_FL_4_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL4CloudType"), kFmi_FL_4_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl4CloudType"), kFmi_FL_4_CloudType));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl4cloudtype"), kFmi_FL_4_CloudType));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5BASE"), kFmi_FL_5_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5Base"), kFmi_FL_5_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl5Base"), kFmi_FL_5_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl5base"), kFmi_FL_5_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5TOP"), kFmi_FL_5_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5Top"), kFmi_FL_5_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl5Top"), kFmi_FL_5_Top));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl5top"), kFmi_FL_5_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5COVER"), kFmi_FL_5_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5Cover"), kFmi_FL_5_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl5Cover"), kFmi_FL_5_Cover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl5cover"), kFmi_FL_5_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5CLOUDTYPE"), kFmi_FL_5_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL5CloudType"), kFmi_FL_5_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl5CloudType"), kFmi_FL_5_CloudType));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl5cloudtype"), kFmi_FL_5_CloudType));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6BASE"), kFmi_FL_6_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6Base"), kFmi_FL_6_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl6Base"), kFmi_FL_6_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl6base"), kFmi_FL_6_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6TOP"), kFmi_FL_6_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6Top"), kFmi_FL_6_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl6Top"), kFmi_FL_6_Top));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl6top"), kFmi_FL_6_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6COVER"), kFmi_FL_6_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6Cover"), kFmi_FL_6_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl6Cover"), kFmi_FL_6_Cover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl6cover"), kFmi_FL_6_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6CLOUDTYPE"), kFmi_FL_6_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL6CloudType"), kFmi_FL_6_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl6CloudType"), kFmi_FL_6_CloudType));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl6cloudtype"), kFmi_FL_6_CloudType));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7BASE"), kFmi_FL_7_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7Base"), kFmi_FL_7_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl7Base"), kFmi_FL_7_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl7base"), kFmi_FL_7_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7TOP"), kFmi_FL_7_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7Top"), kFmi_FL_7_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl7Top"), kFmi_FL_7_Top));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl7top"), kFmi_FL_7_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7COVER"), kFmi_FL_7_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7Cover"), kFmi_FL_7_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl7Cover"), kFmi_FL_7_Cover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl7cover"), kFmi_FL_7_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7CLOUDTYPE"), kFmi_FL_7_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL7CloudType"), kFmi_FL_7_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl7CloudType"), kFmi_FL_7_CloudType));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl7cloudtype"), kFmi_FL_7_CloudType));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8BASE"), kFmi_FL_8_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8Base"), kFmi_FL_8_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl8Base"), kFmi_FL_8_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl8base"), kFmi_FL_8_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8TOP"), kFmi_FL_8_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8Top"), kFmi_FL_8_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl8Top"), kFmi_FL_8_Top));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl8top"), kFmi_FL_8_Top));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8COVER"), kFmi_FL_8_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8Cover"), kFmi_FL_8_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl8Cover"), kFmi_FL_8_Cover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl8cover"), kFmi_FL_8_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8CLOUDTYPE"), kFmi_FL_8_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FL8CloudType"), kFmi_FL_8_CloudType));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Fl8CloudType"), kFmi_FL_8_CloudType));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl8cloudtype"), kFmi_FL_8_CloudType));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FLCBBASE"), kFmi_FL_Cb_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FlCbBase"), kFmi_FL_Cb_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("flcbbase"), kFmi_FL_Cb_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FLCBCOVER"), kFmi_FL_Cb_Cover));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FlCbCover"), kFmi_FL_Cb_Cover));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("flcbcover"), kFmi_FL_Cb_Cover));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FLMINBASE"), kFmi_FL_Min_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FlMinBase"), kFmi_FL_Min_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("flminbase"), kFmi_FL_Min_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FLMAXBASE"), kFmi_FL_Max_Base));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("FlMaxBase"), kFmi_FL_Max_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("flmaxbase"), kFmi_FL_Max_Base));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("AVIVIS"), kFmiAviationVisibility));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("AviVis"), kFmiAviationVisibility));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("avivis"), kFmiAviationVisibility));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("VERVIS"), kFmiVerticalVisibility));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("VerVis"), kFmiVerticalVisibility));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("vervis"), kFmiVerticalVisibility));
 
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("POP"), kFmiPoP));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("PoP"), kFmiPoP));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Pop"), kFmiPoP));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pop"), kFmiPoP));
-
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("MIST"), kFmiMist));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Mist"), kFmiMist));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("mist"), kFmiMist));
-
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pseudosatel"), kFmiRadiationNetTopAtmLW));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("Pseudosatel"), kFmiRadiationNetTopAtmLW));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("PseudoSatel"), kFmiRadiationNetTopAtmLW));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("PSEUDOSATEL"), kFmiRadiationNetTopAtmLW));
-	
+
 /*
 
   ,
@@ -2231,95 +2063,68 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 	kFmiPacked_FL_12,
 */
 
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("TOPO"), kFmiTopoGraf));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("Topo"), kFmiTopoGraf));
 		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("topo"), kFmiTopoGraf));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("SLOPE"), kFmiTopoSlope));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("Slope"), kFmiTopoSlope));
 		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("slope"), kFmiTopoSlope));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("SLOPEDIR"), kFmiTopoAzimuth));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("SlopeDir"), kFmiTopoAzimuth));
 		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("slopedir"), kFmiTopoAzimuth));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("DISTSEA"), kFmiTopoDistanceToSea));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("DistSea"), kFmiTopoDistanceToSea));
 		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("distsea"), kFmiTopoDistanceToSea));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("DIRSEA"), kFmiTopoDirectionToSea));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("DirSea"), kFmiTopoDirectionToSea));
 		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("dirsea"), kFmiTopoDirectionToSea));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("DISTLAND"), kFmiTopoDistanceToLand));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("DistLand"), kFmiTopoDistanceToLand));
 		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("distland"), kFmiTopoDistanceToLand));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("DIRLAND"), kFmiTopoDirectionToLand));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("DirLand"), kFmiTopoDirectionToLand));
 		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("dirland"), kFmiTopoDirectionToLand));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("LANDSEEMASK"), kFmiLandSeaMask));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("LandSeeMask"), kFmiLandSeaMask));
 		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("landseemask"), kFmiLandSeaMask));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("RELTOPO"), kFmiTopoRelativeHeight));
-		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("RelTopo"), kFmiTopoRelativeHeight));
 		itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("reltopo"), kFmiTopoRelativeHeight));
 
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("LAT"), kFmiLatitude));
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("Lat"), kFmiLatitude));
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("lat"), kFmiLatitude));
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("LON"), kFmiLongitude));
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("Lon"), kFmiLongitude));
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("lon"), kFmiLongitude));
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("EANGLE"), kFmiElevationAngle));
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("EAngle"), kFmiElevationAngle));
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("eangle"), kFmiElevationAngle));
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("JDAY"), kFmiDay)); // julian day oikeasti
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("JDay"), kFmiDay)); // julian day oikeasti
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("Jday"), kFmiDay)); // julian day oikeasti
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("jday"), kFmiDay)); // julian day oikeasti
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("LHOUR"), kFmiHour)); // local hour oikeasti
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("LHour"), kFmiHour)); // local hour oikeasti
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("Lhour"), kFmiHour)); // local hour oikeasti
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("lhour"), kFmiHour)); // local hour oikeasti
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("FHOUR"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia k‰ytetty, koska ei ollut valmista parametria
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("FHour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia k‰ytetty, koska ei ollut valmista parametria
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("Fhour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia k‰ytetty, koska ei ollut valmista parametria
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("fhour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia k‰ytetty, koska ei ollut valmista parametria
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("TIMESTEP"), kFmiDeltaTime)); // TIMESTEP eli timestep palauttaa datan currentin ajan aika stepin tunneissa
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("TimeStep"), kFmiDeltaTime)); // TIMESTEP eli timestep palauttaa datan currentin ajan aika stepin tunneissa
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("timestep"), kFmiDeltaTime)); // TIMESTEP eli timestep palauttaa datan currentin ajan aika stepin tunneissa
 
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("HIR"), kFmiMTAHIRLAM));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Hir"), kFmiMTAHIRLAM));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("hir"), kFmiMTAHIRLAM));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("EC"), kFmiMTAECMWF));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Ec"), kFmiMTAECMWF));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ec"), kFmiMTAECMWF));
-//		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("SYNOP"), kFmiSYNOP));
-//		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Synop"), kFmiSYNOP));
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("gridsizex"), kFmiLastParameter)); // hilan x suuntainen koko metreiss‰ (muokattavan datan tai macroParam hilan koko)
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("gridsizey"), static_cast<FmiParameterName>(kFmiLastParameter+1))); // hilan y suuntainen koko metreiss‰ (muokattavan datan tai macroParam hilan koko)
+
+		// Alustetaan ensin tuottaja listaan muut tarvittavat tuottajat, Huom! nimi pienell‰, koska
+		// tehd‰‰n case insensitiivej‰ tarkasteluja!!
 //		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("synop"), kFmiSYNOP));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("MET"), static_cast<FmiProducerName>(999))); // 999 on m‰‰ritelty helpdatainfo.dat tiedostossa viimeksi editoidun datan kohdalla (feikki tuottaja id:n kohdalla)
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Met"), static_cast<FmiProducerName>(999)));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("met"), static_cast<FmiProducerName>(999)));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ORIG"), kFmiMETEOR)); // tuottaja id:ll‰ ei ole v‰li‰ t‰ss‰ oikeasti
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Orig"), kFmiMETEOR));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("orig"), kFmiMETEOR));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ANAL"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ANA"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Ana"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ana"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("mbe"), kFmiMTAHIRMESO));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Mbe"), kFmiMTAHIRMESO));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("MBE"), kFmiMTAHIRMESO));
 
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ala"), static_cast<FmiProducerName>(555))); // aladdinille laitetaan pikaviritys 555
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("Ala"), static_cast<FmiProducerName>(555))); // aladdinille laitetaan pikaviritys 555
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ALA"), static_cast<FmiProducerName>(555))); // aladdinille laitetaan pikaviritys 555
+		if(theProducerSystem)
+		{
+			// lopuksi tuottaja listaa t‰ydennet‰‰n ProducerSystemin tuottajilla
+			int modelCount = theProducerSystem->Producers().size();
+			int i=0;
+			for(i=0; i<modelCount; i++)
+			{
+				NFmiProducerInfo &prodInfo = theProducerSystem->Producer(i+1);
+				std::vector<int> prodIds = prodInfo.ProducerIds();
+				FmiProducerName prodId1 = static_cast<FmiProducerName>(0);
+				if(prodIds.size() > 0)
+					prodId1 = static_cast<FmiProducerName>(prodIds[0]);
+				std::string prodName(prodInfo.ShortName());
+				NFmiStringTools::LowerCase(prodName); // pit‰‰ muuttaa lower case:en!!!
+				itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(prodName, prodId1));
+			}
+		}
+		else
+		{
+			// t‰st‰ pit‰isi varoittaa ja heitt‰‰ poikkeus, mutta aina ei voi alustaa smarttool-systeemi‰ producersystemill‰ (esim. SmarttoolFilter ei tied‰ moisesta mit‰‰n!!)
+//			throw std::runtime_error("NFmiSmartToolIntepreter::InitTokens - Was not initialized correctly, ProducerSystem missing, error in program, report it!");
 
-		itsTokenConstants.insert(ConstantMap::value_type(string("MISS"), kFloatMissing));
-		itsTokenConstants.insert(ConstantMap::value_type(string("Miss"), kFloatMissing));
+			// joten pakko alustaa t‰m‰ t‰ss‰ tapauksessa sitten jollain hardcode tuottajilla
+			itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("hir"), kFmiMTAHIRLAM));
+			itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ec"), kFmiMTAECMWF));
+			itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("mbe"), kFmiMTAHIRMESO));
+			itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ala"), static_cast<FmiProducerName>(555))); // aladdinille laitetaan pikaviritys 555
+		}
+
+
 		itsTokenConstants.insert(ConstantMap::value_type(string("miss"), kFloatMissing));
-		itsTokenConstants.insert(ConstantMap::value_type(string("PI"), 3.14159265358979));
-		itsTokenConstants.insert(ConstantMap::value_type(string("Pi"), 3.14159265358979));
 		itsTokenConstants.insert(ConstantMap::value_type(string("pi"), 3.14159265358979));
-		
+
 		itsTokenIfCommands.push_back(string("IF"));
 		itsTokenIfCommands.push_back(string("if"));
 		itsTokenIfCommands.push_back(string("If"));
@@ -2354,7 +2159,7 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsBinaryOperator.insert(BinaOperMap::value_type(string("Or"), NFmiAreaMask::kOr));
 		itsBinaryOperator.insert(BinaOperMap::value_type(string("or"), NFmiAreaMask::kOr));
 		itsBinaryOperator.insert(BinaOperMap::value_type(string("OR"), NFmiAreaMask::kOr));
-		
+
 		itsCalculationOperations.insert(CalcOperMap::value_type(string("+"), NFmiAreaMask::Add));
 		itsCalculationOperations.insert(CalcOperMap::value_type(string("-"), NFmiAreaMask::Sub));
 		itsCalculationOperations.insert(CalcOperMap::value_type(string("/"), NFmiAreaMask::Div));
@@ -2413,67 +2218,34 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("srh01km"), kSoundingParSRH0_1km));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("thetae03km"), kSoundingParThetaE0_3km));
 		// ****** sounding index funktiot *************************
-		
+
 		itsTokenCalculationBlockMarkers.push_back(string("{"));
 		itsTokenCalculationBlockMarkers.push_back(string("}"));
 
 		itsTokenMaskBlockMarkers.push_back(string("("));
 		itsTokenMaskBlockMarkers.push_back(string(")"));
 
-		itsTokenFunctions.insert(FunctionMap::value_type(string("AVG"), NFmiAreaMask::Avg));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("Avg"), NFmiAreaMask::Avg));
 		itsTokenFunctions.insert(FunctionMap::value_type(string("avg"), NFmiAreaMask::Avg));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("MIN"), NFmiAreaMask::Min));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("Min"), NFmiAreaMask::Min));
 		itsTokenFunctions.insert(FunctionMap::value_type(string("min"), NFmiAreaMask::Min));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("MAX"), NFmiAreaMask::Max));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("Max"), NFmiAreaMask::Max));
 		itsTokenFunctions.insert(FunctionMap::value_type(string("max"), NFmiAreaMask::Max));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("SUM"), NFmiAreaMask::Sum));
-		itsTokenFunctions.insert(FunctionMap::value_type(string("Sum"), NFmiAreaMask::Sum));
 		itsTokenFunctions.insert(FunctionMap::value_type(string("sum"), NFmiAreaMask::Sum));
-//		itsTokenFunctions.insert(FunctionMap::value_type(string("WAVG"), NFmiAreaMask::WAvg));
-//		itsTokenFunctions.insert(FunctionMap::value_type(string("WAvg"), NFmiAreaMask::WAvg));
-//		itsTokenFunctions.insert(FunctionMap::value_type(string("Wavg"), NFmiAreaMask::WAvg));
 //		itsTokenFunctions.insert(FunctionMap::value_type(string("wavg"), NFmiAreaMask::WAvg));
 
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("sumt"), NFmiAreaMask::Sum));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("SumT"), NFmiAreaMask::Sum));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("SUMT"), NFmiAreaMask::Sum));
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxt"), NFmiAreaMask::Max));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MaxT"), NFmiAreaMask::Max));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MAXT"), NFmiAreaMask::Max));
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("mint"), NFmiAreaMask::Min));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MinT"), NFmiAreaMask::Min));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MINT"), NFmiAreaMask::Min));
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("avgt"), NFmiAreaMask::Avg));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("AvgT"), NFmiAreaMask::Avg));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("AVGT"), NFmiAreaMask::Avg));
 
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("sumz"), NFmiAreaMask::Sum));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("SumZ"), NFmiAreaMask::Sum));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("SUMZ"), NFmiAreaMask::Sum));
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxz"), NFmiAreaMask::Max));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MaxZ"), NFmiAreaMask::Max));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MAXZ"), NFmiAreaMask::Max));
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("minz"), NFmiAreaMask::Min));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MinZ"), NFmiAreaMask::Min));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MINZ"), NFmiAreaMask::Min));
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("avgz"), NFmiAreaMask::Avg));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("AvgZ"), NFmiAreaMask::Avg));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("AVGZ"), NFmiAreaMask::Avg));
 
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxh"), NFmiAreaMask::Max));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MaxH"), NFmiAreaMask::Max));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MAXH"), NFmiAreaMask::Max));
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("minh"), NFmiAreaMask::Min));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MinH"), NFmiAreaMask::Min));
-		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("MINH"), NFmiAreaMask::Min));
 
-		itsTokenPeekXYFunctions.push_back(string("PEEKXY"));
-		itsTokenPeekXYFunctions.push_back(string("PeekXY"));
-		itsTokenPeekXYFunctions.push_back(string("Peekxy"));
-		itsTokenPeekXYFunctions.push_back(string("peekxy"));
+		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy"), NFmiAreaMask::FunctionPeekXY));
+		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy2"), NFmiAreaMask::FunctionPeekXY2));
 
 		itsTokenRampUpFunctions.push_back(string("RU"));
 		itsTokenRampUpFunctions.push_back(string("Ru"));
@@ -2497,62 +2269,23 @@ void NFmiSmartToolIntepreter::InitTokens(void)
 		itsTokenDeltaZIdentifiers.push_back(string("DeltaZ"));
 		itsTokenDeltaZIdentifiers.push_back(string("DELTAZ"));
 
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("EXP"), NFmiAreaMask::Exp));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Exp"), NFmiAreaMask::Exp));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("exp"), NFmiAreaMask::Exp));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("SQRT"), NFmiAreaMask::Sqrt));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Sqrt"), NFmiAreaMask::Sqrt));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("sqrt"), NFmiAreaMask::Sqrt));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("LN"), NFmiAreaMask::Log));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Ln"), NFmiAreaMask::Log));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("ln"), NFmiAreaMask::Log));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("LG"), NFmiAreaMask::Log10));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Lg"), NFmiAreaMask::Log10));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("lg"), NFmiAreaMask::Log10));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("SIN"), NFmiAreaMask::Sin));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Sin"), NFmiAreaMask::Sin));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("sin"), NFmiAreaMask::Sin));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("COS"), NFmiAreaMask::Cos));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Cos"), NFmiAreaMask::Cos));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("cos"), NFmiAreaMask::Cos));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("TAN"), NFmiAreaMask::Tan));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Tan"), NFmiAreaMask::Tan));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("tan"), NFmiAreaMask::Tan));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("SINH"), NFmiAreaMask::Sinh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Sinh"), NFmiAreaMask::Sinh));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("sinh"), NFmiAreaMask::Sinh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("COSH"), NFmiAreaMask::Cosh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Cosh"), NFmiAreaMask::Cosh));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("cosh"), NFmiAreaMask::Cosh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("TANH"), NFmiAreaMask::Tanh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Tanh"), NFmiAreaMask::Tanh));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("tanh"), NFmiAreaMask::Tanh));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ASIN"), NFmiAreaMask::Asin));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ASin"), NFmiAreaMask::Asin));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Asin"), NFmiAreaMask::Asin));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("asin"), NFmiAreaMask::Asin));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ACOS"), NFmiAreaMask::Acos));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ACos"), NFmiAreaMask::Acos));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Acos"), NFmiAreaMask::Acos));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("acos"), NFmiAreaMask::Acos));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ATAN"), NFmiAreaMask::Atan));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ATan"), NFmiAreaMask::Atan));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Atan"), NFmiAreaMask::Atan));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("atan"), NFmiAreaMask::Atan));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("CEIL"), NFmiAreaMask::Ceil));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Ceil"), NFmiAreaMask::Ceil));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("ceil"), NFmiAreaMask::Ceil));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("FLOOR"), NFmiAreaMask::Floor));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Floor"), NFmiAreaMask::Floor));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("floor"), NFmiAreaMask::Floor));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ROUND"), NFmiAreaMask::Round));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Round"), NFmiAreaMask::Round));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("round"), NFmiAreaMask::Round));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("ABS"), NFmiAreaMask::Abs));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Abs"), NFmiAreaMask::Abs));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("abs"), NFmiAreaMask::Abs));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("RAND"), NFmiAreaMask::Rand));
-		itsMathFunctions.insert(MathFunctionMap::value_type(string("Rand"), NFmiAreaMask::Rand));
 		itsMathFunctions.insert(MathFunctionMap::value_type(string("rand"), NFmiAreaMask::Rand));
 
 	}

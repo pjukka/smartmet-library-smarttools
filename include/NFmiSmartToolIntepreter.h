@@ -1,25 +1,25 @@
 //**********************************************************
-// C++ Class Name : NFmiSmartToolIntepreter 
+// C++ Class Name : NFmiSmartToolIntepreter
 // ---------------------------------------------------------
 // Filetype: (HEADER)
-// Filepath: G:/siirto/marko/oc/NFmiSmartToolIntepreter.h 
-// 
-// 
-// GDPro Properties 
+// Filepath: G:/siirto/marko/oc/NFmiSmartToolIntepreter.h
+//
+//
+// GDPro Properties
 // ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 4.0 ) 
-//  - GD System Name    : aSmartTools 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : smarttools 1 
-// ---------------------------------------------------  
-//  Author         : pietarin 
-//  Creation Date  : Thur - Jun 20, 2002 
-// 
-//  Change Log     : 
-// 
+//  - GD Symbol Type    : CLD_Class
+//  - GD Method         : UML ( 4.0 )
+//  - GD System Name    : aSmartTools
+//  - GD View Type      : Class Diagram
+//  - GD View Name      : smarttools 1
+// ---------------------------------------------------
+//  Author         : pietarin
+//  Creation Date  : Thur - Jun 20, 2002
+//
+//  Change Log     :
+//
 // Aluksi simppeli smarttool-tulkki. Macro voi olla muotoa:
-// 
+//
 // calculationSection1
 // IF(mask1)
 //   calculationSection2
@@ -30,7 +30,7 @@
 //   calculationSection4
 // }
 // calculationSection5
-// 
+//
 // Eli Voi olla laskuja, jotka suoritetaan aina ensin (calculationSection1), sitten tulee
 // haluttu m‰‰r‰ IF - ELSEIF - ELSE osioita, joihin jokaiseen liittyy jokin calculationSection.
 // ELSEIF:j‰ voi olla useita, mutta IF ja ELSE osioita voi olla vain yksi kumpaakin
@@ -56,12 +56,13 @@
 #include <set>
 #include <queue>
 
-class NFmiSmartToolCalculationSectionInfo; 
+class NFmiSmartToolCalculationSectionInfo;
 class NFmiAreaMaskSectionInfo;
 class NFmiAreaMaskInfo;
 class NFmiSmartToolCalculationInfo;
 class NFmiInfoOrganizer;
 class NFmiSmartToolCalculationBlockInfo;
+class NFmiProducerSystem;
 
 class NFmiSmartToolCalculationBlockInfoVector
 {
@@ -101,11 +102,11 @@ public:
 	NFmiSmartToolCalculationSectionInfo* itsLastCalculationSectionInfo;
 };
 
-class NFmiSmartToolIntepreter 
+class NFmiSmartToolIntepreter
 {
 public:
 	typedef std::map<std::string, FmiProducerName> ProducerMap;
-	typedef std::map<std::string, std::pair<unsigned long, unsigned long> > LevelMap; // nimi, ident, levelValue 
+	typedef std::map<std::string, std::pair<unsigned long, unsigned long> > LevelMap; // nimi, ident, levelValue
 	typedef std::map<std::string, double> ConstantMap; // esim. MISS 32700 tai PI 3.14159
 /*
 	class Exception
@@ -119,7 +120,7 @@ public:
 */
 	void Interpret(const std::string &theMacroText, bool fThisIsMacroParamSkript = false);
 
-	NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer);
+	NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer, NFmiProducerSystem *theProducerSystem);
 	~NFmiSmartToolIntepreter(void);
 
 	void Clear(void);
@@ -212,6 +213,7 @@ private:
 	FmiLevelType GetLevelType(NFmiInfoData::Type theDataType, long levelValue);
 
 	NFmiInfoOrganizer* itsInfoOrganizer; // ei omista
+	NFmiProducerSystem *itsProducerSystem;  // ei omista
 	std::string itsCheckOutSectionText; // esim. if-sectionin koko teksti
 	std::string::iterator itsCheckOutTextStartPosition; // sen hetkinen tekstiosan alkupiste
 	std::string::iterator itsCheckOutTextEndPosition; // sen hetkinen tekstiosan alkupiste
@@ -226,11 +228,11 @@ private:
 
 	int itsMaxCalculationSectionCount;
 
-	static void InitTokens(void);
+	static void InitTokens(NFmiProducerSystem *theProducerSystem);
 	static bool fTokensInitialized;
 	static ParamMap itsTokenParameterNamesAndIds;
 	static ProducerMap itsTokenProducerNamesAndIds;
-	static ConstantMap itsTokenConstants; 
+	static ConstantMap itsTokenConstants;
 	static checkedVector<std::string> itsTokenConditionalCommands;
 	static checkedVector<std::string> itsTokenIfCommands;
 	static checkedVector<std::string> itsTokenElseIfCommands;
@@ -262,7 +264,9 @@ private:
 	static FunctionMap itsTokenFunctions;
 	static FunctionMap itsTokenThreeArgumentFunctions;
 
-	static checkedVector<std::string> itsTokenPeekXYFunctions;
+	typedef std::map<std::string, NFmiAreaMask::CalculationOperationType> PeekFunctionMap;
+	static PeekFunctionMap itsTokenPeekFunctions;
+//	static checkedVector<std::string> itsTokenPeekXYFunctions;
 
 	typedef std::map<std::string, NFmiAreaMask::MathFunctionType> MathFunctionMap;
 	static MathFunctionMap itsMathFunctions;
@@ -287,7 +291,7 @@ private:
     std::string::iterator exp_end;
 	char token[128]; // holds current token
 	types tok_type;  // holds token's type
-	
+
 };
 #endif
 
