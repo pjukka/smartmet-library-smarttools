@@ -1,31 +1,31 @@
 //**********************************************************
-// C++ Class Name : NFmiDrawParam 
+// C++ Class Name : NFmiDrawParam
 // ---------------------------------------------------------
 // Filetype: (HEADER)
-// Filepath: D:/projekti/GDPro/GDTemp/NFmiDrawParam.h 
-// 
-// 
-// GDPro Properties 
+// Filepath: D:/projekti/GDPro/GDTemp/NFmiDrawParam.h
+//
+//
+// GDPro Properties
 // ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 2.1.4 ) 
-//  - GD System Name    : Met-editor Plan 2 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : Markon ehdotus 
-// ---------------------------------------------------  
-//  Author         : pietarin 
-//  Creation Date  : Thur - Jan 28, 1999 
-// 
-// 
-//  Description: 
-//   En ole vielä varma tämän luokan tarkoituksesta/toiminnasta, 
-//   tämä on 
+//  - GD Symbol Type    : CLD_Class
+//  - GD Method         : UML ( 2.1.4 )
+//  - GD System Name    : Met-editor Plan 2
+//  - GD View Type      : Class Diagram
+//  - GD View Name      : Markon ehdotus
+// ---------------------------------------------------
+//  Author         : pietarin
+//  Creation Date  : Thur - Jan 28, 1999
+//
+//
+//  Description:
+//   En ole vielä varma tämän luokan tarkoituksesta/toiminnasta,
+//   tämä on
 //   Persan idea.
-// 
-//  Change Log: 
-// Changed 1999.09.28/Marko	Lisäsin SecondaryIsoLineColor:in käytön (käytetään 
+//
+//  Change Log:
+// Changed 1999.09.28/Marko	Lisäsin SecondaryIsoLineColor:in käytön (käytetään
 //							vertailtaessa samantyyppistä dataa päällekkäin)
-// 
+//
 //**********************************************************
 #ifndef  NFMIDRAWPARAM_H
 #define  NFMIDRAWPARAM_H
@@ -50,7 +50,7 @@ public:
     NFmiDrawParam (const NFmiDataIdent& theParam, const NFmiLevel &theLevel, int thePriority, NFmiInfoData::Type theDataType = NFmiInfoData::kNoDataType);//, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0);
 	virtual  ~NFmiDrawParam (void);
 
-	void Init(const NFmiDrawParam* theDrawParam);
+	void Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawingOptions = false);
 	void HideParam(bool newValue){fHidden = newValue;};
 	void EditParam(bool newValue){fEditedParam = newValue;};
 	bool IsParamHidden(void) const {return fHidden;};
@@ -68,12 +68,12 @@ public:
 // --------------- "set" ja "get" metodit -----------------
 	const std::string&	 ParameterAbbreviation (void) const;
 	void				 ParameterAbbreviation(std::string theParameterAbbreviation) { itsParameterAbbreviation = theParameterAbbreviation; }
-	NFmiDataIdent&		 Param (void) { return itsParameter; }; 
-	void                 Param (const NFmiDataIdent& theParameter) { itsParameter = theParameter; }; 
+	NFmiDataIdent&		 Param (void) { return itsParameter; };
+	void                 Param (const NFmiDataIdent& theParameter) { itsParameter = theParameter; };
 	NFmiLevel&			 Level(void) {return itsLevel;}
 	void				 Level(const NFmiLevel& theLevel) {itsLevel = theLevel;}
-	void				 Priority (int thePriority){ itsPriority = thePriority; }; 
-	int					 Priority (void) const { return itsPriority; }; 
+	void				 Priority (int thePriority){ itsPriority = thePriority; };
+	int					 Priority (void) const { return itsPriority; };
 	void				 ViewType (const NFmiMetEditorTypes::View& theViewType) { itsViewType = theViewType; };
 	NFmiMetEditorTypes::View ViewType (void) const {return itsViewType;};
 	void				 FrameColor (const NFmiColor& theFrameColor) { itsFrameColor = theFrameColor; };
@@ -104,7 +104,7 @@ public:
 	void				 InitFileName(std::string theFileName) { itsInitFileName = theFileName; }
 
 	double AbsoluteMinValue(void) const {return itsAbsoluteMinValue;}
-	void AbsoluteMinValue(double theAbsoluteMinValue) {itsAbsoluteMinValue = theAbsoluteMinValue;}	
+	void AbsoluteMinValue(double theAbsoluteMinValue) {itsAbsoluteMinValue = theAbsoluteMinValue;}
 	double AbsoluteMaxValue(void) const {return itsAbsoluteMaxValue;}
 	void AbsoluteMaxValue(double theAbsoluteMaxValue) {itsAbsoluteMaxValue = theAbsoluteMaxValue;}
 	double TimeSeriesScaleMin(void) const {return itsTimeSeriesScaleMin;};
@@ -300,16 +300,16 @@ protected:
 	std::string itsParameterAbbreviation;
     int itsPriority;
 
-//   Tähän talletetaan tiedoston nimi, mistä luetaan/mihin 
-//   kirjoitetaan 
+//   Tähän talletetaan tiedoston nimi, mistä luetaan/mihin
+//   kirjoitetaan
 //   kyseisen luokan tiedot.
 	std::string itsInitFileName;
-	std::string itsMacroParamRelativePath; // tätä tarvitaan kun viewMacrojen yhteydessä on macroParametreja ja 
+	std::string itsMacroParamRelativePath; // tätä tarvitaan kun viewMacrojen yhteydessä on macroParametreja ja
 								// ne ovat alihakemistossa. Eli Kun viewMacro talletetaan tiedostoon, lisätään tämä
 								// tieto itsParameterAbbreviation-tiedosn yhteyteen ja se myös puretaan luettaessa tähän.
 								// Tämä avulla voidaan rakentaa oikea suhteellinen polku haluttuun macroParamiin
 
-//  Parametrin oletus näyttötyyppi (symboli, 
+//  Parametrin oletus näyttötyyppi (symboli,
 //  isoviiva, teksti...)
 	NFmiMetEditorTypes::View itsViewType;
 	NFmiMetEditorTypes::View itsStationDataViewType; // jos viewtype on isoviiva, mutta data on asema dataa, pitää olla varalla joku näyttötyyppi että voidaan piirtää tällöin
@@ -317,9 +317,9 @@ protected:
 	NFmiColor itsFillColor;
 
 	NFmiColor itsIsolineLabelBoxFillColor;
-//   Minkä kokoinen näyttöön piirrettävä 'symbolidata' 
+//   Minkä kokoinen näyttöön piirrettävä 'symbolidata'
 //   on suhteessa
-//   annettuun asemalle/hilalle varattuun 'datalaatikkoon'. 
+//   annettuun asemalle/hilalle varattuun 'datalaatikkoon'.
 //   (oletusarvo)
 	NFmiPoint itsRelativeSize;	// nämä ovat asemadata symboli kokoja
 	NFmiPoint itsRelativePositionOffset;
@@ -342,7 +342,7 @@ protected:
 	double itsTimeSeriesScaleMin; // käytetään aikasarjaeditorissa
 	double itsTimeSeriesScaleMax; // käytetään aikasarjaeditorissa
 
-//   Lista mahdollisista näyttötyypeistä kyseiselle 
+//   Lista mahdollisista näyttötyypeistä kyseiselle
 //   parametrille.
 	NFmiMetEditorTypes::View itsPossibleViewTypeList[5];
 	int itsPossibleViewTypeCount;
@@ -424,7 +424,7 @@ protected:
 	int itsIsoLineHatchType2; // hatch tyyppi 1=vinoviiva oikealle, 2=vinoviiva vasemmalle jne.
 	NFmiColor itsIsoLineHatchColor2;
 	NFmiColor itsIsoLineHatchBorderColor2;
-	int itsIsoLineLabelDigitCount; // isoviiva labelin näytettävien digitaalien lukumäärä 
+	int itsIsoLineLabelDigitCount; // isoviiva labelin näytettävien digitaalien lukumäärä
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
@@ -439,13 +439,13 @@ private:
 	bool fEditedParam;	// vain yksi parametreista voidaan editoida yhtä aikaa
 	bool fEditableParam;	// onko parametri suoraan editoitavissa ollenkaan? (esim. HESSAA tai tuulivektori eivät ole)
 
-	std::string itsUnit;			
+	std::string itsUnit;
 	bool fActive;			// onko kyseinen parametri näytön aktiivinen parametri (jokaisella näyttörivillä aina yksi aktivoitunut parametri)
 	bool fShowDifference;	// näytetäänkö kartalla parametrin arvo, vai erotus edelliseen aikaan (ei ole vielä talletettu tiedostoon)
 	bool fShowDifferenceToOriginalData;
 
 	NFmiInfoData::Type itsDataType; // lisäsin tämän, kun laitoin editoriin satelliitti kuvien katselun mahdollisuuden (satel-datalla ei ole infoa)
-	bool fViewMacroDrawParam; // is this DrawParam from viewmacro, if it is, then some things are handled 
+	bool fViewMacroDrawParam; // is this DrawParam from viewmacro, if it is, then some things are handled
 							  // differently when modifying options, default value is false
 							  // This is not stored in file!
 

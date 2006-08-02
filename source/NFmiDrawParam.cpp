@@ -1,33 +1,33 @@
 //**********************************************************
-// C++ Class Name : NFmiDrawParam 
+// C++ Class Name : NFmiDrawParam
 // ---------------------------------------------------------
 // Filetype: (SOURCE)
-// Filepath: D:/projekti/GDPro/GDTemp/NFmiDrawParam.cpp 
-// 
-// 
-// GDPro Properties 
+// Filepath: D:/projekti/GDPro/GDTemp/NFmiDrawParam.cpp
+//
+//
+// GDPro Properties
 // ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 2.1.4 ) 
-//  - GD System Name    : Met-editor Plan 2 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : Markon ehdotus 
-// ---------------------------------------------------  
-//  Author         : pietarin 
-//  Creation Date  : Thur - Jan 28, 1999 
-// 
-// 
-//  Description: 
-//   En ole vielä varma tämän luokan tarkoituksesta/toiminnasta, 
-//   tämä on 
+//  - GD Symbol Type    : CLD_Class
+//  - GD Method         : UML ( 2.1.4 )
+//  - GD System Name    : Met-editor Plan 2
+//  - GD View Type      : Class Diagram
+//  - GD View Name      : Markon ehdotus
+// ---------------------------------------------------
+//  Author         : pietarin
+//  Creation Date  : Thur - Jan 28, 1999
+//
+//
+//  Description:
+//   En ole vielä varma tämän luokan tarkoituksesta/toiminnasta,
+//   tämä on
 //   Persan idea.
-// 
-//  Change Log: 
-// Changed 1999.08.31/Marko	Muutin kontruktoreita niin, että mahdollisia 
+//
+//  Change Log:
+// Changed 1999.08.31/Marko	Muutin kontruktoreita niin, että mahdollisia
 //							näyttötyyppejä on 2 (teksti ja isoviiva).
-// Changed 1999.09.28/Marko	Lisäsin SecondaryIsoLineColor:in käytön (käytetään 
+// Changed 1999.09.28/Marko	Lisäsin SecondaryIsoLineColor:in käytön (käytetään
 //							vertailtaessa samantyyppistä dataa päällekkäin)
-// 
+//
 //**********************************************************
 #include "NFmiDrawParam.h"
 
@@ -193,8 +193,8 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 , itsSecondaryIsolineColor(0.6f,0.6f,0.6f)		// tehdään secondary väreistä aina harmaita
 , itsSecondaryIsolineTextColor(0.6f,0.6f,0.6f)	// tehdään secondary väreistä aina harmaita
 , fUseSecondaryColors(false)
-, itsAbsoluteMinValue(-10000)
-, itsAbsoluteMaxValue(10000)
+, itsAbsoluteMinValue(-1000000000)
+, itsAbsoluteMaxValue(1000000000)
 , itsTimeSeriesScaleMin(0)
 , itsTimeSeriesScaleMax(100)
 , itsPossibleViewTypeCount(2)
@@ -291,19 +291,24 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 // ~NFmiDrawParam
 //-------------------------------------------------------
 NFmiDrawParam::~NFmiDrawParam(void)
-{ 
+{
 }
 
 //-------------------------------------------------------
 // Init
 //-------------------------------------------------------
-void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam)
+void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawingOptions)
 {
 	if(theDrawParam)
 	{
-		itsInitFileName = theDrawParam->InitFileName();
-		// HUOM! itsMacroParamRelativePath-dataosaa ei saa initialisoida, koska sitä käytetään vain viewmakrojen yhteydessä
-		itsParameterAbbreviation = theDrawParam->ParameterAbbreviation();
+		if(fInitOnlyDrawingOptions == false)
+		{
+			itsInitFileName = theDrawParam->InitFileName();
+			// HUOM! itsMacroParamRelativePath-dataosaa ei saa initialisoida, koska sitä käytetään vain viewmakrojen yhteydessä
+			itsParameterAbbreviation = theDrawParam->ParameterAbbreviation();
+			fEditableParam = theDrawParam->IsEditable();
+			fViewMacroDrawParam = theDrawParam->ViewMacroDrawParam();
+		}
 		itsPriority = theDrawParam->Priority();
 
 		itsViewType = theDrawParam->ViewType();
@@ -322,7 +327,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam)
 		itsModifyingStep =  theDrawParam->ModifyingStep();
 		fModifyingUnit =  theDrawParam->ModifyingUnit();
 		itsTimeSerialModifyingLimit = theDrawParam->TimeSerialModifyingLimit();
-		
+
 		itsIsolineColor =  theDrawParam->IsolineColor();
 		itsIsolineTextColor =  theDrawParam->IsolineTextColor();
 
@@ -346,9 +351,8 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam)
 		}
 
 		fHidden = theDrawParam->IsParamHidden();
-		fEditableParam = theDrawParam->IsEditable();
 
-		itsUnit = theDrawParam->Unit();	
+		itsUnit = theDrawParam->Unit();
 
 		fShowNumbers = theDrawParam->ShowNumbers();
 		fShowMasks = theDrawParam->ShowMasks();
@@ -427,7 +431,6 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam)
 	//***********************************************
 	//********** 'versio 2' parametreja *************
 	//***********************************************
-		fViewMacroDrawParam = theDrawParam->ViewMacroDrawParam();
 
 	}
 	return;
@@ -472,7 +475,7 @@ bool NFmiDrawParam::StoreData (const std::string& theFilename)
 }
 
 //--------------------------------------------------------
-// operator == 
+// operator ==
 //--------------------------------------------------------
 bool NFmiDrawParam::operator==(const NFmiDrawParam& theDrawParam) const
 {
@@ -498,7 +501,7 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 	file << itsFileVersionNumber << endl;
 	file << "'ParameterAbbreviation'" << endl;  // selittävä teksti
 	if(fViewMacroDrawParam)
-	{ // jos viewmacro tapaus ja siinä oleva macroParam, sen drawParamin nimen lyhenteeseen talletetaan suhteellinen polku 
+	{ // jos viewmacro tapaus ja siinä oleva macroParam, sen drawParamin nimen lyhenteeseen talletetaan suhteellinen polku
 	  // ('optimointia', näin minun ei vielä tarvitse muuttaa minkään macrosysteemien data tiedoston rakennetta)
 		std::string tmpStr(itsMacroParamRelativePath);
 		tmpStr += tmpStr.empty() ? "" : "\\";
@@ -693,7 +696,7 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 	//********** 'versio 2' parametreja *************
 	//***********************************************
 	}
-	return file;	
+	return file;
 }
 
 //--------------------------------------------------------
@@ -736,7 +739,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			file >> temp; // luetaan nimike pois
 			file >> number;
 			itsViewType = NFmiMetEditorTypes::View(number);
-			
+
 			file >> temp; // luetaan nimike pois
 			file >> number;
 			fShowStationMarker = number != 0;
@@ -867,7 +870,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				itsSpecialIsoLineValues.resize(size);
 				for(i=0; i < size; i++)
 					file >> itsSpecialIsoLineValues[i];
-				
+
 				file >> size;
 				itsSpecialIsoLineLabelHeight.resize(size);
 				for(i=0; i < size; i++)
@@ -951,7 +954,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
     return file;
 }
 
-const std::string& NFmiDrawParam::ParameterAbbreviation(void) const 
+const std::string& NFmiDrawParam::ParameterAbbreviation(void) const
 {
 	static std::string dummy;
 	if(itsParameterAbbreviation != std::string("") && itsParameterAbbreviation != std::string("?"))
