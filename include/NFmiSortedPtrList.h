@@ -39,6 +39,7 @@ public:
 
 	NFmiSortedPtrList (bool fAscendingOrder = true)
 					: NFmiPtrList<Type>()
+					,fAscending(fAscendingOrder)
 	{};
 
 	virtual ~NFmiSortedPtrList (void)
