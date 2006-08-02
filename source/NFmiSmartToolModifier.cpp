@@ -93,12 +93,12 @@ void NFmiSmartToolCalculationBlockVector::SetTime(const NFmiMetTime &theTime)
 		(*it)->SetTime(theTime);
 }
 
-void NFmiSmartToolCalculationBlockVector::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculationBlockVector::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue)
 {
 	Iterator it = Begin();
 	Iterator endIt = End();
 	for( ; it != endIt; ++it)
-		(*it)->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
+		(*it)->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
 }
 
 void NFmiSmartToolCalculationBlockVector::Add(NFmiSmartToolCalculationBlock* theBlock)
@@ -195,20 +195,20 @@ void NFmiSmartToolCalculationBlock::SetTime(const NFmiMetTime &theTime)
 		itsLastCalculationSection->SetTime(theTime);
 }
 
-void NFmiSmartToolCalculationBlock::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculationBlock::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue)
 {
 	if(itsFirstCalculationSection)
-		itsFirstCalculationSection->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
+		itsFirstCalculationSection->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
 
 	if(itsIfAreaMaskSection && itsIfAreaMaskSection->IsMasked(theLatlon, theLocationIndex, theTime, theTimeIndex))
-		itsIfCalculationBlocks->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
+		itsIfCalculationBlocks->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
 	else if(itsElseIfAreaMaskSection && itsElseIfAreaMaskSection->IsMasked(theLatlon, theLocationIndex, theTime, theTimeIndex))
-		itsElseIfCalculationBlocks->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
+		itsElseIfCalculationBlocks->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
 	else if(itsElseCalculationBlocks)
-		itsElseCalculationBlocks->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
+		itsElseCalculationBlocks->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
 
 	if(itsLastCalculationSection)
-		itsLastCalculationSection->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
+		itsLastCalculationSection->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
 }
 
 //--------------------------------------------------------
@@ -216,7 +216,7 @@ void NFmiSmartToolCalculationBlock::Calculate(const NFmiPoint &theLatlon, unsign
 //--------------------------------------------------------
 NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer)
 :itsInfoOrganizer(theInfoOrganizer)
-,itsSmartToolIntepreter(new NFmiSmartToolIntepreter(theInfoOrganizer))
+,itsSmartToolIntepreter(new NFmiSmartToolIntepreter(theInfoOrganizer, 0))
 //,itsFirstCalculationSection(0)
 //,itsLastCalculationSection(0)
 //,itsIfAreaMaskSection(0)
@@ -230,6 +230,7 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer
 ,fMacroParamCalculation(false)
 ,fHeightFunctionFlag(false)
 ,fUseLevelData(false)
+,fDoCrossSectionCalculation(false)
 ,itsCommaCounter(0)
 ,itsParethesisCounter(0)
 {
@@ -449,6 +450,62 @@ void NFmiSmartToolModifier::ClearCalculationModifiers(void)
 	itsElseCalculationSection = 0;
 }
 */
+
+// Laskee smarttool-systeemin avulla halutun poikkileikkauksen arvo-matriisin.
+// T‰m‰ on universaali metodi, joka hoitaa kaikki kolme tapausta: poikkileikkaus, aika-poikkileikkaus ja reitti-poikkileikkaus.
+// Parametreina annetaa aina sopiva pisteet ja ajat, ett‰ saadaan eri efektit aikaan. Eli aika-poikkileikkauksessa
+// kaikki pisteet ovat samoja, normaali poikkileikkauksessa kaikki ajat ovat samoja ja reitti versiossa ajat ja pisteet muuttuvat.
+void NFmiSmartToolModifier::CalcCrossSectionSmartToolValues(NFmiDataMatrix<float> &theValues, checkedVector<float> &thePressures, checkedVector<NFmiPoint> &theLatlonPoints, const checkedVector<NFmiMetTime> &thePointTimes)
+{
+	fDoCrossSectionCalculation = true;
+	unsigned int sizeX = theLatlonPoints.size();
+	if(sizeX != thePointTimes.size())
+		throw runtime_error("NFmiSmartToolModifier::CalcCrossSectionSmartToolValues - latlon point count and time count must be the same, Error in program.");
+	unsigned int sizeY = thePressures.size();
+	if(sizeX < 1 || sizeY < 1)
+		throw runtime_error("NFmiSmartToolModifier::CalcCrossSectionSmartToolValues - invalid data-matrix size, Error in program.");
+	theValues.Resize(sizeX, sizeY, kFloatMissing);
+
+	NFmiMacroParamValue macroParamValue;
+	macroParamValue.fSetValue = true;
+	macroParamValue.fDoCrossSectionCalculations = true;
+
+	// lasketaan l‰pi yksitt‰isi‰ arvoja kaikille halutuille pisteille
+	for(unsigned int i = 0; i<sizeX; i++)
+	{
+		macroParamValue.itsLatlon = theLatlonPoints[i];
+		macroParamValue.itsTime = thePointTimes[i];
+		NFmiTimeBag timeBag(macroParamValue.itsTime, macroParamValue.itsTime, 60);
+		NFmiTimeDescriptor times(macroParamValue.itsTime, timeBag);
+		itsInfoOrganizer->CrossSectionMacroParamData()->SetTimeDescriptor(times); // asetetaan makroData-infon aikasysteemi currentin kartan kohtaan (feikki datassa vain yksi aika ja se pit‰‰ s‰‰t‰‰ kohdalleen, ett‰ laskut onnistuvat)
+		for(unsigned int j = 0; j<sizeY; j++)
+		{
+			macroParamValue.itsPressureHeight = thePressures[j];
+			float value = CalcSmartToolValue(macroParamValue);
+			theValues[i][j] = value;
+		}
+	}
+}
+
+float NFmiSmartToolModifier::CalcSmartToolValue(NFmiMacroParamValue &theMacroParamValue)
+{
+	NFmiTimeBag validTimes(theMacroParamValue.itsTime, theMacroParamValue.itsTime, 60);
+	NFmiTimeDescriptor times(validTimes, theMacroParamValue.itsTime);
+	// oikeasti t‰ss‰ ei modifioida mit‰‰n, vaan palautetaan vain yksi arvo
+	ModifyData(&times, false, true, theMacroParamValue);
+	return theMacroParamValue.itsValue;
+}
+
+float NFmiSmartToolModifier::CalcSmartToolValue(const NFmiMetTime &theTime, const NFmiPoint &theLatlon)
+{
+	NFmiMacroParamValue macroParamValue;
+	macroParamValue.fSetValue = true;
+	macroParamValue.itsLatlon = theLatlon;
+	macroParamValue.itsTime = theTime;
+	return CalcSmartToolValue(macroParamValue);
+}
+
+
 //--------------------------------------------------------
 // ModifyData
 //--------------------------------------------------------
@@ -456,6 +513,12 @@ void NFmiSmartToolModifier::ClearCalculationModifiers(void)
 // modifioinneille, jos theModifiedTimes on 0-pointteri, tehd‰‰n operaatiot kaikille
 // datan ajoille.
 void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation)
+{
+	NFmiMacroParamValue macroParamValue;
+	ModifyData(theModifiedTimes, fSelectedLocationsOnly, isMacroParamCalculation, macroParamValue);
+}
+
+void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation, NFmiMacroParamValue &theMacroParamValue)
 {
 	itsModifiedTimes = theModifiedTimes;
 	fMacroParamCalculation = isMacroParamCalculation;
@@ -475,7 +538,7 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, boo
 			auto_ptr<NFmiSmartToolCalculationBlock> blockPtr(block); // tuhoaa block-otuksen automaattisesti
 			if(block)
 			{
-				ModifyBlockData(block);
+				ModifyBlockData(block, theMacroParamValue);
 //			InitializeCalculationModifiers(&blockInfo);
 			}
 //			ModifyData2(theModifiedTimes, itsFirstCalculationSection);
@@ -498,14 +561,14 @@ bool NFmiSmartToolModifier::IsInterpretedSkriptMacroParam(void)
 	return itsSmartToolIntepreter ? itsSmartToolIntepreter->IsInterpretedSkriptMacroParam() : false;
 }
 
-void NFmiSmartToolModifier::ModifyBlockData(NFmiSmartToolCalculationBlock *theCalculationBlock)
+void NFmiSmartToolModifier::ModifyBlockData(NFmiSmartToolCalculationBlock *theCalculationBlock, NFmiMacroParamValue &theMacroParamValue)
 {
-	ModifyData2(theCalculationBlock->itsFirstCalculationSection);
-	ModifyConditionalData(theCalculationBlock);
-	ModifyData2(theCalculationBlock->itsLastCalculationSection);
+	ModifyData2(theCalculationBlock->itsFirstCalculationSection, theMacroParamValue);
+	ModifyConditionalData(theCalculationBlock, theMacroParamValue);
+	ModifyData2(theCalculationBlock->itsLastCalculationSection, theMacroParamValue);
 }
 
-void NFmiSmartToolModifier::ModifyConditionalData(NFmiSmartToolCalculationBlock *theCalculationBlock)
+void NFmiSmartToolModifier::ModifyConditionalData(NFmiSmartToolCalculationBlock *theCalculationBlock, NFmiMacroParamValue &theMacroParamValue)
 {
 	if(theCalculationBlock->itsIfAreaMaskSection && theCalculationBlock->itsIfCalculationBlocks)
 	{
@@ -524,6 +587,8 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiSmartToolCalculationBlock 
 			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 			{
 				NFmiMetTime time1(modifiedTimes.Time());
+				if(theMacroParamValue.fSetValue)
+					time1 = theMacroParamValue.itsTime;
 				info->Time(time1); // asetetaan myˆs t‰m‰, ett‰ saadaan oikea timeindex
 				theCalculationBlock->itsIfAreaMaskSection->SetTime(time1); // yritet‰‰n optimoida laskuja hieman kun mahdollista
 				theCalculationBlock->itsIfCalculationBlocks->SetTime(time1); // yritet‰‰n optimoida laskuja hieman kun mahdollista
@@ -538,16 +603,26 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiSmartToolCalculationBlock 
 				for(info->ResetLocation(); info->NextLocation(); )
 				{
 					NFmiPoint latlon(info->LatLon());
-					unsigned long locationIndex = info->LocationIndex();
+					if(theMacroParamValue.fSetValue)
+					{
+						latlon = theMacroParamValue.itsLatlon;
+						info->Location(latlon); // pit‰‰ laittaa nearestlocation p‰‰lle, ett‰ tuloksia voidaan myˆhemmin hakea interpolaation avulla
+					}
+					unsigned long locationIndex = info->LocationIndex(); // t‰m‰ locationindex juttu liittyy kai optimointiin, jota ei tehd‰ en‰‰, pit‰isikˆ poistaa
 					int timeIndex = info->TimeIndex();
 					if(theCalculationBlock->itsIfAreaMaskSection->IsMasked(latlon, locationIndex, time1, timeIndex))
-						theCalculationBlock->itsIfCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex);
+						theCalculationBlock->itsIfCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex, theMacroParamValue);
 					else if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks && theCalculationBlock->itsElseIfAreaMaskSection->IsMasked(latlon, locationIndex, time1, timeIndex))
 					{
-						theCalculationBlock->itsElseIfCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex);
+						theCalculationBlock->itsElseIfCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex, theMacroParamValue);
 					}
 					else if(theCalculationBlock->itsElseCalculationBlocks)
-						theCalculationBlock->itsElseCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex);
+						theCalculationBlock->itsElseCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex, theMacroParamValue);
+					if(theMacroParamValue.fSetValue)
+					{
+						info->DestroyData();
+						return ; // eli jos oli yhden pisteen laskusta kyse, lopetetaan loppi heti
+					}
 				}
 			}
 		}
@@ -560,12 +635,14 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiSmartToolCalculationBlock 
 	}
 }
 
-void NFmiSmartToolModifier::ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection)
+void NFmiSmartToolModifier::ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection, NFmiMacroParamValue &theMacroParamValue)
 {
 	if(theCalculationSection && theCalculationSection->FirstVariableInfo())
 	{
 //		NFmiFastQueryInfo info(*theCalculationSection->FirstVariableInfo());
 		NFmiSmartInfo *info = theCalculationSection->FirstVariableInfo()->Clone();
+		if(info == 0)
+			return ;
 		std::auto_ptr<NFmiSmartInfo> infoPtr(info);
 		try
 		{
@@ -588,15 +665,28 @@ void NFmiSmartToolModifier::ModifyData2(NFmiSmartToolCalculationSection* theCalc
 				for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 				{
 					NFmiMetTime time1(modifiedTimes.Time());
+					if(theMacroParamValue.fSetValue)
+						time1 = theMacroParamValue.itsTime;
 					if(info->Time(time1)) // asetetaan myˆs t‰m‰, ett‰ saadaan oikea timeindex
 					{
 						theCalculationSection->SetTime(time1); // yritet‰‰n optimoida laskuja hieman kun mahdollista
 						for(info->ResetLocation(); info->NextLocation(); )
 						{
-//							theCalculationSection->Calculate(info->LatLon(), info->LocationIndex(), time1, info->TimeIndex());
-							(*theCalculationSection->GetCalculations())[i]->Calculate(info->LatLon(), info->LocationIndex(), time1, info->TimeIndex());
+							NFmiPoint latlon(info->LatLon());
+							if(theMacroParamValue.fSetValue)
+							{
+								latlon = theMacroParamValue.itsLatlon;
+								info->Location(latlon); // pit‰‰ laittaa nearestlocation p‰‰lle, ett‰ tuloksia voidaan myˆhemmin hakea interpolaation avulla
+							}
+							// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseist‰ optimointi juttua ei kai en‰‰ k‰ytet‰
+							(*theCalculationSection->GetCalculations())[i]->Calculate(latlon, info->LocationIndex(), time1, info->TimeIndex(), theMacroParamValue);
+
+							if(theMacroParamValue.fSetValue)
+								break;
 						}
 					}
+					if(theMacroParamValue.fSetValue)
+						break;
 				}
 
 			}
@@ -687,6 +777,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			break;
 			}
 		case NFmiAreaMask::FunctionPeekXY:
+		case NFmiAreaMask::FunctionPeekXY2:
 			{
 			// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
 			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
@@ -699,8 +790,11 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 				delete info;
 				info = tmp;
 			}
-			areaMask = new NFmiInfoAreaMaskPeekXY(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info,
-				static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), true, NFmiAreaMask::kNoValue, deepCopyCreated);
+			if(maskType == NFmiAreaMask::FunctionPeekXY)
+				areaMask = new NFmiInfoAreaMaskPeekXY(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), true, NFmiAreaMask::kNoValue, deepCopyCreated);
+			else
+				areaMask = new NFmiInfoAreaMaskPeekXY2(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, this->fMacroParamCalculation ? itsInfoOrganizer->MacroParamData() : itsInfoOrganizer->EditedInfo(), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), true, NFmiAreaMask::kNoValue, deepCopyCreated);
+
 			if(fUseLevelData)
 				itsParethesisCounter++;
 			break;
@@ -840,6 +934,10 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateCalculatedAreaMask(const NFmiAreaMask
 		areaMask = new NFmiForecastHourAreaMask(itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
 	else if(parId == kFmiDeltaTime)
 		areaMask = new NFmiTimeStepAreaMask(itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
+	else if(parId == kFmiLastParameter)
+		areaMask = new NFmiGridSizeAreaMask(this->fMacroParamCalculation ? itsInfoOrganizer->MacroParamData() : itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition(), true);
+	else if(parId == kFmiLastParameter+1)
+		areaMask = new NFmiGridSizeAreaMask(this->fMacroParamCalculation ? itsInfoOrganizer->MacroParamData() : itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition(), false);
 
 
 	if(areaMask)
@@ -919,15 +1017,26 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 	else if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kSoundingParameterData)
 		info = CreateSoundingParamInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetUseDefaultProducer());
 	else if(theAreaMaskInfo.GetUseDefaultProducer() || theAreaMaskInfo.GetDataType() == NFmiInfoData::kCopyOfEdited)
-		info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), true, fUseLevelData);
+	{
+		NFmiInfoData::Type dataType = theAreaMaskInfo.GetDataType();
+		if(fDoCrossSectionCalculation && dataType == NFmiInfoData::kMacroParam)
+			dataType = NFmiInfoData::kCrossSectionMacroParam;
+		info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), dataType, true, fUseLevelData);
+	}
 	else
 	{
 		if(fUseLevelData && theAreaMaskInfo.GetLevel() != 0) // jos pit‰‰ k‰ytt‰‰ level dataa (SumZ ja MinH funktiot), ei saa antaa level infoa parametrin yhteydess‰
 			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNoLevel") + "\n" + theAreaMaskInfo.GetMaskText());
-		if(fUseLevelData) // jos leveldata-flagi p‰‰ll‰, yritet‰‰n ensin, lˆytyykˆ hybridi dataa
-			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), NFmiInfoData::kHybridData, false, fUseLevelData); // t‰h‰n pieni hybrid-koukku, jos haluttiin level dataa
+		if(fUseLevelData || fDoCrossSectionCalculation) // jos leveldata-flagi p‰‰ll‰, yritet‰‰n ensin, lˆytyykˆ hybridi dataa
+			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), NFmiInfoData::kHybridData, false, fUseLevelData | fDoCrossSectionCalculation); // t‰h‰n pieni hybrid-koukku, jos haluttiin level dataa
 		if(info == 0)
-			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData);
+			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData | fDoCrossSectionCalculation);
+		if(info == 0 && theAreaMaskInfo.GetLevel() != 0) // kokeillaan viel‰ jos halutaan hybridi datan leveli‰
+		{
+			NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
+			aLevel.SetIdent(kFmiHybridLevel);
+			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), &aLevel, NFmiInfoData::kHybridData, false, fUseLevelData);
+		}
 	}
 	if(!info)
 		throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNotFound") + "\n" + theAreaMaskInfo.GetMaskText());

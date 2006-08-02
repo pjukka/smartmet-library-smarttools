@@ -49,6 +49,7 @@ class NFmiDataIdent;
 class NFmiMetTime;
 class NFmiPoint;
 class NFmiSmartToolCalculationBlock;
+class NFmiMacroParamValue;
 
 class NFmiSmartToolCalculationBlockVector
 {
@@ -60,7 +61,7 @@ public:
 	void Clear(void);
 	NFmiSmartInfo* FirstVariableInfo(void);
 	void SetTime(const NFmiMetTime &theTime);
-	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
+	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
 	void Add(NFmiSmartToolCalculationBlock* theBlock);
 	Iterator Begin(void) {return itsCalculationBlocks.begin();}
 	Iterator End(void) {return itsCalculationBlocks.end();}
@@ -78,7 +79,7 @@ public:
 	void Clear(void);
 	NFmiSmartInfo* FirstVariableInfo(void);
 	void SetTime(const NFmiMetTime &theTime);
-	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
+	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
 
 	NFmiSmartToolCalculationSection* itsFirstCalculationSection;
 	NFmiSmartToolCalculation* itsIfAreaMaskSection;
@@ -94,6 +95,10 @@ class NFmiSmartToolModifier
 public:
 	void InitSmartTool(const std::string &theSmartToolText, bool fThisIsMacroParamSkript = false);
 	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation);
+	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation, NFmiMacroParamValue &theMacroParamValue);
+	float CalcSmartToolValue(NFmiMacroParamValue &theMacroParamValue);
+	float CalcSmartToolValue(const NFmiMetTime &theTime, const NFmiPoint &theLatlon);
+	void CalcCrossSectionSmartToolValues(NFmiDataMatrix<float> &theValues, checkedVector<float> &thePressures, checkedVector<NFmiPoint> &theLatlonPoints, const checkedVector<NFmiMetTime> &thePointTimes);
 	NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer);
 	~NFmiSmartToolModifier(void);
 
@@ -106,8 +111,8 @@ public:
 	bool IsInterpretedSkriptMacroParam(void); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysy‰, onko kyseinen makro ns. macroParam-skripti eli sis‰lt‰‰kˆ se RESULT = ??? tapaista teksti‰
 
 private:
-	void ModifyConditionalData(NFmiSmartToolCalculationBlock *theCalculationBlock);
-	void ModifyBlockData(NFmiSmartToolCalculationBlock *theCalculationBlock);
+	void ModifyConditionalData(NFmiSmartToolCalculationBlock *theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
+	void ModifyBlockData(NFmiSmartToolCalculationBlock *theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
 	NFmiSmartToolCalculationBlockVector* CreateCalculationBlockVector(NFmiSmartToolCalculationBlockInfoVector* theBlockInfoVector);
 	NFmiSmartToolCalculationBlock* CreateCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlockInfo);
 	NFmiSmartInfo* CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent);
@@ -118,7 +123,7 @@ private:
 	void GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit, bool *fCheckLimits);
 	NFmiDataModifier* CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	NFmiDataIterator* CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo);
-	void ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection);
+	void ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection, NFmiMacroParamValue &theMacroParamValue);
 	NFmiAreaMask* CreateAreaMask(const NFmiAreaMaskInfo &theInfo);
 	NFmiAreaMask* CreateEndingAreaMask(void);
 	NFmiSmartInfo* CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo);
@@ -146,6 +151,7 @@ private:
 	// k‰ytet‰‰n parasta mahdollista level-dataa. Eli ensin hybridi ja sitten painepinta dataa.
 	bool fHeightFunctionFlag; // ollaanko tekem‰ss‰ SumZ tai MinH tyyppisen funktion calculaatio-otusta
 	bool fUseLevelData; // kun t‰m‰ flagi on p‰‰ll‰, k‰ytet‰‰n CreateInfo-metodissa hybridi-datoja jos mahd. ja sitten painepinta datoja.
+	bool fDoCrossSectionCalculation; // kun t‰m‰ flagi on p‰‰ll‰, ollaan laskemassa poikkileikkauksia ja silloin level-infot yritet‰‰n tehd‰ ensin hybrididatasta ja sitten painepintadatasta
 	int itsCommaCounter; // tarvitaan laskemaan pilkkuja, kun lasketaan milloin level-dataa pit‰‰ k‰ytt‰‰.
 	int itsParethesisCounter; // kun k‰ytet‰‰n esim. Sumz-funktion 2. pilkun j‰lkeen level-dataa, 
 							  // pit‰‰ laskea sulkujen avulla, milloin funktio loppuu.

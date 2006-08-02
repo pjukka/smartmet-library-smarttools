@@ -25,18 +25,33 @@
 
 #include <string>
 #include "NFmiAreaMask.h"
+#include "NFmiPoint.h"
 #include "NFmiDataMatrix.h"
+#include "NFmiMetTime.h"
 
-class NFmiPoint;
-class NFmiMetTime;
 class NFmiSmartInfo;
 class NFmiDataModifier;
+
+class NFmiMacroParamValue
+{
+public:
+
+	NFmiMacroParamValue(void):itsLatlon(),itsTime(),itsValue(kFloatMissing),itsPressureHeight(kFloatMissing),fSetValue(false),fDoCrossSectionCalculations(false)
+	{}
+
+	NFmiPoint itsLatlon;
+	NFmiMetTime itsTime;
+	float itsValue; // t‰h‰n talletetaan value
+	float itsPressureHeight; // poikkileikkaus laskuissa k‰ytet‰‰n t‰t‰
+	bool fSetValue; // t‰t‰ luokkaa k‰ytet‰‰n vain jos t‰m‰ on true
+	bool fDoCrossSectionCalculations;
+};
 
 class NFmiSmartToolCalculation 
 {
 public:
 	bool IsMasked(const NFmiPoint &theLatlon, int theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
-	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
+	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
 	void SetTime(const NFmiMetTime &theTime); // optimointia laskuja varten
 
 	NFmiSmartToolCalculation(void);
@@ -94,10 +109,12 @@ private:
 	NFmiSmartInfo* itsResultInfo; // omistaa+tuhoaa
 	checkedVector<NFmiAreaMask*> itsCalculations; // omistaa+tuhoaa
 	float itsHeightValue;
+	float itsPressureHeightValue;
 
 	bool fUseTimeInterpolationAlways; // uudet MINT, MAXT, jne vaativat aina aikainterpolointia, ja t‰m‰ flagi laitetaan silloin p‰‰lle 
 									  // (t‰m‰ on jo k‰ytˆss‰ olevan optimoinnin toimivuuden kannalta pakko tehd‰ n‰in)
 	bool fUseHeightCalculation; // atom-metodi kutsuu HeightValue-metodia, jos t‰m‰ on p‰‰ll‰
+	bool fUsePressureLevelCalculation; // atom-metodi kutsuu PressureValue-metodia, jos t‰m‰ on p‰‰ll‰
 	bool fAllowMissingValueAssignment; 
 
 	// tuulen suuntaa varten pit‰‰ tehd‰ virityksi‰, ett‰ esim. 350 + 20 olisi 10 eik‰ 360 (eli maksimi) jne.

@@ -32,12 +32,13 @@ class NFmiPoint;
 class NFmiMetTime;
 class NFmiSmartToolCalculation;
 class NFmiSmartInfo;
+class NFmiMacroParamValue;
 
 class NFmiSmartToolCalculationSection 
 {
 
 public:
-	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
+	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
 	void Clear(void);
 	void SetTime(const NFmiMetTime &theTime);
 	NFmiSmartInfo* FirstVariableInfo(void);

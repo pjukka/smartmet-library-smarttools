@@ -1,24 +1,24 @@
 // ======================================================================
 /*!
- * C++ Class Name : NFmiSmartToolCalculationSection 
+ * C++ Class Name : NFmiSmartToolCalculationSection
  * ---------------------------------------------------------
  * Filetype: (SOURCE)
- * Filepath: G:/siirto/marko/oc/NFmiSmartToolCalculationSection.cpp 
- * 
- * 
- * GDPro Properties 
+ * Filepath: G:/siirto/marko/oc/NFmiSmartToolCalculationSection.cpp
+ *
+ *
+ * GDPro Properties
  * ---------------------------------------------------
- *  - GD Symbol Type    : CLD_Class 
- *  - GD Method         : UML ( 4.0 ) 
- *  - GD System Name    : aSmartTools 
- *  - GD View Type      : Class Diagram 
- *  - GD View Name      : smarttools 1 
- * ---------------------------------------------------  
- *  Author         : pietarin 
- *  Creation Date  : Thur - Jun 20, 2002 
- * 
- *  Change Log     : 
- * 
+ *  - GD Symbol Type    : CLD_Class
+ *  - GD Method         : UML ( 4.0 )
+ *  - GD System Name    : aSmartTools
+ *  - GD View Type      : Class Diagram
+ *  - GD View Name      : smarttools 1
+ * ---------------------------------------------------
+ *  Author         : pietarin
+ *  Creation Date  : Thur - Jun 20, 2002
+ *
+ *  Change Log     :
+ *
  */
 // ======================================================================
 
@@ -32,7 +32,7 @@
 #include <algorithm>
 
 //--------------------------------------------------------
-// Constructor/Destructor 
+// Constructor/Destructor
 //--------------------------------------------------------
 NFmiSmartToolCalculationSection::NFmiSmartToolCalculationSection(void)
 {
@@ -42,14 +42,14 @@ NFmiSmartToolCalculationSection::~NFmiSmartToolCalculationSection(void)
 	Clear();
 }
 //--------------------------------------------------------
-// Calculate 
+// Calculate
 //--------------------------------------------------------
-void NFmiSmartToolCalculationSection::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculationSection::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue)
 {
 	int size = itsCalculations.size();
 
 	for(int i=0; i<size; i++)
-		itsCalculations[i]->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex);
+		itsCalculations[i]->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
 }
 
 void NFmiSmartToolCalculationSection::AddCalculations(NFmiSmartToolCalculation* value)
