@@ -127,7 +127,9 @@ class NFmiInfoOrganizer
 	void WorkingDirectory(const std::string& newValue){itsWorkingDirectory = newValue;};
 	void UpdateEditedDataCopy(void); // 28.09.1999/Marko
 	NFmiSmartInfo* MacroParamData(void) {return itsMacroParamData;} // t‰t‰ tarvitaan asettamaan mm. aikadescriptoria ja ehk‰ muita descriptoreita
-	NFmiDataMatrix<float>& DefaultMissingValueMatrix(void){return itsDefaultMissingValueMatrix;}
+	NFmiSmartInfo* CrossSectionMacroParamData(void) {return itsCrossSectionMacroParamData;}
+	NFmiDataMatrix<float>& MacroParamMissingValueMatrix(void){return itsMacroParamMissingValueMatrix;}
+	NFmiDataMatrix<float>& CrossSectionMacroParamMissingValueMatrix(void){return itsCrossSectionMacroParamMissingValueMatrix;}
 	void SetDrawParamPath(const std::string &theDrawParamPath);
 	const std::string GetDrawParamPath(void);
 	void SetMacroParamDataGridSize(int x, int y);
@@ -139,6 +141,7 @@ class NFmiInfoOrganizer
 	const NFmiPoint& GetMacroParamDataMinGridSize(void) const {return itsMacroParamMinGridSize;}
 	int CountData(void);
 	int CountDataSize(void);
+	void UpdateCrossSectionMacroParamDataSize(int x, int y);
  private:
  	bool Remove(void);
 	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, NFmiSmartInfo* theSmartInfo2);
@@ -174,7 +177,9 @@ class NFmiInfoOrganizer
 	NFmiPoint itsMacroParamMinGridSize;
 	NFmiPoint itsMacroParamMaxGridSize;
 	NFmiSmartInfo* itsMacroParamData; // makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
-	NFmiDataMatrix<float> itsDefaultMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
+	NFmiDataMatrix<float> itsMacroParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
+	NFmiSmartInfo* itsCrossSectionMacroParamData; // poikkileikkaus makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
+	NFmiDataMatrix<float> itsCrossSectionMacroParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
 
 	bool fCreateEditedDataCopy; // luodaanko vai eikˆ luoda kopiota editoidusta datasta
 

@@ -52,6 +52,7 @@
 #include "NFmiGrid.h"
 #include "NFmiQueryDataUtil.h"
 #include "NFmiQueryData.h"
+#include "NFmiLatLonArea.h"
 
 /*
 #ifdef _DEBUG
@@ -75,7 +76,9 @@ NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 ,itsMacroParamMinGridSize(10, 10)
 ,itsMacroParamMaxGridSize(200, 200)
 ,itsMacroParamData(0)
-,itsDefaultMissingValueMatrix()
+,itsMacroParamMissingValueMatrix()
+,itsCrossSectionMacroParamData(0)
+,itsCrossSectionMacroParamMissingValueMatrix()
 ,fCreateEditedDataCopy(true)
 {
 }
@@ -96,6 +99,10 @@ NFmiInfoOrganizer::~NFmiInfoOrganizer (void)
 	if(itsMacroParamData)
 		itsMacroParamData->DestroySharedData();
 	delete itsMacroParamData;
+
+	if(itsCrossSectionMacroParamData)
+		itsCrossSectionMacroParamData->DestroySharedData();
+	delete itsCrossSectionMacroParamData;
 }
 
 
@@ -158,6 +165,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 		return GetSynopPlotParamInfo(theParam, fSubParameter, theLevel, theType);
 	if(theType == NFmiInfoData::kMacroParam || theType >= NFmiInfoData::kSoundingParameterData) // macro- ja sounding parametrit lasketaan samalla periaatteella
 		return itsMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
+	if(theType == NFmiInfoData::kCrossSectionMacroParam)
+		return itsCrossSectionMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
 	bool anyDataOk = (theType == NFmiInfoData::kAnyData);
 	NFmiSmartInfo* aInfo = 0;
@@ -209,6 +218,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 		return GetSynopPlotParamInfo(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), fSubParameter, theLevel, theType);
 	if(theType == NFmiInfoData::kMacroParam || theType >= NFmiInfoData::kSoundingParameterData) // macro- ja sounding parametrit lasketaan samalla periaatteella
 		return itsMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
+	if(theType == NFmiInfoData::kCrossSectionMacroParam)
+		return itsCrossSectionMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
 	bool anyDataOk = (theType == NFmiInfoData::kAnyData);
 	NFmiSmartInfo* aInfo = 0;
@@ -254,6 +265,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataI
 													, NFmiInfoData::Type theType
 													, bool fIgnoreProducerName)
 {
+	if(theType == NFmiInfoData::kCrossSectionMacroParam)
+		return itsCrossSectionMacroParamData;
 	bool anyDataOk = (theType == NFmiInfoData::kAnyData || theType == NFmiInfoData::kEditable);
 	NFmiSmartInfo* aInfo = 0;
 	if(itsEditedData && (itsEditedData->DataType() == theType || anyDataOk) && itsEditedData->SizeLevels() > 1 && itsEditedData->Param(static_cast<FmiParameterName>(theDataIdent.GetParam()->GetIdent())))
@@ -344,7 +357,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& the
 		info = fUseParIdOnly ? Info(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), aSubParam, theLevel, theType) : Info(theDataIdent, aSubParam, theLevel, theType, true);
 	if(info)
 	{
-		if(theType == NFmiInfoData::kMacroParam || theType >= NFmiInfoData::kSoundingParameterData || (fUseParIdOnly ?  info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) : info->Param(theDataIdent)))  // makroparamille ei tarvitse laittaa parametria kohdalleen!
+		if(theType == NFmiInfoData::kCrossSectionMacroParam || theType == NFmiInfoData::kMacroParam || theType >= NFmiInfoData::kSoundingParameterData || (fUseParIdOnly ?  info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) : info->Param(theDataIdent)))  // makroparamille ei tarvitse laittaa parametria kohdalleen!
 		{
 			NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
 			return copyOfInfo;
@@ -816,9 +829,29 @@ void NFmiInfoOrganizer::UpdateMacroParamDataArea(const NFmiArea *theArea)
 	{
 		NFmiQueryInfo infoIter(data);
 		itsMacroParamData = new NFmiSmartInfo(infoIter, data, "", "", NFmiInfoData::kMacroParam);
-		itsDefaultMissingValueMatrix.Resize(itsMacroParamData->Grid()->XNumber(), itsMacroParamData->Grid()->YNumber(), kFloatMissing);
+		itsMacroParamMissingValueMatrix.Resize(itsMacroParamData->Grid()->XNumber(), itsMacroParamData->Grid()->YNumber(), kFloatMissing);
 	}
 }
+
+void NFmiInfoOrganizer::UpdateCrossSectionMacroParamDataSize(int x, int y)
+{
+	static std::auto_ptr<NFmiArea> dummyArea(new NFmiLatLonArea(NFmiPoint(19,57), NFmiPoint(32,71)));
+	// tuhoa ensin vanha pois alta
+	if(itsCrossSectionMacroParamData)
+		itsCrossSectionMacroParamData->DestroySharedData();
+	delete itsCrossSectionMacroParamData;
+	itsCrossSectionMacroParamData = 0;
+
+	// Luo sitten uusi data jossa on yksi aika,param ja level ja luo hplaceDesc annetusta areasta ja hila koosta
+	NFmiQueryData* data = CreateDefaultMacroParamQueryData(dummyArea.get(), x, y);
+	if(data)
+	{
+		NFmiQueryInfo infoIter(data);
+		itsCrossSectionMacroParamData = new NFmiSmartInfo(infoIter, data, "", "", NFmiInfoData::kCrossSectionMacroParam);
+		itsCrossSectionMacroParamMissingValueMatrix.Resize(itsCrossSectionMacroParamData->Grid()->XNumber(), itsCrossSectionMacroParamData->Grid()->YNumber(), kFloatMissing);
+	}
+}
+
 /*
 // Aina kun on asetettu uusi editoitu data, on makroparam-data päivitettävä
 void NFmiInfoOrganizer::UpdateMacroParamDataArea(void)
@@ -839,7 +872,7 @@ void NFmiInfoOrganizer::UpdateMacroParamDataArea(void)
 			itsMacroParamData = new NFmiSmartInfo(infoIter, data, "", "", NFmiInfoData::kMacroParam);
 			if(itsMacroParamData && itsMacroParamData->IsGrid())
 			{ // alustetaan missing matriisi, että sillä voidaan alustaa ennen makroparamin piirtoa kenttä ensin puuttuvaksi (tämä tehdään NFmiStationView-luokassa)
-				itsDefaultMissingValueMatrix.Resize(itsMacroParamData->Grid()->XNumber(), itsMacroParamData->Grid()->YNumber(), kFloatMissing);
+				itsMacroParamMissingValueMatrix.Resize(itsMacroParamData->Grid()->XNumber(), itsMacroParamData->Grid()->YNumber(), kFloatMissing);
 			}
 		}
 	}
@@ -1017,7 +1050,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info(NFmiDrawParam &theDrawParam, bool fCrossS
 	bool subParameter = false;
 	NFmiInfoData::Type dataType = theDrawParam.DataType();
 	if(fCrossSectionInfoWanted)
-		return CrossSectionInfo(theDrawParam.Param(), subParameter, dataType);
+		return CrossSectionInfo(theDrawParam.Param(), subParameter, dataType, true);
 	else
 	{
 		NFmiLevel* level = &theDrawParam.Level();
