@@ -38,10 +38,14 @@
 #include <list>
 #include "NFmiDataMatrix.h"
 #include "NFmiInfoData.h"
+#include "NFmiDrawParam.h"
+
+#ifdef WIN32
+#pragma warning(disable : 4512) // poistaa VC++ k‰‰nt‰j‰n C4512 "assignment operator could not be generated" varoituksen
+#endif
 
 class NFmiMetTime;
 class NFmiLevel;
-class NFmiDrawParam;
 class NFmiProducer;
 class NFmiLevel;
 class NFmiDataIdent;

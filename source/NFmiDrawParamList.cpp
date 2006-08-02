@@ -25,7 +25,7 @@
 // 
 //**********************************************************
 #ifdef WIN32
-#pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n "liian pitk‰ tyyppi nimi" varoitusta
+#pragma warning(disable : 4786 4512) // poistaa n kpl VC++ k‰‰nt‰j‰n "liian pitk‰ tyyppi nimi" varoitusta
 #endif
 
 #include "NFmiDrawParamList.h"
