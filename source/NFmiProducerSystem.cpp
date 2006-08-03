@@ -116,7 +116,7 @@ unsigned int NFmiProducerSystem::FindProducerInfo(const NFmiProducer &theProduce
 	{
 		NFmiProducerInfo &prodInfo = itsProducers[index];
 		std::vector<int> &ids = prodInfo.ProducerIds();
-		for(int i = 0; i < static_cast<int>(ids.size()); i++)
+		for(unsigned int i = 0; i < ids.size(); i++)
 		{
 			if(ids[i] == theProducer.GetIdent())
 				return index+1; // palautetaan siis 1-pohjainen indeksi
