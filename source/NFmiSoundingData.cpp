@@ -726,8 +726,6 @@ bool NFmiSoundingData::Add2ParamAtNearestP(float P, FmiParameterName parId, floa
 	{
 		float currentP = kFloatMissing;
 		float currentParam = kFloatMissing;
-		float lastP = kFloatMissing;
-		float lastParam = kFloatMissing;
 		float closestPdiff = kFloatMissing;
 		unsigned int closestIndex = 0;
 		unsigned int ssize = pV.size();
