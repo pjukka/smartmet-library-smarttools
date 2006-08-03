@@ -118,8 +118,8 @@ unsigned int NFmiProducerSystem::FindProducerInfo(const NFmiProducer &theProduce
 		std::vector<int> &ids = prodInfo.ProducerIds();
 		for(unsigned int i = 0; i < ids.size(); i++)
 		{
-			if(ids[i] == theProducer.GetIdent())
-				return index+1; // palautetaan siis 1-pohjainen indeksi
+		  if(ids[i] == static_cast<int>(theProducer.GetIdent()))
+			return index+1; // palautetaan siis 1-pohjainen indeksi
 		}
 	}
 	return 0; // ei löytynyt, palautetaan 0;
