@@ -19,7 +19,7 @@
 class NFmiProducerInfo
 {
 public:
-	NFmiProducerInfo(void):itsName(),itsShortName(),itsUltraShortName(),itsProducerIds(),itsDescription(){}
+	NFmiProducerInfo(void):itsName(),itsShortName(),itsUltraShortName(),itsProducerIds(),itsDescription(),fHasRealVerticalData(false){}
 
 	const std::string& Name(void) const {return itsName;}
 	void Name(const std::string &newValue) {itsName = newValue;}
@@ -36,12 +36,16 @@ public:
 	const std::string& Description(void) const {return itsDescription;}
 	void Description(const std::string &newValue) {itsDescription = newValue;}
 	std::vector<NFmiProducer> GetProducers(void);
+	bool HasRealVerticalData(void) const {return fHasRealVerticalData;}
+	void HasRealVerticalData(bool newValue) {fHasRealVerticalData = newValue;}
 private:
 	std::string itsName; // Pitempi nimi esim. Hirlam tai Ecmwf (voidaan k‰ytt‰‰ esim. popup-valikoissa, miss‰ on tilaa)
 	std::string itsShortName; // Lyhyempi nimi esim. Hir tai Ec (k‰ytet‰‰n mm. jossain pikavalinnoissa nimen‰ ja smarttool-kielen tuottaja nimen‰ skripteiss‰)
 	std::string itsUltraShortName; // Lyhyempi nimi esim. Hir tai Ec (k‰ytet‰‰n mm. jossain pikavalinnoissa nimen‰ ja smarttool-kielen tuottaja nimen‰ skripteiss‰)
 	std::vector<int> itsProducerIds; // useilla malleilla on vain yksi par-id, mutta esim. EC ja HIR:eilla on kaksi.
 	std::string itsDescription;
+	bool fHasRealVerticalData; // esim. UK,DWDjaUSa datoissa ei ole nyt oikeasti vertikaalidataa, vaikka siin‰ on painepintoja, n‰ist‰ malleista ei haluta 
+							   // tehd‰ luotauksia, poikkileikkausia tai trajektori laskuja, joten n‰m‰ mallit saavat arvon false.
 };
 
 class NFmiProducerSystem

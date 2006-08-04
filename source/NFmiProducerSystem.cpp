@@ -28,6 +28,7 @@ NFmiProducerInfo NFmiProducerSystem::GetProducerInfoFromSettings(const std::stri
 	prod.Description(NFmiSettings::Require<std::string>(std::string(theUsedNameSpaceBase + "::Description").c_str()));
 	std::string idStr(NFmiSettings::Require<std::string>(std::string(theUsedNameSpaceBase + "::ProducerIds").c_str()));
 	prod.ProducerIds(NFmiStringTools::Split<std::vector<int> >(idStr, ","));
+	prod.HasRealVerticalData(NFmiSettings::Require<bool>(std::string(theUsedNameSpaceBase + "::HasRealVerticalData").c_str()));
 
 	return prod;
 }
@@ -39,6 +40,7 @@ NFmiProducerInfo NFmiProducerSystem::GetProducerInfoFromSettings(const std::stri
 //   ShortName = Hir
 //   Description = Hirlam RCR model
 //   ProducerIds = 1,230
+//   HasRealVerticalData = 1
 // }
 // ProducerSystem::Producer2
 // {
@@ -46,6 +48,7 @@ NFmiProducerInfo NFmiProducerSystem::GetProducerInfoFromSettings(const std::stri
 //   ShortName = Ec
 //   Description = Ecmwf global model
 //   ProducerIds = 240
+//   HasRealVerticalData = 1
 // }
 // and so on. System will try to find as many Producer# as it can. 
 // You should put them in rising order in file to make it clearer.
