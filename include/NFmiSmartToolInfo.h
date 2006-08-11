@@ -48,12 +48,12 @@ public:
 	checkedVector<std::string> GetScriptNames(void); // hae lista olemassa olevista skripteistä (pelkkä nimi lista)
 	const std::string& ScriptFileExtension(void) const {return itsScriptFileExtension;}
 	void ScriptFileExtension(const std::string& newValue) {itsScriptFileExtension = newValue;}
+	std::string GetFullScriptFileName(const std::string &theScriptName);
 
 private:
 	bool WriteScript2File(const std::string &theFileName, const std::string &theScript);
 	bool LoadSettings(void);
 	bool SaveSettings(void);
-	std::string GetFullScriptFileName(const std::string &theScriptName);
 
 	std::string itsCurrentScript; //! Dialogissa oleva scripti.
 	std::string itsScriptFileExtension; //! smarttool-macrot talletetaan tiedostoihin tällä extensiolla (.st).
