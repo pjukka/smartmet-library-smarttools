@@ -462,8 +462,18 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 
 		if(theDataType == NFmiInfoData::kEditable)
 		{
-			if(theUndoLevel)
-				aSmartInfo->UndoLevel(theUndoLevel);
+			try
+			{
+				if(theUndoLevel)
+					aSmartInfo->UndoLevel(theUndoLevel);
+			}
+			catch(...)
+			{
+				// jos muisti loppuu tai muu poikkeus, asetetaan undo level 0:ksi ja jatketaan
+				theUndoLevel = 0;
+				aSmartInfo->DestroySharedData(false); // false tässä tarkoittaa että ei tuhota queryDataa
+			}
+
 			if(itsEditedData)
 			{
 				itsEditedData->DestroySharedData();
