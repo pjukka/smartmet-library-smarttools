@@ -128,7 +128,7 @@ NFmiSmartInfo::~NFmiSmartInfo()
 {
 }
 
-void NFmiSmartInfo::DestroyData(void)
+void NFmiSmartInfo::DestroyData(bool deleteQData)
 {
 	//kopio-konstruktori kopioi n‰ist‰ vain osoitteet,
 	//joten n‰m‰ saa tuhota vaan yhdest‰ oliosta, k‰ytt‰j‰n pit‰‰ tiet‰‰ mist‰ ja milloin
@@ -179,8 +179,11 @@ void NFmiSmartInfo::DestroyData(void)
 	delete itsAreaMask;
 	itsAreaMask = 0;
 
-	delete itsDataReference;
-	itsDataReference = 0;
+	if(deleteQData)
+	{
+		delete itsDataReference;
+		itsDataReference = 0;
+	}
 
 	delete fDirty;
 	fDirty = 0;
@@ -645,14 +648,35 @@ void NFmiSmartInfo::UndoLevel (const long& theDepth)	// theDepth kuvaa kuinka mo
 			*itsCurrentUndoLevelPtr = -1;
 			*itsCurrentRedoLevelPtr = -1;
 			*itsMaxUndoLevelPtr = theDepth + 1;		// Redon tekemisen mahdollistamiseksi yksi
-			itsUndoTable = new char* [*itsMaxUndoLevelPtr];				// taso lis‰‰.
-			itsUndoTextTable = new std::string [*itsMaxUndoLevelPtr];
-
-			for (int level = 0; level < (*itsMaxUndoLevelPtr); level++)
+			try
 			{
-				itsUndoTable[level] = new char[itsRefDataPool->Size()];
+				itsUndoTable = new char* [*itsMaxUndoLevelPtr];				// taso lis‰‰.
+				itsUndoTextTable = new std::string [*itsMaxUndoLevelPtr];
+				for (int level = 0; level < (*itsMaxUndoLevelPtr); level++)
+					itsUndoTable[level] = 0; // nollataan ensin pointteri, ett‰ voidaan siivota j‰lki‰ jos muistin varaus pett‰‰ joskus
+
+				for (int level = 0; level < (*itsMaxUndoLevelPtr); level++)
+					itsUndoTable[level] = new char[itsRefDataPool->Size()];
+				itsUndoRedoHarmonizerBookKeepingData = new std::deque<NFmiHarmonizerBookKeepingData>;
 			}
-			itsUndoRedoHarmonizerBookKeepingData = new std::deque<NFmiHarmonizerBookKeepingData>;
+			catch(...)
+			{ // oletetaan ett‰ poikkeus liittyi muistin varaamiseen ja lopetetaan t‰h‰n
+				// siivotaan talukot tyhjiksi.
+				delete itsUndoRedoHarmonizerBookKeepingData;
+				itsUndoRedoHarmonizerBookKeepingData = 0;
+
+				for (int level = 0; level < (*itsMaxUndoLevelPtr); level++)
+				{
+					if(itsUndoTable[level])
+						delete [] itsUndoTable[level];
+				}
+				*itsMaxUndoLevelPtr = 0;
+				delete [] itsUndoTable;
+				itsUndoTable = 0;
+				delete [] itsUndoTextTable;
+				itsUndoTextTable = 0;
+
+			}
 		}
 	}
 

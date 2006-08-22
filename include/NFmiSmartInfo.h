@@ -128,8 +128,8 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	bool operator==(const NFmiSmartInfo& theSmartInfo) const;
 	bool operator< (const NFmiSmartInfo& theSmartInfo) const;
 
-	void DestroyData(void);
-	void DestroySharedData(void){DestroyData();};
+	void DestroyData(bool deleteQData = true);
+	void DestroySharedData(bool deleteQData = true){DestroyData(deleteQData);};
 	NFmiQueryData* DataReference(void);
 
 	bool IsEditable(void){return fEditable;}
