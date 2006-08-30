@@ -241,7 +241,7 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 				{
 					if(theLevel == 0)
 						return true;
-					if(drawParam->Level().LevelType() == 0 && theLevel->LevelType() == kFmiAnyLevelType)
+					if(drawParam->Level().LevelType() == 0 && (theLevel->LevelType() == kFmiAnyLevelType || theLevel->LevelType() == kFmiMeanSeaLevel))
 						return true; // tämä case tulee kun nykyään tehdään pinta parametreja
 					if(*(theLevel) == drawParam->Level())
 						return true;
