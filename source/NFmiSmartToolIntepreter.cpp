@@ -1381,6 +1381,8 @@ bool NFmiSmartToolIntepreter::FindParamAndProducerAndSetMaskInfo(const std::stri
 	NFmiProducer producer(GetPossibleProducerInfo(theProducerText));
 	if(producer.GetIdent() == gMesanProdId)
 		theDataType = NFmiInfoData::kAnalyzeData; // ik‰v‰‰ koodia, mutta analyysi data tyyppi pit‰‰ asettaa jos ANAL-tuottajaa k‰ytetty
+	else if(producer.GetIdent() == NFmiProducerSystem::gHelpEditorDataProdId)
+		theDataType = NFmiInfoData::kEditingHelpData; // ik‰v‰‰ koodia, editor help datalle pit‰‰ saada oma tuottaja id
 	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer))
 		return true;
 	return false;
@@ -1984,6 +1986,10 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("w"), kFmiVerticalVelocityMMS));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("z"), kFmiGeopHeight));
 
+		// laitetaan kokoelma parametritkin kieleen, ett‰ niit‰ voi sijoittaa kerralla yhdell‰ komennolla
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wind"), kFmiTotalWindMS));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("weather"), kFmiWeatherAndCloudiness));
+
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrcon"), kFmiPrecipitationConv));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrlar"), kFmiPrecipitationLarge));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape"), kFmiCAPE));
@@ -2091,6 +2097,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("orig"), kFmiMETEOR));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ana"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("help"), static_cast<FmiProducerName>(NFmiProducerSystem::gHelpEditorDataProdId)));
 
 		if(theProducerSystem)
 		{
