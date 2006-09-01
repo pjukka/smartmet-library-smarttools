@@ -51,6 +51,11 @@ private:
 class NFmiProducerSystem
 {
 public:
+	static const int gHelpEditorDataProdId = 996; // pistin t‰m‰n tuottaja id:n tanne, koska en viitsi laittaa t‰t‰
+												// metkun editorin sis‰ist‰ help-data tuottaja id juttua
+												// newbasen ProducerName listaan. T‰t‰ k‰ytet‰‰n ainakin
+												// smarttool-kielen alustamisessa ja dokumentin HelpDataSystemin alustuksessa
+
 	NFmiProducerSystem(void):itsProducers(){}
 
 	void Add(const NFmiProducerInfo &newValue){itsProducers.push_back(newValue);}
