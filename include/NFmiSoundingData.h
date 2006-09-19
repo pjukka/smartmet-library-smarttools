@@ -23,8 +23,9 @@ class NFmiSoundingData
 public:
 	NFmiSoundingData(void){};
 
-	bool FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation);
+	bool FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly = false);
 	bool FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName);
+	void CutEmptyData(void); // tämä leikkaa Fill.. -metodeissa laskettuja data vektoreita niin että pelkät puuttuvat kerrokset otetaan pois
 
 	// FillSoundingData-metodeilla täytetään kunkin parametrin vektorit ja tällä saa haluamansa parametrin vektorin käyttöön
 	checkedVector<float>& GetParamData(FmiParameterName theId);
@@ -47,9 +48,11 @@ public:
 	float FindPressureWhereHighestValue(FmiParameterName theId, float theMaxP, float theMinP);
 	bool ModifyT2DryAdiapaticBelowGivenP(double P, double T);
 	bool ModifyTd2MoistAdiapaticBelowGivenP(double P, double Td);
+	bool ModifyTd2MixingRatioBelowGivenP(double P, double T, double Td);
 	bool Add2ParamAtNearestP(float P, FmiParameterName parId, float addValue, float minValue, float maxValue, bool fCircularValue);
 	void UpdateUandVParams(void);
 private:
+	unsigned int GetHighestNonMissingValueLevelIndex(FmiParameterName theParaId);
 	float GetPressureAtHeight(double H);
 	void ClearDatas(void);
 	bool FillParamData(NFmiQueryInfo* theInfo, FmiParameterName theId);

@@ -505,8 +505,53 @@ bool NFmiSoundingData::FillParamData(NFmiQueryInfo* theInfo, FmiParameterName th
 	return status;
 }
 
+unsigned int NFmiSoundingData::GetHighestNonMissingValueLevelIndex(FmiParameterName theParaId)
+{
+	checkedVector<float> &vec = GetParamData(theParaId);
+	checkedVector<float>::size_type ssize = vec.size();
+	unsigned int index = 0;
+	for(unsigned int i = 0; i < ssize; i++)
+		if(vec[i] != kFloatMissing)
+			index = i;
+	return index;
+}
+
+// tämä leikkaa Fill.. -metodeissa laskettuja data vektoreita niin että pelkät puuttuvat kerrokset otetaan pois
+void NFmiSoundingData::CutEmptyData(void)
+{
+	std::vector<FmiParameterName> itsSoundingParameters;
+	itsSoundingParameters.push_back(kFmiPressure);
+	itsSoundingParameters.push_back(kFmiTemperature);
+	itsSoundingParameters.push_back(kFmiDewPoint);
+	itsSoundingParameters.push_back(kFmiWindSpeedMS);
+	itsSoundingParameters.push_back(kFmiWindDirection);
+	itsSoundingParameters.push_back(kFmiGeomHeight);
+
+	unsigned int greatestNonMissingLevelIndex = 0;
+	unsigned int maxLevelIndex = GetParamData(itsSoundingParameters[0]).size();
+	for(unsigned int i = 0; i < itsSoundingParameters.size(); i++)
+	{
+		unsigned int currentIndex = GetHighestNonMissingValueLevelIndex(itsSoundingParameters[i]);
+		if(currentIndex > greatestNonMissingLevelIndex)
+			greatestNonMissingLevelIndex = currentIndex;
+		if(greatestNonMissingLevelIndex >= maxLevelIndex)
+			return ; // ei tarvitse leikata, kun dataa löytyy korkeimmaltakin leveliltä
+	}
+
+	// tässä pitää käydä läpi kaikki data vektorit!!!! Oikeasti nämä datavektori pitäisi laittaa omaan vektoriin että sitä voitaisiin iteroida oikein!
+	itsTemperatureData.resize(greatestNonMissingLevelIndex);
+	itsDewPointData.resize(greatestNonMissingLevelIndex);
+	itsPressureData.resize(greatestNonMissingLevelIndex);
+	itsGeomHeightData.resize(greatestNonMissingLevelIndex);
+	itsWindSpeedData.resize(greatestNonMissingLevelIndex);
+	itsWindDirectionData.resize(greatestNonMissingLevelIndex);
+	itsWindComponentUData.resize(greatestNonMissingLevelIndex);
+	itsWindComponentVData.resize(greatestNonMissingLevelIndex);
+
+}
+
 // Tälle anntaan asema dataa ja ei tehdä minkäänlaisia interpolointeja.
-bool NFmiSoundingData::FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation)
+bool NFmiSoundingData::FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly)
 {
 	ClearDatas();
 	if(theInfo && !theInfo->IsGrid())
@@ -514,7 +559,7 @@ bool NFmiSoundingData::FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTim
 		fObservationData = true;
 		if(theInfo->Time(theTime))
 		{
-			if(theInfo->Location(theLocation))
+			if(useStationIdOnly ? theInfo->Location(theLocation.GetIdent()) : theInfo->Location(theLocation))
 			{
 				itsLocation = theLocation;
 				itsTime = theTime;
@@ -651,6 +696,35 @@ bool NFmiSoundingData::ModifyT2DryAdiapaticBelowGivenP(double P, double T)
 			{ // muutoksia siis tehtiin niin kauan kuin oltiin alle annetun paineen
 				float wantedT = static_cast<float>(::Tpot2t(wantedTPot, currentP));
 				tV[i] = wantedT;
+			}
+			else
+				break;
+		}
+		return true;
+	}
+	return false;
+}
+
+bool NFmiSoundingData::ModifyTd2MixingRatioBelowGivenP(double P, double T, double Td)
+{
+	if(P == kFloatMissing || Td == kFloatMissing)
+		return false;
+
+	checkedVector<float>&pV = GetParamData(kFmiPressure);
+	checkedVector<float>&tV = GetParamData(kFmiTemperature);
+	checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
+	if(pV.size() > 0 && pV.size() == tV.size() && pV.size() == tdV.size())
+	{
+		unsigned int ssize = pV.size();
+
+		float wantedMixRatio = static_cast<float>(::CalcMixingRatio(T, Td, P));
+		for(unsigned int i=0; i<ssize; i++)
+		{
+			float currentP = pV[i];
+			if(currentP >= P)
+			{ // muutoksia siis tehtiin niin kauan kuin oltiin alle annetun paineen
+				float wantedTd = static_cast<float>(::CalcDewPoint(tV[i], wantedMixRatio, currentP));
+				tdV[i] = wantedTd;
 			}
 			else
 				break;
