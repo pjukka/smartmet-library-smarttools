@@ -75,6 +75,7 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* ViewableInfo(void); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	checkedVector<NFmiSmartInfo*> GetInfos(NFmiInfoData::Type theDataType); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
 	checkedVector<NFmiSmartInfo*> GetInfos(int theProducerId, int theProducerId2 = -1, int theProducerId3 = -1, int theProducerId4 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
+	checkedVector<NFmiSmartInfo*> GetInfos(NFmiInfoData::Type theType, bool fGroundData, int theProducerId, int theProducerId2 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
 	NFmiSmartInfo* ViewableInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
 	NFmiSmartInfo* ObservationInfo(void); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* ObservationInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)

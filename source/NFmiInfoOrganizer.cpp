@@ -979,7 +979,7 @@ checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type the
 	return infoVector;
 }
 
-static bool IsProducerWanted(int theCurrentProdId, int theProducerId1, int theProducerId2, int theProducerId3, int theProducerId4)
+static bool IsProducerWanted(int theCurrentProdId, int theProducerId1, int theProducerId2, int theProducerId3 = -1, int theProducerId4 = -1)
 {
 	if(theCurrentProdId == theProducerId1)
 		return true;
@@ -999,11 +999,30 @@ checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(int theProducerId, int
 {
 	checkedVector<NFmiSmartInfo*> infoVector;
 
-	for(Reset(); Next();)
+	for(Reset(); Next();) // HUOM! tässä ei kiinnosta editoitu data tai sen kopio!!!!
 	{
 		int currentProdId = static_cast<int>(Current()->Producer()->GetIdent());
 		if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
 			infoVector.push_back(Current());
+	}
+	return infoVector;
+}
+
+checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type theType, bool fGroundData, int theProducerId, int theProducerId2)
+{
+	checkedVector<NFmiSmartInfo*> infoVector;
+	for(Reset(); Next();) // HUOM! tässä ei kiinnosta editoitu data tai sen kopio!!!!
+	{
+		NFmiSmartInfo *info = Current();
+		if(info->DataType() == theType)
+		{
+			if((fGroundData == true && info->SizeLevels() == 1) || (fGroundData == false && info->SizeLevels() > 1))
+			{
+				int currentProdId = static_cast<int>(Current()->Producer()->GetIdent());
+				if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2))
+					infoVector.push_back(Current());
+			}
+		}
 	}
 	return infoVector;
 }
