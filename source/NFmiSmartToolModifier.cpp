@@ -233,6 +233,7 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer
 ,fDoCrossSectionCalculation(false)
 ,itsCommaCounter(0)
 ,itsParethesisCounter(0)
+,itsMacroParamData(0)
 {
 	assert(itsInfoOrganizer);
 }
@@ -793,7 +794,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			if(maskType == NFmiAreaMask::FunctionPeekXY)
 				areaMask = new NFmiInfoAreaMaskPeekXY(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), true, NFmiAreaMask::kNoValue, deepCopyCreated);
 			else
-				areaMask = new NFmiInfoAreaMaskPeekXY2(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, this->fMacroParamCalculation ? itsInfoOrganizer->MacroParamData() : itsInfoOrganizer->EditedInfo(), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), true, NFmiAreaMask::kNoValue, deepCopyCreated);
+				areaMask = new NFmiInfoAreaMaskPeekXY2(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, this->fMacroParamCalculation ? MacroParamData() : itsInfoOrganizer->EditedInfo(), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), true, NFmiAreaMask::kNoValue, deepCopyCreated);
 
 			if(fUseLevelData)
 				itsParethesisCounter++;
@@ -935,9 +936,9 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateCalculatedAreaMask(const NFmiAreaMask
 	else if(parId == kFmiDeltaTime)
 		areaMask = new NFmiTimeStepAreaMask(itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
 	else if(parId == kFmiLastParameter)
-		areaMask = new NFmiGridSizeAreaMask(this->fMacroParamCalculation ? itsInfoOrganizer->MacroParamData() : itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition(), true);
+		areaMask = new NFmiGridSizeAreaMask(this->fMacroParamCalculation ? MacroParamData() : itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition(), true);
 	else if(parId == kFmiLastParameter+1)
-		areaMask = new NFmiGridSizeAreaMask(this->fMacroParamCalculation ? itsInfoOrganizer->MacroParamData() : itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition(), false);
+		areaMask = new NFmiGridSizeAreaMask(this->fMacroParamCalculation ? MacroParamData() : itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition(), false);
 
 
 	if(areaMask)
@@ -1021,7 +1022,16 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 		NFmiInfoData::Type dataType = theAreaMaskInfo.GetDataType();
 		if(fDoCrossSectionCalculation && dataType == NFmiInfoData::kMacroParam)
 			dataType = NFmiInfoData::kCrossSectionMacroParam;
-		info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), dataType, true, fUseLevelData);
+		if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kMacroParam)
+		{ // tämä macroParam data viritys on multi threaddaavaa serveriä varten, eli macroparam data pitää olla thread-kohtainen
+			// ja se on aina annettu luodulle NFmiSmartToolModifier-luokan instansille erikseen.
+			if(MacroParamData()) 
+				info = new NFmiSmartInfo(*MacroParamData());
+			else
+				throw runtime_error("NFmiSmartToolModifier::CreateInfo - error in program, no macroParam data available.");
+		}
+		else
+			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), dataType, true, fUseLevelData);
 	}
 	else
 	{
@@ -1138,7 +1148,7 @@ void NFmiSmartToolModifier::ClearScriptVariableInfos(void)
 
 NFmiSmartInfo* NFmiSmartToolModifier::CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent)
 {
-	NFmiSmartInfo* baseInfo = fMacroParamCalculation ? itsInfoOrganizer->MacroParamData() : itsInfoOrganizer->EditedInfo();
+	NFmiSmartInfo* baseInfo = fMacroParamCalculation ? MacroParamData() : itsInfoOrganizer->EditedInfo();
 	NFmiParamBag paramBag;
 	paramBag.Add(theDataIdent);
 	NFmiParamDescriptor paramDesc(paramBag);
@@ -1159,4 +1169,14 @@ NFmiParamBag NFmiSmartToolModifier::ModifiedParams(void)
 const std::string& NFmiSmartToolModifier::GetStrippedMacroText(void) const
 {
 	return itsSmartToolIntepreter->GetStrippedMacroText();
+}
+
+NFmiSmartInfo* NFmiSmartToolModifier::UsedMacroParamData(void)
+{
+	if(itsMacroParamData)
+		return itsMacroParamData;
+	else if(itsInfoOrganizer)
+		return itsInfoOrganizer->MacroParamData();
+	else
+		return 0;
 }
