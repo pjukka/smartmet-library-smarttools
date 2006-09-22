@@ -88,7 +88,7 @@ std::istream & NFmiHelpDataInfo::Read(std::istream & file)
 	ReadNextLine(file, itsFileNameFilter);
 	int tmp = 0;
 	file >> tmp;
-	itsDataType = (NFmiInfoData::Type)tmp;
+	itsDataType = static_cast<NFmiInfoData::Type>(tmp);
 	file >> itsFakeProducerId;
 	if(itsDataType == NFmiInfoData::kSatelData)
 	{
@@ -166,7 +166,7 @@ NFmiDataIdent NFmiHelpDataInfoSystem::GetNextSatelChannel(const NFmiDataIdent &t
 	{
 		if(itsDynamicHelpDataInfos[i].DataType() == NFmiInfoData::kSatelData)
 		{
-			if(prodId == itsDynamicHelpDataInfos[i].ImageDataIdent().GetProducer()->GetIdent())
+			if(static_cast<unsigned long>(prodId) == itsDynamicHelpDataInfos[i].ImageDataIdent().GetProducer()->GetIdent())
 			{
 				dataIdentVec.push_back(itsDynamicHelpDataInfos[i].ImageDataIdent());
 				if(theDataIdent.GetParamIdent() == itsDynamicHelpDataInfos[i].ImageDataIdent().GetParamIdent())
@@ -205,7 +205,8 @@ const NFmiArea* NFmiHelpDataInfoSystem::GetDataFilePatternAndArea(NFmiInfoData::
 		{
 			if(itsDynamicHelpDataInfos[i].DataType() == theDataType)
 			{
-				if(theProdId == itsDynamicHelpDataInfos[i].ImageDataIdent().GetProducer()->GetIdent() && theParamId == itsDynamicHelpDataInfos[i].ImageDataIdent().GetParamIdent())
+				if(static_cast<unsigned long>(theProdId) == itsDynamicHelpDataInfos[i].ImageDataIdent().GetProducer()->GetIdent() &&
+				   static_cast<unsigned long>(theParamId) == itsDynamicHelpDataInfos[i].ImageDataIdent().GetParamIdent())
 				{
 					if(fDemandMatchingArea && IsSameTypeProjections(theZoomedArea, itsDynamicHelpDataInfos[i].ImageArea()))
 					{
