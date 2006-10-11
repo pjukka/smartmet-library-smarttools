@@ -1008,25 +1008,28 @@ checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(int theProducerId, int
 	return infoVector;
 }
 
+// HUOM! T‰st‰ pit‰‰ tehd‰ multithreaddauksen kest‰v‰‰ koodia, eli
+// iteraattorista pit‰‰ tehd‰ lokaali kopio.
 checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type theType, bool fGroundData, int theProducerId, int theProducerId2)
 {
 	checkedVector<NFmiSmartInfo*> infoVector;
-	for(Reset(); Next();) // HUOM! t‰ss‰ ei kiinnosta editoitu data tai sen kopio!!!!
+	NFmiSortedPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start();
+	for( ; iter.Next(); ) // HUOM! t‰ss‰ ei kiinnosta editoitu data tai sen kopio!!!!
 	{
-		NFmiSmartInfo *info = Current();
-		if(info->DataType() == theType)
+		NFmiSmartInfo *info = iter.CurrentPtr();
+		if(info && info->DataType() == theType)
 		{
 			if((fGroundData == true && info->SizeLevels() == 1) || (fGroundData == false && info->SizeLevels() > 1))
 			{
-				int currentProdId = static_cast<int>(Current()->Producer()->GetIdent());
+				// HUOM! info->Producer() on potentiaalisti vaarallinen kutsu multi-threaddaavassa tilanteessa.
+				int currentProdId = static_cast<int>(info->Producer()->GetIdent());
 				if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2))
-					infoVector.push_back(Current());
+					infoVector.push_back(info);
 			}
 		}
 	}
 	return infoVector;
 }
-
 
 // Haetaan halutun datatyypin, tuottajan joko pinta tai level dataa (mahd indeksi kertoo sitten konfliktin
 // yhteydess‰, monesko otetaan)
