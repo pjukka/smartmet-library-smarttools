@@ -122,7 +122,7 @@ bool NFmiSmartToolUtil::InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, c
 		if(sQData.ReadData(theHelperDataFileNames[i]))
 		{
 			NFmiInfoData::Type dataType = NFmiInfoData::kViewable;
-			if(sQData.QueryData()->Info()->SizeTimes() == 1)
+			if(sQData.QueryData()->Info()->SizeTimes() == 1 && sQData.QueryData()->Info()->Param(kFmiTopoGraf))
 				dataType = NFmiInfoData::kStationary;
 			theDataBase.AddData(sQData.QueryData(true), theHelperDataFileNames[i], "", dataType, 0); // 0=undolevel
 		}
