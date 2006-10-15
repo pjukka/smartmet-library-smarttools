@@ -43,8 +43,11 @@ public:
 	time_t LatestFileTimeStamp(void) const {return itsLatestFileTimeStamp;}
 	void LatestFileTimeStamp(time_t newValue) {itsLatestFileTimeStamp = newValue;}
 	int FakeProducerId(void) const {return itsFakeProducerId;}
+	void FakeProducerId(int newValue) { itsFakeProducerId = newValue; }
 	const NFmiDataIdent& ImageDataIdent(void) const {return itsImageDataIdent;}
+	void ImageDataIdent(const NFmiDataIdent& newValue) { itsImageDataIdent = newValue; }
 	const NFmiArea* ImageArea(void) const {return itsImageArea;}
+	void ImageArea(NFmiArea *newValue) { if (!itsImageArea) itsImageArea = newValue; } // Can only be called once
 
 private:
 	bool ReadNextLine(std::istream & file, std::string &theLine);
@@ -88,6 +91,7 @@ public:
 	const NFmiArea* GetDataFilePatternAndArea(NFmiInfoData::Type theDataType, FmiProducerName theProdId, FmiParameterName theParamId, const NFmiArea *theZoomedArea, std::string &theFilePattern, bool fDemandMatchingArea);
 	NFmiDataIdent GetNextSatelChannel(const NFmiDataIdent &theDataIdent, FmiDirection theDir);
 	void AddDynamic(const NFmiHelpDataInfo &theInfo);
+	void AddStatic(const NFmiHelpDataInfo &theInfo);
 
 private:
 	bool IsSameTypeProjections(const NFmiArea *theFirst, const NFmiArea *theSecond);

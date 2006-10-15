@@ -126,13 +126,13 @@ std::istream & NFmiHelpDataInfoSystem::Read(std::istream & file)
 	for(i=0; i<dataCount; i++)
 	{
 		file >> hdInfo;
-		itsDynamicHelpDataInfos.push_back(hdInfo);
+		AddDynamic(hdInfo);
 	}
 	file >> dataCount; // staattistem lukum‰‰r‰
 	for(i=0; i<dataCount; i++)
 	{
 		file >> hdInfo;
-		itsStaticHelpDataInfos.push_back(hdInfo);
+		AddStatic(hdInfo);
 	}
 	return file;
 }
@@ -251,3 +251,9 @@ void NFmiHelpDataInfoSystem::AddDynamic(const NFmiHelpDataInfo &theInfo)
 {
 	itsDynamicHelpDataInfos.push_back(theInfo);
 }
+
+void NFmiHelpDataInfoSystem::AddStatic(const NFmiHelpDataInfo &theInfo)
+{
+	itsStaticHelpDataInfos.push_back(theInfo);
+}
+
