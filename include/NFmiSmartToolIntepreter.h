@@ -106,7 +106,6 @@ class NFmiSmartToolIntepreter
 {
 public:
 	typedef std::map<std::string, FmiProducerName> ProducerMap;
-	typedef std::map<std::string, std::pair<unsigned long, unsigned long> > LevelMap; // nimi, ident, levelValue
 	typedef std::map<std::string, double> ConstantMap; // esim. MISS 32700 tai PI 3.14159
 /*
 	class Exception
@@ -171,7 +170,7 @@ private:
 
 	void InitCheckOut(void);
 	bool IsCaseInsensitiveEqual(const std::string &theStr1, const std::string &theStr2);
-	bool IsPossiblyLevelItem(const std::string &theText, LevelMap &theMap);
+	bool IsPossiblyLevelItem(const std::string &theText);
 	bool IsPossiblyProducerItem(const std::string &theText, ProducerMap &theMap);
 	bool GetProducerFromVariableById(const std::string &theVariableText, NFmiProducer &theProducer);
 	bool GetLevelFromVariableById(const std::string &theVariableText, NFmiLevel &theLevel, NFmiInfoData::Type theDataType);
@@ -254,8 +253,6 @@ private:
 	static BinaOperMap itsBinaryOperator;
 	static ParamMap itsTokenStaticParameterNamesAndIds;
 	static ParamMap itsTokenCalculatedParameterNamesAndIds; // mm. lat, lon ja elevAngle
-
-	static LevelMap itsTokenLevelNamesIdentsAndValues;
 
 	typedef std::map<std::string, FmiSoundingParameters> SoundingIndexMap;
 	static SoundingIndexMap itsTokenSoundingIndexFunctions;

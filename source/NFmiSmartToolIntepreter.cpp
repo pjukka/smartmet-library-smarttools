@@ -195,7 +195,6 @@ NFmiSmartToolIntepreter::CalcOperMap NFmiSmartToolIntepreter::itsCalculationOper
 NFmiSmartToolIntepreter::BinaOperMap NFmiSmartToolIntepreter::itsBinaryOperator;
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenStaticParameterNamesAndIds;
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenCalculatedParameterNamesAndIds;
-NFmiSmartToolIntepreter::LevelMap NFmiSmartToolIntepreter::itsTokenLevelNamesIdentsAndValues;
 NFmiSmartToolIntepreter::SoundingIndexMap NFmiSmartToolIntepreter::itsTokenSoundingIndexFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenThreeArgumentFunctions;
@@ -1278,7 +1277,7 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 		theParamText = string(theVariableText.begin(), theVariableText.begin() + pos1);
 		pos1++;
 		string tmp(theVariableText.begin() + pos1, pos2 != string::npos ? theVariableText.begin() + pos2 : theVariableText.end());
-		if(IsPossiblyLevelItem(tmp, itsTokenLevelNamesIdentsAndValues))
+		if(IsPossiblyLevelItem(tmp))
 		{
 			fLevelExist = true;
 			theLevelText = tmp;
@@ -1295,7 +1294,7 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 		{
 			pos2++;
 			string tmp(theVariableText.begin() + pos2, theVariableText.end());
-			if(IsPossiblyLevelItem(tmp, itsTokenLevelNamesIdentsAndValues))
+			if(IsPossiblyLevelItem(tmp))
 			{
 				if(fLevelExist == false)
 				{
@@ -1331,11 +1330,19 @@ bool NFmiSmartToolIntepreter::IsPossiblyProducerItem(const std::string &theText,
 		return true;
 	return false;
 }
-bool NFmiSmartToolIntepreter::IsPossiblyLevelItem(const std::string &theText, LevelMap &theMap)
+bool NFmiSmartToolIntepreter::IsPossiblyLevelItem(const std::string &theText)
 {
-	if(IsInMap(theMap, theText))
+	try
+	{
+		// jos numeroksi muunto onnistuu, oletetaan ett‰ kyseess‰ on level
+		int value = NFmiStringTools::Convert<int>(theText);
 		return true;
-	else if(IsWantedStart(theText, "lev"))
+	}
+	catch(...)
+	{
+	}
+	
+	if(IsWantedStart(theText, "lev"))
 		return true;
 	return false;
 }
@@ -1406,10 +1413,19 @@ bool NFmiSmartToolIntepreter::FindParamAndLevelAndProducerAndSetMaskInfo(const s
 NFmiLevel NFmiSmartToolIntepreter::GetPossibleLevelInfo(const std::string &theLevelText, NFmiInfoData::Type theDataType)
 {
 	NFmiLevel level;
-	LevelMap::iterator it = itsTokenLevelNamesIdentsAndValues.find(theLevelText);
-	if(it != itsTokenLevelNamesIdentsAndValues.end())
-		level = NFmiLevel((*it).second.first, (*it).first, (*it).second.second);
-	else if(!GetLevelFromVariableById(theLevelText, level, theDataType))
+
+	try
+	{
+		// jos numeroksi muunto onnistuu, oletetaan ett‰ kyseess‰ on level
+		int value = NFmiStringTools::Convert<int>(theLevelText);
+		level = NFmiLevel(kFmiPressureLevel, theLevelText, value);
+		return level;
+	}
+	catch(...)
+	{
+	}
+
+	if(!GetLevelFromVariableById(theLevelText, level, theDataType))
 		throw runtime_error(::GetDictionaryString("SmartToolErrorLevelInfoFailed") + ":\n" + theLevelText);
 	return level;
 }
@@ -2084,6 +2100,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("eangle"), kFmiElevationAngle));
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("jday"), kFmiDay)); // julian day oikeasti
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("lhour"), kFmiHour)); // local hour oikeasti
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("utchour"), kFmiSecond)); // utc hour k‰ytt‰‰ secondia, koska ei ollut omaa parametria utc hourille enk‰ lis‰‰ sellaista
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("fhour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia k‰ytetty, koska ei ollut valmista parametria
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("timestep"), kFmiDeltaTime)); // TIMESTEP eli timestep palauttaa datan currentin ajan aika stepin tunneissa
 
@@ -2173,14 +2190,6 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsCalculationOperations.insert(CalcOperMap::value_type(string("*"), NFmiAreaMask::Mul));
 		itsCalculationOperations.insert(CalcOperMap::value_type(string("^"), NFmiAreaMask::Pow));
 		itsCalculationOperations.insert(CalcOperMap::value_type(string("%"), NFmiAreaMask::Mod));
-
-
-		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("1000"), make_pair(kFmiPressureLevel, 1000)));
-		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("925"), make_pair(kFmiPressureLevel, 925)));
-		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("850"), make_pair(kFmiPressureLevel, 850)));
-		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("700"), make_pair(kFmiPressureLevel, 700)));
-		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("500"), make_pair(kFmiPressureLevel, 500)));
-		itsTokenLevelNamesIdentsAndValues.insert(LevelMap::value_type(string("300"), make_pair(kFmiPressureLevel, 300)));
 
 		// ****** sounding index funktiot  HUOM! ne k‰sitell‰‰n case insensitivein‰!! *************************
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclsur"), kSoundingParLCLSur));
