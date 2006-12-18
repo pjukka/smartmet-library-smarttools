@@ -109,10 +109,10 @@ NFmiInfoOrganizer::~NFmiInfoOrganizer (void)
 //--------------------------------------------------------
 // Init
 //--------------------------------------------------------
-bool NFmiInfoOrganizer::Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist, bool createEditedDataCopy)
+bool NFmiInfoOrganizer::Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist, bool createEditedDataCopy, bool fUseOnePressureLevelDrawParam)
 {
 	fCreateEditedDataCopy = createEditedDataCopy;
- 	itsDrawParamFactory =new NFmiDrawParamFactory(createDrawParamFileIfNotExist);
+ 	itsDrawParamFactory =new NFmiDrawParamFactory(createDrawParamFileIfNotExist, fUseOnePressureLevelDrawParam);
 	itsDrawParamFactory->LoadDirectory(theDrawParamPath);
  	return itsDrawParamFactory->Init();
 }

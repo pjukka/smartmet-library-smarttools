@@ -62,7 +62,7 @@ class NFmiInfoOrganizer
 	NFmiInfoOrganizer (void);
 	~NFmiInfoOrganizer (void);
 
-	bool Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist, bool createEditedDataCopy);
+	bool Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist, bool createEditedDataCopy, bool fUseOnePressureLevelDrawParam);
 
 	// Kehitä tähän perhe infojen palautus funktioita, jotka korvaavat vanhat
   	NFmiSmartInfo* Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted = false);
