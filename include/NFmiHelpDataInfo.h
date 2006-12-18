@@ -76,6 +76,9 @@ class NFmiHelpDataInfoSystem
 {
 public:
 	NFmiHelpDataInfoSystem(void)
+	:itsDynamicHelpDataInfos()
+	,itsStaticHelpDataInfos()
+	,itsRootDirectory()
 	{}
 
 	void Clear(void)
@@ -92,12 +95,15 @@ public:
 	NFmiDataIdent GetNextSatelChannel(const NFmiDataIdent &theDataIdent, FmiDirection theDir);
 	void AddDynamic(const NFmiHelpDataInfo &theInfo);
 	void AddStatic(const NFmiHelpDataInfo &theInfo);
+	const std::string& RootDirectory(void) const {return itsRootDirectory;}
+	void RootDirectory(const std::string &theRoot) {itsRootDirectory = theRoot;}
 
 private:
 	bool IsSameTypeProjections(const NFmiArea *theFirst, const NFmiArea *theSecond);
 
 	checkedVector<NFmiHelpDataInfo> itsDynamicHelpDataInfos; // t‰h‰n tulee jatkuvasti p‰ivitett‰v‰t datat kuten havainnot, tutka ja analyysi datat
 	checkedVector<NFmiHelpDataInfo> itsStaticHelpDataInfos; // t‰h‰n tulee kerran ladattavat jutut kuten maa/meri maskit ja klimatologiset jutut
+	std::string itsRootDirectory; // jos halutaan, k‰yttet‰‰n root directoria helpottamaan datan latauksia
 };
 
 //inline std::ostream & operator<<(std::ostream & os, const NFmiHelpDataInfoSystem & item)
