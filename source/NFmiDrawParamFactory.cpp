@@ -65,9 +65,10 @@ static void InitDrawParam(NFmiDrawParam* theDrawParam, const std::string &theFil
 //--------------------------------------------------------
 // NFmiDrawParamFactory(void) 
 //--------------------------------------------------------
-NFmiDrawParamFactory::NFmiDrawParamFactory(bool createDrawParamFileIfNotExist) 
+NFmiDrawParamFactory::NFmiDrawParamFactory(bool createDrawParamFileIfNotExist, bool onePressureLevelDrawParam) 
 :itsLoadDirectory("")
 ,fCreateDrawParamFileIfNotExist(createDrawParamFileIfNotExist)
+,fOnePressureLevelDrawParam(onePressureLevelDrawParam)
 {
 }
 //--------------------------------------------------------
@@ -161,13 +162,20 @@ std::string NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool 
 		{
 			if(drawParam && drawParam->Level().LevelType() == kFmiPressureLevel)
 			{ // jos leveleitä on useita, niillä on omat tiedostot
-				fileName += "_level_";
-				NFmiLevel& level = drawParam->Level();
-				int levelTypeId = level.LevelTypeId();
-				fileName += NFmiStringTools::Convert(levelTypeId);
-				fileName += "_";
-				int levelValue = level.LevelValue();
-				fileName += NFmiStringTools::Convert(levelValue);
+				if(fOnePressureLevelDrawParam)
+				{
+					fileName += "_pressure";
+				}
+				else
+				{
+					fileName += "_level_";
+					NFmiLevel& level = drawParam->Level();
+					int levelTypeId = level.LevelTypeId();
+					fileName += NFmiStringTools::Convert(levelTypeId);
+					fileName += "_";
+					int levelValue = level.LevelValue();
+					fileName += NFmiStringTools::Convert(levelValue);
+				}
 			}
 			else if(drawParam && drawParam->Level().LevelType() == kFmiHybridLevel)
 			{ // hybrideillä on ain yksi piirtotapa

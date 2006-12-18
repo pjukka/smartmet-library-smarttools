@@ -39,7 +39,7 @@ class NFmiDrawParamFactory
 {
 
 public:
-    NFmiDrawParamFactory(bool createDrawParamFileIfNotExist);
+    NFmiDrawParamFactory(bool createDrawParamFileIfNotExist, bool onePressureLevelDrawParam);
     ~NFmiDrawParamFactory(void);
 	NFmiDrawParam * CreateDrawParam(const NFmiDataIdent& theIdent
 								   ,const NFmiLevel* theLevel);
@@ -54,6 +54,7 @@ private:
 	std::string itsLoadDirectory;
 	bool fCreateDrawParamFileIfNotExist; // esim. metkun editori luo drawparam-tiedostot, 
 										 // mutta SmarToolFiltterin ei tarvitse.
+	bool fOnePressureLevelDrawParam;
 };
 
 #endif
