@@ -57,6 +57,8 @@ static void InitDrawParam(NFmiDrawParam* theDrawParam, const std::string &theFil
 				{
 					// tiedostoa ei voitu luoda, mitä pitäisi tehdä?
 				}
+				else // koska tiedoston talletus onnistui, laita initFile talteen drawParamiin
+					theDrawParam->InitFileName(theFileName);
 			}
 		}
 	}
