@@ -998,6 +998,14 @@ static bool IsProducerWanted(int theCurrentProdId, int theProducerId1, int thePr
 checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(int theProducerId, int theProducerId2, int theProducerId3, int theProducerId4)
 {
 	checkedVector<NFmiSmartInfo*> infoVector;
+	
+	int currentProdId = 0;
+	if(itsEditedData && itsEditedData->IsGrid() == false) // laitetaan myös mahdollisesti editoitava data, jos kyseessä on asema dataa eli havainto
+	{ 
+		currentProdId = itsEditedData->Producer()->GetIdent();
+		if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
+			infoVector.push_back(itsEditedData);
+	}
 
 	for(Reset(); Next();) // HUOM! tässä ei kiinnosta editoitu data tai sen kopio!!!!
 	{
