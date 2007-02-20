@@ -49,7 +49,6 @@ class NFmiDrawParamFactory;
 class NFmiDrawParamList;
 class NFmiDrawParam;
 class NFmiQueryData;
-class NFmiProducerList;
 class NFmiLevel;
 class NFmiQueryInfo;
 class NFmiLevelBag;
@@ -121,7 +120,6 @@ class NFmiInfoOrganizer
 	bool Clear (void);
 	void ClearData(NFmiInfoData::Type theDataType);
 	void ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData::Type theDataType, const std::string &theFileNamePattern);
- 	NFmiProducerList* ProducerList(void); // k‰y l‰pi kaikki SmartInfot ja pyyt‰‰ ensimm‰iselt‰ parametrilta tuottajan (viel‰ ainakaan SmartInfolla ei ole montaa tuottajaa)
 	NFmiLevelBag* GetAndCreateViewableInfoWithManyLevelsOrZeroPointer(void);
 
 	const std::string& WorkingDirectory(void) const {return itsWorkingDirectory;};
@@ -158,10 +156,8 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* CrossSectionInfo(const NFmiDataIdent& theDataIdent, bool& fSubParameter, NFmiInfoData::Type theType, bool fIgnoreProducerName = false);
     bool Add (NFmiSmartInfo* theInfo);
 	NFmiParamBag GetParams(NFmiInfoData::Type theDataType);
-	NFmiSmartInfo* GetSynopPlotParamInfo( const FmiParameterName& theParam
-										, bool& fSubParameter
-										, const NFmiLevel* theLevel
-										, NFmiInfoData::Type theType);
+	NFmiSmartInfo* GetSynopPlotParamInfo(bool& fSubParameter, NFmiInfoData::Type theType);
+	NFmiSmartInfo* GetSoundingPlotParamInfo(bool& fSubParameter, NFmiInfoData::Type theType);
 	NFmiDrawParam* CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent
 											,const NFmiLevel* theLevel
 											,NFmiInfoData::Type theType);

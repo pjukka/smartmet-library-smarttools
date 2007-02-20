@@ -48,7 +48,6 @@
 #include "NFmiSmartInfo.h"
 #include "NFmiDrawParamFactory.h"
 #include "NFmiDrawParam.h"
-#include "NFmiProducerList.h"
 #include "NFmiGrid.h"
 #include "NFmiQueryDataUtil.h"
 #include "NFmiQueryData.h"
@@ -117,10 +116,7 @@ bool NFmiInfoOrganizer::Init(const std::string &theDrawParamPath, bool createDra
  	return itsDrawParamFactory->Init();
 }
 
-NFmiSmartInfo* NFmiInfoOrganizer::GetSynopPlotParamInfo( const FmiParameterName& theParam
-														, bool& fSubParameter
-														, const NFmiLevel* theLevel
-														, NFmiInfoData::Type theType)
+NFmiSmartInfo* NFmiInfoOrganizer::GetSynopPlotParamInfo(bool& fSubParameter, NFmiInfoData::Type theType)
 {
 	fSubParameter = false;
 	if(theType == NFmiInfoData::kEditable)
@@ -134,6 +130,26 @@ NFmiSmartInfo* NFmiInfoOrganizer::GetSynopPlotParamInfo( const FmiParameterName&
 		{
 			aInfo = aIter.CurrentPtr();
 			if(aInfo->DataType() == theType && aInfo->Producer()->GetIdent() == 1001) // 1001 on synop tuottaja
+				return aInfo;
+		}
+	}
+	return 0;
+}
+
+NFmiSmartInfo* NFmiInfoOrganizer::GetSoundingPlotParamInfo(bool& fSubParameter, NFmiInfoData::Type theType)
+{
+	fSubParameter = false;
+	if(theType == NFmiInfoData::kEditable)
+		return itsEditedData;
+	else
+	{
+		NFmiSmartInfo * aInfo = 0;
+		NFmiPtrList<NFmiSmartInfo>::Iterator aIter = itsList.Start();
+		// tutkitaan ensin lˆytyykˆ theParam suoraan joltain listassa olevalta NFmiSmartInfo-pointterilta
+		while(aIter.Next())
+		{
+			aInfo = aIter.CurrentPtr();
+			if(aInfo->DataType() == theType && aInfo->Producer()->GetIdent() == 1005) // 1005 on sounding tuottaja
 				return aInfo;
 		}
 	}
@@ -162,7 +178,9 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 									   , NFmiInfoData::Type theType)
 {
 	if(theParam == 997) // synop plot paramille pit‰‰ tehd‰ kikka
-		return GetSynopPlotParamInfo(theParam, fSubParameter, theLevel, theType);
+		return GetSynopPlotParamInfo(fSubParameter, theType);
+	if(theParam == 9997) // sounding plot paramille pit‰‰ tehd‰ kikka
+		return GetSoundingPlotParamInfo(fSubParameter, theType);
 	if(theType == NFmiInfoData::kMacroParam || theType >= NFmiInfoData::kSoundingParameterData) // macro- ja sounding parametrit lasketaan samalla periaatteella
 		return itsMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType == NFmiInfoData::kCrossSectionMacroParam)
@@ -215,7 +233,9 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 									   , bool fIgnoreProducerName)
 {
 	if(theDataIdent.GetParamIdent() == 997) // synop plot paramille pit‰‰ tehd‰ kikka
-		return GetSynopPlotParamInfo(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), fSubParameter, theLevel, theType);
+		return GetSynopPlotParamInfo(fSubParameter, theType);
+	if(theDataIdent.GetParamIdent() == 9997) // sounding plot paramille pit‰‰ tehd‰ kikka
+		return GetSoundingPlotParamInfo(fSubParameter, theType);
 	if(theType == NFmiInfoData::kMacroParam || theType >= NFmiInfoData::kSoundingParameterData) // macro- ja sounding parametrit lasketaan samalla periaatteella
 		return itsMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType == NFmiInfoData::kCrossSectionMacroParam)
@@ -615,22 +635,6 @@ bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoDat
 }
 
 //--------------------------------------------------------
-// ProducerList
-//--------------------------------------------------------
-// EI TOIMI TEHTYJEN MUUTOSTEN JƒLKEEN (1999.08.26/Marko), KORJAA!!!
-NFmiProducerList* NFmiInfoOrganizer::ProducerList(void)
-{
-// duplikaattien poisto teht‰v‰ joskus...
-	NFmiProducerList* prodList = new NFmiProducerList;
-	for(Reset();Next();)
-	{
-		NFmiProducer* produ = new NFmiProducer(*(Current()->Param().GetProducer()));
-		prodList->Add(produ);
-	}
-	return prodList;
-}
-
-//--------------------------------------------------------
 // Add
 //--------------------------------------------------------
 //   Laittaa alkuper‰isen pointterin listaan - uutta pointteria
@@ -998,10 +1002,10 @@ static bool IsProducerWanted(int theCurrentProdId, int theProducerId1, int thePr
 checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(int theProducerId, int theProducerId2, int theProducerId3, int theProducerId4)
 {
 	checkedVector<NFmiSmartInfo*> infoVector;
-	
+
 	int currentProdId = 0;
 	if(itsEditedData && itsEditedData->IsGrid() == false) // laitetaan myˆs mahdollisesti editoitava data, jos kyseess‰ on asema dataa eli havainto
-	{ 
+	{
 		currentProdId = itsEditedData->Producer()->GetIdent();
 		if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
 			infoVector.push_back(itsEditedData);
