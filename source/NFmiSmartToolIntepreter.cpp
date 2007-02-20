@@ -1924,8 +1924,11 @@ bool NFmiSmartToolIntepreter::InterpretNextMask(const std::string &theMaskSectio
 
 NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &theParamText)
 {
+	string lowerCaseParamText(theParamText);
+	NFmiStringTools::LowerCase(lowerCaseParamText); // nyky‰‰n itsTokenParameterNamesAndIds pit‰‰ sis‰ll‰‰n vain lower-case nimi‰, joten n‰in sit‰ pit‰‰ myˆs kysy‰
+
 	NFmiParam param;
-	ParamMap::iterator it = itsTokenParameterNamesAndIds.find(theParamText);
+	ParamMap::iterator it = itsTokenParameterNamesAndIds.find(lowerCaseParamText);
 	if(it == itsTokenParameterNamesAndIds.end())
 	{
 		if(!GetParamFromVariableById(theParamText, param))
