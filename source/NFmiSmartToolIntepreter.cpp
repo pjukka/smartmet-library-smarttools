@@ -1341,7 +1341,7 @@ bool NFmiSmartToolIntepreter::IsPossiblyLevelItem(const std::string &theText)
 	catch(...)
 	{
 	}
-	
+
 	if(IsWantedStart(theText, "lev"))
 		return true;
 	return false;
@@ -1924,11 +1924,8 @@ bool NFmiSmartToolIntepreter::InterpretNextMask(const std::string &theMaskSectio
 
 NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &theParamText)
 {
-	string lowerCaseParamText(theParamText);
-	NFmiStringTools::LowerCase(lowerCaseParamText); // nyky‰‰n itsTokenParameterNamesAndIds pit‰‰ sis‰ll‰‰n vain lower-case nimi‰, joten n‰in sit‰ pit‰‰ myˆs kysy‰
-
 	NFmiParam param;
-	ParamMap::iterator it = itsTokenParameterNamesAndIds.find(lowerCaseParamText);
+	ParamMap::iterator it = itsTokenParameterNamesAndIds.find(theParamText);
 	if(it == itsTokenParameterNamesAndIds.end())
 	{
 		if(!GetParamFromVariableById(theParamText, param))
@@ -2203,6 +2200,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elheightsur"), kSoundingParELHeightSur));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("capesur"), kSoundingParCAPESur));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape03kmsur"), kSoundingParCAPE0_3kmSur));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape1040sur"), kSoundingParCAPE_TT_Sur));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cinsur"), kSoundingParCINSur));
 
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lcl500m"), kSoundingParLCL500m));
@@ -2213,6 +2211,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elheight500m"), kSoundingParELHeight500m));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape500m"), kSoundingParCAPE500m));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape03km500m"), kSoundingParCAPE0_3km500m));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape1040500m"), kSoundingParCAPE_TT_500m));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cin500m"), kSoundingParCIN500m));
 
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclmostun"), kSoundingParLCLMostUn));
@@ -2223,6 +2222,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elheightmostun"), kSoundingParELHeightMostUn));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("capemostun"), kSoundingParCAPEMostUn));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape03kmmostun"), kSoundingParCAPE0_3kmMostUn));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape1040mostun"), kSoundingParCAPE_TT_MostUn));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cinmostun"), kSoundingParCINMostUn));
 
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("show"), kSoundingParSHOW));
