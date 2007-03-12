@@ -23,6 +23,7 @@ class NFmiSoundingData
 public:
 	NFmiSoundingData(void){};
 
+	// TODO Fill-metodeille pit‰‰ laittaa haluttu parametri-lista parametriksi (jolla t‰ytet‰‰n sitten dynaamisesti NFmiDataMatrix-otus)
 	bool FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly = false);
 	bool FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName);
 	void CutEmptyData(void); // t‰m‰ leikkaa Fill.. -metodeissa laskettuja data vektoreita niin ett‰ pelk‰t puuttuvat kerrokset otetaan pois
@@ -63,6 +64,8 @@ private:
 	NFmiMetTime	itsTime;
 	NFmiMetTime	itsOriginTime; // t‰m‰ otetaan talteen IsSameSounding-metodia varten
 
+	// TODO Laita k‰ytt‰m‰‰n NFmiDataMatrix-luokkaa dynaamista datalistaa varten. Laita myˆs
+	// param-lista (joka annetaan fillData-metodeissa) data osaksi
 	checkedVector<float> itsTemperatureData;
 	checkedVector<float> itsDewPointData;
 	checkedVector<float> itsPressureData;
