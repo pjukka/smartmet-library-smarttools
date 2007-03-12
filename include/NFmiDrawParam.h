@@ -48,6 +48,7 @@ class NFmiDrawParam
 public:
     NFmiDrawParam (void);
     NFmiDrawParam (const NFmiDataIdent& theParam, const NFmiLevel &theLevel, int thePriority, NFmiInfoData::Type theDataType = NFmiInfoData::kNoDataType);//, NFmiMetEditorCoordinatorMapOptions* theMetEditorCoordinatorMapOptions=0);
+	NFmiDrawParam(const NFmiDrawParam& other);
 	virtual  ~NFmiDrawParam (void);
 
 	void Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawingOptions = false);
@@ -285,6 +286,8 @@ public:
 	void ViewMacroDrawParam(bool newState) {fViewMacroDrawParam = newState;}
 	const std::string& MacroParamRelativePath(void) const {return itsMacroParamRelativePath;}
 	void MacroParamRelativePath(const std::string &newValue) {itsMacroParamRelativePath = newValue;}
+	bool BorrowedParam(void) const {return fBorrowedParam;}
+	void BorrowedParam(bool newValue) {fBorrowedParam = newValue;}
 
 // ---------------------- operators ------------------------
 	bool operator == (const NFmiDrawParam & theDrawParam) const;
@@ -448,6 +451,7 @@ private:
 	bool fViewMacroDrawParam; // is this DrawParam from viewmacro, if it is, then some things are handled
 							  // differently when modifying options, default value is false
 							  // This is not stored in file!
+	bool fBorrowedParam; // onko parametri lainassa vai ei (A-J Punkan vilkutus juttu)
 
 //	NFmiMetEditorCoordinatorMapOptions* itsMetEditorCoordinatorMapOptions; // t‰t‰ k‰ytet‰‰n koordinaatio tarkasteluissa
 };

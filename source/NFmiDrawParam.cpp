@@ -157,6 +157,7 @@ NFmiDrawParam::NFmiDrawParam()
 //********** 'versio 2' parametreja *************
 //***********************************************
 , fViewMacroDrawParam(false)
+, fBorrowedParam(false)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -283,10 +284,133 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 //, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 , itsDataType(theDataType)
 , fViewMacroDrawParam(false)
+, fBorrowedParam(false)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
 }
+
+NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
+: itsParameter(other.itsParameter)
+, itsLevel(other.itsLevel)
+, itsParameterAbbreviation(other.itsParameterAbbreviation)
+, itsPriority(other.itsPriority)
+, itsInitFileName(other.itsInitFileName)
+, itsViewType(other.itsViewType)
+, itsStationDataViewType(other.itsStationDataViewType)
+, itsFrameColor(other.itsFrameColor)
+, itsFillColor(other.itsFillColor)
+, itsIsolineLabelBoxFillColor(other.itsIsolineLabelBoxFillColor)
+, itsRelativeSize(other.itsRelativeSize)
+, itsRelativePositionOffset(other.itsRelativePositionOffset)
+, itsOnlyOneSymbolRelativeSize(other.itsOnlyOneSymbolRelativeSize)
+, itsOnlyOneSymbolRelativePositionOffset(other.itsOnlyOneSymbolRelativePositionOffset)
+, fShowStationMarker(other.fShowStationMarker)
+, itsIsoLineGab(other.itsIsoLineGab)
+, itsModifyingStep(other.itsModifyingStep)
+, fModifyingUnit(other.fModifyingUnit)
+, itsTimeSerialModifyingLimit(other.itsTimeSerialModifyingLimit)
+, itsIsolineColor(other.itsIsolineColor)
+, itsIsolineTextColor(other.itsIsolineTextColor)
+, itsSecondaryIsolineColor(other.itsSecondaryIsolineColor)
+, itsSecondaryIsolineTextColor(other.itsSecondaryIsolineTextColor)
+, fUseSecondaryColors(other.fUseSecondaryColors)
+, itsAbsoluteMinValue(other.itsAbsoluteMinValue)
+, itsAbsoluteMaxValue(other.itsAbsoluteMaxValue)
+, itsTimeSeriesScaleMin(other.itsTimeSeriesScaleMin)
+, itsTimeSeriesScaleMax(other.itsTimeSeriesScaleMax)
+, itsPossibleViewTypeCount(other.itsPossibleViewTypeCount)
+, fShowNumbers(other.fShowNumbers)
+, fShowMasks(other.fShowMasks)
+, fShowColors(other.fShowColors)
+, fShowColoredNumbers(other.fShowColoredNumbers)
+, fZeroColorMean(other.fZeroColorMean)
+//***********************************************
+//********** 'versio 2' parametreja *************
+//***********************************************
+, itsStationSymbolColorShadeLowValue(other.itsStationSymbolColorShadeLowValue)
+, itsStationSymbolColorShadeMidValue(other.itsStationSymbolColorShadeMidValue)
+, itsStationSymbolColorShadeHighValue(other.itsStationSymbolColorShadeHighValue)
+, itsStationSymbolColorShadeLowValueColor(other.itsStationSymbolColorShadeLowValueColor)
+, itsStationSymbolColorShadeMidValueColor(other.itsStationSymbolColorShadeMidValueColor)
+, itsStationSymbolColorShadeHighValueColor(other.itsStationSymbolColorShadeHighValueColor)
+, itsStationSymbolColorShadeClassCount(other.itsStationSymbolColorShadeClassCount)
+, fUseSymbolsInTextMode(other.fUseSymbolsInTextMode)
+, itsUsedSymbolListIndex(other.itsUsedSymbolListIndex)
+, itsSymbolIndexingMapListIndex(other.itsSymbolIndexingMapListIndex)
+, itsGridDataPresentationStyle(other.itsGridDataPresentationStyle)
+, fUseIsoLineFeathering(other.fUseIsoLineFeathering)
+, fIsoLineLabelsOverLapping(other.fIsoLineLabelsOverLapping)
+, fShowColorLegend(other.fShowColorLegend)
+, fUseSimpleIsoLineDefinitions(other.fUseSimpleIsoLineDefinitions)
+, fUseSeparatorLinesBetweenColorContourClasses(other.fUseSeparatorLinesBetweenColorContourClasses)
+, itsSimpleIsoLineGap(other.itsSimpleIsoLineGap)
+, itsSimpleIsoLineZeroValue(other.itsSimpleIsoLineZeroValue)
+, itsSimpleIsoLineLabelHeight(other.itsSimpleIsoLineLabelHeight)
+, fShowSimpleIsoLineLabelBox(other.fShowSimpleIsoLineLabelBox)
+, itsSimpleIsoLineWidth(other.itsSimpleIsoLineWidth)
+, itsSimpleIsoLineLineStyle(other.itsSimpleIsoLineLineStyle)
+, itsIsoLineSplineSmoothingFactor(other.itsIsoLineSplineSmoothingFactor)
+, fUseSingleColorsWithSimpleIsoLines(other.fUseSingleColorsWithSimpleIsoLines)
+, itsSimpleIsoLineColorShadeLowValue(other.itsSimpleIsoLineColorShadeLowValue)
+, itsSimpleIsoLineColorShadeMidValue(other.itsSimpleIsoLineColorShadeMidValue)
+, itsSimpleIsoLineColorShadeHighValue(other.itsSimpleIsoLineColorShadeHighValue)
+, itsSimpleIsoLineColorShadeLowValueColor(other.itsSimpleIsoLineColorShadeLowValueColor)
+, itsSimpleIsoLineColorShadeMidValueColor(other.itsSimpleIsoLineColorShadeMidValueColor)
+, itsSimpleIsoLineColorShadeHighValueColor(other.itsSimpleIsoLineColorShadeHighValueColor)
+, itsSimpleIsoLineColorShadeClassCount(other.itsSimpleIsoLineColorShadeClassCount)
+, itsSpecialIsoLineValues(other.itsSpecialIsoLineValues)
+, itsSpecialIsoLineLabelHeight(other.itsSpecialIsoLineLabelHeight)
+, itsSpecialIsoLineWidth(other.itsSpecialIsoLineWidth)
+, itsSpecialIsoLineStyle(other.itsSpecialIsoLineStyle)
+, itsSpecialIsoLineColorIndexies(other.itsSpecialIsoLineColorIndexies)
+, itsSpecialIsoLineShowLabelBox(other.itsSpecialIsoLineShowLabelBox)
+, fUseDefaultRegioning(other.fUseDefaultRegioning)
+, fUseCustomColorContouring(other.fUseCustomColorContouring)
+, itsSpecialColorContouringValues(other.itsSpecialColorContouringValues)
+, itsSpecialColorContouringColorIndexies(other.itsSpecialColorContouringColorIndexies)
+, itsColorContouringColorShadeLowValue(other.itsColorContouringColorShadeLowValue)
+, itsColorContouringColorShadeMidValue(other.itsColorContouringColorShadeMidValue)
+, itsColorContouringColorShadeHighValue(other.itsColorContouringColorShadeHighValue)
+, itsColorContouringColorShadeLowValueColor(other.itsColorContouringColorShadeLowValueColor)
+, itsColorContouringColorShadeMidValueColor(other.itsColorContouringColorShadeMidValueColor)
+, itsColorContouringColorShadeHighValueColor(other.itsColorContouringColorShadeHighValueColor)
+, itsColorContouringColorShadeClassCount(other.itsColorContouringColorShadeClassCount)
+, fUseWithIsoLineHatch1(other.fUseWithIsoLineHatch1)
+, fDrawIsoLineHatchWithBorders1(other.fDrawIsoLineHatchWithBorders1)
+, itsIsoLineHatchLowValue1(other.itsIsoLineHatchLowValue1)
+, itsIsoLineHatchHighValue1(other.itsIsoLineHatchHighValue1)
+, itsIsoLineHatchType1(other.itsIsoLineHatchType1)
+, itsIsoLineHatchColor1(other.itsIsoLineHatchColor1)
+, itsIsoLineHatchBorderColor1(other.itsIsoLineHatchBorderColor1)
+, fUseWithIsoLineHatch2(other.fUseWithIsoLineHatch2)
+, fDrawIsoLineHatchWithBorders2(other.fDrawIsoLineHatchWithBorders2)
+, itsIsoLineHatchLowValue2(other.itsIsoLineHatchLowValue2)
+, itsIsoLineHatchHighValue2(other.itsIsoLineHatchHighValue2)
+, itsIsoLineHatchType2(other.itsIsoLineHatchType2)
+, itsIsoLineHatchColor2(other.itsIsoLineHatchColor2)
+, itsIsoLineHatchBorderColor2(other.itsIsoLineHatchBorderColor2)
+, itsIsoLineLabelDigitCount(other.itsIsoLineLabelDigitCount)
+//***********************************************
+//********** 'versio 2' parametreja *************
+//***********************************************
+, itsInitFileVersionNumber(other.itsInitFileVersionNumber)
+, fHidden(other.fHidden)
+, fEditedParam(other.fEditedParam)
+, fEditableParam(other.fEditableParam)
+, itsUnit(other.itsUnit)
+, fActive(other.fActive)
+, fShowDifference(other.fShowDifference)
+, fShowDifferenceToOriginalData(other.fShowDifferenceToOriginalData)
+//, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
+, itsDataType(other.itsDataType)
+, fViewMacroDrawParam(other.fViewMacroDrawParam)
+, fBorrowedParam(other.fBorrowedParam)
+{
+	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
+	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
+}
+
 //-------------------------------------------------------
 // ~NFmiDrawParam
 //-------------------------------------------------------
@@ -450,6 +574,7 @@ bool NFmiDrawParam::Init (const std::string& theFilename)
 			in.close();
 			itsInitFileName = theFilename;
 			fViewMacroDrawParam = false;
+			fBorrowedParam = false;
 			return true;
 		}
 	}
