@@ -42,6 +42,140 @@ NFmiTEMPCode::~NFmiTEMPCode(void)
 {
 }
 
+void NFmiTEMPCode::Clear(void)
+{
+	itsOriginalCodeAStr.clear();
+	itsOriginalCodeBStr.clear();
+	itsOriginalCodeCStr.clear();
+	itsOriginalCodeDStr.clear();
+	itsStation = NFmiStation(); // joku dummy asema vain
+	fTempMobil = false;
+	itsLevels.clear();
+}
+
+static void InsertLevelData(std::map<double, TEMPLevelData> &theLevelMap, const TEMPLevelData &theLevelData)
+{
+	theLevelMap.insert(std::make_pair(theLevelData.itsPressure, theLevelData));
+}
+
+// oletus painelevelit (theLevels) ovat 'nousevassa' j‰rjestyksess‰ eli pienenev‰t
+// toisin kuin itse level-data, joiden oletetaan alkavan ylh‰‰lt‰
+void NFmiTEMPCode::ForceWantedPressureLevels(NFmiVPlaceDescriptor &theLevels)
+{
+	size_t levelSize = itsLevels.size();
+	if(levelSize <= 2)
+		return;
+	theLevels.Reset();
+	theLevels.Next();
+	double currentMainLevel = static_cast<double>(theLevels.Level()->LevelValue());
+	std::map<double, TEMPLevelData>::reverse_iterator it = itsLevels.rbegin();
+	std::map<double, TEMPLevelData>::reverse_iterator last = it; // t‰h‰n sijoitetaan edellisen levelin data
+	std::map<double, TEMPLevelData>::reverse_iterator endIt = itsLevels.rend();
+	std::map<double, TEMPLevelData> resultLevels;
+	InsertLevelData(resultLevels, (*last).second); // 1. leveli laitetaan aina
+	int lastTemperatureDir = 0; // jos T laskee, t‰h‰n -1, jos nousee, 1, jos ei alustettu, 0
+	int currentTemperatureDir = 0; // jos T laskee, t‰h‰n -1, jos nousee, 1, jos ei alustettu, 0
+	int minDirCounter = 6;
+	int T_Dircounter = 0;
+	int lastDewPointDir = 0; // jos T laskee, t‰h‰n -1, jos nousee, 1, jos ei alustettu, 0
+	int currentDewPointDir = 0; // jos T laskee, t‰h‰n -1, jos nousee, 1, jos ei alustettu, 0
+	int Td_Dircounter = 0;
+	double lastTZRatio = 0;
+	double currentTZRatio = 0;
+	double lastTdZRatio = 0;
+	double currentTdZRatio = 0;
+	int counter = 0;
+	do
+	{
+		counter++;
+		lastTemperatureDir = currentTemperatureDir;
+		lastDewPointDir = currentDewPointDir;
+		last = it;
+		++it;
+		double p1 = (*last).second.itsPressure;
+		double p2 = (*it).second.itsPressure;
+		if(p1 < currentMainLevel && p2 < currentMainLevel)
+		{ // molemmat kerrokset ovat jo ylemp‰n‰ kuin etsitty main level, etsit‰‰n sellainen main level, mik‰ ei ole molempien yl‰puolella
+			do
+			{
+				if(theLevels.Next() == false)
+					break;
+				currentMainLevel = static_cast<double>(theLevels.Level()->LevelValue());
+			}while(p1 < currentMainLevel && p2 < currentMainLevel);
+		}
+
+		if(p1 >= currentMainLevel && p2 <= currentMainLevel)
+		{ // nyt etsitty main level on leveleiden v‰liss‰. katsotaan kumpi on l‰hemp‰n‰ ja muutetaan se tarvittaessa halutuksi leveliksi
+			if(p1 == currentMainLevel || p1 == currentMainLevel)
+			{ // ei tarvitse muuta kuin alkaa etsim‰‰n seuraavaa leveli‰
+			}
+			else
+			{
+				double diff1 = ::fabs(currentMainLevel-p1);
+				double diff2 = ::fabs(currentMainLevel-p2);
+				if(diff1 < diff2)
+				{
+					(*last).second.itsPressure = currentMainLevel;
+					InsertLevelData(resultLevels, (*last).second);
+				}
+				else
+				{
+					(*it).second.itsPressure = currentMainLevel;
+					InsertLevelData(resultLevels, (*it).second);
+				}
+			}
+			theLevels.Next();
+			currentMainLevel = static_cast<double>(theLevels.Level()->LevelValue());
+		}
+		double z1 = (*last).second.itsHeight;
+		int zFix = static_cast<int>(z1/1000.);
+		double z2 = (*it).second.itsHeight;
+		double T1 = (*last).second.itsTemperature;
+		double T2 = (*it).second.itsTemperature;
+		T_Dircounter++;
+		if(T1 >= T2)
+			currentTemperatureDir = -1;
+		else
+			currentTemperatureDir = 1;
+		if(lastTemperatureDir != currentTemperatureDir && T_Dircounter > minDirCounter+zFix)
+		{
+			T_Dircounter = 0;
+			InsertLevelData(resultLevels, (*last).second); // jos l‰mpˆtilan suunta vaihtuu, laitetaan leveli talteen
+		}
+
+		double Td1 = (*last).second.itsDewPoint;
+		double Td2 = (*it).second.itsDewPoint;
+		Td_Dircounter++;
+		if(Td1 >= Td2)
+			currentDewPointDir = -1;
+		else
+			currentDewPointDir = 1;
+		if(lastDewPointDir != currentDewPointDir && Td_Dircounter > (minDirCounter+zFix)*3)
+		{
+			Td_Dircounter = 0;
+			InsertLevelData(resultLevels, (*last).second); // jos kastepisteen suunta vaihtuu, laitetaan leveli talteen
+		}
+		if(z1 != z2)
+		{
+			currentTZRatio = (T2-T1)/(z2-z1);
+			if(::fabs(currentTZRatio - lastTZRatio) > 0.22)
+			{
+				InsertLevelData(resultLevels, (*last).second); // jos l‰mpˆtilan 'kulmakerroin' muuttuu tarpeeksi, laitetaan leveli talteen
+				lastTZRatio = currentTZRatio;
+			}
+			currentTdZRatio = (Td2-Td1)/(z2-z1);
+			if(::fabs(currentTdZRatio - lastTdZRatio) > 0.22)
+			{
+				InsertLevelData(resultLevels, (*last).second); // jos l‰mpˆtilan 'kulmakerroin' muuttuu tarpeeksi, laitetaan leveli talteen
+				lastTdZRatio = currentTdZRatio;
+			}
+		}
+
+	}while(it != endIt);
+	InsertLevelData(resultLevels, (*it).second); // viimeinen leveli laitetaan aina
+	itsLevels = resultLevels;
+}
+
 // Saa A,B,C ja D koodit. Tarkistaa ne ja purkaa. Palauttaa luvun, joka kertoo kuinka monta
 // osaa kelpasi (eli oli samalta asemalta, samaan aikaan jne. )
 int NFmiTEMPCode::InsertCodeStrings(const std::string &theCodeAStr, const std::string &theCodeBStr, const std::string &theCodeCStr, const std::string &theCodeDStr, bool fNoEqualSignInCode)
@@ -913,9 +1047,15 @@ NFmiQueryData* DecodeTEMP::MakeNewDataFromTEMPStr(const std::string &theTEMPStr,
 		i += decodeCount; // edet‰‰n purettujen blokkien m‰‰r‰n verran eteenp‰in
 	}
 
-	NFmiQueryData *newData = 0;
+	NFmiQueryData *newData = DecodeTEMP::CreateNewQData(tempCodeVec, theWantedProducer);
+	theCheckReportStr = MakeCheckReport(newData, errorCount, tempCodeVec.size());
+	return newData;
+}
 
-	NFmiQueryInfo* innerInfo = MakeNewInnerInfoForTEMP(tempCodeVec, theWantedProducer);
+NFmiQueryData* DecodeTEMP::CreateNewQData(std::vector<NFmiTEMPCode> &theTempCodeVec, const NFmiProducer &theWantedProducer)
+{
+	NFmiQueryData *newData = 0;
+	NFmiQueryInfo* innerInfo = MakeNewInnerInfoForTEMP(theTempCodeVec, theWantedProducer);
 	std::auto_ptr<NFmiQueryInfo> innerInfoPtr(innerInfo);
 	if(innerInfo)
 	{
@@ -924,19 +1064,17 @@ NFmiQueryData* DecodeTEMP::MakeNewDataFromTEMPStr(const std::string &theTEMPStr,
 		{ // sitten t‰ytet‰‰n uusi data
 			NFmiFastQueryInfo infoIter(newData);
 
-			std::vector<NFmiTEMPCode>::iterator it = tempCodeVec.begin();
-			std::vector<NFmiTEMPCode>::iterator endIt = tempCodeVec.end();
+			std::vector<NFmiTEMPCode>::iterator it = theTempCodeVec.begin();
+			std::vector<NFmiTEMPCode>::iterator endIt = theTempCodeVec.end();
 			for(; it != endIt; ++it)
 			{
 				const NFmiTEMPCode &tempCode = *it;
 				if(infoIter.Time(tempCode.Time()))
 				{
-					if(infoIter.Location(tempCode.Station().GetName()))
+//					if(infoIter.Location(tempCode.Station().GetName()))
+					if(infoIter.Location(tempCode.Station().GetLocation()))
 					{
-//						const std::vector<TEMPLevelData> &levelData = tempCode.LevelData();
 						const std::map<double, TEMPLevelData> &levelData = tempCode.LevelData();
-//						std::vector<TEMPLevelData>::const_iterator levelIt = levelData.begin();
-//						std::vector<TEMPLevelData>::const_iterator endLevelIt = levelData.end();
 						std::map<double, TEMPLevelData>::const_iterator levelIt = levelData.begin();
 						std::map<double, TEMPLevelData>::const_iterator endLevelIt = levelData.end();
 						infoIter.FirstLevel();
@@ -955,7 +1093,6 @@ NFmiQueryData* DecodeTEMP::MakeNewDataFromTEMPStr(const std::string &theTEMPStr,
 							infoIter.Param(kFmiWindSpeedMS);
 							infoIter.FloatValue(static_cast<float>((*levelIt).second.itsWS));
 
-
 							infoIter.NextLevel();
 						}
 					}
@@ -963,8 +1100,6 @@ NFmiQueryData* DecodeTEMP::MakeNewDataFromTEMPStr(const std::string &theTEMPStr,
 			}
 		}
 	}
-	theCheckReportStr = MakeCheckReport(newData, errorCount, tempCodeVec.size());
-
 	return newData;
 }
 
@@ -998,9 +1133,9 @@ Esimerkki RAW TEMP ja siit‰ tehty lista (luulen ett‰ sit‰ on t‰ytetty joissain k
 
 -----------------------------------------------------------------------------
    PRES   HGHT   TEMP   DWPT   RELH   MIXR   DRCT   SKNT   THTA   THTE   THTV
-    hPa     m      C      C      %    g/kg    deg   knot     K      K      K 
+    hPa     m      C      C      %    g/kg    deg   knot     K      K      K
 -----------------------------------------------------------------------------
- 1000.0     38                                                               
+ 1000.0     38
   992.0    103    1.6    0.8     94   4.11    240      5  275.4  286.7  276.1
   954.0    415   -1.5   -1.9     97   3.50    243      7  275.3  285.1  275.9
   925.0    660   -3.1   -3.8     95   3.13    245      9  276.1  284.9  276.7
@@ -1082,5 +1217,5 @@ Esimerkki RAW TEMP ja siit‰ tehty lista (luulen ett‰ sit‰ on t‰ytetty joissain k
    36.8  22312  -48.1  -82.1      1   0.01    217     33  578.1  578.3  578.1
    36.0  22456  -48.5  -82.4      1   0.01    205     34  580.8  580.9  580.8
    30.2  23604  -51.5  -84.5      1   0.01    234     42  602.5  602.6  602.5
-   30.0                                       235     42                     
+   30.0                                       235     42
 */
