@@ -235,7 +235,7 @@ double CalcEs(double T)
 double CalcEs2(double Tcelsius)
 {
 	const double b = 17.2694;
-	const double e0 = 6.11; // 6.11 <- 0.611 [kPa] 
+	const double e0 = 6.11; // 6.11 <- 0.611 [kPa]
 	const double T1 = 273.16; // [K]
 	const double T2 = 35.86; // [K]
 
@@ -378,7 +378,7 @@ double CalcMoistT(double T, double P)
 		double AOS0 = OS(moistT0, 1000.);
 		double ATSA0  = TSA(AOS0, P);
 		double diff0 = ATSA0 - T;
-		if(::fabs(diff0) < minDiff) 
+		if(::fabs(diff0) < minDiff)
 		{ // jos laskettu lämpötila oli tarpeeksi lähellä annettua, laitetaan arvo talteen
 			minDiff = ::fabs(diff0);
 			minDiffMoistT = moistT0;
@@ -418,7 +418,7 @@ double CalcTOfLiftedAirParcel(double T, double Td, double fromP, double toP)
 				double Tparcel_LCL = Tpot2t(TpotStart, lclPressure);
 				// laske kyseiselle korkeudelle vastaava kostea-adiapaatti arvo
 				double TmoistLCL = CalcMoistT(Tparcel_LCL, lclPressure);
-				// kyseinen kostea-adiapaatti pitää konvertoida vielä (ADL-kielestä kopioitua koodia, ks. OS- ja 
+				// kyseinen kostea-adiapaatti pitää konvertoida vielä (ADL-kielestä kopioitua koodia, ks. OS- ja
 				// TSA-funtioita) jotenkin 1000 mb:hen.
 				if(TmoistLCL != kFloatMissing)
 				{
@@ -456,7 +456,7 @@ double CalcSHOWIndex(NFmiSoundingData &theData)
 // LIFT Lifted index
 // LIFT	= T500 - Tparcel
 // T500 = temperature in Celsius of the environment at 500 mb
-// Tparcel = 500 mb temperature in Celsius of a lifted parcel with the average pressure, 
+// Tparcel = 500 mb temperature in Celsius of a lifted parcel with the average pressure,
 //			 temperature, and dewpoint of the layer 500 m above the surface.
 double CalcLIFTIndex(NFmiSoundingData &theData)
 {
@@ -595,8 +595,8 @@ bool GetValuesNeededInLCLCalculations(NFmiSoundingData &theData, FmiLCLCalcType 
 double CalcLCLPressureLevel(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType)
 {
 	// 1. calc T,Td,P values from 500 m layer avg or surface values
-	double T=kFloatMissing, 
-		   Td=kFloatMissing, 
+	double T=kFloatMissing,
+		   Td=kFloatMissing,
 		   P=kFloatMissing;
 	if(!GetValuesNeededInLCLCalculations(theData, theLCLCalcType, T, Td, P))
 		return kFloatMissing;
@@ -619,14 +619,14 @@ double CalcLCLHeightIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcTy
 // Claculates LFC (Level of Free Convection)
 // which is the level above which the lifted parcel is warmer than environment
 // parcel is avg from 500 m layer at surface
-// HUOM! Lisäsin myös EL laskun eli EL on korkeus millä nostettu ilmapaketti muuttuu 
+// HUOM! Lisäsin myös EL laskun eli EL on korkeus millä nostettu ilmapaketti muuttuu
 // jälleen kylmemmäksi kuin ympäristö (jos se koskaan oli lämpimämpää)
 // Tiedän tämä on ikävä kaksi vastuuta yhdellä metodilla, joista toinen ei edes näy metodin nimessä.
 double CalcLFCIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double &EL)
 {
 	// 1. calc T,Td,P values from 500 m layer avg or surface values
-	double T=kFloatMissing, 
-		   Td=kFloatMissing, 
+	double T=kFloatMissing,
+		   Td=kFloatMissing,
 		   P=kFloatMissing;
 	if(!GetValuesNeededInLCLCalculations(theData, theLCLCalcType, T, Td, P))
 		return kFloatMissing;
@@ -666,7 +666,7 @@ double CalcLFCIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, do
 		}
 	}
 	if(foundPValue != kFloatMissing && LCLValue < foundPValue)
-		foundPValue = LCLValue; // LFC:n pitää olla ainakin LCL korkeudessa tai korkeammalla eli kun paineesta kysymys LCL >= LFC 
+		foundPValue = LCLValue; // LFC:n pitää olla ainakin LCL korkeudessa tai korkeammalla eli kun paineesta kysymys LCL >= LFC
 	return foundPValue;
 }
 
@@ -683,8 +683,8 @@ double CalcLFCHeightIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcTy
 double CalcCAPE500Index(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double theHeightLimit)
 {
 	// 1. calc T,Td,P values from 500 m layer avg or surface values
-	double T=kFloatMissing, 
-		   Td=kFloatMissing, 
+	double T=kFloatMissing,
+		   Td=kFloatMissing,
 		   P=kFloatMissing;
 	if(!GetValuesNeededInLCLCalculations(theData, theLCLCalcType, T, Td, P))
 		return kFloatMissing;
@@ -710,6 +710,8 @@ double CalcCAPE500Index(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType
 		{
 			if(tValues[i] != kFloatMissing) // kaikilla painepinnoilla ei ole lämpötilaa
 			{
+// !!!!!!!!		if((Tlow != kFloatMissing && Tlow > tValues[i]) || (Thigh != kFloatMissing && Thigh < tValues[i]))
+//					continue;
 				double TofLiftedParcer = CalcTOfLiftedAirParcel(T, Td, P, pValues[i]);
 				currentZ = theData.GetValueAtPressure(kFmiGeomHeight, pValues[i]); // interpoloidaan jos tarvis
 
@@ -731,13 +733,61 @@ double CalcCAPE500Index(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType
 	return CAPE;
 }
 
+// Calculates CAPE in layer between two temperatures given
+double CalcCAPE_TT_Index(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double Thigh, double Tlow)
+{
+	// 1. calc T,Td,P values from 500 m layer avg or surface values
+	double T=kFloatMissing,
+		   Td=kFloatMissing,
+		   P=kFloatMissing;
+	if(!GetValuesNeededInLCLCalculations(theData, theLCLCalcType, T, Td, P))
+		return kFloatMissing;
+
+	checkedVector<float> &pValues = theData.GetParamData(kFmiPressure);
+	checkedVector<float> &tValues = theData.GetParamData(kFmiTemperature);
+	int ssize = pValues.size();
+	double CAPE = 0;
+	double g = 9.81; // acceleration by gravity
+	double Tparcel = 0;
+	double Tenvi = 0;
+	double currentZ = 0;
+	double lastZ = kFloatMissing;
+	double deltaZ = kFloatMissing;
+    double TK=273.15;
+	for(int i = 0; i < ssize; i++)
+	{
+		if(pValues[i] != kFloatMissing && pValues[i] < P) // aloitetaan LFC etsintä vasta 'aloitus' korkeuden jälkeen
+		{
+			if(tValues[i] != kFloatMissing) // kaikilla painepinnoilla ei ole lämpötilaa
+			{
+				currentZ = theData.GetValueAtPressure(kFmiGeomHeight, pValues[i]); // interpoloidaan jos tarvis
+				if(Tlow < tValues[i] && Thigh > tValues[i])
+				{
+					double TofLiftedParcer = CalcTOfLiftedAirParcel(T, Td, P, pValues[i]);
+
+					// integrate here if T parcel is greater than T environment
+					if(TofLiftedParcer > tValues[i] && currentZ != kFloatMissing && lastZ != kFloatMissing)
+					{
+						Tparcel = TofLiftedParcer + TK;
+						Tenvi = tValues[i] + TK;
+						deltaZ = currentZ - lastZ;
+						CAPE += g * deltaZ * ((Tparcel - Tenvi)/Tenvi);
+					}
+				}
+				lastZ = currentZ;
+			}
+		}
+	}
+	return CAPE;
+}
+
 // Calculates CIN
 // first layer of negative (TP - TE (= T-parcel - T-envi)) unless its the last also
 double CalcCINIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType)
 {
 	// 1. calc T,Td,P values from 500 m layer avg or surface values
-	double T=kFloatMissing, 
-		   Td=kFloatMissing, 
+	double T=kFloatMissing,
+		   Td=kFloatMissing,
 		   P=kFloatMissing;
 	if(!GetValuesNeededInLCLCalculations(theData, theLCLCalcType, T, Td, P))
 		return kFloatMissing;
@@ -838,18 +888,18 @@ Some tips here on how tyo calculate storm-relative helciity
 
 How to calculate storm-relative helicity
 
-Integrate the following from p = p_surface to p = p_top (or in case of height coordinates from h_surface to h_top): 
+Integrate the following from p = p_surface to p = p_top (or in case of height coordinates from h_surface to h_top):
 
 storm_rel_helicity -= ((u_ID-u[p])*(v[p]-v[p+1]))-((v_ID - v[p])*(u[p]-u[p+1]));
 
-Here, u_ID and v_ID are the forecast storm motion vectors calculated with the so-called ID-method. These can be calculated as follows: 
+Here, u_ID and v_ID are the forecast storm motion vectors calculated with the so-called ID-method. These can be calculated as follows:
 
 where
 
 /average wind
-u0_6 = average 0_6 kilometer u-wind component 
+u0_6 = average 0_6 kilometer u-wind component
 v0_6 = average 0_6 kilometer v-wind component
-(you should use a pressure-weighted average in case you work with height coordinates) 
+(you should use a pressure-weighted average in case you work with height coordinates)
 
 /shear
 shr_0_6_u = u_6km - u_surface;
@@ -860,7 +910,7 @@ shr_0_6_u_n = shr_0_6_u / ((shr_0_6_u^2 + shr_0_6_v^2)**0.5);
 shr_0_6_v_n = shr_0_6_v / ((shr_0_6_u^2 + shr_0_6_v^2)** 0.5);
 
 /id-vector components
-u_ID = u0_6 + shr_0_6_v_n * 7.5; 
+u_ID = u0_6 + shr_0_6_v_n * 7.5;
 v_ID = v0_6 - shr_0_6_u_n * 7.5;
 
 (7.5 are meters per second... watch out when you work with knots instead)
@@ -1085,7 +1135,7 @@ double FindNearestW(double T, double P)
 		double w0 = FindRoot(w1, w2, diff1, diff2);
 		double t0 = TMR(w0, P);
 		double diff0 = t0 - T;
-		if(::fabs(diff0) < minDiff) 
+		if(::fabs(diff0) < minDiff)
 		{ // jos laskettu lämpötila oli tarpeeksi lähellä annettua, laitetaan arvo talteen
 			minDiff = ::fabs(diff0);
 			minDiffW = w0;

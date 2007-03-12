@@ -102,6 +102,9 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 	case kSoundingParCAPE0_3kmSur:
 		value = CalcCAPE500Index(theSoundingData, kLCLCalcSurface, 3000);
 		break;
+	case kSoundingParCAPE_TT_Sur:
+		value = CalcCAPE_TT_Index(theSoundingData, kLCLCalcSurface, -10, -40);
+		break;
 	case kSoundingParCINSur:
 		value = CalcCINIndex(theSoundingData, kLCLCalcSurface);
 		break;
@@ -119,6 +122,9 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 	case kSoundingParCAPE0_3km500m:
 		value = CalcCAPE500Index(theSoundingData, kLCLCalc500m2, 3000);
 		break;
+	case kSoundingParCAPE_TT_500m:
+		value = CalcCAPE_TT_Index(theSoundingData, kLCLCalc500m2, -10, -40);
+		break;
 	case kSoundingParCIN500m:
 		value = CalcCINIndex(theSoundingData, kLCLCalc500m2);
 		break;
@@ -135,6 +141,9 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 		break;
 	case kSoundingParCAPE0_3kmMostUn:
 		value = CalcCAPE500Index(theSoundingData, kLCLCalcMostUnstable, 3000);
+		break;
+	case kSoundingParCAPE_TT_MostUn:
+		value = CalcCAPE_TT_Index(theSoundingData, kLCLCalcMostUnstable, -10, -40);
 		break;
 	case kSoundingParCINMostUn:
 		value = CalcCINIndex(theSoundingData, kLCLCalcMostUnstable);

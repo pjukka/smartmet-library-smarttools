@@ -40,6 +40,7 @@ typedef enum
 	kSoundingParLCLHeightSur,
 	kSoundingParLFCHeightSur,
 	kSoundingParELHeightSur,
+	kSoundingParCAPE_TT_Sur, // cape -10 ja -40 asteen kerroksen läpi
 	// sitten 500m arvojen avulla lasketut parametrit
 	kSoundingParLCL500m = 4730,
 	kSoundingParLFC500m,
@@ -50,6 +51,7 @@ typedef enum
 	kSoundingParLCLHeight500m,
 	kSoundingParLFCHeight500m,
 	kSoundingParELHeight500m,
+	kSoundingParCAPE_TT_500m, // cape -10 ja -40 asteen kerroksen läpi
 	// sitten mostunstable (MostUn) arvojen avulla lasketut parametrit
 	kSoundingParLCLMostUn = 4740,
 	kSoundingParLFCMostUn,
@@ -60,6 +62,7 @@ typedef enum
 	kSoundingParLCLHeightMostUn,
 	kSoundingParLFCHeightMostUn,
 	kSoundingParELHeightMostUn,
+	kSoundingParCAPE_TT_MostUn, // cape -10 ja -40 asteen kerroksen läpi
 	// sitten normaaleja yleis indeksejä
 	kSoundingParSHOW = 4750,
 	kSoundingParLIFT,
