@@ -4,6 +4,8 @@
 #include "NFmiArea.h"
 #include "NFmiAreaFactory.h"
 #include "NFmiStereographicArea.h"
+#include "NFmiSettings.h"
+#include "NFmiFileString.h"
 
 using namespace std;
 
@@ -255,5 +257,122 @@ void NFmiHelpDataInfoSystem::AddDynamic(const NFmiHelpDataInfo &theInfo)
 void NFmiHelpDataInfoSystem::AddStatic(const NFmiHelpDataInfo &theInfo)
 {
 	itsStaticHelpDataInfos.push_back(theInfo);
+}
+
+bool NFmiHelpDataInfoSystem::Init(const std::string &theBaseNameSpaceStr, std::string theHelpEditorFileNameFilter)
+{
+	string rootKey = theBaseNameSpaceStr + "::RootDir";
+	string rootDir = NFmiSettings::Optional(rootKey.c_str(), string(""));
+	RootDirectory(rootDir);
+	bool useRootDir = rootDir.empty() == false;
+
+	// Read static helpdata configurations
+	string staticBaseKey = theBaseNameSpaceStr + "::Static";
+	string staticFileFilterKey = staticBaseKey + "::%s::FilenameFilter";
+	string staticDataTypeKey = staticBaseKey + "::%s::DataType";
+	string staticProducerKey = staticBaseKey + "::%s::ProducerId";
+	
+	char key1[128], key2[128];
+	std::vector<std::string> stats = NFmiSettings::ListChildren(staticBaseKey.c_str());
+	std::vector<std::string>::iterator statiter = stats.begin();
+	while (statiter != stats.end())
+	{
+		std::string stat(*statiter);
+		sprintf(key1, staticFileFilterKey.c_str(), stat.c_str());
+		if (NFmiSettings::IsSet(key1))
+		{
+			// Read configuration
+			NFmiHelpDataInfo hdi;
+			hdi.FileNameFilter(NFmiSettings::Require<std::string>(key1));
+			sprintf(key1, staticDataTypeKey.c_str(), stat.c_str()); // Datatype
+			NFmiInfoData::Type datatype = static_cast<NFmiInfoData::Type> (NFmiSettings::Optional<int>(key1, 0));
+			hdi.DataType(datatype);
+			sprintf(key1, staticProducerKey.c_str(), stat.c_str()); // (Fake) Producer ID
+			hdi.FakeProducerId(NFmiSettings::Optional<int>(key1, 0));
+
+			AddStatic(hdi);
+		}
+
+		statiter++;
+	}
+
+	// Read dynamic helpdata configurations
+	string dynamicBaseKey = theBaseNameSpaceStr + "::Dynamic";
+	string dynamicFileFilterKey = dynamicBaseKey + "::%s::FilenameFilter";
+	string dynamicDataTypeKey = dynamicBaseKey + "::%s::DataType";
+	string dynamicProducerKey = dynamicBaseKey + "::%s::ProducerId";
+	string dynamicImageProjectionKey = dynamicBaseKey + "::%s::ImageProjection";
+	string dynamicParameterNameKey = dynamicBaseKey + "::%s::ParameterName";
+	string dynamicParameterIdKey = dynamicBaseKey + "::%s::ParameterId";
+
+	std::vector<std::string> dyns = NFmiSettings::ListChildren(dynamicBaseKey.c_str());
+	std::vector<std::string>::iterator dyniter = dyns.begin();
+	while (dyniter != dyns.end())
+	{
+		std::string dyn(*dyniter);
+		sprintf(key1, dynamicFileFilterKey.c_str(), dyn.c_str());
+		if (NFmiSettings::IsSet(key1))
+		{
+			// Read configuration
+			NFmiHelpDataInfo hdi;
+			string tmpFileNameFilter = NFmiSettings::Require<std::string>(key1);
+			if(useRootDir)
+			{
+				NFmiFileString fileStr(tmpFileNameFilter);
+				fileStr.NormalizeDelimiter();
+				unsigned long bs1 = 1; // V***n MSVC k‰‰nt‰j‰ ei p‰‰st‰ muuten l‰pi
+				unsigned long bs2 = 2;
+				// T‰m‰ kikkailu on sit‰ varten ett‰ helpdata-tiedostossa on k‰ytetty
+				// ./alkuisia suhteellisia polkuja, joita halutaan k‰ytt‰‰ vaikka rootti-dir onkin m‰‰ritelty!!!
+				if(fileStr.IsAbsolutePath() == false && (fileStr.GetLen() > 2 && fileStr[bs1] != '.' && fileStr[bs2] != kFmiDirectorySeparator))
+				{
+					NFmiFileString finalFileStr(rootDir);
+					finalFileStr.NormalizeDelimiter();
+					if(finalFileStr[finalFileStr.GetLen()] != kFmiDirectorySeparator)
+						finalFileStr += kFmiDirectorySeparator;
+					finalFileStr += tmpFileNameFilter;
+
+					tmpFileNameFilter = (char*)finalFileStr;
+				}
+			}
+	//		hdi.FileNameFilter(NFmiSettings::Require<std::string>(key1));
+			hdi.FileNameFilter(tmpFileNameFilter);
+			sprintf(key1, dynamicDataTypeKey.c_str(), dyn.c_str()); // Datatype
+			NFmiInfoData::Type datatype = static_cast<NFmiInfoData::Type> (NFmiSettings::Optional<int>(key1, 0));
+			hdi.DataType(datatype);
+			sprintf(key1, dynamicProducerKey.c_str(), dyn.c_str()); // (Fake) Producer ID
+			hdi.FakeProducerId(NFmiSettings::Optional<int>(key1, 0));
+			sprintf(key1, dynamicImageProjectionKey.c_str(), dyn.c_str()); // Image projection
+			if (NFmiSettings::IsSet(key1))
+			{
+				NFmiArea *area = NFmiAreaFactory::Create(NFmiSettings::Require<std::string>(key1)).release();
+				hdi.ImageArea(area);
+			}
+			sprintf(key1, dynamicParameterIdKey.c_str(), dyn.c_str()); // Parameter ID
+			sprintf(key2, dynamicParameterNameKey.c_str(), dyn.c_str()); // Parameter name
+			if (NFmiSettings::IsSet(key1) && NFmiSettings::IsSet(key2))
+			{
+				NFmiDataIdent ident(
+					NFmiParam(NFmiSettings::Require<int>(key1), NFmiSettings::Require<std::string>(key2)),
+					hdi.FakeProducerId());
+				hdi.ImageDataIdent(ident);
+			}
+
+			AddDynamic(hdi);
+		}
+
+		dyniter++;
+	}
+
+	// Lis‰t‰‰n help editor mode datan luku jos niin on haluttu
+	if(theHelpEditorFileNameFilter.empty() == false)
+	{
+		NFmiHelpDataInfo helpDataInfo;
+		helpDataInfo.FileNameFilter(theHelpEditorFileNameFilter);
+		helpDataInfo.DataType(NFmiInfoData::kEditingHelpData);
+		AddDynamic(helpDataInfo);
+	}
+
+	return true;
 }
 
