@@ -1,28 +1,28 @@
 //**********************************************************
-// C++ Class Name : NFmiDrawParamList 
+// C++ Class Name : NFmiDrawParamList
 // ---------------------------------------------------------
 // Filetype: (SOURCE)
-// Filepath: D:/projekti/GDPro/GDTemp/NFmiDrawParamList.cpp 
-// 
-// 
-// GDPro Properties 
+// Filepath: D:/projekti/GDPro/GDTemp/NFmiDrawParamList.cpp
+//
+//
+// GDPro Properties
 // ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 2.1.4 ) 
-//  - GD System Name    : Met-editor Plan 2 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : Markon ehdotus 
-// ---------------------------------------------------  
-//  Author         : pietarin 
-//  Creation Date  : Thur - Jan 28, 1999 
-// 
-// 
-//  Description: 
-//   Voi olla että tässä riittää suoraan uuden 
+//  - GD Symbol Type    : CLD_Class
+//  - GD Method         : UML ( 2.1.4 )
+//  - GD System Name    : Met-editor Plan 2
+//  - GD View Type      : Class Diagram
+//  - GD View Name      : Markon ehdotus
+// ---------------------------------------------------
+//  Author         : pietarin
+//  Creation Date  : Thur - Jan 28, 1999
+//
+//
+//  Description:
+//   Voi olla että tässä riittää suoraan uuden
 //   template lista luokan ilmentymä.
-// 
-//  Change Log: 
-// 
+//
+//  Change Log:
+//
 //**********************************************************
 #ifdef WIN32
 #pragma warning(disable : 4786 4512) // poistaa n kpl VC++ kääntäjän "liian pitkä tyyppi nimi" varoitusta
@@ -39,7 +39,8 @@
 NFmiDrawParamList::NFmiDrawParamList(void):
 itsList(),
 itsIter(itsList.Start()),
-fDirtyList(true)
+fDirtyList(true),
+fHasBorrowedParams(false)
 {
 }
 
@@ -52,7 +53,7 @@ NFmiDrawParamList::~NFmiDrawParamList(void)
 }
 
 //--------------------------------------------------------
-// Add 
+// Add
 //--------------------------------------------------------
 bool NFmiDrawParamList::Add (NFmiDrawParam* theParam)
 {
@@ -73,7 +74,7 @@ bool NFmiDrawParamList::Add (NFmiDrawParam* theParam)
 	return false;
 }
 //--------------------------------------------------------
-// Add 
+// Add
 //--------------------------------------------------------
 bool NFmiDrawParamList::Add(NFmiDrawParam * theParam, unsigned long theIndex)
 {
@@ -88,15 +89,39 @@ bool NFmiDrawParamList::Add(NFmiDrawParam * theParam, unsigned long theIndex)
    }
    return false;
 }
+
+// ottaa toiselta listalta parametrit lainaan (tekee kopiot, mutta merkitää lainatuiksi)
+void NFmiDrawParamList::BorrowParams(NFmiDrawParamList &theList)
+{
+	for(theList.Reset(); theList.Next(); )
+	{
+		NFmiDrawParam *tmp = new NFmiDrawParam(*(theList.Current()));
+		tmp->BorrowedParam(true);
+		Add(tmp);
+		HasBorrowedParams(true);
+	}
+}
+
+// poistaa listasta lainatut parametrit
+void NFmiDrawParamList::ClearBorrowedParams(void)
+{
+	for(Reset(); Next(); )
+	{
+		if(Current()->BorrowedParam())
+			Remove(true);
+	}
+	HasBorrowedParams(false);
+}
+
 //--------------------------------------------------------
-// Current 
+// Current
 //--------------------------------------------------------
 NFmiDrawParam* NFmiDrawParamList::Current (void)
 {
 	return itsIter.CurrentPtr();
 }
 //--------------------------------------------------------
-// Reset 
+// Reset
 //--------------------------------------------------------
 bool NFmiDrawParamList::Reset (void)
 {
@@ -104,21 +129,21 @@ bool NFmiDrawParamList::Reset (void)
    return true;
 }
 //--------------------------------------------------------
-// Next 
+// Next
 //--------------------------------------------------------
 bool NFmiDrawParamList::Next (void)
 {
    return itsIter.Next();
 }
 //--------------------------------------------------------
-// Previous 
+// Previous
 //--------------------------------------------------------
 bool NFmiDrawParamList::Previous (void)
 {
    return itsIter.Previous();
 }
 //--------------------------------------------------------
-// Clear 
+// Clear
 //--------------------------------------------------------
 void NFmiDrawParamList::Clear(bool fDeleteData)
 {
@@ -126,7 +151,7 @@ void NFmiDrawParamList::Clear(bool fDeleteData)
 	fDirtyList = true;
 }
 //--------------------------------------------------------
-// Remove 
+// Remove
 //--------------------------------------------------------
 bool NFmiDrawParamList::Remove(bool fDeleteData)
 {
@@ -167,7 +192,7 @@ bool NFmiDrawParamList::Find(NFmiDrawParam* item)
 //--------------------------------------------------------
 void NFmiDrawParamList::Update(void)
 {
-	
+
 }
 
 void NFmiDrawParamList::HideAllParams(bool newState)
@@ -322,7 +347,7 @@ struct ParamIdLevelSearcher
 	std::pair<int, NFmiLevel> itsSearchPair;
 }
 */
-/*! 
+/*!
  * Poistaa listalta kaikki halutun tuottajan ja mahd. annetun levelin parametrit.
  * Ei poista niitä parametreja, jotka ovat theParamIdsNotRemoved-listalla. Löy-
  * tynyt paramId poistetaan theParamIdsNotRemoved-listalta, että niitä ei

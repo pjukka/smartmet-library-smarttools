@@ -1,31 +1,31 @@
 //**********************************************************
-// C++ Class Name : NFmiDrawParamList 
+// C++ Class Name : NFmiDrawParamList
 // ---------------------------------------------------------
 // Filetype: (HEADER)
-// Filepath: D:/projekti/GDPro/GDTemp/NFmiDrawParamList.h 
-// 
-// 
-// GDPro Properties 
-// ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 2.1.4 ) 
-//  - GD System Name    : Met-editor Plan 2 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : Markon ehdotus 
-// ---------------------------------------------------  
-//  Author         : pietarin 
-//  Creation Date  : Thur - Jan 28, 1999 
-// 
-// 
-//  Description: 
-//   Voi olla ett‰ t‰ss‰ riitt‰‰ suoraan uuden 
-//   template lista luokan ilmentym‰.
-// 
+// Filepath: D:/projekti/GDPro/GDTemp/NFmiDrawParamList.h
 //
-//  Change Log: 
-// 
+//
+// GDPro Properties
+// ---------------------------------------------------
+//  - GD Symbol Type    : CLD_Class
+//  - GD Method         : UML ( 2.1.4 )
+//  - GD System Name    : Met-editor Plan 2
+//  - GD View Type      : Class Diagram
+//  - GD View Name      : Markon ehdotus
+// ---------------------------------------------------
+//  Author         : pietarin
+//  Creation Date  : Thur - Jan 28, 1999
+//
+//
+//  Description:
+//   Voi olla ett‰ t‰ss‰ riitt‰‰ suoraan uuden
+//   template lista luokan ilmentym‰.
+//
+//
+//  Change Log:
+//
 //  22.02.-99 lis‰ttiin bool fDirtyList, joka saa arvon
-//  metodeissa Add, Remove ja Clear true. Oletusarvo on false. 
+//  metodeissa Add, Remove ja Clear true. Oletusarvo on false.
 // Changed 26.08.1999/Marko		Lis‰sin uuden Find()-metodin.
 //
 //**********************************************************
@@ -50,7 +50,7 @@ class NFmiProducer;
 class NFmiLevel;
 class NFmiDataIdent;
 
-class NFmiDrawParamList 
+class NFmiDrawParamList
 {
 
 public:
@@ -67,6 +67,9 @@ public:
 	void            Clear (const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved, bool fDeleteData = false);
 	bool      Add (NFmiDrawParam * theParam);
 	bool      Add (NFmiDrawParam * theParam, unsigned long theIndex);
+	void      BorrowParams(NFmiDrawParamList & theList);
+	void      ClearBorrowedParams(void);
+//	bool      Add (NFmiDrawParamList & theList); // ei ole toteutettu
 	bool      Remove (bool fDeleteData = false);
 	bool      Index(unsigned long index);
 	bool		Find(NFmiDrawParam* item);
@@ -79,17 +82,20 @@ public:
 	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId = false);
 
 	void            Update(void);
-	bool      IsDirty (void){ return fDirtyList; }; 
-	void            Dirty (bool fDirty){ fDirtyList = fDirty; }; 
+	bool      IsDirty (void){ return fDirtyList; };
+	void            Dirty (bool fDirty){ fDirtyList = fDirty; };
 	unsigned long NumberOfItems(void){return itsList.NumberOfItems();};
 	bool RemoveMacroParam(const std::string &theName);
 	bool MoveActiveParam(int theMovement);
 	int FindActive(void);
+	bool HasBorrowedParams(void) const {return fHasBorrowedParams;}
+	void HasBorrowedParams(bool newValue) {fHasBorrowedParams = newValue;}
 
 private:
 	NFmiSortedPtrList < NFmiDrawParam > itsList;
 	NFmiPtrList < NFmiDrawParam > :: Iterator itsIter;
 	bool fDirtyList;
+	bool fHasBorrowedParams; // onko t‰ll‰ listalla 'lainattuja' parametreja
 };
 
 #endif
