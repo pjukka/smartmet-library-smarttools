@@ -352,10 +352,10 @@ bool NFmiHelpDataInfoSystem::Init(const std::string &theBaseNameSpaceStr, std::s
 			sprintf(key2, dynamicParameterNameKey.c_str(), dyn.c_str()); // Parameter name
 			if (NFmiSettings::IsSet(key1) && NFmiSettings::IsSet(key2))
 			{
-				NFmiDataIdent ident(
-					NFmiParam(NFmiSettings::Require<int>(key1), NFmiSettings::Require<std::string>(key2)),
-					hdi.FakeProducerId());
-				hdi.ImageDataIdent(ident);
+			  NFmiParam p(NFmiSettings::Require<int>(key1),
+						  NFmiSettings::Require<std::string>(key2));
+			  NFmiDataIdent ident(p,hdi.FakeProducerId());
+			  hdi.ImageDataIdent(ident);
 			}
 
 			AddDynamic(hdi);
