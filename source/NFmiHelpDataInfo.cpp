@@ -332,7 +332,7 @@ bool NFmiHelpDataInfoSystem::Init(const std::string &theBaseNameSpaceStr, std::s
 						finalFileStr += kFmiDirectorySeparator;
 					finalFileStr += tmpFileNameFilter;
 
-					tmpFileNameFilter = (char*)finalFileStr;
+					tmpFileNameFilter = static_cast<char *>(finalFileStr);
 				}
 			}
 	//		hdi.FileNameFilter(NFmiSettings::Require<std::string>(key1));
