@@ -14,7 +14,6 @@
 
 class NFmiSmartInfo;
 class NFmiFastQueryInfo;
-class NFmiQueryInfo;
 class NFmiSoundingData;
 class NFmiDrawParam;
 class NFmiMetTime;
@@ -86,7 +85,7 @@ public:
 	static bool FillSoundingData(NFmiFastQueryInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiMetTime &theTime, const NFmiLocation &theLocation);
 	static void Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrganizer *theInfoOrganizer, NFmiDrawParam *theDrawParam, NFmiDataMatrix<float> &theValues, const NFmiMetTime &theTime);
 	static float Calc(NFmiSoundingData &theSoundingData, FmiSoundingParameters theParam);
-	static float Calc(NFmiQueryInfo *theInfo, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, FmiSoundingParameters theParam);
+	static float Calc(NFmiFastQueryInfo *theInfo, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, FmiSoundingParameters theParam);
 };
 
 #endif // NFMISOUNDINGINDEXCALCULATOR_H

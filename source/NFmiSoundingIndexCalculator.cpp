@@ -29,7 +29,7 @@ bool NFmiSoundingIndexCalculator::FillSoundingData(NFmiFastQueryInfo *theInfo, N
 	return false;
 }
 
-static bool FillSoundingData(NFmiQueryInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiMetTime &theTime, const NFmiPoint &theLatlon)
+static bool FillSoundingData(NFmiFastQueryInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiMetTime &theTime, const NFmiPoint &theLatlon)
 {
 	static NFmiString bsName("bsname");
 	if(theInfo)
@@ -219,7 +219,7 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 	return static_cast<float>(value);
 }
 
-float NFmiSoundingIndexCalculator::Calc(NFmiQueryInfo *theInfo, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, FmiSoundingParameters theParam)
+float NFmiSoundingIndexCalculator::Calc(NFmiFastQueryInfo *theInfo, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, FmiSoundingParameters theParam)
 {
 	NFmiSoundingData soundingData;
 	if(::FillSoundingData(theInfo, soundingData, theTime, theLatlon))

@@ -6,6 +6,7 @@
 // ======================================================================
 
 #include "NFmiInfoAreaMaskSoundingIndex.h"
+#include "NFmiFastQueryInfo.h"
 
 NFmiInfoAreaMaskSoundingIndex::~NFmiInfoAreaMaskSoundingIndex(void)
 {
@@ -20,5 +21,6 @@ NFmiInfoAreaMaskSoundingIndex::NFmiInfoAreaMaskSoundingIndex(NFmiQueryInfo * the
 // tätä kaytetaan smarttool-modifierin yhteydessä
 double NFmiInfoAreaMaskSoundingIndex::Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int /* theTimeIndex */ , bool /* fUseTimeInterpolationAlways */ )
 {
-	return NFmiSoundingIndexCalculator::Calc(itsInfo, theLatlon, theTime, itsSoundingParam);
+	// RUMAA CAST-koodia!!!!!
+	return NFmiSoundingIndexCalculator::Calc(static_cast<NFmiFastQueryInfo*>(itsInfo), theLatlon, theTime, itsSoundingParam);
 }
