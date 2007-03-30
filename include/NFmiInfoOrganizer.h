@@ -88,6 +88,7 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType, int theIndex); // Hakee indeksin mukaisen tietyn datatyypin infon
 
 	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
+	NFmiSmartInfo* FindSoundingInfo(const NFmiProducer &theProducer); // Hakee parhaan luotaus infon tuottajalle
 
 	NFmiParamBag GetParams(int theProducerId1, int theProducerId2, NFmiInfoData::Type theIgnoreDataType1, NFmiInfoData::Type theIgnoreDataType2, NFmiInfoData::Type theIgnoreDataType3);
 	NFmiParamBag EditedParams(void); // itsEditedData infon parambagi

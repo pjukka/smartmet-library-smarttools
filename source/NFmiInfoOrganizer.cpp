@@ -52,6 +52,7 @@
 #include "NFmiQueryDataUtil.h"
 #include "NFmiQueryData.h"
 #include "NFmiLatLonArea.h"
+#include "NFmiProducerName.h"
 
 /*
 #ifdef _DEBUG
@@ -1074,6 +1075,61 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, const
 		}
 	}
 	return 0;
+}
+
+// vastaus 0 = ei ole
+// 1 = on sounding dataa, mutta ei välttämättä paras mahd.
+// 2 = on hyvää dataa
+// Tämä on malli datojen kanssa  niin että painepinta data on 1 ja hybridi on 2
+static int IsGoodSoundingData(NFmiSmartInfo* info, const NFmiProducer &theProducer, bool ignoreProducer)
+{
+	if(info)
+	{
+		if(ignoreProducer || (*(info->Producer()) == theProducer))
+		{
+			if(info->SizeLevels() > 3) // pitää olla väh 4 leveliä ennen kuin kelpuutetaan sounding dataksi
+			{
+				if(info->DataType() == NFmiInfoData::kViewable)
+					return 1;
+				else
+					return 2;
+			}
+		}
+	}
+	return 0;
+}
+
+// Hakee parhaan luotaus infon tuottajalle. Eli jos kyseessä esim hirlam tuottaja, katsotaan löytyykö
+// hybridi dataa ja sitten tyydytään viewable-dataa (= painepinta)
+NFmiSmartInfo* NFmiInfoOrganizer::FindSoundingInfo(const NFmiProducer &theProducer)
+{
+	// TODO Ei ota huomioon vielä editoitavaa dataa
+	NFmiSmartInfo* exceptableInfo = 0;
+	for(Reset(); Next();)
+	{
+		NFmiSmartInfo* info = Current();
+		int result = ::IsGoodSoundingData(info, theProducer, false);
+		if(result == 2)
+			return info;
+		else if(result == 1)
+			exceptableInfo = info;
+	}
+
+	if(theProducer.GetIdent() == kFmiMETEOR) // tässä hanskataan 'editoitu' data, jolloin ignoorataan tuottaja
+	{
+		NFmiSmartInfo* info = EditedInfo();
+		int result = ::IsGoodSoundingData(info, theProducer, true);
+		if(result != 0)
+			exceptableInfo = info;
+	}
+//	if(theDataType == NFmiInfoData::kEditable)
+//		return EditedInfo();
+//	else if(theDataType == NFmiInfoData::kCopyOfEdited)
+//		return EditedInfoCopy();
+//	else
+//	{
+
+	return exceptableInfo;
 }
 
 void NFmiInfoOrganizer::SetDrawParamPath(const std::string &theDrawParamPath)
