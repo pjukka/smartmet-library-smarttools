@@ -16,7 +16,6 @@
 #include "NFmiDataMatrix.h"
 
 class NFmiFastQueryInfo;
-class NFmiQueryInfo;
 
 class NFmiSoundingData
 {
@@ -24,8 +23,8 @@ public:
 	NFmiSoundingData(void){};
 
 	// TODO Fill-metodeille pitää laittaa haluttu parametri-lista parametriksi (jolla täytetään sitten dynaamisesti NFmiDataMatrix-otus)
-	bool FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly = false);
-	bool FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName);
+	bool FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly = false);
+	bool FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName);
 	void CutEmptyData(void); // tämä leikkaa Fill.. -metodeissa laskettuja data vektoreita niin että pelkät puuttuvat kerrokset otetaan pois
 
 	// FillSoundingData-metodeilla täytetään kunkin parametrin vektorit ja tällä saa haluamansa parametrin vektorin käyttöön
@@ -52,12 +51,14 @@ public:
 	bool ModifyTd2MixingRatioBelowGivenP(double P, double T, double Td);
 	bool Add2ParamAtNearestP(float P, FmiParameterName parId, float addValue, float minValue, float maxValue, bool fCircularValue);
 	void UpdateUandVParams(void);
+	bool PressureDataAvailable(void) const {return fPressureDataAvailable;}
+	bool HeightDataAvailable(void) const {return fHeightDataAvailable;}
 private:
 	unsigned int GetHighestNonMissingValueLevelIndex(FmiParameterName theParaId);
 	float GetPressureAtHeight(double H);
 	void ClearDatas(void);
-	bool FillParamData(NFmiQueryInfo* theInfo, FmiParameterName theId);
-	bool FillParamData(NFmiQueryInfo* theInfo, FmiParameterName theId, const NFmiMetTime& theTime, const NFmiPoint& theLatlon);
+	bool FillParamData(NFmiFastQueryInfo* theInfo, FmiParameterName theId);
+	bool FillParamData(NFmiFastQueryInfo* theInfo, FmiParameterName theId, const NFmiMetTime& theTime, const NFmiPoint& theLatlon);
 	void InitZeroHeight(void); // tätä kutsutaan FillParamData-metodeista
 
 	NFmiLocation itsLocation;
@@ -78,6 +79,8 @@ private:
 	float itsZeroHeight; // tältä korkeudelta alkaa luotauksen 0-korkeus, eli vuoristossa luotaus alkaa oikeasti korkeammalta ja se korkeus pitää käsitellä pintakorkeutena
 	int itsZeroHeightIndex; // edellisen indeksi (paikka vektorissa). Arvo on -1 jos ei löytynyt kunnollista 0-korkeutta
 	bool fObservationData;
+	bool fPressureDataAvailable;
+	bool fHeightDataAvailable;
 };
 
 #endif // NFMISOUNDINGDATA_H

@@ -427,7 +427,7 @@ bool NFmiSoundingData::GetValuesStartingLookingFromPressureLevel(double &T, doub
 
 // oletuksia paljon:
 // theInfo on validi, aika ja paikka on jo asetettu
-bool NFmiSoundingData::FillParamData(NFmiQueryInfo* theInfo, FmiParameterName theId)
+bool NFmiSoundingData::FillParamData(NFmiFastQueryInfo* theInfo, FmiParameterName theId)
 {
 	try
 	{
@@ -441,9 +441,12 @@ bool NFmiSoundingData::FillParamData(NFmiQueryInfo* theInfo, FmiParameterName th
 			int i = 0;
 			for(theInfo->ResetLevel(); theInfo->NextLevel(); i++)
 				data[i] = theInfo->FloatValue();
-			// IKÄVÄÄ CASTI KOODIA!!!!
-			if(static_cast<NFmiFastQueryInfo*>(theInfo)->HeightParamIsRising() == false) // jos ei nousevassa järjestyksessä, käännetään vektorissa olevat arvot
+			if(theInfo->HeightParamIsRising() == false) // jos ei nousevassa järjestyksessä, käännetään vektorissa olevat arvot
 				std::reverse(data.begin(), data.end());
+			if(theId == kFmiPressure)
+				fPressureDataAvailable = true;
+			if(theId == kFmiGeomHeight || theId == kFmiGeopHeight)
+				fHeightDataAvailable = true;
 			return true;
 		}
 	}
@@ -453,7 +456,7 @@ bool NFmiSoundingData::FillParamData(NFmiQueryInfo* theInfo, FmiParameterName th
 	return false;
 }
 
-bool NFmiSoundingData::FillParamData(NFmiQueryInfo* theInfo, FmiParameterName theId, const NFmiMetTime& theTime, const NFmiPoint& theLatlon)
+bool NFmiSoundingData::FillParamData(NFmiFastQueryInfo* theInfo, FmiParameterName theId, const NFmiMetTime& theTime, const NFmiPoint& theLatlon)
 {
 	bool status = false;
 	checkedVector<float>&data = GetParamData(theId);
@@ -498,8 +501,7 @@ bool NFmiSoundingData::FillParamData(NFmiQueryInfo* theInfo, FmiParameterName th
 		}
 	}
 
-		// IKÄVÄÄ CASTI KOODIA!!!!
-	if(static_cast<NFmiFastQueryInfo*>(theInfo)->HeightParamIsRising() == false) // jos ei nousevassa järjestyksessä, käännetään vektorissa olevat arvot
+	if(theInfo->HeightParamIsRising() == false) // jos ei nousevassa järjestyksessä, käännetään vektorissa olevat arvot
 		std::reverse(data.begin(), data.end());
 
 	return status;
@@ -551,7 +553,7 @@ void NFmiSoundingData::CutEmptyData(void)
 }
 
 // Tälle anntaan asema dataa ja ei tehdä minkäänlaisia interpolointeja.
-bool NFmiSoundingData::FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly)
+bool NFmiSoundingData::FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly)
 {
 	ClearDatas();
 	if(theInfo && !theInfo->IsGrid())
@@ -583,7 +585,7 @@ bool NFmiSoundingData::FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTim
 }
 
 // Tälle annetaan hiladataa, ja interpolointi tehdään tarvittaessa ajassa ja paikassa.
-bool NFmiSoundingData::FillSoundingData(NFmiQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName)
+bool NFmiSoundingData::FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName)
 {
 	ClearDatas();
 	if(theInfo && theInfo->IsGrid())
@@ -675,6 +677,9 @@ void NFmiSoundingData::ClearDatas(void)
 	checkedVector<float>().swap(itsWindDirectionData);
 	checkedVector<float>().swap(itsWindComponentUData);
 	checkedVector<float>().swap(itsWindComponentVData);
+
+	fPressureDataAvailable = false;
+	fHeightDataAvailable = false;
 }
 
 bool NFmiSoundingData::ModifyT2DryAdiapaticBelowGivenP(double P, double T)
