@@ -1,23 +1,23 @@
 //**********************************************************
-// C++ Class Name : NFmiSmartToolModifier 
+// C++ Class Name : NFmiSmartToolModifier
 // ---------------------------------------------------------
 // Filetype: (HEADER)
-// Filepath: G:/siirto/marko/oc/NFmiSmartToolModifier.h 
-// 
-// 
-// GDPro Properties 
+// Filepath: G:/siirto/marko/oc/NFmiSmartToolModifier.h
+//
+//
+// GDPro Properties
 // ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 4.0 ) 
-//  - GD System Name    : aSmartTools 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : smarttools 1 
-// ---------------------------------------------------  
-//  Author         : pietarin 
-//  Creation Date  : Thur - Jun 20, 2002 
-// 
-//  Change Log     : 
-// 
+//  - GD Symbol Type    : CLD_Class
+//  - GD Method         : UML ( 4.0 )
+//  - GD System Name    : aSmartTools
+//  - GD View Type      : Class Diagram
+//  - GD View Name      : smarttools 1
+// ---------------------------------------------------
+//  Author         : pietarin
+//  Creation Date  : Thur - Jun 20, 2002
+//
+//  Change Log     :
+//
 // T‰m‰ luokka hoitaa koko smarttool-toiminnan. Sill‰ on tietokanta,
 // tulkki, ja erilaisia maski/operaatio generaattoreita, joiden avulla
 // laskut suoritetaan.
@@ -90,7 +90,7 @@ public:
 	NFmiSmartToolCalculationSection* itsLastCalculationSection;
 };
 
-class NFmiSmartToolModifier 
+class NFmiSmartToolModifier
 {
 public:
 	void InitSmartTool(const std::string &theSmartToolText, bool fThisIsMacroParamSkript = false);
@@ -128,7 +128,8 @@ private:
 	void ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection, NFmiMacroParamValue &theMacroParamValue);
 	NFmiAreaMask* CreateAreaMask(const NFmiAreaMaskInfo &theInfo);
 	NFmiAreaMask* CreateEndingAreaMask(void);
-	NFmiSmartInfo* CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo);
+	NFmiSmartInfo* CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+	NFmiSmartInfo* GetPossibleLevelInterpolatedInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
 	void CreateCalculationModifiers(void);
 	void CreateFirstCalculationSection(void);
 	NFmiSmartToolCalculationSection* CreateCalculationSection(NFmiSmartToolCalculationSectionInfo *theCalcSectionInfo);
@@ -155,7 +156,7 @@ private:
 	bool fUseLevelData; // kun t‰m‰ flagi on p‰‰ll‰, k‰ytet‰‰n CreateInfo-metodissa hybridi-datoja jos mahd. ja sitten painepinta datoja.
 	bool fDoCrossSectionCalculation; // kun t‰m‰ flagi on p‰‰ll‰, ollaan laskemassa poikkileikkauksia ja silloin level-infot yritet‰‰n tehd‰ ensin hybrididatasta ja sitten painepintadatasta
 	int itsCommaCounter; // tarvitaan laskemaan pilkkuja, kun lasketaan milloin level-dataa pit‰‰ k‰ytt‰‰.
-	int itsParethesisCounter; // kun k‰ytet‰‰n esim. Sumz-funktion 2. pilkun j‰lkeen level-dataa, 
+	int itsParethesisCounter; // kun k‰ytet‰‰n esim. Sumz-funktion 2. pilkun j‰lkeen level-dataa,
 							  // pit‰‰ laskea sulkujen avulla, milloin funktio loppuu.
 							  // HUOM! sulkujen lis‰ksi pit‰‰ laskea myˆs erilaisten funktioiden alut.
 	NFmiSmartInfo* itsMacroParamData; // t‰ss‰ on vara macroParamData, jota k‰ytet‰‰n mm. multithreaddaavassa ymp‰ristˆss‰ (ei omista, ei tuhoa)

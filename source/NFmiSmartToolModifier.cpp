@@ -412,7 +412,8 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateCalculation(NFmiSmartTool
 		calculation = new NFmiSmartToolCalculation;
 		auto_ptr<NFmiSmartToolCalculation> calculationPtr(calculation);
 		calculation->SetCalculationText(theCalcInfo->GetCalculationText());
-		calculation->SetResultInfo(CreateInfo(*theCalcInfo->GetResultDataInfo()));
+		bool mustUsePressureInterpolation = false; // tätäei käytetä tässä, mutta pakko laittaa metodin interfacen takia
+		calculation->SetResultInfo(CreateInfo(*theCalcInfo->GetResultDataInfo(), mustUsePressureInterpolation));
 		float lowerLimit;
 		float upperLimit;
 		bool checkLimits = true; // yleensä parametreille käytetdään min/max rajoja, mutta ei esim TotalWind tai W&C:lle
@@ -726,6 +727,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 {
 	NFmiAreaMask::CalculationOperationType maskType = theAreaMaskInfo.GetOperationType();
 	NFmiAreaMask* areaMask = 0;
+	bool mustUsePressureInterpolation = false;
 
 	switch(maskType)
 	{
@@ -733,9 +735,16 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			{
 			// HUOM!! Tähän vaaditaan syvä data kopio!!!
 			// JOS kyseessä on ehtolauseen muuttujasta, joka on editoitavaa dataa.
-			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
+			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 //			areaMask = new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, true);
 			areaMask = new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, true);
+			if(areaMask && mustUsePressureInterpolation)
+			{
+				areaMask->UsePressureLevelInterpolation(true);
+				areaMask->UsedPressureLevelValue(theAreaMaskInfo.GetLevel()->LevelValue());
+				if(theAreaMaskInfo.GetLevel()->LevelType() == kFmiFlightLevel)
+					const_cast<NFmiLevel*>(areaMask->Level())->SetIdent(static_cast<unsigned long>(kFmiFlightLevel));
+			}
 			break;
 			}
 		case NFmiAreaMask::RampFunction:
@@ -743,7 +752,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			NFmiInfoData::Type type = theAreaMaskInfo.GetDataType();
 			if(type != NFmiInfoData::kCalculatedValue)
 			{
-				NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
+				NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 				areaMask = new NFmiCalculationRampFuction(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, true);
 			}
 			else
@@ -760,7 +769,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			{
 			// HUOM!! Tähän vaaditaan syvä data kopio!!!
 			// JOS kyseessä on ehtolauseen muuttujasta, joka on editoitavaa dataa.
-			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
+			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 			bool deepCopyCreated = false;
 			if(theAreaMaskInfo.GetUseDefaultProducer())
 			{ // Pitää tehdä syvä kopio datasta, että datan muuttuminen ei vaikuta laskuihin.
@@ -782,7 +791,7 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			{
 			// HUOM!! Tähän vaaditaan syvä data kopio!!!
 			// JOS kyseessä on ehtolauseen muuttujasta, joka on editoitavaa dataa.
-			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
+			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 			bool deepCopyCreated = false;
 			if(theAreaMaskInfo.GetUseDefaultProducer())
 			{ // Pitää tehdä syvä kopio datasta, että datan muuttuminen ei vaikuta laskuihin.
@@ -906,7 +915,8 @@ NFmiAreaMask*  NFmiSmartToolModifier::CreateSoundingIndexFunctionAreaMask(const 
 {
 	// HUOM!! Tähän vaaditaan syvä data kopio!!!
 	// JOS kyseessä on ehtolauseen muuttujasta, joka on editoitavaa dataa.
-	NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo);
+	bool mustUsePressureInterpolation = false; // tätäei käytetä tässä, mutta pakko laittaa metodin interfacen takia
+	NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 	bool deepCopyCreated = false;
 	if(theAreaMaskInfo.GetUseDefaultProducer())
 	{ // Pitää tehdä syvä kopio datasta, että datan muuttuminen ei vaikuta laskuihin.
@@ -1012,8 +1022,65 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateEndingAreaMask(void)
 	return areaMask;
 }
 
-NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo)
+static bool IsBetweenValues(double value, double value1, double value2)
 {
+	if(value >= value1 && value <= value2)
+		return true;
+	if(value >= value2 && value <= value1)
+		return true;
+	return false;
+}
+
+NFmiSmartInfo* NFmiSmartToolModifier::GetPossibleLevelInterpolatedInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
+{
+	NFmiSmartInfo *info = 0;
+	NFmiSmartInfo *possiblePressureLevelDataInfo = 0;
+	if(theAreaMaskInfo.GetLevel() != 0)
+	{
+		bool flightLevelWanted = theAreaMaskInfo.GetLevel()->LevelType() == kFmiFlightLevel;
+		checkedVector<NFmiSmartInfo*> infoVector = itsInfoOrganizer->GetInfos(theAreaMaskInfo.GetDataIdent().GetProducer()->GetIdent());
+		for(size_t i = 0; i<infoVector.size(); i++)
+		{
+			NFmiSmartInfo *tmpInfo = infoVector[i];
+			if(flightLevelWanted ? (tmpInfo->HeightValueAvailable()) : (tmpInfo->PressureValueAvailable() || tmpInfo->PressureLevelDataAvailable()))
+			{
+				if(tmpInfo->Param(static_cast<FmiParameterName>(theAreaMaskInfo.GetDataIdent().GetParamIdent())))
+				{
+					tmpInfo->FirstLevel();
+					if(tmpInfo->Level()->GetIdent() == kFmiHybridLevel)
+					{ // lähdetään tässä siitä että jos löytyy mallipinta-dataa, mikä sopii tarkoitukseen, se valitaan ensisijaisesti
+						info = new NFmiSmartInfo(*tmpInfo);
+						break;
+					}
+					else if(tmpInfo->Level()->GetIdent() == kFmiPressureLevel)
+					{
+						if(flightLevelWanted)
+							possiblePressureLevelDataInfo = tmpInfo;
+						else
+						{
+							double levelValue1 = tmpInfo->Level()->LevelValue();
+							tmpInfo->LastLevel();
+							double levelValue2 = tmpInfo->Level()->LevelValue();
+							if(::IsBetweenValues(theAreaMaskInfo.GetLevel()->LevelValue(), levelValue1, levelValue2))
+							{
+								possiblePressureLevelDataInfo = tmpInfo;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if(info == 0 && possiblePressureLevelDataInfo != 0) // jos ei löytynyt sopivaa mallipinta-dataa, mutta painepinta-dataa löytyi, otetaan se käyttöön
+		info = new NFmiSmartInfo(*possiblePressureLevelDataInfo);
+	if(info)
+		mustUsePressureInterpolation = true;
+	return info;
+}
+
+NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
+{
+	mustUsePressureInterpolation = false;
 	NFmiSmartInfo* info = 0;
 	if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kScriptVariableData)
 		info = CreateScriptVariableInfo(theAreaMaskInfo.GetDataIdent());
@@ -1027,13 +1094,15 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 		if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kMacroParam)
 		{ // tämä macroParam data viritys on multi threaddaavaa serveriä varten, eli macroparam data pitää olla thread-kohtainen
 			// ja se on aina annettu luodulle NFmiSmartToolModifier-luokan instansille erikseen.
-			if(UsedMacroParamData()) 
+			if(UsedMacroParamData())
 				info = new NFmiSmartInfo(*UsedMacroParamData());
 			else
 				throw runtime_error("NFmiSmartToolModifier::CreateInfo - error in program, no macroParam data available.");
 		}
 		else
 			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), dataType, true, fUseLevelData);
+		if(info == 0)
+			info = GetPossibleLevelInterpolatedInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 	}
 	else
 	{
@@ -1043,6 +1112,8 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), NFmiInfoData::kHybridData, false, fUseLevelData | fDoCrossSectionCalculation); // tähän pieni hybrid-koukku, jos haluttiin level dataa
 		if(info == 0)
 			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData | fDoCrossSectionCalculation);
+		if(info == 0)
+			info = GetPossibleLevelInterpolatedInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 		if(info == 0 && theAreaMaskInfo.GetLevel() != 0) // kokeillaan vielä jos halutaan hybridi datan leveliä
 		{
 			NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
