@@ -445,7 +445,7 @@ bool NFmiSoundingData::FillParamData(NFmiFastQueryInfo* theInfo, FmiParameterNam
 				std::reverse(data.begin(), data.end());
 			if(theId == kFmiPressure)
 				fPressureDataAvailable = true;
-			if(theId == kFmiGeomHeight || theId == kFmiGeopHeight)
+			if(theId == kFmiGeomHeight || theId == kFmiGeopHeight || theId == kFmiFlAltitude)
 				fHeightDataAvailable = true;
 			return true;
 		}
@@ -552,26 +552,123 @@ void NFmiSoundingData::CutEmptyData(void)
 
 }
 
+static bool FindTimeIndexies(NFmiFastQueryInfo* theInfo, const NFmiMetTime &theStartTime, long minuteRange, unsigned long &timeIndex1, unsigned long &timeIndex2)
+{
+	theInfo->FindNearestTime(theStartTime, kBackward);
+	timeIndex1 = theInfo->TimeIndex();
+	NFmiMetTime endTime(theStartTime);
+	endTime.ChangeByMinutes(minuteRange);
+	theInfo->FindNearestTime(endTime, kBackward);
+	timeIndex2 = theInfo->TimeIndex();
+
+	if(timeIndex1 == timeIndex2) // pitää testata erikois tapaus, koska TimeToNearestStep-palauttaa aina jotain, jos on dataa
+	{
+		theInfo->TimeIndex(timeIndex1);
+		NFmiMetTime foundTime(theInfo->Time());
+		if(foundTime > endTime || foundTime < theStartTime) // jos löydetty aika on alku ja loppu ajan ulkopuolella ei piirretä salamaa
+			return false;
+	}
+	return true;
+}
+
+static bool FindAmdarSoundingTime(NFmiFastQueryInfo* theInfo, const NFmiMetTime &theTime, NFmiLocation &theLocation)
+{
+	theInfo->FirstLocation();  // amdareissa vain yksi dummy paikka, laitetaan se päälle
+	NFmiMetTime timeStart(theTime);
+	timeStart.ChangeByMinutes(-30);
+	unsigned long timeIndex1 = 0;
+	unsigned long timeIndex2 = 0;
+	if(::FindTimeIndexies(theInfo, timeStart, 60, timeIndex1, timeIndex2) == false)
+		return false;
+
+	float lat = 0;
+	float lon = 0;
+	float power = 0;
+	theInfo->Param(kFmiLatitude);
+	unsigned long latIndex = theInfo->ParamIndex();
+	theInfo->Param(kFmiLongitude);
+	unsigned long lonIndex = theInfo->ParamIndex();
+	double minDistance = 99999999;
+	unsigned long minDistTimeInd = static_cast<unsigned long>(-1);
+	for(unsigned long i=timeIndex1; i<=timeIndex2; i++)
+	{
+		theInfo->TimeIndex(i);
+
+		for(theInfo->ResetLevel() ; theInfo->NextLevel(); )
+		{
+			theInfo->ParamIndex(latIndex);
+			lat = theInfo->FloatValue();
+			theInfo->ParamIndex(lonIndex);
+			lon = theInfo->FloatValue();
+
+			if(lat != kFloatMissing && lon != kFloatMissing)
+			{
+				NFmiLocation loc(NFmiPoint(lon, lat));
+				double currDist = theLocation.Distance(loc);
+				if(currDist < minDistance)
+				{
+					minDistance = currDist;
+					minDistTimeInd = i;
+				}
+			}
+		}
+	}
+	if(minDistance < 1000 * 1000) // jos lento löytyi vähintäin 1000 km säteeltä hiiren klikkauspaikasta, otetaan kyseinen amdar piirtoon
+	{
+		theInfo->TimeIndex(minDistTimeInd);
+		// pitää lisäksi asettaa locationiksi luotauksen alkupiste
+		theInfo->FirstLevel();
+		theInfo->ParamIndex(latIndex);
+		lat = theInfo->FloatValue();
+		theInfo->ParamIndex(lonIndex);
+		lon = theInfo->FloatValue();
+		theLocation.SetLatitude(lat);
+		theLocation.SetLongitude(lon);
+
+		return true;
+	}
+
+	return false;
+}
+
 // Tälle anntaan asema dataa ja ei tehdä minkäänlaisia interpolointeja.
 bool NFmiSoundingData::FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly)
 {
+	NFmiMetTime usedTime = theTime;
+	NFmiLocation usedLocation(theLocation);
 	ClearDatas();
 	if(theInfo && !theInfo->IsGrid())
 	{
 		fObservationData = true;
-		if(theInfo->Time(theTime))
+		theInfo->FirstLevel();
+		bool amdarSounding = (theInfo->Level()->LevelType() == kFmiAmdarLevel);
+		bool timeOk = false;
+		if(amdarSounding)
 		{
-			if(useStationIdOnly ? theInfo->Location(theLocation.GetIdent()) : theInfo->Location(theLocation))
+			timeOk = ::FindAmdarSoundingTime(theInfo, usedTime, usedLocation);
+			usedTime = theInfo->Time();
+		}
+		else
+			timeOk = theInfo->Time(usedTime);
+		if(timeOk)
+		{
+			bool stationOk = false;
+			if(amdarSounding)
+				stationOk = true; // asemaa ei etsitä, jokainen lento liittyy tiettyyn aikaa
+			else
+				stationOk = (useStationIdOnly ? theInfo->Location(usedLocation.GetIdent()) : theInfo->Location(usedLocation));
+			if(stationOk)
 			{
-				itsLocation = theLocation;
-				itsTime = theTime;
+				itsLocation = usedLocation;
+				itsTime = usedTime;
 				itsOriginTime = theOriginTime;
 
 				FillParamData(theInfo, kFmiTemperature);
 				FillParamData(theInfo, kFmiDewPoint);
 				FillParamData(theInfo, kFmiPressure);
 				if(!FillParamData(theInfo, kFmiGeopHeight))
-					FillParamData(theInfo, kFmiGeomHeight); // eri datoissa on geom ja geop heightia, kokeillaan molempia tarvittaessa
+					if(!FillParamData(theInfo, kFmiGeomHeight))
+					FillParamData(theInfo, kFmiFlAltitude); // eri datoissa on geom ja geop heightia, kokeillaan molempia tarvittaessa
 				FillParamData(theInfo, kFmiWindSpeedMS);
 				FillParamData(theInfo, kFmiWindDirection);
 				FillParamData(theInfo, kFmiWindUMS);
@@ -653,6 +750,7 @@ checkedVector<float>& NFmiSoundingData::GetParamData(FmiParameterName theId)
 		return itsPressureData;
 	case kFmiGeopHeight:
 	case kFmiGeomHeight:
+	case kFmiFlAltitude:
 		return itsGeomHeightData;
 	case kFmiWindSpeedMS:
 		return itsWindSpeedData;

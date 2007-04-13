@@ -30,6 +30,7 @@ public:
 	// FillSoundingData-metodeilla täytetään kunkin parametrin vektorit ja tällä saa haluamansa parametrin vektorin käyttöön
 	checkedVector<float>& GetParamData(FmiParameterName theId);
 	const NFmiLocation& Location(void) const {return itsLocation;}
+	void Location(const NFmiLocation &newValue) {itsLocation = newValue;}
 	const NFmiMetTime& Time(void) const {return itsTime;}
 	const NFmiMetTime& OriginTime(void) const {return itsOriginTime;}
 	bool GetValuesStartingLookingFromPressureLevel(double &T, double &Td, double &P);
