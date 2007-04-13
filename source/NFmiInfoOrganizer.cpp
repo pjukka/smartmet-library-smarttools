@@ -75,8 +75,11 @@ NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 ,itsMacroParamGridSize(50, 50)
 ,itsMacroParamMinGridSize(10, 10)
 ,itsMacroParamMaxGridSize(200, 200)
+,itsSoundingParamGridSize(30, 30)
 ,itsMacroParamData(0)
+,itsSoundingParamData(0)
 ,itsMacroParamMissingValueMatrix()
+,itsSoundingParamMissingValueMatrix()
 ,itsCrossSectionMacroParamData(0)
 ,itsCrossSectionMacroParamMissingValueMatrix()
 ,fCreateEditedDataCopy(true)
@@ -99,6 +102,10 @@ NFmiInfoOrganizer::~NFmiInfoOrganizer (void)
 	if(itsMacroParamData)
 		itsMacroParamData->DestroySharedData();
 	delete itsMacroParamData;
+
+	if(itsSoundingParamData)
+		itsSoundingParamData->DestroySharedData();
+	delete itsSoundingParamData;
 
 	if(itsCrossSectionMacroParamData)
 		itsCrossSectionMacroParamData->DestroySharedData();
@@ -180,10 +187,13 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 {
 	if(theParam == 997) // synop plot paramille pit‰‰ tehd‰ kikka
 		return GetSynopPlotParamInfo(fSubParameter, theType);
-	if(theParam == 9997) // sounding plot paramille pit‰‰ tehd‰ kikka
+//	if(theParam == 9997)) // sounding plot paramille pit‰‰ tehd‰ kikka
+	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pit‰‰ tehd‰ kikka
 		return GetSoundingPlotParamInfo(fSubParameter, theType);
-	if(theType == NFmiInfoData::kMacroParam || theType >= NFmiInfoData::kSoundingParameterData) // macro- ja sounding parametrit lasketaan samalla periaatteella
+	if(theType == NFmiInfoData::kMacroParam) // macro- parametrit lasketaan t‰ll‰
 		return itsMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
+	if(theType >= NFmiInfoData::kSoundingParameterData) // sounding parametrit lasketaan t‰ll‰
+		return itsSoundingParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType == NFmiInfoData::kCrossSectionMacroParam)
 		return itsCrossSectionMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
@@ -235,10 +245,13 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 {
 	if(theDataIdent.GetParamIdent() == 997) // synop plot paramille pit‰‰ tehd‰ kikka
 		return GetSynopPlotParamInfo(fSubParameter, theType);
-	if(theDataIdent.GetParamIdent() == 9997) // sounding plot paramille pit‰‰ tehd‰ kikka
+//	if(theDataIdent.GetParamIdent() == 9997) // sounding plot paramille pit‰‰ tehd‰ kikka
+	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pit‰‰ tehd‰ kikka
 		return GetSoundingPlotParamInfo(fSubParameter, theType);
-	if(theType == NFmiInfoData::kMacroParam || theType >= NFmiInfoData::kSoundingParameterData) // macro- ja sounding parametrit lasketaan samalla periaatteella
+	if(theType == NFmiInfoData::kMacroParam) // macro- parametrit lasketaan t‰ll‰
 		return itsMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
+	if(theType >= NFmiInfoData::kSoundingParameterData) // sounding parametrit lasketaan t‰ll‰
+		return itsSoundingParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType == NFmiInfoData::kCrossSectionMacroParam)
 		return itsCrossSectionMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
@@ -812,6 +825,12 @@ static NFmiQueryData* CreateDefaultMacroParamQueryData(NFmiQueryInfo & theEdited
 }
 */
 
+void NFmiInfoOrganizer::SetSoundingParamDataGridSize(int x, int y)
+{
+	itsSoundingParamGridSize = NFmiPoint(x, y);
+	UpdateSoundingParamData();
+}
+
 void NFmiInfoOrganizer::SetMacroParamDataGridSize(int x, int y)
 {
 	x = FmiMin(x, static_cast<int>(itsMacroParamMaxGridSize.X()));
@@ -819,6 +838,7 @@ void NFmiInfoOrganizer::SetMacroParamDataGridSize(int x, int y)
 	x = FmiMax(x, static_cast<int>(itsMacroParamMinGridSize.X()));
 	y = FmiMax(y, static_cast<int>(itsMacroParamMinGridSize.Y()));
 	itsMacroParamGridSize = NFmiPoint(x, y);
+	UpdateMacroParamData();
 }
 void NFmiInfoOrganizer::SetMacroParamDataMinGridSize(int x, int y)
 {
@@ -829,7 +849,48 @@ void NFmiInfoOrganizer::SetMacroParamDataMaxGridSize(int x, int y)
 	itsMacroParamMaxGridSize = NFmiPoint(x, y);
 }
 
-// aina kun editorin area muuttuu, pit‰‰ macroData p‰ivitt‰‰
+void NFmiInfoOrganizer::UpdateMacroParamData(void)
+{
+	if(itsMacroParamData)
+	{
+		std::auto_ptr<NFmiArea> arePtr(itsMacroParamData->Area()->Clone());
+		UpdateSpecialDataArea(arePtr.get(), itsMacroParamGridSize, NFmiInfoData::kMacroParam, &itsMacroParamData, itsMacroParamMissingValueMatrix);
+	}
+}
+
+void NFmiInfoOrganizer::UpdateSoundingParamData(void)
+{
+	if(itsSoundingParamData)
+	{
+		std::auto_ptr<NFmiArea> arePtr(itsSoundingParamData->Area()->Clone());
+		UpdateSpecialDataArea(arePtr.get(), itsSoundingParamGridSize, NFmiInfoData::kSoundingParameterData, &itsSoundingParamData, itsSoundingParamMissingValueMatrix);
+	}
+}
+
+void NFmiInfoOrganizer::UpdateMapArea(const NFmiArea *theArea)
+{
+	UpdateSpecialDataArea(theArea, itsMacroParamGridSize, NFmiInfoData::kMacroParam, &itsMacroParamData, itsMacroParamMissingValueMatrix);
+	UpdateSpecialDataArea(theArea, itsSoundingParamGridSize, NFmiInfoData::kSoundingParameterData, &itsSoundingParamData, itsSoundingParamMissingValueMatrix);
+}
+
+void NFmiInfoOrganizer::UpdateSpecialDataArea(const NFmiArea *theArea, const NFmiPoint &theGridSize, NFmiInfoData::Type theType, NFmiSmartInfo ** theData, NFmiDataMatrix<float> &theMissingValueMatrix)
+{
+	// tuhoa ensin vanha pois alta
+	if(*theData)
+		(*theData)->DestroySharedData();
+	delete *theData;
+	*theData = 0;
+
+	// Luo sitten uusi data jossa on yksi aika,param ja level ja luo hplaceDesc annetusta areasta ja hila koosta
+	NFmiQueryData* data = CreateDefaultMacroParamQueryData(theArea, static_cast<int>(theGridSize.X()), static_cast<int>(theGridSize.Y()));
+	if(data)
+	{
+		NFmiQueryInfo infoIter(data);
+		*theData = new NFmiSmartInfo(infoIter, data, "", "", theType);
+		theMissingValueMatrix.Resize((*theData)->Grid()->XNumber(), (*theData)->Grid()->YNumber(), kFloatMissing);
+	}
+}
+/*
 void NFmiInfoOrganizer::UpdateMacroParamDataArea(const NFmiArea *theArea)
 {
 	// tuhoa ensin vanha pois alta
@@ -847,6 +908,7 @@ void NFmiInfoOrganizer::UpdateMacroParamDataArea(const NFmiArea *theArea)
 		itsMacroParamMissingValueMatrix.Resize(itsMacroParamData->Grid()->XNumber(), itsMacroParamData->Grid()->YNumber(), kFloatMissing);
 	}
 }
+*/
 
 void NFmiInfoOrganizer::UpdateCrossSectionMacroParamDataSize(int x, int y)
 {
@@ -1115,12 +1177,16 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindSoundingInfo(const NFmiProducer &theProduc
 			exceptableInfo = info;
 	}
 
-	if(theProducer.GetIdent() == kFmiMETEOR) // t‰ss‰ hanskataan 'editoitu' data, jolloin ignoorataan tuottaja
+	NFmiSmartInfo* info = EditedInfo();
+	if(info)
 	{
-		NFmiSmartInfo* info = EditedInfo();
-		int result = ::IsGoodSoundingData(info, theProducer, true);
-		if(result != 0)
-			exceptableInfo = info;
+		if(theProducer.GetIdent() == kFmiMETEOR || (*info->Producer() == theProducer)) // t‰ss‰ hanskataan 'editoitu' data, jolloin ignoorataan tuottaja
+		{
+			NFmiSmartInfo* info = EditedInfo();
+			int result = ::IsGoodSoundingData(info, theProducer, true);
+			if(result != 0)
+				exceptableInfo = info;
+		}
 	}
 //	if(theDataType == NFmiInfoData::kEditable)
 //		return EditedInfo();
