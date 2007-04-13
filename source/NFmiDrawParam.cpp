@@ -686,8 +686,18 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 
 	file << "'TimeSerialModifyingLimit'" << endl;   // selittävä teksti
 	file << itsTimeSerialModifyingLimit << endl;
+
+	// ******************************************************************
+	// StationDataViewType otetttiin käyttöön vasta v. 2007, kun halusin
+	// että voidaan katsoa asemadataa myös gridattuna. Ongelma oli että
+	// kyseiseen dataosaan on joihinkin drawparameihin tallettunut tiedostoon
+	// jo 1:stä suurempia lukuja. Tämä on kikka viitonen että ei tarvitsisi
+	// konvertoida nykyisiä drawparam (dpa) tiedostoja siten että niissä
+	// olisi defaulttinä 1 (=teksti tyyppi). Eli talletettaessa lisätään
+	// lukuun 100. Luettaessa vähennetään tuo 100. Jos luku tällöin
+	// on pienempi kuin 1, annetaan arvoksi 1.
 	file << "'StationDataViewType'" << endl;   // selittävä teksti
-	file << static_cast<int>(itsStationDataViewType) << endl;
+	file << static_cast<int>(itsStationDataViewType + 100) << endl;
 	file << "'EditableParam'" << endl;   // selittävä teksti
 	file << fEditableParam << endl;
 	file << "'Unit'" << endl;   // selittävä teksti
@@ -925,7 +935,20 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			file >> temp; // luetaan nimike pois
 			file >> itsTimeSerialModifyingLimit;
 			file >> temp; // luetaan nimike pois
+
+			// ******************************************************************
+			// StationDataViewType otetttiin käyttöön vasta v. 2007, kun halusin
+			// että voidaan katsoa asemadataa myös gridattuna. Ongelma oli että
+			// kyseiseen dataosaan on joihinkin drawparameihin tallettunut tiedostoon
+			// jo 1:stä suurempia lukuja. Tämä on kikka viitonen että ei tarvitsisi
+			// konvertoida nykyisiä drawparam (dpa) tiedostoja siten että niissä
+			// olisi defaulttinä 1 (=teksti tyyppi). Eli talletettaessa lisätään
+			// lukuun 100. Luettaessa vähennetään tuo 100. Jos luku tällöin
+			// on pienempi kuin 1, annetaan arvoksi 1.
 			file >> number;
+			number -= 100;
+			if(number < 1)
+				number = 1;
 			itsStationDataViewType = NFmiMetEditorTypes::View(number);
 			file >> temp; // luetaan nimike pois
 			file >> fEditableParam;
