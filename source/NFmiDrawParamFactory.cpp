@@ -1,30 +1,30 @@
 // ======================================================================
 /*!
  *
- * C++ Class Name : NFmiDrawParamFactory 
+ * C++ Class Name : NFmiDrawParamFactory
  * ---------------------------------------------------------
  * Filetype: (SOURCE)
- * Filepath: D:/projekti/GDPro/GDTemp/NFmiDrawParamFactory.cpp 
- * 
- * 
- * GDPro Properties 
+ * Filepath: D:/projekti/GDPro/GDTemp/NFmiDrawParamFactory.cpp
+ *
+ *
+ * GDPro Properties
  * ---------------------------------------------------
- *  - GD Symbol Type    : CLD_Class 
- *  - GD Method         : UML ( 2.1.4 ) 
- *  - GD System Name    : Met-editor Plan 2 
- *  - GD View Type      : Class Diagram 
- *  - GD View Name      : Markon ehdotus 
- * ---------------------------------------------------  
- *  Author         : pietarin 
- *  Creation Date  : Thur - Jan 28, 1999 
- * 
- * 
- *  Description: 
- * 
- *  Change Log: 
- * 1999.08.26/Marko	Laitoin DrawParam:in (oikeastaan DataParam tarvitsee) 
+ *  - GD Symbol Type    : CLD_Class
+ *  - GD Method         : UML ( 2.1.4 )
+ *  - GD System Name    : Met-editor Plan 2
+ *  - GD View Type      : Class Diagram
+ *  - GD View Name      : Markon ehdotus
+ * ---------------------------------------------------
+ *  Author         : pietarin
+ *  Creation Date  : Thur - Jan 28, 1999
+ *
+ *
+ *  Description:
+ *
+ *  Change Log:
+ * 1999.08.26/Marko	Laitoin DrawParam:in (oikeastaan DataParam tarvitsee)
  *					luontiin mukaan tiedon levelistä.
- * 
+ *
  */
 // ======================================================================
 
@@ -65,23 +65,23 @@ static void InitDrawParam(NFmiDrawParam* theDrawParam, const std::string &theFil
 }
 
 //--------------------------------------------------------
-// NFmiDrawParamFactory(void) 
+// NFmiDrawParamFactory(void)
 //--------------------------------------------------------
-NFmiDrawParamFactory::NFmiDrawParamFactory(bool createDrawParamFileIfNotExist, bool onePressureLevelDrawParam) 
+NFmiDrawParamFactory::NFmiDrawParamFactory(bool createDrawParamFileIfNotExist, bool onePressureLevelDrawParam)
 :itsLoadDirectory("")
 ,fCreateDrawParamFileIfNotExist(createDrawParamFileIfNotExist)
 ,fOnePressureLevelDrawParam(onePressureLevelDrawParam)
 {
 }
 //--------------------------------------------------------
-// ~FmiDrawParamFactory(void) 
+// ~FmiDrawParamFactory(void)
 //--------------------------------------------------------
 NFmiDrawParamFactory::~NFmiDrawParamFactory(void)
 {
 }
 
 //--------------------------------------------------------
-// DrawParam 
+// DrawParam
 //--------------------------------------------------------
 NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam (const NFmiDataIdent& theIdent
 													 ,const NFmiLevel* theLevel)
@@ -89,14 +89,14 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam (const NFmiDataIdent& theId
 //  Tässä metodissa valitaan sääparametrin theParam perusteella piirtoa
 //  varten sopiva drawParam. Kostruktorin NFmiDrawParam vaatima pointteri
 //  NFmiDataParam* dataParam saadaan attribuutilta itsDataParamFactory.
-//  Huomaa, että palautettava drawParam = new NFmiDrawParam, joten drawParam   
+//  Huomaa, että palautettava drawParam = new NFmiDrawParam, joten drawParam
 //  pitää muistaa tuhota ulkopuolella.
 
 {
 
 //	NFmiDrawParam* drawParam = new NFmiDrawParam(theInfo, theIdent, 1); // 1 = priority
 // 7.1.2002/Marko Muutin dataidentin alustuksen niin, että se otetaan annetusta
-// infosta, jolloin se on aina oikein. Info on aina asetettu halutun parametrin 
+// infosta, jolloin se on aina oikein. Info on aina asetettu halutun parametrin
 // kohdalle, kun se tulee tänne.
 	NFmiDrawParam* drawParam = new NFmiDrawParam(theIdent, theLevel ? *theLevel : NFmiLevel(), 1); // 1 = priority
 
@@ -136,7 +136,7 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateEmptyInfoDrawParam(const NFmiDataIden
 }
 
 //--------------------------------------------------------
-// Init 
+// Init
 //--------------------------------------------------------
 bool NFmiDrawParamFactory::Init()
 {
@@ -144,7 +144,7 @@ bool NFmiDrawParamFactory::Init()
 }
 
 //--------------------------------------------------------
-// CreateFileName, private 
+// CreateFileName, private
 //--------------------------------------------------------
 std::string NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool fCrossSectionCase)
 {
@@ -156,7 +156,7 @@ std::string NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool 
 	if(drawParam)
 	{
 		int paramId = drawParam->Param().GetParam()->GetIdent();
-		
+
 		fileName += NFmiStringTools::Convert(paramId);
 		if(fCrossSectionCase)
 			fileName += "_CrossSection";
@@ -183,7 +183,7 @@ std::string NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool 
 			{ // hybrideillä on ain yksi piirtotapa
 				fileName += "_hybrid";
 			}
-			else if(drawParam && drawParam->Level().LevelType() == 50) // tämä on luotaus dataa
+			else if(drawParam && drawParam->Level().LevelType() == kFmiSoundingLevel) // tämä on luotaus dataa
 			{ // luotaus parametreilla on ain yksi piirtotapa kartalla
 				fileName += "_temp";
 			}
