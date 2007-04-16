@@ -613,6 +613,16 @@ void NFmiSmartToolCalculation::atom(double &result, const NFmiPoint &theLatlon, 
 		result = token->HeightValue(itsHeightValue, theLatlon, theTime);
 	else if(fUsePressureLevelCalculation)
 		result = token->PressureValue(itsPressureHeightValue, theLatlon, theTime);
+	else if(token->UsePressureLevelInterpolation())
+	{
+		if(token->Level()->LevelType() == kFmiFlightLevel)
+		{
+			double wantedHeight = token->UsedPressureLevelValue() * 100 * 0.305; // muutetaan haluttu flight level metreiksi
+			result = token->HeightValue(wantedHeight, theLatlon, theTime);
+		}
+		else
+			result = token->PressureValue(token->UsedPressureLevelValue(), theLatlon, theTime);
+	}
 	else
 		result = token->Value(theLatlon, theTime, theTimeIndex, fUseTimeInterpolationAlways);
 	get_token();
