@@ -1344,6 +1344,8 @@ bool NFmiSmartToolIntepreter::IsPossiblyLevelItem(const std::string &theText)
 
 	if(IsWantedStart(theText, "lev"))
 		return true;
+	else if(IsWantedStart(theText, "fl"))
+		return true;
 	return false;
 }
 
@@ -1513,6 +1515,17 @@ bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVar
 			long levelValue = (long)numericPart;
 			// pitaisi tunnistaa level tyyppi arvosta kait, nyt oletus että painepinta
 			FmiLevelType levelType = GetLevelType(theDataType, levelValue);
+			theLevel = NFmiLevel(levelType, theVariableText, (long)numericPart);
+			return true;
+		}
+	}
+	else if(IsWantedStart(theVariableText, "fl"))
+	{
+		NFmiValueString numericPart(theVariableText.substr(2));
+		if(numericPart.IsNumeric())
+		{
+			long levelValue = (long)numericPart;
+			FmiLevelType levelType = kFmiFlightLevel;
 			theLevel = NFmiLevel(levelType, theVariableText, (long)numericPart);
 			return true;
 		}
