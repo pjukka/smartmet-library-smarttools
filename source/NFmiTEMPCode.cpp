@@ -913,8 +913,7 @@ static NFmiLevelBag MakeLevelBag(std::vector<NFmiTEMPCode> &theSoundings)
 		if(theSoundings[i].LevelData().size() > maxLevelSize)
 			maxLevelSize = theSoundings[i].LevelData().size();
 	}
-	int levelType = 50; // t‰t‰ k‰ytet‰‰n oikeissa luotauksissa level tyyppin‰
-	NFmiLevelBag levels(static_cast<FmiLevelType>(levelType), 1, maxLevelSize, 1);
+	NFmiLevelBag levels(kFmiSoundingLevel, 1, maxLevelSize, 1);
 	return levels;
 }
 
