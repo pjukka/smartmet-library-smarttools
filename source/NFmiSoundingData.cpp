@@ -583,7 +583,6 @@ static bool FindAmdarSoundingTime(NFmiFastQueryInfo* theInfo, const NFmiMetTime 
 
 	float lat = 0;
 	float lon = 0;
-	float power = 0;
 	theInfo->Param(kFmiLatitude);
 	unsigned long latIndex = theInfo->ParamIndex();
 	theInfo->Param(kFmiLongitude);
