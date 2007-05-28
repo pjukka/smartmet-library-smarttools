@@ -22,16 +22,17 @@
   #include <unistd.h>
 #endif
 
-NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool goThroughLevels)
+
+NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool goThroughLevels, bool fMakeStaticIfOneTimeStepData)
 {
 	NFmiTimeDescriptor times(theModifiedData->Info()->TimeDescriptor());
-	return ModifyData(theMacroText, theModifiedData, &times, theHelperDataFileNames, createDrawParamFileIfNotExist, goThroughLevels);
+	return ModifyData(theMacroText, theModifiedData, &times, theHelperDataFileNames, createDrawParamFileIfNotExist, goThroughLevels, fMakeStaticIfOneTimeStepData);
 }
 
-NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool goThroughLevels)
+NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool goThroughLevels, bool fMakeStaticIfOneTimeStepData)
 {
 	NFmiInfoOrganizer dataBase;
-	if(!InitDataBase(&dataBase, theModifiedData, theHelperDataFileNames, createDrawParamFileIfNotExist))
+	if(!InitDataBase(&dataBase, theModifiedData, theHelperDataFileNames, createDrawParamFileIfNotExist, fMakeStaticIfOneTimeStepData))
 	{
 		std::cerr << "Tietokannan alustus epäonnistui, ei jatketa." << std::endl;
 		return 0;
@@ -72,15 +73,15 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	return data;
 }
 
-NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, bool createDrawParamFileIfNotExist)
+NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, bool createDrawParamFileIfNotExist, bool fMakeStaticIfOneTimeStepData)
 {
 	NFmiTimeDescriptor times(theModifiedData->Info()->TimeDescriptor());
-	return ModifyData(theMacroText, theModifiedData, &times, createDrawParamFileIfNotExist);
+	return ModifyData(theMacroText, theModifiedData, &times, createDrawParamFileIfNotExist, fMakeStaticIfOneTimeStepData);
 }
 
-NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, bool createDrawParamFileIfNotExist)
+NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, bool createDrawParamFileIfNotExist, bool fMakeStaticIfOneTimeStepData)
 {
-	return ModifyData(theMacroText, theModifiedData, theTimes, 0, createDrawParamFileIfNotExist); // 0=tyhjä apudata filename-lista
+	return ModifyData(theMacroText, theModifiedData, theTimes, 0, createDrawParamFileIfNotExist, false, fMakeStaticIfOneTimeStepData); // 0=tyhjä apudata filename-lista
 }
 
 std::string NFmiSmartToolUtil::GetWorkingDirectory(void)
@@ -99,7 +100,7 @@ std::string NFmiSmartToolUtil::GetWorkingDirectory(void)
 #endif
 }
 
-bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist)
+bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool fMakeStaticIfOneTimeStepData)
 {
 	if(theDataBase)
 	{
@@ -108,13 +109,13 @@ bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryDa
 																		// false tarkoittaa että ei tehdä kopiota editoidusta datasta, tässä se on turhaa
 		theDataBase->AddData(theModifiedData, "xxxfileName", "", NFmiInfoData::kEditable, 0); // 0=undolevel
 		if(theHelperDataFileNames && theHelperDataFileNames->size())
-			InitDataBaseHelperData(*theDataBase, *theHelperDataFileNames);
+			InitDataBaseHelperData(*theDataBase, *theHelperDataFileNames, fMakeStaticIfOneTimeStepData);
 		return true;
 	}
 	return false;
 }
 
-bool NFmiSmartToolUtil::InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, const checkedVector<std::string> &theHelperDataFileNames)
+bool NFmiSmartToolUtil::InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, const checkedVector<std::string> &theHelperDataFileNames, bool fMakeStaticIfOneTimeStepData)
 {
 	NFmiStreamQueryData sQData;
 	for(unsigned int i=0; i<theHelperDataFileNames.size(); i++)
@@ -122,8 +123,11 @@ bool NFmiSmartToolUtil::InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, c
 		if(sQData.ReadData(theHelperDataFileNames[i]))
 		{
 			NFmiInfoData::Type dataType = NFmiInfoData::kViewable;
-			if(sQData.QueryData()->Info()->SizeTimes() == 1 && sQData.QueryData()->Info()->Param(kFmiTopoGraf))
-				dataType = NFmiInfoData::kStationary;
+			if(sQData.QueryData()->Info()->SizeTimes() == 1)
+			{
+				if(fMakeStaticIfOneTimeStepData || sQData.QueryData()->Info()->Param(kFmiTopoGraf))
+					dataType = NFmiInfoData::kStationary;
+			}
 			theDataBase.AddData(sQData.QueryData(true), theHelperDataFileNames[i], "", dataType, 0); // 0=undolevel
 		}
 	}
