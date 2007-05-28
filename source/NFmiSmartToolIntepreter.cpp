@@ -1938,7 +1938,9 @@ bool NFmiSmartToolIntepreter::InterpretNextMask(const std::string &theMaskSectio
 NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &theParamText)
 {
 	NFmiParam param;
-	ParamMap::iterator it = itsTokenParameterNamesAndIds.find(theParamText);
+
+	std::string tmp(theParamText);
+	ParamMap::iterator it = itsTokenParameterNamesAndIds.find(NFmiStringTools::LowerCase(tmp));
 	if(it == itsTokenParameterNamesAndIds.end())
 	{
 		if(!GetParamFromVariableById(theParamText, param))
@@ -2278,6 +2280,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy"), NFmiAreaMask::FunctionPeekXY));
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy2"), NFmiAreaMask::FunctionPeekXY2));
+		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy3"), NFmiAreaMask::FunctionPeekXY3));
 
 		itsTokenRampUpFunctions.push_back(string("RU"));
 		itsTokenRampUpFunctions.push_back(string("Ru"));
