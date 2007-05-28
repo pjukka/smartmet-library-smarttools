@@ -137,7 +137,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::GetSynopPlotParamInfo(bool& fSubParameter, NFm
 		while(aIter.Next())
 		{
 			aInfo = aIter.CurrentPtr();
-			if(aInfo->DataType() == theType && aInfo->Producer()->GetIdent() == 1001) // 1001 on synop tuottaja
+			if(aInfo->DataType() == theType && aInfo->Producer()->GetIdent() == kFmiSYNOP)
 				return aInfo;
 		}
 	}
@@ -157,7 +157,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::GetSoundingPlotParamInfo(bool& fSubParameter, 
 		while(aIter.Next())
 		{
 			aInfo = aIter.CurrentPtr();
-			if(aInfo->DataType() == theType && aInfo->Producer()->GetIdent() == 1005) // 1005 on sounding tuottaja
+			if(aInfo->DataType() == theType && aInfo->Producer()->GetIdent() == kFmiTEMP)
 				return aInfo;
 		}
 	}
@@ -997,6 +997,32 @@ NFmiSmartInfo* NFmiInfoOrganizer::ClimatologyInfo(void)
 NFmiSmartInfo* NFmiInfoOrganizer::AnalyzeDataInfo(const NFmiProducer& theProducer) // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 {
 	return FindInfo(NFmiInfoData::kAnalyzeData, theProducer, true);
+}
+
+// palauttaa tietyssä prioriteetti järjestyksessä jonkun analyysi datan mitä systeemistä löytyy
+NFmiSmartInfo* NFmiInfoOrganizer::AnalyzeDataInfo(void)
+{
+	checkedVector<NFmiSmartInfo*> infos = GetInfos(NFmiInfoData::kAnalyzeData);
+	if(infos.size() == 0)
+		return 0;
+	else if(infos.size() == 1)
+		return infos[0];
+	else
+	{
+		std::vector<unsigned long> analyzeProdIds;
+		analyzeProdIds.push_back(160); // 160 eli mesan2 on prioriteetti 1.
+		analyzeProdIds.push_back(104); // 104 eli mesan on prioriteetti 2.
+
+		for(size_t i = 0; i<analyzeProdIds.size(); i++)
+		{
+			for(size_t j = 0; j<infos.size(); j++)
+			{
+				if(infos[j]->Producer()->GetIdent() == analyzeProdIds[i])
+					return infos[j];
+			}
+		}
+	}
+	return 0;
 }
 
 NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType) // Hakee 1. tietyn datatyypin infon
