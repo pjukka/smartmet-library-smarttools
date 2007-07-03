@@ -7,7 +7,8 @@ Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}
-#Requires: libstdc++.so.6
+Requires: newbase >= 1.0-1
+Provides: smarttool
 
 %description
 FMI smarttools library
@@ -22,18 +23,18 @@ mkdir $RPM_BUILD_ROOT
 make %{_smp_mflags} 
 
 %install
-make install prefix="${RPM_BUILD_ROOT}/data/local"
-mkdir -p ${RPM_BUILD_ROOT}/data/local/src/c++/lib/smarttools
-cp -r . ${RPM_BUILD_ROOT}/data/local/src/c++/lib/smarttools
+make install prefix="${RPM_BUILD_ROOT}"
+mkdir -p ${RPM_BUILD_ROOT}/smartmet/src/c++/lib/smarttools
+cp -r . ${RPM_BUILD_ROOT}/smartmet/src/c++/lib/smarttools
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,www,www,0775)
-/data/local/include/smarttools
-/data/local/lib/libsmarttools.a
-/data/local/src/c++/lib/smarttools
+/usr/include/smarttools
+/usr/lib/libsmarttools.a
+/smartmet/src/c++/lib/smarttools
 
 
 %changelog
