@@ -62,6 +62,7 @@ namespace NFmiSoundingFunctions
 	double CalcDP(double T, double RH);
 
 	float CalcLogInterpolatedValue(float x1, float x2, float x, float y1, float y2);
+	float CalcLogInterpolatedWindWectorValue(float x1, float x2, float x, float wv1, float wv2);
 
 	bool GetValuesNeededInLCLCalculations(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double &T, double &Td, double &P);
 

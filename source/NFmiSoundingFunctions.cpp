@@ -11,6 +11,7 @@
 #include "NFmiSoundingData.h"
 #include "NFmiAngle.h"
 #include "NFmiValueString.h"
+#include "NFmiInterpolation.h"
 
 namespace NFmiSoundingFunctions
 {
@@ -500,6 +501,53 @@ float CalcLogInterpolatedValue(float x1, float x2, float x, float y1, float y2)
 		else if(y2 != kFloatMissing) // jos toinen -arvoista puuttuu annetaan arvoksi toinen
 			y = y2;
 	}
+	return y;
+}
+
+// Laskee logaritmisessa asteikossa interpoloidun arvon.
+// K‰ytet‰‰n esim. logaritmisen paine asteikon kanssa.
+// Palauttaa x:‰‰ vastaavan y:n, kun x1 arvoa vastaa y1 ja x2:n arvoa vastaa y2.
+float CalcLogModLinearInterpolatedValue(float x1, float x2, float x, float y1, float y2, unsigned int modulo)
+{
+	float y = kFloatMissing;
+	if(x1 != kFloatMissing && x2 != kFloatMissing && x != kFloatMissing)
+	{
+		if(x1 == x2)
+			y = y1 != kFloatMissing ? y1 : y2;
+		else if(y1 != kFloatMissing && y2 != kFloatMissing)
+		{
+			float w = (::log(x)-::log(x1)) / (::log(x2)-::log(x1));
+			y =  static_cast<float>(NFmiInterpolation::ModLinear(w, y1, y2, modulo));
+		}
+		else if(y1 != kFloatMissing) // jos toinen -arvoista puuttuu annetaan arvoksi toinen
+			y = y1;
+		else if(y2 != kFloatMissing) // jos toinen -arvoista puuttuu annetaan arvoksi toinen
+			y = y2;
+	}
+	return y;
+}
+
+float CalcLogInterpolatedWindWectorValue(float x1, float x2, float x, float wv1, float wv2)
+{
+	float y = kFloatMissing;
+	if(wv1 != kFloatMissing && wv2 != kFloatMissing)
+	{
+		float wd1 = (static_cast<int>(wv1)%100)*10.f;
+		float ws1 = static_cast<float>(static_cast<int>(wv1)/100);
+		float wd2 = (static_cast<int>(wv2)%100)*10.f;
+		float ws2 = static_cast<float>(static_cast<int>(wv2)/100);
+
+		float wdInterp = CalcLogModLinearInterpolatedValue(x1, x2, x, wd1, wd2, 360);
+		float wsInterp = CalcLogInterpolatedValue(x1, x2, x, ws1, ws2);
+		if(wdInterp != kFloatMissing && wsInterp != kFloatMissing)
+		{
+			y = static_cast<float>(FmiRound(wsInterp)*100 + FmiRound(wdInterp/10.));
+		}
+	}
+	else if(wv1 != kFloatMissing)
+		y = wv1;
+	else if(wv2 != kFloatMissing)
+		y = wv2;
 	return y;
 }
 
