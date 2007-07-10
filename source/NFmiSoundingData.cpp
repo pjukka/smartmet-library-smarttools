@@ -213,14 +213,24 @@ float NFmiSoundingData::GetValueAtPressure(FmiParameterName theId, float P)
 				}
 			}
 		}
+		float maxPDiff = 10.; // suurin sallittu ero, että arvo hyväksytään, jos pyydetty paine on 'asteikon ulkona' 
 		if(lastP != kFloatMissing && currentP != kFloatMissing && lastValue != kFloatMissing && currentValue != kFloatMissing)
 		{ // interpoloidaan arvo kun löytyi kaikki arvot
-			value = CalcLogInterpolatedValue(lastP, currentP, P, lastValue, currentValue);
+			if(theId == kFmiWindVectorMS)
+				value = CalcLogInterpolatedWindWectorValue(lastP, currentP, P, lastValue, currentValue);
+			else
+				value = CalcLogInterpolatedValue(lastP, currentP, P, lastValue, currentValue);
 		}
 		else if(lastP != kFloatMissing && lastValue != kFloatMissing)
-			value = lastValue;
+		{
+			if(::fabs(lastP - P) < maxPDiff)
+				value = lastValue;
+		}
 		else if(currentP != kFloatMissing && currentValue != kFloatMissing)
-			value = currentValue;
+		{
+			if(::fabs(currentP - P) < maxPDiff)
+				value = currentValue;
+		}
 	}
 	return value;
 }
@@ -549,6 +559,7 @@ void NFmiSoundingData::CutEmptyData(void)
 	itsWindDirectionData.resize(greatestNonMissingLevelIndex);
 	itsWindComponentUData.resize(greatestNonMissingLevelIndex);
 	itsWindComponentVData.resize(greatestNonMissingLevelIndex);
+	itsWindVectorData.resize(greatestNonMissingLevelIndex);
 
 }
 
@@ -672,6 +683,7 @@ bool NFmiSoundingData::FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMe
 				FillParamData(theInfo, kFmiWindDirection);
 				FillParamData(theInfo, kFmiWindUMS);
 				FillParamData(theInfo, kFmiWindVMS);
+				FillParamData(theInfo, kFmiWindVectorMS);
 				InitZeroHeight();
 				return true;
 			}
@@ -701,6 +713,7 @@ bool NFmiSoundingData::FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMe
 		FillParamData(theInfo, kFmiWindDirection, theTime, theLatlon);
 		FillParamData(theInfo, kFmiWindUMS, theTime, theLatlon);
 		FillParamData(theInfo, kFmiWindVMS, theTime, theLatlon);
+		FillParamData(theInfo, kFmiWindVectorMS, theTime, theLatlon);
 		InitZeroHeight();
 		return true;
 	}
@@ -759,6 +772,8 @@ checkedVector<float>& NFmiSoundingData::GetParamData(FmiParameterName theId)
 		return itsWindComponentUData;
 	case kFmiWindVMS:
 		return itsWindComponentVData;
+	case kFmiWindVectorMS:
+		return itsWindVectorData;
 	default:
 	  throw std::runtime_error(std::string("NFmiSoundingData::GetParamData - wrong paramId given (Error in Program?): ") + NFmiStringTools::Convert<int>(theId));
 	}
@@ -774,6 +789,7 @@ void NFmiSoundingData::ClearDatas(void)
 	checkedVector<float>().swap(itsWindDirectionData);
 	checkedVector<float>().swap(itsWindComponentUData);
 	checkedVector<float>().swap(itsWindComponentVData);
+	checkedVector<float>().swap(itsWindVectorData);
 
 	fPressureDataAvailable = false;
 	fHeightDataAvailable = false;
@@ -976,4 +992,30 @@ void NFmiSoundingData::UpdateUandVParams(void)
 			vV[i] = ::CalcV(wsV[i], wdV[i]);
 		}
 	}
+}
+
+// tarkistaa onko kyseisellä ajanhetkellä ja asemalla ei puuttuvaa luotaus-dataa
+bool NFmiSoundingData::HasRealSoundingData(NFmiFastQueryInfo &theSoundingLevelInfo)
+{
+//	theSoundingLevelInfo.First();
+	if(theSoundingLevelInfo.Param(kFmiPressure) || theSoundingLevelInfo.Param(kFmiGeomHeight) || theSoundingLevelInfo.Param(kFmiGeopHeight))
+	{
+		int cc = 0;
+		for(theSoundingLevelInfo.ResetLevel(); theSoundingLevelInfo.NextLevel(); cc++)
+		{
+			if(theSoundingLevelInfo.FloatValue() != kFloatMissing)
+				return true; // jos miltään alku leveliltä löytyy yhtään korkeusdataa, on käyrä 'piirrettävissä'
+			if(cc > 10) // pitää löytyä dataa 10 ensimmäisen kerroksen aikana
+				break;
+		}
+		cc = 0; // käydään dataa läpi myös toisesta päästä, jos ei löytynyt
+		for(theSoundingLevelInfo.LastLevel(); theSoundingLevelInfo.PreviousLevel(); cc++)
+		{
+			if(theSoundingLevelInfo.FloatValue() != kFloatMissing)
+				return true; // jos miltään alku leveliltä löytyy yhtään korkeusdataa, on käyrä 'piirrettävissä'
+			if(cc > 10) // pitää löytyä dataa 10 ensimmäisen kerroksen aikana
+				break;
+		}
+	}
+	return false;
 }

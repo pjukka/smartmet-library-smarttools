@@ -26,6 +26,7 @@ public:
 	bool FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly = false);
 	bool FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName);
 	void CutEmptyData(void); // tämä leikkaa Fill.. -metodeissa laskettuja data vektoreita niin että pelkät puuttuvat kerrokset otetaan pois
+	static bool HasRealSoundingData(NFmiFastQueryInfo &theSoundingLevelInfo);
 
 	// FillSoundingData-metodeilla täytetään kunkin parametrin vektorit ja tällä saa haluamansa parametrin vektorin käyttöön
 	checkedVector<float>& GetParamData(FmiParameterName theId);
@@ -76,6 +77,7 @@ private:
 	checkedVector<float> itsWindDirectionData;
 	checkedVector<float> itsWindComponentUData;
 	checkedVector<float> itsWindComponentVData;
+	checkedVector<float> itsWindVectorData;
 
 	float itsZeroHeight; // tältä korkeudelta alkaa luotauksen 0-korkeus, eli vuoristossa luotaus alkaa oikeasti korkeammalta ja se korkeus pitää käsitellä pintakorkeutena
 	int itsZeroHeightIndex; // edellisen indeksi (paikka vektorissa). Arvo on -1 jos ei löytynyt kunnollista 0-korkeutta
