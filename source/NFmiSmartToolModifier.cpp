@@ -1285,9 +1285,14 @@ const std::string& NFmiSmartToolModifier::GetStrippedMacroText(void) const
 NFmiSmartInfo* NFmiSmartToolModifier::UsedMacroParamData(void)
 {
 	if(itsMacroParamData)
-		return itsMacroParamData;
+		return itsMacroParamData; // multithreaddauksen varalle?!?!?
 	else if(itsInfoOrganizer)
-		return itsInfoOrganizer->MacroParamData();
+	{
+		if(fDoCrossSectionCalculation)
+			return itsInfoOrganizer->CrossSectionMacroParamData();
+		else
+			return itsInfoOrganizer->MacroParamData();
+	}
 	else
 		return 0;
 }
