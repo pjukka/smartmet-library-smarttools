@@ -425,8 +425,8 @@ bool NFmiSmartInfo::SnapShotData (const std::string& theAction, const NFmiHarmon
 		RearrangeUndoTable();
 
 	(*itsCurrentUndoLevelPtr)++;
-	memcpy(itsUndoTable[*itsCurrentUndoLevelPtr], itsRefDataPool->Data(),
-				itsRefDataPool->Size());
+	itsRefDataPool->ContinuousCharArrayFill(itsUndoTable[*itsCurrentUndoLevelPtr]);
+//	memcpy(itsUndoTable[*itsCurrentUndoLevelPtr], itsRefDataPool->Data(), itsRefDataPool->Size());
 	itsUndoRedoHarmonizerBookKeepingData->push_back(theHarmonizerBookKeepingData); // lisätään perään annettu bagi
 	(*itsCurrentRedoLevelPtr) = (*itsCurrentUndoLevelPtr);
 	(*itsMaxRedoLevelPtr) = (*itsCurrentRedoLevelPtr);
@@ -586,7 +586,8 @@ bool NFmiSmartInfo::UndoData (const NFmiHarmonizerBookKeepingData &theHarmonizer
 		(*itsCurrentUndoLevelPtr)--;		// jos siihen halutaankin myöhemmin palata redo:lla.
 	}
 
-	memcpy(itsRefDataPool->Data(), itsUndoTable[*itsCurrentUndoLevelPtr], itsRefDataPool->Size());
+	itsRefDataPool->ContinuousCharArrayRead(itsUndoTable[*itsCurrentUndoLevelPtr]);
+//	memcpy(itsRefDataPool->Data(), itsUndoTable[*itsCurrentUndoLevelPtr], itsRefDataPool->Size());
 	(*itsCurrentUndoLevelPtr)--;
 	*itsCurrentRedoLevelPtr = (*itsCurrentUndoLevelPtr) + 2;
 	*fDirty = true; // 18.1.2002/Marko lisäsin datan likauksen.
@@ -611,7 +612,8 @@ bool NFmiSmartInfo::RedoData (void)
 		return false;
 	else
 	{
-		memcpy(itsRefDataPool->Data(), itsUndoTable[*itsCurrentRedoLevelPtr], itsRefDataPool->Size());
+		itsRefDataPool->ContinuousCharArrayRead(itsUndoTable[*itsCurrentRedoLevelPtr]);
+		// memcpy(itsRefDataPool->Data(), itsUndoTable[*itsCurrentRedoLevelPtr], itsRefDataPool->Size());
 		(*itsCurrentUndoLevelPtr)++;
 		if((*itsCurrentRedoLevelPtr) + 1 <= (*itsMaxRedoLevelPtr))
 			(*itsCurrentRedoLevelPtr)++;
@@ -656,7 +658,7 @@ void NFmiSmartInfo::UndoLevel (const long& theDepth)	// theDepth kuvaa kuinka mo
 					itsUndoTable[level] = 0; // nollataan ensin pointteri, että voidaan siivota jälkiä jos muistin varaus pettää joskus
 
 				for (int level = 0; level < (*itsMaxUndoLevelPtr); level++)
-					itsUndoTable[level] = new char[itsRefDataPool->Size()];
+					itsUndoTable[level] = new char[itsRefDataPool->ByteSize()];
 				itsUndoRedoHarmonizerBookKeepingData = new std::deque<NFmiHarmonizerBookKeepingData>;
 			}
 			catch(...)
