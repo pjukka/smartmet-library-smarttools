@@ -553,6 +553,7 @@ void NFmiSoundingData::CutEmptyData(void)
 	// tässä pitää käydä läpi kaikki data vektorit!!!! Oikeasti nämä datavektori pitäisi laittaa omaan vektoriin että sitä voitaisiin iteroida oikein!
 	itsTemperatureData.resize(greatestNonMissingLevelIndex);
 	itsDewPointData.resize(greatestNonMissingLevelIndex);
+	itsHumidityData.resize(greatestNonMissingLevelIndex);
 	itsPressureData.resize(greatestNonMissingLevelIndex);
 	itsGeomHeightData.resize(greatestNonMissingLevelIndex);
 	itsWindSpeedData.resize(greatestNonMissingLevelIndex);
@@ -684,6 +685,7 @@ bool NFmiSoundingData::FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMe
 				FillParamData(theInfo, kFmiWindUMS);
 				FillParamData(theInfo, kFmiWindVMS);
 				FillParamData(theInfo, kFmiWindVectorMS);
+				CalculateHumidityData();
 				InitZeroHeight();
 				return true;
 			}
@@ -714,10 +716,26 @@ bool NFmiSoundingData::FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMe
 		FillParamData(theInfo, kFmiWindUMS, theTime, theLatlon);
 		FillParamData(theInfo, kFmiWindVMS, theTime, theLatlon);
 		FillParamData(theInfo, kFmiWindVectorMS, theTime, theLatlon);
+		CalculateHumidityData();
 		InitZeroHeight();
 		return true;
 	}
 	return false;
+}
+
+// laskee jo laskettujen T ja Td avulla RH
+void NFmiSoundingData::CalculateHumidityData(void)
+{
+	size_t tVectorSize = itsTemperatureData.size();
+	if(tVectorSize > 0 && itsDewPointData.size() == tVectorSize)
+	{
+		itsHumidityData.resize(tVectorSize);
+		for(size_t i = 0; i < tVectorSize; i++)
+		{
+			if(itsTemperatureData[i] != kFloatMissing && itsDewPointData[i] != kFloatMissing)
+				itsHumidityData[i] = static_cast<float>(NFmiSoundingFunctions::CalcRH(itsTemperatureData[i], itsDewPointData[i]));
+		}
+	}
 }
 
 // tätä kutsutaan FillParamData-metodeista
@@ -758,6 +776,8 @@ checkedVector<float>& NFmiSoundingData::GetParamData(FmiParameterName theId)
 		return itsTemperatureData;
 	case kFmiDewPoint:
 		return itsDewPointData;
+	case kFmiHumidity:
+		return itsHumidityData;
 	case kFmiPressure:
 		return itsPressureData;
 	case kFmiGeopHeight:
@@ -783,6 +803,7 @@ void NFmiSoundingData::ClearDatas(void)
 {
 	checkedVector<float>().swap(itsTemperatureData);
 	checkedVector<float>().swap(itsDewPointData);
+	checkedVector<float>().swap(itsHumidityData);
 	checkedVector<float>().swap(itsPressureData);
 	checkedVector<float>().swap(itsGeomHeightData);
 	checkedVector<float>().swap(itsWindSpeedData);

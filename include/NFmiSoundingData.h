@@ -62,6 +62,7 @@ private:
 	bool FillParamData(NFmiFastQueryInfo* theInfo, FmiParameterName theId);
 	bool FillParamData(NFmiFastQueryInfo* theInfo, FmiParameterName theId, const NFmiMetTime& theTime, const NFmiPoint& theLatlon);
 	void InitZeroHeight(void); // tätä kutsutaan FillParamData-metodeista
+	void CalculateHumidityData(void);
 
 	NFmiLocation itsLocation;
 	NFmiMetTime	itsTime;
@@ -71,6 +72,7 @@ private:
 	// param-lista (joka annetaan fillData-metodeissa) data osaksi
 	checkedVector<float> itsTemperatureData;
 	checkedVector<float> itsDewPointData;
+	checkedVector<float> itsHumidityData;
 	checkedVector<float> itsPressureData;
 	checkedVector<float> itsGeomHeightData; // tämä on korkeus dataa metreissä
 	checkedVector<float> itsWindSpeedData;
