@@ -91,8 +91,8 @@ public:
 	const NFmiPoint&	 OnlyOneSymbolRelativeSize (void) const { return itsOnlyOneSymbolRelativeSize; };
 	void				 OnlyOneSymbolRelativePositionOffset (const NFmiPoint& theOnlyOneSymbolRelativePositionOffset) { itsOnlyOneSymbolRelativePositionOffset = theOnlyOneSymbolRelativePositionOffset; };
 	const NFmiPoint&	 OnlyOneSymbolRelativePositionOffset (void) const { return itsOnlyOneSymbolRelativePositionOffset; };
-	void				 ShowStationMarker (const bool newState) { fShowStationMarker = newState; };
-	bool			 ShowStationMarker (void) const { return fShowStationMarker; };
+	void				 UseIsoLineGabWithCustomContours (const bool newState) { fUseIsoLineGabWithCustomContours = newState; };
+	bool				 UseIsoLineGabWithCustomContours (void) const { return fUseIsoLineGabWithCustomContours; };
 	void				 IsoLineGab (const double theIsoLineGab) { itsIsoLineGab = theIsoLineGab; };
 	double				 IsoLineGab (void) const { return itsIsoLineGab; };
 	void				 ModifyingStep (const double theModifyingStep) { itsModifyingStep = theModifyingStep; };
@@ -239,14 +239,18 @@ public:
 	void ColorContouringColorShadeMidValue(float newValue){itsColorContouringColorShadeMidValue = newValue;}
 	float ColorContouringColorShadeHighValue(void) const {return itsColorContouringColorShadeHighValue;}
 	void ColorContouringColorShadeHighValue(float newValue){itsColorContouringColorShadeHighValue = newValue;}
+	float ColorContouringColorShadeHigh2Value(void) const {return itsColorContouringColorShadeHigh2Value;}
+	void ColorContouringColorShadeHigh2Value(float newValue){itsColorContouringColorShadeHigh2Value = newValue;}
 	const NFmiColor& ColorContouringColorShadeLowValueColor(void) const {return itsColorContouringColorShadeLowValueColor;}
 	void ColorContouringColorShadeLowValueColor(const NFmiColor& newValue){itsColorContouringColorShadeLowValueColor = newValue;}
 	const NFmiColor& ColorContouringColorShadeMidValueColor(void) const {return itsColorContouringColorShadeMidValueColor;}
 	void ColorContouringColorShadeMidValueColor(const NFmiColor& newValue){itsColorContouringColorShadeMidValueColor = newValue;}
 	const NFmiColor& ColorContouringColorShadeHighValueColor(void) const {return itsColorContouringColorShadeHighValueColor;}
 	void ColorContouringColorShadeHighValueColor(const NFmiColor& newValue){itsColorContouringColorShadeHighValueColor = newValue;}
-	int ColorContouringColorShadeClassCount(void) const {return itsColorContouringColorShadeClassCount;}
-	void ColorContouringColorShadeClassCount(int newValue){itsColorContouringColorShadeClassCount = newValue;}
+	const NFmiColor& ColorContouringColorShadeHigh2ValueColor(void) const {return itsColorContouringColorShadeHigh2ValueColor;}
+	void ColorContouringColorShadeHigh2ValueColor(const NFmiColor& newValue){itsColorContouringColorShadeHigh2ValueColor = newValue;}
+//	int ColorContouringColorShadeClassCount(void) const {return itsColorContouringColorShadeClassCount;}
+//	void ColorContouringColorShadeClassCount(int newValue){itsColorContouringColorShadeClassCount = newValue;}
 	bool UseWithIsoLineHatch1(void) const {return fUseWithIsoLineHatch1;}
 	void UseWithIsoLineHatch1(bool newValue){fUseWithIsoLineHatch1 = newValue;}
 	bool DrawIsoLineHatchWithBorders1(void) const {return fDrawIsoLineHatchWithBorders1;}
@@ -274,8 +278,8 @@ public:
 	void IsoLineHatchType2(int newValue){itsIsoLineHatchType2 = newValue;}
 	const NFmiColor& IsoLineHatchColor2(void) const {return itsIsoLineHatchColor2;}
 	void IsoLineHatchColor2(const NFmiColor& newValue){itsIsoLineHatchColor2 = newValue;}
-	const NFmiColor& IsoLineHatchBorderColor2(void) const {return itsIsoLineHatchBorderColor2;}
-	void IsoLineHatchBorderColor2(const NFmiColor& newValue){itsIsoLineHatchBorderColor2 = newValue;}
+//	const NFmiColor& IsoLineHatchBorderColor2(void) const {return itsIsoLineHatchBorderColor2;}
+//	void IsoLineHatchBorderColor2(const NFmiColor& newValue){itsIsoLineHatchBorderColor2 = newValue;}
 	int IsoLineLabelDigitCount(void) const {return itsIsoLineLabelDigitCount;}
 	void IsoLineLabelDigitCount(int newValue){itsIsoLineLabelDigitCount = newValue; if(itsIsoLineLabelDigitCount > 10)itsIsoLineLabelDigitCount = 10;}
 //**************************************************************
@@ -328,7 +332,7 @@ protected:
 	NFmiPoint itsRelativePositionOffset;
 	NFmiPoint itsOnlyOneSymbolRelativeSize;
 	NFmiPoint itsOnlyOneSymbolRelativePositionOffset;
-	bool fShowStationMarker;
+	bool fUseIsoLineGabWithCustomContours;
 	double itsIsoLineGab;
 	double itsModifyingStep;
 	bool fModifyingUnit;	//(= 0, jos yksikkö on %, = 1, jos yksikkö on sama kuin itsUnit)
@@ -407,11 +411,13 @@ protected:
 	checkedVector<int> itsSpecialColorContouringColorIndexies; // eri viivojen väri indeksit (pitää tehdä näyttö taulukko käyttäjälle)
 	float itsColorContouringColorShadeLowValue; //väri skaalaus alkaa tästä arvosta
 	float itsColorContouringColorShadeMidValue; //väri skaalauksen keskiarvo
-	float itsColorContouringColorShadeHighValue; //väri skaalaus loppuu tähän arvoon
+	float itsColorContouringColorShadeHighValue; 
+	float itsColorContouringColorShadeHigh2Value; //väri skaalaus loppuu tähän arvoon
 	NFmiColor itsColorContouringColorShadeLowValueColor;
 	NFmiColor itsColorContouringColorShadeMidValueColor;
 	NFmiColor itsColorContouringColorShadeHighValueColor;
-	int itsColorContouringColorShadeClassCount; // kuinka monta väri luokkaa tehdään skaalaukseen
+	NFmiColor itsColorContouringColorShadeHigh2ValueColor;
+//	int itsColorContouringColorShadeClassCount; // kuinka monta väri luokkaa tehdään skaalaukseen
 // isoviivojen kanssa voi käyttää myös hatchättyjä alueita (2 kpl)
 	bool fUseWithIsoLineHatch1;
 	bool fDrawIsoLineHatchWithBorders1;
@@ -426,7 +432,7 @@ protected:
 	float itsIsoLineHatchHighValue2; // hatch alueen yläarvo
 	int itsIsoLineHatchType2; // hatch tyyppi 1=vinoviiva oikealle, 2=vinoviiva vasemmalle jne.
 	NFmiColor itsIsoLineHatchColor2;
-	NFmiColor itsIsoLineHatchBorderColor2;
+//	NFmiColor itsIsoLineHatchBorderColor2;
 	int itsIsoLineLabelDigitCount; // isoviiva labelin näytettävien digitaalien lukumäärä
 //***********************************************
 //********** 'versio 2' parametreja *************
