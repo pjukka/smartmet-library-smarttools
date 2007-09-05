@@ -16,7 +16,7 @@ CFLAGS_RELEASE = -DUNIX -O2 -DNDEBUG $(MAINFLAGS)
 LDFLAGS = -s
 ARFLAGS = -r
 INCLUDES = -I $(includedir)/newbase
-LIBS = -L ../../../../lib -lnewbase
+LIBS = -L $(libdir) -lnewbase
 
 # Common library compiling template
 
