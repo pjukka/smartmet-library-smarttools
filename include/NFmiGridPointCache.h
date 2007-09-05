@@ -14,6 +14,8 @@
 #include <string>
 #include <map>
 
+class NFmiGrid;
+
 class NFmiGridPointCache
 {
 public:
@@ -33,7 +35,7 @@ public:
 	pointMap::iterator Find(const std::string &theGridStr) {return itsPointCache.find(theGridStr);};
 	pointMap::iterator End(void) {return itsPointCache.end();};
 	void Clear(void) {itsPointCache.clear();};
-
+	static const std::string MakeGridCacheStr(const NFmiGrid &theGrid);
 
 private:
 	pointMap itsPointCache;

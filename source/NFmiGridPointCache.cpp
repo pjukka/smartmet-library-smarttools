@@ -6,6 +6,7 @@
 //---------------------------------------------------------- NFmiGridPointCache.cpp
 
 #include "NFmiGridPointCache.h"
+#include "NFmiGrid.h"
 
 void NFmiGridPointCache::Add(const std::string &theGridStr, const NFmiGridPointCache::Data &theData)
 {
@@ -18,3 +19,13 @@ void NFmiGridPointCache::Add(const std::string &theGridStr, const NFmiGridPointC
 	}
 }
 
+const std::string NFmiGridPointCache::MakeGridCacheStr( const NFmiGrid &theGrid )
+{
+	std::string str(theGrid.Area()->AreaStr());
+	str += ":";
+	str += NFmiStringTools::Convert(theGrid.XNumber());
+	str += ",";
+	str += NFmiStringTools::Convert(theGrid.YNumber());
+
+	return str;
+}
