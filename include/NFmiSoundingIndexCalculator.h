@@ -75,15 +75,27 @@ typedef enum
 	kSoundingParSRH0_3km, // SRH=storm related helicity
 	kSoundingParSRH0_1km,
 	kSoundingParWS1500m,
-	kSoundingParThetaE0_3km
+	kSoundingParThetaE0_3km,
+	// sitten obs-surface-based (SurBas) arvojen avulla lasketut parametrit
+	kSoundingParLCLSurBas = 4780,
+	kSoundingParLFCSurBas,
+	kSoundingParELSurBas,
+	kSoundingParCAPESurBas,
+	kSoundingParCAPE0_3kmSurBas,
+	kSoundingParCINSurBas,
+	kSoundingParLCLHeightSurBas,
+	kSoundingParLFCHeightSurBas,
+	kSoundingParELHeightSurBas,
+	kSoundingParCAPE_TT_SurBas // cape -10 ja -40 asteen kerroksen läpi
 } FmiSoundingParameters;
 
 class NFmiSoundingIndexCalculator
 {
 public:
 
+	static bool IsSurfaceBasedSoundingIndex(FmiSoundingParameters theSoundingParameter);
 	static bool FillSoundingData(NFmiFastQueryInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiMetTime &theTime, const NFmiLocation &theLocation);
-	static void Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrganizer *theInfoOrganizer, NFmiDrawParam *theDrawParam, NFmiDataMatrix<float> &theValues, const NFmiMetTime &theTime);
+	static void Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrganizer *theInfoOrganizer, NFmiDrawParam *theDrawParam, NFmiDataMatrix<float> &theValues, const NFmiMetTime &theTime, const NFmiDataMatrix<float> &theObsDataT, const NFmiDataMatrix<float> &theObsDataTd, bool fObsDataFound);
 	static float Calc(NFmiSoundingData &theSoundingData, FmiSoundingParameters theParam);
 	static float Calc(NFmiFastQueryInfo *theInfo, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, FmiSoundingParameters theParam);
 };

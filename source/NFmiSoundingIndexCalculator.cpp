@@ -40,17 +40,59 @@ static bool FillSoundingData(NFmiFastQueryInfo *theInfo, NFmiSoundingData &theSo
 	return false;
 }
 
+bool NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(FmiSoundingParameters theSoundingParameter)
+{
+	if(theSoundingParameter >= kSoundingParLCLSurBas && theSoundingParameter <= kSoundingParCAPE_TT_SurBas)
+		return true;
+	else
+		return false;
+}
+
+static bool FillSurfaceValuesFromInfo(NFmiSmartInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiPoint &theLatLon)
+{
+	theInfo->Param(kFmiTemperature);
+	float T = theInfo->InterpolatedValue(theLatLon);
+	theInfo->Param(kFmiDewPoint);
+	float Td = theInfo->InterpolatedValue(theLatLon);
+	if(T != kFloatMissing && Td != kFloatMissing)
+	{
+		theSoundingData.SetTandTdSurfaceValues(T, Td);
+		return true;
+	}
+	else
+		return false;
+}
+
 // T‰m‰ on ulkopuolista hila datan laskemista varten tehty metodi.
 // theBaseInfo:ssa on projektio ja hila pohja. T‰m‰ hila pit‰‰ laskea theValues parametriin.
 // theDrawParam parametri antaa tiedot halutusta mallista, datatyypist‰ esim. EC mallipinta.
 // theTime kertoo mihin ajan hetkeen parametri lasketaan.
 // Oletus: theValues on jo tehty oikean kokoiseksi (theBaseInfo:n mukaan) ja t‰ytetty puuttuvilla arvoilla.
-void NFmiSoundingIndexCalculator::Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrganizer *theInfoOrganizer, NFmiDrawParam *theDrawParam, NFmiDataMatrix<float> &theValues, const NFmiMetTime &theTime)
+void NFmiSoundingIndexCalculator::Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrganizer *theInfoOrganizer, NFmiDrawParam *theDrawParam, NFmiDataMatrix<float> &theValues, const NFmiMetTime &theTime, const NFmiDataMatrix<float> &theObsDataT, const NFmiDataMatrix<float> &theObsDataTd, bool fObsDataFound)
 {
 	NFmiDrawParam tempDrawParam(*theDrawParam); // tehd‰‰n v‰liaikais kopio drawParamista ett‰ voidaan muuttaa data tyyppi (soundingParamista pois) oikean l‰hde datan hakua varten
 	tempDrawParam.DataType(static_cast<NFmiInfoData::Type>(theDrawParam->DataType() - NFmiInfoData::kSoundingParameterData)); // pit‰‰ v‰hent‰‰ kSoundingParameterData ett‰ saadaan tiet‰‰ mink‰ tyyppist‰ dataa laskuissa halutaan k‰ytt‰‰
 	tempDrawParam.Param(NFmiDataIdent(NFmiParam(kFmiTemperature, "T"), *(theDrawParam->Param().GetProducer()))); // haetaan parametria l‰mpˆtila, t‰ll‰ ei ole merkityst‰, mutta jotain parametria vain pit‰‰ vain hakea (ja T lˆytyy aina?)
 	NFmiSmartInfo *info = theInfoOrganizer->Info(tempDrawParam, true); // pit‰‰ olla true, ett‰ haetaan crosssection dataa, jolloin levelill‰ ei ole v‰li‰
+
+	FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theDrawParam->Param().GetParamIdent());
+	bool surfaceBasedCalculation = IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
+	NFmiSmartInfo *analyzeData = 0;
+	bool useAnalyzeData = false;
+	if(surfaceBasedCalculation)
+	{
+		// onko analysi dataa halutulle ajalle ja halutut parametrit? jos on k‰ytet‰‰n sit‰
+		analyzeData = theInfoOrganizer->AnalyzeDataInfo();
+		if(analyzeData && analyzeData->Time(theTime))
+		{
+			if(analyzeData->Param(kFmiTemperature) && analyzeData->Param(kFmiDewPoint)) // pit‰‰ lˆyty‰ myˆs T ja Td parametrit ett‰ olisi jotain hyˆty‰
+				useAnalyzeData = true;
+		}
+	}
+
+	if(surfaceBasedCalculation == true && (useAnalyzeData == false && fObsDataFound == false))
+		return ; // ei mit‰‰n teht‰viss‰ kun lasketaan surfacebasedlaskuja, joten 'palautetaan' puuttuva matriisi
+
 	if(info && theBaseInfo && theBaseInfo->IsGrid())
 	{
 		unsigned long xnum = theBaseInfo->Grid()->XNumber();
@@ -58,7 +100,16 @@ void NFmiSoundingIndexCalculator::Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrgan
 		NFmiSoundingData soundingData;
 		for(theBaseInfo->ResetLocation(); theBaseInfo->NextLocation(); counter++)
 		{
+			bool surfaceBaseStatus = false;
 			FillSoundingData(info, soundingData, theTime, *(theBaseInfo->Location())); // t‰ytet‰‰n luotaus datat yksi kerrallaan
+			if(useAnalyzeData)
+				surfaceBaseStatus = FillSurfaceValuesFromInfo(analyzeData, soundingData, theBaseInfo->LatLon()); // t‰yt‰ pinta arvot analyysist‰
+			else if(fObsDataFound)
+				; // t‰yt‰ pinta arvot obs-datasta
+			if(surfaceBasedCalculation && surfaceBaseStatus == false)
+				continue; // jos esim. analyysi/havainto pinta data ei lˆytynyt t‰st‰ kohtaa, j‰‰ puuttuva arvo voimaan
+
+			// HUOM!!!! muista muuttaa luotaus-parametri pelk‰ksi surface arvoksi, koska loppu menee itsest‰‰n sitten
 			float value = Calc(soundingData, static_cast<FmiSoundingParameters>(theDrawParam->Param().GetParamIdent()));
 			theValues[counter % xnum][counter / xnum] = value;
 		}
