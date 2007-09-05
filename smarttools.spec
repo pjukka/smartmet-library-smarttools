@@ -1,14 +1,14 @@
 Summary: smarttools library
 Name: smarttools
-Version: 1.0
+Version: 1.0.1
 Release: 1
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}
-Requires: newbase >= 1.0-1
-Provides: smarttool
+Requires: newbase >= 1.0.1-1
+Provides: smarttools
 
 %description
 FMI smarttools library
@@ -25,15 +25,15 @@ make depend
 make %{_smp_mflags} 
 
 %install
-make install prefix="${RPM_BUILD_ROOT}"
+%makeinstall
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%defattr(-,www,www,0775)
-/usr/include/smarttools
-/usr/lib/libsmarttools.a
+%defattr(-,root,www,0775)
+%{_includedir}/smarttools
+%{_libdir}/libsmarttools.a
 
 
 %changelog
