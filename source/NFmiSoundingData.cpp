@@ -79,6 +79,14 @@ bool NFmiSoundingData::SetValueToPressureLevel(float P, float theParamValue, Fmi
 	return false;
 }
 
+void NFmiSoundingData::SetTandTdSurfaceValues(float T, float Td)
+{
+	checkedVector<float>&tV = GetParamData(kFmiTemperature);
+	checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
+	tV[0] = T;
+	tdV[0] = Td;
+}
+
 // paluttaa paine arvon halutulle metri korkeudelle
 float NFmiSoundingData::GetPressureAtHeight(double H)
 {
@@ -213,7 +221,7 @@ float NFmiSoundingData::GetValueAtPressure(FmiParameterName theId, float P)
 				}
 			}
 		}
-		float maxPDiff = 10.; // suurin sallittu ero, että arvo hyväksytään, jos pyydetty paine on 'asteikon ulkona' 
+		float maxPDiff = 10.; // suurin sallittu ero, että arvo hyväksytään, jos pyydetty paine on 'asteikon ulkona'
 		if(lastP != kFloatMissing && currentP != kFloatMissing && lastValue != kFloatMissing && currentValue != kFloatMissing)
 		{ // interpoloidaan arvo kun löytyi kaikki arvot
 			if(theId == kFmiWindVectorMS)

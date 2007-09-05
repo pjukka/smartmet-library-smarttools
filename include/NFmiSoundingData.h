@@ -55,6 +55,7 @@ public:
 	void UpdateUandVParams(void);
 	bool PressureDataAvailable(void) const {return fPressureDataAvailable;}
 	bool HeightDataAvailable(void) const {return fHeightDataAvailable;}
+	void SetTandTdSurfaceValues(float T, float Td);
 private:
 	unsigned int GetHighestNonMissingValueLevelIndex(FmiParameterName theParaId);
 	float GetPressureAtHeight(double H);
