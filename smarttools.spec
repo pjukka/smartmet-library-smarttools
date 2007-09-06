@@ -1,14 +1,15 @@
+%define LIBNAME smarttools
 Summary: smarttools library
-Name: smarttools
+Name: smartmet-%{LIBNAME}
 Version: 1.0.1
-Release: 1
+Release: 1.el5.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}
-Requires: newbase >= 1.0.1-1
-Provides: smarttools
+Requires: smartmet-newbase >= 1.0.1-1
+Provides: %{LIBNAME}
 
 %description
 FMI smarttools library
@@ -17,7 +18,7 @@ FMI smarttools library
 rm -rf $RPM_BUILD_ROOT
 mkdir $RPM_BUILD_ROOT
 
-%setup -q -n %{name}
+%setup -q -n %{LIBNAME}
  
 %build
 make clean
@@ -25,16 +26,15 @@ make depend
 make %{_smp_mflags} 
 
 %install
-%makeinstall
+%makeinstall includedir=%{buildroot}%{_includedir}/smartmet
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%defattr(-,root,www,0775)
-%{_includedir}/smarttools
-%{_libdir}/libsmarttools.a
-
+%defattr(-,root,root,0775)
+%{_includedir}/smartmet/%{LIBNAME}
+%{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
 * Thu Jun  7 2007 tervo <tervo@xodin.weatherproof.fi> - 
