@@ -15,8 +15,8 @@ CFLAGS = -DUNIX -O0 -g $(MAINFLAGS) $(EXTRAFLAGS) -Werror
 CFLAGS_RELEASE = -DUNIX -O2 -DNDEBUG $(MAINFLAGS)
 LDFLAGS = -s
 ARFLAGS = -r
-INCLUDES = -I $(includedir)/newbase
-LIBS = -L $(libdir) -lnewbase
+INCLUDES = -I $(includedir)/smartmet/newbase
+LIBS = -L $(libdir) -lsmartmet-newbase
 
 # Common library compiling template
 
