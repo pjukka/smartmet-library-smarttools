@@ -125,7 +125,7 @@ html::
 objdir:
 	@mkdir -p $(objdir)
 
-rpm:
+rpm: clean depend
 	if [ -a $(LIB).spec ]; \
 	then \
 	  tar -C ../ -cf $(rpmsourcedir)/libsmartmet-$(LIB).tar $(LIB) ; \

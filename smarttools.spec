@@ -7,8 +7,7 @@ License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
-BuildRoot: %{_tmppath}/%{name}
-#BuildPrereq: smartmet-newbase >= 1.0.1-1
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
 Provides: %{LIBNAME}
 
 %description
@@ -16,13 +15,10 @@ FMI smarttools library
 
 %prep
 rm -rf $RPM_BUILD_ROOT
-mkdir $RPM_BUILD_ROOT
 
 %setup -q -n %{LIBNAME}
  
 %build
-make clean
-make depend
 make %{_smp_mflags} release
 
 %install
