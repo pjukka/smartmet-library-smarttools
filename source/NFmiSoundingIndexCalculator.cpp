@@ -211,15 +211,19 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 
 	// **** 3. indeksit jotka lasketaan jonkun muun indeksin yhteydessä, tarvitaan myös mahdollisesti pintakerros lasku tyyppi ja soundingdata ***
 	case kSoundingParLFCSur:
+	case kSoundingParLFCSurBas:
 		value = CalcLFCIndex(theSoundingData, kLCLCalcSurface, xxxxValue);
 		break;
 	case kSoundingParELSur:
+	case kSoundingParELSurBas:
 		xxxxValue = CalcLFCIndex(theSoundingData, kLCLCalcSurface, value);
 		break;
 	case kSoundingParLFCHeightSur:
+	case kSoundingParLFCHeightSurBas:
 		value = CalcLFCHeightIndex(theSoundingData, kLCLCalcSurface, xxxxValue);
 		break;
 	case kSoundingParELHeightSur:
+	case kSoundingParELHeightSurBas:
 		xxxxValue = CalcLFCHeightIndex(theSoundingData, kLCLCalcSurface, value);
 		break;
 
