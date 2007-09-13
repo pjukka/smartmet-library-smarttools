@@ -1335,7 +1335,7 @@ bool NFmiSmartToolIntepreter::IsPossiblyLevelItem(const std::string &theText)
 	try
 	{
 		// jos numeroksi muunto onnistuu, oletetaan että kyseessä on level
-		int value = NFmiStringTools::Convert<int>(theText);
+		NFmiStringTools::Convert<int>(theText);
 		return true;
 	}
 	catch(...)
