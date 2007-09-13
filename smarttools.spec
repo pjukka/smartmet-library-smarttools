@@ -1,7 +1,7 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 1.0.1
+Version: 1.0.2
 Release: 1.el5.fmi
 License: FMI
 Group: Development/Libraries
@@ -19,7 +19,7 @@ rm -rf $RPM_BUILD_ROOT
 %setup -q -n %{LIBNAME}
  
 %build
-make %{_smp_mflags} release
+make %{_smp_mflags}
 
 %install
 %makeinstall includedir=%{buildroot}%{_includedir}/smartmet
@@ -33,6 +33,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Thu Sep 13 2007 mheiskan <mika.heiskanen@fmi.fi> - 1.0.2-1.el5.fmi
+- Improved make system plus new code from Pietarinen
 * Thu Jun  7 2007 tervo <tervo@xodin.weatherproof.fi> - 
 - Initial build.
-
