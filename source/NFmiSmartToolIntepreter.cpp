@@ -1479,8 +1479,8 @@ bool NFmiSmartToolIntepreter::GetParamFromVariableById(const std::string &theVar
 		NFmiValueString numericPart(theVariableText.substr(3));
 		if(numericPart.IsNumeric())
 		{
-			theParam = NFmiParam((long)numericPart, theVariableText);
-			return true;
+		  theParam = NFmiParam(static_cast<long>(numericPart), theVariableText);
+		  return true;
 		}
 	}
 	return false;
@@ -1495,7 +1495,7 @@ bool NFmiSmartToolIntepreter::GetProducerFromVariableById(const std::string &the
 		NFmiValueString numericPart(theVariableText.substr(4));
 		if(numericPart.IsNumeric())
 		{
-			theProducer = NFmiProducer((long)numericPart, theVariableText);
+		  theProducer = NFmiProducer(static_cast<long>(numericPart), theVariableText);
 			fUseAnyDataTypeBecauseUsingProdID = true; // laitetaan trueksi, koska tuottaja annettu PROD104 tyyliin
 			return true;
 		}
@@ -1507,16 +1507,16 @@ bool NFmiSmartToolIntepreter::GetProducerFromVariableById(const std::string &the
 // esim. par100 tai LEV850 jne.
 bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVariableText, NFmiLevel &theLevel, NFmiInfoData::Type theDataType)
 {
-	if(IsWantedStart(theVariableText, "lev"))
+  if(IsWantedStart(theVariableText, "lev"))
 	{
-		NFmiValueString numericPart(theVariableText.substr(3));
-		if(numericPart.IsNumeric())
+	  NFmiValueString numericPart(theVariableText.substr(3));
+	  if(numericPart.IsNumeric())
 		{
-			long levelValue = (long)numericPart;
-			// pitaisi tunnistaa level tyyppi arvosta kait, nyt oletus että painepinta
-			FmiLevelType levelType = GetLevelType(theDataType, levelValue);
-			theLevel = NFmiLevel(levelType, theVariableText, (long)numericPart);
-			return true;
+		  long levelValue = static_cast<long>(numericPart);
+		  // pitaisi tunnistaa level tyyppi arvosta kait, nyt oletus että painepinta
+		  FmiLevelType levelType = GetLevelType(theDataType, levelValue);
+		  theLevel = NFmiLevel(levelType, theVariableText, static_cast<long>(numericPart));
+		  return true;
 		}
 	}
 	else if(IsWantedStart(theVariableText, "fl"))
@@ -1524,9 +1524,10 @@ bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVar
 		NFmiValueString numericPart(theVariableText.substr(2));
 		if(numericPart.IsNumeric())
 		{
-			long levelValue = (long)numericPart;
+		    // Testataan validius
+		    static_cast<long>(numericPart);
 			FmiLevelType levelType = kFmiFlightLevel;
-			theLevel = NFmiLevel(levelType, theVariableText, (long)numericPart);
+			theLevel = NFmiLevel(levelType, theVariableText, static_cast<long>(numericPart));
 			return true;
 		}
 	}
@@ -1543,7 +1544,7 @@ FmiLevelType NFmiSmartToolIntepreter::GetLevelType(NFmiInfoData::Type theDataTyp
 		{
 			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
 			{
-				if(editedInfo->Level()->LevelValue() == levelValue)
+			  if(static_cast<long>(editedInfo->Level()->LevelValue()) == levelValue)
 				{
 					levelType = editedInfo->Level()->LevelType();
 					break;
@@ -1620,7 +1621,7 @@ bool NFmiSmartToolIntepreter::IsVariableConstantValue(const std::string &theVari
 	NFmiValueString valueString(theVariableText);
 	if(valueString.IsNumeric())
 	{
-		double value = (double)valueString;
+	    double value = static_cast<double>(valueString);
 		theMaskInfo->SetOperationType(NFmiAreaMask::Constant);
 		NFmiCalculationCondition calcCond(kFmiMaskEqual, value);
 		theMaskInfo->SetMaskCondition(calcCond);
@@ -1776,9 +1777,9 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 				{
 					theMaskInfo->SetOperationType(NFmiAreaMask::FunctionTimeIntergration);
 					NFmiValueString valueString1(tokens[2].first);
-					double value1 = (double)valueString1;
+					double value1 = static_cast<double>(valueString1);
 					NFmiValueString valueString2(tokens[3].first);
-					double value2 = (double)valueString2;
+					double value2 = static_cast<double>(valueString2);
 					theMaskInfo->SetOffsetPoint1(NFmiPoint(value1, value2));
 					return true;
 				}
@@ -1794,14 +1795,14 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 				{
 					theMaskInfo->SetOperationType(NFmiAreaMask::FunctionAreaIntergration);
 					NFmiValueString valueString1(tokens[2].first);
-					double value1 = (double)valueString1;
+					double value1 = static_cast<double>(valueString1);
 					NFmiValueString valueString2(tokens[3].first);
-					double value2 = (double)valueString2;
+					double value2 = static_cast<double>(valueString2);
 					theMaskInfo->SetOffsetPoint1(NFmiPoint(value1, value2));
 					NFmiValueString valueString3(tokens[4].first);
-					double value3 = (double)valueString3;
+					double value3 = static_cast<double>(valueString3);
 					NFmiValueString valueString4(tokens[5].first);
-					double value4 = (double)valueString4;
+					double value4 = static_cast<double>(valueString4);
 					theMaskInfo->SetOffsetPoint2(NFmiPoint(value3, value4));
 					return true;
 				}
@@ -1840,9 +1841,9 @@ bool NFmiSmartToolIntepreter::IsVariablePeekFunction(const std::string &theVaria
 				{
 					theMaskInfo->SetOperationType((*it).second);
 					NFmiValueString valueString1(tokens[2].first);
-					double value1 = (double)valueString1;
+					double value1 = static_cast<double>(valueString1);
 					NFmiValueString valueString2(tokens[3].first);
-					double value2 = (double)valueString2;
+					double value2 = static_cast<double>(valueString2);
 					theMaskInfo->SetOffsetPoint1(NFmiPoint(value1, value2));
 					return true;
 				}
@@ -1893,9 +1894,9 @@ bool NFmiSmartToolIntepreter::IsVariableRampFunction(const std::string &theVaria
 				{
 					theMaskInfo->SetOperationType(NFmiAreaMask::RampFunction);
 					NFmiValueString valueString1(tokens[2].first);
-					double value1 = (double)valueString1;
+					double value1 = static_cast<double>(valueString1);
 					NFmiValueString valueString2(tokens[3].first);
-					double value2 = (double)valueString2;
+					double value2 = static_cast<double>(valueString2);
 					FmiMaskOperation maskOper = kFmiNoMaskOperation;
 					if(FindAnyFromText(theVariableText, itsTokenRampUpFunctions))
 						maskOper = kFmiMaskRisingRamp;
