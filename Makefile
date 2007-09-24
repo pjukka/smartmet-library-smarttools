@@ -25,7 +25,7 @@ CFLAGS0_DEBUG = -DUNIX -O0 -g $(MAINFLAGS) $(EXTRAFLAGS) -Werror
 CFLAGS_PROFILE = -DUNIX -O2 -g -pg $(MAINFLAGS)
 CFLAGS0_PROFILE = -DUNIX -O0 -g -pg $(MAINFLAGS)
 
-INCLUDES = -I $(includedir)/smartmet/newbase
+INCLUDES = -I$(includedir)/smartmet/newbase
 LIBS = -L $(libdir) -lsmartmet-newbase
 
 # Common library compiling template
@@ -93,7 +93,12 @@ OBJS = $(SRCS:%.cpp=%.o)
 
 OBJFILES = $(OBJS:%.o=obj/%.o)
 
-INCLUDES := -I include $(INCLUDES)
+INCLUDES := -Iinclude $(INCLUDES)
+
+# For make depend:
+
+ALLSRCS = $(wildcard *.cpp source/*.cpp)
+
 
 .PHONY: test rpm
 
@@ -124,7 +129,7 @@ install:
 	$(INSTALL_DATA) $(LIBFILE) $(libdir)/$(LIBFILE)
 
 depend:
-	makedepend $(INCLUDES)
+	gccmakedep -fDependencies -- $(CFLAGS) $(INCLUDES) -- $(ALLSRCS)
 
 test:
 	cd test && make test
@@ -176,5 +181,4 @@ NFmiSmartInfo.o: NFmiSmartInfo.cpp
 NFmiSmartToolIntepreter.o: NFmiSmartToolIntepreter.cpp
 	$(CC) $(CFLAGS0) $(INCLUDES) -c -o $(objdir)/$@ $<
 
-# -include Dependencies
-# DO NOT DELETE THIS LINE -- make depend depends on it.
+-include Dependencies
