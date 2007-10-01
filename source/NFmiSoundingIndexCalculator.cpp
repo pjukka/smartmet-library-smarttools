@@ -14,6 +14,7 @@
 #include "NFmiInfoOrganizer.h"
 #include "NFmiSoundingData.h"
 #include "NFmiSoundingFunctions.h"
+#include "NFmiValueString.h"
 
 using namespace NFmiSoundingFunctions;
 
@@ -48,12 +49,14 @@ bool NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(FmiSoundingParamet
 		return false;
 }
 
-static bool FillSurfaceValuesFromInfo(NFmiSmartInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiPoint &theLatLon)
+static bool FillSurfaceValuesFromInfo(NFmiSmartInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiPoint &theLatLon, float &theT, float &theTd)
 {
 	theInfo->Param(kFmiTemperature);
 	float T = theInfo->InterpolatedValue(theLatLon);
+	theT = T;
 	theInfo->Param(kFmiDewPoint);
 	float Td = theInfo->InterpolatedValue(theLatLon);
+	theTd = Td;
 	if(T != kFloatMissing && Td != kFloatMissing)
 	{
 		theSoundingData.SetTandTdSurfaceValues(T, Td);
@@ -93,6 +96,15 @@ void NFmiSoundingIndexCalculator::Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrgan
 	if(surfaceBasedCalculation == true && (useAnalyzeData == false && fObsDataFound == false))
 		return ; // ei mit‰‰n teht‰viss‰ kun lasketaan surfacebasedlaskuja, joten 'palautetaan' puuttuva matriisi
 
+//#define XXX_DEBUG 1
+
+	// ********  debug koodia  *********************
+#ifdef XXX_DEBUG
+	std::ofstream out("d:\\data2\\surbas_values.txt");
+	out << "Time: " << static_cast<char*>(theTime.ToStr("YYYY.MM.DD HH:mm", kFinnish)) << std::endl;
+#endif
+	// ********  debug koodia  *********************
+
 	if(info && theBaseInfo && theBaseInfo->IsGrid())
 	{
 		unsigned long xnum = theBaseInfo->Grid()->XNumber();
@@ -102,8 +114,17 @@ void NFmiSoundingIndexCalculator::Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrgan
 		{
 			bool surfaceBaseStatus = false;
 			FillSoundingData(info, soundingData, theTime, *(theBaseInfo->Location())); // t‰ytet‰‰n luotaus datat yksi kerrallaan
+
+			// ********  debug koodia  *********************
+			float T = kFloatMissing; // debug koodia
+			float Td = kFloatMissing; // debug koodia
+#ifdef XXX_DEBUG
+			float valueTest = Calc(soundingData, static_cast<FmiSoundingParameters>(theDrawParam->Param().GetParamIdent())); // debug koodia
+#endif
+			// ********  debug koodia  *********************
+
 			if(useAnalyzeData)
-				surfaceBaseStatus = FillSurfaceValuesFromInfo(analyzeData, soundingData, theBaseInfo->LatLon()); // t‰yt‰ pinta arvot analyysist‰
+				surfaceBaseStatus = FillSurfaceValuesFromInfo(analyzeData, soundingData, theBaseInfo->LatLon(), T, Td); // t‰yt‰ pinta arvot analyysist‰
 			else if(fObsDataFound)
 				; // t‰yt‰ pinta arvot obs-datasta
 			if(surfaceBasedCalculation && surfaceBaseStatus == false)
@@ -112,6 +133,17 @@ void NFmiSoundingIndexCalculator::Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrgan
 			// HUOM!!!! muista muuttaa luotaus-parametri pelk‰ksi surface arvoksi, koska loppu menee itsest‰‰n sitten
 			float value = Calc(soundingData, static_cast<FmiSoundingParameters>(theDrawParam->Param().GetParamIdent()));
 			theValues[counter % xnum][counter / xnum] = value;
+
+			// ********  debug koodia  *********************
+#ifdef XXX_DEBUG
+			out << static_cast<char*>(NFmiValueString::GetStringWithMaxDecimalsSmartWay(theBaseInfo->LatLon().X(), 2)) << " " << static_cast<char*>(NFmiValueString::GetStringWithMaxDecimalsSmartWay(theBaseInfo->LatLon().Y(), 2));
+			out << " " << "realInd: " << static_cast<char*>(NFmiValueString::GetStringWithMaxDecimalsSmartWay(valueTest, 1));
+			out << " T: " << static_cast<char*>(NFmiValueString::GetStringWithMaxDecimalsSmartWay(T, 1));
+			out << " Td: " << static_cast<char*>(NFmiValueString::GetStringWithMaxDecimalsSmartWay(Td, 1));
+			out << " surbas: " << static_cast<char*>(NFmiValueString::GetStringWithMaxDecimalsSmartWay(value, 1));
+			out << std::endl;
+#endif
+			// ********  debug koodia  *********************
 		}
 	}
 }
