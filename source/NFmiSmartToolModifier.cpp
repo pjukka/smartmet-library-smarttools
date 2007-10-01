@@ -1053,7 +1053,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::GetPossibleLevelInterpolatedInfo(const NFm
 {
 	NFmiSmartInfo *info = 0;
 	NFmiSmartInfo *possiblePressureLevelDataInfo = 0;
-	if(theAreaMaskInfo.GetLevel() != 0)
+	if(theAreaMaskInfo.GetLevel() != 0 && theAreaMaskInfo.GetLevel()->LevelType() != kFmiHybridLevel)
 	{
 		bool flightLevelWanted = theAreaMaskInfo.GetLevel()->LevelType() == kFmiFlightLevel;
 		checkedVector<NFmiSmartInfo*> infoVector = itsInfoOrganizer->GetInfos(theAreaMaskInfo.GetDataIdent().GetProducer()->GetIdent());
