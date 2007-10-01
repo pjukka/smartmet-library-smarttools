@@ -1515,6 +1515,8 @@ bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVar
 		  long levelValue = static_cast<long>(numericPart);
 		  // pitaisi tunnistaa level tyyppi arvosta kait, nyt oletus että painepinta
 		  FmiLevelType levelType = GetLevelType(theDataType, levelValue);
+			if(levelType == kFmiPressureLevel)
+				levelType = kFmiHybridLevel; // jos käyttäjä on antanut lev45, tällöin halutaan hybrid level 45 ei painepinta 45. painepinnat saa automaattisesti pelkällä numerolla
 		  theLevel = NFmiLevel(levelType, theVariableText, static_cast<long>(numericPart));
 		  return true;
 		}
@@ -2080,6 +2082,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pop"), kFmiPoP));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("mist"), kFmiMist));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pseudosatel"), kFmiRadiationNetTopAtmLW));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("vis"), kFmiVisibility));
 
 /*
 
@@ -2241,6 +2244,17 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape03kmmostun"), kSoundingParCAPE0_3kmMostUn));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape1040mostun"), kSoundingParCAPE_TT_MostUn));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cinmostun"), kSoundingParCINMostUn));
+
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclobsbas"), kSoundingParLCLSurBas));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfcobsbas"), kSoundingParLFCSurBas));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elobsbas"), kSoundingParELSurBas));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclheightobsbas"), kSoundingParLCLHeightSurBas));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfcheightobsbas"), kSoundingParLFCHeightSurBas));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elheightobsbas"), kSoundingParELHeightSurBas));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("capeobsbas"), kSoundingParCAPESurBas));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape03kmobsbas"), kSoundingParCAPE0_3kmSurBas));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape1040obsbas"), kSoundingParCAPE_TT_SurBas));
+		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cinobsbas"), kSoundingParCINSurBas));
 
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("show"), kSoundingParSHOW));
 		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lift"), kSoundingParLIFT));
