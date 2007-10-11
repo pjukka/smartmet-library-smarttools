@@ -30,8 +30,9 @@
 //
 //**********************************************************
 #include "NFmiDrawParam.h"
+#include "NFmiDataStoringHelpers.h"
 
-float NFmiDrawParam::itsFileVersionNumber=2.0;
+float NFmiDrawParam::itsFileVersionNumber=3.0;
 
 //--------------------------------------------------------
 // NFmiDrawParam(void)
@@ -154,12 +155,40 @@ NFmiDrawParam::NFmiDrawParam()
 , fShowDifferenceToOriginalData(false)
 //, itsMetEditorCoordinatorMapOptions(0)
 , itsDataType(NFmiInfoData::kNoDataType)
-
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
 , fViewMacroDrawParam(false)
 , fBorrowedParam(false)
+
+//***********************************************
+//********** 'versio 3' parametreja *************
+//***********************************************
+,itsContourLabelBoxFillColor(NFmiColor(1.,1.,0.)) // keltainen
+,fUseContourGabWithCustomContours(false)
+,itsContourGab(1.)
+,itsContourColor(NFmiColor(0.,0.,0.))
+,itsContourTextColor(NFmiColor(0.,0.,0.))
+,fUseContourFeathering(false)
+,fUseSimpleContourDefinitions(true)
+,itsSimpleContourZeroValue(0)
+,itsSimpleContourLabelHeight(4)
+,fShowSimpleContourLabelBox(false)
+,itsSimpleContourWidth(0.2f)
+,itsSimpleContourLineStyle(0)
+,itsSimpleIsoLineColorShadeHigh2Value(100)
+,itsSimpleIsoLineColorShadeHigh2ValueColor(0,1,0)
+,itsSpecialContourValues()
+,itsSpecialContourLabelHeight()
+,itsSpecialContourWidth()
+,itsSpecialContourStyle()
+,itsSpecialContourColorIndexies()
+,fUseCustomIsoLineing(false)
+,itsContourLabelDigitCount(0)
+//***********************************************
+//********** 'versio 3' parametreja *************
+//***********************************************
+
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -289,6 +318,35 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 , itsDataType(theDataType)
 , fViewMacroDrawParam(false)
 , fBorrowedParam(false)
+
+//***********************************************
+//********** 'versio 3' parametreja *************
+//***********************************************
+,itsContourLabelBoxFillColor(NFmiColor(1.,1.,0.)) // keltainen
+,fUseContourGabWithCustomContours(false)
+,itsContourGab(1.)
+,itsContourColor(NFmiColor(0.,0.,0.))
+,itsContourTextColor(NFmiColor(0.,0.,0.))
+,fUseContourFeathering(false)
+,fUseSimpleContourDefinitions(true)
+,itsSimpleContourZeroValue(0)
+,itsSimpleContourLabelHeight(4)
+,fShowSimpleContourLabelBox(false)
+,itsSimpleContourWidth(0.2f)
+,itsSimpleContourLineStyle(0)
+,itsSimpleIsoLineColorShadeHigh2Value(100)
+,itsSimpleIsoLineColorShadeHigh2ValueColor(0,1,0)
+,itsSpecialContourValues()
+,itsSpecialContourLabelHeight()
+,itsSpecialContourWidth()
+,itsSpecialContourStyle()
+,itsSpecialContourColorIndexies()
+,fUseCustomIsoLineing(false)
+,itsContourLabelDigitCount(0)
+//***********************************************
+//********** 'versio 3' parametreja *************
+//***********************************************
+
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -413,6 +471,35 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 , itsDataType(other.itsDataType)
 , fViewMacroDrawParam(other.fViewMacroDrawParam)
 , fBorrowedParam(other.fBorrowedParam)
+
+//***********************************************
+//********** 'versio 3' parametreja *************
+//***********************************************
+,itsContourLabelBoxFillColor(other.itsContourLabelBoxFillColor)
+,fUseContourGabWithCustomContours(other.fUseContourGabWithCustomContours)
+,itsContourGab(other.itsContourGab)
+,itsContourColor(other.itsContourColor)
+,itsContourTextColor(other.itsContourTextColor)
+,fUseContourFeathering(other.fUseContourFeathering)
+,fUseSimpleContourDefinitions(other.fUseSimpleContourDefinitions)
+,itsSimpleContourZeroValue(other.itsSimpleContourZeroValue)
+,itsSimpleContourLabelHeight(other.itsSimpleContourLabelHeight)
+,fShowSimpleContourLabelBox(other.fShowSimpleContourLabelBox)
+,itsSimpleContourWidth(other.itsSimpleContourWidth)
+,itsSimpleContourLineStyle(other.itsSimpleContourLineStyle)
+,itsSimpleIsoLineColorShadeHigh2Value(other.itsSimpleIsoLineColorShadeHigh2Value)
+,itsSimpleIsoLineColorShadeHigh2ValueColor(other.itsSimpleIsoLineColorShadeHigh2ValueColor)
+,itsSpecialContourValues(other.itsSpecialContourValues)
+,itsSpecialContourLabelHeight(other.itsSpecialContourLabelHeight)
+,itsSpecialContourWidth(other.itsSpecialContourWidth)
+,itsSpecialContourStyle(other.itsSpecialContourStyle)
+,itsSpecialContourColorIndexies(other.itsSpecialContourColorIndexies)
+,fUseCustomIsoLineing(other.fUseCustomIsoLineing)
+,itsContourLabelDigitCount(other.itsContourLabelDigitCount)
+//***********************************************
+//********** 'versio 3' parametreja *************
+//***********************************************
+
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -563,6 +650,34 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 		itsIsoLineLabelDigitCount = theDrawParam->IsoLineLabelDigitCount();
 	//***********************************************
 	//********** 'versio 2' parametreja *************
+	//***********************************************
+
+	//***********************************************
+	//********** 'versio 3' parametreja *************
+	//***********************************************
+	itsContourLabelBoxFillColor = theDrawParam->itsContourLabelBoxFillColor;
+	fUseContourGabWithCustomContours = theDrawParam->fUseContourGabWithCustomContours;
+	itsContourGab = theDrawParam->itsContourGab;
+	itsContourColor = theDrawParam->itsContourColor;
+	itsContourTextColor = theDrawParam->itsContourTextColor;
+	fUseContourFeathering = theDrawParam->fUseContourFeathering;
+	fUseSimpleContourDefinitions = theDrawParam->fUseSimpleContourDefinitions;
+	itsSimpleContourZeroValue = theDrawParam->itsSimpleContourZeroValue;
+	itsSimpleContourLabelHeight = theDrawParam->itsSimpleContourLabelHeight;
+	fShowSimpleContourLabelBox = theDrawParam->fShowSimpleContourLabelBox;
+	itsSimpleContourWidth = theDrawParam->itsSimpleContourWidth;
+	itsSimpleContourLineStyle = theDrawParam->itsSimpleContourLineStyle;
+	itsSimpleIsoLineColorShadeHigh2Value = theDrawParam->itsSimpleIsoLineColorShadeHigh2Value;
+	itsSimpleIsoLineColorShadeHigh2ValueColor = theDrawParam->itsSimpleIsoLineColorShadeHigh2ValueColor;
+	itsSpecialContourValues = theDrawParam->itsSpecialContourValues;
+	itsSpecialContourLabelHeight = theDrawParam->itsSpecialContourLabelHeight;
+	itsSpecialContourWidth = theDrawParam->itsSpecialContourWidth;
+	itsSpecialContourStyle = theDrawParam->itsSpecialContourStyle;
+	itsSpecialContourColorIndexies = theDrawParam->itsSpecialContourColorIndexies;
+	fUseCustomIsoLineing = theDrawParam->fUseCustomIsoLineing;
+	itsContourLabelDigitCount = theDrawParam->itsContourLabelDigitCount;
+	//***********************************************
+	//********** 'versio 3' parametreja *************
 	//***********************************************
 
 	}
@@ -842,6 +957,46 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 	//********** 'versio 2' parametreja *************
 	//***********************************************
 	}
+
+	if(itsFileVersionNumber >= 3.)
+	{
+		//***********************************************
+		//********** 'versio 3' parametreja *************
+		//***********************************************
+		file << "Version_3_stuff" << endl;
+		file << itsContourLabelBoxFillColor << endl;
+		file << fUseContourGabWithCustomContours << " " << itsContourGab << endl;
+		file << itsContourColor << endl;
+		file << itsContourTextColor << endl;
+		file << fUseContourFeathering << " " << fUseSimpleContourDefinitions << " " << itsSimpleContourZeroValue << " " << itsSimpleContourLabelHeight << endl;
+		file << fShowSimpleContourLabelBox << " " << itsSimpleContourWidth << " " << itsSimpleContourLineStyle << " " << itsSimpleIsoLineColorShadeHigh2Value << endl;
+		file << itsSimpleIsoLineColorShadeHigh2ValueColor << endl;
+
+		NFmiDataStoringHelpers::WriteContainer(itsSpecialContourValues, file, std::string(" "));
+		file << endl;
+		NFmiDataStoringHelpers::WriteContainer(itsSpecialContourLabelHeight, file, std::string(" "));
+		file << endl;
+		NFmiDataStoringHelpers::WriteContainer(itsSpecialContourWidth, file, std::string(" "));
+		file << endl;
+		NFmiDataStoringHelpers::WriteContainer(itsSpecialContourStyle, file, std::string(" "));
+		file << endl;
+		NFmiDataStoringHelpers::WriteContainer(itsSpecialContourColorIndexies, file, std::string(" "));
+		file << endl;
+
+		file << fUseCustomIsoLineing << " " << itsContourLabelDigitCount << endl;
+	
+		NFmiDataStoringHelpers::NFmiExtraDataStorage extraData; // lopuksi viel‰ mahdollinen extra data
+		// Kun tulee uusia muuttujia, tee t‰h‰n extradatan t‰yttˆ‰, jotta se saadaan talteen tiedopstoon siten ett‰
+		// edelliset versiot eiv‰t mene solmuun vaikka on tullut uutta dataa.
+		file << "possible_extra_data" << std::endl;
+		file << extraData;
+
+		if(file.fail())
+			throw std::runtime_error("NFmiDrawParam::Write failed");
+		//***********************************************
+		//********** 'versio 3' parametreja *************
+		//***********************************************
+	}
 	return file;
 }
 
@@ -859,6 +1014,9 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 	if(std::string(temp) == std::string("Version"))
 	{
 		file >> itsInitFileVersionNumber;
+		if(itsInitFileVersionNumber > itsFileVersionNumber)
+			throw std::runtime_error("NFmiDrawParam::Read failed because version number in DrawParam was higher than program expects.");
+
 		if(itsInitFileVersionNumber >= 1.) // t‰m‰ on vain esimerkki siit‰ mit‰ joskus tulee olemaan
 		{
 			if(!file)
@@ -1109,7 +1267,77 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 	//********** 'versio 2' parametreja *************
 	//***********************************************
 			}
-		}
+
+			if(itsInitFileVersionNumber >= 3.)
+			{
+				//***********************************************
+				//********** 'versio 3' parametreja *************
+				//***********************************************
+				file >> temp; // luetaan 'Version_3_stuff' pois
+				file >> itsContourLabelBoxFillColor;
+				file >> fUseContourGabWithCustomContours >> itsContourGab;
+				file >> itsContourColor;
+				file >> itsContourTextColor;
+				file >> fUseContourFeathering >> fUseSimpleContourDefinitions >> itsSimpleContourZeroValue >> itsSimpleContourLabelHeight;
+				file >> fShowSimpleContourLabelBox >> itsSimpleContourWidth >> itsSimpleContourLineStyle >> itsSimpleIsoLineColorShadeHigh2Value;
+				file >> itsSimpleIsoLineColorShadeHigh2ValueColor;
+
+				NFmiDataStoringHelpers::ReadContainer(itsSpecialContourValues, file);
+				NFmiDataStoringHelpers::ReadContainer(itsSpecialContourLabelHeight, file);
+				NFmiDataStoringHelpers::ReadContainer(itsSpecialContourWidth, file);
+				NFmiDataStoringHelpers::ReadContainer(itsSpecialContourStyle, file);
+				NFmiDataStoringHelpers::ReadContainer(itsSpecialContourColorIndexies, file);
+
+				file >> fUseCustomIsoLineing >> itsContourLabelDigitCount;
+			
+				if(file.fail())
+					throw std::runtime_error("NFmiDrawParam::Write failed");
+
+				file >> temp; // luetaan 'possible_extra_data' pois
+				NFmiDataStoringHelpers::NFmiExtraDataStorage extraData; // lopuksi viel‰ mahdollinen extra data
+				file >> extraData;
+				// T‰ss‰ sitten otetaaan extradatasta talteen uudet muuttujat, mit‰ on mahdollisesti tullut
+				// eli jos uusia muutujia tai arvoja, k‰sittele t‰ss‰.
+
+				if(file.fail())
+					throw std::runtime_error("NFmiDrawParam::Write failed");
+				//***********************************************
+				//********** 'versio 3' parametreja *************
+				//***********************************************
+			}
+			else
+			{ // tietyt muuttujat pit‰‰ alustaa jos versio 2.
+				itsColorContouringColorShadeHigh2Value = itsColorContouringColorShadeHighValue;
+				itsColorContouringColorShadeHigh2ValueColor = itsColorContouringColorShadeHighValueColor;
+		
+				itsContourLabelBoxFillColor = itsIsolineLabelBoxFillColor;
+				fUseContourGabWithCustomContours;
+				itsContourGab = itsIsoLineGab;
+				itsContourColor = itsIsolineColor;
+				itsContourTextColor = itsIsolineTextColor;
+				fUseContourFeathering = fUseIsoLineFeathering;
+				fUseSimpleContourDefinitions = fUseSimpleIsoLineDefinitions;
+				itsSimpleContourZeroValue = itsSimpleIsoLineZeroValue;
+				itsSimpleContourLabelHeight = itsSimpleIsoLineLabelHeight;
+				fShowSimpleContourLabelBox = fShowSimpleIsoLineLabelBox;
+				itsSimpleContourWidth = itsSimpleIsoLineWidth;
+				itsSimpleContourLineStyle = itsSimpleIsoLineLineStyle;
+				itsSimpleIsoLineColorShadeHigh2Value = itsSimpleIsoLineColorShadeHighValue;
+				itsSimpleIsoLineColorShadeHigh2ValueColor = itsSimpleIsoLineColorShadeHighValueColor;
+
+				itsSpecialContourValues = itsSpecialIsoLineValues;
+				itsSpecialContourLabelHeight = itsSpecialIsoLineLabelHeight;
+				itsSpecialContourWidth = itsSpecialIsoLineWidth;
+				itsSpecialContourStyle = itsSpecialIsoLineStyle;
+				itsSpecialContourColorIndexies = itsSpecialIsoLineColorIndexies;
+
+				fUseCustomIsoLineing = fUseCustomColorContouring;
+				itsContourLabelDigitCount = itsIsoLineLabelDigitCount;
+
+			}
+	
+
+	}
 		itsInitFileVersionNumber = itsFileVersionNumber; // lopuksi asetetaan versio numero viimeisimm‰ksi, ett‰ tulevaisuudessa talletus menee uudella versiolla
 	}
     return file;

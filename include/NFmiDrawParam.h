@@ -81,8 +81,16 @@ public:
 	const NFmiColor&	 FrameColor (void) const { return itsFrameColor; };
 	void				 FillColor (const NFmiColor& theFillColor) { itsFillColor = theFillColor; };
 	const NFmiColor&	 FillColor (void) const { return itsFillColor; };
-	void				 IsolineLabelBoxFillColor(const NFmiColor& theColor) { itsIsolineLabelBoxFillColor = theColor; };
+	void				 IsolineLabelBoxFillColor(const NFmiColor& theColor) 
+	{ 
+		itsIsolineLabelBoxFillColor = theColor;
+		itsContourLabelBoxFillColor = theColor; // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
+	};
 	const NFmiColor&	 IsolineLabelBoxFillColor(void) const { return itsIsolineLabelBoxFillColor; };
+
+	void				 ContourLabelBoxFillColor(const NFmiColor& theColor) { itsContourLabelBoxFillColor = theColor; };
+	const NFmiColor&	 ContourLabelBoxFillColor(void) const { return itsContourLabelBoxFillColor; };
+
 	void				 RelativeSize (const NFmiPoint& theRelativeSize) { itsRelativeSize = theRelativeSize; };
 	const NFmiPoint&	 RelativeSize (void) const { return itsRelativeSize; };
 	void				 RelativePositionOffset (const NFmiPoint& theRelativePositionOffset) { itsRelativePositionOffset = theRelativePositionOffset; };
@@ -91,10 +99,28 @@ public:
 	const NFmiPoint&	 OnlyOneSymbolRelativeSize (void) const { return itsOnlyOneSymbolRelativeSize; };
 	void				 OnlyOneSymbolRelativePositionOffset (const NFmiPoint& theOnlyOneSymbolRelativePositionOffset) { itsOnlyOneSymbolRelativePositionOffset = theOnlyOneSymbolRelativePositionOffset; };
 	const NFmiPoint&	 OnlyOneSymbolRelativePositionOffset (void) const { return itsOnlyOneSymbolRelativePositionOffset; };
-	void				 UseIsoLineGabWithCustomContours (const bool newState) { fUseIsoLineGabWithCustomContours = newState; };
+	void				 UseIsoLineGabWithCustomContours (const bool newState) 
+	{ 
+		fUseIsoLineGabWithCustomContours = newState; 
+		fUseContourGabWithCustomContours = newState;  // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
+	};
 	bool				 UseIsoLineGabWithCustomContours (void) const { return fUseIsoLineGabWithCustomContours; };
-	void				 IsoLineGab (const double theIsoLineGab) { itsIsoLineGab = theIsoLineGab; };
+
+	void				 UseContourGabWithCustomContours(const bool newState) { fUseContourGabWithCustomContours = newState; };
+	bool				 UseContourGabWithCustomContours(void) const { return fUseContourGabWithCustomContours; };
+
+
+
+	void				 IsoLineGab (const double theIsoLineGab) 
+	{ 
+		itsIsoLineGab = theIsoLineGab; 
+		itsContourGab = theIsoLineGab;  // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
+	}
 	double				 IsoLineGab (void) const { return itsIsoLineGab; };
+
+	void				 ContourGab(const double theIsoLineGab) { itsContourGab = theIsoLineGab; };
+	double				 ContourGab(void) const { return itsContourGab; };
+
 	void				 ModifyingStep (const double theModifyingStep) { itsModifyingStep = theModifyingStep; };
 	double				 ModifyingStep (void) const { return itsModifyingStep; };
 	void				 ModifyingUnit (bool theModifyingUnit) { fModifyingUnit = theModifyingUnit; }
@@ -113,9 +139,25 @@ public:
 	void TimeSeriesScaleMin(double theValue){itsTimeSeriesScaleMin = theValue;};
 	void TimeSeriesScaleMax(double theValue){itsTimeSeriesScaleMax = theValue;};
 	const NFmiColor& IsolineColor(void) const {return fUseSecondaryColors ? itsSecondaryIsolineColor : itsIsolineColor;};
+	void IsolineColor(const NFmiColor& newColor)
+	{
+		itsIsolineColor = newColor;
+		itsContourColor = newColor; // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
+	}
+
+	const NFmiColor& ContourColor(void) const {return itsContourColor;};
+	void ContourColor(const NFmiColor& newColor){itsContourColor = newColor;};
+
+	void IsolineTextColor(const NFmiColor& newColor)
+	{
+		itsIsolineTextColor = newColor;
+		itsContourTextColor = newColor; // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
+	}
 	const NFmiColor& IsolineTextColor(void) const {return fUseSecondaryColors ? itsSecondaryIsolineTextColor : itsIsolineTextColor;};
-	void IsolineColor(const NFmiColor& newColor){itsIsolineColor = newColor;};
-	void IsolineTextColor(const NFmiColor& newColor){itsIsolineTextColor = newColor;};
+
+	void ContourTextColor(const NFmiColor& newColor){itsContourTextColor = newColor;};
+	const NFmiColor& ContourTextColor(void) const {return itsContourTextColor;};
+
 	double TimeSerialModifyingLimit(void) const {return fModifyingUnit ? itsTimeSerialModifyingLimit : 100;};
 	NFmiMetEditorTypes::View StationDataViewType(void) const {return itsStationDataViewType;};
 	void TimeSerialModifyingLimit(double newValue){itsTimeSerialModifyingLimit = newValue;};
@@ -174,27 +216,83 @@ public:
 	int GridDataPresentationStyle(void) const {return itsGridDataPresentationStyle;}
 	void GridDataPresentationStyle(int newValue){itsGridDataPresentationStyle = newValue;}
 	bool UseIsoLineFeathering(void) const {return fUseIsoLineFeathering;}
-	void UseIsoLineFeathering(bool newValue){fUseIsoLineFeathering = newValue;}
+	void UseIsoLineFeathering(bool newValue)
+	{
+		fUseIsoLineFeathering = newValue;
+		fUseContourFeathering = newValue; // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
+	}
+
+	bool UseContourFeathering(void) const {return fUseContourFeathering;}
+	void UseContourFeathering(bool newValue){fUseContourFeathering = newValue;}
+
 	bool IsoLineLabelsOverLapping(void) const {return fIsoLineLabelsOverLapping;}
 	void IsoLineLabelsOverLapping(bool newValue){fIsoLineLabelsOverLapping = newValue;}
 	bool ShowColorLegend(void) const {return fShowColorLegend;}
 	void ShowColorLegend(bool newValue){fShowColorLegend = newValue;}
 	bool UseSimpleIsoLineDefinitions(void) const {return fUseSimpleIsoLineDefinitions;}
-	void UseSimpleIsoLineDefinitions(bool newValue){fUseSimpleIsoLineDefinitions = newValue;}
+	void UseSimpleIsoLineDefinitions(bool newValue)
+	{
+		fUseSimpleIsoLineDefinitions = newValue;
+		fUseSimpleContourDefinitions = newValue; // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
+	}
+
+	bool UseSimpleContourDefinitions(void) const {return fUseSimpleContourDefinitions;}
+	void UseSimpleContourDefinitions(bool newValue){fUseSimpleContourDefinitions = newValue;}
+
 	bool UseSeparatorLinesBetweenColorContourClasses(void) const {return fUseSeparatorLinesBetweenColorContourClasses;}
 	void UseSeparatorLinesBetweenColorContourClasses(bool newValue){fUseSeparatorLinesBetweenColorContourClasses = newValue;}
 	float SimpleIsoLineGap(void) const {return itsSimpleIsoLineGap;}
 	void SimpleIsoLineGap(float newValue){itsSimpleIsoLineGap = newValue;}
 	float SimpleIsoLineZeroValue(void) const {return itsSimpleIsoLineZeroValue;}
-	void SimpleIsoLineZeroValue(float newValue){itsSimpleIsoLineZeroValue = newValue;}
+	void SimpleIsoLineZeroValue(float newValue)
+	{
+		itsSimpleIsoLineZeroValue = newValue;
+		itsSimpleContourZeroValue = newValue; // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
+	}
+
+	float SimpleContourZeroValue(void) const {return itsSimpleContourZeroValue;}
+	void SimpleContourZeroValue(float newValue){itsSimpleContourZeroValue = newValue;}
+
 	float SimpleIsoLineLabelHeight(void) const {return itsSimpleIsoLineLabelHeight;}
-	void SimpleIsoLineLabelHeight(float newValue){itsSimpleIsoLineLabelHeight = newValue;}
+	void SimpleIsoLineLabelHeight(float newValue)
+	{
+		itsSimpleIsoLineLabelHeight = newValue;
+		itsSimpleContourLabelHeight = newValue; // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
+	}
+
+	float SimpleContourLabelHeight(void) const {return itsSimpleContourLabelHeight;}
+	void SimpleContourLabelHeight(float newValue){itsSimpleContourLabelHeight = newValue;}
+
 	bool ShowSimpleIsoLineLabelBox(void) const {return fShowSimpleIsoLineLabelBox;}
-	void ShowSimpleIsoLineLabelBox(bool newValue){fShowSimpleIsoLineLabelBox = newValue;}
+	void ShowSimpleIsoLineLabelBox(bool newValue)
+	{
+		fShowSimpleIsoLineLabelBox = newValue;
+		fShowSimpleContourLabelBox = newValue;
+	}
+
+	bool ShowSimpleContourLabelBox(void) const {return fShowSimpleContourLabelBox;}
+	void ShowSimpleContourLabelBox(bool newValue){fShowSimpleContourLabelBox = newValue;}
+
 	float SimpleIsoLineWidth(void) const {return itsSimpleIsoLineWidth;}
-	void SimpleIsoLineWidth(float newValue){itsSimpleIsoLineWidth = newValue;}
+	void SimpleIsoLineWidth(float newValue)
+	{
+		itsSimpleIsoLineWidth = newValue;
+		itsSimpleContourWidth = newValue;
+	}
+
+	float SimpleContourWidth(void) const {return itsSimpleContourWidth;}
+	void SimpleContourWidth(float newValue){itsSimpleContourWidth = newValue;}
+
 	int SimpleIsoLineLineStyle(void) const {return itsSimpleIsoLineLineStyle;}
-	void SimpleIsoLineLineStyle(int newValue){itsSimpleIsoLineLineStyle = newValue;}
+	void SimpleIsoLineLineStyle(int newValue)
+	{
+		itsSimpleIsoLineLineStyle = newValue;
+		itsSimpleContourLineStyle = newValue;
+	}
+
+	int SimpleContourLineStyle(void) const {return itsSimpleContourLineStyle;}
+	void SimpleContourLineStyle(int newValue){itsSimpleContourLineStyle = newValue;}
+
 	float IsoLineSplineSmoothingFactor(void) const {return itsIsoLineSplineSmoothingFactor;}
 	void IsoLineSplineSmoothingFactor(float newValue){itsIsoLineSplineSmoothingFactor = newValue;}
 	bool UseSingleColorsWithSimpleIsoLines(void) const {return fUseSingleColorsWithSimpleIsoLines;}
@@ -204,31 +302,95 @@ public:
 	float SimpleIsoLineColorShadeMidValue(void) const {return itsSimpleIsoLineColorShadeMidValue;}
 	void SimpleIsoLineColorShadeMidValue(float newValue){itsSimpleIsoLineColorShadeMidValue = newValue;}
 	float SimpleIsoLineColorShadeHighValue(void) const {return itsSimpleIsoLineColorShadeHighValue;}
-	void SimpleIsoLineColorShadeHighValue(float newValue){itsSimpleIsoLineColorShadeHighValue = newValue;}
+	void SimpleIsoLineColorShadeHighValue(float newValue)
+	{
+		itsSimpleIsoLineColorShadeHighValue = newValue;
+		itsSimpleIsoLineColorShadeHigh2Value = newValue;
+	}
+
+	float SimpleIsoLineColorShadeHigh2Value(void) const {return itsSimpleIsoLineColorShadeHigh2Value;}
+	void SimpleIsoLineColorShadeHigh2Value(float newValue){itsSimpleIsoLineColorShadeHigh2Value = newValue;}
+
 	const NFmiColor& SimpleIsoLineColorShadeLowValueColor(void) const {return itsSimpleIsoLineColorShadeLowValueColor;}
 	void SimpleIsoLineColorShadeLowValueColor(const NFmiColor& newValue){itsSimpleIsoLineColorShadeLowValueColor = newValue;}
 	const NFmiColor& SimpleIsoLineColorShadeMidValueColor(void) const {return itsSimpleIsoLineColorShadeMidValueColor;}
 	void SimpleIsoLineColorShadeMidValueColor(const NFmiColor& newValue){itsSimpleIsoLineColorShadeMidValueColor = newValue;}
 	const NFmiColor& SimpleIsoLineColorShadeHighValueColor(void) const {return itsSimpleIsoLineColorShadeHighValueColor;}
-	void SimpleIsoLineColorShadeHighValueColor(const NFmiColor& newValue){itsSimpleIsoLineColorShadeHighValueColor = newValue;}
+	void SimpleIsoLineColorShadeHighValueColor(const NFmiColor& newValue)
+	{
+		itsSimpleIsoLineColorShadeHighValueColor = newValue;
+		itsSimpleIsoLineColorShadeHigh2ValueColor = newValue;
+	}
+
+	const NFmiColor& SimpleIsoLineColorShadeHigh2ValueColor(void) const {return itsSimpleIsoLineColorShadeHigh2ValueColor;}
+	void SimpleIsoLineColorShadeHigh2ValueColor(const NFmiColor& newValue){itsSimpleIsoLineColorShadeHigh2ValueColor = newValue;}
+
 	int SimpleIsoLineColorShadeClassCount(void) const {return itsSimpleIsoLineColorShadeClassCount;}
 	void SimpleIsoLineColorShadeClassCount(int newValue){itsSimpleIsoLineColorShadeClassCount = newValue;}
 	const checkedVector<float>& SpecialIsoLineValues(void) const {return itsSpecialIsoLineValues;}
-	void SpecialIsoLineValues(checkedVector<float>& newValue){itsSpecialIsoLineValues = newValue;}
+	void SpecialIsoLineValues(checkedVector<float>& newValue)
+	{
+		itsSpecialIsoLineValues = newValue;
+		itsSpecialContourValues = newValue;
+	}
+
+	const checkedVector<float>& SpecialContourValues(void) const {return itsSpecialContourValues;}
+	void SpecialContourValues(checkedVector<float>& newValue){itsSpecialContourValues = newValue;}
+
 	const checkedVector<float>& SpecialIsoLineLabelHeight(void) const {return itsSpecialIsoLineLabelHeight;}
-	void SpecialIsoLineLabelHeight(checkedVector<float>& newValue){itsSpecialIsoLineLabelHeight = newValue;}
+	void SpecialIsoLineLabelHeight(checkedVector<float>& newValue)
+	{
+		itsSpecialIsoLineLabelHeight = newValue;
+		itsSpecialContourLabelHeight = newValue;
+	}
+
+	const checkedVector<float>& SpecialContourLabelHeight(void) const {return itsSpecialContourLabelHeight;}
+	void SpecialContourLabelHeight(checkedVector<float>& newValue){itsSpecialContourLabelHeight = newValue;}
+
 	const checkedVector<float>& SpecialIsoLineWidth(void) const {return itsSpecialIsoLineWidth;}
-	void SpecialIsoLineWidth(checkedVector<float>& newValue){itsSpecialIsoLineWidth = newValue;}
+	void SpecialIsoLineWidth(checkedVector<float>& newValue)
+	{
+		itsSpecialIsoLineWidth = newValue;
+		itsSpecialContourWidth = newValue;
+	}
+
+	const checkedVector<float>& SpecialcontourWidth(void) const {return itsSpecialContourWidth;}
+	void SpecialcontourWidth(checkedVector<float>& newValue){itsSpecialContourWidth = newValue;}
+
 	const checkedVector<int>& SpecialIsoLineStyle(void) const {return itsSpecialIsoLineStyle;}
-	void SpecialIsoLineStyle(checkedVector<int>& newValue){itsSpecialIsoLineStyle = newValue;}
+	void SpecialIsoLineStyle(checkedVector<int>& newValue)
+	{
+		itsSpecialIsoLineStyle = newValue;
+		itsSpecialContourStyle = newValue;
+	}
+
+	const checkedVector<int>& SpecialContourStyle(void) const {return itsSpecialContourStyle;}
+	void SpecialContourStyle(checkedVector<int>& newValue){itsSpecialContourStyle = newValue;}
+
 	const checkedVector<int>& SpecialIsoLineColorIndexies(void) const {return itsSpecialIsoLineColorIndexies;}
-	void SpecialIsoLineColorIndexies(checkedVector<int>& newValue){itsSpecialIsoLineColorIndexies = newValue;}
+	void SpecialIsoLineColorIndexies(checkedVector<int>& newValue)
+	{
+		itsSpecialIsoLineColorIndexies = newValue;
+		itsSpecialContourColorIndexies = newValue;
+	}
+
+	const checkedVector<int>& SpecialContourColorIndexies(void) const {return itsSpecialContourColorIndexies;}
+	void SpecialContourColorIndexies(checkedVector<int>& newValue){itsSpecialContourColorIndexies = newValue;}
+
 	const checkedVector<bool>& SpecialIsoLineShowLabelBox(void) const {return itsSpecialIsoLineShowLabelBox;}
 	void SpecialIsoLineShowLabelBox(checkedVector<bool>& newValue){itsSpecialIsoLineShowLabelBox = newValue;}
 	bool UseDefaultRegioning(void) const {return fUseDefaultRegioning;}
 	void UseDefaultRegioning(bool newValue){fUseDefaultRegioning = newValue;}
 	bool UseCustomColorContouring(void) const {return fUseCustomColorContouring;}
-	void UseCustomColorContouring(bool newValue){fUseCustomColorContouring = newValue;}
+	void UseCustomColorContouring(bool newValue)
+	{
+		fUseCustomColorContouring = newValue;
+		fUseCustomIsoLineing = newValue;
+	}
+
+	bool UseCustomIsoLineing(void) const {return fUseCustomIsoLineing;}
+	void UseCustomIsoLineing(bool newValue){fUseCustomIsoLineing = newValue;}
+
 	const checkedVector<float>& SpecialColorContouringValues(void) const {return itsSpecialColorContouringValues;}
 	void SpecialColorContouringValues(checkedVector<float>& newValue){itsSpecialColorContouringValues = newValue;}
 	const checkedVector<int>& SpecialColorContouringColorIndexies(void) const {return itsSpecialColorContouringColorIndexies;}
@@ -281,7 +443,19 @@ public:
 //	const NFmiColor& IsoLineHatchBorderColor2(void) const {return itsIsoLineHatchBorderColor2;}
 //	void IsoLineHatchBorderColor2(const NFmiColor& newValue){itsIsoLineHatchBorderColor2 = newValue;}
 	int IsoLineLabelDigitCount(void) const {return itsIsoLineLabelDigitCount;}
-	void IsoLineLabelDigitCount(int newValue){itsIsoLineLabelDigitCount = newValue; if(itsIsoLineLabelDigitCount > 10)itsIsoLineLabelDigitCount = 10;}
+	void IsoLineLabelDigitCount(int newValue)
+	{
+		itsIsoLineLabelDigitCount = newValue; 
+		if(itsIsoLineLabelDigitCount > 10)
+			itsIsoLineLabelDigitCount = 10;
+		itsContourLabelDigitCount = newValue; 
+		if(itsContourLabelDigitCount > 10)
+			itsContourLabelDigitCount = 10;
+	}
+
+	int ContourLabelDigitCount(void) const {return itsContourLabelDigitCount;}
+	void ContourLabelDigitCount(int newValue){itsContourLabelDigitCount = newValue; if(itsContourLabelDigitCount > 10) itsContourLabelDigitCount = 10;}
+
 //**************************************************************
 //********** 'versio 2' parametrien asetusfunktiot *************
 //**************************************************************
@@ -324,6 +498,7 @@ protected:
 	NFmiColor itsFillColor;
 
 	NFmiColor itsIsolineLabelBoxFillColor;
+	NFmiColor itsContourLabelBoxFillColor; // **** Versio 3 parametri ****
 //   Minkä kokoinen näyttöön piirrettävä 'symbolidata'
 //   on suhteessa
 //   annettuun asemalle/hilalle varattuun 'datalaatikkoon'.
@@ -333,12 +508,16 @@ protected:
 	NFmiPoint itsOnlyOneSymbolRelativeSize;
 	NFmiPoint itsOnlyOneSymbolRelativePositionOffset;
 	bool fUseIsoLineGabWithCustomContours;
+	bool fUseContourGabWithCustomContours; // **** Versio 3 parametri ****
 	double itsIsoLineGab;
+	double itsContourGab; // **** Versio 3 parametri ****
 	double itsModifyingStep;
 	bool fModifyingUnit;	//(= 0, jos yksikkö on %, = 1, jos yksikkö on sama kuin itsUnit)
 	double itsTimeSerialModifyingLimit; // aikasarjanäytön muutos akselin minimi ja maksimi arvo
 	NFmiColor itsIsolineColor;
+	NFmiColor itsContourColor; // **** Versio 3 parametri ****
 	NFmiColor itsIsolineTextColor;
+	NFmiColor itsContourTextColor; // **** Versio 3 parametri ****
 	NFmiColor itsSecondaryIsolineColor;
 	NFmiColor itsSecondaryIsolineTextColor;
 	bool fUseSecondaryColors;
@@ -377,36 +556,51 @@ protected:
 
 	int itsGridDataPresentationStyle; // 1=asema muodossa, 2=isoviiva, 3=color contouring, 4= contour+isoviiva, 5=quick color contouring
 	bool fUseIsoLineFeathering; // isoviivojen harvennus optio
+	bool fUseContourFeathering; // **** Versio 3 parametri ****
 	bool fIsoLineLabelsOverLapping; // voivatko isoviiva labelit mennä päällekkäin vai ei?
 	bool fShowColorLegend; // piirretäänko rivin viimeiseen ruutuun color contouringin väri selitys laatikko?
 	bool fUseSimpleIsoLineDefinitions; // otetaanko isoviivamääritykset simppelillä tavalla, vai kaikki arvot spesiaali tapauksina määritettyinä
+	bool fUseSimpleContourDefinitions; // **** Versio 3 parametri ****
 	bool fUseSeparatorLinesBetweenColorContourClasses; // piirrä viivat arvo/väri luokkien välille
 	float itsSimpleIsoLineGap;
 	float itsSimpleIsoLineZeroValue; // tämän arvon kautta isoviivat joutuvat menemään
+	float itsSimpleContourZeroValue; // **** Versio 3 parametri ****
 	float itsSimpleIsoLineLabelHeight; // relatiivinen vai mm? (0=ei näytetä ollenkaan)
+	float itsSimpleContourLabelHeight; // **** Versio 3 parametri ****
 	bool fShowSimpleIsoLineLabelBox; // ei vielä muita attribuutteja isoviiva labelille (tämä tarkoittaa lukua ympäroivää laatikkoa)
+	bool fShowSimpleContourLabelBox; // **** Versio 3 parametri ****
 	float itsSimpleIsoLineWidth; // relatiivinen vai mm?
+	float itsSimpleContourWidth; // **** Versio 3 parametri ****
 	int itsSimpleIsoLineLineStyle; // 1=yht. viiva, 2=pisteviiva jne.
+	int itsSimpleContourLineStyle; // **** Versio 3 parametri ****
 	float itsIsoLineSplineSmoothingFactor; // 0-10, 0=ei pehmennystä, 10=maksimi pyöritys
 	bool fUseSingleColorsWithSimpleIsoLines; // true=sama väri kaikille isoviivoille, false=tehdään väriskaala
 // isoviivan väriskaalaus asetukset
 	float itsSimpleIsoLineColorShadeLowValue; //väri skaalaus alkaa tästä arvosta
 	float itsSimpleIsoLineColorShadeMidValue; //väri skaalauksen keskiarvo
 	float itsSimpleIsoLineColorShadeHighValue; //väri skaalaus loppuu tähän arvoon
+	float itsSimpleIsoLineColorShadeHigh2Value;  // **** Versio 3 parametri ****
 	NFmiColor itsSimpleIsoLineColorShadeLowValueColor;
 	NFmiColor itsSimpleIsoLineColorShadeMidValueColor;
 	NFmiColor itsSimpleIsoLineColorShadeHighValueColor;
+	NFmiColor itsSimpleIsoLineColorShadeHigh2ValueColor;  // **** Versio 3 parametri ****
 	int itsSimpleIsoLineColorShadeClassCount; // kuinka monta väri luokkaa tehdään skaalaukseen
 // speciaali isoviiva asetukset (otetaan käyttöön, jos fUseSimpleIsoLineDefinitions=false)
 	checkedVector<float> itsSpecialIsoLineValues; // tähän laitetaan kaikki arvot, johon halutaan isoviiva
+	checkedVector<float> itsSpecialContourValues;  // **** Versio 3 parametri ****
 	checkedVector<float> itsSpecialIsoLineLabelHeight; // isoviivalabeleiden korkeudet (0=ei labelia)
+	checkedVector<float> itsSpecialContourLabelHeight;  // **** Versio 3 parametri ****
 	checkedVector<float> itsSpecialIsoLineWidth; // viivan paksuudet
+	checkedVector<float> itsSpecialContourWidth;  // **** Versio 3 parametri ****
 	checkedVector<int> itsSpecialIsoLineStyle; // viiva tyylit
+	checkedVector<int> itsSpecialContourStyle;  // **** Versio 3 parametri ****
 	checkedVector<int> itsSpecialIsoLineColorIndexies; // eri viivojen väri indeksit (pitää tehdä näyttö taulukko käyttäjälle)
+	checkedVector<int> itsSpecialContourColorIndexies;  // **** Versio 3 parametri ****
 	checkedVector<bool> itsSpecialIsoLineShowLabelBox; // eri viivojen väri indeksit (pitää tehdä näyttö taulukko käyttäjälle)
 // colorcontouring ja quick contouring asetukset
 	bool fUseDefaultRegioning; // jos true, data piirretään vain defaultregionin (maan) päälle
 	bool fUseCustomColorContouring; // true ja saa määritellä luokka rajat ja värit
+	bool fUseCustomIsoLineing;  // **** Versio 3 parametri ****
 	checkedVector<float> itsSpecialColorContouringValues; // tähän laitetaan kaikki arvot, johon halutaan color contour luokka rajoiksi
 	checkedVector<int> itsSpecialColorContouringColorIndexies; // eri viivojen väri indeksit (pitää tehdä näyttö taulukko käyttäjälle)
 	float itsColorContouringColorShadeLowValue; //väri skaalaus alkaa tästä arvosta
@@ -434,6 +628,7 @@ protected:
 	NFmiColor itsIsoLineHatchColor2;
 //	NFmiColor itsIsoLineHatchBorderColor2;
 	int itsIsoLineLabelDigitCount; // isoviiva labelin näytettävien digitaalien lukumäärä
+	int itsContourLabelDigitCount;  // **** Versio 3 parametri ****
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
