@@ -21,11 +21,16 @@ void NFmiGridPointCache::Add(const std::string &theGridStr, const NFmiGridPointC
 
 const std::string NFmiGridPointCache::MakeGridCacheStr( const NFmiGrid &theGrid )
 {
-	std::string str(theGrid.Area()->AreaStr());
-	str += ":";
-	str += NFmiStringTools::Convert(theGrid.XNumber());
-	str += ",";
-	str += NFmiStringTools::Convert(theGrid.YNumber());
+	if(theGrid.Area() == 0)
+		return std::string();
+	else
+	{
+		std::string str(theGrid.Area()->AreaStr());
+		str += ":";
+		str += NFmiStringTools::Convert(theGrid.XNumber());
+		str += ",";
+		str += NFmiStringTools::Convert(theGrid.YNumber());
 
-	return str;
+		return str;
+	}
 }
