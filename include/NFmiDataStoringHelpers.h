@@ -7,6 +7,7 @@
 #ifndef __NFMIDATASTORINGHELPERS_H__
 #define __NFMIDATASTORINGHELPERS_H__
 
+#include <iterator>
 #include <vector>
 #include <string>
 #include "NFmiString.h"
