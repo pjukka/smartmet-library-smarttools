@@ -34,7 +34,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
-* Thu Nov 15 2007 mheiskan <mika.heiskanen@fmi.fi> - 1.0.7-1.el5.fmi
+* Mon Nov 19 2007 mheiskan <mika.heiskanen@fmi.fi> - 1.0.7-1.el5.fmi
 - Linked with newbase 1.0.4-1
 * Thu Nov 15 2007 mheiskan <mika.heiskanen@fmi.fi> - 1.0.6-1.el5.fmi
 - Linked with newbase 1.0.3-1
