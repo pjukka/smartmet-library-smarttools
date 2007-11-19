@@ -1,14 +1,14 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 1.0.5
+Version: 1.0.7
 Release: 1.el5.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase >= 1.0.2-1
+BuildRequires: libsmartmet-newbase >= 1.0.4-1
 Provides: %{LIBNAME}
 
 %description
@@ -34,6 +34,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Thu Nov 15 2007 mheiskan <mika.heiskanen@fmi.fi> - 1.0.7-1.el5.fmi
+- Linked with newbase 1.0.4-1
+* Thu Nov 15 2007 mheiskan <mika.heiskanen@fmi.fi> - 1.0.6-1.el5.fmi
+- Linked with newbase 1.0.3-1
 * Thu Oct 18 2007 mheiskan <mika.heiskanen@fmi.fi> - 1.0.5-1.el5.fmi
 - New improvements from Marko Pietarinen
 * Mon Sep 24 2007 mheiskan <mika.heiskanen@fmi.fi> - 1.0.4-1.el5.fmi
