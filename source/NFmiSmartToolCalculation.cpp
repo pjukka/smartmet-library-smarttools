@@ -452,7 +452,7 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(double &result, doubl
 		float usedHeightResolution = 100;
 		if(argument1 >= 0 && argument1 <= argument2)
 		{
-			if((argument2 - argument2) > 35000)
+			if((argument2 - argument1) > 35000)
 				throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorHeightCalcOverRun"));
 			// 5. funktiosta riippuva datamodifier min, max jne.
 			NFmiDataModifier* modifier = CreateIntegrationFuction(func); // tämä palauttaa aina jotain, tai heittää poikkeuksen
@@ -472,7 +472,7 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(double &result, doubl
 					modifier->Calculate(static_cast<float>(value));
 					if(theIntegrationFunctionType == 3)
 					{
-						if(value == modifier->CalculationResult())
+						if(value != kFloatMissing && value == modifier->CalculationResult())
 							heightValue = itsHeightValue;
 					}
 					// 9. 'next'
