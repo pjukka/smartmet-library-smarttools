@@ -346,7 +346,14 @@ bool NFmiHelpDataInfoSystem::Init(const std::string &theBaseNameSpaceStr, std::s
 			if (NFmiSettings::IsSet(key1))
 			{
 				NFmiArea *area = NFmiAreaFactory::Create(NFmiSettings::Require<std::string>(key1)).release();
-				hdi.ImageArea(area);
+				if(area)
+				{
+					if(area->XYArea().Width() != 1 || area->XYArea().Height() != 1)
+					{
+						area->SetXYArea(NFmiRect(0,0,1,1));
+					}
+					hdi.ImageArea(area);
+				}
 			}
 			sprintf(key1, dynamicParameterIdKey.c_str(), dyn.c_str()); // Parameter ID
 			sprintf(key2, dynamicParameterNameKey.c_str(), dyn.c_str()); // Parameter name
