@@ -1,6 +1,6 @@
 LIB = smarttools
 
-MAINFLAGS = -Wall -W -Wno-unused-parameter
+MAINFLAGS = -Wall -W -Wno-unused-parameter -fPIC
 
 EXTRAFLAGS = -pedantic -Wpointer-arith -Wcast-qual \
 	-Wcast-align -Wwrite-strings -Wconversion -Winline \
