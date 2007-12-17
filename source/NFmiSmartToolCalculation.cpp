@@ -308,6 +308,21 @@ void NFmiSmartToolCalculation::eval_exp5(double &result, const NFmiPoint &theLat
 		result = -result;
 }
 
+static void DEBUGOUT2(bool doOutPut, const string &theComment, double theValue)
+{
+	static bool firstTime = true;
+	static ofstream out;
+	if(firstTime)
+	{
+		out.open("d:\\debugout.txt");
+		firstTime = false;
+	}
+	if(doOutPut)
+	{
+		out << theComment << " " << NFmiStringTools::Convert<double>(theValue) << endl;
+	}
+}
+
 // Process a parenthesized expression.
 void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
@@ -436,6 +451,13 @@ static float GetCurrentHeightStep(float theHeight)
 	return step;
 }
 
+template<typename T>
+static IsEqualEnough(T value1, T value2, T usedEpsilon)
+{
+	if(::fabs(static_cast<double>(value1 - value2)) < usedEpsilon)
+		return true;
+	return false;
+}
 void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
 	result = kFloatMissing;
@@ -472,8 +494,20 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(double &result, doubl
 					modifier->Calculate(static_cast<float>(value));
 					if(theIntegrationFunctionType == 3)
 					{
-						if(value != kFloatMissing && value == modifier->CalculationResult())
+						double calculationResult = modifier->CalculationResult();
+//						DEBUGOUT2(counter == checkedIndex, "calculationResult" , calculationResult);
+
+						// HUOM!! T‰ss‰ value vs. calculationResult vertailu pit‰‰ tehd‰ virherajan sis‰ll‰,
+						// koska modifier k‰sittelee arvoja floateilla ja muu ysteemi doubleina ja
+						// siit‰ seuraa ongelmia tarkkuuden kanssa.
+						// MSVC++ 7.1 debug toimi == operaatorin kanssa, MUTTA release versio EI!!!
+						// Bugin mets‰stykseen on mennyt arviolta eri aikoina yhteens‰ 10 tuntia!!!!
+						// Ja ainakin nelj‰ kertaa kun olen esitellyt SmartTool-kielen maxh-funktiota
+						// olen ihmetellyt ett‰ demossa ei toimi, mutta omassa koneessa toimi (debug versiona!)
+						if(value != kFloatMissing && ::IsEqualEnough(value, calculationResult, 0.000001))
+						{
 							heightValue = itsHeightValue;
+						}
 					}
 					// 9. 'next'
 					itsHeightValue += usedHeightResolution;
