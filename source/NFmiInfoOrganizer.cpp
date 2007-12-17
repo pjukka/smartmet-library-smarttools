@@ -1177,10 +1177,10 @@ static int IsGoodSoundingData(NFmiSmartInfo* info, const NFmiProducer &theProduc
 		{
 			if(info->SizeLevels() > 3) // pitää olla väh 4 leveliä ennen kuin kelpuutetaan sounding dataksi
 			{
-				if(info->DataType() == NFmiInfoData::kViewable)
-					return 1;
-				else
+				if(info->DataType() == NFmiInfoData::kHybridData)
 					return 2;
+				else
+					return 1;
 			}
 		}
 	}
