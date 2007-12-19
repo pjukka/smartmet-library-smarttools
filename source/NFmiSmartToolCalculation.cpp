@@ -454,7 +454,7 @@ static float GetCurrentHeightStep(float theHeight)
 }
 
 template<typename T>
-static IsEqualEnough(T value1, T value2, T usedEpsilon)
+bool static IsEqualEnough(T value1, T value2, T usedEpsilon)
 {
 	if(::fabs(static_cast<double>(value1 - value2)) < usedEpsilon)
 		return true;
