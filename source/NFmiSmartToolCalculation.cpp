@@ -308,6 +308,7 @@ void NFmiSmartToolCalculation::eval_exp5(double &result, const NFmiPoint &theLat
 		result = -result;
 }
 
+#if 0
 static void DEBUGOUT2(bool doOutPut, const string &theComment, double theValue)
 {
 	static bool firstTime = true;
@@ -322,6 +323,7 @@ static void DEBUGOUT2(bool doOutPut, const string &theComment, double theValue)
 		out << theComment << " " << NFmiStringTools::Convert<double>(theValue) << endl;
 	}
 }
+#endif
 
 // Process a parenthesized expression.
 void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
