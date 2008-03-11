@@ -135,9 +135,9 @@ float NFmiSmartToolCalculation::GetInsideLimitsValue(float theValue)
 
 	if(fDoLimitCheck)
 	{
-		if(theValue < itsLowerLimit)
+		if(itsLowerLimit != kFloatMissing && theValue < itsLowerLimit)
 			return itsLowerLimit;
-		else if(theValue > itsUpperLimit)
+		else if(itsUpperLimit != kFloatMissing && theValue > itsUpperLimit)
 			return itsUpperLimit;
 	}
 	return theValue;
@@ -148,7 +148,7 @@ void NFmiSmartToolCalculation::SetLimits(float theLowerLimit, float theUpperLimi
 	fDoLimitCheck = theDoLimitCheck;
 	if(fDoLimitCheck)
 	{
-		if(theLowerLimit >= theUpperLimit)
+		if((theLowerLimit != kFloatMissing && theUpperLimit != kFloatMissing) && theLowerLimit >= theUpperLimit)
 			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorMinMaxLimits"));
 		else
 		{
@@ -454,7 +454,7 @@ static float GetCurrentHeightStep(float theHeight)
 }
 
 template<typename T>
-bool static IsEqualEnough(T value1, T value2, T usedEpsilon)
+static bool IsEqualEnough(T value1, T value2, T usedEpsilon)
 {
 	if(::fabs(static_cast<double>(value1 - value2)) < usedEpsilon)
 		return true;
