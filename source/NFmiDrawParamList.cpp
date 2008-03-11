@@ -411,6 +411,12 @@ bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 		if(index)
 		{
 			index += theMovement;
+			if(index < 1)
+				index = (index + paramCount); // menn‰‰n listan ymp‰ri tarvittaessa
+			else if(index > paramCount)
+				index = (index - paramCount); // menn‰‰n listan ymp‰ri tarvittaessa
+
+			// tarkistus koodia sille jos theMovement on suurempi kuin paramCount
 			index = FmiMax(index, 1);
 			index = FmiMin(index, paramCount);
 			if(index != oldIndex) // jos todella tapahtuu siirto, tehd‰‰n se ja laitetaan lista likaiseksi
