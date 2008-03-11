@@ -131,7 +131,7 @@ NFmiDrawParam::NFmiDrawParam()
 , itsSpecialIsoLineColorIndexies()
 , itsSpecialContourColorIndexies()
 , itsSpecialIsoLineShowLabelBox()
-, fUseDefaultRegioning(false)
+, fDrawOnlyOverMask(false)
 , fUseCustomColorContouring(false)
 , fUseCustomIsoLineing(false)
 , itsSpecialColorContouringValues()
@@ -278,7 +278,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 , itsSpecialIsoLineColorIndexies()
 , itsSpecialContourColorIndexies()
 , itsSpecialIsoLineShowLabelBox()
-, fUseDefaultRegioning(false)
+, fDrawOnlyOverMask(false)
 , fUseCustomColorContouring(false)
 , fUseCustomIsoLineing(false)
 , itsSpecialColorContouringValues()
@@ -424,7 +424,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 , itsSpecialIsoLineColorIndexies(other.itsSpecialIsoLineColorIndexies)
 , itsSpecialContourColorIndexies(other.itsSpecialContourColorIndexies)
 , itsSpecialIsoLineShowLabelBox(other.itsSpecialIsoLineShowLabelBox)
-, fUseDefaultRegioning(other.fUseDefaultRegioning)
+, fDrawOnlyOverMask(other.fDrawOnlyOverMask)
 , fUseCustomColorContouring(other.fUseCustomColorContouring)
 , fUseCustomIsoLineing(other.fUseCustomIsoLineing)
 , itsSpecialColorContouringValues(other.itsSpecialColorContouringValues)
@@ -597,7 +597,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 		itsSpecialIsoLineStyle = theDrawParam->SpecialIsoLineStyle();
 		itsSpecialIsoLineColorIndexies = theDrawParam->SpecialIsoLineColorIndexies();
 		itsSpecialIsoLineShowLabelBox = theDrawParam->SpecialIsoLineShowLabelBox();
-		fUseDefaultRegioning = theDrawParam->UseDefaultRegioning();
+		fDrawOnlyOverMask = theDrawParam->DrawOnlyOverMask();
 		fUseCustomColorContouring = theDrawParam->UseCustomColorContouring();
 		itsSpecialColorContouringValues = theDrawParam->SpecialColorContouringValues();
 		itsSpecialColorContouringColorIndexies = theDrawParam->SpecialColorContouringColorIndexies();
@@ -890,7 +890,7 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 			file << itsSpecialIsoLineShowLabelBox[i] << " ";
 		file << endl;
 
-		file << fUseDefaultRegioning << endl;
+		file << fDrawOnlyOverMask << endl;
 		file << fUseCustomColorContouring << endl;
 
 		size = itsSpecialColorContouringValues.size();
@@ -1197,7 +1197,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 
 				if(!file)
 					return file;
-				file >> fUseDefaultRegioning;
+				file >> fDrawOnlyOverMask;
 				file >> fUseCustomColorContouring;
 
 				file >> size;

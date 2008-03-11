@@ -111,11 +111,7 @@ public:
 
 
 
-	void				 IsoLineGab (const double theIsoLineGab) 
-	{ 
-		itsIsoLineGab = theIsoLineGab; 
-		itsContourGab = theIsoLineGab;  // **** Versio 3 parametri asetetaan toistaiseksi myˆs n‰in ****
-	}
+	void				 IsoLineGab (const double theIsoLineGab) { itsIsoLineGab = theIsoLineGab; }
 	double				 IsoLineGab (void) const { return itsIsoLineGab; };
 
 	void				 ContourGab(const double theIsoLineGab) { itsContourGab = theIsoLineGab; };
@@ -379,8 +375,8 @@ public:
 
 	const checkedVector<bool>& SpecialIsoLineShowLabelBox(void) const {return itsSpecialIsoLineShowLabelBox;}
 	void SpecialIsoLineShowLabelBox(checkedVector<bool>& newValue){itsSpecialIsoLineShowLabelBox = newValue;}
-	bool UseDefaultRegioning(void) const {return fUseDefaultRegioning;}
-	void UseDefaultRegioning(bool newValue){fUseDefaultRegioning = newValue;}
+	bool DrawOnlyOverMask(void) const {return fDrawOnlyOverMask;}
+	void DrawOnlyOverMask(bool newValue){fDrawOnlyOverMask = newValue;}
 	bool UseCustomColorContouring(void) const {return fUseCustomColorContouring;}
 	void UseCustomColorContouring(bool newValue)
 	{
@@ -598,7 +594,7 @@ protected:
 	checkedVector<int> itsSpecialContourColorIndexies;  // **** Versio 3 parametri ****
 	checkedVector<bool> itsSpecialIsoLineShowLabelBox; // eri viivojen v‰ri indeksit (pit‰‰ tehd‰ n‰yttˆ taulukko k‰ytt‰j‰lle)
 // colorcontouring ja quick contouring asetukset
-	bool fUseDefaultRegioning; // jos true, data piirret‰‰n vain defaultregionin (maan) p‰‰lle
+	bool fDrawOnlyOverMask; // jos true, data piirret‰‰n vain maskin p‰‰lle
 	bool fUseCustomColorContouring; // true ja saa m‰‰ritell‰ luokka rajat ja v‰rit
 	bool fUseCustomIsoLineing;  // **** Versio 3 parametri ****
 	checkedVector<float> itsSpecialColorContouringValues; // t‰h‰n laitetaan kaikki arvot, johon halutaan color contour luokka rajoiksi
