@@ -36,6 +36,8 @@
 #include "NFmiSmartInfo.h"
 #include "NFmiValueString.h"
 #include "NFmiDrawParam.h"
+#include "NFmiFileSystem.h"
+
 #include <assert.h>
 /*
 #ifdef _DEBUG
@@ -51,14 +53,19 @@ static void InitDrawParam(NFmiDrawParam* theDrawParam, const std::string &theFil
 	{
 		if(!theDrawParam->Init(theFileName))
 		{
+			// laitetaan tiedoston nimi kuitenkin talteen drawparamiin ja yritetään luoda tiedosto jos tarpeen
+			theDrawParam->InitFileName(theFileName);
 			if(createDrawParamFileIfNotExist)
 			{
-				if(!theDrawParam->StoreData(theFileName))
-				{
-					// tiedostoa ei voitu luoda, mitä pitäisi tehdä?
+				if(NFmiFileSystem::FileExists(theFileName) == false)
+				{ // jos tosiaan tiedostoa ei ollut, luodaan sellainen.
+				  // Mutta jos luku ei onnistunut, ei luoda sitä, koska kyseessä saattoi olla jokin hetkellinen luku häiriö
+				  // ja omituisesti tiuhtissa olevat perustiedostot ovat aina silloin tällöin 'resetoituneet'.
+					if(!theDrawParam->StoreData(theFileName))
+					{
+						// tiedostoa ei voitu luoda, mitä pitäisi tehdä?
+					}
 				}
-				else // koska tiedoston talletus onnistui, laita initFile talteen drawParamiin
-					theDrawParam->InitFileName(theFileName);
 			}
 		}
 	}
