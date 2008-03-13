@@ -414,8 +414,8 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateCalculation(NFmiSmartTool
 		calculation->SetCalculationText(theCalcInfo->GetCalculationText());
 		bool mustUsePressureInterpolation = false; // tätäei käytetä tässä, mutta pakko laittaa metodin interfacen takia
 		calculation->SetResultInfo(CreateInfo(*theCalcInfo->GetResultDataInfo(), mustUsePressureInterpolation));
-		float lowerLimit;
-		float upperLimit;
+		float lowerLimit = kFloatMissing;
+		float upperLimit = kFloatMissing;
 		bool checkLimits = true; // yleensä parametreille käytetdään min/max rajoja, mutta ei esim TotalWind tai W&C:lle
 		GetParamValueLimits(*theCalcInfo->GetResultDataInfo(), &lowerLimit, &upperLimit, &checkLimits);
 		calculation->SetLimits(lowerLimit, upperLimit, checkLimits);
@@ -1177,8 +1177,8 @@ void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaM
 			*theUpperLimit = static_cast<float>(drawParam->AbsoluteMaxValue());
 			delete drawParam;
 		}
-		else
-			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorNoMinMaxLimits"));
+//		else
+//			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorNoMinMaxLimits"));
 	}
 }
 
