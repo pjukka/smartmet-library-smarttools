@@ -106,13 +106,7 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam (const NFmiDataIdent& theId
 // infosta, jolloin se on aina oikein. Info on aina asetettu halutun parametrin
 // kohdalle, kun se tulee t‰nne.
 	NFmiDrawParam* drawParam = new NFmiDrawParam(theIdent, theLevel ? *theLevel : NFmiLevel(), 1); // 1 = priority
-
-	if(drawParam)
-	{
-		std::string fileName = CreateFileName(drawParam);
-		InitDrawParam(drawParam, fileName, fCreateDrawParamFileIfNotExist);
-	}
-	return drawParam;
+	return CreateDrawParam(&drawParam, false);
 }
 
 // luodaan drawparam crossSectionDataa varten. Huom k‰ytetyt tiedostonimet
@@ -121,25 +115,40 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam (const NFmiDataIdent& theId
 NFmiDrawParam * NFmiDrawParamFactory::CreateCrossSectionDrawParam(const NFmiDataIdent& theIdent)
 {
 	NFmiDrawParam* drawParam = new NFmiDrawParam(theIdent, NFmiLevel(), 1); // 1 = priority
-	if(drawParam)
-	{
-		std::string fileName = CreateFileName(drawParam, true);
-		InitDrawParam(drawParam, fileName, fCreateDrawParamFileIfNotExist);
-	}
-	return drawParam;
+	return CreateDrawParam(&drawParam, true);
 }
 
 NFmiDrawParam* NFmiDrawParamFactory::CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent)
 {
 	NFmiDrawParam* drawParam = new NFmiDrawParam;
-
 	if(drawParam)
-	{
 		drawParam->Param(theIdent);
-		std::string fileName = CreateFileName(drawParam);
-		InitDrawParam(drawParam, fileName, fCreateDrawParamFileIfNotExist);
+	return CreateDrawParam(&drawParam, false);
+}
+
+// Halusin laittaa yhteen metodiin kaiken drawParam-alustuksen ja virhetilanteiden k‰sittelyn, koska
+// muuten olisi tullut melkein kolme idensttist‰ metodi runkoa. T‰m‰ on tosin ruma funktio, koska
+// t‰m‰ mahdollisesti tuhoaa annetun DrawParamin tai sitten palautta sen jatkok‰sittelyj‰ varten. Joten 
+// HUOM!!!! Eli parametrina annettua theDrawParam:ia pit‰‰ tarkastaa t‰m‰n kutsun j‰lkeen, koska se on 
+// saatettu tuhota!!!!!
+// Rumaa koodia, oikea tapa olisi ehk‰ tehd‰ nuo kolme metodia (CreateDrawParam, CreateCrossSectionDrawParam, 
+// CreateEmptyInfoDrawParam) yhdeksi metodiksi, joka hoitaa kaiken kerralla.
+NFmiDrawParam * NFmiDrawParamFactory::CreateDrawParam(NFmiDrawParam **theDrawParam, bool fDoCrossSection)
+{
+	try
+	{
+		if(*theDrawParam)
+		{
+			std::string fileName = CreateFileName(*theDrawParam, fDoCrossSection);
+			InitDrawParam(*theDrawParam, fileName, fCreateDrawParamFileIfNotExist);
+		}
 	}
-	return drawParam;
+	catch(...)
+	{
+		delete *theDrawParam;
+		*theDrawParam = 0;
+	}
+	return *theDrawParam;
 }
 
 //--------------------------------------------------------

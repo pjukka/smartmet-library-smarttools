@@ -50,6 +50,7 @@ public:
 	void LoadDirectory(const std::string& newValue){itsLoadDirectory = newValue;};
 
 private:
+	NFmiDrawParam * CreateDrawParam(NFmiDrawParam **theDrawParam, bool fDoCrossSection);
 	std::string CreateFileName(NFmiDrawParam* drawParam, bool fCrossSectionCase = false);
 	std::string itsLoadDirectory;
 	bool fCreateDrawParamFileIfNotExist; // esim. metkun editori luo drawparam-tiedostot, 
