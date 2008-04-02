@@ -73,7 +73,7 @@ namespace NFmiDataStoringHelpers
 		long dayShift = 0;
 		is >> utcHour >> utcMinute >> dayShift;
 
-		NFmiMetTime aTime(60);
+		NFmiMetTime aTime(1);
 		aTime.SetHour(0);
 		aTime.ChangeByDays(-dayShift);
 		aTime.SetHour(utcHour);
