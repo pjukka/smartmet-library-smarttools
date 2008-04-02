@@ -162,6 +162,7 @@ NFmiDrawParam::NFmiDrawParam()
 // protected osa
 , itsIsoLineLabelDigitCount(0)
 , itsContourLabelDigitCount(0)
+, itsAlpha(100.f) // dafault on 100 eli t‰ysin l‰pin‰kym‰tˆn
 , itsInitFileVersionNumber(itsFileVersionNumber)
 , fHidden(false)
 , fEditedParam(false)
@@ -308,6 +309,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 //, itsIsoLineHatchBorderColor2(0.5f,0.5f,0.5f)
 , itsIsoLineLabelDigitCount(0)
 , itsContourLabelDigitCount(0)
+, itsAlpha(100.f) // dafault on 100 eli t‰ysin l‰pin‰kym‰tˆn
 , itsInitFileVersionNumber(itsFileVersionNumber)
 , fHidden(false)
 , fEditedParam(false)
@@ -457,6 +459,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
+, itsAlpha(other.itsAlpha)
 , itsInitFileVersionNumber(other.itsInitFileVersionNumber)
 , fHidden(other.fHidden)
 , fEditedParam(other.fEditedParam)
@@ -503,6 +506,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 			itsParameterAbbreviation = theDrawParam->ParameterAbbreviation();
 			fEditableParam = theDrawParam->IsEditable();
 			fViewMacroDrawParam = theDrawParam->ViewMacroDrawParam();
+			itsParameter = theDrawParam->itsParameter;
 		}
 		itsPriority = theDrawParam->Priority();
 
@@ -518,6 +522,8 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 		itsOnlyOneSymbolRelativeSize = NFmiPoint(theDrawParam->OnlyOneSymbolRelativeSize());
 		itsOnlyOneSymbolRelativePositionOffset = NFmiPoint(theDrawParam->OnlyOneSymbolRelativePositionOffset());
 
+		fUseIsoLineGabWithCustomContours = theDrawParam->UseIsoLineGabWithCustomContours();
+		fUseContourGabWithCustomContours = theDrawParam->UseContourGabWithCustomContours();
 		itsIsoLineGab = theDrawParam->IsoLineGab();
 		itsModifyingStep =  theDrawParam->ModifyingStep();
 		fModifyingUnit =  theDrawParam->ModifyingUnit();
@@ -656,6 +662,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 	//***********************************************
 	//********** 'versio 3' parametreja *************
 	//***********************************************
+	itsAlpha = theDrawParam->itsAlpha;
 
 	}
 	return;
@@ -961,10 +968,12 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 		file << endl;
 
 		file << fUseCustomIsoLineing << " " << itsContourLabelDigitCount << endl;
-	
+
 		NFmiDataStoringHelpers::NFmiExtraDataStorage extraData; // lopuksi viel‰ mahdollinen extra data
 		// Kun tulee uusia muuttujia, tee t‰h‰n extradatan t‰yttˆ‰, jotta se saadaan talteen tiedopstoon siten ett‰
 		// edelliset versiot eiv‰t mene solmuun vaikka on tullut uutta dataa.
+		extraData.Add(itsAlpha); // alpha on siis 1. uusista extra-parametreista
+
 		file << "possible_extra_data" << std::endl;
 		file << extraData;
 
@@ -1266,7 +1275,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				NFmiDataStoringHelpers::ReadContainer(itsSpecialContourColorIndexies, file);
 
 				file >> fUseCustomIsoLineing >> itsContourLabelDigitCount;
-			
+
 				if(file.fail())
 					throw std::runtime_error("NFmiDrawParam::Write failed");
 
@@ -1275,6 +1284,9 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				file >> extraData;
 				// T‰ss‰ sitten otetaaan extradatasta talteen uudet muuttujat, mit‰ on mahdollisesti tullut
 				// eli jos uusia muutujia tai arvoja, k‰sittele t‰ss‰.
+				itsAlpha = 100.f; // t‰m‰ on siis default arvo alphalle (t‰ysin l‰pin‰kyv‰)
+				if(extraData.itsDoubleValues.size() >= 1)
+					Alpha(static_cast<float>(extraData.itsDoubleValues[0])); // laitetaan asetus-funktion l‰pi, jossa raja tarkistukset
 
 				if(file.fail())
 					throw std::runtime_error("NFmiDrawParam::Write failed");
@@ -1286,7 +1298,7 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			{ // tietyt muuttujat pit‰‰ alustaa jos versio 2.
 				itsColorContouringColorShadeHigh2Value = itsColorContouringColorShadeHighValue;
 				itsColorContouringColorShadeHigh2ValueColor = itsColorContouringColorShadeHighValueColor;
-		
+
 				itsContourLabelBoxFillColor = itsIsolineLabelBoxFillColor;
 				fUseContourGabWithCustomContours = false;
 				itsContourGab = itsIsoLineGab;
@@ -1310,9 +1322,9 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 
 				fUseCustomIsoLineing = fUseCustomColorContouring;
 				itsContourLabelDigitCount = itsIsoLineLabelDigitCount;
-
+				itsAlpha = 100.f; // t‰m‰ on siis default arvo alphalle (t‰ysin l‰pin‰kyv‰)
 			}
-	
+
 
 	}
 		itsInitFileVersionNumber = itsFileVersionNumber; // lopuksi asetetaan versio numero viimeisimm‰ksi, ett‰ tulevaisuudessa talletus menee uudella versiolla

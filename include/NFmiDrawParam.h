@@ -81,8 +81,8 @@ public:
 	const NFmiColor&	 FrameColor (void) const { return itsFrameColor; };
 	void				 FillColor (const NFmiColor& theFillColor) { itsFillColor = theFillColor; };
 	const NFmiColor&	 FillColor (void) const { return itsFillColor; };
-	void				 IsolineLabelBoxFillColor(const NFmiColor& theColor) 
-	{ 
+	void				 IsolineLabelBoxFillColor(const NFmiColor& theColor)
+	{
 		itsIsolineLabelBoxFillColor = theColor;
 		itsContourLabelBoxFillColor = theColor; // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
 	};
@@ -99,9 +99,9 @@ public:
 	const NFmiPoint&	 OnlyOneSymbolRelativeSize (void) const { return itsOnlyOneSymbolRelativeSize; };
 	void				 OnlyOneSymbolRelativePositionOffset (const NFmiPoint& theOnlyOneSymbolRelativePositionOffset) { itsOnlyOneSymbolRelativePositionOffset = theOnlyOneSymbolRelativePositionOffset; };
 	const NFmiPoint&	 OnlyOneSymbolRelativePositionOffset (void) const { return itsOnlyOneSymbolRelativePositionOffset; };
-	void				 UseIsoLineGabWithCustomContours (const bool newState) 
-	{ 
-		fUseIsoLineGabWithCustomContours = newState; 
+	void				 UseIsoLineGabWithCustomContours (const bool newState)
+	{
+		fUseIsoLineGabWithCustomContours = newState;
 		fUseContourGabWithCustomContours = newState;  // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
 	};
 	bool				 UseIsoLineGabWithCustomContours (void) const { return fUseIsoLineGabWithCustomContours; };
@@ -441,10 +441,10 @@ public:
 	int IsoLineLabelDigitCount(void) const {return itsIsoLineLabelDigitCount;}
 	void IsoLineLabelDigitCount(int newValue)
 	{
-		itsIsoLineLabelDigitCount = newValue; 
+		itsIsoLineLabelDigitCount = newValue;
 		if(itsIsoLineLabelDigitCount > 10)
 			itsIsoLineLabelDigitCount = 10;
-		itsContourLabelDigitCount = newValue; 
+		itsContourLabelDigitCount = newValue;
 		if(itsContourLabelDigitCount > 10)
 			itsContourLabelDigitCount = 10;
 	}
@@ -455,6 +455,15 @@ public:
 //**************************************************************
 //********** 'versio 2' parametrien asetusfunktiot *************
 //**************************************************************
+	float Alpha(void) const {return itsAlpha;}
+	void Alpha(float newValue)
+	{
+		itsAlpha = newValue;
+		if(itsAlpha < 0.f)
+			itsAlpha = 0.f;
+		if(itsAlpha > 100.f)
+			itsAlpha = 100.f;
+	}
 
 	bool ViewMacroDrawParam(void) const {return fViewMacroDrawParam;}
 	void ViewMacroDrawParam(bool newState) {fViewMacroDrawParam = newState;}
@@ -601,7 +610,7 @@ protected:
 	checkedVector<int> itsSpecialColorContouringColorIndexies; // eri viivojen väri indeksit (pitää tehdä näyttö taulukko käyttäjälle)
 	float itsColorContouringColorShadeLowValue; //väri skaalaus alkaa tästä arvosta
 	float itsColorContouringColorShadeMidValue; //väri skaalauksen keskiarvo
-	float itsColorContouringColorShadeHighValue; 
+	float itsColorContouringColorShadeHighValue;
 	float itsColorContouringColorShadeHigh2Value; //väri skaalaus loppuu tähän arvoon
 	NFmiColor itsColorContouringColorShadeLowValueColor;
 	NFmiColor itsColorContouringColorShadeMidValueColor;
@@ -628,6 +637,7 @@ protected:
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
+	float itsAlpha; // läpinäkyvyys kerroin, 0 on täysin läpinäkyvä ja 100 täysin läpinäkymätön
 
 private:
 
