@@ -111,10 +111,20 @@ public:
 
 
 
-	void				 IsoLineGab (const double theIsoLineGab) { itsIsoLineGab = theIsoLineGab; }
+	void				 IsoLineGab (const double theIsoLineGab) 
+	{ 
+		itsIsoLineGab = theIsoLineGab; 
+		if(itsIsoLineGab == 0)
+			itsIsoLineGab = 1; // gappi ei voi olla 0
+	}
 	double				 IsoLineGab (void) const { return itsIsoLineGab; };
 
-	void				 ContourGab(const double theIsoLineGab) { itsContourGab = theIsoLineGab; };
+	void				 ContourGab(const double theContourGab) 
+	{ 
+		itsContourGab = theContourGab; 
+		if(itsContourGab == 0)
+			itsContourGab = 1;
+	}
 	double				 ContourGab(void) const { return itsContourGab; };
 
 	void				 ModifyingStep (const double theModifyingStep) { itsModifyingStep = theModifyingStep; };
@@ -324,54 +334,54 @@ public:
 	int SimpleIsoLineColorShadeClassCount(void) const {return itsSimpleIsoLineColorShadeClassCount;}
 	void SimpleIsoLineColorShadeClassCount(int newValue){itsSimpleIsoLineColorShadeClassCount = newValue;}
 	const checkedVector<float>& SpecialIsoLineValues(void) const {return itsSpecialIsoLineValues;}
-	void SpecialIsoLineValues(checkedVector<float>& newValue)
+	void SetSpecialIsoLineValues(const checkedVector<float>& newValue)
 	{
 		itsSpecialIsoLineValues = newValue;
 		itsSpecialContourValues = newValue;
 	}
 
 	const checkedVector<float>& SpecialContourValues(void) const {return itsSpecialContourValues;}
-	void SpecialContourValues(checkedVector<float>& newValue){itsSpecialContourValues = newValue;}
+	void SetSpecialContourValues(const checkedVector<float>& newValue){itsSpecialContourValues = newValue;}
 
 	const checkedVector<float>& SpecialIsoLineLabelHeight(void) const {return itsSpecialIsoLineLabelHeight;}
-	void SpecialIsoLineLabelHeight(checkedVector<float>& newValue)
+	void SetSpecialIsoLineLabelHeight(const checkedVector<float>& newValue)
 	{
 		itsSpecialIsoLineLabelHeight = newValue;
 		itsSpecialContourLabelHeight = newValue;
 	}
 
 	const checkedVector<float>& SpecialContourLabelHeight(void) const {return itsSpecialContourLabelHeight;}
-	void SpecialContourLabelHeight(checkedVector<float>& newValue){itsSpecialContourLabelHeight = newValue;}
+	void SetSpecialContourLabelHeight(const checkedVector<float>& newValue){itsSpecialContourLabelHeight = newValue;}
 
 	const checkedVector<float>& SpecialIsoLineWidth(void) const {return itsSpecialIsoLineWidth;}
-	void SpecialIsoLineWidth(checkedVector<float>& newValue)
+	void SetSpecialIsoLineWidth(const checkedVector<float>& newValue)
 	{
 		itsSpecialIsoLineWidth = newValue;
 		itsSpecialContourWidth = newValue;
 	}
 
 	const checkedVector<float>& SpecialcontourWidth(void) const {return itsSpecialContourWidth;}
-	void SpecialcontourWidth(checkedVector<float>& newValue){itsSpecialContourWidth = newValue;}
+	void SetSpecialcontourWidth(const checkedVector<float>& newValue){itsSpecialContourWidth = newValue;}
 
 	const checkedVector<int>& SpecialIsoLineStyle(void) const {return itsSpecialIsoLineStyle;}
-	void SpecialIsoLineStyle(checkedVector<int>& newValue)
+	void SetSpecialIsoLineStyle(const checkedVector<int>& newValue)
 	{
 		itsSpecialIsoLineStyle = newValue;
 		itsSpecialContourStyle = newValue;
 	}
 
 	const checkedVector<int>& SpecialContourStyle(void) const {return itsSpecialContourStyle;}
-	void SpecialContourStyle(checkedVector<int>& newValue){itsSpecialContourStyle = newValue;}
+	void SetSpecialContourStyle(checkedVector<int>& newValue){itsSpecialContourStyle = newValue;}
 
 	const checkedVector<int>& SpecialIsoLineColorIndexies(void) const {return itsSpecialIsoLineColorIndexies;}
-	void SpecialIsoLineColorIndexies(checkedVector<int>& newValue)
+	void SetSpecialIsoLineColorIndexies(const checkedVector<int>& newValue)
 	{
 		itsSpecialIsoLineColorIndexies = newValue;
 		itsSpecialContourColorIndexies = newValue;
 	}
 
 	const checkedVector<int>& SpecialContourColorIndexies(void) const {return itsSpecialContourColorIndexies;}
-	void SpecialContourColorIndexies(checkedVector<int>& newValue){itsSpecialContourColorIndexies = newValue;}
+	void SetSpecialContourColorIndexies(const checkedVector<int>& newValue){itsSpecialContourColorIndexies = newValue;}
 
 	const checkedVector<bool>& SpecialIsoLineShowLabelBox(void) const {return itsSpecialIsoLineShowLabelBox;}
 	void SpecialIsoLineShowLabelBox(checkedVector<bool>& newValue){itsSpecialIsoLineShowLabelBox = newValue;}
@@ -388,7 +398,7 @@ public:
 	void UseCustomIsoLineing(bool newValue){fUseCustomIsoLineing = newValue;}
 
 	const checkedVector<float>& SpecialColorContouringValues(void) const {return itsSpecialColorContouringValues;}
-	void SpecialColorContouringValues(checkedVector<float>& newValue){itsSpecialColorContouringValues = newValue;}
+	void SetSpecialColorContouringValues(const checkedVector<float>& newValue){itsSpecialColorContouringValues = newValue;}
 	const checkedVector<int>& SpecialColorContouringColorIndexies(void) const {return itsSpecialColorContouringColorIndexies;}
 	void SpecialColorContouringColorIndexies(checkedVector<int>& newValue){itsSpecialColorContouringColorIndexies = newValue;}
 	float ColorContouringColorShadeLowValue(void) const {return itsColorContouringColorShadeLowValue;}
