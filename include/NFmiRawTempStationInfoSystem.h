@@ -90,4 +90,34 @@ private:
 	bool fVerboseMode;
 };
 
+class NFmiSilamStationList
+{
+public:
+	class Station
+	{
+	public:
+		double itsLongitude;
+		double itsLatitude;
+		std::string itsCountry;
+		std::string itsType;
+		std::string itsInfo;
+	};
+
+
+	NFmiSilamStationList(void)
+	:itsInitLogMessage()
+	,itsLocations()
+	{}
+
+	void Init(const std::string &theInitFileName);
+	void Clear(void);
+	checkedVector<NFmiSilamStationList::Station>& Locations(void) {return itsLocations;}
+	const std::string& InitLogMessage(void) const {return itsInitLogMessage;}
+private:
+
+	std::string itsInitLogMessage; // onnistuneen initialisoinnin viesti, missä voi olla varoituksia lokiin.
+	checkedVector<NFmiSilamStationList::Station> itsLocations;
+};
+
+
 #endif // NFMIRAWTEMPSTATIONINFOSYSTEM_H

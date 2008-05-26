@@ -398,3 +398,129 @@ bool NFmiAviationStationInfoSystem::FindStation(unsigned long theStationId)
 // ***********************************************************************
 // *****************  AviationStationInfoSystem  *************************
 // ***********************************************************************
+
+
+// ***********************************************************************
+// *****************  NFmiSilamStationList  *************************
+// ***********************************************************************
+
+// t‰‰lt‰ heitet‰‰n aina poikkeus kun on virhe tai halutaan skipata rivi
+static NFmiSilamStationList::Station GetSilamStationFromString(const std::string &lineStr)
+{
+	if(lineStr.empty())
+		throw std::runtime_error("GetSilamStationFromString - empty line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+
+	if(lineStr[0] == '!')
+		throw std::runtime_error("GetSilamStationFromString - comment line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+
+	std::stringstream in(lineStr);
+	NFmiSilamStationList::Station station;
+
+	double value = 0;
+	in >> value; // latitude
+	if(in.fail())
+		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+	std::string str;
+	in >> str; // latitude sign
+	if(in.fail())
+		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+
+	station.itsLatitude = value; // latitude signilla ei ilmeisesti merkityst‰, ainakin longitude sign on merkityksetˆn
+
+
+	in >> value; // longtitude
+	if(in.fail())
+		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+	in >> str; // longtitude sign
+	if(in.fail())
+		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+
+	station.itsLongitude = value; // longtitude signilla ei ilmeisesti merkityst‰, ainakin longitude sign on merkityksetˆn
+
+	// sitten luetaan maa (joka voi olla useassa osassa)
+	do
+	{
+		in >> str;
+		if(in.fail())
+			throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+		if(str.size() >= 2 && (str[0] == 'O' && str[1] == 'T') || (str[0] == 'P' && str[1] == 'L')) // tyyppi ilmeisesti alkaa OT tai PL alulla
+			break;
+		station.itsCountry += str;
+	}while(true);
+
+	if(in.fail())
+		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+
+	station.itsType = str;
+
+	int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+	std::string buffer;
+	buffer.resize(maxBufferSize);
+	in.getline(&buffer[0], maxBufferSize);
+	station.itsInfo = buffer;
+
+	return station;
+}
+
+
+// Lukee Silam tyyppisest‰ asemalista tiedostosta asema tiedot, heitt‰‰ poikkeuksen jos ongelmia.
+// Asema tiedoston formaatti on seuraava (!-merkki aloittaa kommentti rivin):
+// 
+// !    latitude        longitude        valtio                    tyyppi               info
+// !--------------------------------------------------------------------------------------------------------------------
+//
+// 40.600   N   44.350   E   ARMENIA   PL_PWR   Ararat, Armenia teho 2x376 MW, Shut down 1989 
+// 48.300   N   15.800   E   AUSTRIA   PL   Zwentendorf, Tullnerfeld 1
+void NFmiSilamStationList::Init(const std::string &theInitFileName)
+{
+	itsInitLogMessage = "";
+	itsLocations.clear(); // tyhjennet‰‰n ensin asemalista
+
+	if(theInitFileName.empty())
+		throw std::runtime_error("NFmiSilamStationList::Init - empty settings filename given.");
+
+	ifstream in(theInitFileName.c_str());
+	if(in)
+	{
+		const int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+		std::string buffer;
+		Station station;
+		int i = 0;
+		int counter = 0;
+		do
+		{
+			buffer.resize(maxBufferSize);
+			in.getline(&buffer[0], maxBufferSize);
+
+			int realSize = strlen(buffer.c_str());
+			buffer.resize(realSize);
+			buffer = ::RemoveExtraSpaces(buffer);
+
+			try
+			{
+				station = ::GetSilamStationFromString(buffer);
+				itsLocations.push_back(station);
+			}
+			catch(...)
+			{
+				// ei tehd‰ mit‰‰n, jatketaan seuraavalla rivill‰ niin kauan kuin rivej‰ riitt‰‰
+			}
+
+		}while(in.good());
+		itsInitLogMessage = "Initializing silam station data went OK, from file: ";
+		itsInitLogMessage += theInitFileName;
+/*
+		if(itsLocations.Size() == 0)
+			itsInitLogMessage += "\nWarning: 0 sounding stations found.";
+		else
+			itsInitLogMessage += std::string("\nInfo: ") + NFmiStringTools::Convert<int>(itsLocations.Size()) + " sounding stations found.";
+*/
+	}
+	else
+		throw std::runtime_error(std::string("NFmiSilamStationList::Init - trouble reading file: ") + theInitFileName);
+}
+
+void NFmiSilamStationList::Clear(void)
+{
+	itsLocations.clear();
+}
