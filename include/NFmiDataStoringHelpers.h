@@ -24,6 +24,22 @@ namespace NFmiDataStoringHelpers
 	template<typename T>
 	inline void WriteContainer(const T & theContainer, std::ostream& os, const std::string &theSeparator, int theReallyStoredSize = -1)
 	{
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1500)
+// MSVC 2008 ei sitten osannut enää kääntää alempana olevaa koodia (KUN annetussa containerissa 
+// oli luokan sisäisiä luokkia), joten tein for loopin, joka meni läpi.
+		size_t storedCount = theReallyStoredSize;
+		if(storedCount > theContainer.size())
+			storedCount = theContainer.size();
+
+		os << storedCount << std::endl;
+		for(size_t i = 0; i < storedCount; i++)
+		{
+			os << theContainer[i];
+			if(i < storedCount-1) // ei laiteta separaattoria viimeisen jälkeen
+				os << theSeparator;
+		}
+#else
 		if(theReallyStoredSize < 0 || theReallyStoredSize >= static_cast<int>(theContainer.size()))
 		{
 			os << theContainer.size() << std::endl;
@@ -37,6 +53,7 @@ namespace NFmiDataStoringHelpers
 				copy(theContainer.begin(), theContainer.begin()+theReallyStoredSize, std::ostream_iterator<typename T::value_type>(os, theSeparator.c_str()));
 			}
 		}
+#endif
 	}
 
 	template< typename Container>
