@@ -485,8 +485,6 @@ void NFmiSilamStationList::Init(const std::string &theInitFileName)
 		const int maxBufferSize = 1024+1; // kuinka pitkä yhden rivin maksimissaan oletetaan olevan
 		std::string buffer;
 		Station station;
-		int i = 0;
-		int counter = 0;
 		do
 		{
 			buffer.resize(maxBufferSize);
