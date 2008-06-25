@@ -12,23 +12,6 @@ DIFFICULTFLAGS = -Weffc++ -Wredundant-decls -Wshadow -Woverloaded-virtual -Wunre
 CC = g++
 ARFLAGS = -rs
 
-# Default compile flags
-
-CFLAGS = -DUNIX -O2 -DNDEBUG $(MAINFLAGS)
-CFLAGS0 = -DUNIX -O0 -DNDEBUG $(MAINFLAGS)
-
-# Special modes
-
-CFLAGS_DEBUG = -DUNIX -O0 -g $(MAINFLAGS) $(EXTRAFLAGS) -Werror
-CFLAGS0_DEBUG = -DUNIX -O0 -g $(MAINFLAGS) $(EXTRAFLAGS) -Werror
-
-CFLAGS_PROFILE = -DUNIX -O2 -g -pg $(MAINFLAGS)
-CFLAGS0_PROFILE = -DUNIX -O0 -g -pg $(MAINFLAGS)
-
-INCLUDES = -I$(includedir)/smartmet/newbase
-LIBS = -L $(libdir) -lsmartmet-newbase
-
-# Common library compiling template
 
 # Installation directories
 
@@ -47,8 +30,26 @@ else
 endif
 
 bindir = $(PREFIX)/bin
-includedir = $(PREFIX)/include
+includedir = $(PREFIX)/include/smartmet
 objdir = obj
+
+# Default compile flags
+
+CFLAGS = -DUNIX -O2 -DNDEBUG $(MAINFLAGS)
+CFLAGS0 = -DUNIX -O0 -DNDEBUG $(MAINFLAGS)
+
+# Special modes
+
+CFLAGS_DEBUG = -DUNIX -O0 -g $(MAINFLAGS) $(EXTRAFLAGS) -Werror
+CFLAGS0_DEBUG = -DUNIX -O0 -g $(MAINFLAGS) $(EXTRAFLAGS) -Werror
+
+CFLAGS_PROFILE = -DUNIX -O2 -g -pg $(MAINFLAGS)
+CFLAGS0_PROFILE = -DUNIX -O0 -g -pg $(MAINFLAGS)
+
+INCLUDES = -I$(includedir)/newbase
+LIBS = -L $(libdir) -lsmartmet-newbase
+
+# Common library compiling template
 
 # rpm variables
 
