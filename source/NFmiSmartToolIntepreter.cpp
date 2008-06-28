@@ -1293,23 +1293,23 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 		if(pos2 != string::npos)
 		{
 			pos2++;
-			string tmp(theVariableText.begin() + pos2, theVariableText.end());
-			if(IsPossiblyLevelItem(tmp))
+			string tmp2(theVariableText.begin() + pos2, theVariableText.end());
+			if(IsPossiblyLevelItem(tmp2))
 			{
 				if(fLevelExist == false)
 				{
 					fLevelExist = true;
-					theLevelText = tmp;
+					theLevelText = tmp2;
 				}
 				else
 					throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithTwoLevels") + ":\n" + theVariableText);
 			}
-			else if(IsPossiblyProducerItem(tmp, itsTokenProducerNamesAndIds))
+			else if(IsPossiblyProducerItem(tmp2, itsTokenProducerNamesAndIds))
 			{
 				if(fProducerExist == false)
 				{
 					fProducerExist = true;
-					theProducerText = tmp;
+					theProducerText = tmp2;
 				}
 				else
 					throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithTwoProducers") + ":\n" + theVariableText);
@@ -1670,7 +1670,6 @@ bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVaria
 	MathFunctionMap::iterator it = itsMathFunctions.find(NFmiStringTools::LowerCase(tmp));
 	if(it != itsMathFunctions.end())
 	{
-		string tmp;
 		if(GetToken())
 		{
 			tmp = token; // luetaan muuttuja/vakio/funktio tai mikä lie
@@ -1726,7 +1725,6 @@ bool NFmiSmartToolIntepreter::IsVariableThreeArgumentFunction(const std::string 
 			functionUsed = 3;
 		theMaskInfo->SetFunctionType((*it).second); // min, max jne. asetus
 		theMaskInfo->IntegrationFunctionType(functionUsed);
-		string tmp;
 		if(GetToken())
 		{
 			tmp = token; // luetaan muuttuja/vakio/funktio tai mikä lie
@@ -1758,7 +1756,6 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 	if(it != itsTokenFunctions.end())
 	{
 		theMaskInfo->SetFunctionType((*it).second);
-		string tmp;
 		checkedVector<pair<string, types> > tokens;
 		int i;
 		for(i=0; i<7 && GetToken(); i++) // maksimissaan 7 kertaa
