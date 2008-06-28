@@ -30,16 +30,17 @@ class NFmiCalculationChangeFactorArray : public NFmiAreaMaskImpl
 {
 
 public:
-	double Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-
-	NFmiCalculationChangeFactorArray(void);
-	~NFmiCalculationChangeFactorArray(void);
-
-	void SetChangeFactors(const std::vector<double>& value);
-	const std::vector<double>& GetChangeFactors (void) const {return itsChangeFactors;}
-
+  using NFmiAreaMaskImpl::Value;
+  double Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+  
+  NFmiCalculationChangeFactorArray(void);
+  ~NFmiCalculationChangeFactorArray(void);
+  
+  void SetChangeFactors(const std::vector<double>& value);
+  const std::vector<double>& GetChangeFactors (void) const {return itsChangeFactors;}
+  
 private:
-	std::vector<double> itsChangeFactors;
+  std::vector<double> itsChangeFactors;
 
 };
 #endif
