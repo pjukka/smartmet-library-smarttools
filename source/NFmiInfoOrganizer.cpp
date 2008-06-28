@@ -1092,12 +1092,11 @@ checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(int theProducerId, int
 {
 	checkedVector<NFmiSmartInfo*> infoVector;
 
-	int currentProdId = 0;
 	if(itsEditedData && itsEditedData->IsGrid() == false) // laitetaan myös mahdollisesti editoitava data, jos kyseessä on asema dataa eli havainto
 	{
-		currentProdId = itsEditedData->Producer()->GetIdent();
-		if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
-			infoVector.push_back(itsEditedData);
+	  int currentProdId = itsEditedData->Producer()->GetIdent();
+	  if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
+		infoVector.push_back(itsEditedData);
 	}
 
 	for(Reset(); Next();) // HUOM! tässä ei kiinnosta editoitu data tai sen kopio!!!!
@@ -1208,7 +1207,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindSoundingInfo(const NFmiProducer &theProduc
 	{
 		if(theProducer.GetIdent() == kFmiMETEOR || (*info->Producer() == theProducer)) // tässä hanskataan 'editoitu' data, jolloin ignoorataan tuottaja
 		{
-			NFmiSmartInfo* info = EditedInfo();
+			info = EditedInfo();
 			int result = ::IsGoodSoundingData(info, theProducer, true);
 			if(result != 0)
 				exceptableInfo = info;
