@@ -2,12 +2,25 @@ LIB = smarttools
 
 MAINFLAGS = -Wall -W -Wno-unused-parameter -fPIC -Wno-variadic-macros
 
-EXTRAFLAGS = -pedantic -Wpointer-arith -Wcast-qual \
-	-Wcast-align -Wwrite-strings -Wconversion -Winline \
-	-Wnon-virtual-dtor -Wno-pmf-conversions \
-	-Wsign-promo -Wchar-subscripts -Wold-style-cast
+EXTRAFLAGS = \
+	-Wpointer-arith \
+	-Wcast-qual \
+	-Wcast-align \
+	-Wwrite-strings \
+	-Wconversion \
+	-Winline \
+	-Wnon-virtual-dtor \
+	-Wno-pmf-conversions \
+	-Wsign-promo \
+	-Wchar-subscripts \
+	-Wredundant-decls \
+	-Wshadow \
+	-Woverloaded-virtual \
+	-pedantic \
+	-Wold-style-cast
 
-DIFFICULTFLAGS = -Weffc++ -Wredundant-decls -Wshadow -Woverloaded-virtual -Wunreachable-code
+DIFFICULTFLAGS = -Weffc++ -Wunreachable-code
+
 
 CC = g++
 ARFLAGS = -rs
@@ -33,6 +46,18 @@ bindir = $(PREFIX)/bin
 includedir = $(PREFIX)/include/smartmet
 objdir = obj
 
+INCLUDES = \
+	-I$(includedir)/newbase \
+	-I/usr/local/include/boost-1_35
+
+LIBS = \
+	-L $(libdir) -lsmartmet-newbase \
+	-Wl,-rpath,/usr/local/lib \
+	-L /usr/local/lib \
+	-lboost_regex-gcc41-mt \
+	-lboost_filesystem-gcc41-mt \
+	-lboost_system-gcc41-mt
+
 # Default compile flags
 
 CFLAGS = -DUNIX -O2 -DNDEBUG $(MAINFLAGS)
@@ -45,9 +70,6 @@ CFLAGS0_DEBUG = -DUNIX -O0 -g $(MAINFLAGS) $(EXTRAFLAGS) -Werror
 
 CFLAGS_PROFILE = -DUNIX -O2 -g -pg $(MAINFLAGS)
 CFLAGS0_PROFILE = -DUNIX -O0 -g -pg $(MAINFLAGS)
-
-INCLUDES = -I$(includedir)/newbase
-LIBS = -L $(libdir) -lsmartmet-newbase
 
 # Common library compiling template
 
