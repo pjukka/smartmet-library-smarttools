@@ -1199,9 +1199,9 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				for(i=0; i < size; i++)
 				  {
 				    // Mika: g++ 2.95 ei salli suoraa sijoitusta
-				    bool temp;
-				    file >> temp;
-				    itsSpecialIsoLineShowLabelBox[i] = temp;
+				    bool foobar;
+				    file >> foobar;
+				    itsSpecialIsoLineShowLabelBox[i] = foobar;
 				  }
 
 				if(!file)
