@@ -374,8 +374,8 @@ bool NFmiSoundingData::CalcLCLAvgValues(double fromZ, double toZ, double &T, dou
 			}
 		if(P == kFloatMissing)
 			return false;
-		int startP = FmiRound(GetPressureAtHeight(fromZ));
-		int endP = FmiRound(GetPressureAtHeight(toZ));
+		int startP = static_cast<int>(round(GetPressureAtHeight(fromZ)));
+		int endP = static_cast<int>(round(GetPressureAtHeight(toZ)));
 		if(startP == kFloatMissing || endP == kFloatMissing || startP <= endP)
 			return false;
 		NFmiDataModifierAvg avgT; // riippuen moodista tässä lasketaan T tai Tpot keskiarvoa

@@ -33,7 +33,7 @@ double CalcDP(double T, double RH)
 	const double c = 237.3f;
 //	double x = (log(RH/100.) + b * (T / (T + c))) / b;
 
-	int logIndex = FmiRound(RH*10);
+	int logIndex = static_cast<int>(round(RH*10));
 	if(T != kFloatMissing && RH != kFloatMissing && logIndex > 0 && logIndex < arraySize) // logIndex pitää olla > 0 koska 0-kohdassa on not a number!
 	{
 		double x = (gLogTable0_100[logIndex] + b * (T / (T + c))) / b;
@@ -541,7 +541,7 @@ float CalcLogInterpolatedWindWectorValue(float x1, float x2, float x, float wv1,
 		float wsInterp = CalcLogInterpolatedValue(x1, x2, x, ws1, ws2);
 		if(wdInterp != kFloatMissing && wsInterp != kFloatMissing)
 		{
-			y = static_cast<float>(FmiRound(wsInterp)*100 + FmiRound(wdInterp/10.));
+			y = static_cast<float>(round(wsInterp)*100 + round(wdInterp/10.));
 		}
 	}
 	else if(wv1 != kFloatMissing)

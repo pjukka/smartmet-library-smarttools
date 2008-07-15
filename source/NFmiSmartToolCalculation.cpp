@@ -629,7 +629,7 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
 		  result = floor(result);
 		  break;
 		case NFmiAreaMask::Round:
-		  result = FmiRound(result);
+		  result = round(result);
 		  break;
 		case NFmiAreaMask::Abs:
 		  result = fabs(result);
