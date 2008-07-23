@@ -28,7 +28,7 @@
 // Tämä luokka antaa laskuihin mukaan ajan mukana muuttuvat kertoimet. Aikasarja-editorista huom!
 class NFmiCalculationChangeFactorArray : public NFmiAreaMaskImpl
 {
-
+  
 public:
   using NFmiAreaMaskImpl::Value;
   double Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
