@@ -204,7 +204,7 @@ NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctio
 //--------------------------------------------------------
 // Constructor/Destructor
 //--------------------------------------------------------
-NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer, NFmiProducerSystem *theProducerSystem)
+NFmiSmartToolIntepreter::NFmiSmartToolIntepreter( NFmiInfoOrganizer_fake_* theInfoOrganizer, NFmiProducerSystem *theProducerSystem)
 :itsInfoOrganizer(theInfoOrganizer)
 ,itsProducerSystem(theProducerSystem)
 ,itsSmartToolCalculationBlocks()
@@ -1293,23 +1293,23 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 		if(pos2 != string::npos)
 		{
 			pos2++;
-			string tmp2(theVariableText.begin() + pos2, theVariableText.end());
-			if(IsPossiblyLevelItem(tmp2))
+			string tmpstr(theVariableText.begin() + pos2, theVariableText.end());
+			if(IsPossiblyLevelItem(tmpstr))
 			{
 				if(fLevelExist == false)
 				{
 					fLevelExist = true;
-					theLevelText = tmp2;
+					theLevelText = tmpstr;
 				}
 				else
 					throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithTwoLevels") + ":\n" + theVariableText);
 			}
-			else if(IsPossiblyProducerItem(tmp2, itsTokenProducerNamesAndIds))
+			else if(IsPossiblyProducerItem(tmpstr, itsTokenProducerNamesAndIds))
 			{
 				if(fProducerExist == false)
 				{
 					fProducerExist = true;
-					theProducerText = tmp2;
+					theProducerText = tmpstr;
 				}
 				else
 					throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithTwoProducers") + ":\n" + theVariableText);
@@ -1756,6 +1756,7 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 	if(it != itsTokenFunctions.end())
 	{
 		theMaskInfo->SetFunctionType((*it).second);
+		tmp = "";
 		checkedVector<pair<string, types> > tokens;
 		int i;
 		for(i=0; i<7 && GetToken(); i++) // maksimissaan 7 kertaa

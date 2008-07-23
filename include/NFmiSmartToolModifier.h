@@ -26,11 +26,12 @@
 #define  NFMISMARTTOOLMODIFIER_H
 
 #include "NFmiParamBag.h"
+#include "NFmiQDLog.h"
 
 #include <string>
+#include <stdexcept>
 #include "NFmiDataMatrix.h"
 
-class NFmiInfoOrganizer;
 class NFmiSmartToolIntepreter;
 class NFmiTimeDescriptor;
 class NFmiAreaMaskInfo;
@@ -51,21 +52,42 @@ class NFmiPoint;
 class NFmiSmartToolCalculationBlock;
 class NFmiMacroParamValue;
 class NFmiLevel;
+class NFmiInfoOrganizer;
+
+    // Separating the required interface from 'NFmiInfoOrganizer', for
+    // Q2 brainstorm module's needs (so it does not need to create whole
+    // 'NFmiInfoOrganizer').
+    //
+#include "NFmiInfoData.h"
+class NFmiDrawParam;
+class NFmiFastQueryInfo;
+
+class NFmiInfoOrganizer_fake_ {
+  public:
+    virtual NFmiSmartInfo* CrossSectionMacroParamData() = 0;
+    virtual NFmiSmartInfo* MacroParamData() = 0;
+    virtual NFmiSmartInfo* EditedInfo() = 0;
+    virtual std::vector<NFmiSmartInfo*> GetInfos( int prod_id, const NFmiMetTime* origin_time ) = 0;
+	virtual NFmiSmartInfo* AnalyzeDataInfo( const NFmiMetTime* origin_time ) = 0;
+	virtual NFmiSmartInfo* CreateShallowCopyInfo( const NFmiDataIdent&, const NFmiLevel*, NFmiInfoData::Type, bool fUseParIdOnly, bool fLevelData, const NFmiMetTime *origin_time ) = 0;
+	virtual NFmiDrawParam* CreateDrawParam(const NFmiDataIdent&, const NFmiLevel*, NFmiInfoData::Type) = 0;
+	virtual ~NFmiInfoOrganizer_fake_() { };     // = 0;
+};
 
 class NFmiSmartToolCalculationBlockVector
 {
 public:
 	typedef checkedVector<NFmiSmartToolCalculationBlock*>::iterator Iterator;
 
-	NFmiSmartToolCalculationBlockVector(void);
-	~NFmiSmartToolCalculationBlockVector(void);
-	void Clear(void);
-	NFmiSmartInfo* FirstVariableInfo(void);
+	NFmiSmartToolCalculationBlockVector();
+	~NFmiSmartToolCalculationBlockVector();
+	void Clear();
+	NFmiSmartInfo* FirstVariableInfo();
 	void SetTime(const NFmiMetTime &theTime);
 	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
 	void Add(NFmiSmartToolCalculationBlock* theBlock);
-	Iterator Begin(void) {return itsCalculationBlocks.begin();}
-	Iterator End(void) {return itsCalculationBlocks.end();}
+	Iterator Begin() {return itsCalculationBlocks.begin();}
+	Iterator End() {return itsCalculationBlocks.end();}
 
 private:
 	// luokka ei omista vektorissa olevia otuksia, Clear pitää kutsua erikseen!!!
@@ -75,10 +97,10 @@ private:
 class NFmiSmartToolCalculationBlock
 {
 public:
-	NFmiSmartToolCalculationBlock(void);
-	~NFmiSmartToolCalculationBlock(void);
-	void Clear(void);
-	NFmiSmartInfo* FirstVariableInfo(void);
+	NFmiSmartToolCalculationBlock();
+	~NFmiSmartToolCalculationBlock();
+	void Clear();
+	NFmiSmartInfo* FirstVariableInfo();
 	void SetTime(const NFmiMetTime &theTime);
 	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
 
@@ -100,27 +122,35 @@ public:
 	float CalcSmartToolValue(NFmiMacroParamValue &theMacroParamValue);
 	float CalcSmartToolValue(const NFmiMetTime &theTime, const NFmiPoint &theLatlon);
 	void CalcCrossSectionSmartToolValues(NFmiDataMatrix<float> &theValues, checkedVector<float> &thePressures, checkedVector<NFmiPoint> &theLatlonPoints, const checkedVector<NFmiMetTime> &thePointTimes);
-	NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer);
-	~NFmiSmartToolModifier(void);
+	NFmiSmartToolModifier(NFmiInfoOrganizer_fake_*);
 
-	bool IsMacroRunnable(void) const {return fMacroRunnable;}
-	const std::string& GetErrorText(void) const {return itsErrorText;}
-	const std::string& IncludeDirectory(void) const {return itsIncludeDirectory;}
+    /* It's hard to take this out, either, and get sources to compile. Likely
+     * used only when editing points, which Q2 does not anyways support.
+     */
+	NFmiSmartToolModifier(NFmiInfoOrganizer*) { 
+	   LOG_BUG0( "Should not have come here! NOT IMPLEMENTED" );
+	   throw std::runtime_error( "'NFmiSmartToolModifier(NFmiInfoOrganizer*)' not available!" ); 
+    }
+	~NFmiSmartToolModifier();
+
+	bool IsMacroRunnable() const {return fMacroRunnable;}
+	const std::string& GetErrorText() const {return itsErrorText;}
+	const std::string& IncludeDirectory() const {return itsIncludeDirectory;}
 	void IncludeDirectory(const std::string& newValue) {itsIncludeDirectory = newValue;}
-	NFmiParamBag ModifiedParams(void);
-	const std::string& GetStrippedMacroText(void) const;
-	bool IsInterpretedSkriptMacroParam(void); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns. macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
-	NFmiSmartInfo* MacroParamData(void) {return itsMacroParamData;}
+	NFmiParamBag ModifiedParams();
+	const std::string& GetStrippedMacroText() const;
+	bool IsInterpretedSkriptMacroParam(); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns. macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
+	NFmiSmartInfo* MacroParamData() {return itsMacroParamData;}
 	void MacroParamData(NFmiSmartInfo *theInfo) {itsMacroParamData = theInfo;}
 private:
-	NFmiSmartInfo* UsedMacroParamData(void);
+	NFmiSmartInfo* UsedMacroParamData();
 	void ModifyConditionalData(NFmiSmartToolCalculationBlock *theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
 	void ModifyBlockData(NFmiSmartToolCalculationBlock *theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
 	NFmiSmartToolCalculationBlockVector* CreateCalculationBlockVector(NFmiSmartToolCalculationBlockInfoVector* theBlockInfoVector);
 	NFmiSmartToolCalculationBlock* CreateCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlockInfo);
 	NFmiSmartInfo* CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 	NFmiSmartInfo* GetScriptVariableInfo(const NFmiDataIdent &theDataIdent);
-	void ClearScriptVariableInfos(void);
+	void ClearScriptVariableInfos();
 	NFmiSmartInfo* CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 	NFmiAreaMask* CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	void GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit, bool *fCheckLimits);
@@ -128,19 +158,19 @@ private:
 	NFmiDataIterator* CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo);
 	void ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection, NFmiMacroParamValue &theMacroParamValue);
 	NFmiAreaMask* CreateAreaMask(const NFmiAreaMaskInfo &theInfo);
-	NFmiAreaMask* CreateEndingAreaMask(void);
-	NFmiSmartInfo* CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-	NFmiSmartInfo* GetPossibleLevelInterpolatedInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-	void CreateCalculationModifiers(void);
-	void CreateFirstCalculationSection(void);
+	NFmiAreaMask* CreateEndingAreaMask();
+	NFmiSmartInfo* CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation );
+	NFmiSmartInfo* GetPossibleLevelInterpolatedInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation );
+	void CreateCalculationModifiers();
+	void CreateFirstCalculationSection();
 	NFmiSmartToolCalculationSection* CreateCalculationSection(NFmiSmartToolCalculationSectionInfo *theCalcSectionInfo);
 	NFmiSmartToolCalculation* CreateCalculation(NFmiSmartToolCalculationInfo *theCalcInfo);
 	NFmiSmartToolCalculation* CreateConditionalSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
 	NFmiAreaMask* CreateSoundingIndexFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
-	NFmiSmartInfo* CreateSoundingParamInfo(const NFmiDataIdent &theDataIdent, bool useEditedData);
-	NFmiSmartInfo* CreateCopyOfAnalyzeInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel);
+	NFmiSmartInfo* CreateSoundingParamInfo(const NFmiDataIdent &theDataIdent, bool useEditedData, const NFmiMetTime *origin_time);
+	NFmiSmartInfo* CreateCopyOfAnalyzeInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, const NFmiMetTime* origin_time);
 
-	NFmiInfoOrganizer *itsInfoOrganizer; // eli database, ei omista ei tuhoa
+	NFmiInfoOrganizer_fake_ *itsInfoOrganizer_; // eli database, ei omista ei tuhoa
 	NFmiSmartToolIntepreter *itsSmartToolIntepreter; // omistaa, tuhoaa
 	bool fMacroRunnable;
 	std::string itsErrorText;
