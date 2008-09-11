@@ -46,17 +46,9 @@ bindir = $(PREFIX)/bin
 includedir = $(PREFIX)/include/smartmet
 objdir = obj
 
-INCLUDES = \
-	-I$(includedir)/newbase \
-	-I/usr/local/include/boost-1_35
+INCLUDES = -I$(includedir)/newbase
 
-LIBS = \
-	-L $(libdir) -lsmartmet-newbase \
-	-Wl,-rpath,/usr/local/lib \
-	-L /usr/local/lib \
-	-lboost_regex-gcc41-mt \
-	-lboost_filesystem-gcc41-mt \
-	-lboost_system-gcc41-mt
+LIBS = -L $(libdir) -lsmartmet-newbase
 
 # Default compile flags
 
@@ -191,17 +183,5 @@ headertest:
 
 .cpp.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c -o $(objdir)/$@ $<
-
-# stl_algo warning, nothing to do
-NFmiDrawParamList.o: NFmiDrawParamList.cpp
-	$(CC) $(CFLAGS) -Wno-error $(INCLUDES) -c -o $(objdir)/$@ $<
-
-# overloading warning
-NFmiSmartInfo.o: NFmiSmartInfo.cpp
-	$(CC) $(CFLAGS0) -Wno-error $(INCLUDES) -c -o $(objdir)/$@ $<
-
-# lots of isspace warnings
-NFmiSmartToolIntepreter.o: NFmiSmartToolIntepreter.cpp
-	$(CC) $(CFLAGS0) $(INCLUDES) -c -o $(objdir)/$@ $<
 
 -include Dependencies
