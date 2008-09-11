@@ -185,7 +185,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 									   , const NFmiLevel* theLevel
 									   , NFmiInfoData::Type theType)
 {
-	if(theParam == 997) // synop plot paramille pit‰‰ tehd‰ kikka
+	if(theParam == 997 || theParam == 9996) // synop plot paramille pit‰‰ tehd‰ kikka (ja min/max plot 9996)
 		return GetSynopPlotParamInfo(fSubParameter, theType);
 //	if(theParam == 9997)) // sounding plot paramille pit‰‰ tehd‰ kikka
 	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pit‰‰ tehd‰ kikka
@@ -243,7 +243,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 									   , NFmiInfoData::Type theType
 									   , bool fIgnoreProducerName)
 {
-	if(theDataIdent.GetParamIdent() == 997) // synop plot paramille pit‰‰ tehd‰ kikka
+	if(theDataIdent.GetParamIdent() == 997 || theDataIdent.GetParamIdent() == 9996) // synop plot paramille pit‰‰ tehd‰ kikka (ja min/max plot 9996)
 		return GetSynopPlotParamInfo(fSubParameter, theType);
 //	if(theDataIdent.GetParamIdent() == 9997) // sounding plot paramille pit‰‰ tehd‰ kikka
 	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pit‰‰ tehd‰ kikka
