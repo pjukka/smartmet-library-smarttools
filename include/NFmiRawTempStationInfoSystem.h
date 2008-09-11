@@ -96,8 +96,7 @@ public:
 	class Station
 	{
 	public:
-		double itsLongitude;
-		double itsLatitude;
+		NFmiPoint itsLatlon;
 		std::string itsCountry;
 		std::string itsType;
 		std::string itsInfo;
