@@ -457,7 +457,7 @@ static NFmiSilamStationList::Station GetSilamStationFromString(const std::string
 	std::string buffer;
 	buffer.resize(maxBufferSize);
 	in.getline(&buffer[0], maxBufferSize);
-	size_t length = buffer.length();
+	// size_t length = buffer.length();
 	size_t length2 = ::strlen(&buffer[0]);
 	buffer.resize(length2);
 	station.itsInfo = buffer;
