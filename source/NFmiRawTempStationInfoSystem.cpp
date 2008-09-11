@@ -425,7 +425,7 @@ static NFmiSilamStationList::Station GetSilamStationFromString(const std::string
 	if(in.fail())
 		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestillä ei ole oikeastaan väliä, lähinnä kommentti
 
-	station.itsLatitude = value; // latitude signilla ei ilmeisesti merkitystä, ainakin longitude sign on merkityksetön
+	station.itsLatlon.Y(value); // latitude signilla ei ilmeisesti merkitystä, ainakin longitude sign on merkityksetön
 
 
 	in >> value; // longtitude
@@ -435,7 +435,7 @@ static NFmiSilamStationList::Station GetSilamStationFromString(const std::string
 	if(in.fail())
 		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestillä ei ole oikeastaan väliä, lähinnä kommentti
 
-	station.itsLongitude = value; // longtitude signilla ei ilmeisesti merkitystä, ainakin longitude sign on merkityksetön
+	station.itsLatlon.X(value); // longtitude signilla ei ilmeisesti merkitystä, ainakin longitude sign on merkityksetön
 
 	// sitten luetaan maa (joka voi olla useassa osassa)
 	do
@@ -457,6 +457,9 @@ static NFmiSilamStationList::Station GetSilamStationFromString(const std::string
 	std::string buffer;
 	buffer.resize(maxBufferSize);
 	in.getline(&buffer[0], maxBufferSize);
+	size_t length = buffer.length();
+	size_t length2 = ::strlen(&buffer[0]);
+	buffer.resize(length2);
 	station.itsInfo = buffer;
 
 	return station;
