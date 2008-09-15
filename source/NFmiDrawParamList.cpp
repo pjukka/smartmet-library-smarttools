@@ -24,7 +24,7 @@
 //  Change Log:
 //
 //**********************************************************
-#ifdef WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4786 4512) // poistaa n kpl VC++ k‰‰nt‰j‰n "liian pitk‰ tyyppi nimi" varoitusta
 #endif
 
