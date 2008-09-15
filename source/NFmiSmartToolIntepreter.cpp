@@ -19,7 +19,7 @@
 //  Change Log     :
 //
 //**********************************************************
-#ifdef WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4786) // poistaa n kpl VC++ kääntäjän varoitusta
 #endif
 
@@ -253,7 +253,7 @@ void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText, bool fT
 				throw runtime_error(::GetDictionaryString("SmartToolErrorTooManyBlocks"));
 			fGoOn = CheckoutPossibleNextCalculationBlock(&block, true);
 			itsSmartToolCalculationBlocks.push_back(block);
-			if(*itsCheckOutTextStartPosition == '}') // jos ollaan blokin loppu merkissä, siirrytään sen yli ja jatketaan seuraavalle kierrokselle
+			if(itsCheckOutTextStartPosition != itsStrippedMacroText.end() && *itsCheckOutTextStartPosition == '}') // jos ollaan blokin loppu merkissä, siirrytään sen yli ja jatketaan seuraavalle kierrokselle
 				++itsCheckOutTextStartPosition;
 		}
 		catch(exception & /* e */ )
@@ -308,7 +308,7 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlockVector(NFmiSma
 			if(safetyIndex > 500)
 				throw runtime_error(::GetDictionaryString("SmartToolErrorTooManyBlocks"));
 
-			if(*itsCheckOutTextStartPosition == '}') // jos ollaan loppu merkissä, siirrytään sen yli ja jatketaan seuraavalle kierrokselle
+			if(itsCheckOutTextStartPosition != itsStrippedMacroText.end() && *itsCheckOutTextStartPosition == '}') // jos ollaan loppu merkissä, siirrytään sen yli ja jatketaan seuraavalle kierrokselle
 			{
 				++itsCheckOutTextStartPosition;
 				break; // lopetetaan blokki vektorin luku tähän kun loppu merkki tuli vastaan
@@ -377,15 +377,24 @@ void NFmiSmartToolIntepreter::InitCheckOut(void)
 }
 
 #ifdef UNIX
-static std::string::iterator EatWhiteSpaces(std::string::iterator it)
+static std::string::iterator EatWhiteSpaces(std::string::iterator &it, const std::string::iterator &endIter)
 {
   for(; isspace(*it) ; ++it)  ;
 	return it;
 }
 #else
-static std::string::iterator EatWhiteSpaces(std::string::iterator it)
+static std::string::iterator EatWhiteSpaces(std::string::iterator &it, const std::string::iterator &endIter)
 {
-  for(; ::isspace(*it) ; ++it)  ;
+	if(it == endIter)
+		return it;
+
+//	for(; ::isspace(*it) ; ++it)  
+	while(::isspace(*it))  
+	{
+		++it;
+		if(it == endIter)
+			break;
+	};
 	return it;
 }
 #endif
@@ -403,9 +412,9 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 	string nextLine;
 //	std::string::iterator eolPos = itsStrippedMacroText.begin();
 	std::string::iterator eolPos = itsCheckOutTextStartPosition;
-	eolPos = EatWhiteSpaces(eolPos);
+	eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
 	itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
-	if(*eolPos == '{') // jos blokin alkumerkki löytyi, haetaan sen loppua
+	if(eolPos != itsStrippedMacroText.end() && *eolPos == '{') // jos blokin alkumerkki löytyi, haetaan sen loppua
 	{
 		eolPos = std::find(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), '}');
 		if(eolPos == itsStrippedMacroText.end())
@@ -424,11 +433,11 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 	{
 		do
 		{
-			eolPos = EatWhiteSpaces(eolPos);
+			eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
 			// en ole varma vielä näistä iteraattoreista, mitkä ovat tarpeellisisa ja mitkä turhia.
 			itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
 			itsCheckOutSectionText += nextLine;
-			if(*eolPos == '{' || *eolPos == '}') // jos seuraavan blokin alkumerkki tai loppumerkki löytyi, lopetetaan tämä blokki tähän
+			if(eolPos != itsStrippedMacroText.end() && (*eolPos == '{' || *eolPos == '}')) // jos seuraavan blokin alkumerkki tai loppumerkki löytyi, lopetetaan tämä blokki tähän
 			{
 				if(*eolPos == '{') // jos löytyy alkumerkki, ilmoitetaan siitä ulos täältä
 					fWasBlockMarksFound = true;
@@ -445,7 +454,7 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 
 			nextLine = string(itsCheckOutTextStartPosition, eolPos);
 			nextLine += '\n';
-			if(*eolPos == '\n' || *eolPos == '\r')
+			if(eolPos != itsStrippedMacroText.end() && (*eolPos == '\n' || *eolPos == '\r'))
 				++eolPos;
 		}while(IsPossibleCalculationLine(nextLine));
 	}
@@ -570,7 +579,7 @@ bool NFmiSmartToolIntepreter::ExtractPossibleIfClauseSection(void)
 {
 	itsCheckOutSectionText = "";
 	std::string::iterator eolPos = itsCheckOutTextStartPosition;
-	eolPos = EatWhiteSpaces(eolPos);
+	eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
 	// en ole varma vielä näistä iteraattoreista, mitkä ovat tarpeellisisa ja mitkä turhia.
 	itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
 
@@ -629,7 +638,7 @@ bool NFmiSmartToolIntepreter::ExtractPossibleElseIfClauseSection(void)
 {
 	itsCheckOutSectionText = "";
 	std::string::iterator eolPos = itsCheckOutTextStartPosition;
-	eolPos = EatWhiteSpaces(eolPos);
+	eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
 	// en ole varma vielä näistä iteraattoreista, mitkä ovat tarpeellisisa ja mitkä turhia.
 	itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
 
@@ -653,7 +662,7 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleElseClauseSection(void)
 {
 	itsCheckOutSectionText = "";
 	std::string::iterator eolPos = itsCheckOutTextStartPosition;
-	eolPos = EatWhiteSpaces(eolPos);
+	eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
 	// en ole varma vielä näistä iteraattoreista, mitkä ovat tarpeellisisa ja mitkä turhia.
 	itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
 
@@ -965,54 +974,54 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 	temp = token;
 	*temp = '\0';
 
-	if(exp_ptr>=exp_end)
+	if(exp_ptr >= exp_end)
 		return false; // at end of expression
 
-	while(exp_ptr<exp_end && isspace(*exp_ptr))
+	while(exp_ptr < exp_end && isspace(*exp_ptr))
 		++exp_ptr; // skip over white space
-	if(exp_ptr>=exp_end)
+	if(exp_ptr >= exp_end)
 		return false; // at end of expression
 
 	// HUOM! tässä delimiter rimpsussa ei ole spacea, joten ei voi tehdä yhteistä stringiä, muista päivittää myös IsDelim-metodi
 	if(strchr("+-*/%^=(){}<>&|!,", *exp_ptr))
 	{
-/*
-		if(strchr("+-", *exp_ptr) && isdigit(exp_ptr[1])) // etumerkilliset vakiot otetaan tässä
-		{
-			*temp++ = *exp_ptr++;
-			while(!IsDelim(*exp_ptr))
-				*temp++ = *exp_ptr++;
-			tok_type = NUMBER;
-		}
-		else */
-//		{
 		tok_type = DELIMITER;
 		// advance to next char
 		*temp++ = *exp_ptr++;
-		if(*exp_ptr == '>' || *exp_ptr == '=') // tässä halutaan ottaa huomioon >=, <=, !=, <> ja == vertailu operaattorit
+		if(exp_ptr < exp_end)
 		{
-			*temp++ = *exp_ptr++;
+			if(*exp_ptr == '>' || *exp_ptr == '=') // tässä halutaan ottaa huomioon >=, <=, !=, <> ja == vertailu operaattorit
+			{
+				*temp++ = *exp_ptr++;
+			}
+			if(*exp_ptr == '&') // tässä halutaan ottaa huomioon && vertailu operaattori
+			{
+				*temp++ = *exp_ptr++;
+			}
+			if(*exp_ptr == '|') // tässä halutaan ottaa huomioon || vertailu operaattori
+			{
+				*temp++ = *exp_ptr++;
+			}
 		}
-		if(*exp_ptr == '&') // tässä halutaan ottaa huomioon && vertailu operaattori
-		{
-			*temp++ = *exp_ptr++;
-		}
-		if(*exp_ptr == '|') // tässä halutaan ottaa huomioon || vertailu operaattori
-		{
-			*temp++ = *exp_ptr++;
-		}
-//		}
 	}
 	else if(isalpha(*exp_ptr))
 	{
 		while(!IsDelim(*exp_ptr))
+		{
 			*temp++ = *exp_ptr++;
+			if(exp_ptr >= exp_end)
+				break; // at end of expression
+		}
 		tok_type = VARIABLE;
 	}
 	else if(isdigit(*exp_ptr))
 	{
 		while(!IsDelim(*exp_ptr))
+		{
 			*temp++ = *exp_ptr++;
+			if(exp_ptr >= exp_end)
+				break; // at end of expression
+		}
 		tok_type = NUMBER;
 	}
 
