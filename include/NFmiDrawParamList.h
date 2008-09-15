@@ -40,7 +40,7 @@
 #include "NFmiInfoData.h"
 #include "NFmiDrawParam.h"
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #pragma warning(disable : 4512) // poistaa VC++ k‰‰nt‰j‰n C4512 "assignment operator could not be generated" varoituksen
 #endif
 
