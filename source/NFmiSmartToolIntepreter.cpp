@@ -376,19 +376,12 @@ void NFmiSmartToolIntepreter::InitCheckOut(void)
 	fContinueCurrentSectionCheckOut = true;
 }
 
-#ifdef UNIX
-static std::string::iterator EatWhiteSpaces(std::string::iterator &it, const std::string::iterator &endIter)
-{
-  for(; isspace(*it) ; ++it)  ;
-	return it;
-}
-#else
-static std::string::iterator EatWhiteSpaces(std::string::iterator &it, const std::string::iterator &endIter)
+static std::string::iterator EatWhiteSpaces(std::string::iterator &it,
+											const std::string::iterator &endIter)
 {
 	if(it == endIter)
 		return it;
 
-//	for(; ::isspace(*it) ; ++it)  
 	while(::isspace(*it))  
 	{
 		++it;
@@ -397,7 +390,6 @@ static std::string::iterator EatWhiteSpaces(std::string::iterator &it, const std
 	};
 	return it;
 }
-#endif
 
 // Irroitetaan mahdollisia laskuoperaatio rivej‰ tulkkausta varten.
 // laskun pit‰‰ olla yhdell‰ rivill‰ ja ne ovat muotoa:
@@ -605,7 +597,7 @@ bool NFmiSmartToolIntepreter::ExtractPossibleConditionalClauseSection(memfunctio
 {
 	itsCheckOutSectionText = "";
 	std::string::iterator eolPos = itsCheckOutTextStartPosition;
-	eolPos = EatWhiteSpaces(eolPos);
+	eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
 	// en ole varma viel‰ n‰ist‰ iteraattoreista, mitk‰ ovat tarpeellisisa ja mitk‰ turhia.
 	itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
 
