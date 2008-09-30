@@ -204,7 +204,7 @@ NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctio
 //--------------------------------------------------------
 // Constructor/Destructor
 //--------------------------------------------------------
-NFmiSmartToolIntepreter::NFmiSmartToolIntepreter( NFmiInfoOrganizer_fake_* theInfoOrganizer, NFmiProducerSystem *theProducerSystem)
+NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer, NFmiProducerSystem *theProducerSystem)
 :itsInfoOrganizer(theInfoOrganizer)
 ,itsProducerSystem(theProducerSystem)
 ,itsSmartToolCalculationBlocks()
@@ -377,7 +377,7 @@ void NFmiSmartToolIntepreter::InitCheckOut(void)
 }
 
 static std::string::iterator EatWhiteSpaces(std::string::iterator &it,
-											const std::string::iterator &endIter)
+											std::string::const_iterator &endIter)
 {
 	if(it == endIter)
 		return it;

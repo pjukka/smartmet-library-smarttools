@@ -51,9 +51,6 @@
 #include "NFmiDataMatrix.h"
 #include "NFmiSoundingIndexCalculator.h"
 
-#include "NFmiSmartToolModifier.h"  
-    // NFmiInfoOrganizer_fake
-
 #include <string>
 #include <map>
 #include <set>
@@ -122,7 +119,7 @@ public:
 */
 	void Interpret(const std::string &theMacroText, bool fThisIsMacroParamSkript = false);
 
-	NFmiSmartToolIntepreter(NFmiInfoOrganizer_fake_* theInfoOrganizer, NFmiProducerSystem *theProducerSystem);
+	NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer, NFmiProducerSystem *theProducerSystem);
 	~NFmiSmartToolIntepreter(void);
 
 	void Clear(void);
@@ -214,7 +211,7 @@ private:
 	bool IsVariableSoundingParameter(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theProducerNameOnly);
 	FmiLevelType GetLevelType(NFmiInfoData::Type theDataType, long levelValue);
 
-	NFmiInfoOrganizer_fake_* itsInfoOrganizer; // ei omista
+	NFmiInfoOrganizer* itsInfoOrganizer; // ei omista
 	NFmiProducerSystem *itsProducerSystem;  // ei omista
 	std::string itsCheckOutSectionText; // esim. if-sectionin koko teksti
 	std::string::iterator itsCheckOutTextStartPosition; // sen hetkinen tekstiosan alkupiste

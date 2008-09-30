@@ -28,9 +28,8 @@
 //--------------------------------------------------------
 // Constructor/Destructor 
 //--------------------------------------------------------
-NFmiAreaMaskInfo::NFmiAreaMaskInfo( const NFmiMetTime *origin_time_ )
-:itsOriginTime(0)
-,itsDataIdent()
+NFmiAreaMaskInfo::NFmiAreaMaskInfo()
+:itsDataIdent()
 ,fUseDefaultProducer(true)
 ,itsMaskCondition()
 ,itsOperationType(NFmiAreaMask::NoType)
@@ -46,10 +45,6 @@ NFmiAreaMaskInfo::NFmiAreaMaskInfo( const NFmiMetTime *origin_time_ )
 ,itsIntegrationFunctionType(0)
 ,itsSoundingParameter(kSoundingParNone)
 {
-    if (origin_time_) {
-        itsOriginTimeStore= *origin_time_;   // local copy
-        itsOriginTime= &itsOriginTimeStore;
-    }
 }
 
 NFmiAreaMaskInfo::~NFmiAreaMaskInfo(void)

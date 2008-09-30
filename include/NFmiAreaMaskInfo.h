@@ -27,7 +27,6 @@
 #include "NFmiCalculationCondition.h"
 #include "NFmiPoint.h"
 #include "NFmiSoundingIndexCalculator.h"
-#include "NFmiMetTime.h"
 
 class NFmiLevel;
 
@@ -44,7 +43,7 @@ class NFmiAreaMaskInfo
 
 public:
 
-	NFmiAreaMaskInfo( const NFmiMetTime* origin_time= 0 );
+	NFmiAreaMaskInfo(void);
 	~NFmiAreaMaskInfo(void);
 
 	void SetDataIdent(const NFmiDataIdent& value) {itsDataIdent = value;}
@@ -77,8 +76,6 @@ public:
 	void IntegrationFunctionType(int newValue) {itsIntegrationFunctionType = newValue;}
 	FmiSoundingParameters SoundingParameter(void) const {return itsSoundingParameter;}
 	void SoundingParameter(FmiSoundingParameters newValue) {itsSoundingParameter = newValue;}
-
-	const NFmiMetTime *itsOriginTime;
 private:
 	NFmiDataIdent itsDataIdent;
 	bool fUseDefaultProducer;
@@ -96,9 +93,5 @@ private:
 	NFmiAreaMask::MathFunctionType itsMathFunctionType;
 	int itsIntegrationFunctionType; // 1=SumT tyylinen ja 2=SumZ tyylinen ja 3=MinH tyylinen funktio
 	FmiSoundingParameters itsSoundingParameter;
-	
-	// Storing a copy of the 'origin_time' pointed to in constructor
-	//
-	NFmiMetTime itsOriginTimeStore;
 };
 #endif
