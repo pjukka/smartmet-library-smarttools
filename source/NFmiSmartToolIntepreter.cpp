@@ -376,8 +376,8 @@ void NFmiSmartToolIntepreter::InitCheckOut(void)
 	fContinueCurrentSectionCheckOut = true;
 }
 
-static std::string::iterator EatWhiteSpaces(std::string::iterator &it,
-											std::string::const_iterator &endIter)
+static std::string::iterator EatWhiteSpaces(std::string::iterator & it,
+                                     const std::string::const_iterator & endIter)
 {
 	if(it == endIter)
 		return it;
