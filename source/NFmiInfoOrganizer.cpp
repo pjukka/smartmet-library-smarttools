@@ -551,6 +551,24 @@ void NFmiInfoOrganizer::ClearData(NFmiInfoData::Type theDataType)
 	}
 }
 
+void NFmiInfoOrganizer::ClearDynamicHelpData()
+{ 
+	std::vector<NFmiInfoData::Type> ignoreTypesVector;
+	ignoreTypesVector.push_back(NFmiInfoData::kStationary); // stationaariset eli esim. topografia data ei kuulu poistettaviin datoihin
+	ignoreTypesVector.push_back(NFmiInfoData::kClimatologyData); // klimatologiset datat luetaan vain kerran ohjelman käynnistyessä
+
+	// käydään lista läpi ja tuhotaan dynaamiset help datat
+	for(Reset(); Next(); )
+	{
+		if(std::find(ignoreTypesVector.begin(), ignoreTypesVector.end(), Current()->DataType()) == ignoreTypesVector.end())
+		{
+			Current()->DestroySharedData();
+			Remove();
+		}
+	}
+}
+
+
 void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData::Type theDataType, const std::string &theFileNamePattern)
 {
 	if(theInfo)
@@ -1268,10 +1286,10 @@ NFmiParamBag NFmiInfoOrganizer::GetParams(int theProducerId1, int theProducerId2
 {
 	NFmiParamBag paramBag;
 	checkedVector<NFmiSmartInfo*> infos(GetInfos(theProducerId1, theProducerId2));
-	int size = infos.size();
+	size_t size = infos.size();
 	if(size > 0)
 	{
-		for(int i=0; i<size; i++)
+		for(size_t i=0; i<size; i++)
 		{
 			if(infos[i]->DataType() == theIgnoreDataType1 || infos[i]->DataType() == theIgnoreDataType2 || infos[i]->DataType() == theIgnoreDataType3)
 				continue; // tiettyjä data tyyppeja ei haluttukkaan listaan

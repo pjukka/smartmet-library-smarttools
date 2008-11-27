@@ -123,6 +123,7 @@ class NFmiInfoOrganizer
 	void ClearData(NFmiInfoData::Type theDataType);
 	void ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData::Type theDataType, const std::string &theFileNamePattern);
 	NFmiLevelBag* GetAndCreateViewableInfoWithManyLevelsOrZeroPointer(void);
+	void ClearDynamicHelpData();
 
 	const std::string& WorkingDirectory(void) const {return itsWorkingDirectory;};
 	void WorkingDirectory(const std::string& newValue){itsWorkingDirectory = newValue;};
