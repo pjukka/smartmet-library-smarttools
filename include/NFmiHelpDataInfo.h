@@ -98,6 +98,7 @@ public:
 	const std::string& RootDirectory(void) const {return itsRootDirectory;}
 	void RootDirectory(const std::string &theRoot) {itsRootDirectory = theRoot;}
 	bool Init(const std::string &theBaseNameSpaceStr, std::string theHelpEditorFileNameFilter = "");
+	void MarkAllDynamicDatasAsNotReaded();
 
 private:
 	bool IsSameTypeProjections(const NFmiArea *theFirst, const NFmiArea *theSecond);

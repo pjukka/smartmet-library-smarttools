@@ -383,3 +383,9 @@ bool NFmiHelpDataInfoSystem::Init(const std::string &theBaseNameSpaceStr, std::s
 	return true;
 }
 
+void NFmiHelpDataInfoSystem::MarkAllDynamicDatasAsNotReaded()
+{
+	size_t ssize = itsDynamicHelpDataInfos.size();
+	for(size_t i = 0; i<ssize; i++)
+		itsDynamicHelpDataInfos[i].LatestFileTimeStamp(-1);
+}
