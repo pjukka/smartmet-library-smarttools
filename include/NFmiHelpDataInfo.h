@@ -89,8 +89,8 @@ public:
 	//@}
 	NFmiHelpDataInfo& DynamicHelpDataInfo(int theIndex);
 	NFmiHelpDataInfo& StaticHelpDataInfo(int theIndex);
-	int DynamicCount(void) const{return itsDynamicHelpDataInfos.size();}
-	int StaticCount(void) const{return itsStaticHelpDataInfos.size();}
+	int DynamicCount(void) const{return static_cast<int>(itsDynamicHelpDataInfos.size());}
+	int StaticCount(void) const{return static_cast<int>(itsStaticHelpDataInfos.size());}
 	const NFmiArea* GetDataFilePatternAndArea(NFmiInfoData::Type theDataType, FmiProducerName theProdId, FmiParameterName theParamId, const NFmiArea *theZoomedArea, std::string &theFilePattern, bool fDemandMatchingArea);
 	NFmiDataIdent GetNextSatelChannel(const NFmiDataIdent &theDataIdent, FmiDirection theDir);
 	void AddDynamic(const NFmiHelpDataInfo &theInfo);
