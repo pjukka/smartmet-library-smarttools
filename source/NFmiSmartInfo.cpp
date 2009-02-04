@@ -678,6 +678,7 @@ void NFmiSmartInfo::UndoLevel (const long& theDepth)	// theDepth kuvaa kuinka mo
 				delete [] itsUndoTextTable;
 				itsUndoTextTable = 0;
 
+				throw ; // heitet‰‰n lopuksi poikkeus eteenp‰in
 			}
 		}
 	}
