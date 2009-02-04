@@ -9,6 +9,8 @@
 
 #include "NFmiProducerSystem.h"
 #include "NFmiSettings.h"
+#include "NFmiMetTime.h"
+#include "NFmiLevel.h"
 
 // generoi vektorin NFmiProducer-otuksia. Useita tuottajia tulee jos id-listassa on useita id:tä
 std::vector<NFmiProducer> NFmiProducerInfo::GetProducers(void)
@@ -126,4 +128,32 @@ unsigned int NFmiProducerSystem::FindProducerInfo(const NFmiProducer &theProduce
 		}
 	}
 	return 0; // ei löytynyt, palautetaan 0;
+}
+
+NFmiString NFmiProducerSystem::GetProducerAndLevelTypeString(const NFmiProducer &theProducer, const NFmiLevel &theLevel, const NFmiMetTime &theOriginTime, bool fEncloseInBracers)
+{
+	NFmiString txt;
+	if(fEncloseInBracers)
+		txt += "(";
+
+	// etsi mallin nimi
+	unsigned int modelIndex = FindProducerInfo(theProducer);
+	if(modelIndex > 0)
+		txt += Producer(modelIndex).UltraShortName();
+	else
+		txt += "X?";
+
+	txt += theOriginTime.ToStr("HH ");
+
+	if(theLevel.LevelType() == kFmiHybridLevel)
+		txt += "hyb";
+	else if(theLevel.LevelType() == kFmiPressureLevel)
+		txt += "pre";
+	else
+		txt += "sfc";
+
+	if(fEncloseInBracers)
+		txt += ")";
+
+	return txt;
 }

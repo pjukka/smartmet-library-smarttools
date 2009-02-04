@@ -17,6 +17,10 @@
 #include <string>
 #include <vector>
 
+class NFmiProducer;
+class NFmiLevel;
+class NFmiMetTime;
+
 class NFmiProducerInfo
 {
 public:
@@ -67,6 +71,7 @@ public:
 	bool ExistProducer(unsigned int index1Based) const;
 	NFmiProducerInfo& Producer(unsigned int index1Based);
 	unsigned int FindProducerInfo(const NFmiProducer &theProducer);
+	NFmiString GetProducerAndLevelTypeString(const NFmiProducer &theProducer, const NFmiLevel &theLevel, const NFmiMetTime &theOriginTime, bool fEncloseInBracers);
 private:
 	NFmiProducerInfo GetProducerInfoFromSettings(const std::string &theUsedNameSpaceBase);
 
