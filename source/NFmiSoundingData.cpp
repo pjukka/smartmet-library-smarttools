@@ -70,7 +70,7 @@ bool NFmiSoundingData::SetValueToPressureLevel(float P, float theParamValue, Fmi
 			checkedVector<float>::iterator it = std::find(pV.begin(), pV.end(), P);
 			if(it != pV.end())
 			{
-				int index = std::distance(pV.begin(), it);
+				int index = static_cast<int>(std::distance(pV.begin(), it));
 				parV[index] = theParamValue;
 				return true;
 			}
@@ -99,7 +99,7 @@ float NFmiSoundingData::GetPressureAtHeight(double H)
 	float value = kFloatMissing;
 	if(hV.size() > 0 && pV.size() == hV.size())
 	{
-		unsigned int ssize = pV.size();
+		unsigned int ssize = static_cast<unsigned int>(pV.size());
 		float lastP = kFloatMissing;
 		float lastH = kFloatMissing;
 		float currentP = kFloatMissing;
@@ -196,7 +196,7 @@ float NFmiSoundingData::GetValueAtPressure(FmiParameterName theId, float P)
 	float value = kFloatMissing;
 	if(paramV.size() > 0 && pV.size() == paramV.size())
 	{
-		unsigned int ssize = pV.size();
+		unsigned int ssize = static_cast<unsigned int>(pV.size());
 		float lastP = kFloatMissing;
 		float lastValue = kFloatMissing;
 		float currentP = kFloatMissing;
@@ -548,7 +548,7 @@ void NFmiSoundingData::CutEmptyData(void)
 	itsSoundingParameters.push_back(kFmiGeomHeight);
 
 	unsigned int greatestNonMissingLevelIndex = 0;
-	unsigned int maxLevelIndex = GetParamData(itsSoundingParameters[0]).size();
+	unsigned int maxLevelIndex = static_cast<unsigned int>(GetParamData(itsSoundingParameters[0]).size());
 	for(unsigned int i = 0; i < itsSoundingParameters.size(); i++)
 	{
 		unsigned int currentIndex = GetHighestNonMissingValueLevelIndex(itsSoundingParameters[i]);
@@ -703,7 +703,7 @@ bool NFmiSoundingData::FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMe
 }
 
 // Tälle annetaan hiladataa, ja interpolointi tehdään tarvittaessa ajassa ja paikassa.
-bool NFmiSoundingData::FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName)
+bool NFmiSoundingData::FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName, NFmiFastQueryInfo* theGroundDataInfo)
 {
 	ClearDatas();
 	if(theInfo && theInfo->IsGrid())
@@ -726,9 +726,106 @@ bool NFmiSoundingData::FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMe
 		FillParamData(theInfo, kFmiWindVectorMS, theTime, theLatlon);
 		CalculateHumidityData();
 		InitZeroHeight();
+		FixPressureDataSoundingWithGroundData(theGroundDataInfo);
 		return true;
 	}
 	return false;
+}
+
+// theVec is vector that is to be erased from the start.
+// theCutIndex is the index that ends the cutting operation. If 0 then nothing is done.
+template <class vectorContainer>
+static void CutStartOfVector(vectorContainer &theVec, int theCutIndex)
+{
+	if(theVec.size() > 0 && theCutIndex > 0 && theCutIndex < theVec.size() - 1)
+		theVec.erase(theVec.begin(), theVec.begin() + theCutIndex);
+}
+
+// Jos kyseessä on painepinta dataa, mistä löytyy myös siihen liittyvä pinta data, jossa on
+// mukana parametri 472 eli paine aseman korkeudella, laitetaan tämä uudeksi ala-paineeksi luotaus-dataan
+// ja laitetaan pinta-arvot muutenkin alimmalle tasolle pinta-datan mukaisiksi.
+// HUOM! Oletus että löytyi ainakin yksi kerros, joka oli alle tämän pintakerroksen, koska
+// en tee taulukkojen resize:a ainakaan nyt, eli taulukossa pitää olla tilaa tälle uudelle
+// pintakerrokselle.
+void NFmiSoundingData::FixPressureDataSoundingWithGroundData(NFmiFastQueryInfo* theGroundDataInfo)
+{
+	if(theGroundDataInfo)
+	{
+		NFmiPoint wantedLatlon(itsLocation.GetLocation());
+		theGroundDataInfo->Param(kFmiTemperature);
+		float groundT = theGroundDataInfo->InterpolatedValue(wantedLatlon, itsTime);
+		theGroundDataInfo->Param(kFmiDewPoint);
+		float groundTd = theGroundDataInfo->InterpolatedValue(wantedLatlon, itsTime);
+		theGroundDataInfo->Param(kFmiWindSpeedMS);
+		float groundWS = theGroundDataInfo->InterpolatedValue(wantedLatlon, itsTime);
+		theGroundDataInfo->Param(kFmiWindDirection);
+		float groundWD = theGroundDataInfo->InterpolatedValue(wantedLatlon, itsTime);
+		theGroundDataInfo->Param(kFmiWindUMS);
+		float groundU = theGroundDataInfo->InterpolatedValue(wantedLatlon, itsTime);
+		theGroundDataInfo->Param(kFmiWindVMS);
+		float groundV = theGroundDataInfo->InterpolatedValue(wantedLatlon, itsTime);
+		theGroundDataInfo->Param(kFmiWindVectorMS);
+		float groundWv = theGroundDataInfo->InterpolatedValue(wantedLatlon, itsTime);
+		theGroundDataInfo->Param(kFmiPressureAtStationLevel);
+		float groundStationPressure = theGroundDataInfo->InterpolatedValue(wantedLatlon, itsTime);
+		theGroundDataInfo->Param(kFmiHumidity);
+		float groundRH = theGroundDataInfo->InterpolatedValue(wantedLatlon, itsTime);
+
+		if(groundStationPressure != kFloatMissing)
+		{
+			// oletus, kaikki vektorit on alustettu saman kokoisiksi kuin paine vektori
+			if(theGroundDataInfo && itsPressureData.size() > 0)
+			{
+				// HUOM! luotausdatat ovat aina 'nousevassa' järjestyksessä eli maanpinta on taulukoissa ensimmäisenä
+				for(int i=0; i < static_cast<int>(itsPressureData.size()); i++)
+				{
+					float currentPressure = itsPressureData[i];
+					if(currentPressure != kFloatMissing && groundStationPressure >= currentPressure)
+					{ // Eli nyt luotausdata taulukosta löytynyt paine on pienempi kuin paineasemakorkeudella (eli ollaan juuri menty
+						// groundStationPressure-lukeman yli siis pinnasta avaruutta kohden, ei isompaan paine lukemaan), eli 
+						// uusi pinta on laitettava ennen tätä kerrosta (jos kyseessä on alin pinta taulukosta)
+						if(i > 0)
+						{
+							// mennään siis edelliseen tasoon ja laitetaan se uudeksi pinta kerrokseksi
+							i--; 
+							itsZeroHeightIndex = i;
+							itsZeroHeight = 2;
+
+							itsGeomHeightData[i] = 2; // Oletus: pinta data on 2 metrin korkeudella
+							itsPressureData[i] = groundStationPressure;
+							itsTemperatureData[i] = groundT;
+							itsDewPointData[i] = groundTd;
+							itsWindSpeedData[i] = groundWS;
+							itsWindDirectionData[i] = groundWD;
+							itsWindVectorData[i] = groundWv;
+							itsWindComponentUData[i] = groundU;
+							itsWindComponentVData[i] = groundV;
+							itsHumidityData[i] = groundRH;
+
+							// pitää ottaa vektoreista alkuosa pois, kun tuota itsZeroHeightIndex -dataosaa
+							// ei näemmä käytetäkään missään
+							if(itsZeroHeightIndex > 0)
+							{	// huonoa koodia pitäisi olla vektorin vektori, että ei tarvitse aina muistaa kuinka monta vektoria on olemassa
+								::CutStartOfVector(itsGeomHeightData, itsZeroHeightIndex);
+								::CutStartOfVector(itsPressureData, itsZeroHeightIndex);
+								::CutStartOfVector(itsTemperatureData, itsZeroHeightIndex);
+								::CutStartOfVector(itsDewPointData, itsZeroHeightIndex);
+								::CutStartOfVector(itsWindSpeedData, itsZeroHeightIndex);
+								::CutStartOfVector(itsWindDirectionData, itsZeroHeightIndex);
+								::CutStartOfVector(itsWindVectorData, itsZeroHeightIndex);
+								::CutStartOfVector(itsWindComponentUData, itsZeroHeightIndex);
+								::CutStartOfVector(itsWindComponentVData, itsZeroHeightIndex);
+								::CutStartOfVector(itsHumidityData, itsZeroHeightIndex);
+								itsZeroHeightIndex = 0;
+							}
+
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 // laskee jo laskettujen T ja Td avulla RH
@@ -833,7 +930,7 @@ bool NFmiSoundingData::ModifyT2DryAdiapaticBelowGivenP(double P, double T)
 	checkedVector<float>&tV = GetParamData(kFmiTemperature);
 	if(pV.size() > 0 && pV.size() == tV.size())
 	{
-		unsigned int ssize = pV.size();
+		unsigned int ssize = static_cast<unsigned int>(pV.size());
 		float wantedTPot = static_cast<float>(::T2tpot(T, P));
 		float currentP = 1000;
 		for(unsigned int i=0; i<ssize; i++)
@@ -862,7 +959,7 @@ bool NFmiSoundingData::ModifyTd2MixingRatioBelowGivenP(double P, double T, doubl
 	checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
 	if(pV.size() > 0 && pV.size() == tV.size() && pV.size() == tdV.size())
 	{
-		unsigned int ssize = pV.size();
+		unsigned int ssize = static_cast<unsigned int>(pV.size());
 
 		float wantedMixRatio = static_cast<float>(::CalcMixingRatio(T, Td, P));
 		for(unsigned int i=0; i<ssize; i++)
@@ -890,7 +987,7 @@ bool NFmiSoundingData::ModifyTd2MoistAdiapaticBelowGivenP(double P, double Td)
 	checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
 	if(pV.size() > 0 && pV.size() == tdV.size())
 	{
-		unsigned int ssize = pV.size();
+		unsigned int ssize = static_cast<unsigned int>(pV.size());
 
 //		float wantedTPot = static_cast<float>(::T2tpot(Td, P));
 		float AOS = static_cast<float>(NFmiSoundingFunctions::OS(Td, P));
@@ -949,7 +1046,7 @@ bool NFmiSoundingData::Add2ParamAtNearestP(float P, FmiParameterName parId, floa
 		float currentParam = kFloatMissing;
 		float closestPdiff = kFloatMissing;
 		unsigned int closestIndex = 0;
-		unsigned int ssize = pV.size();
+		unsigned int ssize = static_cast<unsigned int>(pV.size());
 		for(unsigned int i=0; i<ssize; i++)
 		{
 			currentP = pV[i];
@@ -1014,7 +1111,7 @@ void NFmiSoundingData::UpdateUandVParams(void)
 	checkedVector<float>&vV = GetParamData(kFmiWindVMS);
 	if(wsV.size() > 0 && wsV.size() == wdV.size() && wsV.size() == uV.size() && wsV.size() == vV.size())
 	{
-		unsigned int ssize = wsV.size();
+		unsigned int ssize = static_cast<unsigned int>(wsV.size());
 		for(unsigned int i=0; i<ssize; i++)
 		{
 			uV[i] = ::CalcU(wsV[i], wdV[i]);

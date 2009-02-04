@@ -18,12 +18,12 @@
 
 using namespace NFmiSoundingFunctions;
 
-bool NFmiSoundingIndexCalculator::FillSoundingData(NFmiFastQueryInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiMetTime &theTime, const NFmiLocation &theLocation)
+bool NFmiSoundingIndexCalculator::FillSoundingData(NFmiFastQueryInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiMetTime &theTime, const NFmiLocation &theLocation, NFmiFastQueryInfo* theGroundDataInfo)
 {
 	if(theInfo)
 	{
 		if(theInfo->IsGrid())
-			return theSoundingData.FillSoundingData(theInfo, theTime, theInfo->OriginTime(), theLocation.GetLocation(), theLocation.GetName());
+			return theSoundingData.FillSoundingData(theInfo, theTime, theInfo->OriginTime(), theLocation.GetLocation(), theLocation.GetName(), theGroundDataInfo);
 		else
 			return theSoundingData.FillSoundingData(theInfo, theTime, theInfo->OriginTime(), theLocation);
 	}
@@ -36,7 +36,7 @@ static bool FillSoundingData(NFmiFastQueryInfo *theInfo, NFmiSoundingData &theSo
 	if(theInfo)
 	{
 		if(theInfo->IsGrid())
-			return theSoundingData.FillSoundingData(theInfo, theTime, theInfo->OriginTime(), theLatlon, bsName);
+			return theSoundingData.FillSoundingData(theInfo, theTime, theInfo->OriginTime(), theLatlon, bsName, 0);
 	}
 	return false;
 }
@@ -113,7 +113,7 @@ void NFmiSoundingIndexCalculator::Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrgan
 		for(theBaseInfo->ResetLocation(); theBaseInfo->NextLocation(); counter++)
 		{
 			bool surfaceBaseStatus = false;
-			FillSoundingData(info, soundingData, theTime, *(theBaseInfo->Location())); // t‰ytet‰‰n luotaus datat yksi kerrallaan
+			FillSoundingData(info, soundingData, theTime, *(theBaseInfo->Location()), 0); // t‰ytet‰‰n luotaus datat yksi kerrallaan
 
 			// ********  debug koodia  *********************
 			float T = kFloatMissing; // debug koodia

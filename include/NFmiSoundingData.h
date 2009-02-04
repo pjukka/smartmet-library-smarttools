@@ -24,7 +24,7 @@ public:
 
 	// TODO Fill-metodeille pit‰‰ laittaa haluttu parametri-lista parametriksi (jolla t‰ytet‰‰n sitten dynaamisesti NFmiDataMatrix-otus)
 	bool FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly = false);
-	bool FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName);
+	bool FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName, NFmiFastQueryInfo* theGroundDataInfo);
 	void CutEmptyData(void); // t‰m‰ leikkaa Fill.. -metodeissa laskettuja data vektoreita niin ett‰ pelk‰t puuttuvat kerrokset otetaan pois
 	static bool HasRealSoundingData(NFmiFastQueryInfo &theSoundingLevelInfo);
 
@@ -57,6 +57,7 @@ public:
 	bool HeightDataAvailable(void) const {return fHeightDataAvailable;}
 	void SetTandTdSurfaceValues(float T, float Td);
 private:
+	void FixPressureDataSoundingWithGroundData(NFmiFastQueryInfo* theGroundDataInfo);
 	unsigned int GetHighestNonMissingValueLevelIndex(FmiParameterName theParaId);
 	float GetPressureAtHeight(double H);
 	void ClearDatas(void);
