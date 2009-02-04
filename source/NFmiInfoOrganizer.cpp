@@ -506,6 +506,8 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 				// jos muisti loppuu tai muu poikkeus, asetetaan undo level 0:ksi ja jatketaan
 				theUndoLevel = 0;
 				aSmartInfo->DestroySharedData(false); // false t‰ss‰ tarkoittaa ett‰ ei tuhota queryDataa
+
+				throw ; // heitet‰‰n poikkeus eteenp‰in
 			}
 
 			if(itsEditedData)
