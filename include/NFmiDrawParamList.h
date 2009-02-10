@@ -59,12 +59,13 @@ public:
 	~NFmiDrawParamList (void);
 
 	NFmiDrawParam*  Current (void);
+	void	  CopyList(NFmiDrawParamList &theList, bool clearFirst);
 	bool      Reset (void);
 	bool      Next (void);
 	bool      Previous (void);
-	void            Clear (bool fDeleteData = false);
-	void            Clear (const NFmiProducer& theProducer, checkedVector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel = 0, bool fDeleteData = false);
-	void            Clear (const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved, bool fDeleteData = false);
+	void      Clear (bool fDeleteData = false);
+	void      Clear (const NFmiProducer& theProducer, checkedVector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel = 0, bool fDeleteData = false);
+	void      Clear (const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved, bool fDeleteData = false);
 	bool      Add (NFmiDrawParam * theParam);
 	bool      Add (NFmiDrawParam * theParam, unsigned long theIndex);
 	void      BorrowParams(NFmiDrawParamList & theList);

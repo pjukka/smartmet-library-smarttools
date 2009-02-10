@@ -59,9 +59,9 @@ bool NFmiDrawParamList::Add (NFmiDrawParam* theParam)
 {
 	if(theParam)
 	{
-		FmiParameterName parId = static_cast<FmiParameterName>(theParam->Param().GetParamIdent());
-		if(parId >= kFmiSatelCh1 && parId <= kFmiSatelCh164 && itsList.AddStart(theParam))
-		{ // satelliitti-n‰ytˆt pit‰‰ laitaa aina 1. n‰ytˆlle, koska ne peitt‰v‰t muut
+		if(theParam->DataType() == NFmiInfoData::kSatelData) // kSatelData tarkoittaa oikeasti vain kuva muotoista dataa eli ei v‰ltt‰m‰tt‰ satelliitti dataa siis
+		{ // satelliitti-kuvat pit‰‰ laitaa aina 1. n‰ytˆlle, koska ne peitt‰v‰t muut
+			itsList.AddStart(theParam);
 			fDirtyList = true;
 			return true;
 		}
@@ -264,11 +264,11 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 			{
 				if(theDataType == NFmiInfoData::kAnyData || drawParam->DataType() == theDataType)
 				{
-					if(theLevel == 0)
+					if(theLevel == 0 && drawParam->Level().LevelType() == 0)
 						return true;
 					if(drawParam->Level().LevelType() == 0 && (theLevel->LevelType() == kFmiAnyLevelType || theLevel->LevelType() == kFmiMeanSeaLevel))
 						return true; // t‰m‰ case tulee kun nyky‰‰n tehd‰‰n pinta parametreja
-					if(*(theLevel) == drawParam->Level())
+					if(theLevel && (*(theLevel) == drawParam->Level()))
 						return true;
 				}
 			}
@@ -444,4 +444,19 @@ int NFmiDrawParamList::FindActive(void)
 			return index;
 	}
 	return 0;
+}
+
+/*!
+ * Tekee annetusta listasta kopioidut drawParamit omaan listaansa. clearList parametrilla voidaan
+ * 'this' -lista tyhjent‰‰ ennen kopiointia.
+*/
+void NFmiDrawParamList::CopyList(NFmiDrawParamList &theList, bool clearFirst)
+{
+	if(clearFirst)
+		Clear(true);
+
+	for(theList.Reset(); theList.Next(); )
+	{
+		Add(new NFmiDrawParam(*theList.Current()));
+	}
 }
