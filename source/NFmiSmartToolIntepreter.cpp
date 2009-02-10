@@ -2083,6 +2083,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pseudosatel"), kFmiRadiationNetTopAtmLW));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("vis"), kFmiVisibility));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("gust"), kFmiHourlyMaximumGust));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wsmax"), kFmiHourlyMaximumWindSpeed));
 
 /*
 
