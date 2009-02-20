@@ -12,7 +12,7 @@
 #include <string>
 #include "NFmiString.h"
 #include "NFmiStringTools.h"
-#include "NFmiMetTime.h"
+#include "NFmiTimeBag.h"
 
 
 namespace NFmiDataStoringHelpers
@@ -97,6 +97,52 @@ namespace NFmiDataStoringHelpers
 		aTime.SetMin(utcMinute);
 		theTime = aTime;
 	}
+
+	inline void WriteTimeBagWithOffSets(const NFmiTimeBag &theTimeBag, std::ostream& os)
+	{
+		NFmiDataStoringHelpers::WriteTimeWithOffsets(theTimeBag.FirstTime(), os);
+		os << " ";
+		NFmiDataStoringHelpers::WriteTimeWithOffsets(theTimeBag.LastTime(), os);
+		os << " ";
+		os << static_cast<long>(theTimeBag.Resolution()) << std::endl;
+	}
+
+	inline void ReadTimeBagWithOffSets(NFmiTimeBag &theTimeBag, std::istream& is)
+	{
+		NFmiMetTime firstTime;
+		NFmiDataStoringHelpers::ReadTimeWithOffsets(firstTime, is);
+		NFmiMetTime lastTime;
+		NFmiDataStoringHelpers::ReadTimeWithOffsets(lastTime, is);
+		long period = 60;
+		is >> period;
+
+		theTimeBag = NFmiTimeBag(firstTime, lastTime, period);
+	}
+
+	inline std::string GetTimeBagOffSetStr(const NFmiTimeBag &theTimeBag)
+	{
+		std::stringstream out;
+		NFmiDataStoringHelpers::WriteTimeWithOffsets(theTimeBag.FirstTime(), out);
+		out << " ";
+		NFmiDataStoringHelpers::WriteTimeWithOffsets(theTimeBag.LastTime(), out);
+		out << " ";
+		out << static_cast<long>(theTimeBag.Resolution());
+		return out.str();
+	}
+
+	inline NFmiTimeBag GetTimeBagOffSetFromStr(const std::string &theTimeBagStr)
+	{
+		std::stringstream in(theTimeBagStr);
+		NFmiMetTime firstTime;
+		NFmiDataStoringHelpers::ReadTimeWithOffsets(firstTime, in);
+		NFmiMetTime lastTime;
+		NFmiDataStoringHelpers::ReadTimeWithOffsets(lastTime, in);
+		long period = 60;
+		in >> period;
+
+		return NFmiTimeBag(firstTime, lastTime, period);
+	}
+
 
 	// Luokka jota k‰yttet‰‰n itsens‰ kirjoittavien luokkien
 	// tulevaisuudessa lis‰ttyjen datojen tallettamiseen.
