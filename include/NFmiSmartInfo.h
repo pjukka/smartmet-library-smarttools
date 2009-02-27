@@ -97,6 +97,8 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 
 	const NFmiBitMask& LocationMask (unsigned long theMaskType) const;
 	void LocationMask (const NFmiBitMask& theMask, unsigned long theMaskType);
+	bool Mask(const NFmiBitMask& theMask, unsigned long theMaskType);
+	const NFmiBitMask& Mask(unsigned long theMaskType) const;
 
 	bool SnapShotData (const std::string& theAction, const NFmiHarmonizerBookKeepingData &theCurrentHarmonizerBookKeepingData);
 	void RearrangeUndoTable(void);

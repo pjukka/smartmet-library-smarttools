@@ -33,6 +33,7 @@
 #include "NFmiPtrList.h"
 
 class NFmiMultiLevelMask;
+class NFmiBitMask;
 
 class NFmiUndoableMultiLevelMask 
 {
@@ -54,6 +55,8 @@ class NFmiUndoableMultiLevelMask
    // HUOM! ei toimi aivan oikein, jos undoleveliksi annetaan 5, on todellinen undo 
    // mahdollista vain 4 kertaa. En jaksa nyt ihmetellä sitä nyt (T:Marko).
    void UndoLevel(int theNewUndoLevel);				// undolevel asetetaan tällä
+   bool Mask(const NFmiBitMask& theMask, unsigned long theMaskType);
+   const NFmiBitMask& Mask(unsigned long theMaskType) const;
 
  private:
    void RearrangeUndoTable(void);

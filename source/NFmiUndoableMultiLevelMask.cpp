@@ -207,3 +207,20 @@ void NFmiUndoableMultiLevelMask::UndoLevel(int theNewUndoLevel)
 		itsUndoList.AddEnd(new NFmiMultiLevelMask(itsMultiLevelMask->MaskSize()));
 
 }
+
+// Tämä asettaa halutun maskin, mutta ei tee undo/redo valmisteluja tai muuta.
+bool NFmiUndoableMultiLevelMask::Mask(const NFmiBitMask& theMask, unsigned long theMaskType)
+{
+	if(itsMultiLevelMask)
+		return itsMultiLevelMask->Mask(theMask, theMaskType);
+
+	return false;
+}
+
+const NFmiBitMask& NFmiUndoableMultiLevelMask::Mask(unsigned long theMaskType) const
+{
+	if(itsMultiLevelMask)
+		return itsMultiLevelMask->Mask(theMaskType);
+
+	throw std::runtime_error("Error in application - NFmiUndoableMultiLevelMask::Mask has no mask.");
+}

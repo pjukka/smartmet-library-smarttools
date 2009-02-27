@@ -399,6 +399,22 @@ void NFmiSmartInfo::LocationMask (const NFmiBitMask& theMask, unsigned long theM
     (*itsAreaMask)->Mask(theMask,theMaskType);
 }
 
+bool NFmiSmartInfo::Mask(const NFmiBitMask& theMask, unsigned long theMaskType)
+{
+	if(itsAreaMask)
+		return itsAreaMask->Mask(theMask, theMaskType);
+
+	return false;
+}
+
+const NFmiBitMask& NFmiSmartInfo::Mask(unsigned long theMaskType) const
+{
+	if(itsAreaMask)
+		return itsAreaMask->Mask(theMaskType);
+
+	throw std::runtime_error("Error in application - NFmiSmartInfo::Mask has no mask.");
+}
+
 //--------------------------------------------------------
 // SnapShotData			M.K.
 //--------------------------------------------------------
