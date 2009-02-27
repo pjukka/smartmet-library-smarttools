@@ -590,10 +590,7 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiSmartToolCalculationBlock 
 
 		try
 		{
-			if(this->fModifySelectedLocationsOnly)
-				info->MaskType(NFmiMetEditorTypes::kFmiSelectionMask);
-			else
-				info->MaskType(NFmiMetEditorTypes::kFmiNoMask);
+			SetInfosMaskType(info);
 			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
 			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 			{
@@ -646,6 +643,20 @@ void NFmiSmartToolModifier::ModifyConditionalData(NFmiSmartToolCalculationBlock 
 	}
 }
 
+void NFmiSmartToolModifier::SetInfosMaskType(NFmiSmartInfo *theInfo)
+{
+	if(fModifySelectedLocationsOnly)
+	{
+		if(theInfo->DataType() == NFmiInfoData::kScriptVariableData && itsInfoOrganizer->EditedInfo())
+		{ // skripti muuttujalle pitää asettaa sama valittujen pisteiden maski kuin on editoidulla datalla
+			theInfo->Mask(itsInfoOrganizer->EditedInfo()->Mask(NFmiMetEditorTypes::kFmiSelectionMask), NFmiMetEditorTypes::kFmiSelectionMask);
+		}
+		theInfo->MaskType(NFmiMetEditorTypes::kFmiSelectionMask);
+	}
+	else
+		theInfo->MaskType(NFmiMetEditorTypes::kFmiNoMask);
+}
+
 void NFmiSmartToolModifier::ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection, NFmiMacroParamValue &theMacroParamValue)
 {
 	if(theCalculationSection && theCalculationSection->FirstVariableInfo())
@@ -657,16 +668,7 @@ void NFmiSmartToolModifier::ModifyData2(NFmiSmartToolCalculationSection* theCalc
 		std::auto_ptr<NFmiSmartInfo> infoPtr(info);
 		try
 		{
-			if(fModifySelectedLocationsOnly)
-			{
-				if(info->DataType() == NFmiInfoData::kScriptVariableData && itsInfoOrganizer->EditedInfo())
-				{ // skripti muuttujalle pitää asettaa sama valittujen pisteiden maski kuin on editoidulla datalla
-					info->Mask(itsInfoOrganizer->EditedInfo()->Mask(NFmiMetEditorTypes::kFmiSelectionMask), NFmiMetEditorTypes::kFmiSelectionMask);
-				}
-				info->MaskType(NFmiMetEditorTypes::kFmiSelectionMask);
-			}
-			else
-				info->MaskType(NFmiMetEditorTypes::kFmiNoMask);
+			SetInfosMaskType(info);
 			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
 
 			// Muutin lasku systeemin suoritusta, koska tuli ongelmia mm. muuttujien kanssa, kun niitä käytettiin samassa calculationSectionissa

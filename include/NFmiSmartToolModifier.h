@@ -113,6 +113,7 @@ public:
 	NFmiSmartInfo* MacroParamData(void) {return itsMacroParamData;}
 	void MacroParamData(NFmiSmartInfo *theInfo) {itsMacroParamData = theInfo;}
 private:
+	void SetInfosMaskType(NFmiSmartInfo *theInfo);
 	NFmiSmartInfo* UsedMacroParamData(void);
 	void ModifyConditionalData(NFmiSmartToolCalculationBlock *theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
 	void ModifyBlockData(NFmiSmartToolCalculationBlock *theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
