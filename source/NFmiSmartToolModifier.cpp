@@ -658,7 +658,13 @@ void NFmiSmartToolModifier::ModifyData2(NFmiSmartToolCalculationSection* theCalc
 		try
 		{
 			if(fModifySelectedLocationsOnly)
+			{
+				if(info->DataType() == NFmiInfoData::kScriptVariableData && itsInfoOrganizer->EditedInfo())
+				{ // skripti muuttujalle pitää asettaa sama valittujen pisteiden maski kuin on editoidulla datalla
+					info->Mask(itsInfoOrganizer->EditedInfo()->Mask(NFmiMetEditorTypes::kFmiSelectionMask), NFmiMetEditorTypes::kFmiSelectionMask);
+				}
 				info->MaskType(NFmiMetEditorTypes::kFmiSelectionMask);
+			}
 			else
 				info->MaskType(NFmiMetEditorTypes::kFmiNoMask);
 			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
@@ -1268,7 +1274,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateRealScriptVariableInfo(const NFmiDat
 	data->Init();
 	NFmiQueryInfo info(data);
 	info.First();
-	NFmiSmartInfo *returnInfo = new NFmiSmartInfo(info, data, "", "");
+	NFmiSmartInfo *returnInfo = new NFmiSmartInfo(info, data, "", "", NFmiInfoData::kScriptVariableData);
 	return returnInfo;
 }
 
