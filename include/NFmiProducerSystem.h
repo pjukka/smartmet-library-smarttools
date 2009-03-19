@@ -7,7 +7,7 @@
 // tuottaja valinta radio buttoneihin saa mukaan vain kolme mallia (pit‰‰ kai tehd‰
 // joskus dropdown lista). Mutta esim. erilaisiin dynaamisiin parametrin valinta
 // popup-valikoihin voidaan laittaa useampia tuottajia.
-//---------------------------------------------------------- NFmiWarningCenterSystem.h
+//---------------------------------------------------------- NFmiProducerSystem.h
 
 #ifndef __NFMIPRODUCERSYSTEM_H__
 #define __NFMIPRODUCERSYSTEM_H__
@@ -85,6 +85,14 @@ private:
 
 struct NFmiProducerHelperInfo
 {
+	NFmiProducerHelperInfo(void)
+	:itsName()
+	,itsProducerId1(0)
+	,itsProducerId2(0)
+	,itsDataType(NFmiInfoData::kNoDataType)
+	,fGroundData(false)
+	{}
+
 	NFmiProducerHelperInfo(const std::string theName,	int theProducerId1,	int theProducerId2, NFmiInfoData::Type theDataType, bool groundData = true)
 	:itsName(theName)
 	,itsProducerId1(theProducerId1)
