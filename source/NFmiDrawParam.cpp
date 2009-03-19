@@ -31,6 +31,7 @@
 //**********************************************************
 #include "NFmiDrawParam.h"
 #include "NFmiDataStoringHelpers.h"
+#include <fstream>
 
 float NFmiDrawParam::itsFileVersionNumber=3.0;
 

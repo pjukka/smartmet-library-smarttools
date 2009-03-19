@@ -5,6 +5,7 @@
 #include "NFmiCommentStripper.h"
 #include "NFmiStation.h"
 #include "NFmiLocationBag.h"
+#include <fstream>
 
 using namespace std;
 
