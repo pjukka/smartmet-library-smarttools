@@ -737,7 +737,7 @@ bool NFmiSoundingData::FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMe
 template <class vectorContainer>
 static void CutStartOfVector(vectorContainer &theVec, int theCutIndex)
 {
-	if(theVec.size() > 0 && theCutIndex > 0 && theCutIndex < theVec.size() - 1)
+  if(theVec.size() > 0 && theCutIndex > 0 && static_cast<unsigned long>(theCutIndex) < theVec.size() - 1)
 		theVec.erase(theVec.begin(), theVec.begin() + theCutIndex);
 }
 
