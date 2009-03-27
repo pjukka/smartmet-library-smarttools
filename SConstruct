@@ -58,7 +58,7 @@ else:
         #
         "-Wall", 
         "-Wno-unused-parameter",
-        "-Wno-variadic-macros",
+#       "-Wno-variadic-macros",
 	    
 	    # DIFFICULTFLAGS from orig. Makefile (flags that cause some choking,
 	    # would be good but not used)
@@ -116,28 +116,6 @@ env.Append( LIBS= [ "smartmet_newbase" ] )
 #
 if not WINDOWS:
     env.ParseConfig("freetype-config --cflags --libs") 
-
-#
-# Cairomm-1.0 support
-#
-if WINDOWS:
-    env.Append( CPPPATH= [ "../cairomm-1.6.4" ] )
-    env.Append( LIBPATH= [ "../cairomm-1.6.4/MSVC_Net2005/cairomm/Release" ] )
-
-    env.Append( CPPPATH= [ "../cairo-1.6.4/src" ] )
-    #env.Append( LIBPATH= [ "../cairo-1.6.4/src/release" ] )
-else:
-    env.ParseConfig("pkg-config --cflags --libs cairomm-1.0") 
-
-#
-# Other libraries
-#
-if WINDOWS:
-    env.Append( CPPPATH= [ "../lpng1231", "../zlib123" ] )
-    #env.Append( LIBS= [ "../lpng1231/libpng.lib", "../zlib123/zlib.lib" ] )
-else:
-    env.Append( LIBS= [ "jpeg", "png", "z" ] )
-
 
 #
 # Debug settings
