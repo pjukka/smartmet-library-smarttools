@@ -29,6 +29,7 @@
 //**********************************************************
 #include "NFmiUndoableMultiLevelMask.h"
 #include "NFmiMultiLevelMask.h"
+#include <stdexcept>
 
 //--------------------------------------------------------
 // Constructor/Destructor 
