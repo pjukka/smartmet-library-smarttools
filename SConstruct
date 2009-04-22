@@ -2,7 +2,7 @@
 # SConstruct for building smarttools
 #
 # Usage:
-#       scons [-j 4] [-Q] [debug=1|profile=1] [objdir=<path>]
+#       scons [-j 4] [-Q] [debug=1|profile=1] [objdir=<path>] smartmet_smarttools[-mt].a|lib
 #
 # Notes:
 #       The three variants share the same output and object file names;
@@ -19,7 +19,7 @@
 import os.path
 
 Help(""" 
-    Usage: scons [-j 4] [-Q] [debug=1|profile=1] [objdir=<path>] [prefix=<path>]
+    Usage: scons [-j 4] [-Q] [debug=1|profile=1] [objdir=<path>] [prefix=<path>] smartmet_smarttools[-mt].a|lib
     
     Or just use 'make release|debug|profile', which point right back to us.
 """) 
@@ -114,10 +114,10 @@ env.Append( LIBS= [ "smartmet_newbase" ] )
 #
 # Freetype2 support
 #
-if not WINDOWS:
-    env.ParseConfig("freetype-config --cflags --libs") 
+# if not WINDOWS:
+#    env.ParseConfig("freetype-config --cflags --libs") 
 
-#
+
 # Debug settings
 #
 if DEBUG:
@@ -185,7 +185,18 @@ if PROFILE:
 #env.Library( "smartmet_smarttools", Glob("source/*.cpp") )
 
 objs= []
-shared_objs= []
+objs_mt= []
+
+env_mt = env.Clone()
+
+env.Append( LIBS= [ "smartmet_newbase" ] )
+env.Append( CPPDEFINES="BOOST_DISABLE_THREADS" )
+
+env_mt.Append( LIBS= [ "smartmet_newbase-mt" ] )
+env_mt.Append( CPPDEFINES="FMI_MULTITHREAD" )
+if not WINDOWS:
+    env_mt.Append( CPPDEFINES= "_REENTRANT" )
+
 
 if WINDOWS:
     for fn in Glob("source/*.cpp"): 
@@ -193,49 +204,45 @@ if WINDOWS:
         obj_s= OBJDIR+"/"+ s.replace(".cpp","")
 
         objs += env.Object( obj_s, fn )
-        shared_objs += env.SharedObject( obj_s, fn ) 
+        objs_mt += env.Object( obj_s + "_mt", fn )
+
 else:
     if DEBUG:
-        e_O0= env       # No change, anyways
+        e_O0= env          # No change, anyways
+        e_O0_mt= env       # No change, anyways
+
         e_noerror= env.Clone()
         e_noerror["CXXFLAGS"].remove( "-Werror" )
         e_noerror["CXXFLAGS"].append( "-Wno-error" )
+
+        e_noerror_mt= env_mt.Clone()
+        e_noerror_mt["CXXFLAGS"].remove( "-Werror" )
+        e_noerror_mt["CXXFLAGS"].append( "-Wno-error" )
     else:
         e_O0= env.Clone()
         e_O0["CXXFLAGS"].remove("-O2")
         e_O0["CXXFLAGS"].append("-O0")
         e_O0["CXXFLAGS"].remove("-Wuninitialized")    # not supported without '-O'
+
+        e_O0_mt= env_mt.Clone()
+        e_O0_mt["CXXFLAGS"].remove("-O2")
+        e_O0_mt["CXXFLAGS"].append("-O0")
+        e_O0_mt["CXXFLAGS"].remove("-Wuninitialized")    # not supported without '-O'
+
         e_noerror= env    # anyways no -Werror
-    
+        e_noerror_mt= env    # anyways no -Werror
+   
     for fn in Glob("source/*.cpp"): 
         s= os.path.basename( str(fn) )
         obj_s= OBJDIR+"/"+ s.replace(".cpp","")
         
-        # Using -O0 since -O2 would take so long to compile (really...?)
-        #
-        if (
-            #s == "NFmiColorTools.cpp" or
-            False): 
-            objs += e_O0.Object( obj_s, fn )
-            shared_objs += e_O0.SharedObject( obj_s, fn )
-        elif (
-             #s == "NFmiEsriShape.cpp" or    # isspace uses an old style cast
-             #s == "NFmiImageJpeg.cpp" or    # jpeglib calls cause warnings
-             #s == "NFmiPath.cpp" or         # isspace
-             #s == "NFmiImage.cpp" or        # sstream causes warnings
-            False):
-            objs += e_noerror.Object( obj_s, fn )
-            shared_objs += e_noerror.SharedObject( obj_s, fn )
-    
-        else:
-            objs += env.Object( obj_s, fn )
-            shared_objs += env.SharedObject( obj_s, fn ) 
+        objs += env.Object( obj_s, fn )
+        objs_mt += env_mt.Object( obj_s + "_mt", fn )
 
-#
+
 # Make just the static lib (at least it should be default for just 'scons')
-#
-env.Library( "smartmet_smarttools", objs )
 
-#env.SharedLibrary( "smartmet_smarttools", shared_objs )
+env.Library( "smartmet_smarttools", objs )
+env.Library( "smartmet_smarttools-mt", objs_mt )
 
 
