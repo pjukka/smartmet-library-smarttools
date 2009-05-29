@@ -1122,7 +1122,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 	NFmiSmartInfo* info = 0;
 	if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kScriptVariableData)
 		info = CreateScriptVariableInfo(theAreaMaskInfo.GetDataIdent());
-	else if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kSoundingParameterData)
+	else if(theAreaMaskInfo.GetDataType() >= NFmiInfoData::kSoundingParameterData)
 		info = CreateSoundingParamInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetUseDefaultProducer());
 	else if(theAreaMaskInfo.GetUseDefaultProducer() || theAreaMaskInfo.GetDataType() == NFmiInfoData::kCopyOfEdited)
 	{
