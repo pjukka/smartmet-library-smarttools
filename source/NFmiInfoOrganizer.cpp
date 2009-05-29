@@ -439,7 +439,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 // drawParam pitää muistaa tuhota  NFmiInfoOrganizer:n ulkopuolella
 	// int thePriority = 1;// toistaiseksi HARDCODE, thePriority määritys tehdään myöhemmin
 	NFmiDrawParam* drawParam = 0;
-	if(theType == NFmiInfoData::kSatelData) // spesiaali keissi satelliitti kuville, niillä ei ole infoa
+	if(theType == NFmiInfoData::kSatelData || theType == NFmiInfoData::kConceptualModelData) // spesiaali keissi satelliitti kuville, niillä ei ole infoa
 	{
 		drawParam = new NFmiDrawParam(theIdent, NFmiLevel(), 1, theType);
 		drawParam->ParameterAbbreviation(static_cast<char*>(theIdent.GetParamName()));
