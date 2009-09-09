@@ -509,6 +509,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 			fViewMacroDrawParam = theDrawParam->ViewMacroDrawParam();
 			itsParameter = theDrawParam->itsParameter;
 			itsLevel = const_cast<NFmiDrawParam*>(theDrawParam)->Level();
+			itsDataType = theDrawParam->itsDataType;
 		}
 		itsPriority = theDrawParam->Priority();
 
