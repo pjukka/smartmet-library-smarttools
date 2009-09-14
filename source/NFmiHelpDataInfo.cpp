@@ -1,5 +1,9 @@
 // NFmiHelpDataInfo.cpp
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4996) // 4996 poistaa ep‰turvallisten string manipulaatio funktioiden k‰ytˆst‰ tulevat varoitukset. En aio k‰ytt‰‰ ehdotettuja turvallisia _s -funktioita (esim. sprintf_s), koska ne eiv‰t ole linux yhteensopivia.
+#endif
+
 #include "NFmiHelpDataInfo.h"
 #include "NFmiArea.h"
 #include "NFmiAreaFactory.h"
@@ -41,6 +45,8 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 ,itsImageProjectionString()
 ,itsImageDataIdent()
 ,itsImageArea(0)
+,fNotifyOnLoad(false)
+,itsNotificationLabel()
 {}
 
 NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
@@ -52,6 +58,8 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
 ,itsImageProjectionString(theOther.itsImageProjectionString)
 ,itsImageDataIdent(theOther.itsImageDataIdent)
 ,itsImageArea(theOther.itsImageArea ? theOther.itsImageArea->Clone() : 0)
+,fNotifyOnLoad(theOther.fNotifyOnLoad)
+,itsNotificationLabel(theOther.itsNotificationLabel)
 {}
 
 NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
@@ -67,6 +75,8 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 		itsImageProjectionString = theOther.itsImageProjectionString;
 		itsImageDataIdent = theOther.itsImageDataIdent;
 		itsImageArea = theOther.itsImageArea ? theOther.itsImageArea->Clone() : 0;
+		fNotifyOnLoad = theOther.fNotifyOnLoad;
+		itsNotificationLabel = theOther.itsNotificationLabel;
 	}
 	return *this;
 }
@@ -304,6 +314,8 @@ bool NFmiHelpDataInfoSystem::Init(const std::string &theBaseNameSpaceStr, std::s
 	string dynamicImageProjectionKey = dynamicBaseKey + "::%s::ImageProjection";
 	string dynamicParameterNameKey = dynamicBaseKey + "::%s::ParameterName";
 	string dynamicParameterIdKey = dynamicBaseKey + "::%s::ParameterId";
+	string dynamicNotifyOnLoadKey = dynamicBaseKey + "::%s::NotifyOnLoad";
+	string dynamicNotificationLabelKey = dynamicBaseKey + "::%s::NotificationLabel";
 
 	std::vector<std::string> dyns = NFmiSettings::ListChildren(dynamicBaseKey.c_str());
 	std::vector<std::string>::iterator dyniter = dyns.begin();
@@ -320,11 +332,9 @@ bool NFmiHelpDataInfoSystem::Init(const std::string &theBaseNameSpaceStr, std::s
 			{
 				NFmiFileString fileStr(tmpFileNameFilter);
 				fileStr.NormalizeDelimiter();
-				unsigned long bs1 = 1; // V***n MSVC k‰‰nt‰j‰ ei p‰‰st‰ muuten l‰pi
-				unsigned long bs2 = 2;
 				// T‰m‰ kikkailu on sit‰ varten ett‰ helpdata-tiedostossa on k‰ytetty
 				// ./alkuisia suhteellisia polkuja, joita halutaan k‰ytt‰‰ vaikka rootti-dir onkin m‰‰ritelty!!!
-				if(fileStr.IsAbsolutePath() == false && (fileStr.GetLen() > 2 && fileStr[bs1] != '.' && fileStr[bs2] != kFmiDirectorySeparator))
+				if(fileStr.IsAbsolutePath() == false && (fileStr.GetLen() > 2 && fileStr[1ul] != '.' && fileStr[2ul] != kFmiDirectorySeparator)) // 1ul on unsigned long casti, jonka msvc++ 2008 k‰‰nt‰j‰ vaatii
 				{
 					NFmiFileString finalFileStr(rootDir);
 					finalFileStr.NormalizeDelimiter();
@@ -342,6 +352,11 @@ bool NFmiHelpDataInfoSystem::Init(const std::string &theBaseNameSpaceStr, std::s
 			hdi.DataType(datatype);
 			sprintf(key1, dynamicProducerKey.c_str(), dyn.c_str()); // (Fake) Producer ID
 			hdi.FakeProducerId(NFmiSettings::Optional<int>(key1, 0));
+			sprintf(key1, dynamicNotifyOnLoadKey.c_str(), dyn.c_str()); // NotifyOnLoad
+			hdi.NotifyOnLoad(NFmiSettings::Optional<bool>(key1, false));
+			sprintf(key1, dynamicNotificationLabelKey.c_str(), dyn.c_str()); // NotificationLabel
+			hdi.NotificationLabel(NFmiSettings::Optional<string>(key1, ""));
+
 			sprintf(key1, dynamicImageProjectionKey.c_str(), dyn.c_str()); // Image projection
 			if (NFmiSettings::IsSet(key1))
 			{

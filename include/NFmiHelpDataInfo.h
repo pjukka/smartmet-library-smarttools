@@ -48,6 +48,10 @@ public:
 	void ImageDataIdent(const NFmiDataIdent& newValue) { itsImageDataIdent = newValue; }
 	const NFmiArea* ImageArea(void) const {return itsImageArea;}
 	void ImageArea(NFmiArea *newValue) { if (!itsImageArea) itsImageArea = newValue; } // Can only be called once
+	bool NotifyOnLoad(void) const {return fNotifyOnLoad;}
+	void NotifyOnLoad(bool newValue) {fNotifyOnLoad = newValue;}
+	const std::string& NotificationLabel(void) const {return itsNotificationLabel;}
+	void NotificationLabel(const std::string &newValue) {itsNotificationLabel = newValue;}
 
 private:
 	bool ReadNextLine(std::istream & file, std::string &theLine);
@@ -64,6 +68,9 @@ private:
 	NFmiDataIdent itsImageDataIdent; // tieto image paramin id:stä, nimestä (vain id ja nimi talletetaan tiedostoon)
 	NFmiArea *itsImageArea; // tähän luodaan ed. stringin avulla projektio, tämä ei ole tallessa tiedostossa
 	// Edelliset koskevat vain image-tyyppisiä juttuja
+
+	bool fNotifyOnLoad; // Jos datan latauksen yhteydessä halutaan tehdä ilmoitus, tämä on true. Oletus arvo on false
+	std::string itsNotificationLabel; // Jos notifikaatioon halutaan tietty sanoma, se voidaan antaa tähän. Defaulttina annetaan tiedoston nimi
 };
 
 //inline std::ostream & operator<<(std::ostream & os, const NFmiHelpDataInfo & item)
