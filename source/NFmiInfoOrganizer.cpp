@@ -1092,6 +1092,25 @@ checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type the
 	return infoVector;
 }
 
+// Haetaan infoOrganizerista kaikki ne SmartInfot, joihin annettu fileNameFilter sopii.
+// Mielestäni vastauksia pitäisi tulla korkeintaan yksi, mutta ehkä tulevaisuudessa voisi tulla lista.
+// HUOM! Palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota delete:llä.
+// Ei käy läpi kEditable, eikä kCopyOfEdited erikois datoja!
+checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(const std::string &theFileNameFilter)
+{
+	checkedVector<NFmiSmartInfo*> infoVector;
+
+	if(theFileNameFilter.empty() == false)
+	{
+		for(Reset(); Next();)
+		{
+			if(Current()->DataFilePattern() == theFileNameFilter)
+				infoVector.push_back(Current());
+		}
+	}
+	return infoVector;
+}
+
 static bool IsProducerWanted(int theCurrentProdId, int theProducerId1, int theProducerId2, int theProducerId3 = -1, int theProducerId4 = -1)
 {
 	if(theCurrentProdId == theProducerId1)
