@@ -21,20 +21,6 @@ using namespace std;
  * \return Undocumented
  */
 // ----------------------------------------------------------------------
-static bool EatWhiteSpaces(istream & theInput)
-{
-  char ch = '\0';
-  do
-	{
-	  ch = theInput.get();
-	}
-  while(isspace(ch));
-  if(theInput.fail()) 
-	return false; // jos stremin lopussa, ep‰onnistuu
-  else
-	theInput.unget();
-  return true;
-}
 
 NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 :itsFileNameFilter()
@@ -47,6 +33,8 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 ,itsImageArea(0)
 ,fNotifyOnLoad(false)
 ,itsNotificationLabel()
+,itsCustomMenuFolder()
+,itsBaseNameSpace()
 {}
 
 NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
@@ -60,6 +48,8 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
 ,itsImageArea(theOther.itsImageArea ? theOther.itsImageArea->Clone() : 0)
 ,fNotifyOnLoad(theOther.fNotifyOnLoad)
 ,itsNotificationLabel(theOther.itsNotificationLabel)
+,itsCustomMenuFolder(theOther.itsCustomMenuFolder)
+,itsBaseNameSpace(theOther.itsBaseNameSpace)
 {}
 
 NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
@@ -77,6 +67,8 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 		itsImageArea = theOther.itsImageArea ? theOther.itsImageArea->Clone() : 0;
 		fNotifyOnLoad = theOther.fNotifyOnLoad;
 		itsNotificationLabel = theOther.itsNotificationLabel;
+		itsCustomMenuFolder = theOther.itsCustomMenuFolder;
+		itsBaseNameSpace = theOther.itsBaseNameSpace;
 	}
 	return *this;
 }
@@ -92,61 +84,69 @@ void NFmiHelpDataInfo::Clear(void)
 	itsImageDataIdent = NFmiDataIdent();
 	delete itsImageArea;
 	itsImageArea = 0;
+	fNotifyOnLoad = false;
+	itsNotificationLabel = "";
+	itsCustomMenuFolder = "";
+	itsBaseNameSpace = "";
 }
 
-std::istream & NFmiHelpDataInfo::Read(std::istream & file)
+static std::string MakeFileNameFilter(const std::string &theFileFilterBase, const std::string &theRootDir)
 {
-	Clear();
-	ReadNextLine(file, itsFileNameFilter);
-	int tmp = 0;
-	file >> tmp;
-	itsDataType = static_cast<NFmiInfoData::Type>(tmp);
-	file >> itsFakeProducerId;
-	if(itsDataType == NFmiInfoData::kSatelData)
+	std::string returnValue = theFileFilterBase;
+	bool useRootDir = theRootDir.empty() == false;
+	if(useRootDir)
 	{
-		file >> itsImageProjectionString;
-		itsImageArea = NFmiAreaFactory::Create(itsImageProjectionString).release(); // HUOM! voi heitt‰‰ poikkeuksen
-		int tmpParId;
-		file >> tmpParId;
-		string tmpParNameStr;
-		ReadNextLine(file, tmpParNameStr);
-		itsImageDataIdent = NFmiDataIdent(NFmiParam(tmpParId, tmpParNameStr), NFmiProducer(itsFakeProducerId)); // ik‰v‰ koukku, mutta fake prod id onkin satelliitin prod id
+		NFmiFileString fileStr(returnValue);
+		fileStr.NormalizeDelimiter();
+		// T‰m‰ kikkailu on sit‰ varten ett‰ helpdata-tiedostossa on k‰ytetty
+		// ./alkuisia suhteellisia polkuja, joita halutaan k‰ytt‰‰ vaikka rootti-dir onkin m‰‰ritelty!!!
+		if(fileStr.IsAbsolutePath() == false && (fileStr.GetLen() > 2 && fileStr[1ul] != '.' && fileStr[2ul] != kFmiDirectorySeparator)) // 1ul on unsigned long casti, jonka msvc++ 2008 k‰‰nt‰j‰ vaatii
+		{
+			NFmiFileString finalFileStr(theRootDir);
+			finalFileStr.NormalizeDelimiter();
+			if(finalFileStr[finalFileStr.GetLen()] != kFmiDirectorySeparator)
+				finalFileStr += kFmiDirectorySeparator;
+			finalFileStr += returnValue;
+
+			returnValue = static_cast<char *>(finalFileStr);
+		}
 	}
-	return file;
+	return returnValue;
 }
 
-bool NFmiHelpDataInfo::ReadNextLine(std::istream & file, std::string &theLine)
+void NFmiHelpDataInfo::InitFromSettings(const std::string &theInitNameSpace, const std::string &theRootDir)
 {
-	const int maxBufferSize = 512; // kuinka pitk‰ tiedoston nimi voi olla polkuineen maksimissaan
-	string buffer;
-	buffer.resize(maxBufferSize);
-	::EatWhiteSpaces(file);
-	file.getline(&buffer[0], maxBufferSize);
-	int realSize = strlen(buffer.c_str());
-	buffer.resize(realSize);
-	theLine = buffer;
-	return file.good();
-}
+	itsBaseNameSpace = theInitNameSpace;
 
-std::istream & NFmiHelpDataInfoSystem::Read(std::istream & file)
-{
-	Clear();
-	int dataCount = 0;
-	file >> dataCount; // dynaamisten lukum‰‰r‰
-	int i=0;
-	NFmiHelpDataInfo hdInfo;
-	for(i=0; i<dataCount; i++)
+	std::string fileNameFilterKey = itsBaseNameSpace + "::FilenameFilter";
+	if(NFmiSettings::IsSet(fileNameFilterKey))
 	{
-		file >> hdInfo;
-		AddDynamic(hdInfo);
+		// Read configuration
+		string tmpFileNameFilter = NFmiSettings::Require<std::string>(fileNameFilterKey);
+		itsFileNameFilter = ::MakeFileNameFilter(tmpFileNameFilter, theRootDir);
+		itsDataType = static_cast<NFmiInfoData::Type> (NFmiSettings::Require<int>(itsBaseNameSpace + "::DataType"));
+		itsFakeProducerId = NFmiSettings::Optional<int>(itsBaseNameSpace + "::ProducerId", 0);
+		fNotifyOnLoad = NFmiSettings::Optional<bool>(itsBaseNameSpace + "::NotifyOnLoad", false);
+		itsNotificationLabel = NFmiSettings::Optional<string>(itsBaseNameSpace + "::NotificationLabel", "");
+		itsCustomMenuFolder = NFmiSettings::Optional<string>(itsBaseNameSpace + "::CustomMenuFolder", "");
+
+		std::string imageProjectionKey(itsBaseNameSpace + "::ImageProjection");
+		if (NFmiSettings::IsSet(imageProjectionKey))
+		{
+			NFmiArea *area = NFmiAreaFactory::Create(NFmiSettings::Require<std::string>(imageProjectionKey)).release();
+			if(area)
+			{
+				if(area->XYArea().Width() != 1 || area->XYArea().Height() != 1)
+				{
+					area->SetXYArea(NFmiRect(0,0,1,1));
+				}
+				itsImageArea = area;
+			}
+			NFmiParam param(NFmiSettings::Require<int>(itsBaseNameSpace + "::ParameterId")
+						   ,NFmiSettings::Require<std::string>(itsBaseNameSpace + "::ParameterName"));
+			itsImageDataIdent = NFmiDataIdent(param, itsFakeProducerId);
+		}
 	}
-	file >> dataCount; // staattistem lukum‰‰r‰
-	for(i=0; i<dataCount; i++)
-	{
-		file >> hdInfo;
-		AddStatic(hdInfo);
-	}
-	return file;
 }
 
 NFmiHelpDataInfo& NFmiHelpDataInfoSystem::DynamicHelpDataInfo(int theIndex)
@@ -170,11 +170,11 @@ NFmiDataIdent NFmiHelpDataInfoSystem::GetNextSatelChannel(const NFmiDataIdent &t
 {
 	NFmiDataIdent returnDataIdent(theDataIdent);
 	FmiProducerName prodId = static_cast<FmiProducerName>(theDataIdent.GetProducer()->GetIdent());
-	int count = itsDynamicHelpDataInfos.size();
+	size_t count = itsDynamicHelpDataInfos.size();
 	std::vector<NFmiDataIdent> dataIdentVec;
 	int counter = 0;
 	int currentIndex = -1;
-	for(int i=0; i<count; i++)
+	for(size_t i=0; i<count; i++)
 	{
 		if(itsDynamicHelpDataInfos[i].DataType() == NFmiInfoData::kSatelData)
 		{
@@ -212,8 +212,8 @@ const NFmiArea* NFmiHelpDataInfoSystem::GetDataFilePatternAndArea(NFmiInfoData::
 {
 	if(theDataType == NFmiInfoData::kSatelData)
 	{
-		int count = itsDynamicHelpDataInfos.size();
-		for(int i=0; i<count; i++)
+		size_t count = itsDynamicHelpDataInfos.size();
+		for(size_t i=0; i<count; i++)
 		{
 			if(itsDynamicHelpDataInfos[i].DataType() == theDataType)
 			{
@@ -269,122 +269,28 @@ void NFmiHelpDataInfoSystem::AddStatic(const NFmiHelpDataInfo &theInfo)
 	itsStaticHelpDataInfos.push_back(theInfo);
 }
 
-bool NFmiHelpDataInfoSystem::Init(const std::string &theBaseNameSpaceStr, std::string theHelpEditorFileNameFilter)
+void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey, const std::string &theRootDir, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos)
+{
+	std::vector<std::string> dataKeys = NFmiSettings::ListChildren(theBaseKey);
+	std::vector<std::string>::iterator iter = dataKeys.begin();
+	for( ; iter != dataKeys.end(); ++iter)
+	{
+		NFmiHelpDataInfo hdi;
+		hdi.InitFromSettings(theBaseKey + "::" + (*iter), theRootDir);
+		theHelpDataInfos.push_back(hdi);
+	}
+}
+
+void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpaceStr, std::string theHelpEditorFileNameFilter)
 {
 	string rootKey = theBaseNameSpaceStr + "::RootDir";
 	string rootDir = NFmiSettings::Optional(rootKey.c_str(), string(""));
 	RootDirectory(rootDir);
-	bool useRootDir = rootDir.empty() == false;
-
 	// Read static helpdata configurations
-	string staticBaseKey = theBaseNameSpaceStr + "::Static";
-	string staticFileFilterKey = staticBaseKey + "::%s::FilenameFilter";
-	string staticDataTypeKey = staticBaseKey + "::%s::DataType";
-	string staticProducerKey = staticBaseKey + "::%s::ProducerId";
-	
-	char key1[128], key2[128];
-	std::vector<std::string> stats = NFmiSettings::ListChildren(staticBaseKey.c_str());
-	std::vector<std::string>::iterator statiter = stats.begin();
-	while (statiter != stats.end())
-	{
-		std::string stat(*statiter);
-		sprintf(key1, staticFileFilterKey.c_str(), stat.c_str());
-		if (NFmiSettings::IsSet(key1))
-		{
-			// Read configuration
-			NFmiHelpDataInfo hdi;
-			hdi.FileNameFilter(NFmiSettings::Require<std::string>(key1));
-			sprintf(key1, staticDataTypeKey.c_str(), stat.c_str()); // Datatype
-			NFmiInfoData::Type datatype = static_cast<NFmiInfoData::Type> (NFmiSettings::Optional<int>(key1, 0));
-			hdi.DataType(datatype);
-			sprintf(key1, staticProducerKey.c_str(), stat.c_str()); // (Fake) Producer ID
-			hdi.FakeProducerId(NFmiSettings::Optional<int>(key1, 0));
-
-			AddStatic(hdi);
-		}
-
-		statiter++;
-	}
+	InitDataType(theBaseNameSpaceStr + "::Static", rootDir, itsStaticHelpDataInfos);
 
 	// Read dynamic helpdata configurations
-	string dynamicBaseKey = theBaseNameSpaceStr + "::Dynamic";
-	string dynamicFileFilterKey = dynamicBaseKey + "::%s::FilenameFilter";
-	string dynamicDataTypeKey = dynamicBaseKey + "::%s::DataType";
-	string dynamicProducerKey = dynamicBaseKey + "::%s::ProducerId";
-	string dynamicImageProjectionKey = dynamicBaseKey + "::%s::ImageProjection";
-	string dynamicParameterNameKey = dynamicBaseKey + "::%s::ParameterName";
-	string dynamicParameterIdKey = dynamicBaseKey + "::%s::ParameterId";
-	string dynamicNotifyOnLoadKey = dynamicBaseKey + "::%s::NotifyOnLoad";
-	string dynamicNotificationLabelKey = dynamicBaseKey + "::%s::NotificationLabel";
-
-	std::vector<std::string> dyns = NFmiSettings::ListChildren(dynamicBaseKey.c_str());
-	std::vector<std::string>::iterator dyniter = dyns.begin();
-	while (dyniter != dyns.end())
-	{
-		std::string dyn(*dyniter);
-		sprintf(key1, dynamicFileFilterKey.c_str(), dyn.c_str());
-		if (NFmiSettings::IsSet(key1))
-		{
-			// Read configuration
-			NFmiHelpDataInfo hdi;
-			string tmpFileNameFilter = NFmiSettings::Require<std::string>(key1);
-			if(useRootDir)
-			{
-				NFmiFileString fileStr(tmpFileNameFilter);
-				fileStr.NormalizeDelimiter();
-				// T‰m‰ kikkailu on sit‰ varten ett‰ helpdata-tiedostossa on k‰ytetty
-				// ./alkuisia suhteellisia polkuja, joita halutaan k‰ytt‰‰ vaikka rootti-dir onkin m‰‰ritelty!!!
-				if(fileStr.IsAbsolutePath() == false && (fileStr.GetLen() > 2 && fileStr[1ul] != '.' && fileStr[2ul] != kFmiDirectorySeparator)) // 1ul on unsigned long casti, jonka msvc++ 2008 k‰‰nt‰j‰ vaatii
-				{
-					NFmiFileString finalFileStr(rootDir);
-					finalFileStr.NormalizeDelimiter();
-					if(finalFileStr[finalFileStr.GetLen()] != kFmiDirectorySeparator)
-						finalFileStr += kFmiDirectorySeparator;
-					finalFileStr += tmpFileNameFilter;
-
-					tmpFileNameFilter = static_cast<char *>(finalFileStr);
-				}
-			}
-	//		hdi.FileNameFilter(NFmiSettings::Require<std::string>(key1));
-			hdi.FileNameFilter(tmpFileNameFilter);
-			sprintf(key1, dynamicDataTypeKey.c_str(), dyn.c_str()); // Datatype
-			NFmiInfoData::Type datatype = static_cast<NFmiInfoData::Type> (NFmiSettings::Optional<int>(key1, 0));
-			hdi.DataType(datatype);
-			sprintf(key1, dynamicProducerKey.c_str(), dyn.c_str()); // (Fake) Producer ID
-			hdi.FakeProducerId(NFmiSettings::Optional<int>(key1, 0));
-			sprintf(key1, dynamicNotifyOnLoadKey.c_str(), dyn.c_str()); // NotifyOnLoad
-			hdi.NotifyOnLoad(NFmiSettings::Optional<bool>(key1, false));
-			sprintf(key1, dynamicNotificationLabelKey.c_str(), dyn.c_str()); // NotificationLabel
-			hdi.NotificationLabel(NFmiSettings::Optional<string>(key1, ""));
-
-			sprintf(key1, dynamicImageProjectionKey.c_str(), dyn.c_str()); // Image projection
-			if (NFmiSettings::IsSet(key1))
-			{
-				NFmiArea *area = NFmiAreaFactory::Create(NFmiSettings::Require<std::string>(key1)).release();
-				if(area)
-				{
-					if(area->XYArea().Width() != 1 || area->XYArea().Height() != 1)
-					{
-						area->SetXYArea(NFmiRect(0,0,1,1));
-					}
-					hdi.ImageArea(area);
-				}
-			}
-			sprintf(key1, dynamicParameterIdKey.c_str(), dyn.c_str()); // Parameter ID
-			sprintf(key2, dynamicParameterNameKey.c_str(), dyn.c_str()); // Parameter name
-			if (NFmiSettings::IsSet(key1) && NFmiSettings::IsSet(key2))
-			{
-			  NFmiParam p(NFmiSettings::Require<int>(key1),
-						  NFmiSettings::Require<std::string>(key2));
-			  NFmiDataIdent ident(p,hdi.FakeProducerId());
-			  hdi.ImageDataIdent(ident);
-			}
-
-			AddDynamic(hdi);
-		}
-
-		dyniter++;
-	}
+	InitDataType(theBaseNameSpaceStr + "::Dynamic", rootDir, itsDynamicHelpDataInfos);
 
 	// Lis‰t‰‰n help editor mode datan luku jos niin on haluttu
 	if(theHelpEditorFileNameFilter.empty() == false)
@@ -394,8 +300,6 @@ bool NFmiHelpDataInfoSystem::Init(const std::string &theBaseNameSpaceStr, std::s
 		helpDataInfo.DataType(NFmiInfoData::kEditingHelpData);
 		AddDynamic(helpDataInfo);
 	}
-
-	return true;
 }
 
 void NFmiHelpDataInfoSystem::MarkAllDynamicDatasAsNotReaded()
@@ -403,4 +307,74 @@ void NFmiHelpDataInfoSystem::MarkAllDynamicDatasAsNotReaded()
 	size_t ssize = itsDynamicHelpDataInfos.size();
 	for(size_t i = 0; i<ssize; i++)
 		itsDynamicHelpDataInfos[i].LatestFileTimeStamp(-1);
+}
+
+static NFmiHelpDataInfo* FindHelpDataInfo(checkedVector<NFmiHelpDataInfo> &theHelpInfos, const std::string &theFileNameFilter)
+{
+	size_t ssize = theHelpInfos.size();
+	for(size_t i = 0; i<ssize; i++)
+	{
+		if(theHelpInfos[i].FileNameFilter() == theFileNameFilter)
+			return &theHelpInfos[i];
+	}
+	return 0;
+}
+
+// Etsii annetun fileNameFilterin avulla HelpDataInfon ja palauttaa sen, jos lˆytyi.
+// Jos ei lˆytynyt vastaavaa filePatternia, palauttaa 0-pointterin.
+// K‰y ensin l‰pi dynaamiset helpDataInfot ja sitten staattiset.
+NFmiHelpDataInfo* NFmiHelpDataInfoSystem::FindHelpDataInfo(const std::string &theFileNameFilter)
+{
+	if(theFileNameFilter.empty())
+		return 0;
+
+	NFmiHelpDataInfo *helpInfo = ::FindHelpDataInfo(itsDynamicHelpDataInfos, theFileNameFilter);
+	if(helpInfo == 0)
+		helpInfo = ::FindHelpDataInfo(itsStaticHelpDataInfos, theFileNameFilter);
+
+	return helpInfo;
+}
+
+static void CollectCustomMenuItems(const checkedVector<NFmiHelpDataInfo> &theHelpInfos, std::set<std::string> &theMenuSet)
+{
+	size_t ssize = theHelpInfos.size();
+	for(size_t i = 0; i<ssize; i++)
+	{
+		if(theHelpInfos[i].CustomMenuFolder().empty() == false)
+			theMenuSet.insert(theHelpInfos[i].CustomMenuFolder());
+	}
+}
+
+// ker‰‰ uniikki lista mahdollisista custom Menu folder asetuksista
+std::vector<std::string> NFmiHelpDataInfoSystem::GetUniqueCustomMenuList(void)
+{
+	std::set<std::string> menuSet;
+	::CollectCustomMenuItems(itsDynamicHelpDataInfos, menuSet);
+	::CollectCustomMenuItems(itsStaticHelpDataInfos, menuSet);
+
+	std::vector<std::string> menuList(menuSet.begin(), menuSet.end());
+	return menuList;
+}
+
+static void CollectCustomMenuHelpDatas(const checkedVector<NFmiHelpDataInfo> &theHelpInfos, const std::string &theCustomFolder, std::vector<NFmiHelpDataInfo> &theCustomHelpDatas)
+{
+	size_t ssize = theHelpInfos.size();
+	for(size_t i = 0; i<ssize; i++)
+	{
+		if(theHelpInfos[i].CustomMenuFolder().empty() == false)
+			if(theHelpInfos[i].CustomMenuFolder() == theCustomFolder)
+				theCustomHelpDatas.push_back(theHelpInfos[i]);
+	}
+}
+
+// ker‰t‰‰n list‰ niista helpDataInfoissta, joissa on asetettu kyseinen customFolder
+std::vector<NFmiHelpDataInfo> NFmiHelpDataInfoSystem::GetCustomMenuHelpDataList(const std::string &theCustomFolder)
+{
+	std::vector<NFmiHelpDataInfo> helpDataList;
+	if(theCustomFolder.empty() == false)
+	{
+		::CollectCustomMenuHelpDatas(itsDynamicHelpDataInfos, theCustomFolder, helpDataList);
+		::CollectCustomMenuHelpDatas(itsStaticHelpDataInfos, theCustomFolder, helpDataList);
+	}
+	return helpDataList;
 }

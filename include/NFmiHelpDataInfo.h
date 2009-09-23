@@ -28,12 +28,11 @@ public:
 	~NFmiHelpDataInfo(void)
 	{Clear();}
 
+	void InitFromSettings(const std::string &theInitNameSpace, const std::string &theRootDir);
+	// void StoreToSettings(void);  // HUOM! ei toteuteta ainakaan vielä talletusta
+
 	NFmiHelpDataInfo& operator=(const NFmiHelpDataInfo &theOther);
 	void Clear(void);
-	//@{ \name Kirjoitus- ja luku-operaatiot
-//	std::ostream & Write(std::ostream & file) const; // ei ole ollut tarveta toteuttaa vielä!
-	std::istream & Read(std::istream & file);
-	//@}
 	const std::string& FileNameFilter(void) const {return itsFileNameFilter;}
 	void FileNameFilter(const std::string &newValue) {itsFileNameFilter = newValue;}
 	const std::string& LatestFileName(void) const {return itsLatestFileName;}
@@ -52,9 +51,10 @@ public:
 	void NotifyOnLoad(bool newValue) {fNotifyOnLoad = newValue;}
 	const std::string& NotificationLabel(void) const {return itsNotificationLabel;}
 	void NotificationLabel(const std::string &newValue) {itsNotificationLabel = newValue;}
+	const std::string& CustomMenuFolder(void) const {return itsCustomMenuFolder;}
+	void CustomMenuFolder(const std::string &newValue) {itsCustomMenuFolder = newValue;}
 
 private:
-	bool ReadNextLine(std::istream & file, std::string &theLine);
 
 	std::string itsFileNameFilter; // tiedostonimi filtteri polun kera esim. d:\weto\wrk\data\in\data_1_*.sqd
 	std::string itsLatestFileName; // kun filtterillä on haettu tiedostot ja uusin on löytynyt, talletetaan se tähän
@@ -71,13 +71,10 @@ private:
 
 	bool fNotifyOnLoad; // Jos datan latauksen yhteydessä halutaan tehdä ilmoitus, tämä on true. Oletus arvo on false
 	std::string itsNotificationLabel; // Jos notifikaatioon halutaan tietty sanoma, se voidaan antaa tähän. Defaulttina annetaan tiedoston nimi
+	std::string itsCustomMenuFolder; // Jos data halutaan laittaa haluttuun hakemistoon param-popupeissa, tehdää sellainen asetus helpdata 
+								// konffeihin. Defaulttina tyhjä, jolloin data menee 'normaaliin' paikkaansa valikoissa.
+	std::string itsBaseNameSpace;
 };
-
-//inline std::ostream & operator<<(std::ostream & os, const NFmiHelpDataInfo & item)
-//{  return item.Write(os);}
-inline std::istream & operator>>(std::istream & is, NFmiHelpDataInfo & item)
-{  return item.Read(is);}
-
 
 class NFmiHelpDataInfoSystem
 {
@@ -86,14 +83,14 @@ public:
 	:itsDynamicHelpDataInfos()
 	,itsStaticHelpDataInfos()
 	,itsRootDirectory()
+	,itsBaseNameSpace()
 	{}
 
 	void Clear(void)
 	{}
-	//@{ \name Kirjoitus- ja luku-operaatiot
-//	std::ostream & Write(std::ostream & file) const;
-	std::istream & Read(std::istream & file);
-	//@}
+	void InitFromSettings(const std::string &theInitNameSpace, std::string theHelpEditorFileNameFilter = "");
+	// void StoreToSettings(void);  // HUOM! ei toteuteta ainakaan vielä talletusta
+
 	NFmiHelpDataInfo& DynamicHelpDataInfo(int theIndex);
 	NFmiHelpDataInfo& StaticHelpDataInfo(int theIndex);
 	int DynamicCount(void) const{return static_cast<int>(itsDynamicHelpDataInfos.size());}
@@ -104,20 +101,19 @@ public:
 	void AddStatic(const NFmiHelpDataInfo &theInfo);
 	const std::string& RootDirectory(void) const {return itsRootDirectory;}
 	void RootDirectory(const std::string &theRoot) {itsRootDirectory = theRoot;}
-	bool Init(const std::string &theBaseNameSpaceStr, std::string theHelpEditorFileNameFilter = "");
 	void MarkAllDynamicDatasAsNotReaded();
-
+	NFmiHelpDataInfo* FindHelpDataInfo(const std::string &theFileNameFilter);
+	std::vector<std::string> GetUniqueCustomMenuList(void);
+	std::vector<NFmiHelpDataInfo> GetCustomMenuHelpDataList(const std::string &theCustomFolder);
 private:
+	void InitDataType(const std::string &theBaseKey, const std::string &theRootDir, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos);
 	bool IsSameTypeProjections(const NFmiArea *theFirst, const NFmiArea *theSecond);
 
 	checkedVector<NFmiHelpDataInfo> itsDynamicHelpDataInfos; // tähän tulee jatkuvasti päivitettävät datat kuten havainnot, tutka ja analyysi datat
 	checkedVector<NFmiHelpDataInfo> itsStaticHelpDataInfos; // tähän tulee kerran ladattavat jutut kuten maa/meri maskit ja klimatologiset jutut
 	std::string itsRootDirectory; // jos halutaan, käyttetään root directoria helpottamaan datan latauksia
-};
 
-//inline std::ostream & operator<<(std::ostream & os, const NFmiHelpDataInfoSystem & item)
-//{  return item.Write(os);}
-inline std::istream & operator>>(std::istream & is, NFmiHelpDataInfoSystem & item)
-{  return item.Read(is);}
+	std::string itsBaseNameSpace;
+};
 
 #endif // __NFMIHELPDATAINFO_H__
