@@ -39,6 +39,7 @@
 #include "NFmiMetEditorTypes.h"
 #include "NFmiInfoData.h"
 #include "NFmiDataMatrix.h" // täältä tulee myös checkedVector
+#include "NFmiMetTime.h"
 
 class NFmiDrawingEnvironment;
 
@@ -58,6 +59,13 @@ public:
 	bool IsParamEdited(void) const {return fEditedParam;};
 	bool IsEditable(void) const {return fEditableParam;};
 	void EditableParam(bool newValue){fEditableParam = newValue;};
+	const NFmiMetTime& ModelOriginTime(void) const {return itsModelOriginTime;}
+	void ModelOriginTime(const NFmiMetTime &newValue) {itsModelOriginTime = newValue;}
+	int ModelRunIndex(void) const {return itsModelRunIndex;}
+	void ModelRunIndex(int newValue) {itsModelRunIndex = newValue;}
+	bool UseArchiveModelData(void) const;
+	const NFmiMetTime& ModelOriginTimeCalculated(void) const {return itsModelOriginTimeCalculated;}
+	void ModelOriginTimeCalculated(const NFmiMetTime &newValue) {itsModelOriginTimeCalculated = newValue;}
 
 	NFmiInfoData::Type DataType(void);
 	// huom! tämä asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppiä!!!!!!
@@ -669,6 +677,20 @@ private:
 							  // differently when modifying options, default value is false
 							  // This is not stored in file!
 	bool fBorrowedParam; // onko parametri lainassa vai ei (A-J Punkan vilkutus juttu)
+
+	// Arkistodatan käyttöön liittyviä asetuksia (historialliseen dataan voidaan viitata kahdella eri tavalla)
+	// Joko suoraan fixatulla itsModelOriginTime:lla tai itsModelRunIndex:illä, jolla kerrotaan monesko ajo 
+	// kiinnostaa viimeiseen nähden. 
+	// Prioriteetti järjestys on, että ensin tarkistetaan löytyykö fiksattu aika (itsModelOriginTime) ja sitten vasta onko suhteellinen.
+	NFmiMetTime itsModelOriginTime; // Jos tässä arvo, etsitään arkistosta (SmartMetin (tulevaisuudessa) oma tai Q2Server) 
+									// suoraan kyseinen aika. Jos arvo on NFmiDrawParam::gMissingOriginTime, tämä ei 
+									// ole käytössä.
+	int itsModelRunIndex; // Jos tässä on negatiivinen arvo (-1 on edellinen malliajo, -2 on sitä edellinen jne.), haetaan
+						// arkistosta dataa. Tämä luku on siis verrattuna kyseisen mallin viimeisimpään data osaan, joka löytyy.
+						// Tarkoittaen että jos Hirlamista on pinta ja painepinta datasta tullut jo 06:n ajo ja 
+						// mallipintadatasta vasta 00, silloin viimeisin ajo on 06 ja -1 viittaa tällöin 00-ajoon.
+						// Jos tämä on 0 tai positiivinen, tämä ei ole käytössä.
+	NFmiMetTime itsModelOriginTimeCalculated; // tähän lasketaan relatiivisen malliajon mukainen origin aika, jotä käytetään sitten mm. tooltipeissä ja muualla
 
 //	NFmiMetEditorCoordinatorMapOptions* itsMetEditorCoordinatorMapOptions; // tätä käytetään koordinaatio tarkasteluissa
 };

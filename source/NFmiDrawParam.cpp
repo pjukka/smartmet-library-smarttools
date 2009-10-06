@@ -34,7 +34,6 @@
 #include <fstream>
 
 float NFmiDrawParam::itsFileVersionNumber=3.0;
-
 //--------------------------------------------------------
 // NFmiDrawParam(void)
 //--------------------------------------------------------
@@ -177,7 +176,8 @@ NFmiDrawParam::NFmiDrawParam()
 , itsDataType(NFmiInfoData::kNoDataType)
 , fViewMacroDrawParam(false)
 , fBorrowedParam(false)
-
+, itsModelOriginTime(NFmiMetTime::gMissingTime)
+, itsModelRunIndex(0)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -326,7 +326,8 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 //***********************************************
 //********** 'versio 3' parametreja *************
 //***********************************************
-
+, itsModelOriginTime(NFmiMetTime::gMissingTime)
+, itsModelRunIndex(0)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -480,7 +481,8 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 //***********************************************
 //********** 'versio 3' parametreja *************
 //***********************************************
-
+, itsModelOriginTime(other.itsModelOriginTime)
+, itsModelRunIndex(other.itsModelRunIndex)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -510,6 +512,8 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 			itsParameter = theDrawParam->itsParameter;
 			itsLevel = const_cast<NFmiDrawParam*>(theDrawParam)->Level();
 			itsDataType = theDrawParam->itsDataType;
+			itsModelOriginTime = theDrawParam->itsModelOriginTime;
+			itsModelRunIndex = theDrawParam->itsModelRunIndex;
 		}
 		itsPriority = theDrawParam->Priority();
 
@@ -726,6 +730,21 @@ bool NFmiDrawParam::operator< (const NFmiDrawParam& theDrawParam) const
 	return (itsPriority < theDrawParam.itsPriority);
 }
 
+// NFmiMetTime stringiksi ja stringistä metTimeksi funktiot, että voidaan tallentaa fiksatut origin timet
+// viewMakroihin.
+static const unsigned long gMetTime2ViewMacroStringFormat = kYYYYMMDDHHMMSS;
+static std::string MetTime2String(const NFmiMetTime &theTime)
+{
+	return static_cast<char*>(theTime.ToStr(gMetTime2ViewMacroStringFormat));
+}
+static NFmiMetTime String2MetTime(const std::string &theStr)
+{
+	NFmiMetTime tmpTime;
+	tmpTime.FromStr(theStr, gMetTime2ViewMacroStringFormat);
+	return tmpTime;
+}
+
+
 //--------------------------------------------------------
 // Write
 //--------------------------------------------------------
@@ -863,8 +882,8 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 		file << itsSimpleIsoLineColorShadeHighValueColor << endl;
 		file << itsSimpleIsoLineColorShadeClassCount << endl;
 
-		int i = 0;
-		int size = itsSpecialIsoLineValues.size();
+		size_t i = 0;
+		size_t size = itsSpecialIsoLineValues.size();
 		file << size << endl;
 		for(i=0; i<size;i++)
 			file << itsSpecialIsoLineValues[i] << " ";
@@ -975,7 +994,10 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 		NFmiDataStoringHelpers::NFmiExtraDataStorage extraData; // lopuksi vielä mahdollinen extra data
 		// Kun tulee uusia muuttujia, tee tähän extradatan täyttöä, jotta se saadaan talteen tiedopstoon siten että
 		// edelliset versiot eivät mene solmuun vaikka on tullut uutta dataa.
-		extraData.Add(itsAlpha); // alpha on siis 1. uusista extra-parametreista
+		extraData.Add(itsAlpha); // alpha on siis 1. uusista double-extra-parametreista
+		extraData.Add(itsModelRunIndex); // modelRunIndex on 2. uusista double-extra-parametreista
+
+		extraData.Add(::MetTime2String(itsModelOriginTime)); // modelRunIndex on 1. uusista string-extra-parametreista
 
 		file << "possible_extra_data" << std::endl;
 		file << extraData;
@@ -1290,6 +1312,13 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				itsAlpha = 100.f; // tämä on siis default arvo alphalle (täysin läpinäkyvä)
 				if(extraData.itsDoubleValues.size() >= 1)
 					Alpha(static_cast<float>(extraData.itsDoubleValues[0])); // laitetaan asetus-funktion läpi, jossa raja tarkistukset
+				itsModelRunIndex = 0; // 0 on default, eli ei ole käytössä
+				if(extraData.itsDoubleValues.size() >= 2)
+					ModelRunIndex(static_cast<int>(extraData.itsDoubleValues[1])); // laitetaan asetus-funktion läpi, jossa raja tarkistukset
+
+				itsModelOriginTime = NFmiMetTime::gMissingTime; // tämä on oletus arvo eli ei ole käytössä
+				if(extraData.itsStringValues.size() >= 1)
+					ModelOriginTime(::String2MetTime(extraData.itsStringValues[0])); // laitetaan asetus-funktion läpi, jossa raja tarkistukset
 
 				if(file.fail())
 					throw std::runtime_error("NFmiDrawParam::Write failed");
@@ -1347,9 +1376,19 @@ const std::string& NFmiDrawParam::ParameterAbbreviation(void) const
 	}
 }
 
-
 NFmiInfoData::Type NFmiDrawParam::DataType(void)
 {
 	return itsDataType;
 }
 
+bool NFmiDrawParam::UseArchiveModelData(void) const
+{
+	if(itsDataType == NFmiInfoData::kViewable || itsDataType == NFmiInfoData::kHybridData)
+	{
+		if(itsModelOriginTime != NFmiMetTime::gMissingTime)
+			return true;
+		if(itsModelRunIndex < 0)
+			return true;
+	}
+	return false;
+}
