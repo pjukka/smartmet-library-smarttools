@@ -12,25 +12,20 @@
 #include "NFmiMetTime.h"
 #include "NFmiLevel.h"
 
-// generoi vektorin NFmiProducer-otuksia. Useita tuottajia tulee jos id-listassa on useita id:tä
-std::vector<NFmiProducer> NFmiProducerInfo::GetProducers(void)
+NFmiProducer NFmiProducerInfo::GetProducer(void)
 {
-	std::vector<NFmiProducer> producers;
-	for(unsigned int i = 0; i<itsProducerIds.size(); i++)
-		producers.push_back(NFmiProducer(itsProducerIds[i], itsName));
-	return producers;
+	return NFmiProducer(itsProducerId, itsName);
 }
 
 NFmiProducerInfo NFmiProducerSystem::GetProducerInfoFromSettings(const std::string &theUsedNameSpaceBase)
 {
 	NFmiProducerInfo prod;
-	prod.Name(NFmiSettings::Require<std::string>(std::string(theUsedNameSpaceBase + "::Name").c_str()));
-	prod.ShortName(NFmiSettings::Require<std::string>(std::string(theUsedNameSpaceBase + "::ShortName").c_str()));
-	prod.UltraShortName(NFmiSettings::Require<std::string>(std::string(theUsedNameSpaceBase + "::UltraShortName").c_str()));
-	prod.Description(NFmiSettings::Require<std::string>(std::string(theUsedNameSpaceBase + "::Description").c_str()));
-	std::string idStr(NFmiSettings::Require<std::string>(std::string(theUsedNameSpaceBase + "::ProducerIds").c_str()));
-	prod.ProducerIds(NFmiStringTools::Split<std::vector<int> >(idStr, ","));
-	prod.HasRealVerticalData(NFmiSettings::Require<bool>(std::string(theUsedNameSpaceBase + "::HasRealVerticalData").c_str()));
+	prod.Name(NFmiSettings::Require<std::string>(theUsedNameSpaceBase + "::Name"));
+	prod.ShortName(NFmiSettings::Require<std::string>(theUsedNameSpaceBase + "::ShortName"));
+	prod.UltraShortName(NFmiSettings::Require<std::string>(theUsedNameSpaceBase + "::UltraShortName"));
+	prod.Description(NFmiSettings::Require<std::string>(theUsedNameSpaceBase + "::Description"));
+	prod.ProducerId(NFmiSettings::Require<unsigned long>(theUsedNameSpaceBase + "::ProducerIds"));
+	prod.HasRealVerticalData(NFmiSettings::Require<bool>(theUsedNameSpaceBase + "::HasRealVerticalData"));
 
 	return prod;
 }
@@ -120,12 +115,8 @@ unsigned int NFmiProducerSystem::FindProducerInfo(const NFmiProducer &theProduce
 	for(unsigned int index = 0; index < itsProducers.size(); index++)
 	{
 		NFmiProducerInfo &prodInfo = itsProducers[index];
-		std::vector<int> &ids = prodInfo.ProducerIds();
-		for(unsigned int i = 0; i < ids.size(); i++)
-		{
-		  if(ids[i] == static_cast<int>(theProducer.GetIdent()))
+		if(prodInfo.ProducerId() == theProducer.GetIdent())
 			return index+1; // palautetaan siis 1-pohjainen indeksi
-		}
 	}
 	return 0; // ei löytynyt, palautetaan 0;
 }
