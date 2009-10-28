@@ -253,7 +253,7 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 	for(Reset(); Next();)
 	{
 		NFmiDrawParam * drawParam = Current();
-		if(theParam.GetParamIdent() == 997) // pirun synop-parametrille pitää taas tehdä virityksiä
+		if(theParam.GetParamIdent() == NFmiInfoData::kFmiSpSynoPlot) // pirun synop-parametrille pitää taas tehdä virityksiä
 		{
 			if(drawParam->Param() == theParam)
 				return true;
