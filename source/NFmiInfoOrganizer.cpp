@@ -185,9 +185,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 									   , const NFmiLevel* theLevel
 									   , NFmiInfoData::Type theType)
 {
-	if(theParam == 997 || theParam == 9996) // synop plot paramille pitää tehdä kikka (ja min/max plot 9996)
+	if(theParam == NFmiInfoData::kFmiSpSynoPlot || theParam == NFmiInfoData::kFmiSpMinMaxPlot) // synop plot paramille pitää tehdä kikka (ja min/max plot 9996)
 		return GetSynopPlotParamInfo(fSubParameter, theType);
-//	if(theParam == 9997)) // sounding plot paramille pitää tehdä kikka
 	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pitää tehdä kikka
 		return GetSoundingPlotParamInfo(fSubParameter, theType);
 	if(theType == NFmiInfoData::kMacroParam) // macro- parametrit lasketaan tällä
@@ -243,9 +242,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 									   , NFmiInfoData::Type theType
 									   , bool fIgnoreProducerName)
 {
-	if(theDataIdent.GetParamIdent() == 997 || theDataIdent.GetParamIdent() == 9996) // synop plot paramille pitää tehdä kikka (ja min/max plot 9996)
+	if(theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpSynoPlot || theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpMinMaxPlot) // synop plot paramille pitää tehdä kikka (ja min/max plot 9996)
 		return GetSynopPlotParamInfo(fSubParameter, theType);
-//	if(theDataIdent.GetParamIdent() == 9997) // sounding plot paramille pitää tehdä kikka
 	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pitää tehdä kikka
 		return GetSoundingPlotParamInfo(fSubParameter, theType);
 	if(theType == NFmiInfoData::kMacroParam) // macro- parametrit lasketaan tällä
@@ -437,7 +435,6 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 {
 // Huomaa, että itsDrawParamFactory luo pointterin drawParam new:llä, joten
 // drawParam pitää muistaa tuhota  NFmiInfoOrganizer:n ulkopuolella
-	// int thePriority = 1;// toistaiseksi HARDCODE, thePriority määritys tehdään myöhemmin
 	NFmiDrawParam* drawParam = 0;
 	if(theType == NFmiInfoData::kSatelData || theType == NFmiInfoData::kConceptualModelData) // spesiaali keissi satelliitti kuville, niillä ei ole infoa
 	{
@@ -445,7 +442,7 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 		drawParam->ParameterAbbreviation(static_cast<char*>(theIdent.GetParamName()));
 		return drawParam;
 	}
-	if(theIdent.GetParamIdent() == 997) // synop plottia varten taas kikkailua
+	if(theIdent.GetParamIdent() == NFmiInfoData::kFmiSpSynoPlot) // synop plottia varten taas kikkailua
 	{
 		return CreateSynopPlotDrawParam(theIdent, theLevel, theType);
 	}
@@ -518,7 +515,6 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 			itsEditedData = aSmartInfo;
 			fCreateEditedDataCopy = theUndoLevel ? true : false; // pitää päivittää kopion luomiseen vaikuttavaa muuttujaa undo-levelin mukaan
 			UpdateEditedDataCopy();
-//			UpdateMacroParamData();
 
 			status = true;
 		}
@@ -823,28 +819,6 @@ static NFmiQueryData* CreateDefaultMacroParamQueryData(const NFmiArea *theArea, 
 	return NFmiQueryDataUtil::CreateEmptyData(info);
 }
 
-/*
-// luo makroparametri dataa varten tyhjä qdatan, jossa on yksi aika,parametri ja leveli
-// ja editoidun datan hplaceDescriptori
-static NFmiQueryData* CreateDefaultMacroParamQueryData(NFmiQueryInfo & theEditedInfo)
-{
-	NFmiLevelBag levelBag;
-	levelBag.AddLevel(NFmiLevel(kFmiGroundSurface, 0)); // ihan mitä puppua vain, ei väliä
-	NFmiVPlaceDescriptor vPlace(levelBag);
-
-	NFmiParamBag parBag;
-	parBag.Add(NFmiDataIdent(NFmiParam(998, "macroParam", kFloatMissing, kFloatMissing, 1, 0, NFmiString("%.1f"), kLinearly)));
-	NFmiParamDescriptor parDesc(parBag);
-
-	NFmiMetTime originTime;
-	NFmiTimeBag validTimes(originTime, originTime, 60); // yhden kokoinen feikki timebagi
-	NFmiTimeDescriptor timeDesc(originTime, validTimes);
-
-	NFmiQueryInfo info(parDesc, timeDesc, theEditedInfo.HPlaceDescriptor(), vPlace);
-	return NFmiQueryDataUtil::CreateEmptyData(info);
-}
-*/
-
 void NFmiInfoOrganizer::SetSoundingParamDataGridSize(int x, int y)
 {
 	itsSoundingParamGridSize = NFmiPoint(x, y);
@@ -910,25 +884,6 @@ void NFmiInfoOrganizer::UpdateSpecialDataArea(const NFmiArea *theArea, const NFm
 		theMissingValueMatrix.Resize((*theData)->Grid()->XNumber(), (*theData)->Grid()->YNumber(), kFloatMissing);
 	}
 }
-/*
-void NFmiInfoOrganizer::UpdateMacroParamDataArea(const NFmiArea *theArea)
-{
-	// tuhoa ensin vanha pois alta
-	if(itsMacroParamData)
-		itsMacroParamData->DestroySharedData();
-	delete itsMacroParamData;
-	itsMacroParamData = 0;
-
-	// Luo sitten uusi data jossa on yksi aika,param ja level ja luo hplaceDesc annetusta areasta ja hila koosta
-	NFmiQueryData* data = CreateDefaultMacroParamQueryData(theArea, static_cast<int>(itsMacroParamGridSize.X()), static_cast<int>(itsMacroParamGridSize.Y()));
-	if(data)
-	{
-		NFmiQueryInfo infoIter(data);
-		itsMacroParamData = new NFmiSmartInfo(infoIter, data, "", "", NFmiInfoData::kMacroParam);
-		itsMacroParamMissingValueMatrix.Resize(itsMacroParamData->Grid()->XNumber(), itsMacroParamData->Grid()->YNumber(), kFloatMissing);
-	}
-}
-*/
 
 void NFmiInfoOrganizer::UpdateCrossSectionMacroParamDataSize(int x, int y)
 {
@@ -949,32 +904,6 @@ void NFmiInfoOrganizer::UpdateCrossSectionMacroParamDataSize(int x, int y)
 	}
 }
 
-/*
-// Aina kun on asetettu uusi editoitu data, on makroparam-data päivitettävä
-void NFmiInfoOrganizer::UpdateMacroParamDataArea(void)
-{
-	if(itsEditedData)
-	{
-		// tuhoa ensin vanha pois alta
-		if(itsMacroParamData)
-			itsMacroParamData->DestroySharedData();
-		delete itsMacroParamData;
-		itsMacroParamData = 0;
-
-		// Luo sitten uusi data jossa on yksi aika,param ja level ja ota hplaceDesc editoitavasta datasta
-		NFmiQueryData* data = CreateDefaultMacroParamQueryData(*itsEditedData);
-		if(data)
-		{
-			NFmiQueryInfo infoIter(data);
-			itsMacroParamData = new NFmiSmartInfo(infoIter, data, "", "", NFmiInfoData::kMacroParam);
-			if(itsMacroParamData && itsMacroParamData->IsGrid())
-			{ // alustetaan missing matriisi, että sillä voidaan alustaa ennen makroparamin piirtoa kenttä ensin puuttuvaksi (tämä tehdään NFmiStationView-luokassa)
-				itsMacroParamMissingValueMatrix.Resize(itsMacroParamData->Grid()->XNumber(), itsMacroParamData->Grid()->YNumber(), kFloatMissing);
-			}
-		}
-	}
-}
-*/
 // kaikkien staattisten (ei muutu ajan mukana) datojen parambag (esim. topografia)
 NFmiParamBag NFmiInfoOrganizer::ObservationParams(void)
 {
@@ -1253,12 +1182,6 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindSoundingInfo(const NFmiProducer &theProduc
 				exceptableInfo = info;
 		}
 	}
-//	if(theDataType == NFmiInfoData::kEditable)
-//		return EditedInfo();
-//	else if(theDataType == NFmiInfoData::kCopyOfEdited)
-//		return EditedInfoCopy();
-//	else
-//	{
 
 	return exceptableInfo;
 }
