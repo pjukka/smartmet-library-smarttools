@@ -46,7 +46,7 @@
 #include <functional>
 #include <cctype>
 
-static const unsigned int gMesanProdId = 104;
+static const unsigned int gMesanProdId = 160;
 
 using namespace std;
 /*
@@ -528,7 +528,7 @@ static bool IsWordContinuing(char ch)
 // Pit‰‰ olla kokonainen sana eli juuri ennen sanaa ei saa olla kirjaimia,numeroita tai _-merkki‰, eik‰ heti sen j‰lkeenk‰‰n.
 bool NFmiSmartToolIntepreter::FindAnyFromText(const std::string &theText, const checkedVector<std::string>& theSearchedItems)
 {
-	int size = theSearchedItems.size();
+	int size = static_cast<int>(theSearchedItems.size());
 	for(int i = 0; i < size; i++)
 	{
 		string::size_type pos = string::npos;
@@ -1981,7 +1981,7 @@ std::string::const_iterator NFmiSmartToolIntepreter::ExtractFirstCalculationSect
 
 void NFmiSmartToolIntepreter::Clear(void)
 {
-	int size = itsSmartToolCalculationBlocks.size();
+	int size = static_cast<int>(itsSmartToolCalculationBlocks.size());
 	for(int i=0; i<size; i++)
 		itsSmartToolCalculationBlocks[i].Clear();
 }
@@ -2140,18 +2140,14 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		if(theProducerSystem)
 		{
 			// lopuksi tuottaja listaa t‰ydennet‰‰n ProducerSystemin tuottajilla
-			int modelCount = theProducerSystem->Producers().size();
+			int modelCount = static_cast<int>(theProducerSystem->Producers().size());
 			int i=0;
 			for(i=0; i<modelCount; i++)
 			{
 				NFmiProducerInfo &prodInfo = theProducerSystem->Producer(i+1);
-				std::vector<int> prodIds = prodInfo.ProducerIds();
-				FmiProducerName prodId1 = static_cast<FmiProducerName>(0);
-				if(prodIds.size() > 0)
-					prodId1 = static_cast<FmiProducerName>(prodIds[0]);
 				std::string prodName(prodInfo.ShortName());
 				NFmiStringTools::LowerCase(prodName); // pit‰‰ muuttaa lower case:en!!!
-				itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(prodName, prodId1));
+				itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(prodName, static_cast<FmiProducerName>(prodInfo.ProducerId())));
 			}
 		}
 		else
