@@ -189,7 +189,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 		return GetSynopPlotParamInfo(fSubParameter, theType);
 	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pitää tehdä kikka
 		return GetSoundingPlotParamInfo(fSubParameter, theType);
-	if(theType == NFmiInfoData::kMacroParam) // macro- parametrit lasketaan tällä
+	if(theType == NFmiInfoData::kMacroParam || theType == NFmiInfoData::kQ3MacroParam) // macro- parametrit lasketaan tällä
 		return itsMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType >= NFmiInfoData::kSoundingParameterData) // sounding parametrit lasketaan tällä
 		return itsSoundingParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
@@ -246,7 +246,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 		return GetSynopPlotParamInfo(fSubParameter, theType);
 	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pitää tehdä kikka
 		return GetSoundingPlotParamInfo(fSubParameter, theType);
-	if(theType == NFmiInfoData::kMacroParam) // macro- parametrit lasketaan tällä
+	if(theType == NFmiInfoData::kMacroParam || theType == NFmiInfoData::kQ3MacroParam) // macro- parametrit lasketaan tällä
 		return itsMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType >= NFmiInfoData::kSoundingParameterData) // sounding parametrit lasketaan tällä
 		return itsSoundingParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
@@ -389,7 +389,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& the
 		info = fUseParIdOnly ? Info(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), aSubParam, theLevel, theType) : Info(theDataIdent, aSubParam, theLevel, theType, true);
 	if(info)
 	{
-		if(theType == NFmiInfoData::kCrossSectionMacroParam || theType == NFmiInfoData::kMacroParam || theType >= NFmiInfoData::kSoundingParameterData || (fUseParIdOnly ?  info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) : info->Param(theDataIdent)))  // makroparamille ei tarvitse laittaa parametria kohdalleen!
+		if(theType == NFmiInfoData::kCrossSectionMacroParam || theType == NFmiInfoData::kMacroParam || theType == NFmiInfoData::kQ3MacroParam || theType >= NFmiInfoData::kSoundingParameterData || (fUseParIdOnly ?  info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) : info->Param(theDataIdent)))  // makroparamille ei tarvitse laittaa parametria kohdalleen!
 		{
 			NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
 			return copyOfInfo;
