@@ -54,6 +54,11 @@ public:
 	const std::string& CustomMenuFolder(void) const {return itsCustomMenuFolder;}
 	void CustomMenuFolder(const std::string &newValue) {itsCustomMenuFolder = newValue;}
 
+	int ReportNewDataTimeStepInMinutes(void) const {return itsReportNewDataTimeStepInMinutes;}
+	void ReportNewDataTimeStepInMinutes(int newValue) {itsReportNewDataTimeStepInMinutes = newValue;}
+	const std::string& ReportNewDataLabel(void) const {return itsReportNewDataLabel;}
+	void ReportNewDataLabel(const std::string &newValue) {itsReportNewDataLabel = newValue;}
+
 private:
 
 	std::string itsFileNameFilter; // tiedostonimi filtteri polun kera esim. d:\weto\wrk\data\in\data_1_*.sqd
@@ -73,6 +78,9 @@ private:
 	std::string itsNotificationLabel; // Jos notifikaatioon halutaan tietty sanoma, se voidaan antaa t‰h‰n. Defaulttina annetaan tiedoston nimi
 	std::string itsCustomMenuFolder; // Jos data halutaan laittaa haluttuun hakemistoon param-popupeissa, tehd‰‰ sellainen asetus helpdata 
 								// konffeihin. Defaulttina tyhj‰, jolloin data menee 'normaaliin' paikkaansa valikoissa.
+	int itsReportNewDataTimeStepInMinutes; // Default arvo on 0, jolloin t‰ll‰ ei ole vaikutusta. T‰m‰n avulla voidaan sanoa
+											// ett‰ SmartMetin pit‰‰ tehd‰ raportointia 'puhekuplilla', kun tulee uutta dataa esim. uudelle tunnille.
+	std::string itsReportNewDataLabel; // Jos halutaan tietty teksti viestiin, se lis‰t‰‰n t‰h‰n.
 	std::string itsBaseNameSpace;
 };
 

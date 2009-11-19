@@ -34,6 +34,9 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 ,fNotifyOnLoad(false)
 ,itsNotificationLabel()
 ,itsCustomMenuFolder()
+,itsReportNewDataTimeStepInMinutes(0)
+,itsReportNewDataLabel()
+
 ,itsBaseNameSpace()
 {}
 
@@ -49,6 +52,9 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
 ,fNotifyOnLoad(theOther.fNotifyOnLoad)
 ,itsNotificationLabel(theOther.itsNotificationLabel)
 ,itsCustomMenuFolder(theOther.itsCustomMenuFolder)
+,itsReportNewDataTimeStepInMinutes(theOther.itsReportNewDataTimeStepInMinutes)
+,itsReportNewDataLabel(theOther.itsReportNewDataLabel)
+
 ,itsBaseNameSpace(theOther.itsBaseNameSpace)
 {}
 
@@ -68,6 +74,9 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 		fNotifyOnLoad = theOther.fNotifyOnLoad;
 		itsNotificationLabel = theOther.itsNotificationLabel;
 		itsCustomMenuFolder = theOther.itsCustomMenuFolder;
+		itsReportNewDataTimeStepInMinutes = theOther.itsReportNewDataTimeStepInMinutes;
+		itsReportNewDataLabel = theOther.itsReportNewDataLabel;
+
 		itsBaseNameSpace = theOther.itsBaseNameSpace;
 	}
 	return *this;
@@ -88,6 +97,8 @@ void NFmiHelpDataInfo::Clear(void)
 	itsNotificationLabel = "";
 	itsCustomMenuFolder = "";
 	itsBaseNameSpace = "";
+	itsReportNewDataTimeStepInMinutes = 0;
+	itsReportNewDataLabel = "";
 }
 
 static std::string MakeFileNameFilter(const std::string &theFileFilterBase, const std::string &theRootDir)
@@ -129,6 +140,8 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theInitNameSpace, con
 		fNotifyOnLoad = NFmiSettings::Optional<bool>(itsBaseNameSpace + "::NotifyOnLoad", false);
 		itsNotificationLabel = NFmiSettings::Optional<string>(itsBaseNameSpace + "::NotificationLabel", "");
 		itsCustomMenuFolder = NFmiSettings::Optional<string>(itsBaseNameSpace + "::CustomMenuFolder", "");
+		itsReportNewDataTimeStepInMinutes = NFmiSettings::Optional<int>(itsBaseNameSpace + "::ReportNewDataTimeStepInMinutes", 0);
+		itsReportNewDataLabel = NFmiSettings::Optional<string>(itsBaseNameSpace + "::ReportNewDataLabel", "");
 
 		std::string imageProjectionKey(itsBaseNameSpace + "::ImageProjection");
 		if (NFmiSettings::IsSet(imageProjectionKey))
