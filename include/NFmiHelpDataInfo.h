@@ -58,6 +58,10 @@ public:
 	void ReportNewDataTimeStepInMinutes(int newValue) {itsReportNewDataTimeStepInMinutes = newValue;}
 	const std::string& ReportNewDataLabel(void) const {return itsReportNewDataLabel;}
 	void ReportNewDataLabel(const std::string &newValue) {itsReportNewDataLabel = newValue;}
+	const std::string& CombineDataPathAndFileName(void) const {return itsCombineDataPathAndFileName;}
+	void CombineDataPathAndFileName(const std::string &newValue) {itsCombineDataPathAndFileName = newValue;}
+	int CombineDataMaxTimeSteps(void) const {return itsCombineDataMaxTimeSteps;}
+	void CombineDataMaxTimeSteps(int newValue) {itsCombineDataMaxTimeSteps = newValue;}
 
 private:
 
@@ -81,6 +85,9 @@ private:
 	int itsReportNewDataTimeStepInMinutes; // Default arvo on 0, jolloin t‰ll‰ ei ole vaikutusta. T‰m‰n avulla voidaan sanoa
 											// ett‰ SmartMetin pit‰‰ tehd‰ raportointia 'puhekuplilla', kun tulee uutta dataa esim. uudelle tunnille.
 	std::string itsReportNewDataLabel; // Jos halutaan tietty teksti viestiin, se lis‰t‰‰n t‰h‰n.
+	std::string itsCombineDataPathAndFileName; // jos t‰m‰ on m‰‰ritelty, tehd‰‰n fileNameFilterist‰ (hakemistosta) lˆytyvist‰ datoista yhdistelm‰ 
+											   // data ja se talletetaan t‰h‰n hakemistoon annetulla nimell‰ ja aikaleimalla (nimess‰ t‰hden tilalle laitetaan aikaleima)
+	int itsCombineDataMaxTimeSteps; // jos ei haluaa rajoittaa kuinka iso yhdistelm‰ datasta tehd‰‰n, t‰m‰n voi m‰‰ritell‰
 	std::string itsBaseNameSpace;
 };
 
@@ -113,6 +120,7 @@ public:
 	NFmiHelpDataInfo* FindHelpDataInfo(const std::string &theFileNameFilter);
 	std::vector<std::string> GetUniqueCustomMenuList(void);
 	std::vector<NFmiHelpDataInfo> GetCustomMenuHelpDataList(const std::string &theCustomFolder);
+	const checkedVector<NFmiHelpDataInfo>& DynamicHelpDataInfos(void) const {return itsDynamicHelpDataInfos;}
 private:
 	void InitDataType(const std::string &theBaseKey, const std::string &theRootDir, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos);
 	bool IsSameTypeProjections(const NFmiArea *theFirst, const NFmiArea *theSecond);

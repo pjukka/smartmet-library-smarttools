@@ -36,6 +36,8 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 ,itsCustomMenuFolder()
 ,itsReportNewDataTimeStepInMinutes(0)
 ,itsReportNewDataLabel()
+,itsCombineDataPathAndFileName()
+,itsCombineDataMaxTimeSteps(0)
 
 ,itsBaseNameSpace()
 {}
@@ -54,6 +56,8 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
 ,itsCustomMenuFolder(theOther.itsCustomMenuFolder)
 ,itsReportNewDataTimeStepInMinutes(theOther.itsReportNewDataTimeStepInMinutes)
 ,itsReportNewDataLabel(theOther.itsReportNewDataLabel)
+,itsCombineDataPathAndFileName(theOther.itsCombineDataPathAndFileName)
+,itsCombineDataMaxTimeSteps(theOther.itsCombineDataMaxTimeSteps)
 
 ,itsBaseNameSpace(theOther.itsBaseNameSpace)
 {}
@@ -76,6 +80,8 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 		itsCustomMenuFolder = theOther.itsCustomMenuFolder;
 		itsReportNewDataTimeStepInMinutes = theOther.itsReportNewDataTimeStepInMinutes;
 		itsReportNewDataLabel = theOther.itsReportNewDataLabel;
+		itsCombineDataPathAndFileName = theOther.itsCombineDataPathAndFileName;
+		itsCombineDataMaxTimeSteps = theOther.itsCombineDataMaxTimeSteps;
 
 		itsBaseNameSpace = theOther.itsBaseNameSpace;
 	}
@@ -99,6 +105,8 @@ void NFmiHelpDataInfo::Clear(void)
 	itsBaseNameSpace = "";
 	itsReportNewDataTimeStepInMinutes = 0;
 	itsReportNewDataLabel = "";
+	itsCombineDataPathAndFileName = "";
+	itsCombineDataMaxTimeSteps = 0;
 }
 
 static std::string MakeFileNameFilter(const std::string &theFileFilterBase, const std::string &theRootDir)
@@ -142,6 +150,8 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theInitNameSpace, con
 		itsCustomMenuFolder = NFmiSettings::Optional<string>(itsBaseNameSpace + "::CustomMenuFolder", "");
 		itsReportNewDataTimeStepInMinutes = NFmiSettings::Optional<int>(itsBaseNameSpace + "::ReportNewDataTimeStepInMinutes", 0);
 		itsReportNewDataLabel = NFmiSettings::Optional<string>(itsBaseNameSpace + "::ReportNewDataLabel", "");
+		itsCombineDataPathAndFileName = NFmiSettings::Optional<string>(itsBaseNameSpace + "::CombineDataPathAndFileName", "");
+		itsCombineDataMaxTimeSteps = NFmiSettings::Optional<int>(itsBaseNameSpace + "::CombineDataMaxTimeSteps", 0);
 
 		std::string imageProjectionKey(itsBaseNameSpace + "::ImageProjection");
 		if (NFmiSettings::IsSet(imageProjectionKey))
