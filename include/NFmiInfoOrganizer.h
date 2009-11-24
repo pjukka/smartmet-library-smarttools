@@ -122,7 +122,7 @@ class NFmiInfoOrganizer
 
 	bool Clear (void);
 	void ClearData(NFmiInfoData::Type theDataType);
-	void ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData::Type theDataType, const std::string &theFileNamePattern);
+	void ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData::Type theDataType, const std::string &theFileNamePattern, NFmiTimeDescriptor &theRemovedDatasTimesOut);
 	NFmiLevelBag* GetAndCreateViewableInfoWithManyLevelsOrZeroPointer(void);
 	void ClearDynamicHelpData();
 

@@ -567,7 +567,9 @@ void NFmiInfoOrganizer::ClearDynamicHelpData()
 }
 
 
-void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData::Type theDataType, const std::string &theFileNamePattern)
+// theRemovedDatasTimesOut -parametri käytetään optimoidaan esim. havaittua hila datan kanssa tehtäviä ruudun päivityksiä,
+// editoitavasta datasta ei oteta mitään aikoja talteen.
+void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData::Type theDataType, const std::string &theFileNamePattern, NFmiTimeDescriptor &theRemovedDatasTimesOut)
 {
 	if(theInfo)
 	{
@@ -586,6 +588,7 @@ void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData
 		{
 			if(IsInfosTwoOfTheKind(theInfo, theDataType, theFileNamePattern, Current()))
 			{
+				theRemovedDatasTimesOut = Current()->TimeDescriptor();
 				Current()->DestroySharedData();
 				Remove();
 				break; // tuhotaan vain yksi!
