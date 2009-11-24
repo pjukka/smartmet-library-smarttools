@@ -337,7 +337,9 @@ static NFmiHelpDataInfo* FindHelpDataInfo(checkedVector<NFmiHelpDataInfo> &theHe
 	size_t ssize = theHelpInfos.size();
 	for(size_t i = 0; i<ssize; i++)
 	{
-		if(theHelpInfos[i].FileNameFilter() == theFileNameFilter)
+		// Siis jos joko FileNameFilter tai CombineDataPathAndFileName (yhdistelmä datoissa tämä 
+		// on se data joka luetaan sisään SmartMetiin) on etsitty, palautetaan helpInfo.
+		if(theHelpInfos[i].FileNameFilter() == theFileNameFilter || theHelpInfos[i].CombineDataPathAndFileName() == theFileNameFilter)
 			return &theHelpInfos[i];
 	}
 	return 0;
