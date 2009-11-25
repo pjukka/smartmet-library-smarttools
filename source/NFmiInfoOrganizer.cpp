@@ -609,9 +609,9 @@ int NFmiInfoOrganizer::CountData(void)
 	return count;
 }
 
-int NFmiInfoOrganizer::CountDataSize(void)
+double NFmiInfoOrganizer::CountDataSize(void)
 {
-	int dataSize = 0;
+	double dataSize = 0;
 	if(itsEditedData)
 		dataSize += itsEditedData->Size() * sizeof(float);
 	if(itsEditedDataCopy)

@@ -149,7 +149,7 @@ class NFmiInfoOrganizer
 	const NFmiPoint& GetMacroParamDataMaxGridSize(void) const {return itsMacroParamMaxGridSize;}
 	const NFmiPoint& GetMacroParamDataMinGridSize(void) const {return itsMacroParamMinGridSize;}
 	int CountData(void);
-	int CountDataSize(void);
+	double CountDataSize(void);
 	void UpdateCrossSectionMacroParamDataSize(int x, int y);
  private:
  	bool Remove(void);
