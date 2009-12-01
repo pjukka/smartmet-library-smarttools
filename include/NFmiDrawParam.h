@@ -66,6 +66,13 @@ public:
 	bool UseArchiveModelData(void) const;
 	const NFmiMetTime& ModelOriginTimeCalculated(void) const {return itsModelOriginTimeCalculated;}
 	void ModelOriginTimeCalculated(const NFmiMetTime &newValue) {itsModelOriginTimeCalculated = newValue;}
+	int TimeSerialModelRunCount(void) const {return itsTimeSerialModelRunCount;}
+	void TimeSerialModelRunCount(int newValue) 
+	{
+		itsTimeSerialModelRunCount = newValue;
+		if(itsTimeSerialModelRunCount < 0)
+			itsTimeSerialModelRunCount = 0;
+	}
 
 	NFmiInfoData::Type DataType(void);
 	// huom! tämä asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppiä!!!!!!
@@ -691,6 +698,8 @@ private:
 						// mallipintadatasta vasta 00, silloin viimeisin ajo on 06 ja -1 viittaa tällöin 00-ajoon.
 						// Jos tämä on 0 tai positiivinen, tämä ei ole käytössä.
 	NFmiMetTime itsModelOriginTimeCalculated; // tähän lasketaan relatiivisen malliajon mukainen origin aika, jotä käytetään sitten mm. tooltipeissä ja muualla
+	int itsTimeSerialModelRunCount; // tähän määrätään kuinka monta viimeista ajoa näytetään mallille 
+									// kerrallaa aikasarjassa. Jos arvo on 0 (default), ei näytetä kuin viimeinen ajo normaalisti.
 
 //	NFmiMetEditorCoordinatorMapOptions* itsMetEditorCoordinatorMapOptions; // tätä käytetään koordinaatio tarkasteluissa
 };
