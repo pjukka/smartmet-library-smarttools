@@ -459,4 +459,20 @@ void NFmiDrawParamList::CopyList(NFmiDrawParamList &theList, bool clearFirst)
 	{
 		Add(new NFmiDrawParam(*theList.Current()));
 	}
+	ActivateOnlyOne();
+}
+
+// Tämä metodi varmistaa, että listassa on vain yksi aktivoitu DrawParami.
+// Jos listassa on useita aktiivisia, ensimmäinen niistä jää aktiiviseksi.
+// Jos listassa ei ole yhtään aktiivista, ensimmäinen aktivoidaan.
+void NFmiDrawParamList::ActivateOnlyOne(void)
+{
+	if(NumberOfItems() == 0)
+		return;
+	int activeIndex = FindActive();
+	DeactivateAll();
+	if(activeIndex == 0)
+		activeIndex++;
+	if(Index(activeIndex)) // pitäisi löytyä!!
+		Current()->Activate(true);
 }

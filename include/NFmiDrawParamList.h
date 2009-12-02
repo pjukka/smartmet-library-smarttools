@@ -91,6 +91,7 @@ public:
 	int FindActive(void);
 	bool HasBorrowedParams(void) const {return fHasBorrowedParams;}
 	void HasBorrowedParams(bool newValue) {fHasBorrowedParams = newValue;}
+	void ActivateOnlyOne(void);
 
 private:
 	NFmiSortedPtrList < NFmiDrawParam > itsList;
