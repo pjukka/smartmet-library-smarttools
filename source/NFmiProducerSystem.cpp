@@ -26,6 +26,7 @@ NFmiProducerInfo NFmiProducerSystem::GetProducerInfoFromSettings(const std::stri
 	prod.Description(NFmiSettings::Require<std::string>(theUsedNameSpaceBase + "::Description"));
 	prod.ProducerId(NFmiSettings::Require<unsigned long>(theUsedNameSpaceBase + "::ProducerIds"));
 	prod.HasRealVerticalData(NFmiSettings::Require<bool>(theUsedNameSpaceBase + "::HasRealVerticalData"));
+	prod.HasQ2ArchiveData(NFmiSettings::Optional<bool>(theUsedNameSpaceBase + "::HasQ2ArchiveData", false));
 
 	return prod;
 }
