@@ -686,14 +686,14 @@ double CalcLFCIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, do
 	// until T-parcel is warmer than T at that pressure level in sounding
 	checkedVector<float> &pValues = theData.GetParamData(kFmiPressure);
 	checkedVector<float> &tValues = theData.GetParamData(kFmiTemperature);
-	int ssize = pValues.size();
+	size_t ssize = pValues.size();
 	double TofLiftedParcer_previous = kFloatMissing;
 	double P_previous = kFloatMissing;
 
 	double foundPValue = kFloatMissing;
 	double durrentDiff = 0; // ilmapaketin ja ympäristön T ero
 	double lastDiff = 0; // ilmapaketin ja ympäristön T ero viime kierroksella
-	for(int i = 0; i < ssize; i++)
+	for(size_t i = 0; i < ssize; i++)
 	{
 		if(pValues[i] != kFloatMissing && pValues[i] <= P) // aloitetaan LFC etsintä vasta 'aloitus' korkeuden jälkeen
 		{
@@ -743,7 +743,7 @@ double CalcCAPE500Index(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType
 
 	checkedVector<float> &pValues = theData.GetParamData(kFmiPressure);
 	checkedVector<float> &tValues = theData.GetParamData(kFmiTemperature);
-	int ssize = pValues.size();
+	size_t ssize = pValues.size();
 	double CAPE = 0;
 	double g = 9.81; // acceleration by gravity
 	double Tparcel = 0;
@@ -752,7 +752,7 @@ double CalcCAPE500Index(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType
 	double lastZ = kFloatMissing;
 	double deltaZ = kFloatMissing;
     double TK=273.15;
-	for(int i = 0; i < ssize; i++)
+	for(size_t i = 0; i < ssize; i++)
 	{
 		if(pValues[i] != kFloatMissing && pValues[i] < P) // aloitetaan LFC etsintä vasta 'aloitus' korkeuden jälkeen
 		{
@@ -793,7 +793,7 @@ double CalcCAPE_TT_Index(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcTyp
 
 	checkedVector<float> &pValues = theData.GetParamData(kFmiPressure);
 	checkedVector<float> &tValues = theData.GetParamData(kFmiTemperature);
-	int ssize = pValues.size();
+	size_t ssize = pValues.size();
 	double CAPE = 0;
 	double g = 9.81; // acceleration by gravity
 	double Tparcel = 0;
@@ -802,7 +802,7 @@ double CalcCAPE_TT_Index(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcTyp
 	double lastZ = kFloatMissing;
 	double deltaZ = kFloatMissing;
     double TK=273.15;
-	for(int i = 0; i < ssize; i++)
+	for(size_t i = 0; i < ssize; i++)
 	{
 		if(pValues[i] != kFloatMissing && pValues[i] < P) // aloitetaan LFC etsintä vasta 'aloitus' korkeuden jälkeen
 		{
@@ -842,7 +842,7 @@ double CalcCINIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType)
 
 	checkedVector<float> &pValues = theData.GetParamData(kFmiPressure);
 	checkedVector<float> &tValues = theData.GetParamData(kFmiTemperature);
-	int ssize = pValues.size();
+	size_t ssize = pValues.size();
 	double CIN = 0;
 	double g = 9.81; // acceleration by gravity
 	double Tparcel = 0;
@@ -853,7 +853,7 @@ double CalcCINIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType)
     double TK=273.15; // celsius/kelvin change
 	bool firstCinLayerFound = false;
 	bool capeLayerFoundAfterCin = false;
-	for(int i = 0; i < ssize; i++)
+	for(size_t i = 0; i < ssize; i++)
 	{
 		if(pValues[i] != kFloatMissing && pValues[i] < P) // aloitetaan LFC etsintä vasta 'aloitus' korkeuden jälkeen
 		{
@@ -896,6 +896,8 @@ double CalcWindBulkShearComponent(NFmiSoundingData &theData, double startH, doub
 	float startValue = theData.GetValueAtHeight(theParId, static_cast<float>(startH*1000));
 	float endValue = theData.GetValueAtHeight(theParId, static_cast<float>(endH*1000));
 	float shearComponent = endValue - startValue;
+	if(endValue == kFloatMissing || startValue == kFloatMissing)
+		shearComponent = kFloatMissing;
 	return shearComponent;
 }
 
@@ -913,8 +915,14 @@ double CalcThetaEDiffIndex(NFmiSoundingData &theData, double startH, double endH
 	float endTd = theData.GetValueAtHeight(kFmiDewPoint, static_cast<float>(endH*1000));
 	float startP = theData.GetValueAtHeight(kFmiPressure, static_cast<float>(startH*1000));
 	float endP = theData.GetValueAtHeight(kFmiPressure, static_cast<float>(endH*1000));
+	if(startT == kFloatMissing || startTd == kFloatMissing || startP == kFloatMissing)
+		return kFloatMissing;
 	double startThetaE = CalcThetaE(startT, startTd, startP);
+	if(endT == kFloatMissing || endTd == kFloatMissing || endP == kFloatMissing)
+		return kFloatMissing;
 	double endThetaE = CalcThetaE(endT, endTd, endP);
+	if(startThetaE == kFloatMissing || endThetaE == kFloatMissing)
+		return kFloatMissing;
 	double diffValue = startThetaE - endThetaE;
 	return diffValue;
 }
@@ -927,6 +935,8 @@ double CalcBulkShearIndex(NFmiSoundingData &theData, double startH, double endH)
 	double uTot = CalcWindBulkShearComponent(theData, startH, endH, kFmiWindUMS);
 	double vTot = CalcWindBulkShearComponent(theData, startH, endH, kFmiWindVMS);
 	double BS = ::sqrt(uTot*uTot + vTot*vTot);
+	if(uTot == kFloatMissing || vTot == kFloatMissing)
+		BS = kFloatMissing;
 	return BS;
 }
 
@@ -1117,7 +1127,7 @@ double CalcSRHIndex(NFmiSoundingData &theData, double startH, double endH)
 		startH += theData.ZeroHeight()/1000.; // zero height pitää muuttaa tässä metreistä kilometreiksi!
 		endH += theData.ZeroHeight()/1000.; // zero height pitää muuttaa tässä metreistä kilometreiksi!
 
-		int ssize = pV.size();
+		size_t ssize = pV.size();
 		checkedVector<float>&uV = theData.GetParamData(kFmiWindUMS);
 		checkedVector<float>&vV = theData.GetParamData(kFmiWindVMS);
 		checkedVector<float>&tV = theData.GetParamData(kFmiTemperature);
@@ -1130,7 +1140,7 @@ double CalcSRHIndex(NFmiSoundingData &theData, double startH, double endH)
 		double lastU = kFloatMissing;
 		double lastV = kFloatMissing;
 		bool foundAnyData = false;
-		for(int i = 0; i<ssize; i++)
+		for(size_t i = 0; i<ssize; i++)
 		{
 			double p = pV[i];
 			double u = uV[i];
