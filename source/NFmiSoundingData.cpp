@@ -846,8 +846,9 @@ void NFmiSoundingData::CalculateHumidityData(void)
 // tätä kutsutaan FillParamData-metodeista
 // sillä katsotaan mistä korkeudesta luotaus oikeasti alkaa
 // Tehdään aloitus korkeus seuraavasti:
-// Se pinta, miltä kaikki arvot löytyvät 1. kertaa ei puuttuvana
-// tai jos sellaista ei löydy asetetaan arvoksi 0.
+// Se pinta, miltä kaikki löytyvät 1. kerran sekä paine, että korkeus arvot
+// ja lisäksi joko lämpötila tai tuulennopeus.
+// Tai jos sellaista ei löydy asetetaan arvoksi 0.
 void NFmiSoundingData::InitZeroHeight(void)
 {
 	itsZeroHeight = 0;
@@ -858,10 +859,9 @@ void NFmiSoundingData::InitZeroHeight(void)
 		for(int i=0; i<static_cast<int>(itsPressureData.size()); i++)
 		{
 			if(itsPressureData[i] != kFloatMissing &&
-//				itsTemperatureData[i] != kFloatMissing && // lämpötilaa ei ehkä tarvitse olla etsittäessä ensimmäistä validia kerrosta
-//				itsDewPointData[i] != kFloatMissing && // kastepistettä ei ehkä tarvitse olla etsittäessä ensimmäistä validia kerrosta
-				itsGeomHeightData[i] != kFloatMissing
-//				&& itsWindSpeedData[i] != kFloatMissing // tuulta ei tarvitse olla etsittäessä ensimmäistä validia kerrosta
+				itsGeomHeightData[i] != kFloatMissing &&
+				(itsTemperatureData[i] != kFloatMissing || // lämpötilaa ei ehkä tarvitse olla etsittäessä ensimmäistä validia kerrosta
+				 itsWindSpeedData[i] != kFloatMissing) // tuulta ei tarvitse olla etsittäessä ensimmäistä validia kerrosta
 				)
 			{
 				itsZeroHeight = itsGeomHeightData[i];
