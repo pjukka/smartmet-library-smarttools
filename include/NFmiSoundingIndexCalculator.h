@@ -11,6 +11,7 @@
 #define NFMISOUNDINGINDEXCALCULATOR_H
 
 #include "NFmiDataMatrix.h"
+#include "NFmiQueryDataUtil.h"
 
 class NFmiSmartInfo;
 class NFmiFastQueryInfo;
@@ -95,9 +96,10 @@ public:
 
 	static bool IsSurfaceBasedSoundingIndex(FmiSoundingParameters theSoundingParameter);
 	static bool FillSoundingData(NFmiFastQueryInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiMetTime &theTime, const NFmiLocation &theLocation, NFmiFastQueryInfo* theGroundDataInfo);
-	static void Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrganizer *theInfoOrganizer, NFmiDrawParam *theDrawParam, NFmiDataMatrix<float> &theValues, const NFmiMetTime &theTime, const NFmiDataMatrix<float> &theObsDataT, const NFmiDataMatrix<float> &theObsDataTd, bool fObsDataFound);
+//	static void Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrganizer *theInfoOrganizer, NFmiDrawParam *theDrawParam, NFmiDataMatrix<float> &theValues, const NFmiMetTime &theTime, const NFmiDataMatrix<float> &theObsDataT, const NFmiDataMatrix<float> &theObsDataTd, bool fObsDataFound);
 	static float Calc(NFmiSoundingData &theSoundingData, FmiSoundingParameters theParam);
 	static float Calc(NFmiFastQueryInfo *theInfo, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, FmiSoundingParameters theParam);
+	static void CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor = 0);
 };
 
 #endif // NFMISOUNDINGINDEXCALCULATOR_H

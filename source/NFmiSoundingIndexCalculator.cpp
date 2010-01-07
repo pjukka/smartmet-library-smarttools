@@ -71,6 +71,7 @@ static bool FillSurfaceValuesFromInfo(NFmiSmartInfo *theInfo, NFmiSoundingData &
 // theDrawParam parametri antaa tiedot halutusta mallista, datatyypistä esim. EC mallipinta.
 // theTime kertoo mihin ajan hetkeen parametri lasketaan.
 // Oletus: theValues on jo tehty oikean kokoiseksi (theBaseInfo:n mukaan) ja täytetty puuttuvilla arvoilla.
+/*
 void NFmiSoundingIndexCalculator::Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrganizer *theInfoOrganizer, NFmiDrawParam *theDrawParam, NFmiDataMatrix<float> &theValues, const NFmiMetTime &theTime, const NFmiDataMatrix<float> &theObsDataT, const NFmiDataMatrix<float> &theObsDataTd, bool fObsDataFound)
 {
 	NFmiDrawParam tempDrawParam(*theDrawParam); // tehdään väliaikais kopio drawParamista että voidaan muuttaa data tyyppi (soundingParamista pois) oikean lähde datan hakua varten
@@ -96,15 +97,6 @@ void NFmiSoundingIndexCalculator::Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrgan
 	if(surfaceBasedCalculation == true && (useAnalyzeData == false && fObsDataFound == false))
 		return ; // ei mitään tehtävissä kun lasketaan surfacebasedlaskuja, joten 'palautetaan' puuttuva matriisi
 
-//#define XXX_DEBUG 1
-
-	// ********  debug koodia  *********************
-#ifdef XXX_DEBUG
-	std::ofstream out("d:\\data2\\surbas_values.txt");
-	out << "Time: " << static_cast<char*>(theTime.ToStr("YYYY.MM.DD HH:mm", kFinnish)) << std::endl;
-#endif
-	// ********  debug koodia  *********************
-
 	if(info && theBaseInfo && theBaseInfo->IsGrid())
 	{
 		unsigned long xnum = theBaseInfo->Grid()->XNumber();
@@ -115,13 +107,8 @@ void NFmiSoundingIndexCalculator::Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrgan
 			bool surfaceBaseStatus = false;
 			FillSoundingData(info, soundingData, theTime, *(theBaseInfo->Location()), 0); // täytetään luotaus datat yksi kerrallaan
 
-			// ********  debug koodia  *********************
 			float T = kFloatMissing; // debug koodia
 			float Td = kFloatMissing; // debug koodia
-#ifdef XXX_DEBUG
-			float valueTest = Calc(soundingData, static_cast<FmiSoundingParameters>(theDrawParam->Param().GetParamIdent())); // debug koodia
-#endif
-			// ********  debug koodia  *********************
 
 			if(useAnalyzeData)
 				surfaceBaseStatus = FillSurfaceValuesFromInfo(analyzeData, soundingData, theBaseInfo->LatLon(), T, Td); // täytä pinta arvot analyysistä
@@ -133,17 +120,74 @@ void NFmiSoundingIndexCalculator::Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrgan
 			// HUOM!!!! muista muuttaa luotaus-parametri pelkäksi surface arvoksi, koska loppu menee itsestään sitten
 			float value = Calc(soundingData, static_cast<FmiSoundingParameters>(theDrawParam->Param().GetParamIdent()));
 			theValues[counter % xnum][counter / xnum] = value;
+		}
+	}
+}
+*/
 
-			// ********  debug koodia  *********************
-#ifdef XXX_DEBUG
-			out << static_cast<char*>(NFmiValueString::GetStringWithMaxDecimalsSmartWay(theBaseInfo->LatLon().X(), 2)) << " " << static_cast<char*>(NFmiValueString::GetStringWithMaxDecimalsSmartWay(theBaseInfo->LatLon().Y(), 2));
-			out << " " << "realInd: " << static_cast<char*>(NFmiValueString::GetStringWithMaxDecimalsSmartWay(valueTest, 1));
-			out << " T: " << static_cast<char*>(NFmiValueString::GetStringWithMaxDecimalsSmartWay(T, 1));
-			out << " Td: " << static_cast<char*>(NFmiValueString::GetStringWithMaxDecimalsSmartWay(Td, 1));
-			out << " surbas: " << static_cast<char*>(NFmiValueString::GetStringWithMaxDecimalsSmartWay(value, 1));
-			out << std::endl;
-#endif
-			// ********  debug koodia  *********************
+static void CheckIfStopped(NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
+{
+	if(theStopFunctor && theStopFunctor->Stop())
+		throw NFmiQueryDataUtil::StopThreadException();
+}
+
+static void CalcOneSoundingIndexField(NFmiFastQueryInfo &theSourceInfo, NFmiFastQueryInfo &theResultInfo, NFmiDataMatrix<float> &theResultField, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
+{
+	bool fObsDataFound = false; // toistaiseksi ei käytössä
+	bool useAnalyzeData = false; // toistaiseksi ei käytössä
+	NFmiSmartInfo *analyzeData = 0;
+
+	FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theResultInfo.Param().GetParamIdent());
+	bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
+
+	unsigned long xnum = theResultInfo.GridXNumber();
+	unsigned long ynum = theResultInfo.GridYNumber();
+	unsigned long counter = 0;
+	theResultField.Resize(xnum, ynum, kFloatMissing);
+	theResultField = kFloatMissing; // alustetaan matriisi puuttuvilla arvoilla
+	NFmiSoundingData soundingData;
+	for(theResultInfo.ResetLocation(); theResultInfo.NextLocation(); counter++)
+	{
+		if(counter%20 == 0)
+			::CheckIfStopped(theStopFunctor); // joka 20 hilapisteellä katsotaan, pitääkö lopettaa
+
+		bool surfaceBaseStatus = false;
+		::FillSoundingData(&theSourceInfo, soundingData, theResultInfo.Time(), theSourceInfo.LatLon());
+
+		float T = kFloatMissing; // debug koodia
+		float Td = kFloatMissing; // debug koodia
+
+		if(useAnalyzeData)
+			surfaceBaseStatus = ::FillSurfaceValuesFromInfo(analyzeData, soundingData, theSourceInfo.LatLon(), T, Td); // täytä pinta arvot analyysistä
+		else if(fObsDataFound)
+			; // täytä pinta arvot obs-datasta
+		if(surfaceBasedCalculation && surfaceBaseStatus == false)
+			continue; // jos esim. analyysi/havainto pinta data ei löytynyt tästä kohtaa, jää puuttuva arvo voimaan
+
+		// HUOM!!!! muista muuttaa luotaus-parametri pelkäksi surface arvoksi, koska loppu menee itsestään sitten
+		float value = NFmiSoundingIndexCalculator::Calc(soundingData, soundingParameter);
+		theResultField[counter % xnum][counter / xnum] = value;
+	}
+}
+
+void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
+{
+	NFmiFastQueryInfo sourceInfo(&theSourceData);
+	NFmiFastQueryInfo resultInfo(&theResultData); // tämä laittaa levelin 1. suoraan, joten leveleitä ei tarvitse juoksuttaa (vain 1 leveli)
+	if(sourceInfo.IsGrid() == false || resultInfo.IsGrid() == false)
+		throw std::runtime_error("Error in NFmiSoundingIndexCalculator::CalculateWholeSoundingData, source or result data was non grid-data.");
+	NFmiDataMatrix<float> fieldValues;
+
+	for(resultInfo.ResetTime(); resultInfo.NextTime(); )
+	{
+		if(sourceInfo.Time(resultInfo.Time()))
+		{
+			for(resultInfo.ResetParam(); resultInfo.NextParam(); )
+			{
+				::CheckIfStopped(theStopFunctor);
+				::CalcOneSoundingIndexField(sourceInfo, resultInfo, fieldValues, theStopFunctor);
+				resultInfo.SetValues(fieldValues);
+			}
 		}
 	}
 }
