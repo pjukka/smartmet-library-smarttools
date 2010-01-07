@@ -28,11 +28,14 @@ public:
 	~NFmiHelpDataInfo(void)
 	{Clear();}
 
-	void InitFromSettings(const std::string &theInitNameSpace, const std::string &theRootDir);
+	void InitFromSettings(const std::string &theBaseKey, const std::string &theName, const std::string &theRootDir);
 	// void StoreToSettings(void);  // HUOM! ei toteuteta ainakaan vielä talletusta
 
 	NFmiHelpDataInfo& operator=(const NFmiHelpDataInfo &theOther);
 	void Clear(void);
+
+	const std::string& Name(void) const {return itsName;}
+	void Name(const std::string &newValue) {itsName = newValue;}
 	const std::string& FileNameFilter(void) const {return itsFileNameFilter;}
 	void FileNameFilter(const std::string &newValue) {itsFileNameFilter = newValue;}
 	const std::string& LatestFileName(void) const {return itsLatestFileName;}
@@ -62,9 +65,12 @@ public:
 	void CombineDataPathAndFileName(const std::string &newValue) {itsCombineDataPathAndFileName = newValue;}
 	int CombineDataMaxTimeSteps(void) const {return itsCombineDataMaxTimeSteps;}
 	void CombineDataMaxTimeSteps(int newValue) {itsCombineDataMaxTimeSteps = newValue;}
+	bool MakeSoundingIndexData(void) const {return fMakeSoundingIndexData;}
+	void MakeSoundingIndexData(bool newValue) {fMakeSoundingIndexData = newValue;}
 
 private:
 
+	std::string itsName; // tällä nimellä erotetaan konffi-tiedostoissa eri datat
 	std::string itsFileNameFilter; // tiedostonimi filtteri polun kera esim. d:\weto\wrk\data\in\data_1_*.sqd
 	std::string itsLatestFileName; // kun filtterillä on haettu tiedostot ja uusin on löytynyt, talletetaan se tähän
 	NFmiInfoData::Type itsDataType; // esim. analyysi, havainto jne.
@@ -88,6 +94,7 @@ private:
 	std::string itsCombineDataPathAndFileName; // jos tämä on määritelty, tehdään fileNameFilteristä (hakemistosta) löytyvistä datoista yhdistelmä 
 											   // data ja se talletetaan tähän hakemistoon annetulla nimellä ja aikaleimalla (nimessä tähden tilalle laitetaan aikaleima)
 	int itsCombineDataMaxTimeSteps; // jos ei haluaa rajoittaa kuinka iso yhdistelmä datasta tehdään, tämän voi määritellä
+	bool fMakeSoundingIndexData; // jos tämä on true, SmartMet tekee datasta oman sounding-index datan
 	std::string itsBaseNameSpace;
 };
 

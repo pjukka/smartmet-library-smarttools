@@ -23,7 +23,8 @@ using namespace std;
 // ----------------------------------------------------------------------
 
 NFmiHelpDataInfo::NFmiHelpDataInfo(void)
-:itsFileNameFilter()
+:itsName()
+,itsFileNameFilter()
 ,itsLatestFileName()
 ,itsDataType(NFmiInfoData::kNoDataType)
 ,itsLatestFileTimeStamp(0)
@@ -38,12 +39,14 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 ,itsReportNewDataLabel()
 ,itsCombineDataPathAndFileName()
 ,itsCombineDataMaxTimeSteps(0)
+,fMakeSoundingIndexData(false)
 
 ,itsBaseNameSpace()
 {}
 
 NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
-:itsFileNameFilter(theOther.itsFileNameFilter)
+:itsName(theOther.itsName)
+,itsFileNameFilter(theOther.itsFileNameFilter)
 ,itsLatestFileName(theOther.itsLatestFileName)
 ,itsDataType(theOther.itsDataType)
 ,itsLatestFileTimeStamp(theOther.itsLatestFileTimeStamp)
@@ -58,6 +61,7 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
 ,itsReportNewDataLabel(theOther.itsReportNewDataLabel)
 ,itsCombineDataPathAndFileName(theOther.itsCombineDataPathAndFileName)
 ,itsCombineDataMaxTimeSteps(theOther.itsCombineDataMaxTimeSteps)
+,fMakeSoundingIndexData(theOther.fMakeSoundingIndexData)
 
 ,itsBaseNameSpace(theOther.itsBaseNameSpace)
 {}
@@ -67,6 +71,7 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 	if(this != &theOther)
 	{
 		Clear(); // lähinnä area-otuksen tuhoamista varten kutsutaan
+		itsName = theOther.itsName;
 		itsFileNameFilter = theOther.itsFileNameFilter;
 		itsLatestFileName = theOther.itsLatestFileName;
 		itsDataType = theOther.itsDataType;
@@ -82,6 +87,7 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 		itsReportNewDataLabel = theOther.itsReportNewDataLabel;
 		itsCombineDataPathAndFileName = theOther.itsCombineDataPathAndFileName;
 		itsCombineDataMaxTimeSteps = theOther.itsCombineDataMaxTimeSteps;
+		fMakeSoundingIndexData = theOther.fMakeSoundingIndexData;
 
 		itsBaseNameSpace = theOther.itsBaseNameSpace;
 	}
@@ -90,6 +96,7 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 
 void NFmiHelpDataInfo::Clear(void)
 {
+	itsName = "";
 	itsFileNameFilter = "";
 	itsLatestFileName = "";
 	itsDataType = NFmiInfoData::kNoDataType;
@@ -107,6 +114,7 @@ void NFmiHelpDataInfo::Clear(void)
 	itsReportNewDataLabel = "";
 	itsCombineDataPathAndFileName = "";
 	itsCombineDataMaxTimeSteps = 0;
+	fMakeSoundingIndexData = false;
 }
 
 static std::string MakeFileNameFilter(const std::string &theFileFilterBase, const std::string &theRootDir)
@@ -133,9 +141,10 @@ static std::string MakeFileNameFilter(const std::string &theFileFilterBase, cons
 	return returnValue;
 }
 
-void NFmiHelpDataInfo::InitFromSettings(const std::string &theInitNameSpace, const std::string &theRootDir)
+void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std::string &theName, const std::string &theRootDir)
 {
-	itsBaseNameSpace = theInitNameSpace;
+	itsName = theName;
+	itsBaseNameSpace = theBaseKey + "::" + theName;
 
 	std::string fileNameFilterKey = itsBaseNameSpace + "::FilenameFilter";
 	if(NFmiSettings::IsSet(fileNameFilterKey))
@@ -152,6 +161,7 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theInitNameSpace, con
 		itsReportNewDataLabel = NFmiSettings::Optional<string>(itsBaseNameSpace + "::ReportNewDataLabel", "");
 		itsCombineDataPathAndFileName = NFmiSettings::Optional<string>(itsBaseNameSpace + "::CombineDataPathAndFileName", "");
 		itsCombineDataMaxTimeSteps = NFmiSettings::Optional<int>(itsBaseNameSpace + "::CombineDataMaxTimeSteps", 0);
+		fMakeSoundingIndexData = NFmiSettings::Optional<bool>(itsBaseNameSpace + "::MakeSoundingIndexData", false);
 
 		std::string imageProjectionKey(itsBaseNameSpace + "::ImageProjection");
 		if (NFmiSettings::IsSet(imageProjectionKey))
@@ -299,7 +309,7 @@ void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey, const s
 	for( ; iter != dataKeys.end(); ++iter)
 	{
 		NFmiHelpDataInfo hdi;
-		hdi.InitFromSettings(theBaseKey + "::" + (*iter), theRootDir);
+		hdi.InitFromSettings(theBaseKey, *iter, theRootDir);
 		theHelpDataInfos.push_back(hdi);
 	}
 }
