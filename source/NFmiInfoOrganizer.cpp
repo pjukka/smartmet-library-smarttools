@@ -67,18 +67,18 @@ static char THIS_FILE[] = __FILE__;
 // luodaan tyhjä lista
 NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 :itsList()
-,itsIter(itsList.Start())
+//,itsIter(itsList.Start())
 ,itsDrawParamFactory(0)
 ,itsWorkingDirectory("")
 ,itsEditedData(0)
 ,itsEditedDataCopy(0)
-,itsSoundingParamGridSize(30, 30)
+//,itsSoundingParamGridSize(30, 30)
 ,itsMacroParamGridSize(50, 50)
 ,itsMacroParamMinGridSize(10, 10)
 ,itsMacroParamMaxGridSize(200, 200)
 ,itsMacroParamData(0)
 ,itsMacroParamMissingValueMatrix()
-,itsSoundingParamData(0)
+//,itsSoundingParamData(0)
 ,itsSoundingParamMissingValueMatrix()
 ,itsCrossSectionMacroParamData(0)
 ,itsCrossSectionMacroParamMissingValueMatrix()
@@ -102,11 +102,11 @@ NFmiInfoOrganizer::~NFmiInfoOrganizer (void)
 	if(itsMacroParamData)
 		itsMacroParamData->DestroySharedData();
 	delete itsMacroParamData;
-
+/*
 	if(itsSoundingParamData)
 		itsSoundingParamData->DestroySharedData();
 	delete itsSoundingParamData;
-
+*/
 	if(itsCrossSectionMacroParamData)
 		itsCrossSectionMacroParamData->DestroySharedData();
 	delete itsCrossSectionMacroParamData;
@@ -191,8 +191,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
 		return GetSoundingPlotParamInfo(fSubParameter, theType);
 	if(theType == NFmiInfoData::kMacroParam || theType == NFmiInfoData::kQ3MacroParam) // macro- parametrit lasketaan tällä
 		return itsMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
-	if(theType >= NFmiInfoData::kSoundingParameterData) // sounding parametrit lasketaan tällä
-		return itsSoundingParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
+//	if(theType >= NFmiInfoData::kSoundingParameterData) // sounding parametrit lasketaan tällä
+//		return itsSoundingParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType == NFmiInfoData::kCrossSectionMacroParam)
 		return itsCrossSectionMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
@@ -248,8 +248,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 		return GetSoundingPlotParamInfo(fSubParameter, theType);
 	if(theType == NFmiInfoData::kMacroParam || theType == NFmiInfoData::kQ3MacroParam) // macro- parametrit lasketaan tällä
 		return itsMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
-	if(theType >= NFmiInfoData::kSoundingParameterData) // sounding parametrit lasketaan tällä
-		return itsSoundingParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
+//	if(theType >= NFmiInfoData::kSoundingParameterData) // sounding parametrit lasketaan tällä
+//		return itsSoundingParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType == NFmiInfoData::kCrossSectionMacroParam)
 		return itsCrossSectionMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
@@ -268,9 +268,9 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 	else
 	{
 		// tutkitaan ensin löytyykö theParam suoraan joltain listassa olevalta NFmiSmartInfo-pointterilta
-		for(Reset(); Next(); )
+		for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 		{
-			aInfo = Current();
+			aInfo = &(iter.Current());
 			if((aInfo->DataType() == theType || anyDataOk) && aInfo->Param(theDataIdent) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
 			{
 				if(!(theLevel == 0 && aInfo->SizeLevels() > 1))
@@ -309,9 +309,9 @@ NFmiSmartInfo* NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataI
 	else
 	{
 		// tutkitaan ensin löytyykö theParam suoraan joltain listassa olevalta NFmiSmartInfo-pointterilta
-		for(Reset(); Next(); )
+		for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 		{
-			aInfo = Current();
+			aInfo = &(iter.Current());
 			if((aInfo->DataType() == theType || anyDataOk) && aInfo->SizeLevels() > 1 && aInfo->Param(theDataIdent))
 			{
 				if(fIgnoreProducerName || (theDataIdent.GetProducer()->GetName() == aInfo->Param().GetProducer()->GetName()))
@@ -361,10 +361,10 @@ NFmiParamBag NFmiInfoOrganizer::ObservationParams(int theIndex)
 NFmiParamBag NFmiInfoOrganizer::GetParams(NFmiInfoData::Type theDataType)
 {
 	NFmiParamBag paramBag;
-	for(Reset();Next();)
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		if(Current()->DataType() == theDataType)
-			paramBag = paramBag.Combine(Current()->ParamBag());
+		if(iter.Current().DataType() == theDataType)
+			paramBag = paramBag.Combine(iter.Current().ParamBag());
 	}
 
     return paramBag;
@@ -538,12 +538,12 @@ void NFmiInfoOrganizer::ClearData(NFmiInfoData::Type theDataType)
 	}
 	else
 	{ // käydään lista läpi ja tuhotaan halutun tyyppiset datat
-		for(Reset(); Next(); )
+		for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 		{
-			if(Current()->DataType() == theDataType)
+			if(iter.Current().DataType() == theDataType)
 			{
-				Current()->DestroySharedData();
-				Remove();
+				iter.Current().DestroySharedData();
+				iter.Remove(true);
 			}
 		}
 	}
@@ -556,12 +556,12 @@ void NFmiInfoOrganizer::ClearDynamicHelpData()
 	ignoreTypesVector.push_back(NFmiInfoData::kClimatologyData); // klimatologiset datat luetaan vain kerran ohjelman käynnistyessä
 
 	// käydään lista läpi ja tuhotaan dynaamiset help datat
-	for(Reset(); Next(); )
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		if(std::find(ignoreTypesVector.begin(), ignoreTypesVector.end(), Current()->DataType()) == ignoreTypesVector.end())
+		if(std::find(ignoreTypesVector.begin(), ignoreTypesVector.end(), iter.Current().DataType()) == ignoreTypesVector.end())
 		{
-			Current()->DestroySharedData();
-			Remove();
+			iter.Current().DestroySharedData();
+			iter.Remove(true);
 		}
 	}
 }
@@ -584,13 +584,13 @@ void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData
 			}
 		}
 
-		for(Reset(); Next(); )
+		for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 		{
-			if(IsInfosTwoOfTheKind(theInfo, theDataType, theFileNamePattern, Current()))
+			if(IsInfosTwoOfTheKind(theInfo, theDataType, theFileNamePattern, &(iter.Current())))
 			{
-				theRemovedDatasTimesOut = Current()->TimeDescriptor();
-				Current()->DestroySharedData();
-				Remove();
+				theRemovedDatasTimesOut = iter.Current().TimeDescriptor();
+				iter.Current().DestroySharedData();
+				iter.Remove(true);
 				break; // tuhotaan vain yksi!
 			}
 		}
@@ -617,9 +617,9 @@ double NFmiInfoOrganizer::CountDataSize(void)
 	if(itsEditedDataCopy)
 		dataSize += itsEditedDataCopy->Size() * sizeof(float);
 
-	for(Reset(); Next(); )
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		dataSize += Current()->Size() * sizeof(float);
+		dataSize += iter.Current().Size() * sizeof(float);
 	}
 	return dataSize;
 }
@@ -685,10 +685,10 @@ bool NFmiInfoOrganizer::Add (NFmiSmartInfo* theInfo)
 // tuhoaa aina datan
 bool NFmiInfoOrganizer::Clear (void)
 {
-	for( Reset(); Next(); )
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		Current()->DestroySharedData();
-		delete Current();
+		iter.Current().DestroySharedData();
+		iter.Remove(true);
 	}
 	itsList.Clear(false);
 	return true; // jotain pitäsi varmaan tsekatakin?
@@ -697,6 +697,7 @@ bool NFmiInfoOrganizer::Clear (void)
 //--------------------------------------------------------
 // Reset
 //--------------------------------------------------------
+/*
 bool NFmiInfoOrganizer::Reset (void)
 {
    itsIter = itsList.Start();
@@ -724,14 +725,15 @@ bool NFmiInfoOrganizer::Remove(void)
 {
 	return itsIter.Remove(true);
 }
+*/
 
 // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 NFmiSmartInfo* NFmiInfoOrganizer::ViewableInfo(void)
 {
-	for(Reset(); Next();)
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		if(Current()->DataType() == NFmiInfoData::kViewable)
-			return Current();
+		if(iter.Current().DataType() == NFmiInfoData::kViewable)
+			return &(iter.Current());
 	}
 	return 0;
 }
@@ -741,12 +743,12 @@ NFmiSmartInfo* NFmiInfoOrganizer::ViewableInfo(void)
 NFmiLevelBag* NFmiInfoOrganizer::GetAndCreateViewableInfoWithManyLevelsOrZeroPointer(void)
 {
 	NFmiLevelBag* levels = 0;
-	for(Reset(); Next();)
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		if(Current()->DataType() == NFmiInfoData::kViewable)
-			if(Current()->SizeLevels() > 1)
+		if(iter.Current().DataType() == NFmiInfoData::kViewable)
+			if(iter.Current().SizeLevels() > 1)
 			{
-				levels = new NFmiLevelBag(*Current()->VPlaceDescriptor().Levels());
+				levels = new NFmiLevelBag(*iter.Current().VPlaceDescriptor().Levels());
 				break;
 			}
 	}
@@ -757,12 +759,12 @@ NFmiLevelBag* NFmiInfoOrganizer::GetAndCreateViewableInfoWithManyLevelsOrZeroPoi
 NFmiSmartInfo* NFmiInfoOrganizer::ViewableInfo(int theIndex)
 {
 	int ind = 0;
-	for(Reset(); Next();)
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		if(Current()->DataType() == NFmiInfoData::kViewable)
+		if(iter.Current().DataType() == NFmiInfoData::kViewable)
 		{
 			if(ind == theIndex)
-				return Current();
+				return &(iter.Current());
 			ind++;
 		}
 	}
@@ -773,12 +775,12 @@ NFmiSmartInfo* NFmiInfoOrganizer::ViewableInfo(int theIndex)
 NFmiSmartInfo* NFmiInfoOrganizer::ObservationInfo(int theIndex)
 {
 	int ind = 0;
-	for(Reset(); Next();)
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		if(Current()->DataType() == NFmiInfoData::kObservations)
+		if(iter.Current().DataType() == NFmiInfoData::kObservations)
 		{
 			if(ind == theIndex)
-				return Current();
+				return &(iter.Current());
 			ind++;
 		}
 	}
@@ -821,13 +823,13 @@ static NFmiQueryData* CreateDefaultMacroParamQueryData(const NFmiArea *theArea, 
 	NFmiQueryInfo info(parDesc, timeDesc, hPlace, vPlace);
 	return NFmiQueryDataUtil::CreateEmptyData(info);
 }
-
+/*
 void NFmiInfoOrganizer::SetSoundingParamDataGridSize(int x, int y)
 {
 	itsSoundingParamGridSize = NFmiPoint(x, y);
 	UpdateSoundingParamData();
 }
-
+*/
 void NFmiInfoOrganizer::SetMacroParamDataGridSize(int x, int y)
 {
 	x = FmiMin(x, static_cast<int>(itsMacroParamMaxGridSize.X()));
@@ -854,7 +856,7 @@ void NFmiInfoOrganizer::UpdateMacroParamData(void)
 		UpdateSpecialDataArea(arePtr.get(), itsMacroParamGridSize, NFmiInfoData::kMacroParam, &itsMacroParamData, itsMacroParamMissingValueMatrix);
 	}
 }
-
+/*
 void NFmiInfoOrganizer::UpdateSoundingParamData(void)
 {
 	if(itsSoundingParamData)
@@ -863,11 +865,12 @@ void NFmiInfoOrganizer::UpdateSoundingParamData(void)
 		UpdateSpecialDataArea(arePtr.get(), itsSoundingParamGridSize, NFmiInfoData::kSoundingParameterData, &itsSoundingParamData, itsSoundingParamMissingValueMatrix);
 	}
 }
+*/
 
 void NFmiInfoOrganizer::UpdateMapArea(const NFmiArea *theArea)
 {
 	UpdateSpecialDataArea(theArea, itsMacroParamGridSize, NFmiInfoData::kMacroParam, &itsMacroParamData, itsMacroParamMissingValueMatrix);
-	UpdateSpecialDataArea(theArea, itsSoundingParamGridSize, NFmiInfoData::kSoundingParameterData, &itsSoundingParamData, itsSoundingParamMissingValueMatrix);
+//	UpdateSpecialDataArea(theArea, itsSoundingParamGridSize, NFmiInfoData::kSoundingParameterData, &itsSoundingParamData, itsSoundingParamMissingValueMatrix);
 }
 
 void NFmiInfoOrganizer::UpdateSpecialDataArea(const NFmiArea *theArea, const NFmiPoint &theGridSize, NFmiInfoData::Type theType, NFmiSmartInfo ** theData, NFmiDataMatrix<float> &theMissingValueMatrix)
@@ -916,10 +919,10 @@ NFmiParamBag NFmiInfoOrganizer::ObservationParams(void)
 // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 NFmiSmartInfo* NFmiInfoOrganizer::ObservationInfo(void)
 {
-	for(Reset(); Next();)
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		if(Current()->DataType() == NFmiInfoData::kObservations)
-			return Current();
+		if(iter.Current().DataType() == NFmiInfoData::kObservations)
+			return &(iter.Current());
 	}
 	return 0;
 }
@@ -927,10 +930,10 @@ NFmiSmartInfo* NFmiInfoOrganizer::ObservationInfo(void)
 // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 NFmiSmartInfo* NFmiInfoOrganizer::KepaDataInfo(void)
 {
-	for(Reset(); Next();)
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		if(Current()->DataType() == NFmiInfoData::kKepaData)
-			return Current();
+		if(iter.Current().DataType() == NFmiInfoData::kKepaData)
+			return &(iter.Current());
 	}
 	return 0;
 }
@@ -938,10 +941,10 @@ NFmiSmartInfo* NFmiInfoOrganizer::KepaDataInfo(void)
 // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 NFmiSmartInfo* NFmiInfoOrganizer::ClimatologyInfo(void)
 {
-	for(Reset(); Next();)
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		if(Current()->DataType() == NFmiInfoData::kClimatologyData)
-			return Current();
+		if(iter.Current().DataType() == NFmiInfoData::kClimatologyData)
+			return &(iter.Current());
 	}
 	return 0;
 }
@@ -985,12 +988,12 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType) // Ha
 NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, int theIndex) // Hakee indeksin mukaisen tietyn datatyypin infon
 {
 	int ind = 0;
-	for(Reset(); Next();)
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		if(Current()->DataType() == theDataType)
+		if(iter.Current().DataType() == theDataType)
 		{
 			if(ind == theIndex)
-				return Current();
+				return &(iter.Current());
 			ind++;
 		}
 	}
@@ -1015,10 +1018,10 @@ checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type the
 	}
 	else
 	{
-		for(Reset(); Next();)
+		for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 		{
-			if(Current()->DataType() == theDataType)
-				infoVector.push_back(Current());
+			if(iter.Current().DataType() == theDataType)
+				infoVector.push_back(&(iter.Current()));
 		}
 	}
 	return infoVector;
@@ -1034,10 +1037,10 @@ checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(const std::string &the
 
 	if(theFileNameFilter.empty() == false)
 	{
-		for(Reset(); Next();)
+		for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 		{
-			if(Current()->DataFilePattern() == theFileNameFilter)
-				infoVector.push_back(Current());
+			if(iter.Current().DataFilePattern() == theFileNameFilter)
+				infoVector.push_back(&(iter.Current()));
 		}
 	}
 	return infoVector;
@@ -1071,11 +1074,11 @@ checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(int theProducerId, int
 			infoVector.push_back(itsEditedData);
 	}
 
-	for(Reset(); Next();) // HUOM! tässä ei kiinnosta editoitu data tai sen kopio!!!!
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); ) // HUOM! tässä ei kiinnosta editoitu data tai sen kopio!!!!
 	{
-	    currentProdId = static_cast<int>(Current()->Producer()->GetIdent());
+	    currentProdId = static_cast<int>(iter.Current().Producer()->GetIdent());
 		if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
-			infoVector.push_back(Current());
+			infoVector.push_back(&(iter.Current()));
 	}
 	return infoVector;
 }
@@ -1114,9 +1117,9 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, const
 	else
 	{
 		int ind = 0;
-		for(Reset(); Next();)
+		for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 		{
-			NFmiSmartInfo* info = Current();
+			NFmiSmartInfo* info = &(iter.Current());
 			if(info && info->DataType() == theDataType)
 			{
 				info->FirstParam(); // pitää varmistaa, että producer löytyy
@@ -1164,9 +1167,9 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindSoundingInfo(const NFmiProducer &theProduc
 {
 	// TODO Ei ota huomioon vielä editoitavaa dataa
 	NFmiSmartInfo* exceptableInfo = 0;
-	for(Reset(); Next();)
+	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
-		NFmiSmartInfo* info = Current();
+		NFmiSmartInfo* info = &(iter.Current());
 		int result = ::IsGoodSoundingData(info, theProducer, false);
 		if(result == 2)
 			return info;

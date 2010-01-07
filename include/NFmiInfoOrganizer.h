@@ -133,7 +133,7 @@ class NFmiInfoOrganizer
 	NFmiDataMatrix<float>& MacroParamMissingValueMatrix(void){return itsMacroParamMissingValueMatrix;}
 	NFmiSmartInfo* CrossSectionMacroParamData(void) {return itsCrossSectionMacroParamData;}
 	NFmiDataMatrix<float>& CrossSectionMacroParamMissingValueMatrix(void){return itsCrossSectionMacroParamMissingValueMatrix;}
-	NFmiSmartInfo* SoundingParamData(void) {return itsSoundingParamData;}
+//	NFmiSmartInfo* SoundingParamData(void) {return itsSoundingParamData;}
 	NFmiDataMatrix<float>& SoundingParamMissingValueMatrix(void) {return itsSoundingParamMissingValueMatrix;}
 
 	void SetDrawParamPath(const std::string &theDrawParamPath);
@@ -141,10 +141,10 @@ class NFmiInfoOrganizer
 	void SetMacroParamDataGridSize(int x, int y);
 	void SetMacroParamDataMinGridSize(int x, int y);
 	void SetMacroParamDataMaxGridSize(int x, int y);
-	void SetSoundingParamDataGridSize(int x, int y);
+//	void SetSoundingParamDataGridSize(int x, int y);
 	void UpdateMapArea(const NFmiArea *theArea);
 
-	const NFmiPoint& SoundingParamGridSize(void) const {return itsSoundingParamGridSize;}
+//	const NFmiPoint& SoundingParamGridSize(void) const {return itsSoundingParamGridSize;}
 	const NFmiPoint& GetMacroParamDataGridSize(void) const {return itsMacroParamGridSize;}
 	const NFmiPoint& GetMacroParamDataMaxGridSize(void) const {return itsMacroParamMaxGridSize;}
 	const NFmiPoint& GetMacroParamDataMinGridSize(void) const {return itsMacroParamMinGridSize;}
@@ -152,16 +152,16 @@ class NFmiInfoOrganizer
 	double CountDataSize(void);
 	void UpdateCrossSectionMacroParamDataSize(int x, int y);
  private:
- 	bool Remove(void);
+// 	bool Remove(void);
 	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, NFmiSmartInfo* theSmartInfo2);
 	void UpdateSpecialDataArea(const NFmiArea *theArea, const NFmiPoint &theGridSize, NFmiInfoData::Type theType, NFmiSmartInfo ** theData, NFmiDataMatrix<float> &theMissingValueMatrix);
 	void UpdateMacroParamData(void);
-	void UpdateSoundingParamData(void);
+//	void UpdateSoundingParamData(void);
 
  public: // n‰m‰ ovat pikaviritys k‰ytˆss‰ n‰m‰ metodit pit‰isi laittaa takaisin privateiksi
-	bool Reset (void);
-	bool Next (void);
-	NFmiSmartInfo* Current (void);
+//	bool Reset (void);
+//	bool Next (void);
+//	NFmiSmartInfo* Current (void);
 
  private:
   	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fIgnoreProducerName = false);
@@ -177,19 +177,19 @@ class NFmiInfoOrganizer
 
 // Attributes
   	NFmiSortedPtrList<NFmiSmartInfo> itsList; // error when compiling NFmiInfoOrganizer.cpp//binary '<' : 'class NFmiSmartInfo' does not define this operator or a conversion to a type acceptable to the predefined operator
-	NFmiPtrList<NFmiSmartInfo>::Iterator itsIter;
+//	NFmiPtrList<NFmiSmartInfo>::Iterator itsIter;
  	NFmiDrawParamFactory* itsDrawParamFactory;
 	std::string itsWorkingDirectory;
 	NFmiSmartInfo* itsEditedData; // editoitavaa dataa voi olla vain yksi kerrallaan, joten laitoin sen erilleen tehokkuuden takia.
 	NFmiSmartInfo* itsEditedDataCopy; // t‰m‰ on editoitavan datan kopio, mit‰ k‰ytt‰j‰ voi halutessaan p‰ivitt‰‰, k‰ytet‰‰n visualisoimaan tehtyj‰ muutoksia datassa
 
-	NFmiPoint itsSoundingParamGridSize;
+//	NFmiPoint itsSoundingParamGridSize;
 	NFmiPoint itsMacroParamGridSize;
 	NFmiPoint itsMacroParamMinGridSize;
 	NFmiPoint itsMacroParamMaxGridSize;
 	NFmiSmartInfo* itsMacroParamData; // makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
 	NFmiDataMatrix<float> itsMacroParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
-	NFmiSmartInfo* itsSoundingParamData; // sounding-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
+//	NFmiSmartInfo* itsSoundingParamData; // sounding-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
 	NFmiDataMatrix<float> itsSoundingParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
 	NFmiSmartInfo* itsCrossSectionMacroParamData; // poikkileikkaus makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
 	NFmiDataMatrix<float> itsCrossSectionMacroParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
