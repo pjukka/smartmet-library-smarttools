@@ -17,7 +17,7 @@ namespace NFmiSoundingFunctions
 {
 
 // Funktio laskee kastepisteen (DP) lämpötilan (T) ja suhteellisen
-// kosteuden (RH) avulla. Lämpötila ja kastepiste ovat kelvineinä.
+// kosteuden (RH) avulla. Lämpötila ja kastepiste ovat celsiuksina.
 double CalcDP(double T, double RH)
 {
 	static bool firstTime = true;
