@@ -131,42 +131,41 @@ static void CheckIfStopped(NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
 		throw NFmiQueryDataUtil::StopThreadException();
 }
 
-static void CalcOneSoundingIndexField(NFmiFastQueryInfo &theSourceInfo, NFmiFastQueryInfo &theResultInfo, NFmiDataMatrix<float> &theResultField, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
+static void CalcAllSoundingIndexParamFields(NFmiFastQueryInfo &theSourceInfo, NFmiFastQueryInfo &theResultInfo, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
 {
 	bool fObsDataFound = false; // toistaiseksi ei käytössä
 	bool useAnalyzeData = false; // toistaiseksi ei käytössä
 	NFmiSmartInfo *analyzeData = 0;
 
-	FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theResultInfo.Param().GetParamIdent());
-	bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
-
-	unsigned long xnum = theResultInfo.GridXNumber();
-	unsigned long ynum = theResultInfo.GridYNumber();
-	unsigned long counter = 0;
-	theResultField.Resize(xnum, ynum, kFloatMissing);
-	theResultField = kFloatMissing; // alustetaan matriisi puuttuvilla arvoilla
 	NFmiSoundingData soundingData;
-	for(theResultInfo.ResetLocation(); theResultInfo.NextLocation(); counter++)
+	for(theResultInfo.ResetLocation(); theResultInfo.NextLocation(); )
 	{
-		if(counter%20 == 0)
-			::CheckIfStopped(theStopFunctor); // joka 20 hilapisteellä katsotaan, pitääkö lopettaa
-
 		bool surfaceBaseStatus = false;
-		::FillSoundingData(&theSourceInfo, soundingData, theResultInfo.Time(), theSourceInfo.LatLon());
-
+		::FillSoundingData(&theSourceInfo, soundingData, theResultInfo.Time(), theResultInfo.LatLon());
+/*
 		float T = kFloatMissing; // debug koodia
 		float Td = kFloatMissing; // debug koodia
 
 		if(useAnalyzeData)
-			surfaceBaseStatus = ::FillSurfaceValuesFromInfo(analyzeData, soundingData, theSourceInfo.LatLon(), T, Td); // täytä pinta arvot analyysistä
+			surfaceBaseStatus = ::FillSurfaceValuesFromInfo(analyzeData, soundingData, theResultInfo.LatLon(), T, Td); // täytä pinta arvot analyysistä
 		else if(fObsDataFound)
 			; // täytä pinta arvot obs-datasta
 		if(surfaceBasedCalculation && surfaceBaseStatus == false)
 			continue; // jos esim. analyysi/havainto pinta data ei löytynyt tästä kohtaa, jää puuttuva arvo voimaan
+*/
+		unsigned long counter = 0;
+		for(theResultInfo.ResetParam(); theResultInfo.NextParam(); counter++)
+		{
+			if(counter%20 == 0)
+				::CheckIfStopped(theStopFunctor); // joka 20 hilapisteellä katsotaan, pitääkö lopettaa
 
-		// HUOM!!!! muista muuttaa luotaus-parametri pelkäksi surface arvoksi, koska loppu menee itsestään sitten
-		float value = NFmiSoundingIndexCalculator::Calc(soundingData, soundingParameter);
-		theResultField[counter % xnum][counter / xnum] = value;
+			FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theResultInfo.Param().GetParamIdent());
+			bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
+
+			// HUOM!!!! muista muuttaa luotaus-parametri pelkäksi surface arvoksi, koska loppu menee itsestään sitten
+			float value = NFmiSoundingIndexCalculator::Calc(soundingData, soundingParameter);
+			theResultInfo.FloatValue(value);
+		}
 	}
 }
 
@@ -176,18 +175,13 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 	NFmiFastQueryInfo resultInfo(&theResultData); // tämä laittaa levelin 1. suoraan, joten leveleitä ei tarvitse juoksuttaa (vain 1 leveli)
 	if(sourceInfo.IsGrid() == false || resultInfo.IsGrid() == false)
 		throw std::runtime_error("Error in NFmiSoundingIndexCalculator::CalculateWholeSoundingData, source or result data was non grid-data.");
-	NFmiDataMatrix<float> fieldValues;
 
 	for(resultInfo.ResetTime(); resultInfo.NextTime(); )
 	{
 		if(sourceInfo.Time(resultInfo.Time()))
 		{
-			for(resultInfo.ResetParam(); resultInfo.NextParam(); )
-			{
-				::CheckIfStopped(theStopFunctor);
-				::CalcOneSoundingIndexField(sourceInfo, resultInfo, fieldValues, theStopFunctor);
-				resultInfo.SetValues(fieldValues);
-			}
+			::CheckIfStopped(theStopFunctor);
+			::CalcAllSoundingIndexParamFields(sourceInfo, resultInfo, theStopFunctor);
 		}
 	}
 }
