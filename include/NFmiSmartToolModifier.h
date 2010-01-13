@@ -138,7 +138,7 @@ private:
 	NFmiSmartToolCalculation* CreateCalculation(NFmiSmartToolCalculationInfo *theCalcInfo);
 	NFmiSmartToolCalculation* CreateConditionalSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
 	NFmiAreaMask* CreateSoundingIndexFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
-	NFmiSmartInfo* CreateSoundingParamInfo(const NFmiDataIdent &theDataIdent, bool useEditedData);
+//	NFmiSmartInfo* CreateSoundingParamInfo(const NFmiDataIdent &theDataIdent, bool useEditedData);
 	NFmiSmartInfo* CreateCopyOfAnalyzeInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel);
 
 	NFmiInfoOrganizer *itsInfoOrganizer; // eli database, ei omista ei tuhoa

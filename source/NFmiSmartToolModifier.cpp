@@ -1122,8 +1122,8 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 	NFmiSmartInfo* info = 0;
 	if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kScriptVariableData)
 		info = CreateScriptVariableInfo(theAreaMaskInfo.GetDataIdent());
-	else if(theAreaMaskInfo.GetDataType() >= NFmiInfoData::kSoundingParameterData)
-		info = CreateSoundingParamInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetUseDefaultProducer());
+//	else if(theAreaMaskInfo.GetDataType() >= NFmiInfoData::kSoundingParameterData)
+//		info = CreateSoundingParamInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetUseDefaultProducer());
 	else if(theAreaMaskInfo.GetUseDefaultProducer() || theAreaMaskInfo.GetDataType() == NFmiInfoData::kCopyOfEdited)
 	{
 		NFmiInfoData::Type dataType = theAreaMaskInfo.GetDataType();
@@ -1149,7 +1149,26 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 		if(fUseLevelData || fDoCrossSectionCalculation) // jos leveldata-flagi päällä, yritetään ensin, löytyykö hybridi dataa
 			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), NFmiInfoData::kHybridData, false, fUseLevelData | fDoCrossSectionCalculation); // tähän pieni hybrid-koukku, jos haluttiin level dataa
 		if(info == 0)
+		{
 			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData | fDoCrossSectionCalculation);
+			if(info == 0)
+			{ // tämä on pika pika viritystä, joka on jäämiä luotaus indeksi datasta (jotka nyt lasketaan valmiiksi dataksi)
+				int parId = theAreaMaskInfo.GetDataIdent().GetParamIdent();
+				if(parId >= kSoundingParLCLSur && parId < kSoundingParCAPE_TT_SurBas + 40)
+				{ // tämä on ikävä viritys ja koko juttua pitäisi siivota ja yksinkertaistaa
+					// eli ns. luotausindeksi parametrit on erikoistapaus ja niitä etsitää uudestaan, mutta nyt oikealla
+					// datatypellä eli kViewable + soundingIndex tai kHybrid + soundingIndex
+					// ole vähän jumissa näiden kanssa koska näyttömakroissa on talletettu vanhalla käytännöllä dataTypeja
+					NFmiInfoData::Type usedDataType = static_cast<NFmiInfoData::Type>(NFmiInfoData::kViewable + NFmiInfoData::kSoundingParameterData);
+					info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), usedDataType, false, fUseLevelData | fDoCrossSectionCalculation);
+					if(info == 0)
+					{ // vielä hybrid data testi
+						usedDataType = static_cast<NFmiInfoData::Type>(NFmiInfoData::kHybridData + NFmiInfoData::kSoundingParameterData);
+						info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), usedDataType, false, fUseLevelData | fDoCrossSectionCalculation);
+					}
+				}
+			}
+		}
 		if(info == 0 && theAreaMaskInfo.GetDataType() == NFmiInfoData::kAnalyzeData) // analyysi datalle piti tehdä pika viritys tähän
 			info = CreateCopyOfAnalyzeInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel());
 		if(info == 0)
@@ -1199,7 +1218,7 @@ struct FindScriptVariable
 
 	int itsParId;
 };
-
+/*
 NFmiSmartInfo* NFmiSmartToolModifier::CreateSoundingParamInfo(const NFmiDataIdent &theDataIdent, bool useEditedData)
 {
 	NFmiSmartInfo* info = 0;
@@ -1222,6 +1241,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateSoundingParamInfo(const NFmiDataIden
 	}
 	throw runtime_error(::GetDictionaryString("SmartToolModifierErrorSoundingIndexParam") + ": " + string(theDataIdent.GetParamName()));
 }
+*/
 
 NFmiSmartInfo* NFmiSmartToolModifier::CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent)
 {
