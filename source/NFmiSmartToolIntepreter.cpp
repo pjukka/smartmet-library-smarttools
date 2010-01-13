@@ -195,7 +195,7 @@ NFmiSmartToolIntepreter::CalcOperMap NFmiSmartToolIntepreter::itsCalculationOper
 NFmiSmartToolIntepreter::BinaOperMap NFmiSmartToolIntepreter::itsBinaryOperator;
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenStaticParameterNamesAndIds;
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenCalculatedParameterNamesAndIds;
-NFmiSmartToolIntepreter::SoundingIndexMap NFmiSmartToolIntepreter::itsTokenSoundingIndexFunctions;
+//NFmiSmartToolIntepreter::SoundingIndexMap NFmiSmartToolIntepreter::itsTokenSoundingIndexFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenThreeArgumentFunctions;
 NFmiSmartToolIntepreter::PeekFunctionMap NFmiSmartToolIntepreter::itsTokenPeekFunctions;
@@ -1243,8 +1243,8 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &th
 	if(IsVariableBinaryOperator(theVariableText, theMaskInfo)) // t‰m‰ on and ja or tapausten k‰sittelyyn
 		return true;
 
-	if(IsVariableSoundingParameter(theVariableText, theMaskInfo, fProducerExist, theParamNameOnly, theProducerNameOnly))
-		return true;
+//	if(IsVariableSoundingParameter(theVariableText, theMaskInfo, fProducerExist, theParamNameOnly, theProducerNameOnly))
+//		return true;
 
 	return false;
 }
@@ -1685,7 +1685,7 @@ bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVaria
 	}
 	return false;
 }
-
+/*
 bool NFmiSmartToolIntepreter::IsVariableSoundingParameter(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theProducerNameOnly)
 {
 	std::string tmp(fProducerExist ? theParamNameOnly : theVariableText);
@@ -1711,6 +1711,7 @@ bool NFmiSmartToolIntepreter::IsVariableSoundingParameter(const std::string &the
 	}
 	return false;
 }
+*/
 
 bool NFmiSmartToolIntepreter::IsVariableThreeArgumentFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
 {
@@ -2028,6 +2029,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrlar"), kFmiPrecipitationLarge));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape"), kFmiCAPE));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("tke"), kFmiTurbulentKineticEnergy));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("icing"), kFmiIcing));
 
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1base"), kFmi_FL_1_Base));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1top"), kFmi_FL_1_Top));
@@ -2084,6 +2086,64 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("vis"), kFmiVisibility));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("gust"), kFmiHourlyMaximumGust));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wsmax"), kFmiHourlyMaximumWindSpeed));
+
+		// ****** sounding index funktiot  HUOM! ne k‰sitell‰‰n case insensitivein‰!! *************************
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclsur"), static_cast<FmiParameterName>(kSoundingParLCLSur)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcsur"), static_cast<FmiParameterName>(kSoundingParLFCSur)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elsur"), static_cast<FmiParameterName>(kSoundingParELSur)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclheightsur"), static_cast<FmiParameterName>(kSoundingParLCLHeightSur)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcheightsur"), static_cast<FmiParameterName>(kSoundingParLFCHeightSur)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elheightsur"), static_cast<FmiParameterName>(kSoundingParELHeightSur)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("capesur"), static_cast<FmiParameterName>(kSoundingParCAPESur)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape03kmsur"), static_cast<FmiParameterName>(kSoundingParCAPE0_3kmSur)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape1040sur"), static_cast<FmiParameterName>(kSoundingParCAPE_TT_Sur)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cinsur"), static_cast<FmiParameterName>(kSoundingParCINSur)));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lcl500m"), static_cast<FmiParameterName>(kSoundingParLCL500m)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfc500m"), static_cast<FmiParameterName>(kSoundingParLFC500m)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("el500m"), static_cast<FmiParameterName>(kSoundingParEL500m)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclheight500m"), static_cast<FmiParameterName>(kSoundingParLCLHeight500m)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcheight500m"), static_cast<FmiParameterName>(kSoundingParLFCHeight500m)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elheight500m"), static_cast<FmiParameterName>(kSoundingParELHeight500m)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape500m"), static_cast<FmiParameterName>(kSoundingParCAPE500m)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape03km500m"), static_cast<FmiParameterName>(kSoundingParCAPE0_3km500m)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape1040500m"), static_cast<FmiParameterName>(kSoundingParCAPE_TT_500m)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cin500m"), static_cast<FmiParameterName>(kSoundingParCIN500m)));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclmostun"), static_cast<FmiParameterName>(kSoundingParLCLMostUn)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcmostun"), static_cast<FmiParameterName>(kSoundingParLFCMostUn)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elmostun"), static_cast<FmiParameterName>(kSoundingParELMostUn)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclheightmostun"), static_cast<FmiParameterName>(kSoundingParLCLHeightMostUn)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcheightmostun"), static_cast<FmiParameterName>(kSoundingParLFCHeightMostUn)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elheightmostun"), static_cast<FmiParameterName>(kSoundingParELHeightMostUn)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("capemostun"), static_cast<FmiParameterName>(kSoundingParCAPEMostUn)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape03kmmostun"), static_cast<FmiParameterName>(kSoundingParCAPE0_3kmMostUn)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape1040mostun"), static_cast<FmiParameterName>(kSoundingParCAPE_TT_MostUn)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cinmostun"), static_cast<FmiParameterName>(kSoundingParCINMostUn)));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclobsbas"), static_cast<FmiParameterName>(kSoundingParLCLSurBas)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcobsbas"), static_cast<FmiParameterName>(kSoundingParLFCSurBas)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elobsbas"), static_cast<FmiParameterName>(kSoundingParELSurBas)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclheightobsbas"), static_cast<FmiParameterName>(kSoundingParLCLHeightSurBas)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcheightobsbas"), static_cast<FmiParameterName>(kSoundingParLFCHeightSurBas)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elheightobsbas"), static_cast<FmiParameterName>(kSoundingParELHeightSurBas)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("capeobsbas"), static_cast<FmiParameterName>(kSoundingParCAPESurBas)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape03kmobsbas"), static_cast<FmiParameterName>(kSoundingParCAPE0_3kmSurBas)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape1040obsbas"), static_cast<FmiParameterName>(kSoundingParCAPE_TT_SurBas)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cinobsbas"), static_cast<FmiParameterName>(kSoundingParCINSurBas)));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("show"), static_cast<FmiParameterName>(kSoundingParSHOW)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lift"), static_cast<FmiParameterName>(kSoundingParLIFT)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("kinx"), static_cast<FmiParameterName>(kSoundingParKINX)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("ctot"), static_cast<FmiParameterName>(kSoundingParCTOT)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("vtot"), static_cast<FmiParameterName>(kSoundingParVTOT)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("totl"), static_cast<FmiParameterName>(kSoundingParTOTL)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("bulkshear06km"), static_cast<FmiParameterName>(kSoundingParBS0_6km)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("bulkshear01km"), static_cast<FmiParameterName>(kSoundingParBS0_1km)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("srh03km"), static_cast<FmiParameterName>(kSoundingParSRH0_3km)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("srh01km"), static_cast<FmiParameterName>(kSoundingParSRH0_1km)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("thetae03km"), static_cast<FmiParameterName>(kSoundingParThetaE0_3km)));
+		// ****** sounding index funktiot *************************
 
 /*
 
@@ -2208,63 +2268,6 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsCalculationOperations.insert(CalcOperMap::value_type(string("^"), NFmiAreaMask::Pow));
 		itsCalculationOperations.insert(CalcOperMap::value_type(string("%"), NFmiAreaMask::Mod));
 
-		// ****** sounding index funktiot  HUOM! ne k‰sitell‰‰n case insensitivein‰!! *************************
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclsur"), kSoundingParLCLSur));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfcsur"), kSoundingParLFCSur));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elsur"), kSoundingParELSur));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclheightsur"), kSoundingParLCLHeightSur));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfcheightsur"), kSoundingParLFCHeightSur));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elheightsur"), kSoundingParELHeightSur));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("capesur"), kSoundingParCAPESur));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape03kmsur"), kSoundingParCAPE0_3kmSur));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape1040sur"), kSoundingParCAPE_TT_Sur));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cinsur"), kSoundingParCINSur));
-
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lcl500m"), kSoundingParLCL500m));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfc500m"), kSoundingParLFC500m));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("el500m"), kSoundingParEL500m));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclheight500m"), kSoundingParLCLHeight500m));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfcheight500m"), kSoundingParLFCHeight500m));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elheight500m"), kSoundingParELHeight500m));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape500m"), kSoundingParCAPE500m));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape03km500m"), kSoundingParCAPE0_3km500m));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape1040500m"), kSoundingParCAPE_TT_500m));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cin500m"), kSoundingParCIN500m));
-
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclmostun"), kSoundingParLCLMostUn));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfcmostun"), kSoundingParLFCMostUn));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elmostun"), kSoundingParELMostUn));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclheightmostun"), kSoundingParLCLHeightMostUn));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfcheightmostun"), kSoundingParLFCHeightMostUn));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elheightmostun"), kSoundingParELHeightMostUn));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("capemostun"), kSoundingParCAPEMostUn));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape03kmmostun"), kSoundingParCAPE0_3kmMostUn));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape1040mostun"), kSoundingParCAPE_TT_MostUn));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cinmostun"), kSoundingParCINMostUn));
-
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclobsbas"), kSoundingParLCLSurBas));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfcobsbas"), kSoundingParLFCSurBas));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elobsbas"), kSoundingParELSurBas));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lclheightobsbas"), kSoundingParLCLHeightSurBas));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lfcheightobsbas"), kSoundingParLFCHeightSurBas));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("elheightobsbas"), kSoundingParELHeightSurBas));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("capeobsbas"), kSoundingParCAPESurBas));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape03kmobsbas"), kSoundingParCAPE0_3kmSurBas));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cape1040obsbas"), kSoundingParCAPE_TT_SurBas));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("cinobsbas"), kSoundingParCINSurBas));
-
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("show"), kSoundingParSHOW));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("lift"), kSoundingParLIFT));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("kinx"), kSoundingParKINX));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("ctot"), kSoundingParCTOT));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("vtot"), kSoundingParVTOT));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("totl"), kSoundingParTOTL));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("bulkshear06km"), kSoundingParBS0_6km));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("bulkshear01km"), kSoundingParBS0_1km));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("srh03km"), kSoundingParSRH0_3km));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("srh01km"), kSoundingParSRH0_1km));
-		itsTokenSoundingIndexFunctions.insert(SoundingIndexMap::value_type(string("thetae03km"), kSoundingParThetaE0_3km));
-		// ****** sounding index funktiot *************************
 
 		itsTokenCalculationBlockMarkers.push_back(string("{"));
 		itsTokenCalculationBlockMarkers.push_back(string("}"));

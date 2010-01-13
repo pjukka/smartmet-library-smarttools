@@ -208,7 +208,7 @@ private:
 	bool IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariablePeekFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
-	bool IsVariableSoundingParameter(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theProducerNameOnly);
+//	bool IsVariableSoundingParameter(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theProducerNameOnly);
 	FmiLevelType GetLevelType(NFmiInfoData::Type theDataType, long levelValue);
 
 	NFmiInfoOrganizer* itsInfoOrganizer; // ei omista
@@ -254,8 +254,8 @@ private:
 	static ParamMap itsTokenStaticParameterNamesAndIds;
 	static ParamMap itsTokenCalculatedParameterNamesAndIds; // mm. lat, lon ja elevAngle
 
-	typedef std::map<std::string, FmiSoundingParameters> SoundingIndexMap;
-	static SoundingIndexMap itsTokenSoundingIndexFunctions;
+//	typedef std::map<std::string, FmiSoundingParameters> SoundingIndexMap;
+//	static SoundingIndexMap itsTokenSoundingIndexFunctions;
 
 	typedef std::map<std::string, NFmiAreaMask::FunctionType> FunctionMap;
 	static FunctionMap itsTokenFunctions;
