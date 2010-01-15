@@ -49,6 +49,7 @@ bool NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(FmiSoundingParamet
 		return false;
 }
 
+#if 0  // NOT USED
 static bool FillSurfaceValuesFromInfo(NFmiSmartInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiPoint &theLatLon, float &theT, float &theTd)
 {
 	theInfo->Param(kFmiTemperature);
@@ -65,6 +66,7 @@ static bool FillSurfaceValuesFromInfo(NFmiSmartInfo *theInfo, NFmiSoundingData &
 	else
 		return false;
 }
+#endif
 
 // Tämä on ulkopuolista hila datan laskemista varten tehty metodi.
 // theBaseInfo:ssa on projektio ja hila pohja. Tämä hila pitää laskea theValues parametriin.
@@ -133,14 +135,14 @@ static void CheckIfStopped(NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
 
 static void CalcAllSoundingIndexParamFields(NFmiFastQueryInfo &theSourceInfo, NFmiFastQueryInfo &theResultInfo, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
 {
-	bool fObsDataFound = false; // toistaiseksi ei käytössä
-	bool useAnalyzeData = false; // toistaiseksi ei käytössä
-	NFmiSmartInfo *analyzeData = 0;
+    // bool fObsDataFound = false; // toistaiseksi ei käytössä
+	// bool useAnalyzeData = false; // toistaiseksi ei käytössä
+    // NFmiSmartInfo *analyzeData = 0;
 
 	NFmiSoundingData soundingData;
 	for(theResultInfo.ResetLocation(); theResultInfo.NextLocation(); )
 	{
-		bool surfaceBaseStatus = false;
+	    // bool surfaceBaseStatus = false;
 		::FillSoundingData(&theSourceInfo, soundingData, theResultInfo.Time(), theResultInfo.LatLon());
 /*
 		float T = kFloatMissing; // debug koodia
@@ -160,7 +162,8 @@ static void CalcAllSoundingIndexParamFields(NFmiFastQueryInfo &theSourceInfo, NF
 				::CheckIfStopped(theStopFunctor); // joka 20 hilapisteellä katsotaan, pitääkö lopettaa
 
 			FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theResultInfo.Param().GetParamIdent());
-			bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
+			// bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
+			NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
 
 			// HUOM!!!! muista muuttaa luotaus-parametri pelkäksi surface arvoksi, koska loppu menee itsestään sitten
 			float value = NFmiSoundingIndexCalculator::Calc(soundingData, soundingParameter);
