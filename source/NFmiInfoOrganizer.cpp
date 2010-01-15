@@ -180,12 +180,13 @@ NFmiSmartInfo* NFmiInfoOrganizer::GetSoundingPlotParamInfo(bool& fSubParameter, 
 
 //  22.02.1999 lis‰ttiin  tunnistin bool fSubParameter, josta saadaan tieto
 //  siit‰, oliko lˆydetty parametri itsen‰inen vaiko jonkin parametrin aliparametri.
-NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName& theParam
+NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName & theParam
 									   , bool& fSubParameter
 									   , const NFmiLevel* theLevel
 									   , NFmiInfoData::Type theType)
 {
-	if(theParam == NFmiInfoData::kFmiSpSynoPlot || theParam == NFmiInfoData::kFmiSpMinMaxPlot) // synop plot paramille pit‰‰ tehd‰ kikka (ja min/max plot 9996)
+  if(theParam == FmiParameterName(NFmiInfoData::kFmiSpSynoPlot) ||
+	 theParam == FmiParameterName(NFmiInfoData::kFmiSpMinMaxPlot)) // synop plot paramille pit‰‰ tehd‰ kikka (ja min/max plot 9996)
 		return GetSynopPlotParamInfo(fSubParameter, theType);
 	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pit‰‰ tehd‰ kikka
 		return GetSoundingPlotParamInfo(fSubParameter, theType);
