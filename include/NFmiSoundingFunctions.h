@@ -15,43 +15,72 @@
 #include "NFmiParameterName.h"
 #include "NFmiString.h"
 
-class NFmiSoundingData;
-
-// Miten LCL lasketaan, pinta-arvojen vai mixed layer arvojen avulla, vai most unstable?
-typedef enum
-{
-	kLCLCalcNone = 0,
-	kLCLCalcSurface = 1,
-	kLCLCalc500m = 2,
-	kLCLCalc500m2 = 3, // lasketaan Tpot ja w keskiarvojen ja 1. hPa kerroksin laskien
-	kLCLCalcMostUnstable = 4 // etsi maksimi theta-e arvon avulla most unstable tapaus
-} FmiLCLCalcType;
-
 namespace NFmiSoundingFunctions
 {
-	double CalcSHOWIndex(NFmiSoundingData &theData);
-	double CalcLIFTIndex(NFmiSoundingData &theData);
-	double CalcKINXIndex(NFmiSoundingData &theData);
-	double CalcCTOTIndex(NFmiSoundingData &theData);
-	double CalcVTOTIndex(NFmiSoundingData &theData);
-	double CalcTOTLIndex(NFmiSoundingData &theData);
-	double CalcLCLPressureLevel(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType);
-	double CalcLCLIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType);
-	double CalcLCLHeightIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType);
-	double CalcLFCIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double &EL);
-	double CalcLFCHeightIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double &ELheigth);
-	double CalcCAPE500Index(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double theHeightLimit = kFloatMissing);
-	double CalcCAPE_TT_Index(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double Thigh, double Tlow);
-	double CalcCINIndex(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType);
-	double CalcBulkShearIndex(NFmiSoundingData &theData, double startH, double endH);
-	double CalcSRHIndex(NFmiSoundingData &theData, double startH, double endH);
-	double CalcThetaEDiffIndex(NFmiSoundingData &theData, double startH, double endH);
-	double CalcWSatHeightIndex(NFmiSoundingData &theData, double theH);
+/*
+	class LCLPressureInfo
+	{
+	public:
+		LCLPressureInfo(void)
+		:itsLclCount(0)
+		,itsLclTotal(0)
+		,itsIterationsCount(0)
+		,itsIterationsTotal(0)
+		,itsLclMissingCount(0)
+		{
+		}
+
+		void AddLclValue(double lclValue)
+		{
+			if(lclValue == kFloatMissing)
+				itsLclMissingCount++;
+			else
+			{
+				itsLclCount++;
+				itsLclTotal += lclValue;
+			}
+		}
+		void AddIterationsValue(double iterationValue)
+		{
+			itsIterationsCount++;
+			itsIterationsTotal += iterationValue;
+		}
+		void Clear(void)
+		{
+			*this = LCLPressureInfo();
+		}
+
+		double CalcLclAvg(void)
+		{
+			if(itsLclCount == 0)
+				return 0;
+			else
+				return itsLclTotal/itsLclCount;
+		}
+		double CalcIterationsAvg(void)
+		{
+			if(itsIterationsCount == 0)
+				return 0;
+			else
+				return itsIterationsTotal/itsIterationsCount;
+		}
+
+		int itsLclCount;
+		double itsLclTotal;
+		int itsIterationsCount;
+		double itsIterationsTotal;
+		int itsLclMissingCount;
+	};
+	LCLPressureInfo& GetLCLPressureInfo(void);
+*/
+
 	double FindNearestW(double T, double P);
 	double Tpot2t(double tpot, double p);
-	double CalcTOfLiftedAirParcel(double T, double Td, double fromP, double toP);
+//	double Tpot2tDerivate(double tpot, double p);
+//	double CalcTOfLiftedAirParcel(double T, double Td, double fromP, double toP);
 	double CalcRH(double T, double Td);
 	double TMR(double W, double P);
+//	double TMRderivate(double W, double P);
 	double OS(double T, double P);
 	double TSA(double OS, double P);
 	double T2tpot(double T, double P);
@@ -60,16 +89,26 @@ namespace NFmiSoundingFunctions
 	double CalcMixingRatio(double T, double Td, double P);
 	double CalcDewPoint(double T, double w, double P);
 	double CalcDP(double T, double RH);
+	double CalcLCLPressure(double T, double Td, double P);
+	double CalcLCLPressureFast(double T, double Td, double P);
+//	double CalcLCLPressureBinary(double T, double Td, double P);
+	double Calc_shear_unit_v_vector(double shr_0_6_v, double shr_0_6_u);
+	double CalcU_ID_left(double u0_6, double shr_0_6_v_n);
+	double CalcV_ID_left(double v0_6, double shr_0_6_u_n);
+	double CalcU_ID_right(double u0_6, double shr_0_6_v_n);
+	double CalcV_ID_right(double v0_6, double shr_0_6_u_n);
+	double CalcSRH(double u_ID, double v_ID, double uP1, double uP2, double vP1, double vP2);
 
 	float CalcLogInterpolatedValue(float x1, float x2, float x, float y1, float y2);
 	float CalcLogInterpolatedWindWectorValue(float x1, float x2, float x, float wv1, float wv2);
 
-	bool GetValuesNeededInLCLCalculations(NFmiSoundingData &theData, FmiLCLCalcType theLCLCalcType, double &T, double &Td, double &P);
-
-	NFmiString Get_U_V_ID_IndexText(NFmiSoundingData &theData, const NFmiString &theText, FmiDirection theStormDirection);
-	void Calc_U_and_V_IDs_left(NFmiSoundingData &theData, double &u_ID, double &v_ID);
-	void Calc_U_and_V_IDs_right(NFmiSoundingData &theData, double &u_ID, double &v_ID);
-	void Calc_U_and_V_mean_0_6km(NFmiSoundingData &theData, double &u0_6, double &v0_6);
+	template<typename T>
+	bool IsEqualEnough(T value1, T value2, T usedEpsilon)
+	{
+		if(::fabs(static_cast<double>(value1 - value2)) < usedEpsilon)
+			return true;
+		return false;
+	}
 }
 
 #endif // NFMISOUNDINGDATA_H
