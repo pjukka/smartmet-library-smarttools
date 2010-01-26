@@ -17,6 +17,16 @@
 
 class NFmiFastQueryInfo;
 
+// Miten LCL lasketaan, pinta-arvojen vai mixed layer arvojen avulla, vai most unstable?
+typedef enum
+{
+	kLCLCalcNone = 0,
+	kLCLCalcSurface = 1,
+	kLCLCalc500m = 2,
+	kLCLCalc500m2 = 3, // lasketaan Tpot ja w keskiarvojen ja 1. hPa kerroksin laskien
+	kLCLCalcMostUnstable = 4 // etsi maksimi theta-e arvon avulla most unstable tapaus
+} FmiLCLCalcType;
+
 class NFmiSoundingData
 {
 public:
@@ -56,6 +66,35 @@ public:
 	bool PressureDataAvailable(void) const {return fPressureDataAvailable;}
 	bool HeightDataAvailable(void) const {return fHeightDataAvailable;}
 	void SetTandTdSurfaceValues(float T, float Td);
+
+	double CalcSHOWIndex(void);
+	double CalcLIFTIndex(void);
+	double CalcKINXIndex(void);
+	double CalcCTOTIndex(void);
+	double CalcVTOTIndex(void);
+	double CalcTOTLIndex(void);
+	double CalcLCLPressureLevel(FmiLCLCalcType theLCLCalcType);
+	double CalcLCLIndex(FmiLCLCalcType theLCLCalcType);
+	double CalcLCLHeightIndex(FmiLCLCalcType theLCLCalcType);
+	double CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double &EL);
+	double CalcLFCHeightIndex(FmiLCLCalcType theLCLCalcType, double &ELheigth);
+	double CalcCAPE500Index(FmiLCLCalcType theLCLCalcType, double theHeightLimit = kFloatMissing);
+	double CalcCAPE_TT_Index(FmiLCLCalcType theLCLCalcType, double Thigh, double Tlow);
+	double CalcCINIndex(FmiLCLCalcType theLCLCalcType);
+	double CalcBulkShearIndex(double startH, double endH);
+	double CalcSRHIndex(double startH, double endH);
+	double CalcThetaEDiffIndex(double startH, double endH);
+	double CalcWSatHeightIndex(double theH);
+	bool GetValuesNeededInLCLCalculations(FmiLCLCalcType theLCLCalcType, double &T, double &Td, double &P);
+	NFmiString Get_U_V_ID_IndexText(const NFmiString &theText, FmiDirection theStormDirection);
+	void Calc_U_and_V_IDs_left(double &u_ID, double &v_ID);
+	void Calc_U_and_V_IDs_right(double &u_ID, double &v_ID);
+	void Calc_U_and_V_mean_0_6km(double &u0_6, double &v0_6);
+	double CalcWindBulkShearComponent(double startH, double endH, FmiParameterName theParId);
+	double CalcBulkShearIndex(double startH, double endH, FmiParameterName theParId);
+	void Calc_U_V_helpers(double &shr_0_6_u_n, double &shr_0_6_v_n, double &u0_6, double &v0_6);
+	double CalcTOfLiftedAirParcel(double T, double Td, double fromP, double toP);
+
 private:
 	void FixPressureDataSoundingWithGroundData(NFmiFastQueryInfo* theGroundDataInfo);
 	unsigned int GetHighestNonMissingValueLevelIndex(FmiParameterName theParaId);

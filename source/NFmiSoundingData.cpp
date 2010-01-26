@@ -12,6 +12,8 @@
 #include "NFmiDataModifierAvg.h"
 #include "NFmiInterpolation.h"
 #include "NFmiSoundingFunctions.h"
+#include "NFmiAngle.h"
+#include "NFmiValueString.h"
 
 using namespace NFmiSoundingFunctions;
 
@@ -1144,4 +1146,662 @@ bool NFmiSoundingData::HasRealSoundingData(NFmiFastQueryInfo &theSoundingLevelIn
 		}
 	}
 	return false;
+}
+
+// SHOW Showalter index
+// SHOW	= T500 - Tparcel
+// T500 = Temperature in Celsius at 500 mb
+// Tparcel = Temperature in Celsius at 500 mb of a parcel lifted from 850 mb
+double NFmiSoundingData::CalcSHOWIndex(void)
+{
+	double indexValue = kFloatMissing;
+	double T_850 = GetValueAtPressure(kFmiTemperature, 850);
+	double Td_850 = GetValueAtPressure(kFmiDewPoint, 850);
+	if(T_850 != kFloatMissing && Td_850 != kFloatMissing)
+	{
+		double Tparcel_from850to500 = CalcTOfLiftedAirParcel(T_850, Td_850, 850, 500);
+		// 3. SHOW = T500 - Tparcel_from850to500
+		double T500 = GetValueAtPressure(kFmiTemperature, 500);
+		if(T500 != kFloatMissing && Tparcel_from850to500 != kFloatMissing)
+			indexValue = T500 - Tparcel_from850to500;
+	}
+	return indexValue;
+}
+
+// LIFT Lifted index
+// LIFT	= T500 - Tparcel
+// T500 = temperature in Celsius of the environment at 500 mb
+// Tparcel = 500 mb temperature in Celsius of a lifted parcel with the average pressure,
+//			 temperature, and dewpoint of the layer 500 m above the surface.
+double NFmiSoundingData::CalcLIFTIndex(void)
+{
+	double indexValue = kFloatMissing;
+	double P_500m_avg = kFloatMissing;
+	double T_500m_avg = kFloatMissing;
+	double Td_500m_avg = kFloatMissing;
+
+	// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+	double h1 = 0 + ZeroHeight();
+	double h2 = 500 + ZeroHeight();
+
+	if(CalcLCLAvgValues(h1, h2, T_500m_avg, Td_500m_avg, P_500m_avg, false))
+	{
+		double Tparcel_from500mAvgTo500 = CalcTOfLiftedAirParcel(T_500m_avg, Td_500m_avg, P_500m_avg, 500);
+		// 3. LIFT	= T500 - Tparcel_from500mAvgTo500
+		double T500 = GetValueAtPressure(kFmiTemperature, 500);
+		if(T500 != kFloatMissing && Tparcel_from500mAvgTo500 != kFloatMissing)
+			indexValue = T500 - Tparcel_from500mAvgTo500;
+	}
+	return indexValue;
+}
+
+// KINX K index
+// KINX = ( T850 - T500 ) + TD850 - ( T700 - TD700 )
+//	T850 = Temperature in Celsius at 850 mb
+//	T500 = Temperature in Celsius at 500 mb
+//	TD850 = Dewpoint in Celsius at 850 mb
+//	T700 = Temperature in Celsius at 700 mb
+//	TD700 = Dewpoint in Celsius at 700 mb
+double NFmiSoundingData::CalcKINXIndex(void)
+{
+	double T850 = GetValueAtPressure(kFmiTemperature, 850);
+	double T500 = GetValueAtPressure(kFmiTemperature, 500);
+	double TD850 = GetValueAtPressure(kFmiDewPoint, 850);
+	double T700 = GetValueAtPressure(kFmiTemperature, 700);
+	double TD700 = GetValueAtPressure(kFmiDewPoint, 700);
+	if(T850 != kFloatMissing && T500 != kFloatMissing && TD850 != kFloatMissing && T700 != kFloatMissing && TD700 != kFloatMissing)
+		return ( T850 - T500 ) + TD850 - ( T700 - TD700 );
+	return kFloatMissing;
+}
+
+// CTOT	Cross Totals index
+//	CTOT	= TD850 - T500
+//		TD850 	= Dewpoint in Celsius at 850 mb
+//		T500 	= Temperature in Celsius at 500 mb
+double NFmiSoundingData::CalcCTOTIndex(void)
+{
+	double T500 = GetValueAtPressure(kFmiTemperature, 500);
+	double TD850 = GetValueAtPressure(kFmiDewPoint, 850);
+	if(T500 != kFloatMissing && TD850 != kFloatMissing)
+		return ( TD850 - T500 );
+	return kFloatMissing;
+}
+
+// VTOT	Vertical Totals index
+//	VTOT	= T850 - T500
+//		T850	= Temperature in Celsius at 850 mb
+//		T500	= Temperature in Celsius at 500 mb
+double NFmiSoundingData::CalcVTOTIndex(void)
+{
+	double T500 = GetValueAtPressure(kFmiTemperature, 500);
+	double T850 = GetValueAtPressure(kFmiTemperature, 850);
+	if(T500 != kFloatMissing && T850 != kFloatMissing)
+		return ( T850 - T500 );
+	return kFloatMissing;
+}
+
+// TOTL	Total Totals index
+//	TOTL	= ( T850 - T500 ) + ( TD850 - T500 )
+//		T850 	= Temperature in Celsius at 850 mb
+//		TD850	= Dewpoint in Celsius at 850 mb
+//		T500 	= Temperature in Celsius at 500 mb
+double NFmiSoundingData::CalcTOTLIndex(void)
+{
+	double T850 = GetValueAtPressure(kFmiTemperature, 850);
+	double T500 = GetValueAtPressure(kFmiTemperature, 500);
+	double TD850 = GetValueAtPressure(kFmiDewPoint, 850);
+	if(T850 != kFloatMissing && T500 != kFloatMissing && TD850 != kFloatMissing)
+		return ( T850 - T500 ) + (TD850 - T500);
+	return kFloatMissing;
+}
+
+// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+bool NFmiSoundingData::GetValuesNeededInLCLCalculations(FmiLCLCalcType theLCLCalcType, double &T, double &Td, double &P)
+{
+	// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+	double h1 = 0 + ZeroHeight();
+	double h2 = 500 + ZeroHeight();
+
+	bool status = false;
+	if(theLCLCalcType == kLCLCalc500m)
+		status = CalcLCLAvgValues(h1, h2, T, Td, P, false);
+	else if(theLCLCalcType == kLCLCalc500m2)
+		status = CalcLCLAvgValues(h1, h2, T, Td, P, true);
+	else if(theLCLCalcType == kLCLCalcMostUnstable)
+	{
+		double maxThetaE = 0;
+		status = FindHighestThetaE(T, Td, P, maxThetaE, 500); // rajoitetaan max thetan etsint‰ 500 mb:en asti
+	}
+
+	if(status == false) // jos muu ei auta, laske pinta suureiden avulla
+	{
+		P=1100;
+		if(!GetValuesStartingLookingFromPressureLevel(T, Td, P)) // sitten l‰himm‰t pinta arvot, jotka joskus yli 500 m
+			return false;
+	}
+	return true;
+}
+
+// LCL-levelin painepinnan lasku k‰ytt‰en luotauksen haluttuja arvoja
+double NFmiSoundingData::CalcLCLPressureLevel(FmiLCLCalcType theLCLCalcType)
+{
+	// 1. calc T,Td,P values from 500 m layer avg or surface values
+	double T=kFloatMissing,
+		   Td=kFloatMissing,
+		   P=kFloatMissing;
+	if(!GetValuesNeededInLCLCalculations(theLCLCalcType, T, Td, P))
+		return kFloatMissing;
+
+	return CalcLCLPressure(T, Td, P);
+}
+
+// Claculates LCL (Lifted Condensation Level)
+// halutulla tavalla
+double NFmiSoundingData::CalcLCLIndex(FmiLCLCalcType theLCLCalcType)
+{
+	return CalcLCLPressureLevel(theLCLCalcType);
+}
+// palauttaa LCL:n korkeuden metreiss‰
+double NFmiSoundingData::CalcLCLHeightIndex(FmiLCLCalcType theLCLCalcType)
+{
+	return GetValueAtPressure(kFmiGeomHeight, static_cast<float>(CalcLCLPressureLevel(theLCLCalcType)));
+}
+
+// Claculates LFC (Level of Free Convection)
+// which is the level above which the lifted parcel is warmer than environment
+// parcel is avg from 500 m layer at surface
+// HUOM! Lis‰sin myˆs EL laskun eli EL on korkeus mill‰ nostettu ilmapaketti muuttuu
+// j‰lleen kylmemm‰ksi kuin ymp‰ristˆ (jos se koskaan oli l‰mpim‰mp‰‰)
+// Tied‰n t‰m‰ on ik‰v‰ kaksi vastuuta yhdell‰ metodilla, joista toinen ei edes n‰y metodin nimess‰.
+double NFmiSoundingData::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double &EL)
+{
+	// 1. calc T,Td,P values from 500 m layer avg or surface values
+	double T=kFloatMissing,
+		   Td=kFloatMissing,
+		   P=kFloatMissing;
+	if(!GetValuesNeededInLCLCalculations(theLCLCalcType, T, Td, P))
+		return kFloatMissing;
+
+	double LCLValue = CalcLCLPressure(T, Td, P);
+	// 2. lift parcel until its warmer than environment
+	// 2.1 first adiabatically till LCL and than moist adiabatically
+	// iterate with CalcTOfLiftedAirParcel from 500 m avg P to next sounding pressure level
+	// until T-parcel is warmer than T at that pressure level in sounding
+	checkedVector<float> &pValues = GetParamData(kFmiPressure);
+	checkedVector<float> &tValues = GetParamData(kFmiTemperature);
+	size_t ssize = pValues.size();
+	double TofLiftedParcer_previous = kFloatMissing;
+	double P_previous = kFloatMissing;
+
+	double foundPValue = kFloatMissing;
+	double durrentDiff = 0; // ilmapaketin ja ymp‰ristˆn T ero
+	double lastDiff = 0; // ilmapaketin ja ymp‰ristˆn T ero viime kierroksella
+	for(size_t i = 0; i < ssize; i++)
+	{
+		if(pValues[i] != kFloatMissing && pValues[i] <= P) // aloitetaan LFC etsint‰ vasta 'aloitus' korkeuden j‰lkeen
+		{
+			if(tValues[i] != kFloatMissing) // kaikilla painepinnoilla ei ole l‰mpˆtilaa
+			{
+				double TofLiftedParcer = CalcTOfLiftedAirParcel(T, Td, P, pValues[i]);
+
+				TofLiftedParcer_previous = TofLiftedParcer;
+				P_previous = pValues[i];
+
+				durrentDiff = TofLiftedParcer - tValues[i];
+				if(durrentDiff > 0 && foundPValue == kFloatMissing) // vain alin korkeus talteen
+					foundPValue = pValues[i];
+				if(durrentDiff < 0 && lastDiff > 0) // jos siis paketti muuttui l‰mpim‰mm‰st‰ kylmemm‰ksi (ymp‰ristˆˆn verrattuna, ota talteen korkeus)
+					EL = pValues[i];
+				lastDiff = durrentDiff;
+			}
+		}
+	}
+	if(foundPValue != kFloatMissing && LCLValue < foundPValue)
+		foundPValue = LCLValue; // LFC:n pit‰‰ olla ainakin LCL korkeudessa tai korkeammalla eli kun paineesta kysymys LCL >= LFC
+	return foundPValue;
+}
+
+// palauttaa LFC:n ja  EL:n korkeuden metreiss‰
+double NFmiSoundingData::CalcLFCHeightIndex(FmiLCLCalcType theLCLCalcType, double &ELheigth)
+{
+	double tmpValue = CalcLFCIndex(theLCLCalcType, ELheigth);
+	ELheigth = GetValueAtPressure(kFmiGeomHeight, static_cast<float>(ELheigth));
+	return GetValueAtPressure(kFmiGeomHeight, static_cast<float>(tmpValue));
+}
+
+// Calculates CAPE (500 m mix)
+// theHeightLimit jos halutaan, voidaan cape lasku rajoittaa alle jonkin korkeus arvon (esim. 3000 m)
+double NFmiSoundingData::CalcCAPE500Index(FmiLCLCalcType theLCLCalcType, double theHeightLimit)
+{
+	// 1. calc T,Td,P values from 500 m layer avg or surface values
+	double T=kFloatMissing,
+		   Td=kFloatMissing,
+		   P=kFloatMissing;
+	if(!GetValuesNeededInLCLCalculations(theLCLCalcType, T, Td, P))
+		return kFloatMissing;
+
+	// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+	if(theHeightLimit != kFloatMissing)
+		theHeightLimit += ZeroHeight();
+
+	checkedVector<float> &pValues = GetParamData(kFmiPressure);
+	checkedVector<float> &tValues = GetParamData(kFmiTemperature);
+	size_t ssize = pValues.size();
+	double CAPE = 0;
+	double g = 9.81; // acceleration by gravity
+	double Tparcel = 0;
+	double Tenvi = 0;
+	double currentZ = 0;
+	double lastZ = kFloatMissing;
+	double deltaZ = kFloatMissing;
+    double TK=273.15;
+	for(size_t i = 0; i < ssize; i++)
+	{
+		if(pValues[i] != kFloatMissing && pValues[i] < P) // aloitetaan LFC etsint‰ vasta 'aloitus' korkeuden j‰lkeen
+		{
+			if(tValues[i] != kFloatMissing) // kaikilla painepinnoilla ei ole l‰mpˆtilaa
+			{
+// !!!!!!!!		if((Tlow != kFloatMissing && Tlow > tValues[i]) || (Thigh != kFloatMissing && Thigh < tValues[i]))
+//					continue;
+				double TofLiftedParcer = CalcTOfLiftedAirParcel(T, Td, P, pValues[i]);
+				currentZ = GetValueAtPressure(kFmiGeomHeight, pValues[i]); // interpoloidaan jos tarvis
+
+				// integrate here if T parcel is greater than T environment
+				if(TofLiftedParcer > tValues[i] && currentZ != kFloatMissing && lastZ != kFloatMissing)
+				{
+					Tparcel = TofLiftedParcer + TK;
+					Tenvi = tValues[i] + TK;
+					deltaZ = currentZ - lastZ;
+					CAPE += g * deltaZ * ((Tparcel - Tenvi)/Tenvi);
+				}
+				lastZ = currentZ;
+
+				if(theHeightLimit != kFloatMissing && currentZ > theHeightLimit)
+					break; // lopetetaan laskut jos ollaan menty korkeus rajan yli, kun ensin on laskettu t‰m‰ siivu viel‰ mukaan
+			}
+		}
+	}
+	return CAPE;
+}
+
+// Calculates CAPE in layer between two temperatures given
+double NFmiSoundingData::CalcCAPE_TT_Index(FmiLCLCalcType theLCLCalcType, double Thigh, double Tlow)
+{
+	// 1. calc T,Td,P values from 500 m layer avg or surface values
+	double T=kFloatMissing,
+		   Td=kFloatMissing,
+		   P=kFloatMissing;
+	if(!GetValuesNeededInLCLCalculations(theLCLCalcType, T, Td, P))
+		return kFloatMissing;
+
+	checkedVector<float> &pValues = GetParamData(kFmiPressure);
+	checkedVector<float> &tValues = GetParamData(kFmiTemperature);
+	size_t ssize = pValues.size();
+	double CAPE = 0;
+	double g = 9.81; // acceleration by gravity
+	double Tparcel = 0;
+	double Tenvi = 0;
+	double currentZ = 0;
+	double lastZ = kFloatMissing;
+	double deltaZ = kFloatMissing;
+    double TK=273.15;
+	for(size_t i = 0; i < ssize; i++)
+	{
+		if(pValues[i] != kFloatMissing && pValues[i] < P) // aloitetaan LFC etsint‰ vasta 'aloitus' korkeuden j‰lkeen
+		{
+			if(tValues[i] != kFloatMissing) // kaikilla painepinnoilla ei ole l‰mpˆtilaa
+			{
+				currentZ = GetValueAtPressure(kFmiGeomHeight, pValues[i]); // interpoloidaan jos tarvis
+				if(Tlow < tValues[i] && Thigh > tValues[i])
+				{
+					double TofLiftedParcer = CalcTOfLiftedAirParcel(T, Td, P, pValues[i]);
+
+					// integrate here if T parcel is greater than T environment
+					if(TofLiftedParcer > tValues[i] && currentZ != kFloatMissing && lastZ != kFloatMissing)
+					{
+						Tparcel = TofLiftedParcer + TK;
+						Tenvi = tValues[i] + TK;
+						deltaZ = currentZ - lastZ;
+						CAPE += g * deltaZ * ((Tparcel - Tenvi)/Tenvi);
+					}
+				}
+				lastZ = currentZ;
+			}
+		}
+	}
+	return CAPE;
+}
+
+// Calculates CIN
+// first layer of negative (TP - TE (= T-parcel - T-envi)) unless its the last also
+double NFmiSoundingData::CalcCINIndex(FmiLCLCalcType theLCLCalcType)
+{
+	// 1. calc T,Td,P values from 500 m layer avg or surface values
+	double T=kFloatMissing,
+		   Td=kFloatMissing,
+		   P=kFloatMissing;
+	if(!GetValuesNeededInLCLCalculations(theLCLCalcType, T, Td, P))
+		return kFloatMissing;
+
+	checkedVector<float> &pValues = GetParamData(kFmiPressure);
+	checkedVector<float> &tValues = GetParamData(kFmiTemperature);
+	size_t ssize = pValues.size();
+	double CIN = 0;
+	double g = 9.81; // acceleration by gravity
+	double Tparcel = 0;
+	double Tenvi = 0;
+	double currentZ = 0;
+	double lastZ = kFloatMissing;
+	double deltaZ = kFloatMissing;
+    double TK=273.15; // celsius/kelvin change
+	bool firstCinLayerFound = false;
+	bool capeLayerFoundAfterCin = false;
+	for(size_t i = 0; i < ssize; i++)
+	{
+		if(pValues[i] != kFloatMissing && pValues[i] < P) // aloitetaan LFC etsint‰ vasta 'aloitus' korkeuden j‰lkeen
+		{
+			if(tValues[i] != kFloatMissing) // kaikilla painepinnoilla ei ole l‰mpˆtilaa
+			{
+				double TofLiftedParcer = CalcTOfLiftedAirParcel(T, Td, P, pValues[i]);
+				currentZ = GetValueAtPressure(kFmiGeomHeight, pValues[i]); // interpoloidaan jos tarvis
+
+				// integrate here if T parcel is less than T environment
+				if(TofLiftedParcer <= tValues[i] && currentZ != kFloatMissing && lastZ != kFloatMissing)
+				{
+					Tparcel = TofLiftedParcer + TK;
+					Tenvi = tValues[i] + TK;
+					deltaZ = currentZ - lastZ;
+					CIN += g * deltaZ * ((Tparcel - Tenvi)/Tenvi);
+					firstCinLayerFound = true;
+				}
+				else if(firstCinLayerFound)
+				{
+					capeLayerFoundAfterCin = true;
+					break; // jos 1. CIN layer on lˆydetty ja osutaan CAPE layeriin, lopetetaan
+				}
+				lastZ = currentZ;
+			}
+		}
+	}
+	if(!(firstCinLayerFound && capeLayerFoundAfterCin))
+		CIN = 0;
+	return CIN;
+}
+
+// startH and endH are in kilometers
+// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+double NFmiSoundingData::CalcWindBulkShearComponent(double startH, double endH, FmiParameterName theParId)
+{
+	// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+	startH += ZeroHeight()/1000.; // zero height pit‰‰ muuttaa t‰ss‰ metreist‰ kilometreiksi!
+	endH += ZeroHeight()/1000.; // zero height pit‰‰ muuttaa t‰ss‰ metreist‰ kilometreiksi!
+
+	float startValue = GetValueAtHeight(theParId, static_cast<float>(startH*1000));
+	float endValue = GetValueAtHeight(theParId, static_cast<float>(endH*1000));
+	float shearComponent = endValue - startValue;
+	if(endValue == kFloatMissing || startValue == kFloatMissing)
+		shearComponent = kFloatMissing;
+	return shearComponent;
+}
+
+// startH and endH are in kilometers
+// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+double NFmiSoundingData::CalcThetaEDiffIndex(double startH, double endH)
+{
+	// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+	startH += ZeroHeight()/1000.; // zero height pit‰‰ muuttaa t‰ss‰ metreist‰ kilometreiksi!
+	endH += ZeroHeight()/1000.; // zero height pit‰‰ muuttaa t‰ss‰ metreist‰ kilometreiksi!
+
+	float startT = GetValueAtHeight(kFmiTemperature, static_cast<float>(startH*1000));
+	float endT = GetValueAtHeight(kFmiTemperature, static_cast<float>(endH*1000));
+	float startTd = GetValueAtHeight(kFmiDewPoint, static_cast<float>(startH*1000));
+	float endTd = GetValueAtHeight(kFmiDewPoint, static_cast<float>(endH*1000));
+	float startP = GetValueAtHeight(kFmiPressure, static_cast<float>(startH*1000));
+	float endP = GetValueAtHeight(kFmiPressure, static_cast<float>(endH*1000));
+	if(startT == kFloatMissing || startTd == kFloatMissing || startP == kFloatMissing)
+		return kFloatMissing;
+	double startThetaE = CalcThetaE(startT, startTd, startP);
+	if(endT == kFloatMissing || endTd == kFloatMissing || endP == kFloatMissing)
+		return kFloatMissing;
+	double endThetaE = CalcThetaE(endT, endTd, endP);
+	if(startThetaE == kFloatMissing || endThetaE == kFloatMissing)
+		return kFloatMissing;
+	double diffValue = startThetaE - endThetaE;
+	return diffValue;
+}
+
+// Calculates Bulk Shear between two given layers
+// startH and endH are in kilometers
+double NFmiSoundingData::CalcBulkShearIndex(double startH, double endH)
+{
+	// HUOM! asema korkeus otetaan huomioon CalcWindBulkShearComponent-funktiossa.
+	double uTot = CalcWindBulkShearComponent(startH, endH, kFmiWindUMS);
+	double vTot = CalcWindBulkShearComponent(startH, endH, kFmiWindVMS);
+	double BS = ::sqrt(uTot*uTot + vTot*vTot);
+	if(uTot == kFloatMissing || vTot == kFloatMissing)
+		BS = kFloatMissing;
+	return BS;
+}
+
+/* // **********  SRH calculation help from Pieter Groenemeijer ******************
+
+Some tips here on how tyo calculate storm-relative helciity
+
+How to calculate storm-relative helicity
+
+Integrate the following from p = p_surface to p = p_top (or in case of height coordinates from h_surface to h_top):
+
+storm_rel_helicity -= ((u_ID-u[p])*(v[p]-v[p+1]))-((v_ID - v[p])*(u[p]-u[p+1]));
+
+Here, u_ID and v_ID are the forecast storm motion vectors calculated with the so-called ID-method. These can be calculated as follows:
+
+where
+
+/average wind
+u0_6 = average 0_6 kilometer u-wind component
+v0_6 = average 0_6 kilometer v-wind component
+(you should use a pressure-weighted average in case you work with height coordinates)
+
+/shear
+shr_0_6_u = u_6km - u_surface;
+shr_0_6_v = v_6km - v_surface;
+
+/ shear unit vector
+shr_0_6_u_n = shr_0_6_u / ((shr_0_6_u^2 + shr_0_6_v^2)**0.5);
+shr_0_6_v_n = shr_0_6_v / ((shr_0_6_u^2 + shr_0_6_v^2)** 0.5);
+
+/id-vector components
+u_ID = u0_6 + shr_0_6_v_n * 7.5;
+v_ID = v0_6 - shr_0_6_u_n * 7.5;
+
+(7.5 are meters per second... watch out when you work with knots instead)
+
+*/ // **********  SRH calculation help from Pieter Groenemeijer ******************
+
+// I use same variable names as with the Pieters help evem though calculations are not
+// restricted to 0-6 km layer but they can be from any layer
+
+// shear
+// startH and endH are in kilometers
+double NFmiSoundingData::CalcBulkShearIndex(double startH, double endH, FmiParameterName theParId)
+{
+	// HUOM! asema korkeus otetaan huomioon CalcWindBulkShearComponent-funktiossa.
+	double shr_0_6_component = CalcWindBulkShearComponent(startH, endH, theParId);
+	return shr_0_6_component;
+}
+
+void NFmiSoundingData::Calc_U_V_helpers(double &shr_0_6_u_n, double &shr_0_6_v_n, double &u0_6, double &v0_6)
+{
+	// HUOM! asema korkeus otetaan huomioon CalcWindBulkShearComponent-funktiossa.
+	double shr_0_6_u = CalcWindBulkShearComponent(0, 6, kFmiWindUMS);
+	double shr_0_6_v = CalcWindBulkShearComponent(0, 6, kFmiWindVMS);
+	shr_0_6_u_n = NFmiSoundingFunctions::Calc_shear_unit_v_vector(shr_0_6_u, shr_0_6_v);
+	shr_0_6_v_n = Calc_shear_unit_v_vector(shr_0_6_v, shr_0_6_u);
+
+	// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+	double h1 = 0 + ZeroHeight(); // 0 m + aseman korkeus
+	double h2 = 6000 + ZeroHeight(); // 6000 m + aseman korkeus
+	CalcAvgWindComponentValues(h1, h2, u0_6, v0_6);
+}
+
+// lasketaan u ja v ID:t 0-6km layeriss‰
+// t‰m‰ on hodografissa 'left'
+void NFmiSoundingData::Calc_U_and_V_IDs_left(double &u_ID, double &v_ID)
+{
+	double shr_0_6_u_n=0, shr_0_6_v_n=0, u0_6=0, v0_6=0;
+	Calc_U_V_helpers(shr_0_6_u_n, shr_0_6_v_n, u0_6, v0_6);
+
+	u_ID = NFmiSoundingFunctions::CalcU_ID_left(u0_6, shr_0_6_v_n);
+	v_ID = NFmiSoundingFunctions::CalcV_ID_left(v0_6, shr_0_6_u_n);
+}
+
+// lasketaan u ja v ID:t 0-6km layeriss‰
+// t‰m‰ on hodografissa 'right'
+void NFmiSoundingData::Calc_U_and_V_IDs_right(double &u_ID, double &v_ID)
+{
+	double shr_0_6_u_n=0, shr_0_6_v_n=0, u0_6=0, v0_6=0;
+	Calc_U_V_helpers(shr_0_6_u_n, shr_0_6_v_n, u0_6, v0_6);
+
+	u_ID = NFmiSoundingFunctions::CalcU_ID_right(u0_6, shr_0_6_v_n);
+	v_ID = NFmiSoundingFunctions::CalcV_ID_right(v0_6, shr_0_6_u_n);
+}
+
+// lasketaan u ja v mean 0-6km layeriss‰
+void NFmiSoundingData::Calc_U_and_V_mean_0_6km(double &u0_6, double &v0_6)
+{
+	// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+	double h1 = 0 + ZeroHeight(); // 0 m + aseman korkeus
+	double h2 = 6000 + ZeroHeight(); // 6000 m + aseman korkeus
+	CalcAvgWindComponentValues(h1, h2, u0_6, v0_6);
+}
+
+NFmiString NFmiSoundingData::Get_U_V_ID_IndexText(const NFmiString &theText, FmiDirection theStormDirection)
+{
+	NFmiString str(theText);
+	str += "=";
+	double u_ID = kFloatMissing;
+	double v_ID = kFloatMissing;
+	if(theStormDirection == kRight)
+		Calc_U_and_V_IDs_right(u_ID, v_ID);
+	else if(theStormDirection == kLeft)
+		Calc_U_and_V_IDs_left(u_ID, v_ID);
+	else
+		Calc_U_and_V_mean_0_6km(u_ID, v_ID);
+
+	if(u_ID == kFloatMissing || v_ID == kFloatMissing)
+		str += " -/-";
+	else
+	{
+		double WS = ::sqrt(u_ID*u_ID + v_ID*v_ID);
+		NFmiWindDirection theDirection(u_ID, v_ID);
+		double WD = theDirection.Value();
+
+		if(WD != kFloatMissing)
+			str += NFmiValueString::GetStringWithMaxDecimalsSmartWay(WD, 0);
+		else
+			str += "-";
+		str += "/";
+		str += NFmiValueString::GetStringWithMaxDecimalsSmartWay(WS, 1);
+	}
+	return str;
+}
+
+// Calculates Storm-Relative Helicity (SRH) between two given layers
+// startH and endH are in kilometers
+// k‰ytet‰‰n muuttujan nimin‰ samoja mit‰ on Pieterin helpiss‰, vaikka kyseess‰ ei olekaan laskut layerille 0-6km vaan mille v‰lille tahansa
+// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+double NFmiSoundingData::CalcSRHIndex(double startH, double endH)
+{
+	checkedVector<float>&pV = GetParamData(kFmiPressure);
+	if(pV.size() > 0)
+	{
+		// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+		startH += ZeroHeight()/1000.; // zero height pit‰‰ muuttaa t‰ss‰ metreist‰ kilometreiksi!
+		endH += ZeroHeight()/1000.; // zero height pit‰‰ muuttaa t‰ss‰ metreist‰ kilometreiksi!
+
+		size_t ssize = pV.size();
+		checkedVector<float>&uV = GetParamData(kFmiWindUMS);
+		checkedVector<float>&vV = GetParamData(kFmiWindVMS);
+		checkedVector<float>&tV = GetParamData(kFmiTemperature);
+		checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
+
+		double u_ID = kFloatMissing;
+		double v_ID = kFloatMissing;
+		Calc_U_and_V_IDs_right(u_ID, v_ID);
+		double SRH = 0;
+		double lastU = kFloatMissing;
+		double lastV = kFloatMissing;
+		bool foundAnyData = false;
+		for(size_t i = 0; i<ssize; i++)
+		{
+			double p = pV[i];
+			double u = uV[i];
+			double v = vV[i];
+			double t = tV[i];
+			double td = tdV[i];
+			if(p != kFloatMissing && u != kFloatMissing && v != kFloatMissing && t != kFloatMissing && td != kFloatMissing)
+			{
+				double z = GetValueAtPressure(kFmiGeomHeight, static_cast<float>(p));
+				if(z != kFloatMissing && z >= startH*1000 && z <= endH*1000)
+				{
+					if(lastU != kFloatMissing && lastV != kFloatMissing)
+					{
+						SRH -= NFmiSoundingFunctions::CalcSRH(u_ID, v_ID, lastU, u, lastV, v);
+						foundAnyData = true;
+					}
+				}
+				lastU = u;
+				lastV = v;
+			}
+		}
+		return foundAnyData ? SRH : kFloatMissing;
+	}
+	return kFloatMissing;
+}
+
+// theH in meters
+double NFmiSoundingData::CalcWSatHeightIndex(double theH)
+{
+	// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
+	theH += ZeroHeight();
+
+	return GetValueAtHeight(kFmiWindSpeedMS, static_cast<float>(theH));
+}
+
+// Laske ilmapaketin l‰mpˆtila nostamalla ilmapakettia
+// Nosta kuiva-adiapaattisesti LCL-korkeuteen ja siit‰ eteenp‰in kostea-adiapaattisesti
+double NFmiSoundingData::CalcTOfLiftedAirParcel(double T, double Td, double fromP, double toP)
+{
+	// 1. laske LCL kerroksen paine alkaen fromP:st‰
+	double lclPressure = CalcLCLPressure(T, Td, fromP);
+	if(lclPressure != kFloatMissing)
+	{
+		// Laske aloitus korkeuden l‰mpˆtilan potentiaali l‰mpˆtila.
+		double TpotStart = NFmiSoundingFunctions::T2tpot(T, fromP);
+		if(TpotStart != kFloatMissing)
+		{
+			if(lclPressure <= toP) // jos lcl oli yli toP:n mb (eli pienempi kuin toP)
+			{ // nyt riitt‰‰ pelkk‰ kuiva-adiapaattinen nosto fromP -> toP
+				double Tparcel = NFmiSoundingFunctions::Tpot2t(TpotStart, toP);
+				return Tparcel;
+			}
+			else
+			{
+				// Laske ilmapaketin l‰mpˆ lcl-korkeudella  kuiva-adiapaattisesti nostettuna
+				double Tparcel_LCL = NFmiSoundingFunctions::Tpot2t(TpotStart, lclPressure);
+				// laske kyseiselle korkeudelle vastaava kostea-adiapaatti arvo
+				double TmoistLCL = NFmiSoundingFunctions::CalcMoistT(Tparcel_LCL, lclPressure);
+				// kyseinen kostea-adiapaatti pit‰‰ konvertoida viel‰ (ADL-kielest‰ kopioitua koodia, ks. OS- ja
+				// TSA-funtioita) jotenkin 1000 mb:hen.
+				if(TmoistLCL != kFloatMissing)
+				{
+					double AOS = NFmiSoundingFunctions::OS(TmoistLCL, 1000.);
+					// Sitten lasketaan l‰mpˆtila viimein 500 mb:hen
+					double Tparcel = NFmiSoundingFunctions::TSA(AOS, toP);
+					return Tparcel;
+				}
+			}
+		}
+	}
+	return kFloatMissing;
 }
