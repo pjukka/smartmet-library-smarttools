@@ -16,6 +16,7 @@
 class NFmiSmartInfo;
 class NFmiFastQueryInfo;
 class NFmiSoundingData;
+class NFmiSoundingDataOpt1;
 class NFmiDrawParam;
 class NFmiMetTime;
 class NFmiInfoOrganizer;
@@ -98,8 +99,10 @@ public:
 	static bool FillSoundingData(NFmiFastQueryInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiMetTime &theTime, const NFmiLocation &theLocation, NFmiFastQueryInfo* theGroundDataInfo);
 //	static void Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrganizer *theInfoOrganizer, NFmiDrawParam *theDrawParam, NFmiDataMatrix<float> &theValues, const NFmiMetTime &theTime, const NFmiDataMatrix<float> &theObsDataT, const NFmiDataMatrix<float> &theObsDataTd, bool fObsDataFound);
 	static float Calc(NFmiSoundingData &theSoundingData, FmiSoundingParameters theParam);
+	static float CalcOpt1(NFmiSoundingDataOpt1 &theSoundingDataOpt1, FmiSoundingParameters theParam);
 	static float Calc(NFmiFastQueryInfo *theInfo, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, FmiSoundingParameters theParam);
-	static void CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor = 0);
+	static void CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor = 0);
+	static NFmiQueryData* CreateNewSoundingIndexData(const std::string &theSourceFileFilter, bool fDoCerrReporting, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor = 0);
 };
 
 #endif // NFMISOUNDINGINDEXCALCULATOR_H
