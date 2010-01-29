@@ -34,3 +34,14 @@ const std::string NFmiGridPointCache::MakeGridCacheStr( const NFmiGrid &theGrid 
 		return str;
 	}
 }
+
+const std::string NFmiGridPointCache::MakeGridCacheStr(const NFmiArea &theArea, size_t xCount, size_t yCount)
+{
+	std::string str(theArea.AreaStr());
+	str += ":";
+	str += NFmiStringTools::Convert(xCount);
+	str += ",";
+	str += NFmiStringTools::Convert(yCount);
+
+	return str;
+}

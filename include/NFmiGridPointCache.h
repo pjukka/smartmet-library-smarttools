@@ -15,6 +15,7 @@
 #include <map>
 
 class NFmiGrid;
+class NFmiArea;
 
 class NFmiGridPointCache
 {
@@ -36,6 +37,7 @@ public:
 	pointMap::iterator End(void) {return itsPointCache.end();};
 	void Clear(void) {itsPointCache.clear();};
 	static const std::string MakeGridCacheStr(const NFmiGrid &theGrid);
+	static const std::string MakeGridCacheStr(const NFmiArea &theArea, size_t xCount, size_t yCount);
 
 private:
 	pointMap itsPointCache;
