@@ -43,13 +43,11 @@
 
 #include "NFmiParameterName.h"
 #include "NFmiProducerName.h"
-#include "NFmiGlobals.h"
 #include "NFmiAreaMask.h"
 #include "NFmiProducer.h"
 #include "NFmiLevelType.h"
 #include "NFmiParamBag.h"
 #include "NFmiDataMatrix.h"
-#include "NFmiSoundingIndexCalculator.h"
 
 #include <string>
 #include <map>
@@ -107,16 +105,6 @@ class NFmiSmartToolIntepreter
 public:
 	typedef std::map<std::string, FmiProducerName> ProducerMap;
 	typedef std::map<std::string, double> ConstantMap; // esim. MISS 32700 tai PI 3.14159
-/*
-	class Exception
-	{
-	public:
-		Exception(const std::string &theText):itsText(theText){}
-		const std::string& What(void){return itsText;}
-	private:
-		const std::string itsText;
-	};
-*/
 	void Interpret(const std::string &theMacroText, bool fThisIsMacroParamSkript = false);
 
 	NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer, NFmiProducerSystem *theProducerSystem);
@@ -208,7 +196,6 @@ private:
 	bool IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariablePeekFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
-//	bool IsVariableSoundingParameter(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theProducerNameOnly);
 	FmiLevelType GetLevelType(NFmiInfoData::Type theDataType, long levelValue);
 
 	NFmiInfoOrganizer* itsInfoOrganizer; // ei omista
@@ -254,16 +241,12 @@ private:
 	static ParamMap itsTokenStaticParameterNamesAndIds;
 	static ParamMap itsTokenCalculatedParameterNamesAndIds; // mm. lat, lon ja elevAngle
 
-//	typedef std::map<std::string, FmiSoundingParameters> SoundingIndexMap;
-//	static SoundingIndexMap itsTokenSoundingIndexFunctions;
-
 	typedef std::map<std::string, NFmiAreaMask::FunctionType> FunctionMap;
 	static FunctionMap itsTokenFunctions;
 	static FunctionMap itsTokenThreeArgumentFunctions;
 
 	typedef std::map<std::string, NFmiAreaMask::CalculationOperationType> PeekFunctionMap;
 	static PeekFunctionMap itsTokenPeekFunctions;
-//	static checkedVector<std::string> itsTokenPeekXYFunctions;
 
 	typedef std::map<std::string, NFmiAreaMask::MathFunctionType> MathFunctionMap;
 	static MathFunctionMap itsMathFunctions;

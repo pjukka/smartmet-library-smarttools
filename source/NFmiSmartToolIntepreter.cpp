@@ -49,14 +49,7 @@
 static const unsigned int gMesanProdId = 160;
 
 using namespace std;
-/*
-#include "stdafx.h"
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-*/
+
 // globaali tarkistus luokka etsim‰‰n rivin lopetusta
 struct EndOfLineSearcher
 {
@@ -182,7 +175,6 @@ checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenElseIfCommands;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenElseCommands;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenCalculationBlockMarkers;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenMaskBlockMarkers;
-//checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenFunctions;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenRampUpFunctions;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenRampDownFunctions;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenDoubleRampFunctions;
@@ -195,7 +187,6 @@ NFmiSmartToolIntepreter::CalcOperMap NFmiSmartToolIntepreter::itsCalculationOper
 NFmiSmartToolIntepreter::BinaOperMap NFmiSmartToolIntepreter::itsBinaryOperator;
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenStaticParameterNamesAndIds;
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenCalculatedParameterNamesAndIds;
-//NFmiSmartToolIntepreter::SoundingIndexMap NFmiSmartToolIntepreter::itsTokenSoundingIndexFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenThreeArgumentFunctions;
 NFmiSmartToolIntepreter::PeekFunctionMap NFmiSmartToolIntepreter::itsTokenPeekFunctions;
@@ -233,7 +224,6 @@ void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText, bool fT
 	Clear();
 	itsTokenScriptVariableNames.clear(); // tyhjennetaan aluksi kaikki skripti muuttujat
 	itsScriptVariableParamIdCounter = 1000000; // alustetaan isoksi, ettei mene p‰‰llekk‰in todellisten param id::::ien kanssa
-//	InitSectionInfos();
 	SetMacroTexts(theMacroText);
 	InitCheckOut();
 
@@ -298,7 +288,6 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlockVector(NFmiSma
 	bool fBlockFound = false;
 	int safetyIndex = 0;
 	NFmiSmartToolCalculationBlockInfo *block = new NFmiSmartToolCalculationBlockInfo;
-//	auto_ptr<NFmiSmartToolCalculationBlockInfo> blockPtr(block); // tuhoaa poikkeusten tapauksessa dynaamisen datan
 	try
 	{
 		for( ; fBlockFound = CheckoutPossibleNextCalculationBlock(block, false, safetyIndex); safetyIndex++)
@@ -402,7 +391,6 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 	fWasBlockMarksFound = false;
 	itsCheckOutSectionText = "";
 	string nextLine;
-//	std::string::iterator eolPos = itsStrippedMacroText.begin();
 	std::string::iterator eolPos = itsCheckOutTextStartPosition;
 	eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
 	itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
@@ -416,12 +404,9 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 			fWasBlockMarksFound = true;
 			++itsCheckOutTextStartPosition; // hyp‰t‰‰n alkumerkin ohi
 			eolPos = itsCheckOutTextStartPosition;
-//			itsCheckOutSectionText = string(itsCheckOutTextStartPosition, eolPos);
-//			++eolPos; // hyp‰t‰‰n blokin loppumerkin ohi
-//			itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
 		}
 	}
-//	else // muuten etsit‰‰n laskurivej‰ rivi kerrallaan
+
 	{
 		do
 		{
@@ -433,15 +418,12 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 			{
 				if(*eolPos == '{') // jos lˆytyy alkumerkki, ilmoitetaan siit‰ ulos t‰‰lt‰
 					fWasBlockMarksFound = true;
-//				if(*eolPos == '}') // jos ollaan loppu merkiss‰, siirryt‰‰n sen yli ja jatketaan seuraavalle kierrokselle
-//					++itsCheckOutTextStartPosition;
 				if(itsCheckOutSectionText.empty())
 					return false;
 				else
 					return true;
 			}
 
-//			eolPos = std::find(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), '\n');
 			eolPos = std::find_if(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), EndOfLineSearcher());
 
 			nextLine = string(itsCheckOutTextStartPosition, eolPos);
@@ -646,8 +628,6 @@ bool NFmiSmartToolIntepreter::ExtractPossibleElseIfClauseSection(void)
 		return true;
 	}
 	return false;
-	// Allaolevaa kutsua en saanut toimimaan, VC:n mem_fun declaraatio outo??
-//	return ExtractPossibleConditionalClauseSection(std::mem_fun(&NFmiSmartToolIntepreter::IsPossibleElseIfConditionLine));
 }
 
 bool NFmiSmartToolIntepreter::CheckoutPossibleElseClauseSection(void)
@@ -846,53 +826,6 @@ std::string NFmiSmartToolIntepreter::ExtractNextLine(std::string &theText, std::
 // Riviss‰ on mahdollinen laskuoperaatio esim.
 // T = T + 1
 // Rivilt‰ pit‰‰ siis lˆty‰ muuttuja johon sijoitetaan ja jotain laskuja
-// HUOM! Oletus aluksi, pit‰‰ olla scape aina v‰liss‰, yksinkertaistaa ohjelmointia.
-// HUOM!! T‰m‰ vuotaa, jos tapahtuu exception!!!!!!
-
-/*
-NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(const std::string &theCalculationLineText) throw (NFmiSmartToolIntepreter::Exception)
-{
-	NFmiSmartToolCalculationInfo *calculationInfo = new NFmiSmartToolCalculationInfo;
-	stringstream sStream(theCalculationLineText);
-	string tmp;
-	string tmp2;
-	sStream >> tmp; // luetaan muuttuja esim. T tai jos luodaan uutta skripti muuttujaa on sana var
-	bool fNewScriptVariable = false;
-	if(IsCaseInsensitiveEqual(tmp, "var"))
-	{
-		sStream >> tmp; // ollaan alustamassa uutta skripti muuttujaa, luetaan nimi talteen
-		fNewScriptVariable = true;
-	}
-	NFmiAreaMaskInfo *assignedVariable = new NFmiAreaMaskInfo;
-	InterpretVariable(tmp, assignedVariable);
-	calculationInfo->SetResultDataInfo(assignedVariable);
-	if(fNewScriptVariable)
-		calculationInfo->GetResultDataInfo()->SetDataType(kVariable);
-	sStream >> tmp; // luetaan sijoitus operaattori =
-	if(tmp != "=")
-		throw NFmiSmartToolIntepreter::Exception(string("Sijoitus operaattori '=' v‰‰r‰ss‰ paikassa"));
-	NFmiAreaMaskInfo *variableInfo = 0;
-	do
-	{
-		tmp = tmp2 = ""; // tyhjennet‰‰n varmuuden vuoksi
-		sStream >> tmp; // luetaan muuttuja/vakio/funktio tai mik‰ lie
-		if(tmp == "")
-			break;
-		variableInfo = new NFmiAreaMaskInfo;
-		InterpretVariable(tmp, variableInfo);
-
-		sStream >> tmp2; // luetaan operaattori (+ - / *)
-		calculationInfo->AddCalculationInfo(variableInfo, InterpretCalculationOperator(tmp2));
-	}while(!sStream.fail());
-	if(calculationInfo->GetCalculationOperandInfoVector()->empty())
-	{
-		delete calculationInfo;
-		calculationInfo = 0;
-	}
-	return calculationInfo;
-}
-*/
-
 NFmiSmartToolCalculationInfo* NFmiSmartToolIntepreter::InterpretCalculationLine(const std::string &theCalculationLineText)
 {
 	string calculationLineText(theCalculationLineText);
@@ -1142,7 +1075,6 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 
 	bool origWanted = producerExist ? IsProducerOrig(producerNameOnly) : false; // lis‰sin ehdon, koska boundchecker valitti tyhj‰n stringin vertailua IsProducerOrig-metodissa.
 
-//	bool levelInVariableName = ExtractParamAndLevel(theVariableText, &paramNameOnly, &levelNameOnly);
 	if(InterpretVariableCheckTokens(theVariableText, theMaskInfo, origWanted, levelExist, producerExist, paramNameOnly, levelNameOnly, producerNameOnly))
 	{
 		if(fNewScriptVariable)
@@ -1199,7 +1131,6 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &th
 	}
 	else if(fLevelExist) // kokeillaan ensin, lˆytyykˆ param+level+producer
 	{
-//		if(FindParamAndLevelAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, NFmiAreaMask::InfoVariable, NFmiInfoData::kViewable, theMaskInfo))
 		// Jos tuottajaa ei ole mainittu, oletetaan, ett‰ kyseess‰ on editoitava parametri.
 		if(FindParamAndLevelAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, NFmiAreaMask::InfoVariable, NFmiInfoData::kEditable, theMaskInfo))
 			return true;
@@ -1242,9 +1173,6 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &th
 
 	if(IsVariableBinaryOperator(theVariableText, theMaskInfo)) // t‰m‰ on and ja or tapausten k‰sittelyyn
 		return true;
-
-//	if(IsVariableSoundingParameter(theVariableText, theMaskInfo, fProducerExist, theParamNameOnly, theProducerNameOnly))
-//		return true;
 
 	return false;
 }
@@ -1685,33 +1613,6 @@ bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVaria
 	}
 	return false;
 }
-/*
-bool NFmiSmartToolIntepreter::IsVariableSoundingParameter(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theProducerNameOnly)
-{
-	std::string tmp(fProducerExist ? theParamNameOnly : theVariableText);
-	SoundingIndexMap::iterator it = itsTokenSoundingIndexFunctions.find(NFmiStringTools::LowerCase(tmp)); // t‰ss‰ tarkastellaan case insensitiivisesti
-	if(it != itsTokenSoundingIndexFunctions.end())
-	{
-		theMaskInfo->SetOperationType(NFmiAreaMask::SoundingIndexFunction);
-		theMaskInfo->SoundingParameter((*it).second);
-		NFmiParam param(4, "T"); // l‰mpˆtila on lˆydytt‰v‰ datasta, muuten ei voi laskea mit‰‰n
-		NFmiProducer producer;
-		if(fProducerExist)
-		{
-			producer = GetPossibleProducerInfo(theProducerNameOnly);
-			theMaskInfo->SetUseDefaultProducer(false);
-		}
-		else
-		{
-			theMaskInfo->SetUseDefaultProducer(true);
-		}
-		theMaskInfo->SetDataType(NFmiInfoData::kSoundingParameterData);
-		theMaskInfo->SetDataIdent(NFmiDataIdent(param, producer));
-		return true;
-	}
-	return false;
-}
-*/
 
 bool NFmiSmartToolIntepreter::IsVariableThreeArgumentFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo)
 {
@@ -1820,7 +1721,6 @@ bool NFmiSmartToolIntepreter::IsVariablePeekFunction(const std::string &theVaria
 	std::string aVariableText(theVariableText);
 	PeekFunctionMap::iterator it = itsTokenPeekFunctions.find(NFmiStringTools::LowerCase(aVariableText)); // t‰ss‰ tarkastellaan case insensitiivisesti
 	if(it != itsTokenPeekFunctions.end())
-//	if(FindAnyFromText(theVariableText, itsTokenPeekXYFunctions))
 	{
 		string tmp;
 		checkedVector<pair<string, types> > tokens;

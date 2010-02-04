@@ -11,76 +11,12 @@
 #ifndef NFMISOUNDINGFUNCTIONS_H
 #define NFMISOUNDINGFUNCTIONS_H
 
-#include "NFmiGlobals.h"
-#include "NFmiParameterName.h"
-#include "NFmiString.h"
-
 namespace NFmiSoundingFunctions
 {
-/*
-	class LCLPressureInfo
-	{
-	public:
-		LCLPressureInfo(void)
-		:itsLclCount(0)
-		,itsLclTotal(0)
-		,itsIterationsCount(0)
-		,itsIterationsTotal(0)
-		,itsLclMissingCount(0)
-		{
-		}
-
-		void AddLclValue(double lclValue)
-		{
-			if(lclValue == kFloatMissing)
-				itsLclMissingCount++;
-			else
-			{
-				itsLclCount++;
-				itsLclTotal += lclValue;
-			}
-		}
-		void AddIterationsValue(double iterationValue)
-		{
-			itsIterationsCount++;
-			itsIterationsTotal += iterationValue;
-		}
-		void Clear(void)
-		{
-			*this = LCLPressureInfo();
-		}
-
-		double CalcLclAvg(void)
-		{
-			if(itsLclCount == 0)
-				return 0;
-			else
-				return itsLclTotal/itsLclCount;
-		}
-		double CalcIterationsAvg(void)
-		{
-			if(itsIterationsCount == 0)
-				return 0;
-			else
-				return itsIterationsTotal/itsIterationsCount;
-		}
-
-		int itsLclCount;
-		double itsLclTotal;
-		int itsIterationsCount;
-		double itsIterationsTotal;
-		int itsLclMissingCount;
-	};
-	LCLPressureInfo& GetLCLPressureInfo(void);
-*/
-
 	double FindNearestW(double T, double P);
 	double Tpot2t(double tpot, double p);
-//	double Tpot2tDerivate(double tpot, double p);
-//	double CalcTOfLiftedAirParcel(double T, double Td, double fromP, double toP);
 	double CalcRH(double T, double Td);
 	double TMR(double W, double P);
-//	double TMRderivate(double W, double P);
 	double OS(double T, double P);
 	double TSA(double OS, double P);
 	double T2tpot(double T, double P);
@@ -91,7 +27,6 @@ namespace NFmiSoundingFunctions
 	double CalcDP(double T, double RH);
 	double CalcLCLPressure(double T, double Td, double P);
 	double CalcLCLPressureFast(double T, double Td, double P);
-//	double CalcLCLPressureBinary(double T, double Td, double P);
 	double Calc_shear_unit_v_vector(double shr_0_6_v, double shr_0_6_u);
 	double CalcU_ID_left(double u0_6, double shr_0_6_v_n);
 	double CalcV_ID_left(double v0_6, double shr_0_6_u_n);

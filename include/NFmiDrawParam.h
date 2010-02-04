@@ -30,7 +30,6 @@
 #ifndef  NFMIDRAWPARAM_H
 #define  NFMIDRAWPARAM_H
 
-#include "NFmiGlobals.h"
 #include "NFmiParameterName.h"
 #include "NFmiDataIdent.h"
 #include "NFmiColor.h"
@@ -432,8 +431,6 @@ public:
 	void ColorContouringColorShadeHighValueColor(const NFmiColor& newValue){itsColorContouringColorShadeHighValueColor = newValue;}
 	const NFmiColor& ColorContouringColorShadeHigh2ValueColor(void) const {return itsColorContouringColorShadeHigh2ValueColor;}
 	void ColorContouringColorShadeHigh2ValueColor(const NFmiColor& newValue){itsColorContouringColorShadeHigh2ValueColor = newValue;}
-//	int ColorContouringColorShadeClassCount(void) const {return itsColorContouringColorShadeClassCount;}
-//	void ColorContouringColorShadeClassCount(int newValue){itsColorContouringColorShadeClassCount = newValue;}
 	bool UseWithIsoLineHatch1(void) const {return fUseWithIsoLineHatch1;}
 	void UseWithIsoLineHatch1(bool newValue){fUseWithIsoLineHatch1 = newValue;}
 	bool DrawIsoLineHatchWithBorders1(void) const {return fDrawIsoLineHatchWithBorders1;}
@@ -461,8 +458,6 @@ public:
 	void IsoLineHatchType2(int newValue){itsIsoLineHatchType2 = newValue;}
 	const NFmiColor& IsoLineHatchColor2(void) const {return itsIsoLineHatchColor2;}
 	void IsoLineHatchColor2(const NFmiColor& newValue){itsIsoLineHatchColor2 = newValue;}
-//	const NFmiColor& IsoLineHatchBorderColor2(void) const {return itsIsoLineHatchBorderColor2;}
-//	void IsoLineHatchBorderColor2(const NFmiColor& newValue){itsIsoLineHatchBorderColor2 = newValue;}
 	int IsoLineLabelDigitCount(void) const {return itsIsoLineLabelDigitCount;}
 	void IsoLineLabelDigitCount(int newValue)
 	{
@@ -641,7 +636,6 @@ protected:
 	NFmiColor itsColorContouringColorShadeMidValueColor;
 	NFmiColor itsColorContouringColorShadeHighValueColor;
 	NFmiColor itsColorContouringColorShadeHigh2ValueColor;
-//	int itsColorContouringColorShadeClassCount; // kuinka monta v‰ri luokkaa tehd‰‰n skaalaukseen
 // isoviivojen kanssa voi k‰ytt‰‰ myˆs hatch‰ttyj‰ alueita (2 kpl)
 	bool fUseWithIsoLineHatch1;
 	bool fDrawIsoLineHatchWithBorders1;
@@ -656,7 +650,6 @@ protected:
 	float itsIsoLineHatchHighValue2; // hatch alueen yl‰arvo
 	int itsIsoLineHatchType2; // hatch tyyppi 1=vinoviiva oikealle, 2=vinoviiva vasemmalle jne.
 	NFmiColor itsIsoLineHatchColor2;
-//	NFmiColor itsIsoLineHatchBorderColor2;
 	int itsIsoLineLabelDigitCount; // isoviiva labelin n‰ytett‰vien digitaalien lukum‰‰r‰
 	int itsContourLabelDigitCount;  // **** Versio 3 parametri ****
 //***********************************************
@@ -700,8 +693,6 @@ private:
 	NFmiMetTime itsModelOriginTimeCalculated; // t‰h‰n lasketaan relatiivisen malliajon mukainen origin aika, jot‰ k‰ytet‰‰n sitten mm. tooltipeiss‰ ja muualla
 	int itsTimeSerialModelRunCount; // t‰h‰n m‰‰r‰t‰‰n kuinka monta viimeista ajoa n‰ytet‰‰n mallille 
 									// kerrallaa aikasarjassa. Jos arvo on 0 (default), ei n‰ytet‰ kuin viimeinen ajo normaalisti.
-
-//	NFmiMetEditorCoordinatorMapOptions* itsMetEditorCoordinatorMapOptions; // t‰t‰ k‰ytet‰‰n koordinaatio tarkasteluissa
 };
 //@{ \name Globaalit NFmiDrawParam-luokan uudelleenohjaus-operaatiot
 inline std::ostream& operator<<(std::ostream& os, const NFmiDrawParam& item){return item.Write(os);}

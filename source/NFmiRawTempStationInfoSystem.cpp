@@ -125,8 +125,6 @@ void NFmiRawTempStationInfoSystem::Init(const std::string &theInitFileName)
 			buffer.resize(maxBufferSize);
 			in.getline(&buffer[0], maxBufferSize);
 
-//			if(i >= 9320)
-//				int jj=0;
 			int realSize = strlen(buffer.c_str());
 			buffer.resize(realSize);
 			buffer = ::RemoveExtraSpaces(buffer);
@@ -510,12 +508,6 @@ void NFmiSilamStationList::Init(const std::string &theInitFileName)
 		}while(in.good());
 		itsInitLogMessage = "Initializing silam station data went OK, from file: ";
 		itsInitLogMessage += theInitFileName;
-/*
-		if(itsLocations.Size() == 0)
-			itsInitLogMessage += "\nWarning: 0 sounding stations found.";
-		else
-			itsInitLogMessage += std::string("\nInfo: ") + NFmiStringTools::Convert<int>(itsLocations.Size()) + " sounding stations found.";
-*/
 	}
 	else
 		throw std::runtime_error(std::string("NFmiSilamStationList::Init - trouble reading file: ") + theInitFileName);

@@ -33,7 +33,6 @@ bool NFmiSoundingData::GetTandTdValuesFromNearestPressureLevel(double P, double 
 			theT = kFloatMissing;
 			theTd = kFloatMissing;
 			bool foundLevel = false;
-//			for(int i=ZeroHeightIndex(); i<static_cast<int>(pV.size()); i++)
 			for(int i=0; i<static_cast<int>(pV.size()); i++)
 			{
 				if(i < 0)
@@ -991,7 +990,6 @@ bool NFmiSoundingData::ModifyTd2MoistAdiapaticBelowGivenP(double P, double Td)
 	{
 		unsigned int ssize = static_cast<unsigned int>(pV.size());
 
-//		float wantedTPot = static_cast<float>(::T2tpot(Td, P));
 		float AOS = static_cast<float>(NFmiSoundingFunctions::OS(Td, P));
 		float currentP = 1000;
 		for(unsigned int i=0; i<ssize; i++)
@@ -1000,7 +998,6 @@ bool NFmiSoundingData::ModifyTd2MoistAdiapaticBelowGivenP(double P, double Td)
 			if(currentP >= P)
 			{ // muutoksia siis tehtiin niin kauan kuin oltiin alle annetun paineen
 				float ATSA  = static_cast<float>(NFmiSoundingFunctions::TSA(AOS, currentP));
-//				float wantedT = static_cast<float>(::Tpot2t(wantedTPot, currentP));
 				tdV[i] = ATSA;
 			}
 			else
@@ -1125,7 +1122,6 @@ void NFmiSoundingData::UpdateUandVParams(void)
 // tarkistaa onko kyseisellä ajanhetkellä ja asemalla ei puuttuvaa luotaus-dataa
 bool NFmiSoundingData::HasRealSoundingData(NFmiFastQueryInfo &theSoundingLevelInfo)
 {
-//	theSoundingLevelInfo.First();
 	if(theSoundingLevelInfo.Param(kFmiPressure) || theSoundingLevelInfo.Param(kFmiGeomHeight) || theSoundingLevelInfo.Param(kFmiGeopHeight))
 	{
 		int cc = 0;
@@ -1401,8 +1397,6 @@ double NFmiSoundingData::CalcCAPE500Index(FmiLCLCalcType theLCLCalcType, double 
 		{
 			if(tValues[i] != kFloatMissing) // kaikilla painepinnoilla ei ole lämpötilaa
 			{
-// !!!!!!!!		if((Tlow != kFloatMissing && Tlow > tValues[i]) || (Thigh != kFloatMissing && Thigh < tValues[i]))
-//					continue;
 				double TofLiftedParcer = CalcTOfLiftedAirParcel(T, Td, P, pValues[i]);
 				currentZ = GetValueAtPressure(kFmiGeomHeight, pValues[i]); // interpoloidaan jos tarvis
 

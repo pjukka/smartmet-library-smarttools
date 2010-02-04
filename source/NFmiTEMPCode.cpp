@@ -654,7 +654,6 @@ void NFmiTEMPCode::AddData(const TEMPLevelData &theLevelData)
 {
 	if(theLevelData.itsPressure != kFloatMissing)
 		itsLevels.insert(std::make_pair<double, TEMPLevelData>(theLevelData.itsPressure, theLevelData)); // laitetaan saatu leveli talteen
-//		itsLevels.push_back(theLevelData); // laitetaan saatu leveli talteen
 }
 
 bool NFmiTEMPCode::DecodeB(void)
@@ -810,12 +809,7 @@ struct LevelSorter
 		return false;
 	}
 };
-/*
-void NFmiTEMPCode::SortLevels(void)
-{
-	std::sort(itsLevels.begin(), itsLevels.end(), LevelSorter());
-}
-*/
+
 static NFmiTimeList MakeTimeList(std::set<NFmiMetTime> &theTimes)
 {
 	NFmiTimeList times;
@@ -853,12 +847,9 @@ static NFmiTimeList MakeTimeListForTEMP(std::vector<NFmiTEMPCode> &theSoundings)
 	return MakeTimeList(collector.itsTimes);
 }
 
-//template<class T>
-//static NFmiLocationBag MakeLocationBag(std::set<T> &theStations)
 static NFmiLocationBag MakeLocationBag(std::set<NFmiStation> &theStations)
 {
 	NFmiLocationBag locations;
-//	std::set<T>::iterator it = theStations.begin();
 	std::set<NFmiStation>::iterator it = theStations.begin();
 	unsigned long ind = 0;
 	std::set<NFmiPoint> points;
@@ -950,7 +941,6 @@ static std::string MakeCheckReport(NFmiQueryData *theData, int theErrorCount, in
 			std::string str;
 			str += ::GetDictionaryString("TempCodeInsertDlgSoundingStr");
 			str += ":";
-//			std::string str("Luotauksia:");
 			str += NFmiStringTools::Convert<int>(theSoundingCount);
 			str += " ";
 			str += ::GetDictionaryString("TempCodeInsertDlgPiecesStr");
@@ -1070,7 +1060,6 @@ NFmiQueryData* DecodeTEMP::CreateNewQData(std::vector<NFmiTEMPCode> &theTempCode
 				const NFmiTEMPCode &tempCode = *it;
 				if(infoIter.Time(tempCode.Time()))
 				{
-//					if(infoIter.Location(tempCode.Station().GetName()))
 					if(infoIter.Location(tempCode.Station().GetLocation()))
 					{
 						const std::map<double, TEMPLevelData> &levelData = tempCode.LevelData();

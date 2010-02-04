@@ -213,40 +213,6 @@ void NFmiDrawParamList::DeactivateAll(void)
 	for(Reset(); Next();)
 		Current()->Activate(false);
 }
-/*
-bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, bool fIgnoreProducer)
-{
-	for(Reset(); Next();)
-	{
-		if(fIgnoreProducer)
-		{
-			if(*(Current()->Param().GetParam()) == *(theParam.GetParam()))
-				return true;
-		}
-		else
-			if(Current()->Param() == theParam)
-				return true;
-	}
-	return false;
-}
-*/
-/*
-bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel)
-{
-	for(Reset(); Next();)
-	{
-		NFmiSmartInfo* info = Current()->Info();
-		if(info && info->Param() == theParam)
-		{
-			if(!theLevel && info->SizeLevels() <= 1)
-				return true;
-			if(theLevel && info->Level() && (*(theLevel) == *(info->Level())))
-				return true;
-		}
-	}
-	return false;
-}
-*/
 
 bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId)
 {
@@ -284,11 +250,9 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel, bool fDeleteData)
 {
 	std::list<int> tmpParIdList;
-//	std::copy(theParamIdsNotRemoved.begin(), theParamIdsNotRemoved.end(), tmpParIdList.begin());
 	int size = theParamIdsNotRemoved.size();
 	for(int i=0; i<size; i++)
 		tmpParIdList.push_back(theParamIdsNotRemoved[i]);
-//	int size2 = tmpParIdList.size();
 	std::list<int>::iterator it;
 	if(theLevel)
 	{
@@ -325,28 +289,10 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int
 		}
 	}
 	theParamIdsNotRemoved.clear();
-//	std::copy(tmpParIdList.begin(), tmpParIdList.end(), theParamIdsNotRemoved.begin());
 	for(it=tmpParIdList.begin(); it != tmpParIdList.end(); ++it)
 		theParamIdsNotRemoved.push_back(*it);
 }
-/*
-struct ParamIdLevelSearcher
-{
-	ParamIdLevelSearcher(std::pair<int, NFmiLevel>& thePair)
-	:itsSearchPair(thePair)
-	{
-	}
 
-	bool operator(std::pair<int, NFmiLevel>& theListPair)
-	{
-		if(itsSearchPair.first == theListPair.first && itsSearchPair.second == theListPair.second)
-			return true;
-		return false;
-	}
-
-	std::pair<int, NFmiLevel> itsSearchPair;
-}
-*/
 /*!
  * Poistaa listalta kaikki halutun tuottajan ja mahd. annetun levelin parametrit.
  * Ei poista niitä parametreja, jotka ovat theParamIdsNotRemoved-listalla. Löy-

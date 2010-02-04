@@ -28,10 +28,6 @@
  */
 // ======================================================================
 
-//#ifndef UNIX
-//  #include "stdafx.h" // DEBUG_NEW
-//#endif
-
 #include "NFmiDrawParamFactory.h"
 #include "NFmiSmartInfo.h"
 #include "NFmiValueString.h"
@@ -39,13 +35,6 @@
 #include "NFmiFileSystem.h"
 
 #include <assert.h>
-/*
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-*/
 
 static void InitDrawParam(NFmiDrawParam* theDrawParam, const std::string &theFileName, bool createDrawParamFileIfNotExist)
 {

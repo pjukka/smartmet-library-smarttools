@@ -66,7 +66,6 @@ public:
 	const NFmiMetTime& Time(void) const {return itsTime;}
 	const NFmiStation& Station(void) const {return itsStation;}
 	void Station(const NFmiStation &theStation) {itsStation = theStation;}
-//	const std::vector<TEMPLevelData>& LevelData(void) const {return itsLevels;}
 	const std::map<double, TEMPLevelData>& LevelData(void) const {return itsLevels;}
 
 private:
@@ -75,7 +74,6 @@ private:
 	bool DecodeB(void);
 	bool DecodeC(void);
 	bool DecodeD(void);
-//	void SortLevels(void);
 
 	std::string itsOriginalCodeAStr; // t‰h‰n talletetaan koko koodi osa A
 	std::string itsOriginalCodeBStr; // t‰h‰n talletetaan koko koodi osa B
@@ -88,7 +86,6 @@ private:
 	NFmiHPlaceDescriptor *itsTempStations; // Ei omista.  Jos t‰ss‰ on luotausinfo, sit‰ voidaan pit‰‰ luotaus asemien "tietokantana"
 	NFmiPoint itsUnknownStationLocation;
 
-//	std::vector<TEMPLevelData> itsLevels;
 	std::map<double, TEMPLevelData> itsLevels;
 
 };

@@ -40,10 +40,6 @@
 #pragma warning(disable : 4786) // poistaa n kpl VC++ kääntäjän varoitusta (liian pitkä nimi >255 merkkiä joka johtuu 'puretuista' STL-template nimistä)
 #endif
 
-//#ifndef UNIX
-//  #include "stdafx.h" // DEBUG_NEW
-//#endif
-
 #include "NFmiInfoOrganizer.h"
 #include "NFmiSmartInfo.h"
 #include "NFmiDrawParamFactory.h"
@@ -54,31 +50,21 @@
 #include "NFmiLatLonArea.h"
 #include "NFmiProducerName.h"
 
-/*
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-*/
 //--------------------------------------------------------
 // Constructor/Destructor
 //--------------------------------------------------------
 // luodaan tyhjä lista
 NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 :itsList()
-//,itsIter(itsList.Start())
 ,itsDrawParamFactory(0)
 ,itsWorkingDirectory("")
 ,itsEditedData(0)
 ,itsEditedDataCopy(0)
-//,itsSoundingParamGridSize(30, 30)
 ,itsMacroParamGridSize(50, 50)
 ,itsMacroParamMinGridSize(10, 10)
 ,itsMacroParamMaxGridSize(200, 200)
 ,itsMacroParamData(0)
 ,itsMacroParamMissingValueMatrix()
-//,itsSoundingParamData(0)
 ,itsSoundingParamMissingValueMatrix()
 ,itsCrossSectionMacroParamData(0)
 ,itsCrossSectionMacroParamMissingValueMatrix()
@@ -102,11 +88,7 @@ NFmiInfoOrganizer::~NFmiInfoOrganizer (void)
 	if(itsMacroParamData)
 		itsMacroParamData->DestroySharedData();
 	delete itsMacroParamData;
-/*
-	if(itsSoundingParamData)
-		itsSoundingParamData->DestroySharedData();
-	delete itsSoundingParamData;
-*/
+
 	if(itsCrossSectionMacroParamData)
 		itsCrossSectionMacroParamData->DestroySharedData();
 	delete itsCrossSectionMacroParamData;
@@ -192,8 +174,6 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName & theParam
 		return GetSoundingPlotParamInfo(fSubParameter, theType);
 	if(theType == NFmiInfoData::kMacroParam || theType == NFmiInfoData::kQ3MacroParam) // macro- parametrit lasketaan tällä
 		return itsMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
-//	if(theType >= NFmiInfoData::kSoundingParameterData) // sounding parametrit lasketaan tällä
-//		return itsSoundingParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType == NFmiInfoData::kCrossSectionMacroParam)
 		return itsCrossSectionMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
@@ -249,8 +229,6 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 		return GetSoundingPlotParamInfo(fSubParameter, theType);
 	if(theType == NFmiInfoData::kMacroParam || theType == NFmiInfoData::kQ3MacroParam) // macro- parametrit lasketaan tällä
 		return itsMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
-//	if(theType >= NFmiInfoData::kSoundingParameterData) // sounding parametrit lasketaan tällä
-//		return itsSoundingParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType == NFmiInfoData::kCrossSectionMacroParam)
 		return itsCrossSectionMacroParamData; // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
@@ -695,39 +673,6 @@ bool NFmiInfoOrganizer::Clear (void)
 	return true; // jotain pitäsi varmaan tsekatakin?
 }
 
-//--------------------------------------------------------
-// Reset
-//--------------------------------------------------------
-/*
-bool NFmiInfoOrganizer::Reset (void)
-{
-   itsIter = itsList.Start();
-   return true;
-}
-//--------------------------------------------------------
-// Next
-//--------------------------------------------------------
-bool NFmiInfoOrganizer::Next (void)
-{
-   return itsIter.Next();
-}
-//--------------------------------------------------------
-// Current
-//--------------------------------------------------------
-NFmiSmartInfo* NFmiInfoOrganizer::Current (void)
-{
-   return itsIter.CurrentPtr();
-}
-
-//--------------------------------------------------------
-// Remove
-//--------------------------------------------------------
-bool NFmiInfoOrganizer::Remove(void)
-{
-	return itsIter.Remove(true);
-}
-*/
-
 // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 NFmiSmartInfo* NFmiInfoOrganizer::ViewableInfo(void)
 {
@@ -824,13 +769,7 @@ static NFmiQueryData* CreateDefaultMacroParamQueryData(const NFmiArea *theArea, 
 	NFmiQueryInfo info(parDesc, timeDesc, hPlace, vPlace);
 	return NFmiQueryDataUtil::CreateEmptyData(info);
 }
-/*
-void NFmiInfoOrganizer::SetSoundingParamDataGridSize(int x, int y)
-{
-	itsSoundingParamGridSize = NFmiPoint(x, y);
-	UpdateSoundingParamData();
-}
-*/
+
 void NFmiInfoOrganizer::SetMacroParamDataGridSize(int x, int y)
 {
 	x = FmiMin(x, static_cast<int>(itsMacroParamMaxGridSize.X()));
@@ -857,21 +796,10 @@ void NFmiInfoOrganizer::UpdateMacroParamData(void)
 		UpdateSpecialDataArea(arePtr.get(), itsMacroParamGridSize, NFmiInfoData::kMacroParam, &itsMacroParamData, itsMacroParamMissingValueMatrix);
 	}
 }
-/*
-void NFmiInfoOrganizer::UpdateSoundingParamData(void)
-{
-	if(itsSoundingParamData)
-	{
-		std::auto_ptr<NFmiArea> arePtr(itsSoundingParamData->Area()->Clone());
-		UpdateSpecialDataArea(arePtr.get(), itsSoundingParamGridSize, NFmiInfoData::kSoundingParameterData, &itsSoundingParamData, itsSoundingParamMissingValueMatrix);
-	}
-}
-*/
 
 void NFmiInfoOrganizer::UpdateMapArea(const NFmiArea *theArea)
 {
 	UpdateSpecialDataArea(theArea, itsMacroParamGridSize, NFmiInfoData::kMacroParam, &itsMacroParamData, itsMacroParamMissingValueMatrix);
-//	UpdateSpecialDataArea(theArea, itsSoundingParamGridSize, NFmiInfoData::kSoundingParameterData, &itsSoundingParamData, itsSoundingParamMissingValueMatrix);
 }
 
 void NFmiInfoOrganizer::UpdateSpecialDataArea(const NFmiArea *theArea, const NFmiPoint &theGridSize, NFmiInfoData::Type theType, NFmiSmartInfo ** theData, NFmiDataMatrix<float> &theMissingValueMatrix)

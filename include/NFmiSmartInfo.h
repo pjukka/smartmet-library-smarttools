@@ -32,7 +32,6 @@
 #include "NFmiFastQueryInfo.h"
 #include <deque>
 #include <set>
-//#include "FmiNMeteditLibraryDefinitions.h"
 
 class NFmiUndoableMultiLevelMask;
 class NFmiBitMask;

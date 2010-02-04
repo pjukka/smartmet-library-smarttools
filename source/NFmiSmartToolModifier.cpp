@@ -50,14 +50,6 @@
 #include <stdexcept>
 
 using namespace std;
-/*
-#include "stdafx.h"
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-*/
 
 NFmiSmartToolCalculationBlockVector::NFmiSmartToolCalculationBlockVector(void)
 :itsCalculationBlocks()
@@ -217,13 +209,6 @@ void NFmiSmartToolCalculationBlock::Calculate(const NFmiPoint &theLatlon, unsign
 NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer)
 :itsInfoOrganizer(theInfoOrganizer)
 ,itsSmartToolIntepreter(new NFmiSmartToolIntepreter(theInfoOrganizer, 0))
-//,itsFirstCalculationSection(0)
-//,itsLastCalculationSection(0)
-//,itsIfAreaMaskSection(0)
-//,itsIfCalculationSection(0)
-//,itsElseIfAreaMaskSection(0)
-//,itsElseIfCalculationSection(0)
-//,itsElseCalculationSection(0)
 ,fModifySelectedLocationsOnly(false)
 ,itsIncludeDirectory()
 ,itsModifiedTimes(0)
@@ -240,7 +225,6 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer
 NFmiSmartToolModifier::~NFmiSmartToolModifier(void)
 {
 	delete itsSmartToolIntepreter;
-//	ClearCalculationModifiers();
 }
 //--------------------------------------------------------
 // InitSmartTool
@@ -260,8 +244,6 @@ void NFmiSmartToolModifier::InitSmartTool(const std::string &theSmartToolText, b
 		fMacroRunnable = false;
 		throw  ;
 	}
-
-//	InitializeCalculationModifiers();
 }
 
 NFmiSmartToolCalculationBlockVector* NFmiSmartToolModifier::CreateCalculationBlockVector(NFmiSmartToolCalculationBlockInfoVector* theBlockInfoVector)
@@ -317,44 +299,6 @@ NFmiSmartToolCalculationBlock* NFmiSmartToolModifier::CreateCalculationBlock(NFm
 	blockPtr.release();
 	return block;
 }
-/*
-void NFmiSmartToolModifier::InitializeCalculationModifiers(NFmiSmartToolCalculationBlockInfo* theBlock)
-{
-	ClearCalculationModifiers();
-
-	itsFirstCalculationSection = CreateCalculationSection(theBlock->itsFirstCalculationSectionInfo);
-	itsIfAreaMaskSection = CreateConditionalSection(theBlock->itsIfAreaMaskSectionInfo);
-	if(itsIfAreaMaskSection)
-	{
-		itsIfCalculationSection = CreateCalculationSection(theBlock->itsIfCalculationSectionInfo);
-		if(!itsIfCalculationSection)
-		{
-			string errorText("IF-lauseen perässä ei ollut lasku osiota?");
-			throw NFmiSmartToolModifier::Exception(errorText);
-		}
-		itsElseIfAreaMaskSection = CreateConditionalSection(theBlock->itsElseIfAreaMaskSectionInfo);
-		if(itsElseIfAreaMaskSection)
-		{
-			itsElseIfCalculationSection = CreateCalculationSection(theBlock->itsElseIfCalculationSectionInfo);
-			if(!itsElseIfCalculationSection)
-			{
-				string errorText("ELSEIF-lauseen perässä ei ollut lasku osiota?");
-				throw NFmiSmartToolModifier::Exception(errorText);
-			}
-		}
-		if(theBlock->fElseSectionExist)
-		{
-			itsElseCalculationSection = CreateCalculationSection(theBlock->itsElseCalculationSectionInfo);
-			if(!itsElseCalculationSection)
-			{
-				string errorText("ELSE-lauseen perässä ei ollut lasku osiota?");
-				throw NFmiSmartToolModifier::Exception(errorText);
-			}
-		}
-	}
-	itsLastCalculationSection = CreateCalculationSection(theBlock->itsLastCalculationSectionInfo);
-}
-*/
 
 NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateConditionalSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo)
 {
@@ -438,29 +382,6 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateCalculation(NFmiSmartTool
 	}
 	return calculation;
 }
-/*
-void NFmiSmartToolModifier::ClearCalculationModifiers(void)
-{
-	delete itsFirstCalculationSection;
-	itsFirstCalculationSection = 0;
-	delete itsLastCalculationSection;
-	itsLastCalculationSection = 0;
-	delete itsIfAreaMaskSection;
-	itsIfAreaMaskSection = 0;
-	delete itsIfCalculationSection;
-	itsIfCalculationSection = 0;
-//	itsElseIfAreaMaskSectionVector.clear(); // vuotavat, käytä PointerDestructoria
-//	itsElseIfCalculationSectionVector.clear();
-	delete itsElseIfAreaMaskSection;
-	itsElseIfAreaMaskSection = 0;
-	delete itsElseIfCalculationSection;
-	itsElseIfCalculationSection = 0;
-//	delete itsElseAreaMaskSection;
-//	itsElseAreaMaskSection = 0;
-	delete itsElseCalculationSection;
-	itsElseCalculationSection = 0;
-}
-*/
 
 // Laskee smarttool-systeemin avulla halutun poikkileikkauksen arvo-matriisin.
 // Tämä on universaali metodi, joka hoitaa kaikki kolme tapausta: poikkileikkaus, aika-poikkileikkaus ja reitti-poikkileikkaus.
@@ -550,11 +471,7 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, boo
 			if(block)
 			{
 				ModifyBlockData(block, theMacroParamValue);
-//			InitializeCalculationModifiers(&blockInfo);
 			}
-//			ModifyData2(theModifiedTimes, itsFirstCalculationSection);
-//			ModifyConditionalData(theModifiedTimes);
-//			ModifyData2(theModifiedTimes, itsLastCalculationSection);
 		}
 		ClearScriptVariableInfos(); // lopuksi nämä skripti-muuttujat tyhjennetään
 	}
@@ -661,7 +578,6 @@ void NFmiSmartToolModifier::ModifyData2(NFmiSmartToolCalculationSection* theCalc
 {
 	if(theCalculationSection && theCalculationSection->FirstVariableInfo())
 	{
-//		NFmiFastQueryInfo info(*theCalculationSection->FirstVariableInfo());
 		NFmiSmartInfo *info = theCalculationSection->FirstVariableInfo()->Clone();
 		if(info == 0)
 			return ;
@@ -720,21 +636,6 @@ void NFmiSmartToolModifier::ModifyData2(NFmiSmartToolCalculationSection* theCalc
 	}
 }
 
-// pakko oli vääntää tämä konvertteri, koska nuo datatyyppi jutut ovat karanneet käsistä
-/*
-static NFmiAreaMask::DataType ConvertType(NFmiInfoData::Type theType)
-{
-	switch (theType)
-	{
-	case kFmiDataTypeEditable:
-		return NFmiAreaMask::kEditable;
-	case kFmiDataTypeStationary:
-		return NFmiAreaMask::kStationary;
-	default:
-		return NFmiAreaMask::kNoDataType;
-	}
-}
-*/
 //--------------------------------------------------------
 // CreateAreaMask
 //--------------------------------------------------------
@@ -753,8 +654,6 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 			// HUOM!! Tähän vaaditaan syvä data kopio!!!
 			// JOS kyseessä on ehtolauseen muuttujasta, joka on editoitavaa dataa.
 			NFmiSmartInfo* info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-//			areaMask = new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, true);
-
 			// HUOM!!! pitäisikö tähän laittaa joku debug-info raportti, jos level on reset-tilassa
 
 			areaMask = new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, true);
@@ -1122,8 +1021,6 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 	NFmiSmartInfo* info = 0;
 	if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kScriptVariableData)
 		info = CreateScriptVariableInfo(theAreaMaskInfo.GetDataIdent());
-//	else if(theAreaMaskInfo.GetDataType() >= NFmiInfoData::kSoundingParameterData)
-//		info = CreateSoundingParamInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetUseDefaultProducer());
 	else if(theAreaMaskInfo.GetUseDefaultProducer() || theAreaMaskInfo.GetDataType() == NFmiInfoData::kCopyOfEdited)
 	{
 		NFmiInfoData::Type dataType = theAreaMaskInfo.GetDataType();
@@ -1151,6 +1048,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 		if(info == 0)
 		{
 			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData | fDoCrossSectionCalculation);
+/*
 			if(info == 0)
 			{ // tämä on pika pika viritystä, joka on jäämiä luotaus indeksi datasta (jotka nyt lasketaan valmiiksi dataksi)
 				int parId = theAreaMaskInfo.GetDataIdent().GetParamIdent();
@@ -1168,6 +1066,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 					}
 				}
 			}
+*/
 		}
 		if(info == 0 && theAreaMaskInfo.GetDataType() == NFmiInfoData::kAnalyzeData) // analyysi datalle piti tehdä pika viritys tähän
 			info = CreateCopyOfAnalyzeInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel());
@@ -1204,8 +1103,6 @@ void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaM
 			*theUpperLimit = static_cast<float>(drawParam->AbsoluteMaxValue());
 			delete drawParam;
 		}
-//		else
-//			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorNoMinMaxLimits"));
 	}
 }
 
@@ -1218,30 +1115,6 @@ struct FindScriptVariable
 
 	int itsParId;
 };
-/*
-NFmiSmartInfo* NFmiSmartToolModifier::CreateSoundingParamInfo(const NFmiDataIdent &theDataIdent, bool useEditedData)
-{
-	NFmiSmartInfo* info = 0;
-	if(useEditedData) // halutaanko editoitua dataa
-	{
-		info = itsInfoOrganizer->EditedInfo();
-		if(info->SizeLevels() > 1)
-			return new NFmiSmartInfo(*info); // vain level data kelpaa ja koska kyse editoidusta datasta, pitää siitä tehdä kopio
-		else
-			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorSoundingIndexNoLevels"));
-	}
-	else
-	{
-		// muuten yritetään ensin tuottajalta hybridi dataa, ja sitten lopuksi painepinta dataa
-		info = itsInfoOrganizer->CreateShallowCopyInfo(theDataIdent, 0, NFmiInfoData::kHybridData, false, true); // ensin yritetään hybrid dataa
-		if(info == 0)
-			info = itsInfoOrganizer->CreateShallowCopyInfo(theDataIdent, 0, NFmiInfoData::kViewable, false, true); // jos ei löytynyt hybrid-dataa, sitten painepinta dataa
-		if(info)
-			return info;
-	}
-	throw runtime_error(::GetDictionaryString("SmartToolModifierErrorSoundingIndexParam") + ": " + string(theDataIdent.GetParamName()));
-}
-*/
 
 NFmiSmartInfo* NFmiSmartToolModifier::CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent)
 {

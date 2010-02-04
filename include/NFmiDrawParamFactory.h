@@ -27,8 +27,6 @@
 #ifndef  NFMIDRAWPARAMFACTORY_H
 #define  NFMIDRAWPARAMFACTORY_H
 
-#include "NFmiParameterName.h"
-#include "NFmiGlobals.h"
 #include <string>
 
 class NFmiDrawParam;

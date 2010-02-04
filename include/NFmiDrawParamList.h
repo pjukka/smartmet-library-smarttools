@@ -33,8 +33,6 @@
 #define  NFMIDRAWPARAMLIST_H
 
 #include "NFmiSortedPtrList.h"
-#include "NFmiGlobals.h"
-#include "NFmiParameterName.h"
 #include <list>
 #include "NFmiDataMatrix.h"
 #include "NFmiInfoData.h"
@@ -70,7 +68,6 @@ public:
 	bool      Add (NFmiDrawParam * theParam, unsigned long theIndex);
 	void      BorrowParams(NFmiDrawParamList & theList);
 	void      ClearBorrowedParams(void);
-//	bool      Add (NFmiDrawParamList & theList); // ei ole toteutettu
 	bool      Remove (bool fDeleteData = false);
 	bool      Index(unsigned long index);
 	bool		Find(NFmiDrawParam* item);
@@ -78,8 +75,6 @@ public:
 	void			HideAllParams(bool newState);
 	void			DisableEditing(void);
 	void			DeactivateAll(void);
-//	bool		Find(const NFmiDataIdent& theParam, bool fIgnoreProducer = false);
-//	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel);
 	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId = false);
 
 	void            Update(void);

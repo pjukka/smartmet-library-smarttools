@@ -33,7 +33,6 @@
 // 
 //**********************************************************
 #include "NFmiMultiLevelMask.h"
-//#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiRect.h"
 #include "NFmiMetEditorTypes.h"
 

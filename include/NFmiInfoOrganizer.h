@@ -38,12 +38,10 @@
 #include "NFmiSortedPtrList.h"
 #include "NFmiParamBag.h"
 #include "NFmiParameterName.h"
-//#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiInfoData.h"
 #include "NFmiDataMatrix.h"
 #include "NFmiPoint.h"
 #include "NFmiSmartInfo.h"
-#include <vector>
 
 class NFmiDrawParamFactory;
 class NFmiDrawParamList;
@@ -53,6 +51,9 @@ class NFmiLevel;
 class NFmiQueryInfo;
 class NFmiLevelBag;
 class NFmiArea;
+
+// TODO T‰m‰ luokka pit‰‰ ensin siivota perinpohjin, ja sitten laittaa k‰ytt‰m‰‰n shared_ptr:i‰.
+// Silloin voidaan saada t‰nne multi-thread turvallista ja vahaa dataa tukevaa koodia.
 
 class NFmiInfoOrganizer
 {
@@ -79,8 +80,6 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* ViewableInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
 	NFmiSmartInfo* ObservationInfo(void); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* ObservationInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
-//	NFmiSmartInfo* CompareModelsInfo(void); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
-//	NFmiSmartInfo* CompareModelsInfo(const NFmiProducer& theProducer);
 	NFmiSmartInfo* KepaDataInfo(void); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* ClimatologyInfo(void); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* AnalyzeDataInfo(const NFmiProducer& theProducer); // t‰m‰ toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
@@ -99,18 +98,13 @@ class NFmiInfoOrganizer
 	NFmiParamBag StaticParams(void); // kaikkien staattisten (ei muutu ajan mukana) datojen parambag (esim. topografia)
 	NFmiParamBag ObservationParams(void); // kaikkien staattisten (ei muutu ajan mukana) datojen parambag (esim. topografia)
 	NFmiParamBag ObservationParams(int theIndex); // vain halutun indeksin parametrit (HUONO VIRITYS KORJAA!!!!)
-//	NFmiParamBag CompareModelsParams(void); // palauttaa vain 1. kyseisen datan parametrit!
 
-//	NFmiSmartInfo* CreateInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	NFmiSmartInfo* CreateInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fTryParIdAlso);
 	NFmiSmartInfo* CreateInfo(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 
 	// SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
-//	NFmiSmartInfo* CreateShallowCopyInfo(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	NFmiSmartInfo* CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData);
 
-//	NFmiDrawParam* CreateDrawParam(FmiParameterName theParamName, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
-//	NFmiDrawParam* CreateEmptyInfoDrawParam(const NFmiDataIdent& theDataIdent); // luo drawparam ilman infoa
 	NFmiDrawParam* CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	NFmiDrawParam* CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
 	NFmiDrawParam* CreateDrawParam(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
@@ -133,7 +127,6 @@ class NFmiInfoOrganizer
 	NFmiDataMatrix<float>& MacroParamMissingValueMatrix(void){return itsMacroParamMissingValueMatrix;}
 	NFmiSmartInfo* CrossSectionMacroParamData(void) {return itsCrossSectionMacroParamData;}
 	NFmiDataMatrix<float>& CrossSectionMacroParamMissingValueMatrix(void){return itsCrossSectionMacroParamMissingValueMatrix;}
-//	NFmiSmartInfo* SoundingParamData(void) {return itsSoundingParamData;}
 	NFmiDataMatrix<float>& SoundingParamMissingValueMatrix(void) {return itsSoundingParamMissingValueMatrix;}
 
 	void SetDrawParamPath(const std::string &theDrawParamPath);
@@ -141,10 +134,8 @@ class NFmiInfoOrganizer
 	void SetMacroParamDataGridSize(int x, int y);
 	void SetMacroParamDataMinGridSize(int x, int y);
 	void SetMacroParamDataMaxGridSize(int x, int y);
-//	void SetSoundingParamDataGridSize(int x, int y);
 	void UpdateMapArea(const NFmiArea *theArea);
 
-//	const NFmiPoint& SoundingParamGridSize(void) const {return itsSoundingParamGridSize;}
 	const NFmiPoint& GetMacroParamDataGridSize(void) const {return itsMacroParamGridSize;}
 	const NFmiPoint& GetMacroParamDataMaxGridSize(void) const {return itsMacroParamMaxGridSize;}
 	const NFmiPoint& GetMacroParamDataMinGridSize(void) const {return itsMacroParamMinGridSize;}
@@ -152,18 +143,10 @@ class NFmiInfoOrganizer
 	double CountDataSize(void);
 	void UpdateCrossSectionMacroParamDataSize(int x, int y);
  private:
-// 	bool Remove(void);
 	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, NFmiSmartInfo* theSmartInfo2);
 	void UpdateSpecialDataArea(const NFmiArea *theArea, const NFmiPoint &theGridSize, NFmiInfoData::Type theType, NFmiSmartInfo ** theData, NFmiDataMatrix<float> &theMissingValueMatrix);
 	void UpdateMacroParamData(void);
-//	void UpdateSoundingParamData(void);
 
- public: // n‰m‰ ovat pikaviritys k‰ytˆss‰ n‰m‰ metodit pit‰isi laittaa takaisin privateiksi
-//	bool Reset (void);
-//	bool Next (void);
-//	NFmiSmartInfo* Current (void);
-
- private:
   	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fIgnoreProducerName = false);
 	NFmiSmartInfo* Info (const FmiParameterName& theParam, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	NFmiSmartInfo* CrossSectionInfo(const NFmiDataIdent& theDataIdent, bool& fSubParameter, NFmiInfoData::Type theType, bool fIgnoreProducerName = false);
@@ -177,19 +160,16 @@ class NFmiInfoOrganizer
 
 // Attributes
   	NFmiSortedPtrList<NFmiSmartInfo> itsList; // error when compiling NFmiInfoOrganizer.cpp//binary '<' : 'class NFmiSmartInfo' does not define this operator or a conversion to a type acceptable to the predefined operator
-//	NFmiPtrList<NFmiSmartInfo>::Iterator itsIter;
  	NFmiDrawParamFactory* itsDrawParamFactory;
 	std::string itsWorkingDirectory;
 	NFmiSmartInfo* itsEditedData; // editoitavaa dataa voi olla vain yksi kerrallaan, joten laitoin sen erilleen tehokkuuden takia.
 	NFmiSmartInfo* itsEditedDataCopy; // t‰m‰ on editoitavan datan kopio, mit‰ k‰ytt‰j‰ voi halutessaan p‰ivitt‰‰, k‰ytet‰‰n visualisoimaan tehtyj‰ muutoksia datassa
 
-//	NFmiPoint itsSoundingParamGridSize;
 	NFmiPoint itsMacroParamGridSize;
 	NFmiPoint itsMacroParamMinGridSize;
 	NFmiPoint itsMacroParamMaxGridSize;
 	NFmiSmartInfo* itsMacroParamData; // makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
 	NFmiDataMatrix<float> itsMacroParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
-//	NFmiSmartInfo* itsSoundingParamData; // sounding-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
 	NFmiDataMatrix<float> itsSoundingParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
 	NFmiSmartInfo* itsCrossSectionMacroParamData; // poikkileikkaus makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
 	NFmiDataMatrix<float> itsCrossSectionMacroParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja

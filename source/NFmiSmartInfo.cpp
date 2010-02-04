@@ -31,7 +31,6 @@
 #endif
 
 #include "NFmiSmartInfo.h"
-//#include "FmiNMeteditLibraryDefinitions.h"
 #include "NFmiUndoableMultiLevelMask.h"
 #include "NFmiMultiLevelMask.h"
 #include "NFmiQueryData.h"
@@ -250,7 +249,6 @@ bool NFmiSmartInfo::InitEditedParamBag()
 //--------------------------------------------------------
 // AreaMask				M.K. 1.4.99
 //--------------------------------------------------------
-//void NFmiSmartInfo::AreaMask(NFmiMultiLevelMask* theAreaMask)
 void NFmiSmartInfo::AreaMask(NFmiUndoableMultiLevelMask* theAreaMask)
 {
 	delete itsAreaMask;
@@ -442,7 +440,6 @@ bool NFmiSmartInfo::SnapShotData (const std::string& theAction, const NFmiHarmon
 
 	(*itsCurrentUndoLevelPtr)++;
 	itsRefRawData->Backup(itsUndoTable[*itsCurrentUndoLevelPtr]);
-//	memcpy(itsUndoTable[*itsCurrentUndoLevelPtr], itsRefRawData->Data(), itsRefRawData->Size());
 	itsUndoRedoHarmonizerBookKeepingData->push_back(theHarmonizerBookKeepingData); // lisätään perään annettu bagi
 	(*itsCurrentRedoLevelPtr) = (*itsCurrentUndoLevelPtr);
 	(*itsMaxRedoLevelPtr) = (*itsCurrentRedoLevelPtr);
@@ -603,7 +600,6 @@ bool NFmiSmartInfo::UndoData (const NFmiHarmonizerBookKeepingData &theHarmonizer
 	}
 
 	itsRefRawData->Undo(itsUndoTable[*itsCurrentUndoLevelPtr]);
-//	memcpy(itsRefRawData->Data(), itsUndoTable[*itsCurrentUndoLevelPtr], itsRefRawData->Size());
 	(*itsCurrentUndoLevelPtr)--;
 	*itsCurrentRedoLevelPtr = (*itsCurrentUndoLevelPtr) + 2;
 	*fDirty = true; // 18.1.2002/Marko lisäsin datan likauksen.
@@ -629,7 +625,6 @@ bool NFmiSmartInfo::RedoData (void)
 	else
 	{
 		itsRefRawData->Undo(itsUndoTable[*itsCurrentRedoLevelPtr]);
-		// memcpy(itsRefRawData->Data(), itsUndoTable[*itsCurrentRedoLevelPtr], itsRefRawData->Size());
 		(*itsCurrentUndoLevelPtr)++;
 		if((*itsCurrentRedoLevelPtr) + 1 <= (*itsMaxRedoLevelPtr))
 			(*itsCurrentRedoLevelPtr)++;

@@ -80,11 +80,8 @@ NFmiDrawParam::NFmiDrawParam()
 , itsStationSymbolColorShadeLowValue(0)
 , itsStationSymbolColorShadeMidValue(50)
 , itsStationSymbolColorShadeHighValue(100)
-//, itsStationSymbolColorShadeLowValueColor(0,0,0)
 , itsStationSymbolColorShadeLowValueColor(0,0,1)
-//, itsStationSymbolColorShadeMidValueColor(0.4f,0.4f,0.4f)
 , itsStationSymbolColorShadeMidValueColor(0,1,0)
-//, itsStationSymbolColorShadeHighValueColor(1,1,1)
 , itsStationSymbolColorShadeHighValueColor(0,1,0)
 , itsStationSymbolColorShadeClassCount(9)
 , fUseSymbolsInTextMode(false)
@@ -144,7 +141,6 @@ NFmiDrawParam::NFmiDrawParam()
 , itsColorContouringColorShadeMidValueColor(0,1,0)
 , itsColorContouringColorShadeHighValueColor(0,1,0)
 , itsColorContouringColorShadeHigh2ValueColor(0,1,0)
-//, itsColorContouringColorShadeClassCount(9)
 , fUseWithIsoLineHatch1(false)
 , fDrawIsoLineHatchWithBorders1(false)
 , itsIsoLineHatchLowValue1(0)
@@ -158,7 +154,6 @@ NFmiDrawParam::NFmiDrawParam()
 , itsIsoLineHatchHighValue2(60)
 , itsIsoLineHatchType2(2)
 , itsIsoLineHatchColor2(0.5f,0.5f,0.5f)
-//, itsIsoLineHatchBorderColor2(0.5f,0.5f,0.5f)
 // protected osa
 , itsIsoLineLabelDigitCount(0)
 , itsContourLabelDigitCount(0)
@@ -167,12 +162,10 @@ NFmiDrawParam::NFmiDrawParam()
 , fHidden(false)
 , fEditedParam(false)
 , fEditableParam(true)
-//, itsInfo(0)
 , itsUnit								("?")
 , fActive(false)
 , fShowDifference(false)
 , fShowDifferenceToOriginalData(false)
-//, itsMetEditorCoordinatorMapOptions(0)
 , itsDataType(NFmiInfoData::kNoDataType)
 , fViewMacroDrawParam(false)
 , fBorrowedParam(false)
@@ -294,7 +287,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 , itsColorContouringColorShadeMidValueColor(0,1,0)
 , itsColorContouringColorShadeHighValueColor(0,1,0)
 , itsColorContouringColorShadeHigh2ValueColor(0,1,0)
-//, itsColorContouringColorShadeClassCount(9)
 , fUseWithIsoLineHatch1(false)
 , fDrawIsoLineHatchWithBorders1(false)
 , itsIsoLineHatchLowValue1(0)
@@ -308,7 +300,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 , itsIsoLineHatchHighValue2(60)
 , itsIsoLineHatchType2(2)
 , itsIsoLineHatchColor2(0.5f,0.5f,0.5f)
-//, itsIsoLineHatchBorderColor2(0.5f,0.5f,0.5f)
 , itsIsoLineLabelDigitCount(0)
 , itsContourLabelDigitCount(0)
 , itsAlpha(100.f) // dafault on 100 eli täysin läpinäkymätön
@@ -320,7 +311,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 , fActive(false)
 , fShowDifference(false)
 , fShowDifferenceToOriginalData(false)
-//, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 , itsDataType(theDataType)
 , fViewMacroDrawParam(false)
 , fBorrowedParam(false)
@@ -443,7 +433,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 , itsColorContouringColorShadeMidValueColor(other.itsColorContouringColorShadeMidValueColor)
 , itsColorContouringColorShadeHighValueColor(other.itsColorContouringColorShadeHighValueColor)
 , itsColorContouringColorShadeHigh2ValueColor(other.itsColorContouringColorShadeHigh2ValueColor)
-//, itsColorContouringColorShadeClassCount(other.itsColorContouringColorShadeClassCount)
 , fUseWithIsoLineHatch1(other.fUseWithIsoLineHatch1)
 , fDrawIsoLineHatchWithBorders1(other.fDrawIsoLineHatchWithBorders1)
 , itsIsoLineHatchLowValue1(other.itsIsoLineHatchLowValue1)
@@ -457,7 +446,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 , itsIsoLineHatchHighValue2(other.itsIsoLineHatchHighValue2)
 , itsIsoLineHatchType2(other.itsIsoLineHatchType2)
 , itsIsoLineHatchColor2(other.itsIsoLineHatchColor2)
-//, itsIsoLineHatchBorderColor2(other.itsIsoLineHatchBorderColor2)
 , itsIsoLineLabelDigitCount(other.itsIsoLineLabelDigitCount)
 , itsContourLabelDigitCount(other.itsContourLabelDigitCount)
 //***********************************************
@@ -472,7 +460,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 , fActive(other.fActive)
 , fShowDifference(other.fShowDifference)
 , fShowDifferenceToOriginalData(other.fShowDifferenceToOriginalData)
-//, itsMetEditorCoordinatorMapOptions(theMetEditorCoordinatorMapOptions ? new NFmiMetEditorCoordinatorMapOptions(*theMetEditorCoordinatorMapOptions) : 0)
 , itsDataType(other.itsDataType)
 , fViewMacroDrawParam(other.fViewMacroDrawParam)
 , fBorrowedParam(other.fBorrowedParam)
@@ -626,7 +613,6 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 		itsColorContouringColorShadeMidValueColor = theDrawParam->ColorContouringColorShadeMidValueColor();
 		itsColorContouringColorShadeHighValueColor = theDrawParam->ColorContouringColorShadeHighValueColor();
 		itsColorContouringColorShadeHigh2ValueColor = theDrawParam->ColorContouringColorShadeHigh2ValueColor();
-//		itsColorContouringColorShadeClassCount = theDrawParam->ColorContouringColorShadeClassCount();
 		fUseWithIsoLineHatch1 = theDrawParam->UseWithIsoLineHatch1();
 		fDrawIsoLineHatchWithBorders1 = theDrawParam->DrawIsoLineHatchWithBorders1();
 		itsIsoLineHatchLowValue1 = theDrawParam->IsoLineHatchLowValue1();
@@ -640,7 +626,6 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 		itsIsoLineHatchHighValue2 = theDrawParam->IsoLineHatchHighValue2();
 		itsIsoLineHatchType2 = theDrawParam->IsoLineHatchType2();
 		itsIsoLineHatchColor2 = theDrawParam->IsoLineHatchColor2();
-//		itsIsoLineHatchBorderColor2 = theDrawParam->IsoLineHatchBorderColor2();
 		itsIsoLineLabelDigitCount = theDrawParam->IsoLineLabelDigitCount();
 	//***********************************************
 	//********** 'versio 2' parametreja *************
@@ -945,7 +930,6 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 		file << itsColorContouringColorShadeLowValueColor << endl;
 		file << itsColorContouringColorShadeMidValueColor << endl;
 		file << itsColorContouringColorShadeHighValueColor << endl;
-//		file << itsColorContouringColorShadeClassCount << endl;
 		file << itsColorContouringColorShadeHigh2Value << endl;
 		file << fUseWithIsoLineHatch1 << endl;
 		file << fDrawIsoLineHatchWithBorders1 << endl;
@@ -960,7 +944,6 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 		file << itsIsoLineHatchHighValue2 << endl;
 		file << itsIsoLineHatchType2 << endl;
 		file << itsIsoLineHatchColor2 << endl;
-//		file << itsIsoLineHatchBorderColor2 << endl;
 		file << itsColorContouringColorShadeHigh2ValueColor << endl;
 		file << itsIsoLineLabelDigitCount << endl;
 	//***********************************************
@@ -1259,7 +1242,6 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				file >> itsColorContouringColorShadeLowValueColor;
 				file >> itsColorContouringColorShadeMidValueColor;
 				file >> itsColorContouringColorShadeHighValueColor;
-//				file >> itsColorContouringColorShadeClassCount;
 				file >> itsColorContouringColorShadeHigh2Value;
 				file >> fUseWithIsoLineHatch1;
 				file >> fDrawIsoLineHatchWithBorders1;
@@ -1274,7 +1256,6 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				file >> itsIsoLineHatchHighValue2;
 				file >> itsIsoLineHatchType2;
 				file >> itsIsoLineHatchColor2;
-//				file >> itsIsoLineHatchBorderColor2;
 				file >> itsColorContouringColorShadeHigh2ValueColor;
 				file >> itsIsoLineLabelDigitCount;
 				if(!file)

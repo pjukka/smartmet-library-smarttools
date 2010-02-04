@@ -15,8 +15,6 @@
 #include "NFmiAngle.h"
 #include "NFmiValueString.h"
 
-//using namespace NFmiSoundingFunctions;
-
 // hakee lähimmän sopivan painepinnan, mistä löytyy halutuille parametreille arvot
 // Mutta ei sallita muokkausta ennen 1. validia leveliä!
 bool NFmiSoundingDataOpt1::GetTandTdValuesFromNearestPressureLevel(double P, double &theFoundP, double &theT, double &theTd)
@@ -33,7 +31,6 @@ bool NFmiSoundingDataOpt1::GetTandTdValuesFromNearestPressureLevel(double P, dou
 			theT = kFloatMissing;
 			theTd = kFloatMissing;
 			bool foundLevel = false;
-//			for(int i=ZeroHeightIndex(); i<static_cast<int>(pV.size()); i++)
 			for(int i=0; i<static_cast<int>(pV.size()); i++)
 			{
 				if(i < 0)
@@ -1061,7 +1058,6 @@ bool NFmiSoundingDataOpt1::ModifyTd2MoistAdiapaticBelowGivenP(double P, double T
 	{
 		unsigned int ssize = static_cast<unsigned int>(pV.size());
 
-//		float wantedTPot = static_cast<float>(::T2tpot(Td, P));
 		float AOS = static_cast<float>(NFmiSoundingFunctions::OS(Td, P));
 		float currentP = 1000;
 		for(unsigned int i=0; i<ssize; i++)
@@ -1070,7 +1066,6 @@ bool NFmiSoundingDataOpt1::ModifyTd2MoistAdiapaticBelowGivenP(double P, double T
 			if(currentP >= P)
 			{ // muutoksia siis tehtiin niin kauan kuin oltiin alle annetun paineen
 				float ATSA  = static_cast<float>(NFmiSoundingFunctions::TSA(AOS, currentP));
-//				float wantedT = static_cast<float>(::Tpot2t(wantedTPot, currentP));
 				tdV[i] = ATSA;
 			}
 			else
@@ -1195,7 +1190,6 @@ void NFmiSoundingDataOpt1::UpdateUandVParams(void)
 // tarkistaa onko kyseisellä ajanhetkellä ja asemalla ei puuttuvaa luotaus-dataa
 bool NFmiSoundingDataOpt1::HasRealSoundingData(NFmiFastQueryInfo &theSoundingLevelInfo)
 {
-//	theSoundingLevelInfo.First();
 	if(theSoundingLevelInfo.Param(kFmiPressure) || theSoundingLevelInfo.Param(kFmiGeomHeight) || theSoundingLevelInfo.Param(kFmiGeopHeight))
 	{
 		int cc = 0;
@@ -1563,8 +1557,6 @@ double NFmiSoundingDataOpt1::CalcCAPE500Index(FmiLCLCalcType theLCLCalcType, dou
 		{
 			if(tValues[i] != kFloatMissing) // kaikilla painepinnoilla ei ole lämpötilaa
 			{
-// !!!!!!!!		if((Tlow != kFloatMissing && Tlow > tValues[i]) || (Thigh != kFloatMissing && Thigh < tValues[i]))
-//					continue;
 				double TofLiftedParcer = CalcTOfLiftedAirParcel(T, Td, P, pValues[i]);
 				currentZ = GetValueAtPressure(kFmiGeomHeight, pValues[i]); // interpoloidaan jos tarvis
 

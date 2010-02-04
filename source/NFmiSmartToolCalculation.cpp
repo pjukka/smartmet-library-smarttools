@@ -52,7 +52,6 @@ NFmiSmartToolCalculation::NFmiSmartToolCalculation(void)
 ,itsCalculations()
 ,itsHeightValue(0)
 ,itsPressureHeightValue(1000)
-//,itsOperators()
 ,fUseTimeInterpolationAlways(false)
 ,fUseHeightCalculation(false)
 ,fUsePressureLevelCalculation(false)
@@ -169,7 +168,6 @@ void NFmiSmartToolCalculation::Clear(void)
 	itsResultInfo = 0;
 	std::for_each(itsCalculations.begin(), itsCalculations.end(), PointerDestroyer());
 	itsCalculations.clear();
-//	itsOperators.clear();
 }
 
 //void NFmiSmartToolCalculation::AddCalculation(NFmiAreaMask* theCalculation, NFmiSmartToolCalculation::FmiCalculationOperators theOperation)
@@ -178,7 +176,6 @@ void NFmiSmartToolCalculation::AddCalculation(NFmiAreaMask* theCalculation)
 	if(theCalculation)
 	{
 		itsCalculations.push_back(theCalculation);
-//		itsOperators.push_back(theOperation);
 	}
 }
 
@@ -205,7 +202,6 @@ double NFmiSmartToolCalculation::eval_exp(const NFmiPoint &theLatlon, const NFmi
 {
 	double result = kFloatMissing;
 
-//  exp_ptr = exp;
 	token = 0; // nollataan aluksi 'token'
 	itsCalcIterator = itsCalculations.begin();
 
@@ -257,7 +253,6 @@ void NFmiSmartToolCalculation::eval_exp3(double &result, const NFmiPoint &theLat
 	double temp;
 
 	eval_exp4(result, theLatlon, theTime, theTimeIndex);
-//	while((op = *token) == '*' || op == '/' || op == '%')
 	while((op = token->GetCalculationOperator()) == NFmiAreaMask::Mul || op == NFmiAreaMask::Div || op == NFmiAreaMask::Mod)
 	{
 		get_token();
@@ -328,12 +323,10 @@ static void DEBUGOUT2(bool doOutPut, const string &theComment, double theValue)
 // Process a parenthesized expression.
 void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-//	if((*token == '('))
 	if(token->GetCalculationOperationType() == NFmiAreaMask::StartParenthesis)
 	{
 		get_token();
 		eval_exp2(result, theLatlon, theTime, theTimeIndex);
-//		if(*token != ')')
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis)
 			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParenthesis") + ":\n" + GetCalculationText());
 		get_token();
@@ -343,7 +336,6 @@ void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLat
 		NFmiAreaMask::MathFunctionType function = token->GetMathFunctionType();
 		get_token();
 		eval_exp2(result, theLatlon, theTime, theTimeIndex);
-//		if(*token != ')')
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
 			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") + ":\n" + GetCalculationText());
 		eval_math_function(result, function);
@@ -497,7 +489,6 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(double &result, doubl
 					if(theIntegrationFunctionType == 3)
 					{
 						double calculationResult = modifier->CalculationResult();
-//						DEBUGOUT2(counter == checkedIndex, "calculationResult" , calculationResult);
 
 						// HUOM!! T‰ss‰ value vs. calculationResult vertailu pit‰‰ tehd‰ virherajan sis‰ll‰,
 						// koska modifier k‰sittelee arvoja floateilla ja muu ysteemi doubleina ja
@@ -649,18 +640,6 @@ void NFmiSmartToolCalculation::atom(double &result, const NFmiPoint &theLatlon, 
 		result = token->HeightValue(itsHeightValue, theLatlon, theTime);
 	else if(fUsePressureLevelCalculation)
 		result = token->PressureValue(itsPressureHeightValue, theLatlon, theTime);
-/*
-	else if(token->UsePressureLevelInterpolation())
-	{
-		if(token->Level()->LevelType() == kFmiFlightLevel)
-		{
-			double wantedHeight = token->UsedPressureLevelValue() * 100 * 0.305; // muutetaan haluttu flight level metreiksi
-			result = token->HeightValue(wantedHeight, theLatlon, theTime);
-		}
-		else
-			result = token->PressureValue(token->UsedPressureLevelValue(), theLatlon, theTime);
-	}
-*/
 	else
 		result = token->Value(theLatlon, theTime, theTimeIndex, fUseTimeInterpolationAlways);
 	get_token();
@@ -689,7 +668,6 @@ bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiPoint &theLatlon, const NF
 	bool maskresult = true;
 	double result = kFloatMissing;
 
-//  exp_ptr = exp;
 	token = 0; // nollataan aluksi 'token'
 	itsCalcIterator = itsCalculations.begin();
 
@@ -744,14 +722,12 @@ void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult, double &result,
 void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
 //	register char op;
-//	using NFmiAreaMask::CalculationOperator;
 	FmiMaskOperation op;
 	bool tempmask;
 	double temp;
 	NFmiAreaMask::CalculationOperationType opType1 = token->GetCalculationOperationType();
 
 	bin_eval_exp2(maskresult, result, theLatlon, theTime, theTimeIndex);
-//	while((op = *token) == '>' || op == '<' || op == '=')
 	while((op = token->Condition().Condition()) != kFmiNoMaskOperation)
 	{
 		get_token();
@@ -821,7 +797,6 @@ void NFmiSmartToolCalculation::bin_eval_exp3(bool &maskresult, double &result, c
 	double temp;
 
 	bin_eval_exp4(maskresult, result, theLatlon, theTime, theTimeIndex);
-//	while((op = *token) == '*' || op == '/' || op == '%')
 	while((op = token->GetCalculationOperator()) == NFmiAreaMask::Mul || op == NFmiAreaMask::Div || op == NFmiAreaMask::Mod)
 	{
 		get_token();
@@ -874,12 +849,10 @@ void NFmiSmartToolCalculation::bin_eval_exp5(bool &maskresult, double &result, c
 // Process a parenthesized expression.
 void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-//	if((*token == '('))
 	if(token->GetCalculationOperationType() == NFmiAreaMask::StartParenthesis)
 	{
 		get_token();
 		bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
-//		if(*token != ')')
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis)
 			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParenthesis") + ":\n" + GetCalculationText());
 		get_token();
@@ -889,7 +862,6 @@ void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, c
 		NFmiAreaMask::MathFunctionType function = token->GetMathFunctionType();
 		get_token();
 		bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
-//		if(*token != ')')
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
 			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") + ":\n" + GetCalculationText());
 		eval_math_function(result, function);

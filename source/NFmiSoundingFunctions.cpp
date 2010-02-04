@@ -137,21 +137,6 @@ double TMR(double W, double P)
 	return TMR - 273.16; // HUOM! lopussa muutetaan kuitenkin celsiuksiksi!!
 }
 
-// Tätä derivaatta funktiota tarvitaan, kun etsitään
-// CalcLCLPressure -funktiossa yhtälöparin nollakohtaa
-// newtonin menetelmällä.
-/*
-double TMRderivate(double W, double P)
-{
-	double X   =  ( W * P / (622.+ W) );
-	double logX   =  ::log10( X );
-
-	double part1 = gTMR_alfa * ::pow( X , gTMR_alfa - 1.) * ::pow(10., gTMR_beta);
-	double part2 = 2 * gTMR_gamma2 * (::pow(10.,( gTMR_gamma * logX )) - gTMR_gamma3 ) * gTMR_gamma * ::pow(X, gTMR_gamma - 1.);
-
-	return part1 + part2;
-}
-*/
 
 // lähde: http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/skewt.pro
 //;========================================================================
@@ -220,29 +205,10 @@ static const double gKelvinChange = 273.16;
 // Oletus: kaikki parametrit ovat ei-puuttuvia!
 double Tpot2t(double tpot, double p)
 {
-/*
-	const double T0 = 273.16; // kelvin asteikon muunnos
-	double t1 = T0 + tpot;
-	double t = t1 * ::pow(p/1000, 0.2854);
-	return t - T0;
-*/
 	// HUOM! pot lämpötila muutetaan ensin kelvineiksi ja lopuksi tulos muutetaan takaisin celsiuksiksi
 	return ( (gKelvinChange + tpot) * ::pow(p/1000, gTpot2tConstant1) ) - gKelvinChange;
 }
 
-// Tätä derivaatta funktiota tarvitaan, kun etsitään
-// CalcLCLPressure -funktiossa yhtälöparin nollakohtaa
-// newtonin menetelmällä.
-/*
-double Tpot2tDerivate(double tpot, double p)
-{
-	double part1 = gKelvinChange + tpot;
-	double part2 = gTpot2tConstant1;
-	double part3 = ::pow(p/1000, gTpot2tConstant1 - 1.);
-	double tot = part1 * part2 * part3;
-	return ( (gKelvinChange + tpot) * gTpot2tConstant1 * ::pow(p/1000, gTpot2tConstant1 - 1.) );
-}
-*/
 // Laskee potentiaalilämpötila theta kun annetaan lämpötila ja paine, missä lämpötila on otettu.
 // T annetaan celsiuksina.
 // Oletus: kaikki parametrit ovat ei-puuttuvia!
@@ -365,13 +331,6 @@ double CalcThetaE(double T, double Td, double P)
 	double thetae = tpot + 3 * w;
 	return thetae;
 }
-/*
-LCLPressureInfo gLCLPressureInfo;
-LCLPressureInfo& GetLCLPressureInfo(void)
-{
-	return gLCLPressureInfo;
-}
-*/
 
 // Laskee LCL-levelin T, Td, ja 'aloitus' P:n avulla
 double CalcLCLPressure(double T, double Td, double P)
@@ -382,7 +341,6 @@ double CalcLCLPressure(double T, double Td, double P)
 	double w = CalcMixingRatio(T, Td, P);
 	double tpot = T2tpot(T, P); // pitää laskea mitä lämpötilaa vastaa pinnan 'potentiaalilämpötila'
 	// 3. iteroi pinnasta ylöspäin ja laske, milloin mixing-ratio käyrä ja lämpötilan kostea-adiapaatti leikkaavat
-//	double diff = 99999;
 	double lastP=P;
 	for(double currentP = P; currentP > 100; currentP -= 1)
 	{
@@ -390,30 +348,16 @@ double CalcLCLPressure(double T, double Td, double P)
 		double Tw = TMR(w, currentP);
 		double Tdry = Tpot2t(tpot, currentP);
 
-//		diff = Tdry - Tw;
 		if(Tdry < Tw)
 			break;
 		lastP = currentP; // viimeisinta painetta ennen kuin Tw ja Tdry ovat leikanneet, voidaan käyttää tarkemman LCL painepinnan interpolointiin
 	}
-//	std::cerr << "slow diff: " << diff << std::endl;
 
 	// laske tarkempi paine jos viitsit lastP ja currentP;n avulla interpoloimalla
 	lclPressure = lastP;
-//	gLCLPressureInfo.AddIterationsValue(iterationCount);
-//	gLCLPressureInfo.AddLclValue(lclPressure);
 	return lclPressure;
 }
-/*
-double CalcMixMoistDiff(double W, double Tpot, double P)
-{
-	return TMR(W, P) - Tpot2t(Tpot, P);
-}
 
-double CalcMixMoistDiffDerivate(double W, double Tpot, double P)
-{
-	return TMRderivate(W, P) - Tpot2tDerivate(Tpot, P);
-}
-*/
 // Laskee newtonin menetelmällä seuraavan P:n arvon funktion ja sen derivaatan avulla.
 // Palauttaa myös viimeisimmällä arvolla lasketun erotuksen.
 double IterateMixMoistDiffWithNewtonMethod(double W, double Tpot, double P, double &diffOut)
@@ -429,11 +373,6 @@ double IterateMixMoistDiffWithNewtonMethod(double W, double Tpot, double P, doub
 	diffOut = mixMoistDiff;
 	double mixMoistDiffDerivate = tmrDeri - TwDeri;
 	return P - (mixMoistDiff / mixMoistDiffDerivate);
-/*
-	diffOut = CalcMixMoistDiff(W, Tpot, P);
-	double derivate = CalcMixMoistDiffDerivate(W, Tpot, P);
-	return P - (diffOut / derivate);
-*/
 }
 
 double CalcLCLPressureFast(double T, double Td, double P)
@@ -461,56 +400,15 @@ double CalcLCLPressureFast(double T, double Td, double P)
 		}
 	}while(iterationCount < maxIterations);
 
-//	std::cerr << "fast diff: " << diff << std::endl;
 	// laske tarkempi paine jos viitsit lastP ja currentP;n avulla interpoloimalla
 	if(iterationCount < maxIterations && currentP != kFloatMissing)
 		lastLCL = currentP;
 	else if(iterationCount >= maxIterations)
 		currentP = kFloatMissing;
 	lclPressure = currentP;
-//	gLCLPressureInfo.AddIterationsValue(iterationCount);
-//	gLCLPressureInfo.AddLclValue(lclPressure);
 	return lclPressure;
 }
 
-/*
-// Laskee LCL-levelin T, Td, ja 'aloitus' P:n avulla
-double CalcLCLPressureBinary(double T, double Td, double P)
-{
-	int iterationCount = 0; // Tämän voi poistaa profiloinnin jälkeen
-	double lclPressure = kFloatMissing;
-	// 2. Laske sekoitussuhde pinnalla
-	double w = CalcMixingRatio(T, Td, P);
-	double tpot = T2tpot(T, P); // pitää laskea mitä lämpötilaa vastaa pinnan 'potentiaalilämpötila'
-	// Etsi binaari haulla (puolittaen), milloin mixing-ratio käyrä ja lämpötilan kostea-adiapaatti leikkaavat
-	// Etsitään LCL:ää P:n ja 100 hPa:n väliltä. Pinnassa Tw on pienempi kuin Tdry ja kun Tw ja Tdry leikkaavat (=ovat tarpeeksi lähellä toisiaan)
-	double maxP = P;
-	double minP = 100;
-	double currentP = (maxP+minP)/2.;
-	do
-	{
-		iterationCount++;
-		double Tw = TMR(w, currentP);
-		double Tdry = Tpot2t(tpot, currentP);
-		if(IsEqualEnough(Tdry, Tw, 0.1))
-			break;
-		else
-		{
-			if(Tw > Tdry) // ollaan menty ohi
-				minP = currentP;
-			else // mennään vielä ylös
-				maxP = currentP;
-			currentP = (maxP+minP)/2.;
-		}
-	}while(iterationCount < 20);
-
-	// laske tarkempi paine jos viitsit lastP ja currentP;n avulla interpoloimalla
-	lclPressure = currentP;
-	gLCLPressureInfo.AddIterationsValue(iterationCount);
-	gLCLPressureInfo.AddLclValue(lclPressure);
-	return lclPressure;
-}
-*/
 // etsii monotonisen 'funktion' juurta kun sille on annettu kaksi funktion pistettä
 double FindRoot(double x1, double x2, double y1, double y2)
 {
