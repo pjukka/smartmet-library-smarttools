@@ -88,65 +88,6 @@ static bool FillSurfaceValuesFromInfo(NFmiSmartInfo *theInfo, NFmiSoundingData &
 		return false;
 }
 
-// T‰m‰ on ulkopuolista hila datan laskemista varten tehty metodi.
-// theBaseInfo:ssa on projektio ja hila pohja. T‰m‰ hila pit‰‰ laskea theValues parametriin.
-// theDrawParam parametri antaa tiedot halutusta mallista, datatyypist‰ esim. EC mallipinta.
-// theTime kertoo mihin ajan hetkeen parametri lasketaan.
-// Oletus: theValues on jo tehty oikean kokoiseksi (theBaseInfo:n mukaan) ja t‰ytetty puuttuvilla arvoilla.
-/*
-void NFmiSoundingIndexCalculator::Calc(NFmiSmartInfo *theBaseInfo, NFmiInfoOrganizer *theInfoOrganizer, NFmiDrawParam *theDrawParam, NFmiDataMatrix<float> &theValues, const NFmiMetTime &theTime, const NFmiDataMatrix<float> &theObsDataT, const NFmiDataMatrix<float> &theObsDataTd, bool fObsDataFound)
-{
-	NFmiDrawParam tempDrawParam(*theDrawParam); // tehd‰‰n v‰liaikais kopio drawParamista ett‰ voidaan muuttaa data tyyppi (soundingParamista pois) oikean l‰hde datan hakua varten
-	tempDrawParam.DataType(static_cast<NFmiInfoData::Type>(theDrawParam->DataType() - NFmiInfoData::kSoundingParameterData)); // pit‰‰ v‰hent‰‰ kSoundingParameterData ett‰ saadaan tiet‰‰ mink‰ tyyppist‰ dataa laskuissa halutaan k‰ytt‰‰
-	tempDrawParam.Param(NFmiDataIdent(NFmiParam(kFmiTemperature, "T"), *(theDrawParam->Param().GetProducer()))); // haetaan parametria l‰mpˆtila, t‰ll‰ ei ole merkityst‰, mutta jotain parametria vain pit‰‰ vain hakea (ja T lˆytyy aina?)
-	NFmiSmartInfo *info = theInfoOrganizer->Info(tempDrawParam, true); // pit‰‰ olla true, ett‰ haetaan crosssection dataa, jolloin levelill‰ ei ole v‰li‰
-
-	FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theDrawParam->Param().GetParamIdent());
-	bool surfaceBasedCalculation = IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
-	NFmiSmartInfo *analyzeData = 0;
-	bool useAnalyzeData = false;
-	if(surfaceBasedCalculation)
-	{
-		// onko analysi dataa halutulle ajalle ja halutut parametrit? jos on k‰ytet‰‰n sit‰
-		analyzeData = theInfoOrganizer->AnalyzeDataInfo();
-		if(analyzeData && analyzeData->Time(theTime))
-		{
-			if(analyzeData->Param(kFmiTemperature) && analyzeData->Param(kFmiDewPoint)) // pit‰‰ lˆyty‰ myˆs T ja Td parametrit ett‰ olisi jotain hyˆty‰
-				useAnalyzeData = true;
-		}
-	}
-
-	if(surfaceBasedCalculation == true && (useAnalyzeData == false && fObsDataFound == false))
-		return ; // ei mit‰‰n teht‰viss‰ kun lasketaan surfacebasedlaskuja, joten 'palautetaan' puuttuva matriisi
-
-	if(info && theBaseInfo && theBaseInfo->IsGrid())
-	{
-		unsigned long xnum = theBaseInfo->Grid()->XNumber();
-		unsigned long counter = 0;
-		NFmiSoundingData soundingData;
-		for(theBaseInfo->ResetLocation(); theBaseInfo->NextLocation(); counter++)
-		{
-			bool surfaceBaseStatus = false;
-			FillSoundingData(info, soundingData, theTime, *(theBaseInfo->Location()), 0); // t‰ytet‰‰n luotaus datat yksi kerrallaan
-
-			float T = kFloatMissing; // debug koodia
-			float Td = kFloatMissing; // debug koodia
-
-			if(useAnalyzeData)
-				surfaceBaseStatus = FillSurfaceValuesFromInfo(analyzeData, soundingData, theBaseInfo->LatLon(), T, Td); // t‰yt‰ pinta arvot analyysist‰
-			else if(fObsDataFound)
-				; // t‰yt‰ pinta arvot obs-datasta
-			if(surfaceBasedCalculation && surfaceBaseStatus == false)
-				continue; // jos esim. analyysi/havainto pinta data ei lˆytynyt t‰st‰ kohtaa, j‰‰ puuttuva arvo voimaan
-
-			// HUOM!!!! muista muuttaa luotaus-parametri pelk‰ksi surface arvoksi, koska loppu menee itsest‰‰n sitten
-			float value = Calc(soundingData, static_cast<FmiSoundingParameters>(theDrawParam->Param().GetParamIdent()));
-			theValues[counter % xnum][counter / xnum] = value;
-		}
-	}
-}
-*/
-
 static void CheckIfStopped(NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
 {
 	if(theStopFunctor && theStopFunctor->Stop())
@@ -160,25 +101,13 @@ static void CalcAllSoundingIndexParamFields(NFmiFastQueryInfo &theSourceInfo, NF
 	NFmiSmartInfo *analyzeData = 0;
 
 	NFmiSoundingDataOpt1 soundingDataOpt1;
-//	NFmiSoundingData soundingData;
 	for(theResultInfo.ResetLocation(); theResultInfo.NextLocation(); )
 	{
 		bool surfaceBaseStatus = false;
 		if(useFastFill)
 			theSourceInfo.LocationIndex(theResultInfo.LocationIndex());
 		::FillSoundingDataOpt1(&theSourceInfo, soundingDataOpt1, theResultInfo.Time(), theResultInfo.LatLon(), useFastFill);
-//		::FillSoundingData(&theSourceInfo, soundingData, theResultInfo.Time(), theResultInfo.LatLon());
-/*
-		float T = kFloatMissing; // debug koodia
-		float Td = kFloatMissing; // debug koodia
 
-		if(useAnalyzeData)
-			surfaceBaseStatus = ::FillSurfaceValuesFromInfo(analyzeData, soundingData, theResultInfo.LatLon(), T, Td); // t‰yt‰ pinta arvot analyysist‰
-		else if(fObsDataFound)
-			; // t‰yt‰ pinta arvot obs-datasta
-		if(surfaceBasedCalculation && surfaceBaseStatus == false)
-			continue; // jos esim. analyysi/havainto pinta data ei lˆytynyt t‰st‰ kohtaa, j‰‰ puuttuva arvo voimaan
-*/
 		unsigned long counter = 0;
 		for(theResultInfo.ResetParam(); theResultInfo.NextParam(); counter++)
 		{
@@ -190,23 +119,7 @@ static void CalcAllSoundingIndexParamFields(NFmiFastQueryInfo &theSourceInfo, NF
 
 			// HUOM!!!! muista muuttaa luotaus-parametri pelk‰ksi surface arvoksi, koska loppu menee itsest‰‰n sitten
 			float valueOpt1 = NFmiSoundingIndexCalculator::CalcOpt1(soundingDataOpt1, soundingParameter);
-/*
-			if(soundingParameter == kSoundingParCAPEMostUn && valueOpt1 > 1000)
-			{
-				int x = 0;
-			}
-*/
-//			std::cerr << "fast lcl: " << valueOpt1 << std::endl;
-//			float value = NFmiSoundingIndexCalculator::Calc(soundingData, soundingParameter);
-//			std::cerr << "slow lcl: " << value << std::endl;
-/*
-			if(value != valueOpt1)
-			{
-				int x = 0;
-			}
-*/
 			theResultInfo.FloatValue(valueOpt1);
-//			theResultInfo.FloatValue(value);
 		}
 	}
 }
@@ -218,7 +131,6 @@ static void CalculatePartOfSoundingData(NFmiFastQueryInfo &theSourceInfo, NFmiFa
 		if(theSourceInfo.IsGrid() == false || theResultInfo.IsGrid() == false)
 			throw std::runtime_error("Error in CalculatePartOfSoundingData, source or result data was non grid-data.");
 
-	//	for(resultInfo.ResetTime(); resultInfo.NextTime(); )
 		for(unsigned long i = startTimeIndex; i <= endTimeIndex; i++)
 		{
 			if(theResultInfo.TimeIndex(i))
@@ -756,18 +668,21 @@ static const NFmiParamDescriptor& GetSoundingIndexParams(void)
 	return soundingParams;
 }
 
-static NFmiQueryInfo MakeSoundingIndexInfo(NFmiQueryData &theSourceData)
+static NFmiQueryInfo MakeSoundingIndexInfo(NFmiQueryData &theSourceData, const std::string &theProducerName)
 {
 	NFmiFastQueryInfo fInfo(&theSourceData);
 
 	NFmiParamDescriptor params = ::GetSoundingIndexParams();
-	params.SetProducer(*fInfo.Producer()); // tuottaja pit‰‰ asettaa oikeaksi
+	NFmiProducer usedProducer = *fInfo.Producer();
+	if(theProducerName.empty() == false)
+		usedProducer.SetName(theProducerName);
+	params.SetProducer(usedProducer); // tuottaja pit‰‰ asettaa oikeaksi
 
 	NFmiQueryInfo info(params, fInfo.TimeDescriptor(), fInfo.HPlaceDescriptor()); // default vplaceDesc riitt‰‰ kun dataa lasketaan vain yhteen tasoon
 	return info;
 }
 
-NFmiQueryData* NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(const std::string &theSourceFileFilter, bool fDoCerrReporting, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
+NFmiQueryData* NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
 {
 	// 1. lue uusin pohjadata k‰yttˆˆn
 	std::auto_ptr<NFmiQueryData> sourceDataPtr(NFmiQueryDataUtil::ReadNewestData(theSourceFileFilter));
@@ -780,7 +695,7 @@ NFmiQueryData* NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(const std
 	}
 
 	// 2. luo sen avulla uusi qinfo pohjaksi
-	NFmiQueryInfo soundingIndexInfo = ::MakeSoundingIndexInfo(*sourceDataPtr.get());
+	NFmiQueryInfo soundingIndexInfo = ::MakeSoundingIndexInfo(*sourceDataPtr.get(), theProducerName);
 	// 3. luo uusi qdata
 	std::auto_ptr<NFmiQueryData> dataPtr(NFmiQueryDataUtil::CreateEmptyData(soundingIndexInfo));
 	if(dataPtr.get() == 0)
