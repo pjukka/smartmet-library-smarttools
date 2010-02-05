@@ -27,6 +27,8 @@ typedef enum
 	kLCLCalcMostUnstable = 4 // etsi maksimi theta-e arvon avulla most unstable tapaus
 } FmiLCLCalcType;
 
+void ReverseSoundingData(NFmiFastQueryInfo* theInfo, checkedVector<float> &theDataVector);
+
 class NFmiSoundingData
 {
 public:

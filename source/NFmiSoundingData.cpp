@@ -17,6 +17,23 @@
 
 using namespace NFmiSoundingFunctions;
 
+// Tarkistetaan onko fastInfon datat nousevassa vai laskevassa suunnassa (korkeus tai paine),
+// jos se ei ole nousevassa j‰rjestyksess‰, k‰‰nnet‰‰n annettu data vektori.
+void ReverseSoundingData(NFmiFastQueryInfo* theInfo, checkedVector<float> &theDataVector)
+{
+	if(theInfo->HeightValueAvailable())
+	{   // jos on korkeus dataa 
+		if(theInfo->HeightParamIsRising() == false) // ja korkeus parametri ei ole nousevassa j‰rjestyksess‰, k‰‰nnet‰‰n vektorissa olevat arvot
+			std::reverse(theDataVector.begin(), theDataVector.end());
+	}
+	else if(theInfo->PressureValueAvailable())
+	{   // jos on paine dataa 
+		if(theInfo->PressureParamIsRising()) // ja paine on nousevassa j‰rjestyksess‰, k‰‰nnet‰‰n vektorissa olevat arvot
+			std::reverse(theDataVector.begin(), theDataVector.end());
+	}
+}
+
+
 // hakee l‰himm‰n sopivan painepinnan, mist‰ lˆytyy halutuille parametreille arvot
 // Mutta ei sallita muokkausta ennen 1. validia leveli‰!
 bool NFmiSoundingData::GetTandTdValuesFromNearestPressureLevel(double P, double &theFoundP, double &theT, double &theTd)
@@ -520,8 +537,7 @@ bool NFmiSoundingData::FillParamData(NFmiFastQueryInfo* theInfo, FmiParameterNam
 		}
 	}
 
-	if(theInfo->HeightParamIsRising() == false) // jos ei nousevassa j‰rjestyksess‰, k‰‰nnet‰‰n vektorissa olevat arvot
-		std::reverse(data.begin(), data.end());
+	::ReverseSoundingData(theInfo, data);
 
 	return status;
 }

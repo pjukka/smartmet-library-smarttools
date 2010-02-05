@@ -519,8 +519,7 @@ bool NFmiSoundingDataOpt1::FastFillParamData(NFmiFastQueryInfo* theInfo, FmiPara
 		}
 	}
 
-	if(theInfo->HeightParamIsRising() == false) // jos ei nousevassa järjestyksessä, käännetään vektorissa olevat arvot
-		std::reverse(data.begin(), data.end());
+	::ReverseSoundingData(theInfo, data);
 
 	return status;
 }
@@ -570,8 +569,7 @@ bool NFmiSoundingDataOpt1::FillParamData(NFmiFastQueryInfo* theInfo, FmiParamete
 		}
 	}
 
-	if(theInfo->HeightParamIsRising() == false) // jos ei nousevassa järjestyksessä, käännetään vektorissa olevat arvot
-		std::reverse(data.begin(), data.end());
+	::ReverseSoundingData(theInfo, data);
 
 	return status;
 }
