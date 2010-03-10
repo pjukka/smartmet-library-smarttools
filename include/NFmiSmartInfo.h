@@ -77,6 +77,7 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	void AreaMask(NFmiUndoableMultiLevelMask* theAreaMask);
 	int MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea);
 	bool MaskByArea(const NFmiArea &theArea, unsigned long theMaskType);
+	void InverseMask(unsigned long theMaskType);
 
 	void MaskAllLocations (const bool& newState, unsigned long theMaskType);
 	void MaskAllLocations (const bool& newState);
@@ -133,9 +134,6 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	void DestroySharedData(bool deleteQData = true){DestroyData(deleteQData);};
 	NFmiQueryData* DataReference(void);
 
-	bool IsEditable(void){return fEditable;}
-	void Editable(bool newState){fEditable = newState;}
-
 	int Priority(void){return itsPriority;}
 	void Priority(int thePriority){itsPriority = thePriority;}
 
@@ -143,10 +141,6 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	void LoadedFromFile(bool loadedFromFile){*fLoadedFromFile = loadedFromFile;}
 
 	bool Extrapolate(void);
-
-	NFmiParamBag* EditedParamBag(void){return itsEditedParamBag;}
-	void EditedParamBag(const NFmiParamBag& theParamBag){*itsEditedParamBag = theParamBag;}
-	bool InitEditedParamBag(void);
 
 	bool LocationSelectionSnapShot(void);	// ota maskit talteen
 	bool LocationSelectionUndo(void);		// kysyy onko undo mahdollinen
@@ -179,7 +173,6 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	std::string itsDataFileName;
 	std::string itsDataFilePattern; // tätä käytetään tunnistamaan mm. info-organizerissa, että onko data samanlaista, eli pyyhitäänkö vanha tälläinen data pois alta
 	int itsPriority;
-	bool fEditable;
 
 	long* itsMaxUndoLevelPtr;
 	long* itsMaxRedoLevelPtr;
@@ -193,8 +186,6 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	bool* fLoadedFromFile;
    	bool*	fDirty; //laura muutti pointteriksi, että tieto säilyisi kaikissa listoissa
 
-	//parambag, siksi että tiedettäisiin mitä parametriä on muutettu
-	NFmiParamBag* itsEditedParamBag;
 	NFmiInfoData::Type itsDataType; // 1999.08.24/Marko
 	std::deque<NFmiHarmonizerBookKeepingData> *itsUndoRedoHarmonizerBookKeepingData; // tämän elin kaari seuraa tiiviisti itsUndoTable:a
 									// tähän talletetaan harmonisaatiossa 'likaantuvat' parametrit ja ajat ja koska

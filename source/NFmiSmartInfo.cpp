@@ -48,7 +48,6 @@ NFmiSmartInfo::NFmiSmartInfo()
 ,itsDataFileName("")
 ,itsDataFilePattern("")
 ,itsPriority(0)
-,itsEditedParamBag(0)
 ,itsDataType(NFmiInfoData::kEditable) // 1999.08.24/Marko
 {
 	fDirty = new bool;
@@ -61,7 +60,6 @@ NFmiSmartInfo::NFmiSmartInfo()
 	itsCurrentRedoLevelPtr = NULL;
 	itsUndoTable = NULL;
 	itsUndoTextTable = NULL;
-	itsEditedParamBag = new NFmiParamBag;
 	itsUndoRedoHarmonizerBookKeepingData = 0;
 }
 
@@ -76,7 +74,6 @@ NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theDa
 	itsDataFilePattern = theDataFilePattern;
 	itsAreaMask = new NFmiUndoableMultiLevelMask(HPlaceDescriptor().Size());
 	itsAreaFactors = 0;
-	fEditable = true; //mikä alkuarvoksi?!!
 	itsPriority = 0;
 
 	fDirty = new bool;
@@ -92,8 +89,6 @@ NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theDa
 	itsUndoTextTable = NULL;
 
 	NFmiParamDescriptor& temp = const_cast<NFmiParamDescriptor&>(theInfo.ParamDescriptor());
-	itsEditedParamBag = new NFmiParamBag(*(temp.ParamBag()));
-	InitEditedParamBag();
 	itsUndoRedoHarmonizerBookKeepingData = 0;
 }
 
@@ -104,7 +99,6 @@ NFmiSmartInfo::NFmiSmartInfo (const NFmiSmartInfo & theInfo)
 ,itsDataType(theInfo.itsDataType)
 {
 	this->itsPriority = theInfo.itsPriority;
-	this->fEditable = theInfo.fEditable;
 
 	this->fDirty = theInfo.fDirty;
 	this->fLoadedFromFile = theInfo.fLoadedFromFile;
@@ -119,7 +113,6 @@ NFmiSmartInfo::NFmiSmartInfo (const NFmiSmartInfo & theInfo)
 	this->itsAreaMask = theInfo.itsAreaMask;
 	this->itsAreaFactors = theInfo.itsAreaFactors;
 	this->itsDataReference = theInfo.itsDataReference;
-	this->itsEditedParamBag = theInfo.itsEditedParamBag;
 	this->itsUndoRedoHarmonizerBookKeepingData = theInfo.itsUndoRedoHarmonizerBookKeepingData;
 }
 
@@ -189,9 +182,6 @@ void NFmiSmartInfo::DestroyData(bool deleteQData)
 	delete fLoadedFromFile;
 	fLoadedFromFile = 0;
 
-	delete itsEditedParamBag;
-	itsEditedParamBag = 0;
-
 	if(itsUndoRedoHarmonizerBookKeepingData)
 	{
 		itsUndoRedoHarmonizerBookKeepingData->clear();
@@ -238,14 +228,6 @@ NFmiSmartInfo* NFmiSmartInfo::Clone(void) const
 		return 0;
 }
 
-bool NFmiSmartInfo::InitEditedParamBag()
-{
-	for(itsEditedParamBag->Reset(); itsEditedParamBag->Next();)
-		itsEditedParamBag->SetActive(itsEditedParamBag->CurrentParam(),false);
-	return true;
-
-}
-
 //--------------------------------------------------------
 // AreaMask				M.K. 1.4.99
 //--------------------------------------------------------
@@ -262,7 +244,6 @@ NFmiSmartInfo& NFmiSmartInfo::operator=(const NFmiSmartInfo& theSmartInfo)
 
 	this->itsDataFileName = theSmartInfo.itsDataFileName;
 	this->itsPriority = theSmartInfo.itsPriority;
-	this->fEditable = theSmartInfo.fEditable;
 	this->fDirty = theSmartInfo.fDirty; //laura 07051999
 	this->fLoadedFromFile = theSmartInfo.fLoadedFromFile; //laura 07051999
 
@@ -277,7 +258,6 @@ NFmiSmartInfo& NFmiSmartInfo::operator=(const NFmiSmartInfo& theSmartInfo)
 	this->itsAreaFactors = theSmartInfo.itsAreaFactors;
 	this->itsDataReference = theSmartInfo.itsDataReference;
 
-	this->itsEditedParamBag = theSmartInfo.itsEditedParamBag;
 	this->itsDataType = theSmartInfo.itsDataType;
 	this->itsUndoRedoHarmonizerBookKeepingData = theSmartInfo.itsUndoRedoHarmonizerBookKeepingData;
 
@@ -314,6 +294,11 @@ bool NFmiSmartInfo::MaskByArea(const NFmiArea &theArea, unsigned long theMaskTyp
 	}
 	MaskType(oldMask);
 	return true;
+}
+
+void NFmiSmartInfo::InverseMask(unsigned long theMaskType)
+{
+	(*itsAreaMask)->InverseMask(theMaskType);
 }
 
 //--------------------------------------------------------
