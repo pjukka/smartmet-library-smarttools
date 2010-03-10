@@ -82,8 +82,8 @@ class NFmiInfoOrganizer
 	NFmiSmartInfo* ObservationInfo(int theIndex); // palauttaa halutun indeksin infon (huono viritys, KORJAA!!!!)
 	NFmiSmartInfo* KepaDataInfo(void); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
 	NFmiSmartInfo* ClimatologyInfo(void); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
-	NFmiSmartInfo* AnalyzeDataInfo(const NFmiProducer& theProducer); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
-	NFmiSmartInfo* AnalyzeDataInfo(void); // palauttaa tietyssä prioriteetti järjestyksessä jonkun analyysi datan mitä systeemistä löytyy
+//	NFmiSmartInfo* AnalyzeDataInfo(const NFmiProducer& theProducer); // tämä toimii vajavaisesti, koska se palauttaa aina 1. kyseisen tyyppisen infon
+//	NFmiSmartInfo* AnalyzeDataInfo(void); // palauttaa tietyssä prioriteetti järjestyksessä jonkun analyysi datan mitä systeemistä löytyy
 
 	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType); // Hakee 1. tietyn datatyypin infon
 	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType, int theIndex); // Hakee indeksin mukaisen tietyn datatyypin infon
