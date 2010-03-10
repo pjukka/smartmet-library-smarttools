@@ -10,8 +10,9 @@
 #ifndef NFMISOUNDINGINDEXCALCULATOR_H
 #define NFMISOUNDINGINDEXCALCULATOR_H
 
-#include "NFmiQueryDataUtil.h"
+#include <string>
 
+class NFmiQueryData;
 class NFmiSmartInfo;
 class NFmiFastQueryInfo;
 class NFmiSoundingData;
@@ -21,6 +22,7 @@ class NFmiMetTime;
 class NFmiInfoOrganizer;
 class NFmiLocation;
 class NFmiPoint;
+class NFmiStopFunctor;
 
 // Nämä parametrit ovat niitä joita lasketaan luotausnäytössä.
 // Tarkoitus on nyt pystyä laskemaan niitä myös hilamuodossa karttanäytölle.
@@ -99,8 +101,8 @@ public:
 	static float Calc(NFmiSoundingData &theSoundingData, FmiSoundingParameters theParam);
 	static float CalcOpt1(NFmiSoundingDataOpt1 &theSoundingDataOpt1, FmiSoundingParameters theParam);
 	static float Calc(NFmiFastQueryInfo *theInfo, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, FmiSoundingParameters theParam);
-	static void CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor = 0);
-	static NFmiQueryData* CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor = 0);
+	static void CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor = 0);
+	static NFmiQueryData* CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor = 0);
 };
 
 #endif // NFMISOUNDINGINDEXCALCULATOR_H

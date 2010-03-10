@@ -17,6 +17,7 @@
 #include "NFmiSoundingFunctions.h"
 #include "NFmiValueString.h"
 #include "NFmiQueryData.h"
+#include "NFmiQueryDataUtil.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable : 4244) // boost:in thread kirjastosta tulee ikävästi 4244 varoituksia
@@ -88,13 +89,13 @@ static bool FillSurfaceValuesFromInfo(NFmiSmartInfo *theInfo, NFmiSoundingData &
 		return false;
 }
 
-static void CheckIfStopped(NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
+static void CheckIfStopped(NFmiStopFunctor *theStopFunctor)
 {
 	if(theStopFunctor && theStopFunctor->Stop())
-		throw NFmiQueryDataUtil::StopThreadException();
+		throw NFmiStopThreadException();
 }
 
-static void CalcAllSoundingIndexParamFields(NFmiFastQueryInfo &theSourceInfo, NFmiFastQueryInfo &theResultInfo, bool useFastFill, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
+static void CalcAllSoundingIndexParamFields(NFmiFastQueryInfo &theSourceInfo, NFmiFastQueryInfo &theResultInfo, bool useFastFill, NFmiStopFunctor *theStopFunctor)
 {
 	bool fObsDataFound = false; // toistaiseksi ei käytössä
 	bool useAnalyzeData = false; // toistaiseksi ei käytössä
@@ -124,7 +125,7 @@ static void CalcAllSoundingIndexParamFields(NFmiFastQueryInfo &theSourceInfo, NF
 	}
 }
 
-static void CalculatePartOfSoundingData(NFmiFastQueryInfo &theSourceInfo, NFmiFastQueryInfo &theResultInfo, unsigned long startTimeIndex, unsigned long endTimeIndex, bool useFastFill, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor, int index, bool fDoCerrReporting)
+static void CalculatePartOfSoundingData(NFmiFastQueryInfo &theSourceInfo, NFmiFastQueryInfo &theResultInfo, unsigned long startTimeIndex, unsigned long endTimeIndex, bool useFastFill, NFmiStopFunctor *theStopFunctor, int index, bool fDoCerrReporting)
 {
 	try
 	{
@@ -145,7 +146,7 @@ static void CalculatePartOfSoundingData(NFmiFastQueryInfo &theSourceInfo, NFmiFa
 			}
 		}
 	}
-	catch(NFmiQueryDataUtil::StopThreadException & /* stopException */ )
+	catch(NFmiStopThreadException & /* stopException */ )
 	{
 		// lopetetaan sitten kun on niin haluttu
 		if(fDoCerrReporting)
@@ -191,7 +192,7 @@ static void CalcTimeIndexStartsForThreeThreads(unsigned long timeSize, unsigned 
 }
 
 // Jos useFastFill on true, on datoilla sama hila ja aika descriptor rakenne
-void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
+void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor)
 {
 	NFmiSoundingFunctions::CalcDP(1, 56); // tämä funktio pitää varmistaa että se on alustettu, koska siellä on pari staattista muuttujaa, jotka 
 											// alustetaan ensimmäisellä kerralla ja multi-threaddaavassa jutussa se voisi olla ongelma.
@@ -231,22 +232,20 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 		NFmiFastQueryInfo sourceInfo3(&theSourceData);
 		NFmiFastQueryInfo resultInfo3(&theResultData);
 
-		boost::xtime xt;
-		boost::xtime_get(&xt, boost::TIME_UTC);
+		// HUOM! multi threaddauksessa otettava huomioon!!!!
+		// NFmiQueryData-luokassa on itsLatLonCache, joka on samalla käytössä kaikilla
+		// erillisillä Info-iteraattoreilla. Tämä on ns. lazy-init dataa, joka initialisoidaan kerran
+		// tarvittaessa. Nyt samoihin datoihin tehdään kolme info-iteraattoria ja tässä kutsumalla yhdelle niistä
+		// LatLon-metodia, varmistetaan että itsLatLonCache on initialisoitu, ennen kuin mennään
+		// suorittamaan kolmea threadia yhtäaikaa. Tämä oli kaato bugi, kun kolme thtreadia kutsui Latlon:ia
+		// ja cache-data ei oltu vielä initialisoitu, jolloin sitä initialisoitiin kolme kertaa päällekkäin. 
+		// Ongelma oli varsinkin isommille datoille (esim. mbe), joille kyseisen cachen rakentaminen kestää kauemmin.
+		NFmiPoint dummyPoint = resultInfo3.LatLon(); // Varmistetaan että NFmiQueryDatan itsLatLonCache on alustettu!!
+		dummyPoint = sourceInfo3.LatLon(); // Varmistetaan että NFmiQueryDatan itsLatLonCache on alustettu!!
 
-		// käynnistetään threadit pinellä viiveillä toisistaan, 1 s väliä, josko se auttaisi salaperäiseen
-		// isojen datojen luomisessa tapahtuvaan satunnaiseen kaamumiseen juuri thredien käynnistyksen
-		// yhteydessä tapahtuviin kaatumisiisn. (Näyttäisi toimivan ainakin testatun MBE-mallipinta datan 
-		// kanssa, joka aiheutti ongelmia)
-		// Käynnistetään ensin 3:n sitten 2:n ja viimeisenä 1:n, koska 3:lla ja 2:lla on potentiaalisesti
-		// eniten aika-askelia tehtävänä.
 		boost::thread_group calcParts;
 		calcParts.add_thread(new boost::thread(::CalculatePartOfSoundingData, sourceInfo3, resultInfo3, timeStart3, timeEnd3, useFastFill, theStopFunctor, 3, fDoCerrReporting));
-		xt.sec += 1;
-		boost::thread::sleep(xt);
 		calcParts.add_thread(new boost::thread(::CalculatePartOfSoundingData, sourceInfo2, resultInfo2, timeStart2, timeEnd2, useFastFill, theStopFunctor, 2, fDoCerrReporting));
-		xt.sec += 1;
-		boost::thread::sleep(xt);
 		calcParts.add_thread(new boost::thread(::CalculatePartOfSoundingData, sourceInfo1, resultInfo1, timeStart1, timeEnd1, useFastFill, theStopFunctor, 1, fDoCerrReporting));
 		calcParts.join_all(); // odotetaan että threadit lopettavat
 		if(fDoCerrReporting)
@@ -682,7 +681,7 @@ static NFmiQueryInfo MakeSoundingIndexInfo(NFmiQueryData &theSourceData, const s
 	return info;
 }
 
-NFmiQueryData* NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiQueryDataUtil::StopFunctorBase *theStopFunctor)
+NFmiQueryData* NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor)
 {
 	// 1. lue uusin pohjadata käyttöön
 	std::auto_ptr<NFmiQueryData> sourceDataPtr(NFmiQueryDataUtil::ReadNewestData(theSourceFileFilter));
