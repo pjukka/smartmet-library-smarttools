@@ -58,7 +58,7 @@ NFmiDrawParam::NFmiDrawParam()
 , itsIsoLineGab						     (1.)
 , itsContourGab(1.)
 , itsModifyingStep                       (1.)
-, fModifyingUnit						 (true)
+//, fModifyingUnit						 (true)
 , itsTimeSerialModifyingLimit(10)
 , itsIsolineColor						(NFmiColor(0.,0.,0.))
 , itsContourColor(NFmiColor(0.,0.,0.))
@@ -161,7 +161,6 @@ NFmiDrawParam::NFmiDrawParam()
 , itsInitFileVersionNumber(itsFileVersionNumber)
 , fHidden(false)
 , fEditedParam(false)
-, fEditableParam(true)
 , itsUnit								("?")
 , fActive(false)
 , fShowDifference(false)
@@ -204,7 +203,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 , itsIsoLineGab						     (1.)
 , itsContourGab(1.)
 , itsModifyingStep                       (1.)
-, fModifyingUnit						 (true)
+//, fModifyingUnit						 (true)
 , itsTimeSerialModifyingLimit(10)
 , itsIsolineColor						(NFmiColor(0.,0.,0.))
 , itsContourColor(NFmiColor(0.,0.,0.))
@@ -306,7 +305,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 , itsInitFileVersionNumber(itsFileVersionNumber)
 , fHidden(false)
 , fEditedParam(false)
-, fEditableParam(true)
 , itsUnit								("?")
 , fActive(false)
 , fShowDifference(false)
@@ -347,7 +345,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 , itsIsoLineGab(other.itsIsoLineGab)
 , itsContourGab(other.itsContourGab)
 , itsModifyingStep(other.itsModifyingStep)
-, fModifyingUnit(other.fModifyingUnit)
+//, fModifyingUnit(other.fModifyingUnit)
 , itsTimeSerialModifyingLimit(other.itsTimeSerialModifyingLimit)
 , itsIsolineColor(other.itsIsolineColor)
 , itsContourColor(other.itsContourColor)
@@ -455,7 +453,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 , itsInitFileVersionNumber(other.itsInitFileVersionNumber)
 , fHidden(other.fHidden)
 , fEditedParam(other.fEditedParam)
-, fEditableParam(other.fEditableParam)
 , itsUnit(other.itsUnit)
 , fActive(other.fActive)
 , fShowDifference(other.fShowDifference)
@@ -497,7 +494,6 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 			itsInitFileName = theDrawParam->InitFileName();
 			// HUOM! itsMacroParamRelativePath-dataosaa ei saa initialisoida, koska sitä käytetään vain viewmakrojen yhteydessä
 			itsParameterAbbreviation = theDrawParam->ParameterAbbreviation();
-			fEditableParam = theDrawParam->IsEditable();
 			fViewMacroDrawParam = theDrawParam->ViewMacroDrawParam();
 			itsParameter = theDrawParam->itsParameter;
 			itsLevel = const_cast<NFmiDrawParam*>(theDrawParam)->Level();
@@ -524,7 +520,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 		fUseContourGabWithCustomContours = theDrawParam->UseContourGabWithCustomContours();
 		itsIsoLineGab = theDrawParam->IsoLineGab();
 		itsModifyingStep =  theDrawParam->ModifyingStep();
-		fModifyingUnit =  theDrawParam->ModifyingUnit();
+//		fModifyingUnit =  theDrawParam->ModifyingUnit();
 		itsTimeSerialModifyingLimit = theDrawParam->TimeSerialModifyingLimit();
 
 		itsIsolineColor =  theDrawParam->IsolineColor();
@@ -769,7 +765,8 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 	file << "'ModifyingStep'" << endl;   // selittävä teksti
 	file << itsModifyingStep << endl;
 	file << "'ModifyingUnit'" << endl;   // selittävä teksti
-	file << fModifyingUnit << endl;
+//	file << fModifyingUnit << endl;
+	file << true << endl; // tässä on otettu pois modifyingUnit, mutta arvo pitää tallettaa että luku/kirjoitus operaatiot eivät mene rikki
 
 	file << "'FrameColor'" << endl;   // selittävä teksti
 	file << itsFrameColor << endl;
@@ -818,7 +815,7 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 	file << "'StationDataViewType'" << endl;   // selittävä teksti
 	file << static_cast<int>(itsStationDataViewType + 100) << endl;
 	file << "'EditableParam'" << endl;   // selittävä teksti
-	file << fEditableParam << endl;
+	file << false << endl; // tämä muuttuja poistettu, muttä jokin arvo laitettava tähän
 	file << "'Unit'" << endl;   // selittävä teksti
 	file << itsUnit << endl;
 
@@ -1055,7 +1052,8 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 			file >> temp; // luetaan nimike pois
 			file >> itsModifyingStep;
 			file >> temp; // luetaan nimike pois
-			file >> fModifyingUnit;
+//			file >> fModifyingUnit;
+			file >> temp; // luetaan legacy-koodi modifyingUnit pois
 
 			file >> temp; // luetaan nimike pois
 			file >> itsFrameColor;
@@ -1119,7 +1117,8 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				number = 1;
 			itsStationDataViewType = NFmiMetEditorTypes::View(number);
 			file >> temp; // luetaan nimike pois
-			file >> fEditableParam;
+			bool tmpBool = false;
+			file >> tmpBool; // tämä on legacy koodia, pitää lukea bool arvo tässä
 
 			file >> temp; // luetaan nimike pois
 			file >> temp;

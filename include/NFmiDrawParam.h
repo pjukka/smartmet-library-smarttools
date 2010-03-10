@@ -56,8 +56,6 @@ public:
 	void EditParam(bool newValue){fEditedParam = newValue;};
 	bool IsParamHidden(void) const {return fHidden;};
 	bool IsParamEdited(void) const {return fEditedParam;};
-	bool IsEditable(void) const {return fEditableParam;};
-	void EditableParam(bool newValue){fEditableParam = newValue;};
 	const NFmiMetTime& ModelOriginTime(void) const {return itsModelOriginTime;}
 	void ModelOriginTime(const NFmiMetTime &newValue) {itsModelOriginTime = newValue;}
 	int ModelRunIndex(void) const {return itsModelRunIndex;}
@@ -143,8 +141,8 @@ public:
 
 	void				 ModifyingStep (const double theModifyingStep) { itsModifyingStep = theModifyingStep; };
 	double				 ModifyingStep (void) const { return itsModifyingStep; };
-	void				 ModifyingUnit (bool theModifyingUnit) { fModifyingUnit = theModifyingUnit; }
-	bool			 ModifyingUnit (void) const { return fModifyingUnit; }
+//	void				 ModifyingUnit (bool theModifyingUnit) { fModifyingUnit = theModifyingUnit; }
+//	bool			 ModifyingUnit (void) const { return fModifyingUnit; }
 	const NFmiMetEditorTypes::View* PossibleViewTypeList (void) const {return itsPossibleViewTypeList;}
 	int					 PossibleViewTypeCount (void) const { return itsPossibleViewTypeCount; };
 	const std::string&	 InitFileName(void) const { return itsInitFileName; }
@@ -178,7 +176,8 @@ public:
 	void ContourTextColor(const NFmiColor& newColor){itsContourTextColor = newColor;};
 	const NFmiColor& ContourTextColor(void) const {return itsContourTextColor;};
 
-	double TimeSerialModifyingLimit(void) const {return fModifyingUnit ? itsTimeSerialModifyingLimit : 100;};
+//	double TimeSerialModifyingLimit(void) const {return fModifyingUnit ? itsTimeSerialModifyingLimit : 100;};
+	double TimeSerialModifyingLimit(void) const {return itsTimeSerialModifyingLimit;};
 	NFmiMetEditorTypes::View StationDataViewType(void) const {return itsStationDataViewType;};
 	void TimeSerialModifyingLimit(double newValue){itsTimeSerialModifyingLimit = newValue;};
 	void StationDataViewType(NFmiMetEditorTypes::View newValue){itsStationDataViewType = newValue;};
@@ -537,7 +536,7 @@ protected:
 	double itsIsoLineGab;
 	double itsContourGab; // **** Versio 3 parametri ****
 	double itsModifyingStep;
-	bool fModifyingUnit;	//(= 0, jos yksikkö on %, = 1, jos yksikkö on sama kuin itsUnit)
+//	bool fModifyingUnit;	//(= 0, jos yksikkö on %, = 1, jos yksikkö on sama kuin itsUnit)
 	double itsTimeSerialModifyingLimit; // aikasarjanäytön muutos akselin minimi ja maksimi arvo
 	NFmiColor itsIsolineColor;
 	NFmiColor itsContourColor; // **** Versio 3 parametri ****
@@ -665,7 +664,7 @@ private:
 
 	bool fHidden;			// näyttö voidaan piiloittaa tämän mukaisesti
 	bool fEditedParam;	// vain yksi parametreista voidaan editoida yhtä aikaa
-	bool fEditableParam;	// onko parametri suoraan editoitavissa ollenkaan? (esim. HESSAA tai tuulivektori eivät ole)
+//	bool fEditableParam;	// onko parametri suoraan editoitavissa ollenkaan? (esim. HESSAA tai tuulivektori eivät ole)
 
 	std::string itsUnit;
 	bool fActive;			// onko kyseinen parametri näytön aktiivinen parametri (jokaisella näyttörivillä aina yksi aktivoitunut parametri)
