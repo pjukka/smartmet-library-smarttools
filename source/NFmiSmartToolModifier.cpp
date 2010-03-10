@@ -1005,6 +1005,14 @@ NFmiSmartInfo* NFmiSmartToolModifier::GetPossibleLevelInterpolatedInfo(const NFm
 
 NFmiSmartInfo* NFmiSmartToolModifier::CreateCopyOfAnalyzeInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel)
 {
+	NFmiSmartInfo *info = itsInfoOrganizer->Info(theDataIdent, theLevel, NFmiInfoData::kAnalyzeData);
+	if(info)
+	{
+		if(info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) && (theLevel == 0 || info->Level(*theLevel)))
+			return new NFmiSmartInfo(*info);
+	}
+	return 0;
+/*
 	NFmiSmartInfo* info = itsInfoOrganizer->AnalyzeDataInfo();
 	if(info)
 	{
@@ -1012,6 +1020,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateCopyOfAnalyzeInfo(const NFmiDataIden
 			return new NFmiSmartInfo(*info);
 	}
 	return 0;
+*/
 }
 
 
