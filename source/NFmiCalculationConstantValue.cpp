@@ -22,6 +22,8 @@
 #include "NFmiCalculationConstantValue.h"
 #include "NFmiDataModifier.h"
 #include "NFmiDataIterator.h"
+#include "NFmiQueryInfo.h"
+
 //--------------------------------------------------------
 // Constructor/Destructor 
 //--------------------------------------------------------
