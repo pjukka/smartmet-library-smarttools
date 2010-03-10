@@ -219,6 +219,19 @@ void NFmiMultiLevelMask::MaskAll (bool theNewState, unsigned long theMaskType)
 		itsDisplayedMask.Mask(theNewState);
 	return;
 }
+
+void NFmiMultiLevelMask::InverseMask(unsigned long theMaskType)
+{
+	if ((theMaskType & NFmiMetEditorTypes::kFmiNoMask) == NFmiMetEditorTypes::kFmiNoMask)
+		return;
+	if ((theMaskType & NFmiMetEditorTypes::kFmiActivationMask) == NFmiMetEditorTypes::kFmiActivationMask)
+		itsActivationMask.InverseMask();
+	if ((theMaskType & NFmiMetEditorTypes::kFmiSelectionMask) == NFmiMetEditorTypes::kFmiSelectionMask)
+		itsSelectionMask.InverseMask();
+	if ((theMaskType & NFmiMetEditorTypes::kFmiDisplayedMask) == NFmiMetEditorTypes::kFmiDisplayedMask)
+		itsDisplayedMask.InverseMask();
+}
+
 //--------------------------------------------------------
 // Mask 
 //--------------------------------------------------------

@@ -56,6 +56,7 @@ class NFmiMultiLevelMask
 	bool IsMasked (unsigned long theIndex, unsigned long theMaskType) const;
 	void MaskAll (bool theNewState);
 	void MaskAll (bool theNewState, unsigned long theMaskType);
+	void InverseMask (unsigned long theMaskType);
 	bool Mask (const NFmiBitMask& theMask);
 	bool Mask (const NFmiBitMask& theMask, unsigned long theMaskType);
 	const NFmiBitMask& Mask (void) const;
