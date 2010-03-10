@@ -84,6 +84,7 @@ public:
 	bool RemoveMacroParam(const std::string &theName);
 	bool MoveActiveParam(int theMovement);
 	int FindActive(void);
+	int FindEdited(void);
 	bool HasBorrowedParams(void) const {return fHasBorrowedParams;}
 	void HasBorrowedParams(bool newValue) {fHasBorrowedParams = newValue;}
 	void ActivateOnlyOne(void);

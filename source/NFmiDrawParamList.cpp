@@ -221,7 +221,7 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 		NFmiDrawParam * drawParam = Current();
 		if(theParam.GetParamIdent() == NFmiInfoData::kFmiSpSynoPlot) // pirun synop-parametrille pitää taas tehdä virityksiä
 		{
-			if(drawParam->Param() == theParam)
+			if(fUseOnlyParamId || drawParam->Param() == theParam)
 				return true;
 		}
 		else
@@ -250,7 +250,7 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel, bool fDeleteData)
 {
 	std::list<int> tmpParIdList;
-	int size = theParamIdsNotRemoved.size();
+	int size = static_cast<int>(theParamIdsNotRemoved.size());
 	for(int i=0; i<size; i++)
 		tmpParIdList.push_back(theParamIdsNotRemoved[i]);
 	std::list<int>::iterator it;
@@ -387,6 +387,17 @@ int NFmiDrawParamList::FindActive(void)
 	for(Reset(); Next(); index++)
 	{
 		if(Current()->IsActive())
+			return index;
+	}
+	return 0;
+}
+
+int NFmiDrawParamList::FindEdited(void)
+{
+	int index = 1;
+	for(Reset(); Next(); index++)
+	{
+		if(Current()->IsParamEdited())
 			return index;
 	}
 	return 0;
