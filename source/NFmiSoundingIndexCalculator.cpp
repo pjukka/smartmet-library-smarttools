@@ -19,6 +19,8 @@
 #include "NFmiQueryData.h"
 #include "NFmiQueryDataUtil.h"
 
+#ifndef BOOST_DISABLE_THREADS
+
 #ifdef _MSC_VER
 #pragma warning (disable : 4244) // boost:in thread kirjastosta tulee ikävästi 4244 varoituksia
 #endif
@@ -27,6 +29,7 @@
 #pragma warning (default : 4244) // laitetaan 4244 takaisin päälle, koska se on tärkeä (esim. double -> int auto castaus varoitus)
 #endif
 
+#endif // BOOST_DISABLE_THREADS
 
 using namespace NFmiSoundingFunctions;
 
@@ -204,13 +207,17 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 	// Lisäksi threadit käynnistetään alle normaalin prioriteetin, että kone ei tukahdu kun näitä käynnistetään.
 
 	unsigned long timeSize = theResultData.Info()->SizeTimes();
+#ifndef BOOST_DISABLE_THREADS
 	if(timeSize < 3)
 	{ // jos aikoja oli alle kolme, lasketaan data yhdessä funktiossa
+#endif // BOOST_DISABLE_THREADS
+
 		if(fDoCerrReporting)
 			std::cerr << "making data in single thread" << std::endl;
 		NFmiFastQueryInfo sourceInfo(&theSourceData);
 		NFmiFastQueryInfo resultInfo(&theResultData);
 		::CalculatePartOfSoundingData(sourceInfo, resultInfo, 0, timeSize-1, useFastFill, theStopFunctor, 1, fDoCerrReporting);
+#ifndef BOOST_DISABLE_THREADS
 	}
 	else
 	{
@@ -251,6 +258,7 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 		if(fDoCerrReporting)
 			std::cerr << "all threads ended" << std::endl;
 	}
+#endif // BOOST_DISABLE_THREADS
 
 }
 
