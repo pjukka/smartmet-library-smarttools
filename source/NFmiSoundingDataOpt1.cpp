@@ -1401,6 +1401,8 @@ void NFmiSoundingDataOpt1::FillLFCIndexCache(FmiLCLCalcType theLCLCalcType, doub
 			itsLFCIndexCache.itsMostUnstableELValue = theELValue;
 			break;
 		}
+	case kLCLCalcNone:
+	  break;
 	}
 }
 
@@ -1448,6 +1450,8 @@ bool NFmiSoundingDataOpt1::CheckLFCIndexCache(FmiLCLCalcType theLCLCalcTypeIn, d
 			}
 			break;
 		}
+	case kLCLCalcNone:
+	  break;
 	}
 	return false;
 }
