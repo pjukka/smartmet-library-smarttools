@@ -88,7 +88,7 @@ NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theDa
 	itsUndoTable = NULL;
 	itsUndoTextTable = NULL;
 
-	NFmiParamDescriptor& temp = const_cast<NFmiParamDescriptor&>(theInfo.ParamDescriptor());
+	// NFmiParamDescriptor& temp = const_cast<NFmiParamDescriptor&>(theInfo.ParamDescriptor());
 	itsUndoRedoHarmonizerBookKeepingData = 0;
 }
 
