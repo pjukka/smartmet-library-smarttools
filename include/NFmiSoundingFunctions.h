@@ -11,6 +11,8 @@
 #ifndef NFMISOUNDINGFUNCTIONS_H
 #define NFMISOUNDINGFUNCTIONS_H
 
+#include <cmath>
+
 namespace NFmiSoundingFunctions
 {
 	double FindNearestW(double T, double P);
