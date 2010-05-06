@@ -75,6 +75,7 @@ bool NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(FmiSoundingParamet
 		return false;
 }
 
+#if 0 // NEVER USED
 static bool FillSurfaceValuesFromInfo(NFmiSmartInfo *theInfo, NFmiSoundingData &theSoundingData, const NFmiPoint &theLatLon, float &theT, float &theTd)
 {
 	theInfo->Param(kFmiTemperature);
@@ -91,6 +92,7 @@ static bool FillSurfaceValuesFromInfo(NFmiSmartInfo *theInfo, NFmiSoundingData &
 	else
 		return false;
 }
+#endif
 
 static void CheckIfStopped(NFmiStopFunctor *theStopFunctor)
 {
@@ -100,14 +102,14 @@ static void CheckIfStopped(NFmiStopFunctor *theStopFunctor)
 
 static void CalcAllSoundingIndexParamFields(NFmiFastQueryInfo &theSourceInfo, NFmiFastQueryInfo &theResultInfo, bool useFastFill, NFmiStopFunctor *theStopFunctor)
 {
-	bool fObsDataFound = false; // toistaiseksi ei käytössä
-	bool useAnalyzeData = false; // toistaiseksi ei käytössä
-	NFmiSmartInfo *analyzeData = 0;
+  // bool fObsDataFound = false; // toistaiseksi ei käytössä
+  // bool useAnalyzeData = false; // toistaiseksi ei käytössä
+  // NFmiSmartInfo *analyzeData = 0;
 
 	NFmiSoundingDataOpt1 soundingDataOpt1;
 	for(theResultInfo.ResetLocation(); theResultInfo.NextLocation(); )
 	{
-		bool surfaceBaseStatus = false;
+	  // bool surfaceBaseStatus = false;
 		if(useFastFill)
 			theSourceInfo.LocationIndex(theResultInfo.LocationIndex());
 		::FillSoundingDataOpt1(&theSourceInfo, soundingDataOpt1, theResultInfo.Time(), theResultInfo.LatLon(), useFastFill);
@@ -119,7 +121,7 @@ static void CalcAllSoundingIndexParamFields(NFmiFastQueryInfo &theSourceInfo, NF
 				::CheckIfStopped(theStopFunctor); // joka 20 hilapisteellä katsotaan, pitääkö lopettaa
 
 			FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theResultInfo.Param().GetParamIdent());
-			bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
+			// bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
 
 			// HUOM!!!! muista muuttaa luotaus-parametri pelkäksi surface arvoksi, koska loppu menee itsestään sitten
 			float valueOpt1 = NFmiSoundingIndexCalculator::CalcOpt1(soundingDataOpt1, soundingParameter);
@@ -171,6 +173,8 @@ static void CalculatePartOfSoundingData(NFmiFastQueryInfo &theSourceInfo, NFmiFa
 		std::cerr << "thread nro: " << index << " end here."<< std::endl;
 }
 
+#ifndef BOOST_DISABLE_THREADS
+
 static void CalcTimeIndexStartsForThreeThreads(unsigned long timeSize, unsigned long &theTimeStart1, unsigned long &theTimeStart2, unsigned long &theTimeStart3)
 {
 	unsigned long partSize = timeSize/3;
@@ -193,6 +197,7 @@ static void CalcTimeIndexStartsForThreeThreads(unsigned long timeSize, unsigned 
 		theTimeStart3 = partSize*2+1; // viimeinen threadi saa tehdä yhden ylimääräisen aika-askeleen
 	}
 }
+#endif
 
 // Jos useFastFill on true, on datoilla sama hila ja aika descriptor rakenne
 void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor)
