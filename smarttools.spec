@@ -2,13 +2,13 @@
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
 Version: 10.7.5
-Release: 1.el5.fmi
+Release: 2.el5.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase >= 10.7.5-1
+BuildRequires: libsmartmet-newbase >= 10.7.5-2
 Provides: %{LIBNAME}
 
 %description
