@@ -180,7 +180,7 @@ std::string NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool 
 					int levelTypeId = level.LevelTypeId();
 					fileName += NFmiStringTools::Convert(levelTypeId);
 					fileName += "_";
-					int levelValue = level.LevelValue();
+					float levelValue = level.LevelValue();
 					fileName += NFmiStringTools::Convert(levelValue);
 				}
 			}
