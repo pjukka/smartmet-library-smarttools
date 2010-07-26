@@ -196,7 +196,7 @@ private:
 	bool IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariablePeekFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
-	FmiLevelType GetLevelType(NFmiInfoData::Type theDataType, long levelValue);
+	FmiLevelType GetLevelType(NFmiInfoData::Type theDataType, float levelValue);
 
 	NFmiInfoOrganizer* itsInfoOrganizer; // ei omista
 	NFmiProducerSystem *itsProducerSystem;  // ei omista

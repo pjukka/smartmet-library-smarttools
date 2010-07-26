@@ -1348,7 +1348,7 @@ NFmiLevel NFmiSmartToolIntepreter::GetPossibleLevelInfo(const std::string &theLe
 	try
 	{
 		// jos numeroksi muunto onnistuu, oletetaan että kyseessä on level
-		int value = NFmiStringTools::Convert<int>(theLevelText);
+		float value = NFmiStringTools::Convert<float>(theLevelText);
 		level = NFmiLevel(kFmiPressureLevel, theLevelText, value);
 		return level;
 	}
@@ -1441,12 +1441,12 @@ bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVar
 	  NFmiValueString numericPart(theVariableText.substr(3));
 	  if(numericPart.IsNumeric())
 		{
-		  long levelValue = static_cast<long>(numericPart);
+		  float levelValue = static_cast<float>(numericPart);
 		  // pitaisi tunnistaa level tyyppi arvosta kait, nyt oletus että painepinta
 		  FmiLevelType levelType = GetLevelType(theDataType, levelValue);
 			if(levelType == kFmiPressureLevel)
 				levelType = kFmiHybridLevel; // jos käyttäjä on antanut lev45, tällöin halutaan hybrid level 45 ei painepinta 45. painepinnat saa automaattisesti pelkällä numerolla
-		  theLevel = NFmiLevel(levelType, theVariableText, static_cast<long>(numericPart));
+		  theLevel = NFmiLevel(levelType, theVariableText, static_cast<float>(numericPart));
 		  return true;
 		}
 	}
@@ -1458,14 +1458,14 @@ bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVar
 		    // Testataan validius
 		    static_cast<long>(numericPart);
 			FmiLevelType levelType = kFmiFlightLevel;
-			theLevel = NFmiLevel(levelType, theVariableText, static_cast<long>(numericPart));
+			theLevel = NFmiLevel(levelType, theVariableText, static_cast<float>(numericPart));
 			return true;
 		}
 	}
 	return false;
 }
 
-FmiLevelType NFmiSmartToolIntepreter::GetLevelType(NFmiInfoData::Type theDataType, long levelValue)
+FmiLevelType NFmiSmartToolIntepreter::GetLevelType(NFmiInfoData::Type theDataType, float levelValue)
 {
 	FmiLevelType levelType = kFmiPressureLevel; // default
 	if(theDataType == NFmiInfoData::kEditable)
@@ -1475,7 +1475,7 @@ FmiLevelType NFmiSmartToolIntepreter::GetLevelType(NFmiInfoData::Type theDataTyp
 		{
 			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
 			{
-			  if(static_cast<long>(editedInfo->Level()->LevelValue()) == levelValue)
+			  if(editedInfo->Level()->LevelValue() == levelValue)
 				{
 					levelType = editedInfo->Level()->LevelType();
 					break;
