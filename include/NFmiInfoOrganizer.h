@@ -147,9 +147,9 @@ class NFmiInfoOrganizer
 	void UpdateSpecialDataArea(const NFmiArea *theArea, const NFmiPoint &theGridSize, NFmiInfoData::Type theType, NFmiSmartInfo ** theData, NFmiDataMatrix<float> &theMissingValueMatrix);
 	void UpdateMacroParamData(void);
 
-  	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fIgnoreProducerName = false);
+  	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	NFmiSmartInfo* Info (const FmiParameterName& theParam, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
-	NFmiSmartInfo* CrossSectionInfo(const NFmiDataIdent& theDataIdent, bool& fSubParameter, NFmiInfoData::Type theType, bool fIgnoreProducerName = false);
+	NFmiSmartInfo* CrossSectionInfo(const NFmiDataIdent& theDataIdent, bool& fSubParameter, NFmiInfoData::Type theType);
     bool Add (NFmiSmartInfo* theInfo);
 	NFmiParamBag GetParams(NFmiInfoData::Type theDataType);
 	NFmiSmartInfo* GetSynopPlotParamInfo(bool& fSubParameter, NFmiInfoData::Type theType);
