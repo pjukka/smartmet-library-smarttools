@@ -124,6 +124,8 @@ public:
 	void Calc_U_V_helpers(double &shr_0_6_u_n, double &shr_0_6_v_n, double &u0_6, double &v0_6);
 	double CalcTOfLiftedAirParcel(double T, double Td, double fromP, double toP);
 
+	bool GetTrValues(double &theTMinValue, double &theTMinPressure);
+	bool GetMwValues(double &theMaxWsValue, double &theMaxWsPressure);
 private:
 	bool CheckLFCIndexCache(FmiLCLCalcType theLCLCalcTypeIn, double &theLfcIndexValueOut, double &theELValueOut);
 	void FillLFCIndexCache(FmiLCLCalcType theLCLCalcType, double theLfcIndexValue, double theELValue);

@@ -100,6 +100,7 @@ public:
 	float CalcSmartToolValue(NFmiMacroParamValue &theMacroParamValue);
 	float CalcSmartToolValue(const NFmiMetTime &theTime, const NFmiPoint &theLatlon);
 	void CalcCrossSectionSmartToolValues(NFmiDataMatrix<float> &theValues, checkedVector<float> &thePressures, checkedVector<NFmiPoint> &theLatlonPoints, const checkedVector<NFmiMetTime> &thePointTimes);
+
 	NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer);
 	~NFmiSmartToolModifier(void);
 
@@ -110,8 +111,6 @@ public:
 	NFmiParamBag ModifiedParams(void);
 	const std::string& GetStrippedMacroText(void) const;
 	bool IsInterpretedSkriptMacroParam(void); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns. macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
-	NFmiSmartInfo* MacroParamData(void) {return itsMacroParamData;}
-	void MacroParamData(NFmiSmartInfo *theInfo) {itsMacroParamData = theInfo;}
 private:
 	void SetInfosMaskType(NFmiSmartInfo *theInfo);
 	NFmiSmartInfo* UsedMacroParamData(void);
@@ -161,7 +160,6 @@ private:
 	int itsParethesisCounter; // kun käytetään esim. Sumz-funktion 2. pilkun jälkeen level-dataa,
 							  // pitää laskea sulkujen avulla, milloin funktio loppuu.
 							  // HUOM! sulkujen lisäksi pitää laskea myös erilaisten funktioiden alut.
-	NFmiSmartInfo* itsMacroParamData; // tässä on vara macroParamData, jota käytetään mm. multithreaddaavassa ympäristössä (ei omista, ei tuhoa)
 };
 
 #endif

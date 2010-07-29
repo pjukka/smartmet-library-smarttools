@@ -33,9 +33,7 @@ typedef enum
 typedef enum
 {
    kFmiNoMask = 1,
-   kFmiActivationMask = 2,
    kFmiSelectionMask = 4,
-// kFmiParameterMask = 8,
    kFmiDisplayedMask = 16
 } Mask;
 

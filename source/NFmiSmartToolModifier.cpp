@@ -46,7 +46,6 @@
 #include "NFmiInfoAreaMaskSoundingIndex.h"
 #include "NFmiDictionaryFunction.h"
 
-#include <cassert>
 #include <stdexcept>
 
 using namespace std;
@@ -218,9 +217,7 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer
 ,fDoCrossSectionCalculation(false)
 ,itsCommaCounter(0)
 ,itsParethesisCounter(0)
-,itsMacroParamData(0)
 {
-	assert(itsInfoOrganizer);
 }
 NFmiSmartToolModifier::~NFmiSmartToolModifier(void)
 {
@@ -306,12 +303,12 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateConditionalSection(NFmiAr
 	if(theAreaMaskSectionInfo)
 	{
 		checkedVector<NFmiAreaMaskInfo*>& maskInfos = *theAreaMaskSectionInfo->GetAreaMaskInfoVector();
-		int size = maskInfos.size();
+		size_t size = maskInfos.size();
 		if(size)
 		{
 			areaMaskHandler = new NFmiSmartToolCalculation;
 			auto_ptr<NFmiSmartToolCalculation> areaMaskHandlerPtr(areaMaskHandler);
-			for(int i=0; i<size; i++)
+			for(size_t i=0; i<size; i++)
 // HUOM!!!! editoitavaN DATAN QDatasta pitää tehdä kopiot, muuten maskit eivät toimi
 // kaikissa tilanteissa oikein!! KORJAA TÄMÄ!!!!!
 				areaMaskHandler->AddCalculation(CreateAreaMask(*maskInfos[i]));
@@ -330,12 +327,12 @@ NFmiSmartToolCalculationSection* NFmiSmartToolModifier::CreateCalculationSection
 	if(theCalcSectionInfo)
 	{
 		checkedVector<NFmiSmartToolCalculationInfo*>& calcInfos = *theCalcSectionInfo->GetCalculationInfos();
-		int size = calcInfos.size();
+		size_t size = calcInfos.size();
 		if(size)
 		{
 			section = new NFmiSmartToolCalculationSection;
 			auto_ptr<NFmiSmartToolCalculationSection> sectionPtr(section);
-			for(int i=0; i<size; i++)
+			for(size_t i=0; i<size; i++)
 			{
 				section->AddCalculations(CreateCalculation(calcInfos[i]));
 			}
@@ -349,7 +346,7 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateCalculation(NFmiSmartTool
 {
 	assert(theCalcInfo);
 	NFmiSmartToolCalculation* calculation = 0;
-	int size = theCalcInfo->GetCalculationOperandInfoVector()->size();
+	size_t size = theCalcInfo->GetCalculationOperandInfoVector()->size();
 	if(size)
 	{
 		checkedVector<NFmiAreaMaskInfo*>& areaMaskInfos = *theCalcInfo->GetCalculationOperandInfoVector();
@@ -364,7 +361,7 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateCalculation(NFmiSmartTool
 		GetParamValueLimits(*theCalcInfo->GetResultDataInfo(), &lowerLimit, &upperLimit, &checkLimits);
 		calculation->SetLimits(lowerLimit, upperLimit, checkLimits);
 		calculation->AllowMissingValueAssignment(theCalcInfo->AllowMissingValueAssignment());
-		for(int i=0; i<size; i++)
+		for(size_t i=0; i<size; i++)
 		{
 			if(areaMaskInfos[i] != 0)
 				calculation->AddCalculation(CreateAreaMask(*areaMaskInfos[i])); // HUOM! TÄHÄN KAATUU JOSKUS, TUTKI ASIAA!!!!!
@@ -390,10 +387,10 @@ NFmiSmartToolCalculation* NFmiSmartToolModifier::CreateCalculation(NFmiSmartTool
 void NFmiSmartToolModifier::CalcCrossSectionSmartToolValues(NFmiDataMatrix<float> &theValues, checkedVector<float> &thePressures, checkedVector<NFmiPoint> &theLatlonPoints, const checkedVector<NFmiMetTime> &thePointTimes)
 {
 	fDoCrossSectionCalculation = true;
-	unsigned int sizeX = theLatlonPoints.size();
+	size_t sizeX = theLatlonPoints.size();
 	if(sizeX != thePointTimes.size())
 		throw runtime_error("NFmiSmartToolModifier::CalcCrossSectionSmartToolValues - latlon point count and time count must be the same, Error in program.");
-	unsigned int sizeY = thePressures.size();
+	size_t sizeY = thePressures.size();
 	if(sizeX < 1 || sizeY < 1)
 		throw runtime_error("NFmiSmartToolModifier::CalcCrossSectionSmartToolValues - invalid data-matrix size, Error in program.");
 	theValues.Resize(sizeX, sizeY, kFloatMissing);
@@ -403,14 +400,14 @@ void NFmiSmartToolModifier::CalcCrossSectionSmartToolValues(NFmiDataMatrix<float
 	macroParamValue.fDoCrossSectionCalculations = true;
 
 	// lasketaan läpi yksittäisiä arvoja kaikille halutuille pisteille
-	for(unsigned int i = 0; i<sizeX; i++)
+	for(size_t i = 0; i<sizeX; i++)
 	{
 		macroParamValue.itsLatlon = theLatlonPoints[i];
 		macroParamValue.itsTime = thePointTimes[i];
 		NFmiTimeBag timeBag(macroParamValue.itsTime, macroParamValue.itsTime, 60);
 		NFmiTimeDescriptor times(macroParamValue.itsTime, timeBag);
 		itsInfoOrganizer->CrossSectionMacroParamData()->SetTimeDescriptor(times); // asetetaan makroData-infon aikasysteemi currentin kartan kohtaan (feikki datassa vain yksi aika ja se pitää säätää kohdalleen, että laskut onnistuvat)
-		for(unsigned int j = 0; j<sizeY; j++)
+		for(size_t j = 0; j<sizeY; j++)
 		{
 			macroParamValue.itsPressureHeight = thePressures[j];
 			float value = CalcSmartToolValue(macroParamValue);
@@ -462,8 +459,8 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, boo
 		srand( static_cast<unsigned int>(time( NULL ))); // mahd. satunnais funktion käytön takia, pitää 'sekoittaa' random generaattori
 
 		checkedVector<NFmiSmartToolCalculationBlockInfo>& smartToolCalculationBlockInfos = itsSmartToolIntepreter->SmartToolCalculationBlocks();
-		int size = smartToolCalculationBlockInfos.size();
-		for(int i=0; i<size; i++)
+		size_t size = smartToolCalculationBlockInfos.size();
+		for(size_t i=0; i<size; i++)
 		{
 			NFmiSmartToolCalculationBlockInfo blockInfo = smartToolCalculationBlockInfos[i];
 			NFmiSmartToolCalculationBlock* block = CreateCalculationBlock(&blockInfo);
@@ -594,8 +591,8 @@ void NFmiSmartToolModifier::ModifyData2(NFmiSmartToolCalculationSection* theCalc
 			// jne. ilman IF-lauseita
 			// ENNEN laskettiin tälläinen sectio siten että käytiin läpi koko sectio samalla paikalla ja ajalla ja sitten siirryttiin eteenpäin.
 			// NYT lasketaan aina yksi laskurivi läpi kaikkien aikojen ja paikkojen, ja sitten siirrytään seuraavalle lasku riville.
-			int size = theCalculationSection->GetCalculations()->size();
-			for(int i=0; i<size; i++)
+			size_t size = theCalculationSection->GetCalculations()->size();
+			for(size_t i=0; i<size; i++)
 			{
 				for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 				{
@@ -1057,25 +1054,6 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 		if(info == 0)
 		{
 			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData | fDoCrossSectionCalculation);
-/*
-			if(info == 0)
-			{ // tämä on pika pika viritystä, joka on jäämiä luotaus indeksi datasta (jotka nyt lasketaan valmiiksi dataksi)
-				int parId = theAreaMaskInfo.GetDataIdent().GetParamIdent();
-				if(parId >= kSoundingParLCLSur && parId < kSoundingParCAPE_TT_SurBas + 40)
-				{ // tämä on ikävä viritys ja koko juttua pitäisi siivota ja yksinkertaistaa
-					// eli ns. luotausindeksi parametrit on erikoistapaus ja niitä etsitää uudestaan, mutta nyt oikealla
-					// datatypellä eli kViewable + soundingIndex tai kHybrid + soundingIndex
-					// ole vähän jumissa näiden kanssa koska näyttömakroissa on talletettu vanhalla käytännöllä dataTypeja
-					NFmiInfoData::Type usedDataType = static_cast<NFmiInfoData::Type>(NFmiInfoData::kViewable + NFmiInfoData::kSoundingParameterData);
-					info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), usedDataType, false, fUseLevelData | fDoCrossSectionCalculation);
-					if(info == 0)
-					{ // vielä hybrid data testi
-						usedDataType = static_cast<NFmiInfoData::Type>(NFmiInfoData::kHybridData + NFmiInfoData::kSoundingParameterData);
-						info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), usedDataType, false, fUseLevelData | fDoCrossSectionCalculation);
-					}
-				}
-			}
-*/
 		}
 		if(info == 0 && theAreaMaskInfo.GetDataType() == NFmiInfoData::kAnalyzeData) // analyysi datalle piti tehdä pika viritys tähän
 			info = CreateCopyOfAnalyzeInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel());
@@ -1194,15 +1172,8 @@ const std::string& NFmiSmartToolModifier::GetStrippedMacroText(void) const
 
 NFmiSmartInfo* NFmiSmartToolModifier::UsedMacroParamData(void)
 {
-	if(itsMacroParamData)
-		return itsMacroParamData; // multithreaddauksen varalle?!?!?
-	else if(itsInfoOrganizer)
-	{
-		if(fDoCrossSectionCalculation)
-			return itsInfoOrganizer->CrossSectionMacroParamData();
-		else
-			return itsInfoOrganizer->MacroParamData();
-	}
+	if(fDoCrossSectionCalculation)
+		return itsInfoOrganizer->CrossSectionMacroParamData();
 	else
-		return 0;
+		return itsInfoOrganizer->MacroParamData();
 }

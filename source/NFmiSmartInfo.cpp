@@ -37,59 +37,22 @@
 #include "NFmiGrid.h"
 #include "NFmiCombinedParam.h"
 #include "NFmiMetEditorTypes.h"
-
+#include "NFmiModifiableQDatasBookKeeping.h"
 #include <stdexcept>
 
-NFmiSmartInfo::NFmiSmartInfo()
-:NFmiFastQueryInfo()
-,itsAreaMask(0)
-,itsAreaFactors(0)
-,itsDataReference(0)
-,itsDataFileName("")
-,itsDataFilePattern("")
-,itsPriority(0)
-,itsDataType(NFmiInfoData::kEditable) // 1999.08.24/Marko
-{
-	fDirty = new bool;
-	*fDirty = false;
-	fLoadedFromFile = new bool;
-	*fLoadedFromFile = false;
-	itsMaxUndoLevelPtr = NULL;
-	itsMaxRedoLevelPtr = NULL;
-	itsCurrentUndoLevelPtr = NULL;
-	itsCurrentRedoLevelPtr = NULL;
-	itsUndoTable = NULL;
-	itsUndoTextTable = NULL;
-	itsUndoRedoHarmonizerBookKeepingData = 0;
-}
+// **********************************************************************
 
 NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theData
 							 ,std::string theDataFileName, std::string theDataFilePattern
 							 ,NFmiInfoData::Type theType)
 :NFmiFastQueryInfo(theInfo)
-,itsDataType(theType) // 1999.08.24/Marko
+,itsDataType(theType)
+,itsModifiableQDatasBookKeeping(0)
 {
 	itsDataReference = theData;
 	itsDataFileName = theDataFileName;
 	itsDataFilePattern = theDataFilePattern;
-	itsAreaMask = new NFmiUndoableMultiLevelMask(HPlaceDescriptor().Size());
-	itsAreaFactors = 0;
-	itsPriority = 0;
-
-	fDirty = new bool;
-	*fDirty = false;
-	fLoadedFromFile = new bool;
-	*fLoadedFromFile = false;
-
-	itsMaxUndoLevelPtr = NULL;
-	itsMaxRedoLevelPtr = NULL;
-	itsCurrentUndoLevelPtr = NULL;
-	itsCurrentRedoLevelPtr = NULL;
-	itsUndoTable = NULL;
-	itsUndoTextTable = NULL;
-
-	// NFmiParamDescriptor& temp = const_cast<NFmiParamDescriptor&>(theInfo.ParamDescriptor());
-	itsUndoRedoHarmonizerBookKeepingData = 0;
+	itsModifiableQDatasBookKeeping = new NFmiModifiableQDatasBookKeeping(HPlaceDescriptor().Size());
 }
 
 NFmiSmartInfo::NFmiSmartInfo (const NFmiSmartInfo & theInfo)
@@ -97,23 +60,9 @@ NFmiSmartInfo::NFmiSmartInfo (const NFmiSmartInfo & theInfo)
 ,itsDataFileName(theInfo.itsDataFileName)
 ,itsDataFilePattern(theInfo.itsDataFilePattern)
 ,itsDataType(theInfo.itsDataType)
+,itsModifiableQDatasBookKeeping(theInfo.itsModifiableQDatasBookKeeping)
+,itsDataReference(theInfo.itsDataReference)
 {
-	this->itsPriority = theInfo.itsPriority;
-
-	this->fDirty = theInfo.fDirty;
-	this->fLoadedFromFile = theInfo.fLoadedFromFile;
-
-	//seuraavista vain osoite
-	this->itsMaxUndoLevelPtr = theInfo.itsMaxUndoLevelPtr;
-	this->itsMaxRedoLevelPtr = theInfo.itsMaxRedoLevelPtr;
-	this->itsCurrentUndoLevelPtr = theInfo.itsCurrentUndoLevelPtr;
-	this->itsCurrentRedoLevelPtr = theInfo.itsCurrentRedoLevelPtr;
-	this->itsUndoTable = theInfo.itsUndoTable;
-	this->itsUndoTextTable = theInfo.itsUndoTextTable;
-	this->itsAreaMask = theInfo.itsAreaMask;
-	this->itsAreaFactors = theInfo.itsAreaFactors;
-	this->itsDataReference = theInfo.itsDataReference;
-	this->itsUndoRedoHarmonizerBookKeepingData = theInfo.itsUndoRedoHarmonizerBookKeepingData;
 }
 
 NFmiSmartInfo::~NFmiSmartInfo()
@@ -124,69 +73,16 @@ void NFmiSmartInfo::DestroyData(bool deleteQData)
 {
 	//kopio-konstruktori kopioi näistä vain osoitteet,
 	//joten nämä saa tuhota vaan yhdestä oliosta, käyttäjän pitää tietää mistä ja milloin
-	if(itsUndoTable!=NULL)
+	if(itsModifiableQDatasBookKeeping)
 	{
-		for (int level = 0; level < (*itsMaxUndoLevelPtr); level++)
-		{
-			if (itsUndoTable[level])
-				delete itsUndoTable[level];
-		}
+		delete itsModifiableQDatasBookKeeping;
+		itsModifiableQDatasBookKeeping = 0;
 	}
-	if (itsUndoTable)
-	{
-		delete [] itsUndoTable;
-		itsUndoTable = NULL;
-	}
-	if (itsUndoTextTable)
-	{
-		delete [] itsUndoTextTable;
-		itsUndoTextTable = NULL;
-	}
-
-	if (itsMaxUndoLevelPtr)
-	{
-		delete itsMaxUndoLevelPtr;
-		itsMaxUndoLevelPtr = NULL;
-	}
-
-	if (itsMaxRedoLevelPtr)
-	{
-		delete itsMaxRedoLevelPtr;
-		itsMaxRedoLevelPtr = NULL;
-	}
-
-	if (itsCurrentUndoLevelPtr)
-	{
-		delete itsCurrentUndoLevelPtr;
-		itsCurrentUndoLevelPtr = NULL;
-	}
-
-	if (itsCurrentRedoLevelPtr)
-	{
-		delete itsCurrentRedoLevelPtr;
-		itsCurrentRedoLevelPtr = NULL;
-	}
-
-	delete itsAreaFactors;
-	delete itsAreaMask;
-	itsAreaMask = 0;
 
 	if(deleteQData)
 	{
 		delete itsDataReference;
 		itsDataReference = 0;
-	}
-
-	delete fDirty;
-	fDirty = 0;
-	delete fLoadedFromFile;
-	fLoadedFromFile = 0;
-
-	if(itsUndoRedoHarmonizerBookKeepingData)
-	{
-		itsUndoRedoHarmonizerBookKeepingData->clear();
-		delete itsUndoRedoHarmonizerBookKeepingData;
-		itsUndoRedoHarmonizerBookKeepingData = 0;
 	}
 }
 
@@ -208,97 +104,32 @@ NFmiSmartInfo* NFmiSmartInfo::Clone(void) const
 		NFmiSmartInfo* copy = new NFmiSmartInfo(queryInfo, queryDataCopy, this->itsDataFileName, this->itsDataFilePattern
 											   ,this->itsDataType); // 1999.08.24/Marko
 		copy->itsDataFileName = this->itsDataFileName;
-
-		*(copy->itsAreaMask) = *(this->itsAreaMask); // laura muutti 06051999
-
-		*(copy->fDirty) = false; //laura 07051999
-		*(copy->fLoadedFromFile) = *(this->fLoadedFromFile); //laura 07051999
-		copy->itsMaxUndoLevelPtr = 0;
-		copy->itsMaxRedoLevelPtr = 0;
-		copy->itsCurrentUndoLevelPtr = 0;
-		copy->itsCurrentRedoLevelPtr = 0;
-		copy->itsUndoTable = 0;
-		copy->itsUndoTextTable = 0;
+		copy->itsModifiableQDatasBookKeeping->CopyClonedDatas(*(this->itsModifiableQDatasBookKeeping));
 
 		copy->SetDescriptors(const_cast<NFmiSmartInfo *>(this), false);
-		copy->itsUndoRedoHarmonizerBookKeepingData = 0;
 		return copy;
 	}
 	else
 		return 0;
 }
 
-//--------------------------------------------------------
-// AreaMask				M.K. 1.4.99
-//--------------------------------------------------------
-void NFmiSmartInfo::AreaMask(NFmiUndoableMultiLevelMask* theAreaMask)
+NFmiSmartInfo& NFmiSmartInfo::operator=(const NFmiSmartInfo &theSmartInfo)
 {
-	delete itsAreaMask;
-	itsAreaMask = theAreaMask;			// Huom vain pointteri!!!!!
-	return;
-}
-
-NFmiSmartInfo& NFmiSmartInfo::operator=(const NFmiSmartInfo& theSmartInfo)
-{
-	NFmiFastQueryInfo::operator=(theSmartInfo);
-
-	this->itsDataFileName = theSmartInfo.itsDataFileName;
-	this->itsPriority = theSmartInfo.itsPriority;
-	this->fDirty = theSmartInfo.fDirty; //laura 07051999
-	this->fLoadedFromFile = theSmartInfo.fLoadedFromFile; //laura 07051999
-
-	//seuraavista vain osoitteet
-	this->itsMaxUndoLevelPtr = theSmartInfo.itsMaxUndoLevelPtr;
-	this->itsMaxRedoLevelPtr = theSmartInfo.itsMaxRedoLevelPtr;
-	this->itsCurrentUndoLevelPtr = theSmartInfo.itsCurrentUndoLevelPtr;
-	this->itsCurrentRedoLevelPtr = theSmartInfo.itsCurrentRedoLevelPtr;
-	this->itsUndoTable = theSmartInfo.itsUndoTable;
-	this->itsUndoTextTable = theSmartInfo.itsUndoTextTable;
-	this->itsAreaMask = theSmartInfo.itsAreaMask;
-	this->itsAreaFactors = theSmartInfo.itsAreaFactors;
-	this->itsDataReference = theSmartInfo.itsDataReference;
-
-	this->itsDataType = theSmartInfo.itsDataType;
-	this->itsUndoRedoHarmonizerBookKeepingData = theSmartInfo.itsUndoRedoHarmonizerBookKeepingData;
-
-	return *this;
-}
-
-bool NFmiSmartInfo::operator==(const NFmiSmartInfo& theSmartInfo) const
-{
-	if(this->itsPriority == theSmartInfo.itsPriority)
-		return true;
-	else
-		return false;
-}
-
-bool NFmiSmartInfo::operator<(const NFmiSmartInfo& theSmartInfo) const
-{
-	if(this->itsPriority < theSmartInfo.itsPriority)
-		return true;
-	else
-		return false;
-}
-
-bool NFmiSmartInfo::MaskByArea(const NFmiArea &theArea, unsigned long theMaskType)
-{
-	unsigned long oldMask = MaskType();
-	MaskType(NFmiMetEditorTypes::kFmiNoMask);
-	for(ResetLocation(); NextLocation();)
+	if(this != &theSmartInfo)
 	{
-		NFmiPoint latlon = LatLon();
-		if(theArea.IsInside(latlon))
-			MaskLocation(true,theMaskType);
-		else
-			MaskLocation(false,theMaskType);
+		NFmiFastQueryInfo::operator=(theSmartInfo);
+
+		this->itsDataFileName = theSmartInfo.itsDataFileName;
+		this->itsModifiableQDatasBookKeeping = theSmartInfo.itsModifiableQDatasBookKeeping;
+		this->itsDataReference = theSmartInfo.itsDataReference;
+		this->itsDataType = theSmartInfo.itsDataType;
 	}
-	MaskType(oldMask);
-	return true;
+	return *this;
 }
 
 void NFmiSmartInfo::InverseMask(unsigned long theMaskType)
 {
-	(*itsAreaMask)->InverseMask(theMaskType);
+	itsModifiableQDatasBookKeeping->InverseMask(theMaskType);
 }
 
 //--------------------------------------------------------
@@ -306,15 +137,9 @@ void NFmiSmartInfo::InverseMask(unsigned long theMaskType)
 //--------------------------------------------------------
 //   Aktivoi tai deaktivoi kaikki locationit.
 //
-void NFmiSmartInfo::MaskAllLocations (const bool& newState,
-									  unsigned long theMaskType)
+void NFmiSmartInfo::MaskAllLocations(const bool& newState, unsigned long theMaskType)
 {
-	(*itsAreaMask)->MaskAll(newState,theMaskType);
-}
-
-void NFmiSmartInfo::MaskAllLocations (const bool& newState)
-{
-   (*itsAreaMask)->MaskAll(newState);
+	itsModifiableQDatasBookKeeping->MaskAllLocations(newState, theMaskType);
 }
 
 //--------------------------------------------------------
@@ -335,67 +160,19 @@ bool NFmiSmartInfo::NextLocation()
 
 	while((returnVal==false) && NFmiFastQueryInfo::NextLocation())
 	{
-		returnVal = (*itsAreaMask)->IsMasked(LocationIndex());
+		returnVal = itsModifiableQDatasBookKeeping->IsMasked(LocationIndex());
 	}
 	return returnVal;
 }
 
-//--------------------------------------------------------
-// IsMaskedLocation
-//--------------------------------------------------------
-//
-//   Kysy hplacedesc:in indeksia ja kysy sitten
-//   itsMaskArea-oliolta onko
-//   maski päällä.
-bool NFmiSmartInfo::IsMaskedLocation (unsigned long theMaskType) const
-{
-	return (*itsAreaMask)->IsMasked(LocationIndex(),theMaskType);
-}
-
-//--------------------------------------------------------
-// LocationMask
-//--------------------------------------------------------
-
-//   Palauttaa HPlaceDesc:issa käytetyn maskin
-//   referenssin, riippuen
-//   itsMaskStatesta (huom nomask palauttaa dummy
-//   otuksen ja jos
-//   on monta maskStatea kerralla päällä, palautetaan
-//   ensimmäinen).
-const NFmiBitMask& NFmiSmartInfo::LocationMask (unsigned long theMaskType) const
-{
-	return (*itsAreaMask)->Mask(theMaskType);
-}
-
-//--------------------------------------------------------
-// LocationMask
-//--------------------------------------------------------
-
-//   Asettaa ulkopuolella rakennetun maskin HPlaceDesc:in
-//   maskiksi.,
-//   riippuen itsMaskStatesta (huom nomask ei
-//   tee mitään ja jos
-//   on monta maskStatea kerralla päällä, asetetaan
-//   ensimmäinen).
-void NFmiSmartInfo::LocationMask (const NFmiBitMask& theMask, unsigned long theMaskType)
-{
-    (*itsAreaMask)->Mask(theMask,theMaskType);
-}
-
 bool NFmiSmartInfo::Mask(const NFmiBitMask& theMask, unsigned long theMaskType)
 {
-	if(itsAreaMask)
-		return itsAreaMask->Mask(theMask, theMaskType);
-
-	return false;
+	return itsModifiableQDatasBookKeeping->Mask(theMask, theMaskType);
 }
 
 const NFmiBitMask& NFmiSmartInfo::Mask(unsigned long theMaskType) const
 {
-	if(itsAreaMask)
-		return itsAreaMask->Mask(theMaskType);
-
-	throw std::runtime_error("Error in application - NFmiSmartInfo::Mask has no mask.");
+	return itsModifiableQDatasBookKeeping->Mask(theMaskType);
 }
 
 //--------------------------------------------------------
@@ -410,156 +187,27 @@ const NFmiBitMask& NFmiSmartInfo::Mask(unsigned long theMaskType) const
 //   toiminnosta ("aikasarjamuutos", "kursori
 //   ylös", "aluemuutos")
 
-bool NFmiSmartInfo::SnapShotData (const std::string& theAction, const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
+bool NFmiSmartInfo::SnapShotData(const std::string& theAction, const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
 {
-	if(itsCurrentUndoLevelPtr == 0)
-		return false;
-	if(!itsUndoTable || !itsUndoTextTable)
-		return false;
-
-	if (*itsMaxUndoLevelPtr <= 0)
-		return false;
-
-	if (*itsCurrentUndoLevelPtr == *itsMaxUndoLevelPtr - 1)
-		RearrangeUndoTable();
-
-	(*itsCurrentUndoLevelPtr)++;
-	itsRefRawData->Backup(itsUndoTable[*itsCurrentUndoLevelPtr]);
-	itsUndoRedoHarmonizerBookKeepingData->push_back(theHarmonizerBookKeepingData); // lisätään perään annettu bagi
-	(*itsCurrentRedoLevelPtr) = (*itsCurrentUndoLevelPtr);
-	(*itsMaxRedoLevelPtr) = (*itsCurrentRedoLevelPtr);
-
-	itsUndoTextTable[*itsCurrentUndoLevelPtr] += theAction;
-
-	return true;
+	return itsModifiableQDatasBookKeeping->SnapShotData(theAction, theHarmonizerBookKeepingData, *itsRefRawData);
 }
 
-
-//--------------------------------------------------------
-// RearrangeUndoTable			M.K.
-//--------------------------------------------------------
-void NFmiSmartInfo::RearrangeUndoTable(void)
-{
-	if(itsCurrentUndoLevelPtr == 0)
-		return ;
-	char* undoTmp = itsUndoTable[0];
-	std::string undoTmpText = itsUndoTextTable[0];
-
-	for (int i = 0; i < (*itsMaxUndoLevelPtr) - 1; i++)
-	{
-		itsUndoTable[i] = itsUndoTable[i + 1];
-		itsUndoTextTable[i] = itsUndoTextTable[i + 1];
-	}
-
-	itsUndoTable[*itsMaxUndoLevelPtr - 1] = undoTmp;
-	itsUndoTextTable[*itsMaxUndoLevelPtr - 1] = undoTmpText;
-
-	(*itsCurrentUndoLevelPtr)--;
-	(*itsCurrentRedoLevelPtr)--;
-
-	itsUndoRedoHarmonizerBookKeepingData->pop_front(); // otetaan pois alusta yksi parBagi
-
-	return;
-}
-
-//--------------------------------------------------------
-// SnapShotData			M.K.
-//--------------------------------------------------------
-//   Makes 'snapshot' of the data for the undo/redo
-//   purpose. Only parameter is saved
-//   in querydata to make 'undo text'? "Undo temperature".
-//    theAction on kuvaileva sana
-//   tehdystä toiminnosta ("aikasarjamuutos",
-//   "kursori ylös", "aluemuutos").
-
-bool NFmiSmartInfo::SnapShotData (const std::string& theAction
- ,FmiParameterName theParameter)
-{
-   bool returnVal = false;
-   return returnVal;
-}
-
-//--------------------------------------------------------
-// UndoText			M.K.
-//--------------------------------------------------------
-//   Return text that describes the operation
-//   that undo will revert next. E.g.
-//   "Undo temperature at 1998-12-09-12:00"
-
-std::string NFmiSmartInfo::UndoText (void)
-{
-	std::string undoText("");
-	if(itsCurrentUndoLevelPtr == 0)
-		return undoText;
-	if (*itsCurrentUndoLevelPtr >= 0)
-	{
-		undoText += std::string("Undo ");
-		undoText += itsUndoTextTable[*itsCurrentUndoLevelPtr];
-	}
-	return undoText;
-}
-//--------------------------------------------------------
-// RedoText			M.K.
-//--------------------------------------------------------
-std::string NFmiSmartInfo::RedoText (void)
-{
-	std::string undoText("");
-	if(itsCurrentUndoLevelPtr == 0)
-		return undoText;
-	if(!((*itsCurrentRedoLevelPtr) == (*itsCurrentUndoLevelPtr)
-	   || (*itsCurrentRedoLevelPtr) == ((*itsCurrentUndoLevelPtr) + 1)))
-	{
-		undoText += std::string("Redo ");
-		undoText += itsUndoTextTable[(*itsCurrentUndoLevelPtr) + 1];
-	}
-	return undoText;
-}
 //--------------------------------------------------------
 // Undo				M.K.
 //--------------------------------------------------------
 // Kertoo onko undo mahdollista suorittaa.
-bool NFmiSmartInfo::Undo (void)
+bool NFmiSmartInfo::Undo(void)
 {
-	if(itsCurrentUndoLevelPtr == 0)
-		return false;
-	if ((*itsCurrentUndoLevelPtr) < 0)
-		return false;
-	else
-		return true;
+	return itsModifiableQDatasBookKeeping->Undo();
 }
 
 //--------------------------------------------------------
 // Redo				M.K.
 //--------------------------------------------------------
 // Kertoo onko redo mahdollista suorittaa.
-bool NFmiSmartInfo::Redo (void)
+bool NFmiSmartInfo::Redo(void)
 {
-	if(itsCurrentUndoLevelPtr == 0)
-		return false;
-	if ((*itsCurrentRedoLevelPtr) == (*itsCurrentUndoLevelPtr)
-			|| (*itsCurrentRedoLevelPtr) == ((*itsCurrentUndoLevelPtr) + 1))
-		return false;
-	else
-		return true;
-}
-//--------------------------------------------------------
-// CommitData			M.K.
-//--------------------------------------------------------
-
-//   Commit:ia kutsutaan jos ei haluta enää käyttää
-//   jo kerääntynyttä undo-listaa. Eli jos on
-//   tehnyt sarjan muutoksia dataan ja tallettaa
-//   datan tiedostoon voidaan kutsua committia.
-//
-void NFmiSmartInfo::CommitData (void)
-{
-	if(itsCurrentUndoLevelPtr == 0)
-		return ;
-	*itsMaxRedoLevelPtr = 0;
-	*itsCurrentUndoLevelPtr = -1;
-	*itsCurrentRedoLevelPtr = -1;
-
-	return;
+	return itsModifiableQDatasBookKeeping->Redo();
 }
 //--------------------------------------------------------
 // UndoData			M.K.
@@ -570,25 +218,9 @@ void NFmiSmartInfo::CommitData (void)
 //   että voidaan myös tehdä Redo(). Jos ei ole
 //   mitään Undo:ta tehtävissä, palautetaan false.
 
-bool NFmiSmartInfo::UndoData (const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
+bool NFmiSmartInfo::UndoData(const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
 {
-	if(itsCurrentUndoLevelPtr == 0)
-		return false;
-	if ((*itsCurrentUndoLevelPtr) < 0)
-		return false;
-	if ((*itsCurrentUndoLevelPtr) == (*itsCurrentRedoLevelPtr))
-	{
-		std::string action("");
-		/// KORJAA TÄMÄ **************************************
-		SnapShotData(action, theHarmonizerBookKeepingData);		// "Ottaa kuvan" undo-toimintoa edeltäneestä tilanteesta,
-		(*itsCurrentUndoLevelPtr)--;		// jos siihen halutaankin myöhemmin palata redo:lla.
-	}
-
-	itsRefRawData->Undo(itsUndoTable[*itsCurrentUndoLevelPtr]);
-	(*itsCurrentUndoLevelPtr)--;
-	*itsCurrentRedoLevelPtr = (*itsCurrentUndoLevelPtr) + 2;
-	*fDirty = true; // 18.1.2002/Marko lisäsin datan likauksen.
-	return true;
+	return itsModifiableQDatasBookKeeping->UndoData(theHarmonizerBookKeepingData, *itsRefRawData);
 }
 
 //--------------------------------------------------------
@@ -600,22 +232,9 @@ bool NFmiSmartInfo::UndoData (const NFmiHarmonizerBookKeepingData &theHarmonizer
 //   ei ole tehty Undo:ta edellä, ei Redo:ta voida
 //   tehdä ja palauttaa false.
 
-bool NFmiSmartInfo::RedoData (void)
+bool NFmiSmartInfo::RedoData(void)
 {
-	if(itsCurrentUndoLevelPtr == 0)
-		return false;
-	if ((*itsCurrentUndoLevelPtr) == (*itsCurrentRedoLevelPtr)
-			|| ((*itsCurrentUndoLevelPtr) + 1) == (*itsCurrentRedoLevelPtr))
-		return false;
-	else
-	{
-		itsRefRawData->Undo(itsUndoTable[*itsCurrentRedoLevelPtr]);
-		(*itsCurrentUndoLevelPtr)++;
-		if((*itsCurrentRedoLevelPtr) + 1 <= (*itsMaxRedoLevelPtr))
-			(*itsCurrentRedoLevelPtr)++;
-	}
-	*fDirty = true; // 18.1.2002/Marko lisäsin datan likauksen.
-	return true;
+	return itsModifiableQDatasBookKeeping->RedoData(*itsRefRawData);
 }
 
 //--------------------------------------------------------
@@ -629,283 +248,92 @@ bool NFmiSmartInfo::RedoData (void)
 //	 Huom! Tämän voi toistaiseksi tehdä vain, jos
 //   undotaulukkoja ei ole entuudestaan olemassa.
 
-void NFmiSmartInfo::UndoLevel (const long& theDepth)	// theDepth kuvaa kuinka monta
-{														// Undota voidaan tehdä.
-	if (!itsUndoTable && !itsUndoTextTable)	// Muuten taulukon ulkopuolelle viittaaminen voisi
-	{										// olla mahdollista!
-		itsMaxUndoLevelPtr = new long;
-		itsMaxRedoLevelPtr = new long;
-		itsCurrentUndoLevelPtr = new int;
-		itsCurrentRedoLevelPtr = new int;
-
-		if (theDepth <= 0)
-			*itsMaxUndoLevelPtr = 0;
-		else
-		{
-			*itsMaxRedoLevelPtr = 0;
-			*itsCurrentUndoLevelPtr = -1;
-			*itsCurrentRedoLevelPtr = -1;
-			*itsMaxUndoLevelPtr = theDepth + 1;		// Redon tekemisen mahdollistamiseksi yksi
-			try
-			{
-				itsUndoTable = new char* [*itsMaxUndoLevelPtr];				// taso lisää.
-				itsUndoTextTable = new std::string [*itsMaxUndoLevelPtr];
-				for (int level = 0; level < (*itsMaxUndoLevelPtr); level++)
-					itsUndoTable[level] = 0; // nollataan ensin pointteri, että voidaan siivota jälkiä jos muistin varaus pettää joskus
-
-				for (int level = 0; level < (*itsMaxUndoLevelPtr); level++)
-				  itsUndoTable[level] = new char[itsRefRawData->Size()*sizeof(float)];
-				itsUndoRedoHarmonizerBookKeepingData = new std::deque<NFmiHarmonizerBookKeepingData>;
-			}
-			catch(...)
-			{ // oletetaan että poikkeus liittyi muistin varaamiseen ja lopetetaan tähän
-				// siivotaan talukot tyhjiksi.
-				delete itsUndoRedoHarmonizerBookKeepingData;
-				itsUndoRedoHarmonizerBookKeepingData = 0;
-
-				for (int level = 0; level < (*itsMaxUndoLevelPtr); level++)
-				{
-					if(itsUndoTable[level])
-						delete [] itsUndoTable[level];
-				}
-				*itsMaxUndoLevelPtr = 0;
-				delete [] itsUndoTable;
-				itsUndoTable = 0;
-				delete [] itsUndoTextTable;
-				itsUndoTextTable = 0;
-
-				throw ; // heitetään lopuksi poikkeus eteenpäin
-			}
-		}
-	}
-
-	return;
+void NFmiSmartInfo::UndoLevel(long theDepth)	// theDepth kuvaa kuinka monta Undota voidaan tehdä.
+{
+	itsModifiableQDatasBookKeeping->UndoLevel(theDepth, *itsRefRawData);
 }
 
-//--------------------------------------------------------
-// MaskLocation
-//--------------------------------------------------------
-//   Asettaa currentin paikan maskin riippuen
-//   itsMaskStatesta.
-
-void NFmiSmartInfo::MaskLocation (const bool& newState)
+void NFmiSmartInfo::MaskLocation(const bool& newState, unsigned long theMaskType)
 {
-	(*itsAreaMask)->Mask(LocationIndex(),newState);
-}
-
-void NFmiSmartInfo::MaskLocation (const bool& newState,
-								  unsigned long theMaskType)
-{
-	(*itsAreaMask)->Mask(LocationIndex(),newState, theMaskType);
+	itsModifiableQDatasBookKeeping->MaskLocation(newState, theMaskType, LocationIndex());
 }
 
 void NFmiSmartInfo::MaskType(unsigned long theMaskType)
 {
-	(*itsAreaMask)->MaskType(theMaskType);
+	itsModifiableQDatasBookKeeping->MaskType(theMaskType);
 }
 
 unsigned long NFmiSmartInfo::MaskType(void)
 {
-	return (*itsAreaMask)->MaskType();
+	return itsModifiableQDatasBookKeeping->MaskType();
 }
-
-//--------------------------------------------------------
-// LocationMaskStep
-//--------------------------------------------------------
-
-//   Tämän tarkoituksena olisi asettaa aktiivisiksi maskeiksi esim. joka
-//   neljännen aseman tai joka viides hila ja joka neljäs rivi (kun piirretään
-//   esim. pieneen tilaan tiheää hilaa ja kaikkia paikkoja ei haluta piirtää).
-
-void NFmiSmartInfo::LocationMaskStep (bool newStatus, bool fResetAllFirst, const long& theXStep, const long& theYStep)
-{
-	if(IsGrid())
-		LocationMaskStepGrid(newStatus, fResetAllFirst, theXStep,theYStep);
-	else if(IsLocation())
-		LocationMaskStepLocation(newStatus, fResetAllFirst, theXStep);
-}
-
-void NFmiSmartInfo::LocationMaskStep (bool newStatus, unsigned long theMaskType, bool fResetAllFirst, const long& theXStep, const long& theYStep)
-{
-	if(IsGrid())
-		LocationMaskStepGrid(newStatus, theMaskType, fResetAllFirst, theXStep, theYStep);
-	else if(IsLocation())
-		LocationMaskStepLocation(newStatus, theMaskType, fResetAllFirst, theXStep);
-}
-
-void NFmiSmartInfo::LocationMaskStepGrid(bool newStatus, bool fResetAllFirst, const long& theXStep, const long& theYStep)
-{
-	if(!(theYStep && theXStep)) // jos ystep tai xstep 0, ei tehdä mitään
-		return;
-
-	unsigned long x = HPlaceDescriptor().Grid()->XNumber();
-	unsigned long y = HPlaceDescriptor().Grid()->YNumber();
-
-	if(fResetAllFirst)
-		MaskAllLocations(!newStatus);
-
-	unsigned long midX = static_cast<unsigned long>(theXStep/2); // sijoittaa näkyvät hilat 'keskemmälle'
-	unsigned long midY = static_cast<unsigned long>(theYStep/2);
-
-	ResetLocation();
-	for(unsigned int j=0; j<y; j++)
-	{
-		for(unsigned int i=0; i<x && NFmiFastQueryInfo::NextLocation(); i++)
-		{
-			if(!(j%theYStep == midY && i%theXStep == midX)) // 1999.09.17/Marko Laitoin aktiivisten hilojen aloituksen keskemmälle (== mid)
-				MaskLocation(newStatus);
-		}
-	}
-}
-
-void NFmiSmartInfo::LocationMaskStepGrid(bool newStatus, unsigned long theMaskType, bool fResetAllFirst, const long& theXStep, const long& theYStep)
-{
-	if(!(theYStep && theXStep)) // jos ystep tai xstep 0, ei tehdä mitään
-		return;
-
-	unsigned long x = HPlaceDescriptor().Grid()->XNumber();
-	unsigned long y = HPlaceDescriptor().Grid()->YNumber();
-
-	if(fResetAllFirst)
-		MaskAllLocations(!newStatus, theMaskType);
-
-	unsigned long midX = static_cast<unsigned long>(theXStep/2); // sijoittaa näkyvät hilat 'keskemmälle'
-	unsigned long midY = static_cast<unsigned long>(theYStep/2);
-
-	ResetLocation();
-	for(unsigned int j=0; j<y; j++)
-	{
-		for(unsigned int i=0; i<x && NFmiFastQueryInfo::NextLocation(); i++)
-		{
-			if(!(j%theYStep == midY && i%theXStep == midX)) // 1999.09.17/Marko Laitoin aktiivisten hilojen aloituksen keskemmälle (== mid)
-				MaskLocation(newStatus,theMaskType);
-		}
-	}
-}
-
-void NFmiSmartInfo::LocationMaskStepLocation(bool newStatus, bool fResetAllFirst, const long& theXStep)
-{
-	if(!theXStep) // jos xstep 0, ei tehdä mitään
-		return;
-
-	if(fResetAllFirst)
-		MaskAllLocations(!newStatus);
-	ResetLocation();
-	while(NFmiFastQueryInfo::NextLocation())
-	{
-		if(!(LocationIndex()%theXStep==0)) // 1999.09.07/Marko
-			MaskLocation(newStatus);
-	}
-}
-
-void NFmiSmartInfo::LocationMaskStepLocation(bool newStatus, unsigned long theMaskType, bool fResetAllFirst, const long& theXStep)
-{
-	if(!theXStep) // jos xstep 0, ei tehdä mitään
-		return;
-
-	if(fResetAllFirst)
-		MaskAllLocations(!newStatus, theMaskType);
-	ResetLocation();
-	while(NFmiFastQueryInfo::NextLocation())
-	{
-		if(!(LocationIndex()%theXStep==0)) // 1999.09.07/Marko
-			MaskLocation(newStatus, theMaskType);
-	}
-}
-
 
 NFmiQueryData* NFmiSmartInfo::DataReference()
 {
 	return itsDataReference;
 }
 
-bool NFmiSmartInfo::Extrapolate(void)
-{
-	for(this->ResetLevel(); this->NextLevel();)
-	{
-		//tähän tarkistetaan jokaiselta parametrilta erikseen ekstrapoloidaanko
-		for(this->ResetParam(); this->NextParam();)
-		{
-			for(this->ResetLocation(); this->NFmiFastQueryInfo::NextLocation();)
-			{
-				float edellinen = kFloatMissing;
-				for(this->ResetTime(); this->NextTime();)
-				{
-					float f1 = this->FloatValue();
-					if(f1 == kFloatMissing || f1 == kTCombinedWeatherFloatMissing)
-					{
-						if(!(edellinen == kFloatMissing || edellinen == kTCombinedWeatherFloatMissing))
-							this->FloatValue(edellinen);
-					}
-					else
-						edellinen = f1;
-				}
-			}
-		}
-	}
-	return true;
-}
-
 unsigned long NFmiSmartInfo::LocationMaskedCount(unsigned long theMaskType)
 {
-	return (*itsAreaMask)->MaskedCount(theMaskType);
+	return itsModifiableQDatasBookKeeping->LocationMaskedCount(theMaskType);
 }
 
 bool NFmiSmartInfo::LocationSelectionSnapShot(void)
 {
-	return itsAreaMask->SnapShotData();
+	return itsModifiableQDatasBookKeeping->LocationSelectionSnapShot();
 }
 
 bool NFmiSmartInfo::LocationSelectionUndo(void)
 {
-	return itsAreaMask->Undo();
+	return itsModifiableQDatasBookKeeping->LocationSelectionUndo();
 }
 
 bool NFmiSmartInfo::LocationSelectionRedo(void)
 {
-	return itsAreaMask->Redo();
-}
-
-void NFmiSmartInfo::LocationSelectionCommitData(void)
-{
-	itsAreaMask->CommitData();
+	return itsModifiableQDatasBookKeeping->LocationSelectionRedo();
 }
 
 bool NFmiSmartInfo::LocationSelectionUndoData(void)
 {
-	return itsAreaMask->UndoData();
+	return itsModifiableQDatasBookKeeping->LocationSelectionUndoData();
 }
 
 bool NFmiSmartInfo::LocationSelectionRedoData(void)
 {
-	return itsAreaMask->RedoData();
+	return itsModifiableQDatasBookKeeping->LocationSelectionRedoData();
 }
 
 void NFmiSmartInfo::LocationSelectionUndoLevel(int theNewUndoLevel)
 {
-	itsAreaMask->UndoLevel(theNewUndoLevel);
-}
-
-void NFmiSmartInfo::AreaFactors(NFmiGrid* theAreaFactor)
-{
-	delete itsAreaFactors;
-	itsAreaFactors = theAreaFactor;
+	itsModifiableQDatasBookKeeping->LocationSelectionUndoLevel(theNewUndoLevel);
 }
 
 int NFmiSmartInfo::MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea)
 {
-	return (*itsAreaMask)->MaskedCount(theMaskType, theIndex, theSearchArea, itsGridXNumber, itsGridYNumber);
+	return itsModifiableQDatasBookKeeping->MaskedCount(theMaskType, theIndex, theSearchArea, itsGridXNumber, itsGridYNumber);
 }
 
 const NFmiHarmonizerBookKeepingData* NFmiSmartInfo::CurrentHarmonizerBookKeepingData(void) const
 {
-	int usedIndex = *itsCurrentUndoLevelPtr + 1; // tässä pitää olla +1, koska tämä bookkeepin data systeemi on poikkeava originaali undo/redo datan kanssa
-	if(itsUndoRedoHarmonizerBookKeepingData == 0)
-		return 0;
-	else if(usedIndex >= 0 && usedIndex < static_cast<int>(itsUndoRedoHarmonizerBookKeepingData->size()))
-		return &(itsUndoRedoHarmonizerBookKeepingData->operator [](usedIndex));
-	else if(usedIndex >= static_cast<int>(itsUndoRedoHarmonizerBookKeepingData->size()))
-		throw std::runtime_error("Vika ohjelmassa NFmiSmartInfo::CurrentHarmonizerParams");
-	else
-		return 0;
+	return itsModifiableQDatasBookKeeping->CurrentHarmonizerBookKeepingData();
+}
+
+bool NFmiSmartInfo::IsDirty(void) const 
+{
+	return itsModifiableQDatasBookKeeping->IsDirty();
+}
+
+void NFmiSmartInfo::Dirty(bool newState)
+{
+	itsModifiableQDatasBookKeeping->Dirty(newState);
+}
+
+bool NFmiSmartInfo::LoadedFromFile(void)
+{
+	return itsModifiableQDatasBookKeeping->LoadedFromFile();
+}
+
+void NFmiSmartInfo::LoadedFromFile(bool loadedFromFile)
+{
+	itsModifiableQDatasBookKeeping->LoadedFromFile(loadedFromFile);
 }

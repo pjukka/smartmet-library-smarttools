@@ -180,8 +180,7 @@ std::string NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool 
 					int levelTypeId = level.LevelTypeId();
 					fileName += NFmiStringTools::Convert(levelTypeId);
 					fileName += "_";
-					float levelValue = level.LevelValue();
-					fileName += NFmiStringTools::Convert(levelValue);
+					fileName += NFmiStringTools::Convert(level.LevelValue());
 				}
 			}
 			else if(drawParam && drawParam->Level().LevelType() == kFmiHybridLevel)

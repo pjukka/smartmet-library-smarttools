@@ -856,9 +856,9 @@ static NFmiLocationBag MakeLocationBag(std::set<NFmiStation> &theStations)
 	std::vector<unsigned long> equalLocationIndexies;
 	for( ; it != theStations.end(); ++it)
 	{
-		unsigned long s1 = points.size();
+		size_t s1 = points.size();
 		points.insert((*it).GetLocation());
-		unsigned long s2 = points.size();
+		size_t s2 = points.size();
 		if(s1 == s2)
 		{
 			// tämä on pikaviritys. Jos arvottu luotaus-asemat, niillä on samat
@@ -897,12 +897,12 @@ static NFmiParamBag MakeParamBag(const NFmiProducer &theWantedProducer)
 
 static NFmiLevelBag MakeLevelBag(std::vector<NFmiTEMPCode> &theSoundings)
 {
-	int ssize = theSoundings.size();
+	size_t ssize = theSoundings.size();
 	unsigned int maxLevelSize = 0;
-	for(int i=0; i<ssize; i++)
+	for(size_t i=0; i<ssize; i++)
 	{ // etsitää luotaus missä eniten levelejä, ja otetaan se 'pohjaksi' level bagiin
 		if(theSoundings[i].LevelData().size() > maxLevelSize)
-			maxLevelSize = theSoundings[i].LevelData().size();
+			maxLevelSize = static_cast<unsigned int>(theSoundings[i].LevelData().size());
 	}
 	NFmiLevelBag levels(kFmiSoundingLevel, 1, maxLevelSize, 1);
 	return levels;
@@ -1037,7 +1037,7 @@ NFmiQueryData* DecodeTEMP::MakeNewDataFromTEMPStr(const std::string &theTEMPStr,
 	}
 
 	NFmiQueryData *newData = DecodeTEMP::CreateNewQData(tempCodeVec, theWantedProducer);
-	theCheckReportStr = MakeCheckReport(newData, errorCount, tempCodeVec.size());
+	theCheckReportStr = MakeCheckReport(newData, errorCount, static_cast<int>(tempCodeVec.size()));
 	return newData;
 }
 

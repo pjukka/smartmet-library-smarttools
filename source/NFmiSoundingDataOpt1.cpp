@@ -1961,3 +1961,66 @@ double NFmiSoundingDataOpt1::CalcTOfLiftedAirParcel(double T, double Td, double 
 	}
 	return kFloatMissing;
 }
+
+// Haetaan minimi lämpötilan arvo ja sen korkeuden paine.
+bool NFmiSoundingDataOpt1::GetTrValues(double &theTMinValue, double &theTMinPressure)
+{
+	theTMinValue = kFloatMissing;
+	theTMinPressure = kFloatMissing;
+	checkedVector<float>&Pvalues = GetParamData(kFmiPressure);
+	if(Pvalues.size())
+	{
+		checkedVector<float>&Tvalues = GetParamData(kFmiTemperature);
+		for(size_t i = 0; i < Pvalues.size(); i++)
+		{
+			double P = Pvalues[i];
+			double T = Tvalues[i];
+			if(P != kFloatMissing && T != kFloatMissing)
+			{
+				if(theTMinValue == kFloatMissing)
+				{
+					theTMinValue = T;
+					theTMinPressure = P;
+				}
+				else if(T < theTMinValue)
+				{
+					theTMinValue = T;
+					theTMinPressure = P;
+				}
+			}
+		}
+	}
+	return (theTMinValue != kFloatMissing) && (theTMinPressure != kFloatMissing);
+}
+
+// Haetaan maksimi tuulen nopeus, sen korkeuden korkeuden paine.
+bool NFmiSoundingDataOpt1::GetMwValues(double &theMaxWsValue, double &theMaxWsPressure)
+{
+	theMaxWsValue = kFloatMissing;
+	theMaxWsPressure = kFloatMissing;
+	checkedVector<float>&Pvalues = GetParamData(kFmiPressure);
+	if(Pvalues.size())
+	{
+		checkedVector<float>&WSvalues = GetParamData(kFmiWindSpeedMS);
+		for(size_t i = 0; i < Pvalues.size(); i++)
+		{
+			double P = Pvalues[i];
+			double WS = WSvalues[i];
+			if(P != kFloatMissing && WS != kFloatMissing)
+			{
+				if(theMaxWsValue == kFloatMissing)
+				{
+					theMaxWsValue = WS;
+					theMaxWsPressure = P;
+				}
+				else if(WS > theMaxWsValue)
+				{
+					theMaxWsValue = WS;
+					theMaxWsPressure = P;
+				}
+			}
+		}
+	}
+	return (theMaxWsValue != kFloatMissing) && (theMaxWsPressure != kFloatMissing);
+}
+

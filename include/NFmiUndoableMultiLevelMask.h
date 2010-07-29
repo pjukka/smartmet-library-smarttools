@@ -48,7 +48,6 @@ class NFmiUndoableMultiLevelMask
    bool SnapShotData(void);	// ota maskit talteen
    bool Undo(void);							// kysyy onko undo mahdollinen
    bool Redo(void);							// kysyy onko redo mahdollinen
-   void CommitData(void);							// hyväksy tehdyt muutokset (eli tuhoaa undo mahdollisuudet)
    bool UndoData(void);						// suorittaa todellisen undon
    bool RedoData(void);						// suorittaa todellisen redon
 

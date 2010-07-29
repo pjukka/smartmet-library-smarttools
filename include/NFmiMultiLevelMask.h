@@ -59,7 +59,6 @@ class NFmiMultiLevelMask
 	void InverseMask (unsigned long theMaskType);
 	bool Mask (const NFmiBitMask& theMask);
 	bool Mask (const NFmiBitMask& theMask, unsigned long theMaskType);
-	const NFmiBitMask& Mask (void) const;
 	const NFmiBitMask& Mask (unsigned long theMaskType) const;
 	void MaskSize(unsigned long theMaskSize) {};
 	unsigned long MaskedCount(unsigned long theMaskType);
@@ -67,7 +66,6 @@ class NFmiMultiLevelMask
 
  private:
 	NFmiBitMask itsSelectionMask;
-	NFmiBitMask itsActivationMask;
 	NFmiBitMask itsDisplayedMask;	// Koskee vain aikasarjaikkunaa
 	unsigned long itsMaskType;
 	unsigned long itsMaskSize;		//    NFmiBitmask:ien koko.

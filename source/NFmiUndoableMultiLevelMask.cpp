@@ -137,15 +137,7 @@ bool NFmiUndoableMultiLevelMask::Redo(void)
 	else
 		return true;
 }
-//--------------------------------------------------------
-// CommitData 
-//--------------------------------------------------------
-void NFmiUndoableMultiLevelMask::CommitData(void)
-{
-	itsMaxRedoLevel = 0;
-	itsCurrentUndoLevel = 0;
-	itsCurrentRedoLevel = 0;
-}
+
 //--------------------------------------------------------
 // UndoData 
 //--------------------------------------------------------
