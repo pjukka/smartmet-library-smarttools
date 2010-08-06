@@ -346,6 +346,8 @@ bool NFmiDrawParamList::RemoveMacroParam(const std::string &theName)
  * Liikuttaa aktiivista parametri‰ listalla halutun verran als/ylˆs p‰in.
  * Tarkoitus on muuttaa esim. karttan‰ytˆll‰ parametrien piirtoj‰rjestyst‰.
  * Palauttaa true jos lista meni likaiseksi eli siirto tapahtui.
+ * Lis‰sin alusta loppuun ja lopusta alkuun erikois k‰sittelyt, koska vanha koodi ei toiminut.
+ * TODO Koodi n‰ytt‰‰ nyt tosi hankalalta ja sen saisi varmaan yksinkertaisemminkin tehty‰.
  */
 bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 {
@@ -353,23 +355,49 @@ bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 	if(theMovement && paramCount > 1)
 	{
 		int index = FindActive();
-		int oldIndex = index;
-		if(index)
+		// pit‰‰ huolehtia kahdest‰ erikoistapauksesta
+		// 1. siirret‰‰n alusta loppuun
+		if(index == 1 && theMovement < 0)
 		{
-			index += theMovement;
-			if(index < 1)
-				index = (index + paramCount); // menn‰‰n listan ymp‰ri tarvittaessa
-			else if(index > paramCount)
-				index = (index - paramCount); // menn‰‰n listan ymp‰ri tarvittaessa
-
-			// tarkistus koodia sille jos theMovement on suurempi kuin paramCount
-			index = FmiMax(index, 1);
-			index = FmiMin(index, paramCount);
-			if(index != oldIndex) // jos todella tapahtuu siirto, tehd‰‰n se ja laitetaan lista likaiseksi
+			NFmiSortedPtrList <NFmiDrawParam>::Iterator iter = itsList.Start();
+			iter.Next();
+			NFmiDrawParam *item = iter.CurrentPtr();
+			itsList.RemoveStart(false);
+			itsList.AddEnd(item);
+			fDirtyList = true;
+			return true;
+		}
+		//  2. siirret‰‰n lopusta alkuun
+		else if(index == paramCount && theMovement > 0)
+		{
+			NFmiSortedPtrList <NFmiDrawParam>::Iterator iter = itsList.End();
+			iter.Previous();
+			NFmiDrawParam *item = iter.CurrentPtr();
+			itsList.RemoveEnd(false);
+			itsList.AddStart(item);
+			fDirtyList = true;
+			return true;
+		}
+		else
+		{
+			int oldIndex = index;
+			if(index)
 			{
-				itsList.Swap(index, oldIndex);
-				fDirtyList = true;
-				return true;
+				index += theMovement;
+				if(index < 1)
+					index = (index + paramCount); // menn‰‰n listan ymp‰ri tarvittaessa
+				else if(index > paramCount)
+					index = (index - paramCount); // menn‰‰n listan ymp‰ri tarvittaessa
+
+				// tarkistus koodia sille jos theMovement on suurempi kuin paramCount
+				index = FmiMax(index, 1);
+				index = FmiMin(index, paramCount);
+				if(index != oldIndex) // jos todella tapahtuu siirto, tehd‰‰n se ja laitetaan lista likaiseksi
+				{
+					itsList.Swap(index, oldIndex);
+					fDirtyList = true;
+					return true;
+				}
 			}
 		}
 	}
