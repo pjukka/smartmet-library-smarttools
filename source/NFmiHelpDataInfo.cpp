@@ -314,10 +314,28 @@ void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey, const s
 	}
 }
 
+static void FixPathEndWithSeparator(std::string &theFixedPathStr)
+{
+	if(theFixedPathStr.empty() == false)
+	{
+		std::string::value_type lastLetter = theFixedPathStr[theFixedPathStr.size()-1];
+		if((lastLetter == '/' || lastLetter == '\\') == false)
+			theFixedPathStr.push_back(kFmiDirectorySeparator);
+	}
+}
+
 void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpaceStr, std::string theHelpEditorFileNameFilter)
 {
 	string rootKey = theBaseNameSpaceStr + "::RootDir";
 	string rootDir = NFmiSettings::Optional(rootKey.c_str(), string(""));
+	
+	itsCacheDirectory = NFmiSettings::Require<std::string>(theBaseNameSpaceStr + "::CacheDirectory");
+	::FixPathEndWithSeparator(itsCacheDirectory);
+	itsCacheTmpDirectory = NFmiSettings::Require<std::string>(theBaseNameSpaceStr + "::CacheTmpDirectory");
+	::FixPathEndWithSeparator(itsCacheTmpDirectory);
+	itsCacheTmpFileNameFix = NFmiSettings::Require<std::string>(theBaseNameSpaceStr + "::CacheTmpFileNameFix");
+	fUseQueryDataCache = NFmiSettings::Require<bool>(theBaseNameSpaceStr + "::UseQueryDataCache");
+
 	RootDirectory(rootDir);
 	// Read static helpdata configurations
 	InitDataType(theBaseNameSpaceStr + "::Static", rootDir, itsStaticHelpDataInfos);

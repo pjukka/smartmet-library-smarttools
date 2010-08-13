@@ -105,6 +105,10 @@ public:
 	:itsDynamicHelpDataInfos()
 	,itsStaticHelpDataInfos()
 	,itsRootDirectory()
+	,itsCacheDirectory()
+	,itsCacheTmpDirectory()
+	,itsCacheTmpFileNameFix()
+	,fUseQueryDataCache(false)
 	,itsBaseNameSpace()
 	{}
 
@@ -128,6 +132,15 @@ public:
 	std::vector<std::string> GetUniqueCustomMenuList(void);
 	std::vector<NFmiHelpDataInfo> GetCustomMenuHelpDataList(const std::string &theCustomFolder);
 	const checkedVector<NFmiHelpDataInfo>& DynamicHelpDataInfos(void) const {return itsDynamicHelpDataInfos;}
+
+	const std::string& CacheDirectory(void) const {return itsCacheDirectory;}
+	void CacheDirectory(const std::string &newValue) {itsCacheDirectory = newValue;}
+	const std::string& CacheTmpDirectory(void) const {return itsCacheTmpDirectory;}
+	void CacheTmpDirectory(const std::string &newValue) {itsCacheTmpDirectory = newValue;}
+	const std::string& CacheTmpFileNameFix(void) const {return itsCacheTmpFileNameFix;}
+	void CacheTmpFileNameFix(const std::string &newValue) {itsCacheTmpFileNameFix = newValue;}
+	bool UsequeryDataCache(void) const {return fUseQueryDataCache;}
+	void UsequeryDataCache(bool newvalue) {fUseQueryDataCache = newvalue;}
 private:
 	void InitDataType(const std::string &theBaseKey, const std::string &theRootDir, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos);
 	bool IsSameTypeProjections(const NFmiArea *theFirst, const NFmiArea *theSecond);
@@ -135,6 +148,16 @@ private:
 	checkedVector<NFmiHelpDataInfo> itsDynamicHelpDataInfos; // t‰h‰n tulee jatkuvasti p‰ivitett‰v‰t datat kuten havainnot, tutka ja analyysi datat
 	checkedVector<NFmiHelpDataInfo> itsStaticHelpDataInfos; // t‰h‰n tulee kerran ladattavat jutut kuten maa/meri maskit ja klimatologiset jutut
 	std::string itsRootDirectory; // jos halutaan, k‰yttet‰‰n root directoria helpottamaan datan latauksia
+
+	// SmartMet voidaan laittaa k‰ytt‰m‰‰n queryData cachetusta, jolloin verkkopalvelimelta
+	// luetaan data m‰‰r‰ttyyn cache-hakemistoon omalle kovalevylle. N‰in voidaan
+	// v‰ltt‰‰ mahdolliset verkko-ongelmat memory-mapattujen dataojen kanssa.
+	std::string itsCacheDirectory; // qdatat kopioidaan haluttaessa t‰h‰n hakemistoon
+	std::string itsCacheTmpDirectory; // qdatat kopioidaan ensin t‰h‰n hakemistoon tmp-nimell‰ ja lopuksi renametaan 
+									  // oiekaan hakemistoon oikealla nimell‰
+									  // HUOM!! ett‰ tmp-file rename toimisi ns 'atomisesti', on hakemistojen oltava samalla levypartitiolla!!!
+	std::string itsCacheTmpFileNameFix; // t‰m‰ name fix lis‰t‰‰n tmp tiedosto nimen alkuun ja loppuun
+	bool fUseQueryDataCache; // onko cachetus systeemi p‰‰ll‰ vai ei?
 
 	std::string itsBaseNameSpace;
 };
