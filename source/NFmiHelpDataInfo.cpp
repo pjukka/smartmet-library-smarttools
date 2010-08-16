@@ -117,31 +117,7 @@ void NFmiHelpDataInfo::Clear(void)
 	fMakeSoundingIndexData = false;
 }
 
-static std::string MakeFileNameFilter(const std::string &theFileFilterBase, const std::string &theRootDir)
-{
-	std::string returnValue = theFileFilterBase;
-	bool useRootDir = theRootDir.empty() == false;
-	if(useRootDir)
-	{
-		NFmiFileString fileStr(returnValue);
-		fileStr.NormalizeDelimiter();
-		// T‰m‰ kikkailu on sit‰ varten ett‰ helpdata-tiedostossa on k‰ytetty
-		// ./alkuisia suhteellisia polkuja, joita halutaan k‰ytt‰‰ vaikka rootti-dir onkin m‰‰ritelty!!!
-		if(fileStr.IsAbsolutePath() == false && (fileStr.GetLen() > 2 && fileStr[1ul] != '.' && fileStr[2ul] != kFmiDirectorySeparator)) // 1ul on unsigned long casti, jonka msvc++ 2008 k‰‰nt‰j‰ vaatii
-		{
-			NFmiFileString finalFileStr(theRootDir);
-			finalFileStr.NormalizeDelimiter();
-			if(finalFileStr[finalFileStr.GetLen()] != kFmiDirectorySeparator)
-				finalFileStr += kFmiDirectorySeparator;
-			finalFileStr += returnValue;
-
-			returnValue = static_cast<char *>(finalFileStr);
-		}
-	}
-	return returnValue;
-}
-
-void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std::string &theName, const std::string &theRootDir)
+void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std::string &theName)
 {
 	itsName = theName;
 	itsBaseNameSpace = theBaseKey + "::" + theName;
@@ -150,8 +126,7 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 	if(NFmiSettings::IsSet(fileNameFilterKey))
 	{
 		// Read configuration
-		string tmpFileNameFilter = NFmiSettings::Require<std::string>(fileNameFilterKey);
-		itsFileNameFilter = ::MakeFileNameFilter(tmpFileNameFilter, theRootDir);
+		itsFileNameFilter = NFmiSettings::Require<std::string>(fileNameFilterKey);
 		itsDataType = static_cast<NFmiInfoData::Type> (NFmiSettings::Require<int>(itsBaseNameSpace + "::DataType"));
 		itsFakeProducerId = NFmiSettings::Optional<int>(itsBaseNameSpace + "::ProducerId", 0);
 		fNotifyOnLoad = NFmiSettings::Optional<bool>(itsBaseNameSpace + "::NotifyOnLoad", false);
@@ -302,14 +277,14 @@ void NFmiHelpDataInfoSystem::AddStatic(const NFmiHelpDataInfo &theInfo)
 	itsStaticHelpDataInfos.push_back(theInfo);
 }
 
-void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey, const std::string &theRootDir, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos)
+void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos)
 {
 	std::vector<std::string> dataKeys = NFmiSettings::ListChildren(theBaseKey);
 	std::vector<std::string>::iterator iter = dataKeys.begin();
 	for( ; iter != dataKeys.end(); ++iter)
 	{
 		NFmiHelpDataInfo hdi;
-		hdi.InitFromSettings(theBaseKey, *iter, theRootDir);
+		hdi.InitFromSettings(theBaseKey, *iter);
 		theHelpDataInfos.push_back(hdi);
 	}
 }
@@ -326,9 +301,6 @@ static void FixPathEndWithSeparator(std::string &theFixedPathStr)
 
 void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpaceStr, std::string theHelpEditorFileNameFilter)
 {
-	string rootKey = theBaseNameSpaceStr + "::RootDir";
-	string rootDir = NFmiSettings::Optional(rootKey.c_str(), string(""));
-	
 	itsCacheDirectory = NFmiSettings::Require<std::string>(theBaseNameSpaceStr + "::CacheDirectory");
 	::FixPathEndWithSeparator(itsCacheDirectory);
 	itsCacheTmpDirectory = NFmiSettings::Require<std::string>(theBaseNameSpaceStr + "::CacheTmpDirectory");
@@ -336,12 +308,11 @@ void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpac
 	itsCacheTmpFileNameFix = NFmiSettings::Require<std::string>(theBaseNameSpaceStr + "::CacheTmpFileNameFix");
 	fUseQueryDataCache = NFmiSettings::Require<bool>(theBaseNameSpaceStr + "::UseQueryDataCache");
 
-	RootDirectory(rootDir);
 	// Read static helpdata configurations
-	InitDataType(theBaseNameSpaceStr + "::Static", rootDir, itsStaticHelpDataInfos);
+	InitDataType(theBaseNameSpaceStr + "::Static", itsStaticHelpDataInfos);
 
 	// Read dynamic helpdata configurations
-	InitDataType(theBaseNameSpaceStr + "::Dynamic", rootDir, itsDynamicHelpDataInfos);
+	InitDataType(theBaseNameSpaceStr + "::Dynamic", itsDynamicHelpDataInfos);
 
 	// Lis‰t‰‰n help editor mode datan luku jos niin on haluttu
 	if(theHelpEditorFileNameFilter.empty() == false)
@@ -350,6 +321,21 @@ void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpac
 		helpDataInfo.FileNameFilter(theHelpEditorFileNameFilter);
 		helpDataInfo.DataType(NFmiInfoData::kEditingHelpData);
 		AddDynamic(helpDataInfo);
+	}
+}
+
+void NFmiHelpDataInfoSystem::InitSettings(const NFmiHelpDataInfoSystem &theOther, bool fDoHelpDataInfo)
+{
+	this->itsCacheDirectory = theOther.itsCacheDirectory;
+	this->itsCacheTmpDirectory = theOther.itsCacheTmpDirectory;
+	this->itsCacheTmpFileNameFix = theOther.itsCacheTmpFileNameFix;
+	this->fUseQueryDataCache = theOther.fUseQueryDataCache;
+	this->itsBaseNameSpace = theOther.itsBaseNameSpace;
+
+	if(fDoHelpDataInfo)
+	{
+		this->itsDynamicHelpDataInfos = theOther.itsDynamicHelpDataInfos;
+		this->itsStaticHelpDataInfos = theOther.itsStaticHelpDataInfos;
 	}
 }
 

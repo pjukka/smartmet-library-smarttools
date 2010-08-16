@@ -28,7 +28,7 @@ public:
 	~NFmiHelpDataInfo(void)
 	{Clear();}
 
-	void InitFromSettings(const std::string &theBaseKey, const std::string &theName, const std::string &theRootDir);
+	void InitFromSettings(const std::string &theBaseKey, const std::string &theName);
 	// void StoreToSettings(void);  // HUOM! ei toteuteta ainakaan viel‰ talletusta
 
 	NFmiHelpDataInfo& operator=(const NFmiHelpDataInfo &theOther);
@@ -104,7 +104,6 @@ public:
 	NFmiHelpDataInfoSystem(void)
 	:itsDynamicHelpDataInfos()
 	,itsStaticHelpDataInfos()
-	,itsRootDirectory()
 	,itsCacheDirectory()
 	,itsCacheTmpDirectory()
 	,itsCacheTmpFileNameFix()
@@ -116,6 +115,7 @@ public:
 	{}
 	void InitFromSettings(const std::string &theInitNameSpace, std::string theHelpEditorFileNameFilter = "");
 	// void StoreToSettings(void);  // HUOM! ei toteuteta ainakaan viel‰ talletusta
+	void InitSettings(const NFmiHelpDataInfoSystem &theOther, bool fDoHelpDataInfo);
 
 	NFmiHelpDataInfo& DynamicHelpDataInfo(int theIndex);
 	NFmiHelpDataInfo& StaticHelpDataInfo(int theIndex);
@@ -125,8 +125,6 @@ public:
 	NFmiDataIdent GetNextSatelChannel(const NFmiDataIdent &theDataIdent, FmiDirection theDir);
 	void AddDynamic(const NFmiHelpDataInfo &theInfo);
 	void AddStatic(const NFmiHelpDataInfo &theInfo);
-	const std::string& RootDirectory(void) const {return itsRootDirectory;}
-	void RootDirectory(const std::string &theRoot) {itsRootDirectory = theRoot;}
 	void MarkAllDynamicDatasAsNotReaded();
 	NFmiHelpDataInfo* FindHelpDataInfo(const std::string &theFileNameFilter);
 	std::vector<std::string> GetUniqueCustomMenuList(void);
@@ -142,12 +140,11 @@ public:
 	bool UsequeryDataCache(void) const {return fUseQueryDataCache;}
 	void UsequeryDataCache(bool newvalue) {fUseQueryDataCache = newvalue;}
 private:
-	void InitDataType(const std::string &theBaseKey, const std::string &theRootDir, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos);
+	void InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos);
 	bool IsSameTypeProjections(const NFmiArea *theFirst, const NFmiArea *theSecond);
 
 	checkedVector<NFmiHelpDataInfo> itsDynamicHelpDataInfos; // t‰h‰n tulee jatkuvasti p‰ivitett‰v‰t datat kuten havainnot, tutka ja analyysi datat
 	checkedVector<NFmiHelpDataInfo> itsStaticHelpDataInfos; // t‰h‰n tulee kerran ladattavat jutut kuten maa/meri maskit ja klimatologiset jutut
-	std::string itsRootDirectory; // jos halutaan, k‰yttet‰‰n root directoria helpottamaan datan latauksia
 
 	// SmartMet voidaan laittaa k‰ytt‰m‰‰n queryData cachetusta, jolloin verkkopalvelimelta
 	// luetaan data m‰‰r‰ttyyn cache-hakemistoon omalle kovalevylle. N‰in voidaan
