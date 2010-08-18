@@ -137,8 +137,8 @@ public:
 	void CacheTmpDirectory(const std::string &newValue) {itsCacheTmpDirectory = newValue;}
 	const std::string& CacheTmpFileNameFix(void) const {return itsCacheTmpFileNameFix;}
 	void CacheTmpFileNameFix(const std::string &newValue) {itsCacheTmpFileNameFix = newValue;}
-	bool UsequeryDataCache(void) const {return fUseQueryDataCache;}
-	void UsequeryDataCache(bool newvalue) {fUseQueryDataCache = newvalue;}
+	bool UseQueryDataCache(void) const {return fUseQueryDataCache;}
+	void UseQueryDataCache(bool newvalue) {fUseQueryDataCache = newvalue;}
 private:
 	void InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos);
 	bool IsSameTypeProjections(const NFmiArea *theFirst, const NFmiArea *theSecond);
