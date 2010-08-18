@@ -25,6 +25,7 @@ using namespace std;
 NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 :itsName()
 ,itsFileNameFilter()
+,fForceFileFilterName(false)
 ,itsLatestFileName()
 ,itsDataType(NFmiInfoData::kNoDataType)
 ,itsLatestFileTimeStamp(0)
@@ -47,6 +48,7 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
 :itsName(theOther.itsName)
 ,itsFileNameFilter(theOther.itsFileNameFilter)
+,fForceFileFilterName(theOther.fForceFileFilterName)
 ,itsLatestFileName(theOther.itsLatestFileName)
 ,itsDataType(theOther.itsDataType)
 ,itsLatestFileTimeStamp(theOther.itsLatestFileTimeStamp)
@@ -73,6 +75,7 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 		Clear(); // lähinnä area-otuksen tuhoamista varten kutsutaan
 		itsName = theOther.itsName;
 		itsFileNameFilter = theOther.itsFileNameFilter;
+		fForceFileFilterName = theOther.fForceFileFilterName;
 		itsLatestFileName = theOther.itsLatestFileName;
 		itsDataType = theOther.itsDataType;
 		itsLatestFileTimeStamp = theOther.itsLatestFileTimeStamp;
@@ -98,6 +101,7 @@ void NFmiHelpDataInfo::Clear(void)
 {
 	itsName = "";
 	itsFileNameFilter = "";
+	fForceFileFilterName = false;
 	itsLatestFileName = "";
 	itsDataType = NFmiInfoData::kNoDataType;
 	itsLatestFileTimeStamp = 0;
@@ -119,6 +123,7 @@ void NFmiHelpDataInfo::Clear(void)
 
 void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std::string &theName)
 {
+	fForceFileFilterName = false;
 	itsName = theName;
 	itsBaseNameSpace = theBaseKey + "::" + theName;
 
@@ -155,6 +160,29 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 			itsImageDataIdent = NFmiDataIdent(param, itsFakeProducerId);
 		}
 	}
+}
+
+static std::string MakeCacheFilePattern(const NFmiHelpDataInfo &theDataInfo, const NFmiHelpDataInfoSystem &theHelpDataSystem)
+{
+	NFmiFileString fileStr(theDataInfo.FileNameFilter());
+	std::string cachePattern(theHelpDataSystem.CacheDirectory());
+	cachePattern += static_cast<char*>(fileStr.FileName());
+	return cachePattern;
+}
+
+void NFmiHelpDataInfo::FileNameFilter(const std::string &newValue, bool forceFileNameFilter) 
+{
+	itsFileNameFilter = newValue;
+	fForceFileFilterName = forceFileNameFilter;
+}
+
+// tämä on viritys, että olisi funktio, jolla voidaan pyytää käytetty fileFilter, riippuen siitä onko cache käytössä vai ei
+const std::string NFmiHelpDataInfo::UsedFileNameFilter(const NFmiHelpDataInfoSystem &theHelpDataInfoSystem) const
+{
+	if(fForceFileFilterName || theHelpDataInfoSystem.UseQueryDataCache() == false)
+		return FileNameFilter();
+	else
+		return ::MakeCacheFilePattern(*this, theHelpDataInfoSystem);
 }
 
 NFmiHelpDataInfo& NFmiHelpDataInfoSystem::DynamicHelpDataInfo(int theIndex)
@@ -346,14 +374,14 @@ void NFmiHelpDataInfoSystem::MarkAllDynamicDatasAsNotReaded()
 		itsDynamicHelpDataInfos[i].LatestFileTimeStamp(-1);
 }
 
-static NFmiHelpDataInfo* FindHelpDataInfo(checkedVector<NFmiHelpDataInfo> &theHelpInfos, const std::string &theFileNameFilter)
+static NFmiHelpDataInfo* FindHelpDataInfo(checkedVector<NFmiHelpDataInfo> &theHelpInfos, const std::string &theFileNameFilter, const NFmiHelpDataInfoSystem &theHelpDataInfoSystem)
 {
 	size_t ssize = theHelpInfos.size();
 	for(size_t i = 0; i<ssize; i++)
 	{
 		// Siis jos joko FileNameFilter tai CombineDataPathAndFileName (yhdistelmä datoissa tämä 
 		// on se data joka luetaan sisään SmartMetiin) on etsitty, palautetaan helpInfo.
-		if(theHelpInfos[i].FileNameFilter() == theFileNameFilter || theHelpInfos[i].CombineDataPathAndFileName() == theFileNameFilter)
+		if(theHelpInfos[i].UsedFileNameFilter(theHelpDataInfoSystem) == theFileNameFilter || theHelpInfos[i].CombineDataPathAndFileName() == theFileNameFilter)
 			return &theHelpInfos[i];
 	}
 	return 0;
@@ -367,9 +395,9 @@ NFmiHelpDataInfo* NFmiHelpDataInfoSystem::FindHelpDataInfo(const std::string &th
 	if(theFileNameFilter.empty())
 		return 0;
 
-	NFmiHelpDataInfo *helpInfo = ::FindHelpDataInfo(itsDynamicHelpDataInfos, theFileNameFilter);
+	NFmiHelpDataInfo *helpInfo = ::FindHelpDataInfo(itsDynamicHelpDataInfos, theFileNameFilter, *this);
 	if(helpInfo == 0)
-		helpInfo = ::FindHelpDataInfo(itsStaticHelpDataInfos, theFileNameFilter);
+		helpInfo = ::FindHelpDataInfo(itsStaticHelpDataInfos, theFileNameFilter, *this);
 
 	return helpInfo;
 }

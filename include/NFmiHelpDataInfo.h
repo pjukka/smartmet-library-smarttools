@@ -19,6 +19,7 @@
 #include <string>
 
 class NFmiArea;
+class NFmiHelpDataInfoSystem;
 
 class NFmiHelpDataInfo
 {
@@ -37,7 +38,9 @@ public:
 	const std::string& Name(void) const {return itsName;}
 	void Name(const std::string &newValue) {itsName = newValue;}
 	const std::string& FileNameFilter(void) const {return itsFileNameFilter;}
-	void FileNameFilter(const std::string &newValue) {itsFileNameFilter = newValue;}
+	void FileNameFilter(const std::string &newValue, bool forceFileNameFilter = false);
+	// tämä on viritys, että olisi funktio, jolla voidaan pyytää käytetty fileFilter, riippuen siitä onko cache käytössä vai ei
+	const std::string UsedFileNameFilter(const NFmiHelpDataInfoSystem &theHelpDataInfoSystem) const;
 	const std::string& LatestFileName(void) const {return itsLatestFileName;}
 	void LatestFileName(const std::string &newName) {itsLatestFileName = newName;}
 	NFmiInfoData::Type DataType(void) const {return itsDataType;}
@@ -72,6 +75,7 @@ private:
 
 	std::string itsName; // tällä nimellä erotetaan konffi-tiedostoissa eri datat
 	std::string itsFileNameFilter; // tiedostonimi filtteri polun kera esim. d:\weto\wrk\data\in\data_1_*.sqd
+	bool fForceFileFilterName; // jos tämä on erikoistilanteissa asetettu true:ksi, ei välitetä mahdillisista cachen käytöistä, vaan UsedFilefilter-metodi palauttaa itsFileNameFilter:in arvon
 	std::string itsLatestFileName; // kun filtterillä on haettu tiedostot ja uusin on löytynyt, talletetaan se tähän
 	NFmiInfoData::Type itsDataType; // esim. analyysi, havainto jne.
 	time_t itsLatestFileTimeStamp; // viimeksi luetus
