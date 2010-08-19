@@ -700,6 +700,12 @@ static NFmiQueryInfo MakeSoundingIndexInfo(NFmiQueryData &theSourceData, const s
 	NFmiProducer usedProducer = *fInfo.Producer();
 	if(theProducerName.empty() == false)
 		usedProducer.SetName(theProducerName);
+	else
+	{
+		NFmiString prodName = usedProducer.GetName();
+		prodName += " (sounding index)";
+		usedProducer.SetName(prodName);
+	}
 	params.SetProducer(usedProducer); // tuottaja pit‰‰ asettaa oikeaksi
 
 	NFmiQueryInfo info(params, fInfo.TimeDescriptor(), fInfo.HPlaceDescriptor()); // default vplaceDesc riitt‰‰ kun dataa lasketaan vain yhteen tasoon
