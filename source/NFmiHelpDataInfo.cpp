@@ -336,6 +336,10 @@ void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpac
 	itsCacheTmpFileNameFix = NFmiSettings::Require<std::string>(theBaseNameSpaceStr + "::CacheTmpFileNameFix");
 	fUseQueryDataCache = NFmiSettings::Require<bool>(theBaseNameSpaceStr + "::UseQueryDataCache");
 
+	fDoCeanCache = NFmiSettings::Require<bool>(theBaseNameSpaceStr + "::DoCeanCache");
+	itsCacheFileKeepMaxDays = NFmiSettings::Require<float>(theBaseNameSpaceStr + "::CacheFileKeepMaxDays");
+	itsCacheMaxFilesPerPattern = NFmiSettings::Require<int>(theBaseNameSpaceStr + "::CacheMaxFilesPerPattern");
+
 	// Read static helpdata configurations
 	InitDataType(theBaseNameSpaceStr + "::Static", itsStaticHelpDataInfos);
 
@@ -358,6 +362,9 @@ void NFmiHelpDataInfoSystem::InitSettings(const NFmiHelpDataInfoSystem &theOther
 	this->itsCacheTmpDirectory = theOther.itsCacheTmpDirectory;
 	this->itsCacheTmpFileNameFix = theOther.itsCacheTmpFileNameFix;
 	this->fUseQueryDataCache = theOther.fUseQueryDataCache;
+	this->fDoCeanCache = theOther.fDoCeanCache;
+	this->itsCacheFileKeepMaxDays = theOther.itsCacheFileKeepMaxDays;
+	this->itsCacheMaxFilesPerPattern = theOther.itsCacheMaxFilesPerPattern;
 	this->itsBaseNameSpace = theOther.itsBaseNameSpace;
 
 	if(fDoHelpDataInfo)
