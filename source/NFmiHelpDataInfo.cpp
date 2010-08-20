@@ -329,22 +329,23 @@ static void FixPathEndWithSeparator(std::string &theFixedPathStr)
 
 void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpaceStr, std::string theHelpEditorFileNameFilter)
 {
-	itsCacheDirectory = NFmiSettings::Require<std::string>(theBaseNameSpaceStr + "::CacheDirectory");
+	itsBaseNameSpace = theBaseNameSpaceStr;
+	itsCacheDirectory = NFmiSettings::Require<std::string>(itsBaseNameSpace + "::CacheDirectory");
 	::FixPathEndWithSeparator(itsCacheDirectory);
-	itsCacheTmpDirectory = NFmiSettings::Require<std::string>(theBaseNameSpaceStr + "::CacheTmpDirectory");
+	itsCacheTmpDirectory = NFmiSettings::Require<std::string>(itsBaseNameSpace + "::CacheTmpDirectory");
 	::FixPathEndWithSeparator(itsCacheTmpDirectory);
-	itsCacheTmpFileNameFix = NFmiSettings::Require<std::string>(theBaseNameSpaceStr + "::CacheTmpFileNameFix");
-	fUseQueryDataCache = NFmiSettings::Require<bool>(theBaseNameSpaceStr + "::UseQueryDataCache");
+	itsCacheTmpFileNameFix = NFmiSettings::Require<std::string>(itsBaseNameSpace + "::CacheTmpFileNameFix");
+	fUseQueryDataCache = NFmiSettings::Require<bool>(itsBaseNameSpace + "::UseQueryDataCache");
 
-	fDoCeanCache = NFmiSettings::Require<bool>(theBaseNameSpaceStr + "::DoCeanCache");
-	itsCacheFileKeepMaxDays = NFmiSettings::Require<float>(theBaseNameSpaceStr + "::CacheFileKeepMaxDays");
-	itsCacheMaxFilesPerPattern = NFmiSettings::Require<int>(theBaseNameSpaceStr + "::CacheMaxFilesPerPattern");
+	fDoCeanCache = NFmiSettings::Require<bool>(itsBaseNameSpace + "::DoCeanCache");
+	itsCacheFileKeepMaxDays = NFmiSettings::Require<float>(itsBaseNameSpace + "::CacheFileKeepMaxDays");
+	itsCacheMaxFilesPerPattern = NFmiSettings::Require<int>(itsBaseNameSpace + "::CacheMaxFilesPerPattern");
 
 	// Read static helpdata configurations
-	InitDataType(theBaseNameSpaceStr + "::Static", itsStaticHelpDataInfos);
+	InitDataType(itsBaseNameSpace + "::Static", itsStaticHelpDataInfos);
 
 	// Read dynamic helpdata configurations
-	InitDataType(theBaseNameSpaceStr + "::Dynamic", itsDynamicHelpDataInfos);
+	InitDataType(itsBaseNameSpace + "::Dynamic", itsDynamicHelpDataInfos);
 
 	// Lis‰t‰‰n help editor mode datan luku jos niin on haluttu
 	if(theHelpEditorFileNameFilter.empty() == false)
@@ -354,6 +355,23 @@ void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpac
 		helpDataInfo.DataType(NFmiInfoData::kEditingHelpData);
 		AddDynamic(helpDataInfo);
 	}
+}
+
+void NFmiHelpDataInfoSystem::StoreToSettings(void)
+{
+	if(itsBaseNameSpace.empty() == false)
+	{
+		// HUOM! t‰ss‰ on toistaiseksi vain cacheen liittyvien muutosten talletukset
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheDirectory"), itsCacheDirectory);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheTmpDirectory"), itsCacheTmpDirectory);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheTmpFileNameFix"), itsCacheTmpFileNameFix);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::UseQueryDataCache"), NFmiStringTools::Convert(fUseQueryDataCache));
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::DoCeanCache"), NFmiStringTools::Convert(fDoCeanCache));
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheFileKeepMaxDays"), NFmiStringTools::Convert(itsCacheFileKeepMaxDays));
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheMaxFilesPerPattern"), NFmiStringTools::Convert(itsCacheMaxFilesPerPattern));
+	}
+	else
+		throw std::runtime_error("Error in NFmiHelpDataInfoSystem::StoreToSettings, unable to store setting.");
 }
 
 void NFmiHelpDataInfoSystem::InitSettings(const NFmiHelpDataInfoSystem &theOther, bool fDoHelpDataInfo)

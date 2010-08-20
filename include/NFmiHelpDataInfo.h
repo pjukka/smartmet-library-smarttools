@@ -121,7 +121,7 @@ public:
 	void Clear(void)
 	{}
 	void InitFromSettings(const std::string &theInitNameSpace, std::string theHelpEditorFileNameFilter = "");
-	// void StoreToSettings(void);  // HUOM! ei toteuteta ainakaan vielä talletusta
+	void StoreToSettings(void);
 	void InitSettings(const NFmiHelpDataInfoSystem &theOther, bool fDoHelpDataInfo);
 
 	NFmiHelpDataInfo& DynamicHelpDataInfo(int theIndex);
