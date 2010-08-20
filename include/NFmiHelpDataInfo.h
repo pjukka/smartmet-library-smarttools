@@ -115,6 +115,9 @@ public:
 	,fDoCeanCache(false)
 	,itsCacheFileKeepMaxDays(-1)
 	,itsCacheMaxFilesPerPattern(-1)
+	,itsCacheMediumFileSizeMB(40)
+	,itsCacheLargeFileSizeMB(200)
+	,itsCacheMaximumFileSizeMB(10000)
 	,itsBaseNameSpace()
 	{}
 
@@ -152,6 +155,12 @@ public:
 	void CacheFileKeepMaxDays(float newValue) {itsCacheFileKeepMaxDays = newValue;}
 	int CacheMaxFilesPerPattern(void) const {return itsCacheMaxFilesPerPattern;}
 	void CacheMaxFilesPerPattern(int newValue) {itsCacheMaxFilesPerPattern = newValue;}
+	double CacheMediumFileSizeMB(void) const {return itsCacheMediumFileSizeMB;}
+	void CacheMediumFileSizeMB(double newValue) {itsCacheMediumFileSizeMB = newValue;}
+	double CacheLargeFileSizeMB(void) const {return itsCacheLargeFileSizeMB;}
+	void CacheLargeFileSizeMB(double newValue) {itsCacheLargeFileSizeMB = newValue;}
+	double CacheMaximumFileSizeMB(void) const {return itsCacheMaximumFileSizeMB;}
+	void CacheMaximumFileSizeMB(double newValue) {itsCacheMaximumFileSizeMB = newValue;}
 
 private:
 	void InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos);
@@ -172,6 +181,16 @@ private:
 	bool fDoCeanCache; // siivotaanko cachea vai ei
 	float itsCacheFileKeepMaxDays; // kuinka vanhat tiedostot ainakin siivotaan pois (esim. 1.5 on 1.5 p‰iv‰‰ eli 36 tuntia) jos luku on <= 0 ei t‰t‰ k‰ytet‰
 	int itsCacheMaxFilesPerPattern; // kuinka monta tiedostoa maksimissaan pidet‰‰n kutakin tiedosto patternia kohden, jos luku <= 0, ei t‰t‰ k‰ytet‰
+
+	// medium ja large koot jakavat cachetettavat qdatat kolmeen osaan:
+	// 1. pienet tiedostot 0 <= size < medium
+	// 2. keskikokoiset tiedostot medium <= size < large
+	// 3. isot tiedostot large <= size < ‰‰retˆn
+	// Jokaiselle kokoluokalle tehd‰‰n SmartMetissa oma datan kopiointi threadi, n‰in isot tiedostot 
+	// eiv‰t j‰‰ blokkaamaan pinempien tiedostojen kopiointia.
+	double itsCacheMediumFileSizeMB; 
+	double itsCacheLargeFileSizeMB;
+	double itsCacheMaximumFileSizeMB; // t‰t‰ isompia tiedostoja ei cache suostu siirt‰m‰‰n
 
 	std::string itsBaseNameSpace;
 };

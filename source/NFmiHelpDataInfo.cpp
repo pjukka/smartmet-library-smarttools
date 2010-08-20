@@ -341,6 +341,10 @@ void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpac
 	itsCacheFileKeepMaxDays = NFmiSettings::Require<float>(itsBaseNameSpace + "::CacheFileKeepMaxDays");
 	itsCacheMaxFilesPerPattern = NFmiSettings::Require<int>(itsBaseNameSpace + "::CacheMaxFilesPerPattern");
 
+	itsCacheMediumFileSizeMB = NFmiSettings::Require<double>(itsBaseNameSpace + "::CacheMediumFileSizeMB");
+	itsCacheLargeFileSizeMB = NFmiSettings::Require<double>(itsBaseNameSpace + "::CacheLargeFileSizeMB");
+	itsCacheMaximumFileSizeMB = NFmiSettings::Require<double>(itsBaseNameSpace + "::CacheMaximumFileSizeMB");
+
 	// Read static helpdata configurations
 	InitDataType(itsBaseNameSpace + "::Static", itsStaticHelpDataInfos);
 
@@ -369,6 +373,9 @@ void NFmiHelpDataInfoSystem::StoreToSettings(void)
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::DoCeanCache"), NFmiStringTools::Convert(fDoCeanCache));
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheFileKeepMaxDays"), NFmiStringTools::Convert(itsCacheFileKeepMaxDays));
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheMaxFilesPerPattern"), NFmiStringTools::Convert(itsCacheMaxFilesPerPattern));
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheMediumFileSizeMB"), NFmiStringTools::Convert(itsCacheMediumFileSizeMB));
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheLargeFileSizeMB"), NFmiStringTools::Convert(itsCacheLargeFileSizeMB));
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheMaximumFileSizeMB"), NFmiStringTools::Convert(itsCacheMaximumFileSizeMB));
 	}
 	else
 		throw std::runtime_error("Error in NFmiHelpDataInfoSystem::StoreToSettings, unable to store setting.");
