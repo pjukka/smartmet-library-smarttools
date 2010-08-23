@@ -25,6 +25,7 @@ using namespace std;
 NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 :itsName()
 ,itsFileNameFilter()
+,itsPartialDataCacheFileNameFilter()
 ,fForceFileFilterName(false)
 ,itsLatestFileName()
 ,itsDataType(NFmiInfoData::kNoDataType)
@@ -48,6 +49,7 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
 :itsName(theOther.itsName)
 ,itsFileNameFilter(theOther.itsFileNameFilter)
+,itsPartialDataCacheFileNameFilter(theOther.itsPartialDataCacheFileNameFilter)
 ,fForceFileFilterName(theOther.fForceFileFilterName)
 ,itsLatestFileName(theOther.itsLatestFileName)
 ,itsDataType(theOther.itsDataType)
@@ -75,6 +77,7 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 		Clear(); // lähinnä area-otuksen tuhoamista varten kutsutaan
 		itsName = theOther.itsName;
 		itsFileNameFilter = theOther.itsFileNameFilter;
+		itsPartialDataCacheFileNameFilter = theOther.itsPartialDataCacheFileNameFilter;
 		fForceFileFilterName = theOther.fForceFileFilterName;
 		itsLatestFileName = theOther.itsLatestFileName;
 		itsDataType = theOther.itsDataType;
@@ -101,6 +104,7 @@ void NFmiHelpDataInfo::Clear(void)
 {
 	itsName = "";
 	itsFileNameFilter = "";
+	itsPartialDataCacheFileNameFilter = "";
 	fForceFileFilterName = false;
 	itsLatestFileName = "";
 	itsDataType = NFmiInfoData::kNoDataType;
@@ -121,7 +125,57 @@ void NFmiHelpDataInfo::Clear(void)
 	fMakeSoundingIndexData = false;
 }
 
-void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std::string &theName)
+static void FixPathEndWithSeparator(std::string &theFixedPathStr)
+{
+	if(theFixedPathStr.empty() == false)
+	{
+		NFmiFileString tmpFileStr = theFixedPathStr;
+		tmpFileStr.NormalizeDelimiter(); // varmistetaan myös että polun merkit ovat oikein päin
+		theFixedPathStr = static_cast<char*>(tmpFileStr);
+
+		std::string::value_type lastLetter = theFixedPathStr[theFixedPathStr.size()-1];
+		if(lastLetter != kFmiDirectorySeparator)
+			theFixedPathStr.push_back(kFmiDirectorySeparator);
+	}
+}
+
+static void FixPatternSeparators(std::string &theFixedPatternStr)
+{
+	if(theFixedPatternStr.empty() == false)
+	{
+		NFmiFileString tmpFileStr = theFixedPatternStr;
+		tmpFileStr.NormalizeDelimiter(); // varmistetaan että polun merkit ovat oikein päin
+		theFixedPatternStr = static_cast<char*>(tmpFileStr);
+	}
+}
+
+static void MakeCombinedDataFilePattern(NFmiHelpDataInfo &theDataInfo, const NFmiHelpDataInfoSystem &theHelpDataSystem)
+{
+	// combineDataPattern += "FileNameFilter:istä osa jossa on mukana ylin hakemistotaso"
+	// esim. "P:\data\partial_data\laps\*_LAPS_finland.sqd" -> "laps\*_LAPS_finland.sqd"
+	std::string lastDirFilePattern = theDataInfo.FileNameFilter();
+	if(lastDirFilePattern.empty() == false)
+	{
+		int slashesFound = 0;
+		size_t i = lastDirFilePattern.size()-1;
+		for( ; i > 0; i--)
+		{
+			if(lastDirFilePattern[i] == '\\')
+				slashesFound++;
+			if(slashesFound > 1)
+				break;
+		}
+
+		if(slashesFound > 1)
+		{
+			std::string combineDataPattern(theHelpDataSystem.CachePartialDataDirectory());
+			combineDataPattern += std::string(lastDirFilePattern.begin() + i + 1, lastDirFilePattern.end());
+			theDataInfo.PartialDataCacheFileNameFilter(combineDataPattern);
+		}
+	}
+}
+
+void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std::string &theName, const NFmiHelpDataInfoSystem &theHelpDataSystem)
 {
 	fForceFileFilterName = false;
 	itsName = theName;
@@ -132,6 +186,7 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 	{
 		// Read configuration
 		itsFileNameFilter = NFmiSettings::Require<std::string>(fileNameFilterKey);
+		::FixPatternSeparators(itsFileNameFilter);
 		itsDataType = static_cast<NFmiInfoData::Type> (NFmiSettings::Require<int>(itsBaseNameSpace + "::DataType"));
 		itsFakeProducerId = NFmiSettings::Optional<int>(itsBaseNameSpace + "::ProducerId", 0);
 		fNotifyOnLoad = NFmiSettings::Optional<bool>(itsBaseNameSpace + "::NotifyOnLoad", false);
@@ -142,6 +197,8 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 		itsCombineDataPathAndFileName = NFmiSettings::Optional<string>(itsBaseNameSpace + "::CombineDataPathAndFileName", "");
 		itsCombineDataMaxTimeSteps = NFmiSettings::Optional<int>(itsBaseNameSpace + "::CombineDataMaxTimeSteps", 0);
 		fMakeSoundingIndexData = NFmiSettings::Optional<bool>(itsBaseNameSpace + "::MakeSoundingIndexData", false);
+		if(itsCombineDataPathAndFileName.empty() == false)
+			::MakeCombinedDataFilePattern(*this, theHelpDataSystem);
 
 		std::string imageProjectionKey(itsBaseNameSpace + "::ImageProjection");
 		if (NFmiSettings::IsSet(imageProjectionKey))
@@ -182,7 +239,12 @@ const std::string NFmiHelpDataInfo::UsedFileNameFilter(const NFmiHelpDataInfoSys
 	if(fForceFileFilterName || theHelpDataInfoSystem.UseQueryDataCache() == false)
 		return FileNameFilter();
 	else
-		return ::MakeCacheFilePattern(*this, theHelpDataInfoSystem);
+	{
+		if(itsCombineDataPathAndFileName.empty())
+			return ::MakeCacheFilePattern(*this, theHelpDataInfoSystem);
+		else
+			return PartialDataCacheFileNameFilter();
+	}
 }
 
 NFmiHelpDataInfo& NFmiHelpDataInfoSystem::DynamicHelpDataInfo(int theIndex)
@@ -312,18 +374,8 @@ void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey, checked
 	for( ; iter != dataKeys.end(); ++iter)
 	{
 		NFmiHelpDataInfo hdi;
-		hdi.InitFromSettings(theBaseKey, *iter);
+		hdi.InitFromSettings(theBaseKey, *iter, *this);
 		theHelpDataInfos.push_back(hdi);
-	}
-}
-
-static void FixPathEndWithSeparator(std::string &theFixedPathStr)
-{
-	if(theFixedPathStr.empty() == false)
-	{
-		std::string::value_type lastLetter = theFixedPathStr[theFixedPathStr.size()-1];
-		if((lastLetter == '/' || lastLetter == '\\') == false)
-			theFixedPathStr.push_back(kFmiDirectorySeparator);
 	}
 }
 
@@ -334,6 +386,8 @@ void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpac
 	::FixPathEndWithSeparator(itsCacheDirectory);
 	itsCacheTmpDirectory = NFmiSettings::Require<std::string>(itsBaseNameSpace + "::CacheTmpDirectory");
 	::FixPathEndWithSeparator(itsCacheTmpDirectory);
+	itsCachePartialDataDirectory = NFmiSettings::Require<std::string>(itsBaseNameSpace + "::CachePartialDataDirectory");
+	::FixPathEndWithSeparator(itsCachePartialDataDirectory);
 	itsCacheTmpFileNameFix = NFmiSettings::Require<std::string>(itsBaseNameSpace + "::CacheTmpFileNameFix");
 	fUseQueryDataCache = NFmiSettings::Require<bool>(itsBaseNameSpace + "::UseQueryDataCache");
 
@@ -368,6 +422,7 @@ void NFmiHelpDataInfoSystem::StoreToSettings(void)
 		// HUOM! tässä on toistaiseksi vain cacheen liittyvien muutosten talletukset
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheDirectory"), itsCacheDirectory);
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheTmpDirectory"), itsCacheTmpDirectory);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CachePartialDataDirectory"), itsCachePartialDataDirectory);
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheTmpFileNameFix"), itsCacheTmpFileNameFix);
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::UseQueryDataCache"), NFmiStringTools::Convert(fUseQueryDataCache));
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::DoCeanCache"), NFmiStringTools::Convert(fDoCeanCache));

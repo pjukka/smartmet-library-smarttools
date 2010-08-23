@@ -29,7 +29,7 @@ public:
 	~NFmiHelpDataInfo(void)
 	{Clear();}
 
-	void InitFromSettings(const std::string &theBaseKey, const std::string &theName);
+	void InitFromSettings(const std::string &theBaseKey, const std::string &theName, const NFmiHelpDataInfoSystem &theHelpDataSystem);
 	// void StoreToSettings(void);  // HUOM! ei toteuteta ainakaan vielä talletusta
 
 	NFmiHelpDataInfo& operator=(const NFmiHelpDataInfo &theOther);
@@ -71,10 +71,13 @@ public:
 	bool MakeSoundingIndexData(void) const {return fMakeSoundingIndexData;}
 	void MakeSoundingIndexData(bool newValue) {fMakeSoundingIndexData = newValue;}
 
+	const std::string& PartialDataCacheFileNameFilter(void) const {return itsPartialDataCacheFileNameFilter;}
+	void PartialDataCacheFileNameFilter(const std::string &newValue) {itsPartialDataCacheFileNameFilter = newValue;}
 private:
 
 	std::string itsName; // tällä nimellä erotetaan konffi-tiedostoissa eri datat
 	std::string itsFileNameFilter; // tiedostonimi filtteri polun kera esim. d:\weto\wrk\data\in\data_1_*.sqd
+	std::string itsPartialDataCacheFileNameFilter; // cachen käyttö ja partial-datat ovat oma lukunsa ja niitä varten pitää tehdä filefiltteri
 	bool fForceFileFilterName; // jos tämä on erikoistilanteissa asetettu true:ksi, ei välitetä mahdillisista cachen käytöistä, vaan UsedFilefilter-metodi palauttaa itsFileNameFilter:in arvon
 	std::string itsLatestFileName; // kun filtterillä on haettu tiedostot ja uusin on löytynyt, talletetaan se tähän
 	NFmiInfoData::Type itsDataType; // esim. analyysi, havainto jne.
@@ -118,6 +121,7 @@ public:
 	,itsCacheMediumFileSizeMB(40)
 	,itsCacheLargeFileSizeMB(200)
 	,itsCacheMaximumFileSizeMB(10000)
+	,itsCachePartialDataDirectory()
 	,itsBaseNameSpace()
 	{}
 
@@ -161,7 +165,8 @@ public:
 	void CacheLargeFileSizeMB(double newValue) {itsCacheLargeFileSizeMB = newValue;}
 	double CacheMaximumFileSizeMB(void) const {return itsCacheMaximumFileSizeMB;}
 	void CacheMaximumFileSizeMB(double newValue) {itsCacheMaximumFileSizeMB = newValue;}
-
+	const std::string& CachePartialDataDirectory(void) const {return itsCachePartialDataDirectory;}
+	void CachePartialDataDirectory(const std::string &newValue) {itsCachePartialDataDirectory = newValue;}
 private:
 	void InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos);
 	bool IsSameTypeProjections(const NFmiArea *theFirst, const NFmiArea *theSecond);
@@ -176,6 +181,7 @@ private:
 	std::string itsCacheTmpDirectory; // qdatat kopioidaan ensin tähän hakemistoon tmp-nimellä ja lopuksi renametaan 
 									  // oiekaan hakemistoon oikealla nimellä
 									  // HUOM!! että tmp-file rename toimisi ns 'atomisesti', on hakemistojen oltava samalla levypartitiolla!!!
+	std::string itsCachePartialDataDirectory; // combineData-threadin käyttämät datat kopioidaan tänne cacheen
 	std::string itsCacheTmpFileNameFix; // tämä name fix lisätään tmp tiedosto nimen alkuun ja loppuun
 	bool fUseQueryDataCache; // onko cachetus systeemi päällä vai ei?
 	bool fDoCeanCache; // siivotaanko cachea vai ei
