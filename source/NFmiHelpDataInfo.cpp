@@ -197,7 +197,7 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 		itsCombineDataPathAndFileName = NFmiSettings::Optional<string>(itsBaseNameSpace + "::CombineDataPathAndFileName", "");
 		itsCombineDataMaxTimeSteps = NFmiSettings::Optional<int>(itsBaseNameSpace + "::CombineDataMaxTimeSteps", 0);
 		fMakeSoundingIndexData = NFmiSettings::Optional<bool>(itsBaseNameSpace + "::MakeSoundingIndexData", false);
-		if(itsCombineDataPathAndFileName.empty() == false)
+		if(IsCombineData())
 			::MakeCombinedDataFilePattern(*this, theHelpDataSystem);
 
 		std::string imageProjectionKey(itsBaseNameSpace + "::ImageProjection");

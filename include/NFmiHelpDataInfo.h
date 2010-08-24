@@ -35,6 +35,7 @@ public:
 	NFmiHelpDataInfo& operator=(const NFmiHelpDataInfo &theOther);
 	void Clear(void);
 
+	bool IsCombineData(void) const {return itsCombineDataPathAndFileName.empty() == false;}
 	const std::string& Name(void) const {return itsName;}
 	void Name(const std::string &newValue) {itsName = newValue;}
 	const std::string& FileNameFilter(void) const {return itsFileNameFilter;}
