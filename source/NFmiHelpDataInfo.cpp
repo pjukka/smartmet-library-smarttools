@@ -440,6 +440,7 @@ void NFmiHelpDataInfoSystem::InitSettings(const NFmiHelpDataInfoSystem &theOther
 {
 	this->itsCacheDirectory = theOther.itsCacheDirectory;
 	this->itsCacheTmpDirectory = theOther.itsCacheTmpDirectory;
+	this->itsCachePartialDataDirectory = theOther.itsCachePartialDataDirectory;
 	this->itsCacheTmpFileNameFix = theOther.itsCacheTmpFileNameFix;
 	this->fUseQueryDataCache = theOther.fUseQueryDataCache;
 	this->fDoCeanCache = theOther.fDoCeanCache;
