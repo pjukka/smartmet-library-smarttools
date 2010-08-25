@@ -116,7 +116,7 @@ public:
 	,itsCacheTmpDirectory()
 	,itsCacheTmpFileNameFix()
 	,fUseQueryDataCache(false)
-	,fDoCeanCache(false)
+	,fDoCleanCache(false)
 	,itsCacheFileKeepMaxDays(-1)
 	,itsCacheMaxFilesPerPattern(-1)
 	,itsCacheMediumFileSizeMB(40)
@@ -154,8 +154,8 @@ public:
 	void CacheTmpFileNameFix(const std::string &newValue) {itsCacheTmpFileNameFix = newValue;}
 	bool UseQueryDataCache(void) const {return fUseQueryDataCache;}
 	void UseQueryDataCache(bool newvalue) {fUseQueryDataCache = newvalue;}
-	bool DoCeanCache(void) const {return fDoCeanCache;}
-	void DoCeanCache(bool newValue) {fDoCeanCache = newValue;}
+	bool DoCleanCache(void) const {return fDoCleanCache;}
+	void DoCleanCache(bool newValue) {fDoCleanCache = newValue;}
 	float CacheFileKeepMaxDays(void) const {return itsCacheFileKeepMaxDays;}
 	void CacheFileKeepMaxDays(float newValue) {itsCacheFileKeepMaxDays = newValue;}
 	int CacheMaxFilesPerPattern(void) const {return itsCacheMaxFilesPerPattern;}
@@ -185,7 +185,7 @@ private:
 	std::string itsCachePartialDataDirectory; // combineData-threadin k‰ytt‰m‰t datat kopioidaan t‰nne cacheen
 	std::string itsCacheTmpFileNameFix; // t‰m‰ name fix lis‰t‰‰n tmp tiedosto nimen alkuun ja loppuun
 	bool fUseQueryDataCache; // onko cachetus systeemi p‰‰ll‰ vai ei?
-	bool fDoCeanCache; // siivotaanko cachea vai ei
+	bool fDoCleanCache; // siivotaanko cachea vai ei
 	float itsCacheFileKeepMaxDays; // kuinka vanhat tiedostot ainakin siivotaan pois (esim. 1.5 on 1.5 p‰iv‰‰ eli 36 tuntia) jos luku on <= 0 ei t‰t‰ k‰ytet‰
 	int itsCacheMaxFilesPerPattern; // kuinka monta tiedostoa maksimissaan pidet‰‰n kutakin tiedosto patternia kohden, jos luku <= 0, ei t‰t‰ k‰ytet‰
 

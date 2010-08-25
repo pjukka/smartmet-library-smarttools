@@ -391,7 +391,7 @@ void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpac
 	itsCacheTmpFileNameFix = NFmiSettings::Require<std::string>(itsBaseNameSpace + "::CacheTmpFileNameFix");
 	fUseQueryDataCache = NFmiSettings::Require<bool>(itsBaseNameSpace + "::UseQueryDataCache");
 
-	fDoCeanCache = NFmiSettings::Require<bool>(itsBaseNameSpace + "::DoCeanCache");
+	fDoCleanCache = NFmiSettings::Require<bool>(itsBaseNameSpace + "::DoCleanCache");
 	itsCacheFileKeepMaxDays = NFmiSettings::Require<float>(itsBaseNameSpace + "::CacheFileKeepMaxDays");
 	itsCacheMaxFilesPerPattern = NFmiSettings::Require<int>(itsBaseNameSpace + "::CacheMaxFilesPerPattern");
 
@@ -425,7 +425,7 @@ void NFmiHelpDataInfoSystem::StoreToSettings(void)
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CachePartialDataDirectory"), itsCachePartialDataDirectory);
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheTmpFileNameFix"), itsCacheTmpFileNameFix);
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::UseQueryDataCache"), NFmiStringTools::Convert(fUseQueryDataCache));
-		NFmiSettings::Set(std::string(itsBaseNameSpace + "::DoCeanCache"), NFmiStringTools::Convert(fDoCeanCache));
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::DoCleanCache"), NFmiStringTools::Convert(fDoCleanCache));
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheFileKeepMaxDays"), NFmiStringTools::Convert(itsCacheFileKeepMaxDays));
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheMaxFilesPerPattern"), NFmiStringTools::Convert(itsCacheMaxFilesPerPattern));
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheMediumFileSizeMB"), NFmiStringTools::Convert(itsCacheMediumFileSizeMB));
@@ -443,7 +443,7 @@ void NFmiHelpDataInfoSystem::InitSettings(const NFmiHelpDataInfoSystem &theOther
 	this->itsCachePartialDataDirectory = theOther.itsCachePartialDataDirectory;
 	this->itsCacheTmpFileNameFix = theOther.itsCacheTmpFileNameFix;
 	this->fUseQueryDataCache = theOther.fUseQueryDataCache;
-	this->fDoCeanCache = theOther.fDoCeanCache;
+	this->fDoCleanCache = theOther.fDoCleanCache;
 	this->itsCacheFileKeepMaxDays = theOther.itsCacheFileKeepMaxDays;
 	this->itsCacheMaxFilesPerPattern = theOther.itsCacheMaxFilesPerPattern;
 	this->itsBaseNameSpace = theOther.itsBaseNameSpace;
