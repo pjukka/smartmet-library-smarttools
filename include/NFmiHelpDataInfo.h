@@ -71,6 +71,8 @@ public:
 	void CombineDataMaxTimeSteps(int newValue) {itsCombineDataMaxTimeSteps = newValue;}
 	bool MakeSoundingIndexData(void) const {return fMakeSoundingIndexData;}
 	void MakeSoundingIndexData(bool newValue) {fMakeSoundingIndexData = newValue;}
+	bool ForceFileFilterName(void) const {return fForceFileFilterName;}
+	void ForceFileFilterName(bool newValue) {fForceFileFilterName = newValue;}
 
 	const std::string& PartialDataCacheFileNameFilter(void) const {return itsPartialDataCacheFileNameFilter;}
 	void PartialDataCacheFileNameFilter(const std::string &newValue) {itsPartialDataCacheFileNameFilter = newValue;}
@@ -169,7 +171,7 @@ public:
 	const std::string& CachePartialDataDirectory(void) const {return itsCachePartialDataDirectory;}
 	void CachePartialDataDirectory(const std::string &newValue) {itsCachePartialDataDirectory = newValue;}
 private:
-	void InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos);
+	void InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos, bool fStaticData);
 	bool IsSameTypeProjections(const NFmiArea *theFirst, const NFmiArea *theSecond);
 
 	checkedVector<NFmiHelpDataInfo> itsDynamicHelpDataInfos; // tähän tulee jatkuvasti päivitettävät datat kuten havainnot, tutka ja analyysi datat

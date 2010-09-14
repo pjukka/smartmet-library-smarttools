@@ -367,7 +367,7 @@ void NFmiHelpDataInfoSystem::AddStatic(const NFmiHelpDataInfo &theInfo)
 	itsStaticHelpDataInfos.push_back(theInfo);
 }
 
-void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos)
+void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos, bool fStaticData)
 {
 	std::vector<std::string> dataKeys = NFmiSettings::ListChildren(theBaseKey);
 	std::vector<std::string>::iterator iter = dataKeys.begin();
@@ -375,6 +375,8 @@ void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey, checked
 	{
 		NFmiHelpDataInfo hdi;
 		hdi.InitFromSettings(theBaseKey, *iter, *this);
+		if(fStaticData)
+			hdi.ForceFileFilterName(true); // varmistetaan ett‰ staattisia datoja ei yritet‰ lukea lokaali cachesta
 		theHelpDataInfos.push_back(hdi);
 	}
 }
@@ -400,10 +402,10 @@ void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpac
 	itsCacheMaximumFileSizeMB = NFmiSettings::Require<double>(itsBaseNameSpace + "::CacheMaximumFileSizeMB");
 
 	// Read static helpdata configurations
-	InitDataType(itsBaseNameSpace + "::Static", itsStaticHelpDataInfos);
+	InitDataType(itsBaseNameSpace + "::Static", itsStaticHelpDataInfos, true);
 
 	// Read dynamic helpdata configurations
-	InitDataType(itsBaseNameSpace + "::Dynamic", itsDynamicHelpDataInfos);
+	InitDataType(itsBaseNameSpace + "::Dynamic", itsDynamicHelpDataInfos, false);
 
 	// Lis‰t‰‰n help editor mode datan luku jos niin on haluttu
 	if(theHelpEditorFileNameFilter.empty() == false)
