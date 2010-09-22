@@ -13,8 +13,9 @@
 #include "NFmiMetTime.h"
 #include "NFmiLocation.h"
 #include "NFmiParameterName.h"
-#include "NFmiDataMatrix.h"
 #include "NFmiSoundingData.h"
+
+#include <deque>
 
 class NFmiFastQueryInfo;
 
@@ -68,7 +69,7 @@ public:
 	static bool HasRealSoundingData(NFmiFastQueryInfo &theSoundingLevelInfo);
 
 	// FillSoundingData-metodeilla täytetään kunkin parametrin vektorit ja tällä saa haluamansa parametrin vektorin käyttöön
-	checkedVector<float>& GetParamData(FmiParameterName theId);
+	std::deque<float>& GetParamData(FmiParameterName theId);
 	const NFmiLocation& Location(void) const {return itsLocation;}
 	void Location(const NFmiLocation &newValue) {itsLocation = newValue;}
 	const NFmiMetTime& Time(void) const {return itsTime;}
@@ -145,16 +146,16 @@ private:
 
 	// TODO Laita käyttämään NFmiDataMatrix-luokkaa dynaamista datalistaa varten. Laita myös
 	// param-lista (joka annetaan fillData-metodeissa) data osaksi
-	checkedVector<float> itsTemperatureData;
-	checkedVector<float> itsDewPointData;
-	checkedVector<float> itsHumidityData;
-	checkedVector<float> itsPressureData;
-	checkedVector<float> itsGeomHeightData; // tämä on korkeus dataa metreissä
-	checkedVector<float> itsWindSpeedData;
-	checkedVector<float> itsWindDirectionData;
-	checkedVector<float> itsWindComponentUData;
-	checkedVector<float> itsWindComponentVData;
-	checkedVector<float> itsWindVectorData;
+	std::deque<float> itsTemperatureData;
+	std::deque<float> itsDewPointData;
+	std::deque<float> itsHumidityData;
+	std::deque<float> itsPressureData;
+	std::deque<float> itsGeomHeightData; // tämä on korkeus dataa metreissä
+	std::deque<float> itsWindSpeedData;
+	std::deque<float> itsWindDirectionData;
+	std::deque<float> itsWindComponentUData;
+	std::deque<float> itsWindComponentVData;
+	std::deque<float> itsWindVectorData;
 
 	float itsZeroHeight; // tältä korkeudelta alkaa luotauksen 0-korkeus, eli vuoristossa luotaus alkaa oikeasti korkeammalta ja se korkeus pitää käsitellä pintakorkeutena
 	int itsZeroHeightIndex; // edellisen indeksi (paikka vektorissa). Arvo on -1 jos ei löytynyt kunnollista 0-korkeutta

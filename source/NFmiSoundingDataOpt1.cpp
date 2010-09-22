@@ -21,9 +21,9 @@ bool NFmiSoundingDataOpt1::GetTandTdValuesFromNearestPressureLevel(double P, dou
 {
 	if(P != kFloatMissing)
 	{
-		checkedVector<float>&pV = GetParamData(kFmiPressure);
-		checkedVector<float>&tV = GetParamData(kFmiTemperature);
-		checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
+		std::deque<float>&pV = GetParamData(kFmiPressure);
+		std::deque<float>&tV = GetParamData(kFmiTemperature);
+		std::deque<float>&tdV = GetParamData(kFmiDewPoint);
 		if(pV.size() > 0) // oletus ett‰ parV on saman kokoinen kuin pV -vektori
 		{
 			double minDiffP = 999999;
@@ -62,11 +62,11 @@ bool NFmiSoundingDataOpt1::SetValueToPressureLevel(float P, float theParamValue,
 {
 	if(P != kFloatMissing)
 	{
-		checkedVector<float>&pV = GetParamData(kFmiPressure);
-		checkedVector<float>&parV = GetParamData(theId);
+		std::deque<float>&pV = GetParamData(kFmiPressure);
+		std::deque<float>&parV = GetParamData(theId);
 		if(pV.size() > 0) // oletus ett‰ parV on saman kokoinen kuin pV -vektori
 		{
-			checkedVector<float>::iterator it = std::find(pV.begin(), pV.end(), P);
+			std::deque<float>::iterator it = std::find(pV.begin(), pV.end(), P);
 			if(it != pV.end())
 			{
 				int index = static_cast<int>(std::distance(pV.begin(), it));
@@ -80,8 +80,8 @@ bool NFmiSoundingDataOpt1::SetValueToPressureLevel(float P, float theParamValue,
 
 void NFmiSoundingDataOpt1::SetTandTdSurfaceValues(float T, float Td)
 {
-	checkedVector<float>&tV = GetParamData(kFmiTemperature);
-	checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
+	std::deque<float>&tV = GetParamData(kFmiTemperature);
+	std::deque<float>&tdV = GetParamData(kFmiDewPoint);
 	tV[0] = T;
 	tdV[0] = Td;
 }
@@ -93,8 +93,8 @@ float NFmiSoundingDataOpt1::GetPressureAtHeight(double H)
 		return kFloatMissing;
 
 	double maxDiffInH = 100; // jos ei voi interpoloida, pit‰‰ lˆydetyn arvon olla v‰hint‰in n‰in l‰hell‰, ett‰ hyv‰ksyt‰‰n
-	checkedVector<float>&pV = GetParamData(kFmiPressure);
-	checkedVector<float>&hV = GetParamData(kFmiGeomHeight);
+	std::deque<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&hV = GetParamData(kFmiGeomHeight);
 	float value = kFloatMissing;
 	if(hV.size() > 0 && pV.size() == hV.size())
 	{
@@ -155,9 +155,9 @@ bool NFmiSoundingDataOpt1::IsSameSounding(const NFmiSoundingDataOpt1 &theOtherSo
 // eiv‰t ole puuttuvia. Haetaan alhaalta ylˆs p‰in arvoja
 bool NFmiSoundingDataOpt1::GetLowestNonMissingValues(float &H, float &U, float &V)
 {
-	checkedVector<float>&hV = GetParamData(kFmiGeomHeight);
-	checkedVector<float>&uV = GetParamData(kFmiWindUMS);
-	checkedVector<float>&vV = GetParamData(kFmiWindVMS);
+	std::deque<float>&hV = GetParamData(kFmiGeomHeight);
+	std::deque<float>&uV = GetParamData(kFmiWindUMS);
+	std::deque<float>&vV = GetParamData(kFmiWindVMS);
 	if(hV.size() > 0 && hV.size() == uV.size() && hV.size() == vV.size())
 	{
 		for(int i=0; i<static_cast<int>(hV.size()); i++)
@@ -190,8 +190,8 @@ float NFmiSoundingDataOpt1::GetValueAtPressure(FmiParameterName theId, float P)
 	if(P == kFloatMissing)
 		return kFloatMissing;
 
-	checkedVector<float>&pV = GetParamData(kFmiPressure);
-	checkedVector<float>&paramV = GetParamData(theId);
+	std::deque<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&paramV = GetParamData(theId);
 	float value = kFloatMissing;
 	if(paramV.size() > 0 && pV.size() == paramV.size())
 	{
@@ -249,7 +249,7 @@ bool NFmiSoundingDataOpt1::CalcAvgWindComponentValues(double fromZ, double toZ, 
 {
 	u = kFloatMissing;
 	v = kFloatMissing;
-	checkedVector<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&pV = GetParamData(kFmiPressure);
 	if(pV.size() > 0)
 	{
 		double hStep = 100; // k‰yd‰‰n dataa l‰pi 100 metrin v‰lein
@@ -277,8 +277,8 @@ bool NFmiSoundingDataOpt1::CalcAvgWindComponentValues(double fromZ, double toZ, 
 float NFmiSoundingDataOpt1::FindPressureWhereHighestValue(FmiParameterName theId, float theMaxP, float theMinP)
 {
 	float maxValuePressure = kFloatMissing;
-	checkedVector<float>&pV = GetParamData(kFmiPressure);
-	checkedVector<float>&paramV = GetParamData(theId);
+	std::deque<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&paramV = GetParamData(theId);
 	if(pV.size() > 0)
 	{
 		float maxValue = -99999999.f;
@@ -315,9 +315,9 @@ bool NFmiSoundingDataOpt1::FindHighestThetaE(double &T, double &Td, double &P, d
 	Td = kFloatMissing;
 	P = kFloatMissing;
 	theMaxThetaE = kFloatMissing;
-	checkedVector<float>&pV = GetParamData(kFmiPressure);
-	checkedVector<float>&tV = GetParamData(kFmiTemperature);
-	checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
+	std::deque<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&tV = GetParamData(kFmiTemperature);
+	std::deque<float>&tdV = GetParamData(kFmiDewPoint);
 	if(pV.size() > 0)
 	{
 		theMaxThetaE = -99999999;
@@ -360,9 +360,9 @@ bool NFmiSoundingDataOpt1::CalcLCLAvgValues(double fromZ, double toZ, double &T,
 	T = kFloatMissing;
 	Td = kFloatMissing;
 	P = kFloatMissing;
-	checkedVector<float>&pV = GetParamData(kFmiPressure);
-	checkedVector<float>&tV = GetParamData(kFmiTemperature);
-	checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
+	std::deque<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&tV = GetParamData(kFmiTemperature);
+	std::deque<float>&tdV = GetParamData(kFmiDewPoint);
 	if(pV.size() > 0)
 	{
 		for(unsigned int i=0; i<pV.size(); i++)
@@ -420,9 +420,9 @@ bool NFmiSoundingDataOpt1::CalcLCLAvgValues(double fromZ, double toZ, double &T,
 // OLETUS: maanpinta arvot ovat vektorin alussa, pit‰isi tarkistaa??
 bool NFmiSoundingDataOpt1::GetValuesStartingLookingFromPressureLevel(double &T, double &Td, double &P)
 {
-	checkedVector<float>&pV = GetParamData(kFmiPressure);
-	checkedVector<float>&tV = GetParamData(kFmiTemperature);
-	checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
+	std::deque<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&tV = GetParamData(kFmiTemperature);
+	std::deque<float>&tdV = GetParamData(kFmiDewPoint);
 	if(pV.size() > 0)
 	{
 		for(unsigned int i=0; i<pV.size(); i++)
@@ -448,7 +448,7 @@ bool NFmiSoundingDataOpt1::FillParamData(NFmiFastQueryInfo* theInfo, FmiParamete
 {
 	try
 	{
-		checkedVector<float>&data = GetParamData(theId);
+		std::deque<float>&data = GetParamData(theId);
 		data.resize(theInfo->SizeLevels(), kFloatMissing); // alustetaan vektori puuttuvalla
 		bool paramFound = theInfo->Param(theId);
 		if(paramFound == false && theId == kFmiDewPoint)
@@ -477,7 +477,7 @@ bool NFmiSoundingDataOpt1::FillParamData(NFmiFastQueryInfo* theInfo, FmiParamete
 bool NFmiSoundingDataOpt1::FastFillParamData(NFmiFastQueryInfo* theInfo, FmiParameterName theId)
 {
 	bool status = false;
-	checkedVector<float>&data = GetParamData(theId);
+	std::deque<float>&data = GetParamData(theId);
 	data.resize(theInfo->SizeLevels(), kFloatMissing); // alustetaan vektori puuttuvalla
 	if(theInfo->Param(theId))
 	{
@@ -527,7 +527,7 @@ bool NFmiSoundingDataOpt1::FastFillParamData(NFmiFastQueryInfo* theInfo, FmiPara
 bool NFmiSoundingDataOpt1::FillParamData(NFmiFastQueryInfo* theInfo, FmiParameterName theId, const NFmiMetTime& theTime, const NFmiPoint& theLatlon)
 {
 	bool status = false;
-	checkedVector<float>&data = GetParamData(theId);
+	std::deque<float>&data = GetParamData(theId);
 	data.resize(theInfo->SizeLevels(), kFloatMissing); // alustetaan vektori puuttuvalla
 	if(theInfo->Param(theId))
 	{
@@ -576,8 +576,8 @@ bool NFmiSoundingDataOpt1::FillParamData(NFmiFastQueryInfo* theInfo, FmiParamete
 
 unsigned int NFmiSoundingDataOpt1::GetHighestNonMissingValueLevelIndex(FmiParameterName theParaId)
 {
-	checkedVector<float> &vec = GetParamData(theParaId);
-	checkedVector<float>::size_type ssize = vec.size();
+	std::deque<float> &vec = GetParamData(theParaId);
+	std::deque<float>::size_type ssize = vec.size();
 	unsigned int index = 0;
 	for(unsigned int i = 0; i < ssize; i++)
 		if(vec[i] != kFloatMissing)
@@ -887,6 +887,26 @@ void NFmiSoundingDataOpt1::FixPressureDataSoundingWithGroundData(NFmiFastQueryIn
 
 							break;
 						}
+						else if(i == 0)
+						{ 
+							// t‰m‰ voi k‰yd‰ esim. hybridi datan kanssa, eli hybridi luotaukseen lis‰t‰‰n alkuun pinta arvot
+							itsZeroHeightIndex = 0;
+							itsZeroHeight = 2;
+
+							itsGeomHeightData.push_front(2); // Oletus: pinta data on 2 metrin korkeudella
+							itsPressureData.push_front(groundStationPressure);
+							itsTemperatureData.push_front(groundT);
+							itsDewPointData.push_front(groundTd);
+							itsWindSpeedData.push_front(groundWS);
+							itsWindDirectionData.push_front(groundWD);
+							itsWindVectorData.push_front(groundWv);
+							itsWindComponentUData.push_front(groundU);
+							itsWindComponentVData.push_front(groundV);
+							itsHumidityData.push_front(groundRH);
+
+							break;
+						}
+
 					}
 				}
 			}
@@ -938,9 +958,9 @@ void NFmiSoundingDataOpt1::InitZeroHeight(void)
 	}
 }
 
-checkedVector<float>& NFmiSoundingDataOpt1::GetParamData(FmiParameterName theId)
+std::deque<float>& NFmiSoundingDataOpt1::GetParamData(FmiParameterName theId)
 {
-	static checkedVector<float> dummy;
+	static std::deque<float> dummy;
 	switch(theId)
 	{
 	case kFmiTemperature:
@@ -972,16 +992,16 @@ checkedVector<float>& NFmiSoundingDataOpt1::GetParamData(FmiParameterName theId)
 
 void NFmiSoundingDataOpt1::ClearDatas(void)
 {
-	checkedVector<float>().swap(itsTemperatureData);
-	checkedVector<float>().swap(itsDewPointData);
-	checkedVector<float>().swap(itsHumidityData);
-	checkedVector<float>().swap(itsPressureData);
-	checkedVector<float>().swap(itsGeomHeightData);
-	checkedVector<float>().swap(itsWindSpeedData);
-	checkedVector<float>().swap(itsWindDirectionData);
-	checkedVector<float>().swap(itsWindComponentUData);
-	checkedVector<float>().swap(itsWindComponentVData);
-	checkedVector<float>().swap(itsWindVectorData);
+	std::deque<float>().swap(itsTemperatureData);
+	std::deque<float>().swap(itsDewPointData);
+	std::deque<float>().swap(itsHumidityData);
+	std::deque<float>().swap(itsPressureData);
+	std::deque<float>().swap(itsGeomHeightData);
+	std::deque<float>().swap(itsWindSpeedData);
+	std::deque<float>().swap(itsWindDirectionData);
+	std::deque<float>().swap(itsWindComponentUData);
+	std::deque<float>().swap(itsWindComponentVData);
+	std::deque<float>().swap(itsWindVectorData);
 
 	fPressureDataAvailable = false;
 	fHeightDataAvailable = false;
@@ -993,8 +1013,8 @@ bool NFmiSoundingDataOpt1::ModifyT2DryAdiapaticBelowGivenP(double P, double T)
 	if(P == kFloatMissing || T == kFloatMissing)
 		return false;
 
-	checkedVector<float>&pV = GetParamData(kFmiPressure);
-	checkedVector<float>&tV = GetParamData(kFmiTemperature);
+	std::deque<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&tV = GetParamData(kFmiTemperature);
 	if(pV.size() > 0 && pV.size() == tV.size())
 	{
 		unsigned int ssize = static_cast<unsigned int>(pV.size());
@@ -1021,9 +1041,9 @@ bool NFmiSoundingDataOpt1::ModifyTd2MixingRatioBelowGivenP(double P, double T, d
 	if(P == kFloatMissing || Td == kFloatMissing)
 		return false;
 
-	checkedVector<float>&pV = GetParamData(kFmiPressure);
-	checkedVector<float>&tV = GetParamData(kFmiTemperature);
-	checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
+	std::deque<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&tV = GetParamData(kFmiTemperature);
+	std::deque<float>&tdV = GetParamData(kFmiDewPoint);
 	if(pV.size() > 0 && pV.size() == tV.size() && pV.size() == tdV.size())
 	{
 		unsigned int ssize = static_cast<unsigned int>(pV.size());
@@ -1050,8 +1070,8 @@ bool NFmiSoundingDataOpt1::ModifyTd2MoistAdiapaticBelowGivenP(double P, double T
 	if(P == kFloatMissing || Td == kFloatMissing)
 		return false;
 
-	checkedVector<float>&pV = GetParamData(kFmiPressure);
-	checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
+	std::deque<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&tdV = GetParamData(kFmiDewPoint);
 	if(pV.size() > 0 && pV.size() == tdV.size())
 	{
 		unsigned int ssize = static_cast<unsigned int>(pV.size());
@@ -1103,8 +1123,8 @@ bool NFmiSoundingDataOpt1::Add2ParamAtNearestP(float P, FmiParameterName parId, 
 	if(P == kFloatMissing)
 		return false;
 
-	checkedVector<float>&pV = GetParamData(kFmiPressure);
-	checkedVector<float>&paramV = GetParamData(parId);
+	std::deque<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&paramV = GetParamData(parId);
 	if(pV.size() > 0 && pV.size() == paramV.size())
 	{
 		float currentP = kFloatMissing;
@@ -1170,10 +1190,10 @@ static float CalcV(float WS, float WD)
 
 void NFmiSoundingDataOpt1::UpdateUandVParams(void)
 {
-	checkedVector<float>&wsV = GetParamData(kFmiWindSpeedMS);
-	checkedVector<float>&wdV = GetParamData(kFmiWindDirection);
-	checkedVector<float>&uV = GetParamData(kFmiWindUMS);
-	checkedVector<float>&vV = GetParamData(kFmiWindVMS);
+	std::deque<float>&wsV = GetParamData(kFmiWindSpeedMS);
+	std::deque<float>&wdV = GetParamData(kFmiWindDirection);
+	std::deque<float>&uV = GetParamData(kFmiWindUMS);
+	std::deque<float>&vV = GetParamData(kFmiWindVMS);
 	if(wsV.size() > 0 && wsV.size() == wdV.size() && wsV.size() == uV.size() && wsV.size() == vV.size())
 	{
 		unsigned int ssize = static_cast<unsigned int>(wsV.size());
@@ -1483,8 +1503,8 @@ double NFmiSoundingDataOpt1::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double 
 	// 2.1 first adiabatically till LCL and than moist adiabatically
 	// iterate with CalcTOfLiftedAirParcel from 500 m avg P to next sounding pressure level
 	// until T-parcel is warmer than T at that pressure level in sounding
-	checkedVector<float> &pValues = GetParamData(kFmiPressure);
-	checkedVector<float> &tValues = GetParamData(kFmiTemperature);
+	std::deque<float> &pValues = GetParamData(kFmiPressure);
+	std::deque<float> &tValues = GetParamData(kFmiTemperature);
 	size_t ssize = pValues.size();
 	double TofLiftedParcer_previous = kFloatMissing;
 	double P_previous = kFloatMissing;
@@ -1542,8 +1562,8 @@ double NFmiSoundingDataOpt1::CalcCAPE500Index(FmiLCLCalcType theLCLCalcType, dou
 	if(theHeightLimit != kFloatMissing)
 		theHeightLimit += ZeroHeight();
 
-	checkedVector<float> &pValues = GetParamData(kFmiPressure);
-	checkedVector<float> &tValues = GetParamData(kFmiTemperature);
+	std::deque<float> &pValues = GetParamData(kFmiPressure);
+	std::deque<float> &tValues = GetParamData(kFmiTemperature);
 	size_t ssize = pValues.size();
 	double CAPE = 0;
 	double g = 9.81; // acceleration by gravity
@@ -1590,8 +1610,8 @@ double NFmiSoundingDataOpt1::CalcCAPE_TT_Index(FmiLCLCalcType theLCLCalcType, do
 	if(!GetValuesNeededInLCLCalculations(theLCLCalcType, T, Td, P))
 		return kFloatMissing;
 
-	checkedVector<float> &pValues = GetParamData(kFmiPressure);
-	checkedVector<float> &tValues = GetParamData(kFmiTemperature);
+	std::deque<float> &pValues = GetParamData(kFmiPressure);
+	std::deque<float> &tValues = GetParamData(kFmiTemperature);
 	size_t ssize = pValues.size();
 	double CAPE = 0;
 	double g = 9.81; // acceleration by gravity
@@ -1639,8 +1659,8 @@ double NFmiSoundingDataOpt1::CalcCINIndex(FmiLCLCalcType theLCLCalcType)
 	if(!GetValuesNeededInLCLCalculations(theLCLCalcType, T, Td, P))
 		return kFloatMissing;
 
-	checkedVector<float> &pValues = GetParamData(kFmiPressure);
-	checkedVector<float> &tValues = GetParamData(kFmiTemperature);
+	std::deque<float> &pValues = GetParamData(kFmiPressure);
+	std::deque<float> &tValues = GetParamData(kFmiTemperature);
 	size_t ssize = pValues.size();
 	double CIN = 0;
 	double g = 9.81; // acceleration by gravity
@@ -1868,7 +1888,7 @@ NFmiString NFmiSoundingDataOpt1::Get_U_V_ID_IndexText(const NFmiString &theText,
 // HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
 double NFmiSoundingDataOpt1::CalcSRHIndex(double startH, double endH)
 {
-	checkedVector<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&pV = GetParamData(kFmiPressure);
 	if(pV.size() > 0)
 	{
 		// HUOM! Pit‰‰ ottaa huomioon aseman korkeus kun tehd‰‰n laskuja!!!!
@@ -1876,10 +1896,10 @@ double NFmiSoundingDataOpt1::CalcSRHIndex(double startH, double endH)
 		endH += ZeroHeight()/1000.; // zero height pit‰‰ muuttaa t‰ss‰ metreist‰ kilometreiksi!
 
 		size_t ssize = pV.size();
-		checkedVector<float>&uV = GetParamData(kFmiWindUMS);
-		checkedVector<float>&vV = GetParamData(kFmiWindVMS);
-		checkedVector<float>&tV = GetParamData(kFmiTemperature);
-		checkedVector<float>&tdV = GetParamData(kFmiDewPoint);
+		std::deque<float>&uV = GetParamData(kFmiWindUMS);
+		std::deque<float>&vV = GetParamData(kFmiWindVMS);
+		std::deque<float>&tV = GetParamData(kFmiTemperature);
+		std::deque<float>&tdV = GetParamData(kFmiDewPoint);
 
 		double u_ID = kFloatMissing;
 		double v_ID = kFloatMissing;
@@ -1967,10 +1987,10 @@ bool NFmiSoundingDataOpt1::GetTrValues(double &theTMinValue, double &theTMinPres
 {
 	theTMinValue = kFloatMissing;
 	theTMinPressure = kFloatMissing;
-	checkedVector<float>&Pvalues = GetParamData(kFmiPressure);
+	std::deque<float>&Pvalues = GetParamData(kFmiPressure);
 	if(Pvalues.size())
 	{
-		checkedVector<float>&Tvalues = GetParamData(kFmiTemperature);
+		std::deque<float>&Tvalues = GetParamData(kFmiTemperature);
 		for(size_t i = 0; i < Pvalues.size(); i++)
 		{
 			double P = Pvalues[i];
@@ -1998,10 +2018,10 @@ bool NFmiSoundingDataOpt1::GetMwValues(double &theMaxWsValue, double &theMaxWsPr
 {
 	theMaxWsValue = kFloatMissing;
 	theMaxWsPressure = kFloatMissing;
-	checkedVector<float>&Pvalues = GetParamData(kFmiPressure);
+	std::deque<float>&Pvalues = GetParamData(kFmiPressure);
 	if(Pvalues.size())
 	{
-		checkedVector<float>&WSvalues = GetParamData(kFmiWindSpeedMS);
+		std::deque<float>&WSvalues = GetParamData(kFmiWindSpeedMS);
 		for(size_t i = 0; i < Pvalues.size(); i++)
 		{
 			double P = Pvalues[i];
