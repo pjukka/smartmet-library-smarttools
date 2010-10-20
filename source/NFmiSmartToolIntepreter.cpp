@@ -290,7 +290,7 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlockVector(NFmiSma
 	NFmiSmartToolCalculationBlockInfo *block = new NFmiSmartToolCalculationBlockInfo;
 	try
 	{
-		for( ; fBlockFound = CheckoutPossibleNextCalculationBlock(block, false, safetyIndex); safetyIndex++)
+	  for( ; (fBlockFound = CheckoutPossibleNextCalculationBlock(block, false, safetyIndex)); safetyIndex++)
 		{
 			theBlockVector->Add(block);
 			block = 0;
