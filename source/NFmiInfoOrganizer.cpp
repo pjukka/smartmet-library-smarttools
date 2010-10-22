@@ -876,9 +876,9 @@ checkedVector<NFmiSmartInfo*> NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type the
 NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex)
 {
 	if(theDataType == NFmiInfoData::kEditable)
-		return EditedInfo();
+		return itsEditedData;
 	else if(theDataType == NFmiInfoData::kCopyOfEdited)
-		return EditedInfoCopy();
+		return itsEditedDataCopy;
 	else
 	{
 		int ind = 0;
