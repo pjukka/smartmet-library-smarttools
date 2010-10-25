@@ -1470,7 +1470,7 @@ FmiLevelType NFmiSmartToolIntepreter::GetLevelType(NFmiInfoData::Type theDataTyp
 	FmiLevelType levelType = kFmiPressureLevel; // default
 	if(theDataType == NFmiInfoData::kEditable)
 	{
-		NFmiSmartInfo *editedInfo = itsInfoOrganizer ? itsInfoOrganizer->EditedInfo() : 0;
+		NFmiSmartInfo *editedInfo = itsInfoOrganizer ? itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable) : 0;
 		if(editedInfo)
 		{
 			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )

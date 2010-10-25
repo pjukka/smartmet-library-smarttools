@@ -69,6 +69,8 @@ NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 ,itsCrossSectionMacroParamMissingValueMatrix()
 ,fCreateEditedDataCopy(true)
 {
+	NFmiLatLonArea defaultArea(NFmiPoint(0,0), NFmiPoint(50,50)); // tehd‰‰n vain dummy area, kun dataa piirret‰‰n ja lasketaan, halutun karttan‰ytˆn alue asetetaan NFmiEditMapGeneralDataDoc::MakeDrawedInfoVectorForMapView -metodissa 
+	UpdateSpecialDataArea(&defaultArea, itsMacroParamGridSize, NFmiInfoData::kMacroParam, &itsMacroParamData, itsMacroParamMissingValueMatrix);
 }
 
 // destruktori tuhoaa infot
@@ -105,9 +107,8 @@ bool NFmiInfoOrganizer::Init(const std::string &theDrawParamPath, bool createDra
  	return itsDrawParamFactory->Init();
 }
 
-NFmiSmartInfo* NFmiInfoOrganizer::GetSynopPlotParamInfo(bool& fSubParameter, NFmiInfoData::Type theType)
+NFmiSmartInfo* NFmiInfoOrganizer::GetSynopPlotParamInfo(NFmiInfoData::Type theType)
 {
-	fSubParameter = false;
 	if(theType == NFmiInfoData::kEditable)
 		return itsEditedData;
 	else
@@ -125,9 +126,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::GetSynopPlotParamInfo(bool& fSubParameter, NFm
 	return 0;
 }
 
-NFmiSmartInfo* NFmiInfoOrganizer::GetSoundingPlotParamInfo(bool& fSubParameter, NFmiInfoData::Type theType)
+NFmiSmartInfo* NFmiInfoOrganizer::GetSoundingPlotParamInfo(NFmiInfoData::Type theType)
 {
-	fSubParameter = false;
 	if(theType == NFmiInfoData::kEditable)
 		return itsEditedData;
 	else
@@ -145,75 +145,30 @@ NFmiSmartInfo* NFmiInfoOrganizer::GetSoundingPlotParamInfo(bool& fSubParameter, 
 	return 0;
 }
 
-//--------------------------------------------------------
-// Info
-//--------------------------------------------------------
-
-//  Palauttaa smartinfon pointterin, jossa on annettu parametri
-//  joko kokonaisena tai jonkin parametrin osaparametrina.
-//	Kysyt‰‰n ensimm‰isen‰ listassa olevalta infolta, onko infolla theParam
-//	suoraan. Jos milt‰‰n infolta ei suoraan saada theParam:a, tutkitaan
-//	lˆytyykˆ theParam aliparametrina (esim. pilvisyys voi lˆyty‰ parametrin
-//	kWeatherAndCloudiness aliparametrina). Periaatteessa theParam voisi lˆyty‰
-//	myˆs aliparametrin aliparametrilta jne - tutkittavia aliparametri-tasoja
-//	ei ole rajoitettu. T‰ss‰ metodissa tutkitaan vain parameri ja tarvittaessa
-//  parametrin aliparametri.
-
-//  22.02.1999 lis‰ttiin  tunnistin bool fSubParameter, josta saadaan tieto
-//  siit‰, oliko lˆydetty parametri itsen‰inen vaiko jonkin parametrin aliparametri.
-NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName & theParam
-									   , bool& fSubParameter
-									   , const NFmiLevel* theLevel
-									   , NFmiInfoData::Type theType)
+static bool CheckDataType(NFmiSmartInfo *theInfo, NFmiInfoData::Type theType)
 {
-  if(theParam == FmiParameterName(NFmiInfoData::kFmiSpSynoPlot) ||
-	 theParam == FmiParameterName(NFmiInfoData::kFmiSpMinMaxPlot)) // synop plot paramille pit‰‰ tehd‰ kikka (ja min/max plot 9996)
-		return GetSynopPlotParamInfo(fSubParameter, theType);
-	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pit‰‰ tehd‰ kikka
-		return GetSoundingPlotParamInfo(fSubParameter, theType);
-	if(theType == NFmiInfoData::kMacroParam || theType == NFmiInfoData::kQ3MacroParam) // macro- parametrit lasketaan t‰ll‰
-		return itsMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
-	if(theType == NFmiInfoData::kCrossSectionMacroParam)
-		return itsCrossSectionMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
-
 	bool anyDataOk = (theType == NFmiInfoData::kAnyData);
-	NFmiSmartInfo* aInfo = 0;
-	if(itsEditedData && (itsEditedData->DataType() == theType || anyDataOk) && itsEditedData->Param(theParam) && (!theLevel || (theLevel && itsEditedData->Level(*theLevel))))
-	{
-		fSubParameter = itsEditedData->UseSubParam();
-		aInfo = itsEditedData;
-	}
-	else if(itsEditedDataCopy && (itsEditedDataCopy->DataType() == theType || anyDataOk) && itsEditedDataCopy->Param(theParam) && (!theLevel || (theLevel && itsEditedDataCopy->Level(*theLevel))))
-	{
-		fSubParameter = itsEditedDataCopy->UseSubParam();
-		aInfo = itsEditedDataCopy;
-	}
-	else
-	{
-		NFmiPtrList<NFmiSmartInfo>::Iterator aIter = itsList.Start();
-		// tutkitaan ensin lˆytyykˆ theParam suoraan joltain listassa olevalta NFmiSmartInfo-pointterilta
-		while(aIter.Next())
-		{
-			aInfo = aIter.CurrentPtr();
-			if((aInfo->DataType() == theType  || anyDataOk) && aInfo->Param(theParam) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
-			{
-				if(theLevel == 0 && aInfo->SizeLevels() > 1) // en osaa nyt laittaa t‰t‰ ehtoa edell‰ olevaan if-lauseeseen, mutta pelkk‰ edellinen ei toimi, jos leveldata lˆytyy ennen pintadataa
-				{
-					aInfo = 0; // pit‰‰ aina t‰ss‰ nollata, muuten viimeisen j‰lkeen j‰‰ voimaan
-					continue;
-				}
-				fSubParameter = aInfo->UseSubParam();
-				break;
-			}
-			aInfo = 0; // pit‰‰ aina t‰ss‰ nollata, muuten viimeisen j‰lkeen j‰‰ voimaan
-		}
-	}
-	if(aInfo && aInfo->SizeLevels() == 1)
-		aInfo->FirstLevel();
-	return aInfo; // theParam ei lˆytynyt edes aliparametrina milt‰‰n listassa olevalta aInfo-pointterilta
+	if(theInfo && (theInfo->DataType() == theType || anyDataOk))
+		return true;
+	return false;
 }
+
+static bool CheckDataIdent(NFmiSmartInfo *theInfo, const NFmiDataIdent& theDataIdent, bool fUseParIdOnly)
+{
+	if(theInfo && (fUseParIdOnly ? theInfo->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())): theInfo->Param(theDataIdent)))
+		return true;
+	return false;
+}
+
+static bool CheckLevel(NFmiSmartInfo *theInfo, const NFmiLevel *theLevel)
+{
+	if(theInfo && (!theLevel || (theLevel && theInfo->Level(*theLevel))))
+		return true;
+	return false;
+}
+
 //--------------------------------------------------------
-// Info
+// GetInfo
 // Yritin aluksi tehd‰ metodin k‰ytt‰m‰ll‰ parametria 
 // bool fIgnoreProducerName = false
 // siksi ett‰ voisi olla samalta tuottajalta useita samaantyyppisi‰
@@ -229,28 +184,26 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const FmiParameterName & theParam
 // oikea data ja palautetaan se.
 //
 //--------------------------------------------------------
-
-NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
-									   , bool& fSubParameter
+NFmiSmartInfo* NFmiInfoOrganizer::GetInfo(const NFmiDataIdent& theDataIdent
 									   , const NFmiLevel* theLevel
-									   , NFmiInfoData::Type theType)
+									   , NFmiInfoData::Type theType
+									   , bool fUseParIdOnly)
 {
 	NFmiSmartInfo *backupData = 0; // etsit‰‰ t‰h‰n 1. data joka muuten sopii kriteereihin, mutta 
 									// jonka tuottaja nimi on eri kuin haluttu. Jos oikealla nimell‰ ei lˆydy dataa, k‰ytet‰‰n t‰t‰.
 	if(theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpSynoPlot || theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpMinMaxPlot) // synop plot paramille pit‰‰ tehd‰ kikka (ja min/max plot 9996)
-		return GetSynopPlotParamInfo(fSubParameter, theType);
+		return GetSynopPlotParamInfo(theType);
 	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pit‰‰ tehd‰ kikka
-		return GetSoundingPlotParamInfo(fSubParameter, theType);
+		return GetSoundingPlotParamInfo(theType);
 	if(theType == NFmiInfoData::kMacroParam || theType == NFmiInfoData::kQ3MacroParam) // macro- parametrit lasketaan t‰ll‰
 		return itsMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType == NFmiInfoData::kCrossSectionMacroParam)
 		return itsCrossSectionMacroParamData; // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
-	bool anyDataOk = (theType == NFmiInfoData::kAnyData);
 	NFmiSmartInfo* foundData = 0;
-	if(itsEditedData && (itsEditedData->DataType() == theType || anyDataOk) && itsEditedData->Param(theDataIdent) && (!theLevel || (theLevel && itsEditedData->Level(*theLevel))))
+	if(::CheckDataType(itsEditedData, theType) && ::CheckDataIdent(itsEditedData, theDataIdent, fUseParIdOnly) && ::CheckLevel(itsEditedData, theLevel))
 		foundData = itsEditedData;
-	else if(itsEditedDataCopy && (itsEditedDataCopy->DataType() == theType || anyDataOk) && itsEditedDataCopy->Param(theDataIdent) && (!theLevel || (theLevel && itsEditedDataCopy->Level(*theLevel))))
+	else if(::CheckDataType(itsEditedDataCopy, theType) && ::CheckDataIdent(itsEditedDataCopy, theDataIdent, fUseParIdOnly) && ::CheckLevel(itsEditedDataCopy, theLevel))
 		foundData = itsEditedDataCopy;
 	else
 	{
@@ -258,7 +211,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 		for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 		{
 			NFmiSmartInfo *aInfo = &(iter.Current());
-			if((aInfo->DataType() == theType || anyDataOk) && aInfo->Param(theDataIdent) && (!theLevel || (theLevel && aInfo->Level(*theLevel))))
+			if(::CheckDataType(aInfo, theType) && ::CheckDataIdent(aInfo, theDataIdent, fUseParIdOnly) && ::CheckLevel(aInfo,theLevel))
 			{
 				if(!(theLevel == 0 && aInfo->SizeLevels() > 1))
 				{
@@ -278,7 +231,6 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 
 	if(foundData)
 	{
-		fSubParameter = foundData->UseSubParam();
 		if(foundData->SizeLevels() == 1)
 			foundData->FirstLevel();
 	}
@@ -290,16 +242,14 @@ NFmiSmartInfo* NFmiInfoOrganizer::Info ( const NFmiDataIdent& theDataIdent
 // HUOM! Tein t‰h‰n CrossSectionInfo-metodiin saman tuottaja nimi ohitus virityksen kuin
 // Info-metodiin. Ks. kommenttia sielt‰.
 NFmiSmartInfo* NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataIdent
-													, bool& fSubParameter
 													, NFmiInfoData::Type theType)
 {
 	if(theType == NFmiInfoData::kCrossSectionMacroParam)
 		return itsCrossSectionMacroParamData;
-	bool anyDataOk = (theType == NFmiInfoData::kAnyData || theType == NFmiInfoData::kEditable);
 	NFmiSmartInfo *backupData = 0; // etsit‰‰ t‰h‰n 1. data joka muuten sopii kriteereihin, mutta 
 									// jonka tuottaja nimi on eri kuin haluttu. Jos oikealla nimell‰ ei lˆydy dataa, k‰ytet‰‰n t‰t‰.
 	NFmiSmartInfo *foundData = 0;
-	if(itsEditedData && (itsEditedData->DataType() == theType || anyDataOk) && itsEditedData->SizeLevels() > 1 && itsEditedData->Param(static_cast<FmiParameterName>(theDataIdent.GetParam()->GetIdent())))
+	if(::CheckDataType(itsEditedData, theType) && itsEditedData->SizeLevels() > 1 && ::CheckDataIdent(itsEditedData, theDataIdent, true))
 		foundData = itsEditedData;
 	else
 	{
@@ -307,7 +257,7 @@ NFmiSmartInfo* NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataI
 		for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 		{
 			NFmiSmartInfo *aInfo = &(iter.Current());
-			if((aInfo->DataType() == theType || anyDataOk) && aInfo->SizeLevels() > 1 && aInfo->Param(theDataIdent))
+			if(::CheckDataType(aInfo, theType) && aInfo->SizeLevels() > 1 && ::CheckDataIdent(aInfo, theDataIdent, false))
 			{
 				if(theDataIdent.GetProducer()->GetName() == aInfo->Param().GetProducer()->GetName())
 				{
@@ -322,44 +272,8 @@ NFmiSmartInfo* NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataI
 
 	if(foundData == 0 && backupData != 0)
 		foundData = backupData;
-	if(foundData)
-		fSubParameter = foundData->UseSubParam();
 
 	return foundData;
-}
-
-
-// SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
-// T‰m‰ ignooraa aina tuottajien nimet, koska t‰t‰ k‰ytet‰‰n SmartToolModifierissa
-// ja siell‰ k‰ytet‰‰n tuottajista aina jotain default nimi‰
-NFmiSmartInfo* NFmiInfoOrganizer::CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData)
-{
-	bool aSubParam;
-	NFmiSmartInfo* info = 0;
-	if(fLevelData)
-		info = CrossSectionInfo(theDataIdent, aSubParam, theType);
-	else
-		info = fUseParIdOnly ? Info(static_cast<FmiParameterName>(theDataIdent.GetParamIdent()), aSubParam, theLevel, theType) : Info(theDataIdent, aSubParam, theLevel, theType);
-	if(info)
-	{
-		if(theType == NFmiInfoData::kCrossSectionMacroParam || theType == NFmiInfoData::kMacroParam || theType == NFmiInfoData::kQ3MacroParam || (fUseParIdOnly ?  info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) : info->Param(theDataIdent)))  // makroparamille ei tarvitse laittaa parametria kohdalleen!
-		{
-			NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*info);
-			return copyOfInfo;
-		}
-	}
-	return 0;
-}
-
-// T‰m‰ luo SmartInfosta pinta kopioin, eli vain ns. iteraattori (info osuus) kopioituu, data pysyy alkuper‰isen kanssa jaettuna.
-NFmiSmartInfo* NFmiInfoOrganizer::CreateInfo(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
-{
-	if(theUsedInfo && theUsedInfo->DataType() == theType && theUsedInfo->Param(theDataIdent) && (!theLevel || (theLevel && theUsedInfo->Level(*theLevel))))
-	{
-		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*theUsedInfo);
-		return copyOfInfo;
-	}
-	return 0;
 }
 
 //--------------------------------------------------------
@@ -696,11 +610,6 @@ void NFmiInfoOrganizer::UpdateMacroParamData(void)
 	}
 }
 
-void NFmiInfoOrganizer::UpdateMapArea(const NFmiArea *theArea)
-{
-	UpdateSpecialDataArea(theArea, itsMacroParamGridSize, NFmiInfoData::kMacroParam, &itsMacroParamData, itsMacroParamMissingValueMatrix);
-}
-
 void NFmiInfoOrganizer::UpdateSpecialDataArea(const NFmiArea *theArea, const NFmiPoint &theGridSize, NFmiInfoData::Type theType, NFmiSmartInfo ** theData, NFmiDataMatrix<float> &theMissingValueMatrix)
 {
 	// tuhoa ensin vanha pois alta
@@ -736,11 +645,6 @@ void NFmiInfoOrganizer::UpdateCrossSectionMacroParamDataSize(int x, int y)
 		itsCrossSectionMacroParamData = new NFmiSmartInfo(infoIter, data, "", "", NFmiInfoData::kCrossSectionMacroParam);
 		itsCrossSectionMacroParamMissingValueMatrix.Resize(itsCrossSectionMacroParamData->Grid()->XNumber(), itsCrossSectionMacroParamData->Grid()->YNumber(), kFloatMissing);
 	}
-}
-
-NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType) // Hakee 1. tietyn datatyypin infon
-{
-	return FindInfo(theDataType, 0); // indeksi alkaa 0:sta!!!
 }
 
 NFmiSmartInfo* NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, int theIndex) // Hakee indeksin mukaisen tietyn datatyypin infon
@@ -930,7 +834,6 @@ static int IsGoodSoundingData(NFmiSmartInfo* info, const NFmiProducer &theProduc
 // hybridi dataa ja sitten tyydyt‰‰n viewable-dataa (= painepinta)
 NFmiSmartInfo* NFmiInfoOrganizer::FindSoundingInfo(const NFmiProducer &theProducer)
 {
-	// TODO Ei ota huomioon viel‰ editoitavaa dataa
 	NFmiSmartInfo* exceptableInfo = 0;
 	for(NFmiPtrList<NFmiSmartInfo>::Iterator iter = itsList.Start(); iter.Next(); )
 	{
@@ -942,12 +845,12 @@ NFmiSmartInfo* NFmiInfoOrganizer::FindSoundingInfo(const NFmiProducer &theProduc
 			exceptableInfo = info;
 	}
 
-	NFmiSmartInfo* info = EditedInfo();
+	NFmiSmartInfo* info = FindInfo(NFmiInfoData::kEditable);
 	if(info)
 	{
 		if(theProducer.GetIdent() == kFmiMETEOR || (*info->Producer() == theProducer)) // t‰ss‰ hanskataan 'editoitu' data, jolloin ignoorataan tuottaja
 		{
-			info = EditedInfo();
+			info = FindInfo(NFmiInfoData::kEditable);
 			int result = ::IsGoodSoundingData(info, theProducer, true);
 			if(result != 0)
 				exceptableInfo = info;
@@ -970,44 +873,45 @@ const std::string NFmiInfoOrganizer::GetDrawParamPath(void)
 		retValue = itsDrawParamFactory->LoadDirectory();
 	return retValue;
 }
+
+static bool UseParIdOnly(NFmiInfoData::Type theDataType)
+{
+	if(theDataType == NFmiInfoData::kEditable || theDataType == NFmiInfoData::kCopyOfEdited || theDataType == NFmiInfoData::kAnyData) // jos editoitava data, ei tuottajalla v‰li‰
+		return true;
+	return false;
+}
+
 NFmiSmartInfo* NFmiInfoOrganizer::Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted)
 {
-	bool subParameter = false;
 	NFmiInfoData::Type dataType = theDrawParam.DataType();
 	if(fCrossSectionInfoWanted)
-		return CrossSectionInfo(theDrawParam.Param(), subParameter, dataType);
+		return CrossSectionInfo(theDrawParam.Param(), dataType);
 	else
 	{
 		NFmiLevel* level = &theDrawParam.Level();
 		if(level && level->GetIdent() == 0) // jos t‰m‰ on ns. default-level otus (GetIdent() == 0), annetaan 0-pointteri Info-metodiin
 			level = 0;
-		if(dataType == NFmiInfoData::kEditable || dataType == NFmiInfoData::kCopyOfEdited || dataType == NFmiInfoData::kAnyData) // jos editoitava data, ei tuottajalla v‰li‰
-			return Info(static_cast<FmiParameterName>(theDrawParam.Param().GetParamIdent()), subParameter, level, dataType);
-		else
-			return Info(theDrawParam.Param(), subParameter, level, dataType);
+		return GetInfo(theDrawParam.Param(), level, dataType, ::UseParIdOnly(dataType));
 	}
 }
 
-NFmiSmartInfo* NFmiInfoOrganizer::Info(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
+NFmiSmartInfo* NFmiInfoOrganizer::Info(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData)
 {
-	bool subParameter = false;
-	if(theType == NFmiInfoData::kEditable || theType == NFmiInfoData::kCopyOfEdited || theType == NFmiInfoData::kAnyData) // jos editoitava data, ei tuottajalla v‰li‰
-		return Info(static_cast<FmiParameterName>(theIdent.GetParamIdent()), subParameter, theLevel, theType);
-	else
-		return Info(theIdent, subParameter, theLevel, theType);
+	if(fLevelData)
+		return CrossSectionInfo(theIdent, theType);
+	else 
+		return GetInfo(theIdent, theLevel, theType, (fUseParIdOnly || ::UseParIdOnly(theType)));
 }
 
-NFmiParamBag NFmiInfoOrganizer::GetParams(int theProducerId1, int theProducerId2, NFmiInfoData::Type theIgnoreDataType1, NFmiInfoData::Type theIgnoreDataType2, NFmiInfoData::Type theIgnoreDataType3)
+NFmiParamBag NFmiInfoOrganizer::GetParams(int theProducerId1)
 {
 	NFmiParamBag paramBag;
-	checkedVector<NFmiSmartInfo*> infos(GetInfos(theProducerId1, theProducerId2));
+	checkedVector<NFmiSmartInfo*> infos(GetInfos(theProducerId1));
 	size_t size = infos.size();
 	if(size > 0)
 	{
 		for(size_t i=0; i<size; i++)
 		{
-			if(infos[i]->DataType() == theIgnoreDataType1 || infos[i]->DataType() == theIgnoreDataType2 || infos[i]->DataType() == theIgnoreDataType3)
-				continue; // tiettyj‰ data tyyppeja ei haluttukkaan listaan
 			paramBag = paramBag.Combine(infos[i]->ParamBag());
 		}
 	}

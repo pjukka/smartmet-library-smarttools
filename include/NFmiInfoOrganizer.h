@@ -49,7 +49,6 @@ class NFmiDrawParam;
 class NFmiQueryData;
 class NFmiLevel;
 class NFmiQueryInfo;
-class NFmiLevelBag;
 class NFmiArea;
 
 // TODO T‰m‰ luokka pit‰‰ ensin siivota perinpohjin, ja sitten laittaa k‰ytt‰m‰‰n shared_ptr:i‰.
@@ -64,24 +63,19 @@ class NFmiInfoOrganizer
 
 	bool Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist, bool createEditedDataCopy, bool fUseOnePressureLevelDrawParam);
 
-	NFmiSmartInfo* EditedInfo(void){return itsEditedData;}; // t‰m‰ toimii jos rajoitetaan editoitavien infojen m‰‰r‰‰
   	NFmiSmartInfo* Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted = false);
-  	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+  	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly = false, bool fLevelData = false);
 	checkedVector<NFmiSmartInfo*> GetInfos(const std::string &theFileNameFilter); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
 	checkedVector<NFmiSmartInfo*> GetInfos(int theProducerId, int theProducerId2 = -1, int theProducerId3 = -1, int theProducerId4 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
 	checkedVector<NFmiSmartInfo*> GetInfos(NFmiInfoData::Type theDataType);
 	checkedVector<NFmiSmartInfo*> GetInfos(NFmiInfoData::Type theType, bool fGroundData, int theProducerId, int theProducerId2 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
-	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType); // Hakee 1. tietyn datatyypin infon
-	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType, int theIndex); // Hakee indeksin mukaisen tietyn datatyypin infon
+	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
 	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
 	NFmiSmartInfo* FindSoundingInfo(const NFmiProducer &theProducer); // Hakee parhaan luotaus infon tuottajalle
 	NFmiSmartInfo* MacroParamData(void) {return itsMacroParamData;} // t‰t‰ tarvitaan asettamaan mm. aikadescriptoria ja ehk‰ muita descriptoreita
 	NFmiSmartInfo* CrossSectionMacroParamData(void) {return itsCrossSectionMacroParamData;}
-	// SmartToolModifier tarvitsee ohuen kopion (eli NFmiQueryData ei kopioidu)
-	NFmiSmartInfo* CreateShallowCopyInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData);
-	NFmiSmartInfo* CreateInfo(NFmiSmartInfo* theUsedInfo, const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 
-	NFmiParamBag GetParams(int theProducerId1, int theProducerId2, NFmiInfoData::Type theIgnoreDataType1, NFmiInfoData::Type theIgnoreDataType2, NFmiInfoData::Type theIgnoreDataType3);
+	NFmiParamBag GetParams(int theProducerId1);
 
 	NFmiDrawParam* CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	NFmiDrawParam* CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
@@ -108,7 +102,6 @@ class NFmiInfoOrganizer
 	void SetMacroParamDataGridSize(int x, int y);
 	void SetMacroParamDataMinGridSize(int x, int y);
 	void SetMacroParamDataMaxGridSize(int x, int y);
-	void UpdateMapArea(const NFmiArea *theArea);
 
 	const NFmiPoint& GetMacroParamDataGridSize(void) const {return itsMacroParamGridSize;}
 	const NFmiPoint& GetMacroParamDataMaxGridSize(void) const {return itsMacroParamMaxGridSize;}
@@ -122,11 +115,10 @@ class NFmiInfoOrganizer
 	void UpdateMacroParamData(void);
     bool Add (NFmiSmartInfo* theInfo);
 
-  	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
-	NFmiSmartInfo* Info (const FmiParameterName& theParam, bool& fSubParameter, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
-	NFmiSmartInfo* CrossSectionInfo(const NFmiDataIdent& theDataIdent, bool& fSubParameter, NFmiInfoData::Type theType);
-	NFmiSmartInfo* GetSynopPlotParamInfo(bool& fSubParameter, NFmiInfoData::Type theType);
-	NFmiSmartInfo* GetSoundingPlotParamInfo(bool& fSubParameter, NFmiInfoData::Type theType);
+  	NFmiSmartInfo* GetInfo(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly);
+	NFmiSmartInfo* CrossSectionInfo(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
+	NFmiSmartInfo* GetSynopPlotParamInfo(NFmiInfoData::Type theType);
+	NFmiSmartInfo* GetSoundingPlotParamInfo(NFmiInfoData::Type theType);
 	NFmiDrawParam* CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 
 // Attributes

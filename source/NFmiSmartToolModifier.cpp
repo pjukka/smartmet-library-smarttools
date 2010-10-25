@@ -561,9 +561,10 @@ void NFmiSmartToolModifier::SetInfosMaskType(NFmiSmartInfo *theInfo)
 {
 	if(fModifySelectedLocationsOnly)
 	{
-		if(theInfo->DataType() == NFmiInfoData::kScriptVariableData && itsInfoOrganizer->EditedInfo())
+		NFmiSmartInfo *editedInfo = itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable);
+		if(theInfo->DataType() == NFmiInfoData::kScriptVariableData && editedInfo)
 		{ // skripti muuttujalle pitää asettaa sama valittujen pisteiden maski kuin on editoidulla datalla
-			theInfo->Mask(itsInfoOrganizer->EditedInfo()->Mask(NFmiMetEditorTypes::kFmiSelectionMask), NFmiMetEditorTypes::kFmiSelectionMask);
+			theInfo->Mask(editedInfo->Mask(NFmiMetEditorTypes::kFmiSelectionMask), NFmiMetEditorTypes::kFmiSelectionMask);
 		}
 		theInfo->MaskType(NFmiMetEditorTypes::kFmiSelectionMask);
 	}
@@ -710,12 +711,13 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateAreaMask(const NFmiAreaMaskInfo &theA
 				delete info;
 				info = tmp;
 			}
+			NFmiSmartInfo *editedInfo = itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable);
 			if(maskType == NFmiAreaMask::FunctionPeekXY)
 				areaMask = new NFmiInfoAreaMaskPeekXY(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), true, NFmiAreaMask::kNoValue, deepCopyCreated);
 			else if(maskType == NFmiAreaMask::FunctionPeekXY2)
-				areaMask = new NFmiInfoAreaMaskPeekXY2(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, this->fMacroParamCalculation ? UsedMacroParamData() : itsInfoOrganizer->EditedInfo(), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), true, NFmiAreaMask::kNoValue, deepCopyCreated);
+				areaMask = new NFmiInfoAreaMaskPeekXY2(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, this->fMacroParamCalculation ? UsedMacroParamData() : editedInfo, static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), true, NFmiAreaMask::kNoValue, deepCopyCreated);
 			else if(maskType == NFmiAreaMask::FunctionPeekXY3)
-				areaMask = new NFmiInfoAreaMaskPeekXY3(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, this->fMacroParamCalculation ? UsedMacroParamData() : itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetOffsetPoint1().X(), theAreaMaskInfo.GetOffsetPoint1().Y(), true, NFmiAreaMask::kNoValue, deepCopyCreated);
+				areaMask = new NFmiInfoAreaMaskPeekXY3(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, this->fMacroParamCalculation ? UsedMacroParamData() : editedInfo, theAreaMaskInfo.GetOffsetPoint1().X(), theAreaMaskInfo.GetOffsetPoint1().Y(), true, NFmiAreaMask::kNoValue, deepCopyCreated);
 
 			if(fUseLevelData)
 				itsParethesisCounter++;
@@ -866,13 +868,13 @@ NFmiAreaMask* NFmiSmartToolModifier::CreateCalculatedAreaMask(const NFmiAreaMask
 	else if(parId == kFmiSecond)
 		areaMask = new NFmiUtcHourAreaMask(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
 	else if(parId == kFmiForecastPeriod)
-		areaMask = new NFmiForecastHourAreaMask(itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
+		areaMask = new NFmiForecastHourAreaMask(itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
 	else if(parId == kFmiDeltaTime)
-		areaMask = new NFmiTimeStepAreaMask(itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
+		areaMask = new NFmiTimeStepAreaMask(itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition());
 	else if(parId == kFmiLastParameter)
-		areaMask = new NFmiGridSizeAreaMask(this->fMacroParamCalculation ? UsedMacroParamData() : itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition(), true);
+		areaMask = new NFmiGridSizeAreaMask(this->fMacroParamCalculation ? UsedMacroParamData() : itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition(), true);
 	else if(parId == kFmiLastParameter+1)
-		areaMask = new NFmiGridSizeAreaMask(this->fMacroParamCalculation ? UsedMacroParamData() : itsInfoOrganizer->EditedInfo(), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition(), false);
+		areaMask = new NFmiGridSizeAreaMask(this->fMacroParamCalculation ? UsedMacroParamData() : itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable), theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition(), false);
 
 
 	if(areaMask)
@@ -1020,6 +1022,15 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateCopyOfAnalyzeInfo(const NFmiDataIden
 */
 }
 
+static NFmiSmartInfo* CreateShallowCopyInfo(NFmiSmartInfo *theOrigInfo)
+{
+	if(theOrigInfo)
+	{
+		NFmiSmartInfo* copyOfInfo = new NFmiSmartInfo(*theOrigInfo);
+		return copyOfInfo;
+	}
+	return 0;
+}
 
 NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
@@ -1041,7 +1052,7 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 				throw runtime_error("NFmiSmartToolModifier::CreateInfo - error in program, no macroParam data available.");
 		}
 		else
-			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), dataType, true, fUseLevelData);
+			info = ::CreateShallowCopyInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), dataType, true, fUseLevelData));
 		if(info == 0)
 			info = GetPossibleLevelInterpolatedInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 	}
@@ -1050,10 +1061,10 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 		if(fUseLevelData && theAreaMaskInfo.GetLevel() != 0) // jos pitää käyttää level dataa (SumZ ja MinH funktiot), ei saa antaa level infoa parametrin yhteydessä
 			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNoLevel") + "\n" + theAreaMaskInfo.GetMaskText());
 		if(fUseLevelData || fDoCrossSectionCalculation) // jos leveldata-flagi päällä, yritetään ensin, löytyykö hybridi dataa
-			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), NFmiInfoData::kHybridData, false, fUseLevelData | fDoCrossSectionCalculation); // tähän pieni hybrid-koukku, jos haluttiin level dataa
+			info = ::CreateShallowCopyInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), NFmiInfoData::kHybridData, false, fUseLevelData | fDoCrossSectionCalculation)); // tähän pieni hybrid-koukku, jos haluttiin level dataa
 		if(info == 0)
 		{
-			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData | fDoCrossSectionCalculation);
+			info = ::CreateShallowCopyInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData | fDoCrossSectionCalculation));
 		}
 		if(info == 0 && theAreaMaskInfo.GetDataType() == NFmiInfoData::kAnalyzeData) // analyysi datalle piti tehdä pika viritys tähän
 			info = CreateCopyOfAnalyzeInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel());
@@ -1063,13 +1074,13 @@ NFmiSmartInfo* NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theArea
 		{
 			NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
 			aLevel.SetIdent(kFmiHybridLevel);
-			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), &aLevel, NFmiInfoData::kHybridData, false, fUseLevelData);
+			info = ::CreateShallowCopyInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), &aLevel, NFmiInfoData::kHybridData, false, fUseLevelData));
 		}
 		if(info == 0 && theAreaMaskInfo.GetLevel() != 0) // kokeillaan vielä jos halutaan 'height' (type 105) datan leveliä
 		{
 			NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
 			aLevel.SetIdent(kFmiHeight);
-			info = itsInfoOrganizer->CreateShallowCopyInfo(theAreaMaskInfo.GetDataIdent(), &aLevel, NFmiInfoData::kViewable, false, fUseLevelData);
+			info = ::CreateShallowCopyInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), &aLevel, NFmiInfoData::kViewable, false, fUseLevelData));
 		}
 	}
 	if(!info)
@@ -1147,7 +1158,7 @@ void NFmiSmartToolModifier::ClearScriptVariableInfos(void)
 
 NFmiSmartInfo* NFmiSmartToolModifier::CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent)
 {
-	NFmiSmartInfo* baseInfo = fMacroParamCalculation ? UsedMacroParamData() : itsInfoOrganizer->EditedInfo();
+	NFmiSmartInfo* baseInfo = fMacroParamCalculation ? UsedMacroParamData() : itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable);
 	NFmiParamBag paramBag;
 	paramBag.Add(theDataIdent);
 	NFmiParamDescriptor paramDesc(paramBag);

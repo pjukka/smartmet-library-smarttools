@@ -50,13 +50,13 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 		return 0;
 	}
 
+	NFmiSmartInfo *editedInfo = dataBase.FindInfo(NFmiInfoData::kEditable);
 	try // suoritetaan macro sitten
 	{
 		if(goThroughLevels == false)
 			smartToolModifier.ModifyData(theTimes, false, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
 		else
 		{
-			NFmiSmartInfo *editedInfo = dataBase.EditedInfo();
 			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
 				smartToolModifier.ModifyData(theTimes, false, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
 		}
@@ -68,8 +68,8 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	}
 
 	NFmiQueryData* data = 0;
-	if(dataBase.EditedInfo() && dataBase.EditedInfo()->RefQueryData())
-		data = dataBase.EditedInfo()->RefQueryData()->Clone();
+	if(editedInfo && editedInfo->RefQueryData())
+		data = editedInfo->RefQueryData()->Clone();
 	return data;
 }
 
