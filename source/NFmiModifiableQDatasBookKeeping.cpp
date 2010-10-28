@@ -145,10 +145,21 @@ bool NFmiModifiableQDatasBookKeeping::RedoData(NFmiRawData &theRawData)
 
 void NFmiModifiableQDatasBookKeeping::UndoLevel(long theDepth, const NFmiRawData &theRawData)
 {
-	if(itsUndoRedoQData == 0)
-		itsUndoRedoQData = new NFmiUndoRedoQData;
+	if(theDepth == 0)
+	{
+		if(itsUndoRedoQData != 0)
+		{
+			delete itsUndoRedoQData;
+			itsUndoRedoQData = 0;
+		}
+	}
+	else
+	{
+		if(itsUndoRedoQData == 0)
+			itsUndoRedoQData = new NFmiUndoRedoQData;
 
-	itsUndoRedoQData->UndoLevel(theDepth, theRawData);
+		itsUndoRedoQData->UndoLevel(theDepth, theRawData);
+	}
 }
 
 const NFmiHarmonizerBookKeepingData* NFmiModifiableQDatasBookKeeping::CurrentHarmonizerBookKeepingData(void) const
