@@ -32,7 +32,6 @@
 #include "NFmiValueString.h"
 #include "NFmiLevelType.h"
 #include "NFmiLevel.h"
-#include "NFmiInfoOrganizer.h"
 #include "NFmiSmartInfo.h"
 #include "NFmiEnumConverter.h"
 #include "NFmiDictionaryFunction.h"
@@ -195,9 +194,8 @@ NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctio
 //--------------------------------------------------------
 // Constructor/Destructor
 //--------------------------------------------------------
-NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer, NFmiProducerSystem *theProducerSystem)
-:itsInfoOrganizer(theInfoOrganizer)
-,itsProducerSystem(theProducerSystem)
+NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiProducerSystem *theProducerSystem)
+:itsProducerSystem(theProducerSystem)
 ,itsSmartToolCalculationBlocks()
 ,fNormalAssigmentFound(false)
 ,fMacroParamFound(false)
@@ -1443,9 +1441,7 @@ bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVar
 		{
 		  float levelValue = static_cast<float>(numericPart);
 		  // pitaisi tunnistaa level tyyppi arvosta kait, nyt oletus että painepinta
-		  FmiLevelType levelType = GetLevelType(theDataType, levelValue);
-			if(levelType == kFmiPressureLevel)
-				levelType = kFmiHybridLevel; // jos käyttäjä on antanut lev45, tällöin halutaan hybrid level 45 ei painepinta 45. painepinnat saa automaattisesti pelkällä numerolla
+		  FmiLevelType levelType = kFmiHybridLevel; // jos käyttäjä on antanut lev45, tällöin halutaan hybrid level 45 ei painepinta 45. painepinnat saa automaattisesti pelkällä numerolla
 		  theLevel = NFmiLevel(levelType, theVariableText, static_cast<float>(numericPart));
 		  return true;
 		}
@@ -1463,27 +1459,6 @@ bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVar
 		}
 	}
 	return false;
-}
-
-FmiLevelType NFmiSmartToolIntepreter::GetLevelType(NFmiInfoData::Type theDataType, float levelValue)
-{
-	FmiLevelType levelType = kFmiPressureLevel; // default
-	if(theDataType == NFmiInfoData::kEditable)
-	{
-		NFmiSmartInfo *editedInfo = itsInfoOrganizer ? itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable) : 0;
-		if(editedInfo)
-		{
-			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
-			{
-			  if(editedInfo->Level()->LevelValue() == levelValue)
-				{
-					levelType = editedInfo->Level()->LevelType();
-					break;
-				}
-			}
-		}
-	}
-	return levelType;
 }
 
 bool NFmiSmartToolIntepreter::IsWantedStart(const std::string &theText, const std::string &theWantedStart)

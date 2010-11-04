@@ -58,7 +58,6 @@ class NFmiSmartToolCalculationSectionInfo;
 class NFmiAreaMaskSectionInfo;
 class NFmiAreaMaskInfo;
 class NFmiSmartToolCalculationInfo;
-class NFmiInfoOrganizer;
 class NFmiSmartToolCalculationBlockInfo;
 class NFmiProducerSystem;
 
@@ -107,7 +106,7 @@ public:
 	typedef std::map<std::string, double> ConstantMap; // esim. MISS 32700 tai PI 3.14159
 	void Interpret(const std::string &theMacroText, bool fThisIsMacroParamSkript = false);
 
-	NFmiSmartToolIntepreter(NFmiInfoOrganizer* theInfoOrganizer, NFmiProducerSystem *theProducerSystem);
+	NFmiSmartToolIntepreter(NFmiProducerSystem *theProducerSystem);
 	~NFmiSmartToolIntepreter(void);
 
 	void Clear(void);
@@ -196,9 +195,7 @@ private:
 	bool IsVariableFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariablePeekFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
 	bool IsVariableMathFunction(const std::string &theVariableText, NFmiAreaMaskInfo *theMaskInfo);
-	FmiLevelType GetLevelType(NFmiInfoData::Type theDataType, float levelValue);
 
-	NFmiInfoOrganizer* itsInfoOrganizer; // ei omista
 	NFmiProducerSystem *itsProducerSystem;  // ei omista
 	std::string itsCheckOutSectionText; // esim. if-sectionin koko teksti
 	std::string::iterator itsCheckOutTextStartPosition; // sen hetkinen tekstiosan alkupiste
