@@ -1,0 +1,69 @@
+#pragma once
+
+
+#include "NFmiMilliSecondTimer.h"
+#include "NFmiDataMatrix.h"
+#include "NFmiMetTime.h"
+#include "boost/shared_ptr.hpp"
+#include <list>
+
+class NFmiOwnerInfo;
+class NFmiFastQueryInfo;
+
+// NFmiQueryDataKeeper on luokka joka pit‰‰ kirjanpitoa NFmiInfoOrganizer-luokassa
+// s‰ilytett‰vist‰ queryDatoista. 
+// HUOM! T‰t‰ luokkaa ei ole tarkoitettu k‰ytett‰v‰ksi kuin NFmiInfoOrganizerin sis‰isesti!!!
+class NFmiQueryDataKeeper
+{
+public:
+	NFmiQueryDataKeeper(void);
+	NFmiQueryDataKeeper(boost::shared_ptr<NFmiOwnerInfo> &theOriginalData);
+	~NFmiQueryDataKeeper(void);
+
+	boost::shared_ptr<NFmiOwnerInfo> OriginalData(void); // T‰t‰ saa k‰ytt‰‰ vain NFmiInfoOrganizer2-luokka sis‰isesti, koska t‰t‰ ei ole tarkoitus palauttaa, 
+														// kun tarvitaan moni-s‰ie turvallinen info-iteraattori kopio, k‰ytet‰‰n mieluummin GetIter-metodia.
+	boost::shared_ptr<NFmiFastQueryInfo> GetIter(void); // T‰m‰ palauttaa vapaana olevan Info-iteraattori kopion dataan.
+	int Index(void) const {return itsIndex;}
+	void Index(int newValue) {itsIndex = newValue;}
+
+private:
+	boost::shared_ptr<NFmiOwnerInfo> itsData; // t‰m‰ on originaali data
+	NFmiMilliSecondTimer itsLastTimeUsedtimer;  // aina kun kyseist‰ dataa k‰ytet‰‰n, k‰ytet‰‰n StartTimer-metodia, jotta myˆhemmin voidaan 
+												// laskea, voidaanko kyseinen data siivota pois muistista (jos dataa ei ole k‰ytetty tarpeeksi pitk‰‰n aikaan)
+	int itsKeepInMemoryTime; // kuinka kauan pidet‰‰n data muistissa, jos sit‰ ei ole k‰ytetty. yksikkˆ on minuutteja
+	int itsIndex; // malliajo datoissa 0 arvo tarkoittaa viimeisint‰ ja -1 sit‰ edellist‰ jne.
+	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > itsIteratorList; // originaali datasta tehn‰‰n tarvittaessa n kpl iteraattori kopioita, ulkopuoliset rutiinit/s‰ikeet
+																		// k‰ytt‰v‰t aina vain iteraattori-kopioita alkuper‰isest‰, jolloin niit‰ voidaan k‰ytt‰‰ eri s‰ikeiss‰ yht'aikaa.
+																		// n‰m‰ luodaan on demandina, eli jos InfoOrganizerilta pyydet‰‰n dataa, ja listassa ei ole vapaata iteraattoria
+																		// luodaan t‰llˆin uusi kopio joka palautetaan.
+																		// TODO: Miten tied‰n ett‰ joku rutiini/s‰ie on lopettanut iteraattorin k‰ytˆn? Ehk‰ shared_ptr:n use_count:in avulla?
+};
+
+// NFmiQueryDataSetKeeper-luokka pit‰‰ kirjaa n kpl viimeisit‰ malliajoista/datasta
+class NFmiQueryDataSetKeeper
+{
+public:
+	typedef std::list<boost::shared_ptr<NFmiQueryDataKeeper> > ListType;
+
+	NFmiQueryDataSetKeeper(void);
+	NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> &theData);
+	~NFmiQueryDataSetKeeper(void);
+
+	void AddData(boost::shared_ptr<NFmiOwnerInfo> &theData, bool fFirstData = false);
+	boost::shared_ptr<NFmiQueryDataKeeper> GetDataKeeper(int theIndex = 0);
+	const std::string& FilePattern(void) const {return itsFilePattern;}
+	void FilePattern(const std::string &newValue) {itsFilePattern = newValue;}
+	size_t DataCount(void);
+	size_t DataByteCount(void);
+
+private:
+	void AddDataToSet(boost::shared_ptr<NFmiOwnerInfo> &theData);
+	void RecalculateIndexies(const NFmiMetTime &theLatestOrigTime);
+	void DeleteTooOldDatas(void);
+
+	ListType itsQueryDatas; // t‰ss‰ on n kpl viimeisint‰ malliajoa tallessa (tai esim. havaintojen tapauksessa vain viimeisin data)
+	int itsMaxLatestDataCount; // kuinka monta viimeisint‰ malliajoa/dataa maksimiss‰‰n kullekin datalle on, 0 jos kyse esim. havainnoista, joille ei ole kuin viimeisin data.
+	int itsModelRunTimeGap; // mill‰ ajov‰leill‰ kyseisen datan mallia ajetaan (yksikkˆ minuutteja), jos kyse havainnosta, eli ei ole kuin viimeinen data, arvo 0 ja jos kyse esim. editoidusta datasta (ep‰m‰‰r‰inen ilmestymisv‰li) on arvo -1.
+	std::string itsFilePattern; // erilaiset datat erotellaan fileFilterin avulla (esim. "D:\smartmet\wrk\data\local\*_hirlam_skandinavia_mallipinta.sqd")
+	NFmiMetTime itsLatestOriginTime; // t‰h‰n talletetaan aina viimeisimm‰n datan origin-time vertailuja helpottamaan
+};

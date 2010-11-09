@@ -1,3 +1,4 @@
+#pragma once
 /*!
  *  \file NFmiSmartToolInfo.h
  *  C++ Class Name : NFmiSmartToolInfo \par
@@ -6,9 +7,6 @@
  *  koskevia tietoja.
  *
  */
-
-#ifndef  NFMISMARTTOOLINFO_H
-#define  NFMISMARTTOOLINFO_H
 
 #include <string>
 #include "NFmiDataMatrix.h"
@@ -66,5 +64,3 @@ private:
 	bool fIsThereDBCheckScript; //! Onko ylip‰‰t‰‰n ollenkaan oletus tiedostossa tallessa DBChecker scripti‰.
 };
 
-
-#endif // NFMISMARTTOOLINFO_H

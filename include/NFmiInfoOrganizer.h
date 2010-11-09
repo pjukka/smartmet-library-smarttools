@@ -1,92 +1,93 @@
-//**********************************************************
-// C++ Class Name : NFmiInfoOrganizer
-// ---------------------------------------------------------
-// Filetype: (HEADER)
-// Filepath: D:/projekti/GDPro/GDTemp/NFmiInfoOrganizer.h
-//
-//
-// GDPro Properties
-// ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class
-//  - GD Method         : UML ( 2.1.4 )
-//  - GD System Name    : Met-editor Plan 2
-//  - GD View Type      : Class Diagram
-//  - GD View Name      : Markon ehdotus
-// ---------------------------------------------------
-//  Author         : pietarin
-//  Creation Date  : Tues - Feb 9, 1999
-//
-//
-//  Description:
-//   Sis‰lt‰‰ listan johon voidaan laitta SmartInfoja. Metodi Info
-//   palauttaa pointterin infoon, joka sis‰lt‰‰ tunnistimena annetun
-//   parametrin. Listalla ei ole j‰rjestyst‰.
-//
-//  Change Log:
-// 1999.08.26/Marko	Laitoin organizeriin eri tyyppisten datojen talletuksen
-//					mahdollisuuden. Editoitavaa dataa voi olla vain yksi, mutta
-//					katsottavaa/maskattavaa dataa voi olla useita erilaisia ja statio-
-//					n‰‰risi‰ (esim. topografia) datoja voi olla myˆs useita erilaisia.
-// 1999.08.26/Marko	Laitoin level tiedon DrawParam:in luonti-kutsuun varten.
-// 1999.09.22/Marko	DrawParamin luonnissa otetaan huomioon datan tyyppi t‰st‰l‰htien.
-// 1999.09.22/Marko	Lis‰sin EditedDatan kopion, jota k‰ytet‰‰n visualisoimaan dataan tehtyj‰ muutoksia.
-//
-//**********************************************************
-#ifndef  NFMIINFOORGANIZER_H
-#define  NFMIINFOORGANIZER_H
+#pragma once
 
-#include "NFmiPtrList.h"
-#include "NFmiParamBag.h"
-#include "NFmiParameterName.h"
-#include "NFmiInfoData.h"
-#include "NFmiDataMatrix.h"
+// Luokan teht‰v‰ on toimia eri queryDatojen ja niiden iteraattoreiden
+// s‰ilytyspaikkana SmartMet ja SmartToolFilter ohjelmille.
+// Alkuper‰inen NFmiInfoOrganizer-luokka on kauheaa syltty‰ ja se pit‰‰ 
+// tehd‰ t‰ss‰ uusiksi:
+// --------------------
+// 1. Rajapinta on siivottava. 
+// 2. Teht‰v‰ selke‰mm‰t data/info -pyynti funktiot.
+//
+// Lis‰ksi tulee uusia ominaisuuksia:
+// ----------------------------------
+// 1. Tuettava multi-threddausta
+// 2. Osattava hanskata vanhoja malliajo datoja (esim. hirlam[-1])
+// 3. Muistin siivous ja datojen tuhoamisen automatisointi.
+// 4. Data voidaan tuhota infoOrganizerista vaikka sit‰ viel‰ joku k‰ytt‰‰
+// omassa threadissaa ja threadi sitten lopuksi itse tuhoaa automaattisesti datan.
+//
+// Toteutus: NFmiOwnerInfo on tavallisten queryDatojen s‰ilytys luokka. 
+// NFmiSmartInfo2 on k‰ytˆss‰ vain editoitavalle datalle.
+// Huom! Myˆs SmartMetiin tiputetut datat pit‰‰ lis‰t‰ t‰nne fileFiltterin kanssa.
+// TODO: keksi parempi nimi tai muuta lopuksi NFmiInfoOrganizer-nimiseksi ja 
+// tuhoa alkuper‰inen luokka.
+
 #include "NFmiPoint.h"
-#include "NFmiSmartInfo.h"
+#include "NFmiDataMatrix.h"
+#include "NFmiInfoData.h"
+#include "NFmiParamBag.h"
+#include "NFmiProducerName.h"
+#include "boost/shared_ptr.hpp"
+#include <map>
 
+class NFmiSmartInfo2;
+class NFmiOwnerInfo;
+class NFmiFastQueryInfo;
 class NFmiDrawParamFactory;
-class NFmiDrawParamList;
 class NFmiDrawParam;
 class NFmiQueryData;
+class NFmiQueryDataSetKeeper;
+class NFmiQueryDataKeeper;
+class NFmiDataIdent;
 class NFmiLevel;
+class NFmiProducer;
 class NFmiQueryInfo;
-class NFmiArea;
-
-// TODO T‰m‰ luokka pit‰‰ ensin siivota perinpohjin, ja sitten laittaa k‰ytt‰m‰‰n shared_ptr:i‰.
-// Silloin voidaan saada t‰nne multi-thread turvallista ja vahaa dataa tukevaa koodia.
+class NFmiTimeDescriptor;
 
 class NFmiInfoOrganizer
 {
- public:
+public:
+	typedef std::map<std::string, boost::shared_ptr<NFmiQueryDataSetKeeper> > MapType;
 
-	NFmiInfoOrganizer (void);
-	~NFmiInfoOrganizer (void);
+	NFmiInfoOrganizer(void);
+	~NFmiInfoOrganizer(void);
 
 	bool Init(const std::string &theDrawParamPath, bool createDrawParamFileIfNotExist, bool createEditedDataCopy, bool fUseOnePressureLevelDrawParam);
-
-  	NFmiSmartInfo* Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted = false);
-  	NFmiSmartInfo* Info (const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly = false, bool fLevelData = false);
-	checkedVector<NFmiSmartInfo*> GetInfos(const std::string &theFileNameFilter); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
-	checkedVector<NFmiSmartInfo*> GetInfos(int theProducerId, int theProducerId2 = -1, int theProducerId3 = -1, int theProducerId4 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
-	checkedVector<NFmiSmartInfo*> GetInfos(NFmiInfoData::Type theDataType);
-	checkedVector<NFmiSmartInfo*> GetInfos(NFmiInfoData::Type theType, bool fGroundData, int theProducerId, int theProducerId2 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
-	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
-	NFmiSmartInfo* FindInfo(NFmiInfoData::Type theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
-	NFmiSmartInfo* FindSoundingInfo(const NFmiProducer &theProducer); // Hakee parhaan luotaus infon tuottajalle
-	NFmiSmartInfo* MacroParamData(void) {return itsMacroParamData;} // t‰t‰ tarvitaan asettamaan mm. aikadescriptoria ja ehk‰ muita descriptoreita
-	NFmiSmartInfo* CrossSectionMacroParamData(void) {return itsCrossSectionMacroParamData;}
-
-	NFmiParamBag GetParams(int theProducerId1);
-
-	NFmiDrawParam* CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
-	NFmiDrawParam* CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
-
 	bool AddData(NFmiQueryData* theData
 					  ,const std::string& theDataFileName
 					  ,const std::string& theDataFilePattern
 					  ,NFmiInfoData::Type theDataType
 					  ,int theUndoLevel = 0);
 
-	bool Clear (void);
+	// ***************************************************************************************************************
+	// T‰ss‰ per‰ss‰ on pienin mahdollinen julkinen rajapinta, jonka sain siivottua originaali NFmiInfoOrganizr:ista. 
+	// Ne pit‰‰ muuttaa viel‰ share_ptr ja uusien Info-luokkien mukaisiksi.
+	// HUOM! Ett‰ multi-threaddaus onnistuisi, pit‰‰ kaikki info-olioiden palautus funktioiden palauttaa kopio
+	// iteraattori-infosta. Pit‰isikˆ jokaiselle datalle luoda on-demandina kopio-info-olio lista, josta palautus olisi nopea?
+	// Pit‰‰kˆ lis‰ksi laittaa extra-infoa eri datoista, ett‰ siivous rutiini tiet‰‰ milloin niit‰ on viimeksi k‰ytetty,
+	// mit‰ muuta infoa tarvitaan kirjanpitoon ja muuhin?
+	// ***************************************************************************************************************
+	boost::shared_ptr<NFmiFastQueryInfo> Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted = false);
+  	boost::shared_ptr<NFmiFastQueryInfo> Info(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly = false, bool fLevelData = false);
+	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(const std::string &theFileNameFilter); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
+	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(int theProducerId, int theProducerId2 = -1, int theProducerId3 = -1, int theProducerId4 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
+	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(NFmiInfoData::Type theDataType);
+	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(NFmiInfoData::Type theType, bool fGroundData, int theProducerId, int theProducerId2 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
+	boost::shared_ptr<NFmiFastQueryInfo> FindInfo(NFmiInfoData::Type theDataType, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
+	boost::shared_ptr<NFmiFastQueryInfo> FindInfo(NFmiInfoData::Type theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
+	boost::shared_ptr<NFmiFastQueryInfo> FindSoundingInfo(const NFmiProducer &theProducer); // Hakee parhaan luotaus infon tuottajalle
+
+	// HUOM! N‰m‰ makroParamData jutut pit‰‰ mietti‰ uusiksi, jos niit‰ aletaan k‰sittelem‰‰n eri s‰ikeiss‰. T‰llˆin
+	// Niist‰ pit‰‰ luoda aina ilmeisesti paikalliset kopiot?!?!
+	boost::shared_ptr<NFmiFastQueryInfo> MacroParamData(void);
+	boost::shared_ptr<NFmiFastQueryInfo> CrossSectionMacroParamData(void);
+
+	NFmiParamBag GetParams(int theProducerId1);
+
+	NFmiDrawParam* CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+	NFmiDrawParam* CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
+
+	bool Clear(void);
 	void ClearData(NFmiInfoData::Type theDataType);
 	void ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData::Type theDataType, const std::string &theFileNamePattern, NFmiTimeDescriptor &theRemovedDatasTimesOut);
 	void ClearDynamicHelpData();
@@ -109,38 +110,36 @@ class NFmiInfoOrganizer
 	int CountData(void);
 	double CountDataSize(void);
 	void UpdateCrossSectionMacroParamDataSize(int x, int y);
- private:
-	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, NFmiSmartInfo* theSmartInfo2);
-	void UpdateSpecialDataArea(const NFmiArea *theArea, const NFmiPoint &theGridSize, NFmiInfoData::Type theType, NFmiSmartInfo ** theData, NFmiDataMatrix<float> &theMissingValueMatrix);
-	void UpdateMacroParamData(void);
-    bool Add (NFmiSmartInfo* theInfo);
+	// ***************************************************************************************************************
 
-  	NFmiSmartInfo* GetInfo(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly);
-	NFmiSmartInfo* CrossSectionInfo(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
-	NFmiSmartInfo* GetSynopPlotParamInfo(NFmiInfoData::Type theType);
-	NFmiSmartInfo* GetSoundingPlotParamInfo(NFmiInfoData::Type theType);
-	NFmiDrawParam* CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
-
-// Attributes
-  	NFmiPtrList<NFmiSmartInfo> itsList;
- 	NFmiDrawParamFactory* itsDrawParamFactory;
-	std::string itsWorkingDirectory;
-	NFmiSmartInfo* itsEditedData; // editoitavaa dataa voi olla vain yksi kerrallaan, joten laitoin sen erilleen tehokkuuden takia.
-	NFmiSmartInfo* itsEditedDataCopy; // t‰m‰ on editoitavan datan kopio, mit‰ k‰ytt‰j‰ voi halutessaan p‰ivitt‰‰, k‰ytet‰‰n visualisoimaan tehtyj‰ muutoksia datassa
-
-	NFmiPoint itsMacroParamGridSize;
-	NFmiPoint itsMacroParamMinGridSize;
-	NFmiPoint itsMacroParamMaxGridSize;
-	NFmiSmartInfo* itsMacroParamData; // makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
-	NFmiDataMatrix<float> itsMacroParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
-	NFmiSmartInfo* itsCrossSectionMacroParamData; // poikkileikkaus makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
-	NFmiDataMatrix<float> itsCrossSectionMacroParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
-
-	bool fCreateEditedDataCopy; // luodaanko vai eikˆ luoda kopiota editoidusta datasta
-
+private:
 	// estet‰‰n kopi konstruktorin ja sijoitus operaattoreiden luonti
 	NFmiInfoOrganizer& operator=(const NFmiInfoOrganizer&);
 	NFmiInfoOrganizer(const NFmiInfoOrganizer&);
-};
 
-#endif
+	bool AddEditedData(NFmiSmartInfo2 *theEditedData, int theUndoLevel);
+	bool Add(NFmiOwnerInfo* theInfo);
+
+	boost::shared_ptr<NFmiFastQueryInfo> GetInfo(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly);
+	boost::shared_ptr<NFmiFastQueryInfo> CrossSectionInfo(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
+	boost::shared_ptr<NFmiFastQueryInfo> GetSynopPlotParamInfo(NFmiInfoData::Type theType);
+	boost::shared_ptr<NFmiFastQueryInfo> GetSoundingPlotParamInfo(NFmiInfoData::Type theType);
+	boost::shared_ptr<NFmiFastQueryInfo> GetWantedProducerInfo(NFmiInfoData::Type theType, FmiProducerName theProducerName);
+	NFmiDrawParam* CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, boost::shared_ptr<NFmiFastQueryInfo> &theInfo2);
+
+	boost::shared_ptr<NFmiQueryDataKeeper> itsEditedDataKeeper; // pit‰‰ sis‰ll‰‰n oikeasti NFmiSmartInfo2-olion
+	boost::shared_ptr<NFmiQueryDataKeeper> itsCopyOfEditedDataKeeper;
+	MapType itsDataMap; // sijoitus mappiin tapahtuu filepatternin avulla
+
+ 	boost::shared_ptr<NFmiDrawParamFactory> itsDrawParamFactory;
+	std::string itsWorkingDirectory;
+	NFmiPoint itsMacroParamGridSize;
+	NFmiPoint itsMacroParamMinGridSize;
+	NFmiPoint itsMacroParamMaxGridSize;
+	boost::shared_ptr<NFmiFastQueryInfo> itsMacroParamData; // makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
+	NFmiDataMatrix<float> itsMacroParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
+	boost::shared_ptr<NFmiFastQueryInfo> itsCrossSectionMacroParamData; // poikkileikkaus makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
+	NFmiDataMatrix<float> itsCrossSectionMacroParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
+	bool fCreateEditedDataCopy; // luodaanko vai eikˆ luoda kopiota editoidusta datasta
+};

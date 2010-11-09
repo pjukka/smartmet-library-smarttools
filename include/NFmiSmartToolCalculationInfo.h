@@ -1,17 +1,6 @@
+#pragma once
 //**********************************************************
 // C++ Class Name : NFmiSmartToolCalculationInfo 
-// ---------------------------------------------------------
-// Filetype: (HEADER)
-// Filepath: G:/siirto/marko/oc/NFmiSmartToolCalculationInfo.h 
-// 
-// 
-// GDPro Properties 
-// ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 4.0 ) 
-//  - GD System Name    : aSmartTools 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : smarttools 1 
 // ---------------------------------------------------  
 //  Author         : pietarin 
 //  Creation Date  : Thur - Jun 20, 2002 
@@ -25,11 +14,10 @@
 // Lasku rivi sisältää aina TulosParametrin ja sijoituksen. Lisäksi se sisältää joukon 
 // operandeja (n kpl) ja operaatioita (n-1 kpl).
 //**********************************************************
-#ifndef  NFMISMARTTOOLCALCULATIONINFO_H
-#define  NFMISMARTTOOLCALCULATIONINFO_H
 
 #include "NFmiDataMatrix.h"
 #include <string>
+#include "boost/shared_ptr.hpp"
 
 class NFmiAreaMaskInfo;
 
@@ -41,11 +29,10 @@ public:
 	NFmiSmartToolCalculationInfo(void);
 	~NFmiSmartToolCalculationInfo(void);
 
-	void Clear(void);
-	void SetResultDataInfo(NFmiAreaMaskInfo *value) {itsResultDataInfo = value;}
-	NFmiAreaMaskInfo* GetResultDataInfo(void) {return itsResultDataInfo;}
-	void AddCalculationInfo(NFmiAreaMaskInfo* theAreaMaskInfo); 
-	checkedVector<NFmiAreaMaskInfo*>* GetCalculationOperandInfoVector(void) {return &itsCalculationOperandInfoVector;}
+	void SetResultDataInfo(boost::shared_ptr<NFmiAreaMaskInfo> &value) {itsResultDataInfo = value;}
+	boost::shared_ptr<NFmiAreaMaskInfo> GetResultDataInfo(void) {return itsResultDataInfo;}
+	void AddCalculationInfo(boost::shared_ptr<NFmiAreaMaskInfo> &theAreaMaskInfo); 
+	checkedVector<boost::shared_ptr<NFmiAreaMaskInfo> >& GetCalculationOperandInfoVector(void) {return itsCalculationOperandInfoVector;}
 	const std::string& GetCalculationText(void){return itsCalculationText;}
 	void SetCalculationText(const std::string& theText){itsCalculationText = theText;}
 	void CheckIfAllowMissingValueAssignment(void);
@@ -55,9 +42,9 @@ private:
 	// HUOM!! Tämä erillinen ResultInfo-systeemi oli huono ratkaisu, laita ne mielluummin
 	// osaksi laskentaketjua (itsCalculationOperandInfoVector:iin).
 	// Silloin voi mm. ottaa tämän luokan käyttöön NFmiAreaMaskSectionInfo-luokan sijasta.
-	NFmiAreaMaskInfo *itsResultDataInfo; // omistaa+tuhoaa
-	checkedVector<NFmiAreaMaskInfo*> itsCalculationOperandInfoVector;  // omistaa+tuhoaa
+	boost::shared_ptr<NFmiAreaMaskInfo> itsResultDataInfo; // omistaa+tuhoaa
+	checkedVector<boost::shared_ptr<NFmiAreaMaskInfo> > itsCalculationOperandInfoVector;  // omistaa+tuhoaa
 	std::string itsCalculationText; // originaali teksti, mistä tämä lasku on tulkittu
 	bool fAllowMissingValueAssignment; 
 };
-#endif
+

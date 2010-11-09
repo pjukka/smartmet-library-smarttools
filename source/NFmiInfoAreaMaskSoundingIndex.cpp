@@ -12,8 +12,8 @@ NFmiInfoAreaMaskSoundingIndex::~NFmiInfoAreaMaskSoundingIndex(void)
 {
 }
 
-NFmiInfoAreaMaskSoundingIndex::NFmiInfoAreaMaskSoundingIndex(NFmiQueryInfo * theInfo, FmiSoundingParameters theSoundingParam, bool ownsInfo, bool destroySmartInfoData)
-:NFmiInfoAreaMask(theInfo, ownsInfo, kNoValue, destroySmartInfoData)
+NFmiInfoAreaMaskSoundingIndex::NFmiInfoAreaMaskSoundingIndex(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiSoundingParameters theSoundingParam)
+:NFmiInfoAreaMask(theInfo, kNoValue)
 ,itsSoundingParam(theSoundingParam)
 {
 }
@@ -22,5 +22,5 @@ NFmiInfoAreaMaskSoundingIndex::NFmiInfoAreaMaskSoundingIndex(NFmiQueryInfo * the
 double NFmiInfoAreaMaskSoundingIndex::Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int /* theTimeIndex */ , bool /* fUseTimeInterpolationAlways */ )
 {
 	// RUMAA CAST-koodia!!!!!
-	return NFmiSoundingIndexCalculator::Calc(static_cast<NFmiFastQueryInfo*>(itsInfo), theLatlon, theTime, itsSoundingParam);
+	return NFmiSoundingIndexCalculator::Calc(itsInfo.get(), theLatlon, theTime, itsSoundingParam);
 }

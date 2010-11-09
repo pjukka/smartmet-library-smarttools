@@ -1,75 +1,65 @@
-//**********************************************************
-// C++ Class Name : NFmiSmartToolModifier
-// ---------------------------------------------------------
-// Filetype: (HEADER)
-// Filepath: G:/siirto/marko/oc/NFmiSmartToolModifier.h
-//
-//
-// GDPro Properties
-// ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class
-//  - GD Method         : UML ( 4.0 )
-//  - GD System Name    : aSmartTools
-//  - GD View Type      : Class Diagram
-//  - GD View Name      : smarttools 1
-// ---------------------------------------------------
-//  Author         : pietarin
-//  Creation Date  : Thur - Jun 20, 2002
-//
-//  Change Log     :
+#pragma once
+// Luokan on tarkoitus kovata nykyinen NFmiSmartToolModifier-luokka.
+// Vanha luokka on rönsyillyt pahasti ja nyt on aika siivota jäljet
+// kirjoittamaal toiminnallisuus uusiksi. Tässä tulee mukaan myös
+// uuden NFmiInfoOrganizer-luokan käyttö.
+// TODO: 
+// 1. Keksi parempi nimi tai muuta lopuksi NFmiSmartToolModifier-nimiseksi ja tuhoa alkuperäinen luokka.
+// 2. Siivoa rajapintaa jos pystyt.
+// 3. Muuta luokka käyttäään NFmiOwnerInfo-luokkaa, tämä tosin piilossa, koska rajapinnoissa käytetään NFmiFastQueryInfo.
+// 4. Lisää tuki edellisiin mallidatoihin eli T_HIR[-1] viittaa edelliseen hirlam-ajoon.
+// 5. Lisää tuki havaintodatan käytölle (muuta asema-data hilaksi ja käytä laskuissa.)
+// 6. Voisi tehdä parserin fiksummin (boost:in tms avulla)
 //
 // Tämä luokka hoitaa koko smarttool-toiminnan. Sillä on tietokanta,
 // tulkki, ja erilaisia maski/operaatio generaattoreita, joiden avulla
 // laskut suoritetaan.
 //**********************************************************
-#ifndef  NFMISMARTTOOLMODIFIER_H
-#define  NFMISMARTTOOLMODIFIER_H
 
 #include "NFmiParamBag.h"
-
-#include <string>
 #include "NFmiDataMatrix.h"
+#include <string>
+#include "boost/shared_ptr.hpp"
 
 class NFmiInfoOrganizer;
 class NFmiSmartToolIntepreter;
 class NFmiTimeDescriptor;
 class NFmiAreaMaskInfo;
-class NFmiSmartToolCalculationSection;
-class NFmiSmartToolCalculationSectionInfo;
-class NFmiSmartToolCalculation;
-class NFmiSmartToolCalculationInfo;
-class NFmiSmartInfo;
+class NFmiFastQueryInfo;
 class NFmiAreaMaskSectionInfo;
 class NFmiAreaMask;
 class NFmiDataModifier;
 class NFmiDataIterator;
-class NFmiSmartToolCalculationBlockInfo;
-class NFmiSmartToolCalculationBlockInfoVector;
 class NFmiDataIdent;
 class NFmiMetTime;
 class NFmiPoint;
 class NFmiSmartToolCalculationBlock;
 class NFmiMacroParamValue;
 class NFmiLevel;
+class NFmiSmartToolCalculationSection;
+class NFmiSmartToolCalculationSectionInfo;
+class NFmiSmartToolCalculation;
+class NFmiSmartToolCalculationInfo;
+class NFmiSmartToolCalculationBlockInfo;
+class NFmiSmartToolCalculationBlockInfoVector;
 
 class NFmiSmartToolCalculationBlockVector
 {
 public:
-	typedef checkedVector<NFmiSmartToolCalculationBlock*>::iterator Iterator;
+	typedef checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlock> >::iterator Iterator;
 
 	NFmiSmartToolCalculationBlockVector(void);
 	~NFmiSmartToolCalculationBlockVector(void);
-	void Clear(void);
-	NFmiSmartInfo* FirstVariableInfo(void);
+	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
 	void SetTime(const NFmiMetTime &theTime);
 	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
-	void Add(NFmiSmartToolCalculationBlock* theBlock);
+	void Add(boost::shared_ptr<NFmiSmartToolCalculationBlock> &theBlock);
 	Iterator Begin(void) {return itsCalculationBlocks.begin();}
 	Iterator End(void) {return itsCalculationBlocks.end();}
 
 private:
 	// luokka ei omista vektorissa olevia otuksia, Clear pitää kutsua erikseen!!!
-	checkedVector<NFmiSmartToolCalculationBlock*> itsCalculationBlocks;
+	checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlock> > itsCalculationBlocks;
 };
 
 class NFmiSmartToolCalculationBlock
@@ -77,18 +67,17 @@ class NFmiSmartToolCalculationBlock
 public:
 	NFmiSmartToolCalculationBlock(void);
 	~NFmiSmartToolCalculationBlock(void);
-	void Clear(void);
-	NFmiSmartInfo* FirstVariableInfo(void);
+	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
 	void SetTime(const NFmiMetTime &theTime);
 	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
 
-	NFmiSmartToolCalculationSection* itsFirstCalculationSection;
-	NFmiSmartToolCalculation* itsIfAreaMaskSection;
-	NFmiSmartToolCalculationBlockVector* itsIfCalculationBlocks;
-	NFmiSmartToolCalculation* itsElseIfAreaMaskSection;
-	NFmiSmartToolCalculationBlockVector* itsElseIfCalculationBlocks;
-	NFmiSmartToolCalculationBlockVector* itsElseCalculationBlocks;
-	NFmiSmartToolCalculationSection* itsLastCalculationSection;
+	boost::shared_ptr<NFmiSmartToolCalculationSection> itsFirstCalculationSection;
+	boost::shared_ptr<NFmiSmartToolCalculation> itsIfAreaMaskSection;
+	boost::shared_ptr<NFmiSmartToolCalculationBlockVector> itsIfCalculationBlocks;
+	boost::shared_ptr<NFmiSmartToolCalculation> itsElseIfAreaMaskSection;
+	boost::shared_ptr<NFmiSmartToolCalculationBlockVector> itsElseIfCalculationBlocks;
+	boost::shared_ptr<NFmiSmartToolCalculationBlockVector> itsElseCalculationBlocks;
+	boost::shared_ptr<NFmiSmartToolCalculationSection> itsLastCalculationSection;
 };
 
 class NFmiSmartToolModifier
@@ -112,32 +101,32 @@ public:
 	const std::string& GetStrippedMacroText(void) const;
 	bool IsInterpretedSkriptMacroParam(void); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns. macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
 private:
-	void SetInfosMaskType(NFmiSmartInfo *theInfo);
-	NFmiSmartInfo* UsedMacroParamData(void);
-	void ModifyConditionalData(NFmiSmartToolCalculationBlock *theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
-	void ModifyBlockData(NFmiSmartToolCalculationBlock *theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
-	NFmiSmartToolCalculationBlockVector* CreateCalculationBlockVector(NFmiSmartToolCalculationBlockInfoVector* theBlockInfoVector);
-	NFmiSmartToolCalculationBlock* CreateCalculationBlock(NFmiSmartToolCalculationBlockInfo* theBlockInfo);
-	NFmiSmartInfo* CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent);
-	NFmiSmartInfo* GetScriptVariableInfo(const NFmiDataIdent &theDataIdent);
+	void SetInfosMaskType(boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
+	boost::shared_ptr<NFmiFastQueryInfo> UsedMacroParamData(void);
+	void ModifyConditionalData(boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
+	void ModifyBlockData(boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
+	boost::shared_ptr<NFmiSmartToolCalculationBlockVector> CreateCalculationBlockVector(boost::shared_ptr<NFmiSmartToolCalculationBlockInfoVector> &theBlockInfoVector);
+	boost::shared_ptr<NFmiSmartToolCalculationBlock> CreateCalculationBlock(NFmiSmartToolCalculationBlockInfo &theBlockInfo);
+	boost::shared_ptr<NFmiFastQueryInfo> CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent);
+	boost::shared_ptr<NFmiFastQueryInfo> GetScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 	void ClearScriptVariableInfos(void);
-	NFmiSmartInfo* CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent);
-	NFmiAreaMask* CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
+	boost::shared_ptr<NFmiFastQueryInfo> CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent);
+	boost::shared_ptr<NFmiAreaMask> CreateCalculatedAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	void GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit, bool *fCheckLimits);
-	NFmiDataModifier* CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo);
-	NFmiDataIterator* CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiSmartInfo* theInfo);
-	void ModifyData2(NFmiSmartToolCalculationSection* theCalculationSection, NFmiMacroParamValue &theMacroParamValue);
-	NFmiAreaMask* CreateAreaMask(const NFmiAreaMaskInfo &theInfo);
-	NFmiAreaMask* CreateEndingAreaMask(void);
-	NFmiSmartInfo* CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-	NFmiSmartInfo* GetPossibleLevelInterpolatedInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+	boost::shared_ptr<NFmiDataModifier> CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo);
+	boost::shared_ptr<NFmiDataIterator> CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
+	void ModifyData2(boost::shared_ptr<NFmiSmartToolCalculationSection> &theCalculationSection, NFmiMacroParamValue &theMacroParamValue);
+	boost::shared_ptr<NFmiAreaMask> CreateAreaMask(const NFmiAreaMaskInfo &theInfo);
+	boost::shared_ptr<NFmiAreaMask> CreateEndingAreaMask(void);
+	boost::shared_ptr<NFmiFastQueryInfo> CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+	boost::shared_ptr<NFmiFastQueryInfo> GetPossibleLevelInterpolatedInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
 	void CreateCalculationModifiers(void);
 	void CreateFirstCalculationSection(void);
-	NFmiSmartToolCalculationSection* CreateCalculationSection(NFmiSmartToolCalculationSectionInfo *theCalcSectionInfo);
-	NFmiSmartToolCalculation* CreateCalculation(NFmiSmartToolCalculationInfo *theCalcInfo);
-	NFmiSmartToolCalculation* CreateConditionalSection(NFmiAreaMaskSectionInfo* theAreaMaskSectionInfo);
-	NFmiAreaMask* CreateSoundingIndexFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
-	NFmiSmartInfo* CreateCopyOfAnalyzeInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel);
+	boost::shared_ptr<NFmiSmartToolCalculationSection> CreateCalculationSection(boost::shared_ptr<NFmiSmartToolCalculationSectionInfo> &theCalcSectionInfo);
+	boost::shared_ptr<NFmiSmartToolCalculation> CreateCalculation(boost::shared_ptr<NFmiSmartToolCalculationInfo> &theCalcInfo);
+	boost::shared_ptr<NFmiSmartToolCalculation> CreateConditionalSection(boost::shared_ptr<NFmiAreaMaskSectionInfo> &theAreaMaskSectionInfo);
+	boost::shared_ptr<NFmiAreaMask> CreateSoundingIndexFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
+	boost::shared_ptr<NFmiFastQueryInfo> CreateCopyOfAnalyzeInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel);
 
 	NFmiInfoOrganizer *itsInfoOrganizer; // eli database, ei omista ei tuhoa
 	NFmiSmartToolIntepreter *itsSmartToolIntepreter; // omistaa, tuhoaa
@@ -145,7 +134,7 @@ private:
 	std::string itsErrorText;
 
 	bool fModifySelectedLocationsOnly;
-	checkedVector<NFmiSmartInfo*> itsScriptVariableInfos; // mahdolliset skripti-muuttujat talletetaan tänne
+	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > itsScriptVariableInfos; // mahdolliset skripti-muuttujat talletetaan tänne
 	std::string itsIncludeDirectory; // mistä ladataan mahd. include filet
 
 	NFmiTimeDescriptor *itsModifiedTimes; // ei omista/tuhoa
@@ -162,4 +151,4 @@ private:
 							  // HUOM! sulkujen lisäksi pitää laskea myös erilaisten funktioiden alut.
 };
 
-#endif
+

@@ -11,7 +11,7 @@
 #include "NFmiInfoAreaMask.h"
 #include "NFmiSoundingIndexCalculator.h"
 
-class NFmiQueryInfo;
+class NFmiFastQueryInfo;
 
 //! Tämä luokka toimii kuten NFmiInfoAreaMask mutta kurkkaa halutun x-y hila pisteen yli arvoa
 class NFmiInfoAreaMaskSoundingIndex : public NFmiInfoAreaMask
@@ -20,7 +20,7 @@ class NFmiInfoAreaMaskSoundingIndex : public NFmiInfoAreaMask
 public:
 
 	virtual ~NFmiInfoAreaMaskSoundingIndex(void);
-	NFmiInfoAreaMaskSoundingIndex(NFmiQueryInfo * theInfo, FmiSoundingParameters theSoundingParam, bool ownsInfo, bool destroySmartInfoData);
+	NFmiInfoAreaMaskSoundingIndex(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiSoundingParameters theSoundingParam);
 	FmiSoundingParameters SoundingParam(void) const {return itsSoundingParam;}
 	void SoundingParam(FmiSoundingParameters newValue) {itsSoundingParam = newValue;}
 

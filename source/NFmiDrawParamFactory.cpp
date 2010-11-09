@@ -29,7 +29,6 @@
 // ======================================================================
 
 #include "NFmiDrawParamFactory.h"
-#include "NFmiSmartInfo.h"
 #include "NFmiValueString.h"
 #include "NFmiDrawParam.h"
 #include "NFmiFileSystem.h"

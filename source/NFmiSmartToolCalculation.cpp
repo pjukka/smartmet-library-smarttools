@@ -1,10 +1,10 @@
 // ======================================================================
 /*!
  *
- * C++ Class Name : NFmiSmartToolCalculation
+ * C++ Class Name : NFmiSmartToolCalculation2
  * ---------------------------------------------------------
  * Filetype: (SOURCE)
- * Filepath: G:/siirto/marko/oc/NFmiSmartToolCalculation.cpp
+ * Filepath: G:/siirto/marko/oc/NFmiSmartToolCalculation2.cpp
  *
  *
  * GDPro Properties
@@ -29,7 +29,7 @@
 
 #include "NFmiSmartToolCalculation.h"
 #include "NFmiAreaMaskInfo.h"
-#include "NFmiSmartInfo.h"
+#include "NFmiFastQueryInfo.h"
 #include "NFmiDataModifierClasses.h"
 #include "NFmiCalculationConstantValue.h"
 #include <algorithm>
@@ -48,7 +48,7 @@ NFmiSmartToolCalculation::NFmiSmartToolCalculation(void)
 :itsLowerLimit(0)
 ,itsUpperLimit(1)
 ,fDoLimitCheck(true)
-,itsResultInfo(0)
+,itsResultInfo()
 ,itsCalculations()
 ,itsHeightValue(0)
 ,itsPressureHeightValue(1000)
@@ -63,7 +63,6 @@ NFmiSmartToolCalculation::NFmiSmartToolCalculation(void)
 
 NFmiSmartToolCalculation::~NFmiSmartToolCalculation(void)
 {
-	Clear();
 }
 
 template<typename T>
@@ -162,16 +161,7 @@ bool NFmiSmartToolCalculation::IsMasked(const NFmiPoint &theLatlon, int theLocat
 	return bin_eval_exp(theLatlon, theTime, theTimeIndex);
 }
 
-void NFmiSmartToolCalculation::Clear(void)
-{
-	delete itsResultInfo;
-	itsResultInfo = 0;
-	std::for_each(itsCalculations.begin(), itsCalculations.end(), PointerDestroyer());
-	itsCalculations.clear();
-}
-
-//void NFmiSmartToolCalculation::AddCalculation(NFmiAreaMask* theCalculation, NFmiSmartToolCalculation::FmiCalculationOperators theOperation)
-void NFmiSmartToolCalculation::AddCalculation(NFmiAreaMask* theCalculation)
+void NFmiSmartToolCalculation::AddCalculation(boost::shared_ptr<NFmiAreaMask> &theCalculation)
 {
 	if(theCalculation)
 	{
@@ -183,7 +173,7 @@ void NFmiSmartToolCalculation::AddCalculation(NFmiAreaMask* theCalculation)
 struct TimeSetter
 {
 	TimeSetter(const NFmiMetTime &theTime):itsTime(theTime){}
-	void operator()(NFmiAreaMask* theMask){theMask->Time(itsTime);}
+	void operator()(boost::shared_ptr<NFmiAreaMask> &theMask){theMask->Time(itsTime);}
 
 	const NFmiMetTime &itsTime;
 };
@@ -202,7 +192,7 @@ double NFmiSmartToolCalculation::eval_exp(const NFmiPoint &theLatlon, const NFmi
 {
 	double result = kFloatMissing;
 
-	token = 0; // nollataan aluksi 'token'
+	token = boost::shared_ptr<NFmiAreaMask>(); // nollataan aluksi 'token'
 	itsCalcIterator = itsCalculations.begin();
 
 	get_token();
@@ -391,7 +381,7 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(double &result, double
 				if(endTime.DifferenceInMinutes(startTime)/usedTimeResolutionInMinutes > 250)
 					throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorTimeCalcOverRun"));
 				// 5. funktiosta riippuva datamodifier min, max jne.
-				NFmiDataModifier* modifier = CreateIntegrationFuction(func); // tämä palauttaa aina jotain, tai heittää poikkeuksen
+				boost::shared_ptr<NFmiDataModifier> modifier = CreateIntegrationFuction(func); // tämä palauttaa aina jotain, tai heittää poikkeuksen
 				try
 				{
 					fUseTimeInterpolationAlways = true;
@@ -409,13 +399,11 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(double &result, double
 					} while(currentTime <= endTime);
 					// 10. loopin lopuksi pyydä result datamodifier:ilta
 					result = modifier->CalculationResult();
-					delete modifier;
 					fUseTimeInterpolationAlways = false;
 				}
 				catch(...)
 				{
 					fUseTimeInterpolationAlways = false;
-					delete modifier;
 					throw ;
 				}
 			}
@@ -471,7 +459,7 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(double &result, doubl
 			if((argument2 - argument1) > 35000)
 				throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorHeightCalcOverRun"));
 			// 5. funktiosta riippuva datamodifier min, max jne.
-			NFmiDataModifier* modifier = CreateIntegrationFuction(func); // tämä palauttaa aina jotain, tai heittää poikkeuksen
+			boost::shared_ptr<NFmiDataModifier> modifier = CreateIntegrationFuction(func); // tämä palauttaa aina jotain, tai heittää poikkeuksen
 			try
 			{
 				fUseHeightCalculation = true;
@@ -510,13 +498,11 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(double &result, doubl
 					result = heightValue; // eli sijoitetaan min/max arvon korkeus tulokseen jos kyseessä oli minh/maxh -funktio
 				else
 					result = modifier->CalculationResult();
-				delete modifier;
 				fUseHeightCalculation = false;
 			}
 			catch(...)
 			{
 				fUseHeightCalculation = false;
-				delete modifier;
 				throw ;
 			}
 		}
@@ -525,22 +511,22 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(double &result, doubl
 }
 
 // Muista jos tulee päivityksiä, smanlainen funktio löytyy myös NFmiSmartToolModifier-luokasta
-NFmiDataModifier* NFmiSmartToolCalculation::CreateIntegrationFuction(NFmiAreaMask::FunctionType func)
+boost::shared_ptr<NFmiDataModifier> NFmiSmartToolCalculation::CreateIntegrationFuction(NFmiAreaMask::FunctionType func)
 {
-	NFmiDataModifier* modifier = 0;
+	boost::shared_ptr<NFmiDataModifier> modifier;
 	switch(func)
 	{
 	case NFmiAreaMask::Avg:
-		modifier = new NFmiDataModifierAvg;
+		modifier = boost::shared_ptr<NFmiDataModifier>(new NFmiDataModifierAvg());
 		break;
 	case NFmiAreaMask::Min:
-		modifier = new NFmiDataModifierMin;
+		modifier = boost::shared_ptr<NFmiDataModifier>(new NFmiDataModifierMin());
 		break;
 	case NFmiAreaMask::Max:
-		modifier = new NFmiDataModifierMax;
+		modifier = boost::shared_ptr<NFmiDataModifier>(new NFmiDataModifierMax());
 		break;
 	case NFmiAreaMask::Sum:
-		modifier = new NFmiDataModifierSum;
+		modifier = boost::shared_ptr<NFmiDataModifier>(new NFmiDataModifierSum());
 		break;
 		// HUOM!!!! Tee WAvg-modifier myös, joka on peritty Avg-modifieristä ja tee joku kerroin juttu painotukseen.
 	default:
@@ -668,7 +654,7 @@ bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiPoint &theLatlon, const NF
 	bool maskresult = true;
 	double result = kFloatMissing;
 
-	token = 0; // nollataan aluksi 'token'
+	token = boost::shared_ptr<NFmiAreaMask>(); // nollataan aluksi 'token'
 	itsCalcIterator = itsCalculations.begin();
 
 	get_token();
