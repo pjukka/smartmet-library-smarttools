@@ -20,7 +20,7 @@ public:
 	NFmiQueryDataKeeper(boost::shared_ptr<NFmiOwnerInfo> &theOriginalData);
 	~NFmiQueryDataKeeper(void);
 
-	boost::shared_ptr<NFmiOwnerInfo> OriginalData(void); // T‰t‰ saa k‰ytt‰‰ vain NFmiInfoOrganizer2-luokka sis‰isesti, koska t‰t‰ ei ole tarkoitus palauttaa, 
+	boost::shared_ptr<NFmiOwnerInfo> OriginalData(void); // T‰t‰ saa k‰ytt‰‰ vain NFmiInfoOrganizer-luokka sis‰isesti, koska t‰t‰ ei ole tarkoitus palauttaa, 
 														// kun tarvitaan moni-s‰ie turvallinen info-iteraattori kopio, k‰ytet‰‰n mieluummin GetIter-metodia.
 	boost::shared_ptr<NFmiFastQueryInfo> GetIter(void); // T‰m‰ palauttaa vapaana olevan Info-iteraattori kopion dataan.
 	int Index(void) const {return itsIndex;}

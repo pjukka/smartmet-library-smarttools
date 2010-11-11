@@ -22,5 +22,5 @@ NFmiInfoAreaMaskSoundingIndex::NFmiInfoAreaMaskSoundingIndex(boost::shared_ptr<N
 double NFmiInfoAreaMaskSoundingIndex::Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int /* theTimeIndex */ , bool /* fUseTimeInterpolationAlways */ )
 {
 	// RUMAA CAST-koodia!!!!!
-	return NFmiSoundingIndexCalculator::Calc(itsInfo.get(), theLatlon, theTime, itsSoundingParam);
+	return NFmiSoundingIndexCalculator::Calc(itsInfo, theLatlon, theTime, itsSoundingParam);
 }

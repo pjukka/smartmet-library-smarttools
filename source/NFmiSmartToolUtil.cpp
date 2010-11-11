@@ -10,7 +10,7 @@
 
 #include "NFmiSmartToolUtil.h"
 #include "NFmiInfoOrganizer.h"
-#include "NFmiSmartInfo.h"
+#include "NFmiFastQueryInfo.h"
 #include "NFmiSmartToolModifier.h"
 #include "NFmiQueryData.h"
 #include "NFmiStreamQueryData.h"
@@ -50,7 +50,7 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 		return 0;
 	}
 
-	NFmiSmartInfo *editedInfo = dataBase.FindInfo(NFmiInfoData::kEditable);
+	boost::shared_ptr<NFmiFastQueryInfo> editedInfo = dataBase.FindInfo(NFmiInfoData::kEditable);
 	try // suoritetaan macro sitten
 	{
 		if(goThroughLevels == false)

@@ -23,7 +23,7 @@ public:
 										// virtuaali funktio, jossa eri paluu-luokka.
 	NFmiInfoData::Type DataType(void) const {return itsDataType;};
 	void DataType(NFmiInfoData::Type newType){itsDataType = newType;};
-	const std::string& DataFileName(void){return itsDataFileName;}
+	const std::string& DataFileName(void) const {return itsDataFileName;}
 	void DataFileName(const std::string& theDataFileName){itsDataFileName = theDataFileName;}
 	const std::string& DataFilePattern(void) const {return itsDataFilePattern;}
 	void DataFilePattern(const std::string &theDataFilePattern) {itsDataFilePattern = theDataFilePattern;}
