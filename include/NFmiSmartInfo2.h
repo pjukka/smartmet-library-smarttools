@@ -31,6 +31,9 @@ public:
 										// TODO: katso pitääkö metodin nimi muuttaa, koska emoissa Clone on 
 										// virtuaali funktio, jossa eri paluu-luokka.
 
+	// HUOM!!!! Jos käytätä tätä funktiota, pidä myös boost::shared_ptr<NFmiFastQueryInfo> -olio tallessa!!!!
+	static NFmiSmartInfo2* GetSmartInfo2Safely(boost::shared_ptr<NFmiFastQueryInfo> &theInfo); // apu funktio, jolla haetaan dynaamisesti lapsi luokan pointteri perus-oliosta (boost::shared_ptr<NFmiFastQueryInfo>():sta)
+
 	bool NextLocation (void);
 
 	bool SnapShotData(const std::string& theAction, const NFmiHarmonizerBookKeepingData &theCurrentHarmonizerBookKeepingData);

@@ -536,6 +536,36 @@ checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos
 	return infoVector;
 }
 
+// Palauttaa vectorin viewable infoja, vectori ei omista pointtereita,
+// joten infoja ei saa tuhota.
+checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type theDataType)
+{
+	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infoVector;
+
+	if(theDataType == NFmiInfoData::kEditable)
+	{
+		boost::shared_ptr<NFmiFastQueryInfo> editedDataIter = itsEditedDataKeeper->GetIter();
+		if(editedDataIter)
+			infoVector.push_back(editedDataIter);
+	}
+	else if(theDataType == NFmiInfoData::kCopyOfEdited)
+	{
+		boost::shared_ptr<NFmiFastQueryInfo> copyOfEditedDataIter = itsCopyOfEditedDataKeeper->GetIter();
+		if(copyOfEditedDataIter)
+			infoVector.push_back(copyOfEditedDataIter);
+	}
+	else
+	{
+		for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
+		{
+			boost::shared_ptr<NFmiFastQueryInfo> info = iter->second->GetDataKeeper()->GetIter();
+			if(info->DataType() == theDataType)
+				infoVector.push_back(info);
+		}
+	}
+	return infoVector;
+}
+
 NFmiParamBag NFmiInfoOrganizer::GetParams(int theProducerId1)
 {
 	NFmiParamBag paramBag;
