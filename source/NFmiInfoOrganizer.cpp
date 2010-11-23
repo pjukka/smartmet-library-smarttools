@@ -187,7 +187,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(const NFmiDataIdent
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetWantedProducerInfo(NFmiInfoData::Type theType, FmiProducerName theProducerName)
 {
-	if(theType == NFmiInfoData::kEditable)
+	if(itsEditedDataKeeper && theType == NFmiInfoData::kEditable)
 		return itsEditedDataKeeper->GetIter();
 	else
 	{
@@ -351,9 +351,9 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CrossSectionInfo(const N
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, int theIndex) // Hakee indeksin mukaisen tietyn datatyypin infon
 {
-	if(theDataType == NFmiInfoData::kEditable)
+	if(itsEditedDataKeeper && theDataType == NFmiInfoData::kEditable)
 		return itsEditedDataKeeper->GetIter();
-	else if(theDataType == NFmiInfoData::kCopyOfEdited)
+	else if(itsCopyOfEditedDataKeeper && theDataType == NFmiInfoData::kCopyOfEdited)
 		return itsCopyOfEditedDataKeeper->GetIter();
 	else
 	{
@@ -376,9 +376,9 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindInfo(NFmiInfoData::T
 // yhteydessä, monesko otetaan)
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindInfo(NFmiInfoData::Type theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex)
 {
-	if(theDataType == NFmiInfoData::kEditable)
+	if(itsEditedDataKeeper && theDataType == NFmiInfoData::kEditable)
 		return itsEditedDataKeeper->GetIter();
-	else if(theDataType == NFmiInfoData::kCopyOfEdited)
+	else if(itsCopyOfEditedDataKeeper && theDataType == NFmiInfoData::kCopyOfEdited)
 		return itsCopyOfEditedDataKeeper->GetIter();
 	else
 	{
@@ -496,12 +496,15 @@ checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos
 	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infoVector;
 
 	int currentProdId = 0;
-	boost::shared_ptr<NFmiFastQueryInfo> editedDataIter = itsEditedDataKeeper->GetIter();
-	if(editedDataIter && editedDataIter->IsGrid() == false) // laitetaan myös mahdollisesti editoitava data, jos kyseessä on asema dataa eli havainto
+	if(itsEditedDataKeeper)
 	{
-		currentProdId = editedDataIter->Producer()->GetIdent();
-		if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
-			infoVector.push_back(editedDataIter);
+		boost::shared_ptr<NFmiFastQueryInfo> editedDataIter = itsEditedDataKeeper->GetIter();
+		if(editedDataIter && editedDataIter->IsGrid() == false) // laitetaan myös mahdollisesti editoitava data, jos kyseessä on asema dataa eli havainto
+		{
+			currentProdId = editedDataIter->Producer()->GetIdent();
+			if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
+				infoVector.push_back(editedDataIter);
+		}
 	}
 
 	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
@@ -542,13 +545,13 @@ checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos
 {
 	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infoVector;
 
-	if(theDataType == NFmiInfoData::kEditable)
+	if(itsEditedDataKeeper && theDataType == NFmiInfoData::kEditable)
 	{
 		boost::shared_ptr<NFmiFastQueryInfo> editedDataIter = itsEditedDataKeeper->GetIter();
 		if(editedDataIter)
 			infoVector.push_back(editedDataIter);
 	}
-	else if(theDataType == NFmiInfoData::kCopyOfEdited)
+	else if(itsCopyOfEditedDataKeeper && theDataType == NFmiInfoData::kCopyOfEdited)
 	{
 		boost::shared_ptr<NFmiFastQueryInfo> copyOfEditedDataIter = itsCopyOfEditedDataKeeper->GetIter();
 		if(copyOfEditedDataIter)
@@ -837,7 +840,7 @@ int NFmiInfoOrganizer::CountData(void)
 	if(itsCopyOfEditedDataKeeper)
 		count++;
 
-	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); )
+	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
 		count += static_cast<int>(iter->second->DataCount());
 
 	return count;
@@ -851,7 +854,7 @@ double NFmiInfoOrganizer::CountDataSize(void)
 	if(itsCopyOfEditedDataKeeper)
 		dataSize += itsCopyOfEditedDataKeeper->OriginalData()->Size() * sizeof(float);
 
-	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); )
+	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
 		dataSize += iter->second->DataByteCount();
 
 	return dataSize;
