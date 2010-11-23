@@ -57,6 +57,11 @@ NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(void)
 }
 
 NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> &theData)
+:itsQueryDatas()
+,itsMaxLatestDataCount(0)
+,itsModelRunTimeGap(6*60)
+,itsFilePattern()
+,itsLatestOriginTime()
 {
 	AddData(theData, true); // true tarkoittaa että kyse on 1. lisättävästä datasta
 }
