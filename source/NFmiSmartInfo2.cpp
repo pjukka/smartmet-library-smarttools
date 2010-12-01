@@ -201,8 +201,3 @@ unsigned long NFmiSmartInfo2::MaskType(void)
 {
 	return itsQDataBookKeepingPtr->MaskType();
 }
-
-NFmiSmartInfo2* NFmiSmartInfo2::GetSmartInfo2Safely(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
-{
-	return dynamic_cast<NFmiSmartInfo2*>(theInfo.get());
-}
