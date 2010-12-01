@@ -110,6 +110,7 @@ public:
 	int CountData(void);
 	double CountDataSize(void);
 	void UpdateCrossSectionMacroParamDataSize(int x, int y);
+	void UpdateMacroParamDataSize(int x, int y);
 	// ***************************************************************************************************************
 
 private:
