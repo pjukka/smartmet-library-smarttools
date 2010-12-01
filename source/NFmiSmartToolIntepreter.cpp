@@ -94,9 +94,12 @@ NFmiSmartToolCalculationBlockInfo::~NFmiSmartToolCalculationBlockInfo(void)
 
 void NFmiSmartToolCalculationBlockInfo::Clear(void)
 {
-	itsIfCalculationBlockInfos->Clear();
-	itsElseIfCalculationBlockInfos->Clear();
-	itsElseCalculationBlockInfos->Clear();
+	if(itsIfCalculationBlockInfos)
+		itsIfCalculationBlockInfos->Clear();
+	if(itsElseIfCalculationBlockInfos)
+		itsElseIfCalculationBlockInfos->Clear();
+	if(itsElseCalculationBlockInfos)
+		itsElseCalculationBlockInfos->Clear();
 	fElseSectionExist = false;
 }
 
