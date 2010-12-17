@@ -57,7 +57,9 @@ public:
 					  ,const std::string& theDataFileName
 					  ,const std::string& theDataFilePattern
 					  ,NFmiInfoData::Type theDataType
-					  ,int theUndoLevel = 0);
+					  ,int theUndoLevel
+					  ,int theMaxLatestDataCount
+					  ,int theModelRunTimeGap);
 
 	// ***************************************************************************************************************
 	// Tässä perässä on pienin mahdollinen julkinen rajapinta, jonka sain siivottua originaali NFmiInfoOrganizr:ista. 
@@ -67,7 +69,7 @@ public:
 	// Pitääkö lisäksi laittaa extra-infoa eri datoista, että siivous rutiini tietää milloin niitä on viimeksi käytetty,
 	// mitä muuta infoa tarvitaan kirjanpitoon ja muuhin?
 	// ***************************************************************************************************************
-	boost::shared_ptr<NFmiFastQueryInfo> Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted = false);
+	boost::shared_ptr<NFmiFastQueryInfo> Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound);
   	boost::shared_ptr<NFmiFastQueryInfo> Info(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly = false, bool fLevelData = false);
 	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(const std::string &theFileNameFilter); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
 	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(int theProducerId, int theProducerId2 = -1, int theProducerId3 = -1, int theProducerId4 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
@@ -119,10 +121,11 @@ private:
 	NFmiInfoOrganizer(const NFmiInfoOrganizer&);
 
 	bool AddEditedData(NFmiSmartInfo2 *theEditedData, int theUndoLevel);
-	bool Add(NFmiOwnerInfo* theInfo);
+	bool Add(NFmiOwnerInfo* theInfo, int theMaxLatestDataCount, int theModelRunTimeGap);
 
-	boost::shared_ptr<NFmiFastQueryInfo> GetInfo(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly);
-	boost::shared_ptr<NFmiFastQueryInfo> CrossSectionInfo(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
+	boost::shared_ptr<NFmiFastQueryInfo> Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted);
+	boost::shared_ptr<NFmiFastQueryInfo> GetInfo(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, int theIndex = 0);
+	boost::shared_ptr<NFmiFastQueryInfo> CrossSectionInfo(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType, int theIndex = 0);
 	boost::shared_ptr<NFmiFastQueryInfo> GetSynopPlotParamInfo(NFmiInfoData::Type theType);
 	boost::shared_ptr<NFmiFastQueryInfo> GetSoundingPlotParamInfo(NFmiInfoData::Type theType);
 	boost::shared_ptr<NFmiFastQueryInfo> GetWantedProducerInfo(NFmiInfoData::Type theType, FmiProducerName theProducerName);

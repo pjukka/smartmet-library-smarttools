@@ -4,6 +4,7 @@
 #include "NFmiMilliSecondTimer.h"
 #include "NFmiDataMatrix.h"
 #include "NFmiMetTime.h"
+#include "NFmiInfoData.h"
 #include "boost/shared_ptr.hpp"
 #include <list>
 
@@ -28,7 +29,7 @@ public:
 
 private:
 	boost::shared_ptr<NFmiOwnerInfo> itsData; // t‰m‰ on originaali data
-	NFmiMilliSecondTimer itsLastTimeUsedtimer;  // aina kun kyseist‰ dataa k‰ytet‰‰n, k‰ytet‰‰n StartTimer-metodia, jotta myˆhemmin voidaan 
+	NFmiMilliSecondTimer itsLastTimeUsedTimer;  // aina kun kyseist‰ dataa k‰ytet‰‰n, k‰ytet‰‰n StartTimer-metodia, jotta myˆhemmin voidaan 
 												// laskea, voidaanko kyseinen data siivota pois muistista (jos dataa ei ole k‰ytetty tarpeeksi pitk‰‰n aikaan)
 	int itsKeepInMemoryTime; // kuinka kauan pidet‰‰n data muistissa, jos sit‰ ei ole k‰ytetty. yksikkˆ on minuutteja
 	int itsIndex; // malliajo datoissa 0 arvo tarkoittaa viimeisint‰ ja -1 sit‰ edellist‰ jne.
@@ -46,13 +47,18 @@ public:
 	typedef std::list<boost::shared_ptr<NFmiQueryDataKeeper> > ListType;
 
 	NFmiQueryDataSetKeeper(void);
-	NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> &theData);
+	NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> &theData, int theMaxLatestDataCount = 0, int theModelRunTimeGap = gStaticDefaultModelRunTimeGap);
 	~NFmiQueryDataSetKeeper(void);
 
 	void AddData(boost::shared_ptr<NFmiOwnerInfo> &theData, bool fFirstData = false);
 	boost::shared_ptr<NFmiQueryDataKeeper> GetDataKeeper(int theIndex = 0);
 	const std::string& FilePattern(void) const {return itsFilePattern;}
 	void FilePattern(const std::string &newValue) {itsFilePattern = newValue;}
+	int MaxLatestDataCount(void) const {return itsMaxLatestDataCount;}
+	void MaxLatestDataCount(int newValue) {itsMaxLatestDataCount = newValue;}
+	int ModelRunTimeGap(void) const {return itsModelRunTimeGap;}
+	void ModelRunTimeGap(int newValue) {itsModelRunTimeGap = newValue;}
+
 	size_t DataCount(void);
 	size_t DataByteCount(void);
 
@@ -60,10 +66,13 @@ private:
 	void AddDataToSet(boost::shared_ptr<NFmiOwnerInfo> &theData);
 	void RecalculateIndexies(const NFmiMetTime &theLatestOrigTime);
 	void DeleteTooOldDatas(void);
+	bool DoOnDemandOldDataLoad(int theIndex);
 
 	ListType itsQueryDatas; // t‰ss‰ on n kpl viimeisint‰ malliajoa tallessa (tai esim. havaintojen tapauksessa vain viimeisin data)
 	int itsMaxLatestDataCount; // kuinka monta viimeisint‰ malliajoa/dataa maksimiss‰‰n kullekin datalle on, 0 jos kyse esim. havainnoista, joille ei ole kuin viimeisin data.
 	int itsModelRunTimeGap; // mill‰ ajov‰leill‰ kyseisen datan mallia ajetaan (yksikkˆ minuutteja), jos kyse havainnosta, eli ei ole kuin viimeinen data, arvo 0 ja jos kyse esim. editoidusta datasta (ep‰m‰‰r‰inen ilmestymisv‰li) on arvo -1.
 	std::string itsFilePattern; // erilaiset datat erotellaan fileFilterin avulla (esim. "D:\smartmet\wrk\data\local\*_hirlam_skandinavia_mallipinta.sqd")
 	NFmiMetTime itsLatestOriginTime; // t‰h‰n talletetaan aina viimeisimm‰n datan origin-time vertailuja helpottamaan
+	static int gStaticDefaultModelRunTimeGap; // t‰ss‰ on m‰‰r‰tty default model run time gap minuuteissa
+	NFmiInfoData::Type itsDataType; // t‰h‰n laitetaan 1. datan datattyyppi (pit‰isi olla yhten‰inen kaikille setiss‰ oleville datoille)
 };

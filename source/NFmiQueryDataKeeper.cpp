@@ -1,12 +1,16 @@
 
 #include "NFmiQueryDataKeeper.h"
 #include "NFmiSmartInfo2.h"
+#include "NFmiFileSystem.h"
+#include "NFmiFileString.h"
+#include "NFmiQueryData.h"
+#include <fstream>
 
 // ************* NFmiQueryDataKeeper-class **********************
 
 NFmiQueryDataKeeper::NFmiQueryDataKeeper(boost::shared_ptr<NFmiOwnerInfo> &theOriginalData)
 :itsData(theOriginalData)
-,itsLastTimeUsedtimer()
+,itsLastTimeUsedTimer()
 ,itsKeepInMemoryTime(10)
 ,itsIndex(0)
 ,itsIteratorList()
@@ -47,19 +51,22 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiQueryDataKeeper::GetIter(void)
 
 // ************* NFmiQueryDataSetKeeper-class **********************
 
+int NFmiQueryDataSetKeeper::gStaticDefaultModelRunTimeGap = 6*60; // säädetään tämä 6 tuntiin, koska se on yleisin malliajoväli (RCR, MBE, Arome, GFS)
+
 NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(void)
 :itsQueryDatas()
 ,itsMaxLatestDataCount(0)
-,itsModelRunTimeGap(6*60)
+,itsModelRunTimeGap(gStaticDefaultModelRunTimeGap)
 ,itsFilePattern()
 ,itsLatestOriginTime()
+,itsDataType(NFmiInfoData::kNoDataType)
 {
 }
 
-NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> &theData)
+NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> &theData, int theMaxLatestDataCount, int theModelRunTimeGap)
 :itsQueryDatas()
-,itsMaxLatestDataCount(0)
-,itsModelRunTimeGap(6*60)
+,itsMaxLatestDataCount(theMaxLatestDataCount)
+,itsModelRunTimeGap(theModelRunTimeGap)
 ,itsFilePattern()
 ,itsLatestOriginTime()
 {
@@ -77,6 +84,7 @@ void NFmiQueryDataSetKeeper::AddData(boost::shared_ptr<NFmiOwnerInfo> &theData, 
 {
 	if(theData)
 	{
+		itsDataType = theData->DataType();
 		if(fFirstData || itsMaxLatestDataCount == 0)
 		{
 			itsQueryDatas.clear(); 
@@ -123,8 +131,10 @@ void NFmiQueryDataSetKeeper::AddDataToSet(boost::shared_ptr<NFmiOwnerInfo> &theD
 
 static int CalcIndex(const NFmiMetTime &theLatestOrigTime, const NFmiMetTime &theOrigCurrentTime, int theModelRunTimeGap)
 {
+	if(theModelRunTimeGap == 0)
+		return 0;
 	int diffInMinutes = theLatestOrigTime.DifferenceInMinutes(theOrigCurrentTime);
-	return round(diffInMinutes/theModelRunTimeGap);
+	return round(-diffInMinutes/theModelRunTimeGap);
 }
 
 void NFmiQueryDataSetKeeper::RecalculateIndexies(const NFmiMetTime &theLatestOrigTime)
@@ -142,7 +152,7 @@ struct OldDataRemover
 
 	bool operator()(boost::shared_ptr<NFmiQueryDataKeeper> &theDataKeeper)
 	{
-		if(itsMaxLatestDataCount < theDataKeeper->Index())
+		if(::abs(theDataKeeper->Index()) > itsMaxLatestDataCount)
 			return true;
 		return false;
 	}
@@ -156,15 +166,87 @@ void NFmiQueryDataSetKeeper::DeleteTooOldDatas(void)
 	itsQueryDatas.remove_if(OldDataRemover(itsMaxLatestDataCount));
 }
 
-boost::shared_ptr<NFmiQueryDataKeeper> NFmiQueryDataSetKeeper::GetDataKeeper(int theIndex)
+static boost::shared_ptr<NFmiQueryDataKeeper> FindQDataKeeper(NFmiQueryDataSetKeeper::ListType &theQueryDatas, int theIndex)
 {
-	for(ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); ++it)
+	for(NFmiQueryDataSetKeeper::ListType::iterator it = theQueryDatas.begin(); it != theQueryDatas.end(); ++it)
 	{
 		if((*it)->Index() == theIndex)
 			return (*it);
 	}
+	return boost::shared_ptr<NFmiQueryDataKeeper>();
+}
+
+// TODO: Tulevaisuudessa pitää vielä hanskata tilanne että halutaan uusimman ajon dataa, 
+// jota ei välttämättä ole kyseiselle datatyypille kyseisestä mallista. Voisi olla siis arvo 0, joka tarkoittaa
+// että hae viimeisimman malliajon data, siis Hirlam RCR:sta pintadata on jo 06, mutta jos mallipinta olisi 00 ajosta,
+// pitäisi tällöin palauttaa 0-data. Jos indeksi olisi 1 (tai suurempi), palautettaisiin viimeisin data, ed. mainitun 
+// esimerkin mukaisesti 00 mallipinta data.
+boost::shared_ptr<NFmiQueryDataKeeper> NFmiQueryDataSetKeeper::GetDataKeeper(int theIndex)
+{
+	if(theIndex > 0)
+		theIndex = 0; 
+
+	boost::shared_ptr<NFmiQueryDataKeeper> qDataKeeperPtr = ::FindQDataKeeper(itsQueryDatas, theIndex);
+	if(qDataKeeperPtr)
+		return qDataKeeperPtr;
+
+	if(DoOnDemandOldDataLoad(theIndex))
+		return ::FindQDataKeeper(itsQueryDatas, theIndex); // kokeillaan, löytyykö on-demand pyynnön jälkeen haluttua dataa 
+
 	// jos ei löytynyt, palautetaan tyhjä
 	return boost::shared_ptr<NFmiQueryDataKeeper>();
+}
+
+static NFmiMetTime CalcWantedOrigTime(const NFmiMetTime &theLatestOrigTime, int theIndex, int theModelRunTimeGap)
+{
+	NFmiMetTime wantedOrigTime = theLatestOrigTime;
+	long diffInMinutes = theModelRunTimeGap * theIndex;
+	wantedOrigTime.ChangeByMinutes(diffInMinutes);
+	return wantedOrigTime;
+}
+
+
+bool NFmiQueryDataSetKeeper::DoOnDemandOldDataLoad(int theIndex)
+{
+	if(::abs(theIndex) < itsMaxLatestDataCount) // ei yritetä hakea liian vanhoja datoja
+	{
+		if(itsModelRunTimeGap > 0)
+		{
+			NFmiMetTime wantedOrigTime = ::CalcWantedOrigTime(itsLatestOriginTime, theIndex, itsModelRunTimeGap);
+			std::list<std::string> files = NFmiFileSystem::PatternFiles(itsFilePattern);
+			for(std::list<std::string>::iterator it = files.begin(); it != files.end(); ++it)
+			{
+				try
+				{
+					NFmiFileString fileName(itsFilePattern);
+					fileName.FileName(*it);
+					std::string usedFileName = fileName;
+					NFmiQueryInfo info;
+					std::ifstream in(usedFileName.c_str());
+					if(in)
+					{
+						in >> info;
+						if(in.good())
+						{
+							if(info.OriginTime() == wantedOrigTime)
+							{
+								in.close();
+								// TODO lue data tässä käyttöön
+								NFmiQueryData *data = new NFmiQueryData(usedFileName);
+								boost::shared_ptr<NFmiOwnerInfo> ownerInfoPtr(new NFmiOwnerInfo(data, itsDataType, usedFileName, itsFilePattern));
+								AddDataToSet(ownerInfoPtr);
+								return true;
+							}
+						}
+					}
+				}
+				catch(...)
+				{ // pitää vain varmistaa että jos tiedosto on viallinen, poikkeukset napataan kiinni tässä
+				}
+			}
+		}
+	}
+	return false;
 }
 
 size_t NFmiQueryDataSetKeeper::DataCount(void)
