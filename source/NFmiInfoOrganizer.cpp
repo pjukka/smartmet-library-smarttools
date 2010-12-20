@@ -170,16 +170,25 @@ static bool CheckLevel(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmi
 	return false;
 }
 
-boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound)
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound, bool &fGetDataFromServer)
 {
+	fGetDataFromServer = false;
 	boost::shared_ptr<NFmiFastQueryInfo> aInfo = Info(theDrawParam, fCrossSectionInfoWanted);
 	if(aInfo == 0 && fGetLatestIfArchiveNotFound && theDrawParam.ModelRunIndex() < 0)
 	{
 		NFmiDrawParam tmpDrawParam(theDrawParam);
 		tmpDrawParam.ModelRunIndex(0); 
 		aInfo = Info(tmpDrawParam, fCrossSectionInfoWanted); // koetetaan sitten hakea viimeisintä dataa
+		if(aInfo)
+			fGetDataFromServer = true;
 	}
 	return aInfo;
+}
+
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound)
+{
+	bool getDataFromServer = false;
+	return Info(theDrawParam, fCrossSectionInfoWanted, fGetLatestIfArchiveNotFound, getDataFromServer);
 }
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted)
@@ -260,6 +269,24 @@ static bool MatchCrossSectionData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
 	return false;
 }
 
+// Palauttaa annetun datan, paitsi jos kyse on arkisto datasta, tarkistetaan että sellainen löytyy ja palautetaan se (parametri asetettuna oikein).
+// Jos ei löydy oikeaa arkisto dataa, palautetaan 0-pointteri.
+static boost::shared_ptr<NFmiFastQueryInfo> DoArchiveCheck(boost::shared_ptr<NFmiFastQueryInfo> &theData, const NFmiDataIdent& theDataIdent, bool fUseParIdOnly, const NFmiLevel* theLevel, int theIndex, NFmiInfoOrganizer::MapType::iterator &theDataKeeperIter)
+{
+	boost::shared_ptr<NFmiFastQueryInfo> aInfo = theData;
+	if(aInfo && theIndex < 0)
+	{
+		boost::shared_ptr<NFmiQueryDataKeeper> qDataKeeper = theDataKeeperIter->second->GetDataKeeper(theIndex);
+		if(qDataKeeper)
+			aInfo = qDataKeeper->GetIter(); // tässä katsotaan löytyykö vielä haluttu arkisto data
+		else
+			aInfo = boost::shared_ptr<NFmiFastQueryInfo>(); // ei löytynyt arkisto dataa, nollataan info-pointteri, että data koetetaan sitten hakea q2serveriltä
+		::CheckDataIdent(aInfo, theDataIdent, fUseParIdOnly); // pitää asettaa arkisto datakin oikeaan parametriin
+		::CheckLevel(aInfo, theLevel);
+	}
+	return aInfo;
+}
+
 //--------------------------------------------------------
 // GetInfo
 // Yritin aluksi tehdä metodin käyttämällä parametria 
@@ -311,20 +338,12 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
 				{
 					if(theDataIdent.GetProducer()->GetName() == aInfo->Param().GetProducer()->GetName())
 					{
-						if(theIndex < 0)
-						{
-							boost::shared_ptr<NFmiQueryDataKeeper> qDataKeeper = iter->second->GetDataKeeper(theIndex);
-							if(qDataKeeper)
-								aInfo = qDataKeeper->GetIter(); // tässä katsotaan löytyykö vielä haluttu arkisto data
-							else
-								aInfo = boost::shared_ptr<NFmiFastQueryInfo>(); // ei löytynyt arkisto dataa, nollataan info-pointteri, että data koetetaan sitten hakea q2serveriltä
-						}
-						foundData = aInfo; // tämä saa olla 0-pointteri, jos kyse oli arkistodatasta
-						backupData = boost::shared_ptr<NFmiFastQueryInfo>(); // pitää vielä varmistaa ettei 0-pointteri tapauksessa oteta backup-infoa!
-						break;
+						foundData = ::DoArchiveCheck(aInfo, theDataIdent, fUseParIdOnly, theLevel, theIndex, iter); // tämä saa olla 0-pointteri, jos kyse oli arkistodatasta
+						if(foundData)
+							break;
 					}
 					else if(backupData == 0)
-						backupData = aInfo;
+						backupData = ::DoArchiveCheck(aInfo, theDataIdent, fUseParIdOnly, theLevel, theIndex, iter);
 				}
 			}
 		}
@@ -358,16 +377,17 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CrossSectionInfo(const N
 		// tutkitaan ensin löytyykö theParam suoraan joltain listassa olevalta NFmiSmartInfo-pointterilta
 		for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
 		{
-			boost::shared_ptr<NFmiFastQueryInfo> aInfo = iter->second->GetDataKeeper(theIndex)->GetIter();
+			boost::shared_ptr<NFmiFastQueryInfo> aInfo = iter->second->GetDataKeeper(0)->GetIter(); // tässä haetaan ensin viimeisin data!!
 			if(::MatchCrossSectionData(aInfo, theType, theDataIdent, false))
 			{
 				if(theDataIdent.GetProducer()->GetName() == aInfo->Param().GetProducer()->GetName())
 				{
-					foundData = aInfo;
-					break;
+					foundData = ::DoArchiveCheck(aInfo, theDataIdent, false, 0, theIndex, iter); // tämä saa olla 0-pointteri, jos kyse oli arkistodatasta
+					if(foundData)
+						break;
 				}
 				else if(backupData == 0)
-					backupData = aInfo;
+					backupData = ::DoArchiveCheck(aInfo, theDataIdent, false, 0, theIndex, iter); // tähän laitetaan siis vain prod-namesta poikkeava data (tämä tapahtuu mm. kun käyttäjä tekee changeAllProducers-toiminnon)
 			}
 		}
 	}
