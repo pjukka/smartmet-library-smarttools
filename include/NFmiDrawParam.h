@@ -70,6 +70,8 @@ public:
 		if(itsTimeSerialModelRunCount < 0)
 			itsTimeSerialModelRunCount = 0;
 	}
+	int ModelRunDifferenceIndex(void) const {return itsModelRunDifferenceIndex;}
+	void ModelRunDifferenceIndex(int newValue) {itsModelRunDifferenceIndex = newValue;}
 
 	NFmiInfoData::Type DataType(void);
 	// huom! tämä asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppiä!!!!!!
@@ -692,6 +694,7 @@ private:
 	NFmiMetTime itsModelOriginTimeCalculated; // tähän lasketaan relatiivisen malliajon mukainen origin aika, jotä käytetään sitten mm. tooltipeissä ja muualla
 	int itsTimeSerialModelRunCount; // tähän määrätään kuinka monta viimeista ajoa näytetään mallille 
 									// kerrallaa aikasarjassa. Jos arvo on 0 (default), ei näytetä kuin viimeinen ajo normaalisti.
+	int itsModelRunDifferenceIndex; // tämän avulla on tarkoitus verrata eri malliajoja. Jos tämä on >= 0, ei ole vertailua, jos se on -1 verrataan edelliseen ajoon, -2:lla verrataan sitä edelliseen jne
 };
 //@{ \name Globaalit NFmiDrawParam-luokan uudelleenohjaus-operaatiot
 inline std::ostream& operator<<(std::ostream& os, const NFmiDrawParam& item){return item.Write(os);}

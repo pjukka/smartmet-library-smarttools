@@ -171,6 +171,7 @@ NFmiDrawParam::NFmiDrawParam()
 , itsModelOriginTime(NFmiMetTime::gMissingTime)
 , itsModelRunIndex(0)
 , itsTimeSerialModelRunCount(0)
+, itsModelRunDifferenceIndex(0)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -318,6 +319,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 , itsModelOriginTime(NFmiMetTime::gMissingTime)
 , itsModelRunIndex(0)
 , itsTimeSerialModelRunCount(0)
+, itsModelRunDifferenceIndex(0)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -470,6 +472,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 , itsModelOriginTime(other.itsModelOriginTime)
 , itsModelRunIndex(other.itsModelRunIndex)
 , itsTimeSerialModelRunCount(other.itsTimeSerialModelRunCount)
+, itsModelRunDifferenceIndex(other.itsModelRunDifferenceIndex)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -501,6 +504,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 			itsModelOriginTime = theDrawParam->itsModelOriginTime;
 			itsModelRunIndex = theDrawParam->itsModelRunIndex;
 			itsTimeSerialModelRunCount = theDrawParam->itsTimeSerialModelRunCount;
+			itsModelRunDifferenceIndex = theDrawParam->itsModelRunDifferenceIndex;
 		}
 		itsPriority = theDrawParam->Priority();
 
@@ -981,6 +985,7 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 		extraData.Add(itsAlpha); // alpha on siis 1. uusista double-extra-parametreista
 		extraData.Add(itsModelRunIndex); // modelRunIndex on 2. uusista double-extra-parametreista
 		extraData.Add(itsTimeSerialModelRunCount); // modelRunIndex on 3. uusista double-extra-parametreista
+		extraData.Add(itsModelRunDifferenceIndex); // itsModelRunDifferenceIndex on 4. uusista double-extra-parametreista
 		
 		extraData.Add(::MetTime2String(itsModelOriginTime)); // modelRunIndex on 1. uusista string-extra-parametreista
 
@@ -1303,6 +1308,9 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				itsTimeSerialModelRunCount = 0;
 				if(extraData.itsDoubleValues.size() >= 3)
 					TimeSerialModelRunCount(static_cast<int>(extraData.itsDoubleValues[2])); // laitetaan asetus-funktion läpi, jossa raja tarkistukset
+				itsModelRunDifferenceIndex = 0; // 0 on default, eli ei ole käytössä
+				if(extraData.itsDoubleValues.size() >= 4)
+					ModelRunDifferenceIndex(static_cast<int>(extraData.itsDoubleValues[3])); // laitetaan asetus-funktion läpi, jossa raja tarkistukset
 
 				itsModelOriginTime = NFmiMetTime::gMissingTime; // tämä on oletus arvo eli ei ole käytössä
 				if(extraData.itsStringValues.size() >= 1)
