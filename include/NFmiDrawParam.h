@@ -73,6 +73,10 @@ public:
 	int ModelRunDifferenceIndex(void) const {return itsModelRunDifferenceIndex;}
 	void ModelRunDifferenceIndex(int newValue) {itsModelRunDifferenceIndex = newValue;}
 
+	// theBrightningFactor on prosentti luku, jolla annettua väriä saadaan vaalennettua tai tummennettua.
+	// jos prosentti luku on > 0, vaalenee väri, jos se on < 0, tummenee väri.
+	void ModifyColors(double theBrightningFactor, bool fDoIsolineColors, bool fDoContourColors, bool fDosymbolColors);
+
 	NFmiInfoData::Type DataType(void);
 	// huom! tämä asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppiä!!!!!!
 	void DataType(NFmiInfoData::Type newValue){itsDataType = newValue;};
