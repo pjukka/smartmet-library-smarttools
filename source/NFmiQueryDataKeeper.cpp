@@ -106,6 +106,7 @@ void NFmiQueryDataSetKeeper::AddDataToSet(boost::shared_ptr<NFmiOwnerInfo> &theD
 	// etsi ja korvaa, jos setistä löytyy jo saman origin-timen data
 	NFmiMetTime origTime = theData->OriginTime();
 	NFmiMetTime latestOrigTime = origTime;
+	bool wasReplace = false;
 	for(ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); ++it)
 	{
 		const NFmiMetTime &currentOrigTime = (*it)->OriginalData()->OriginTime();
@@ -114,17 +115,18 @@ void NFmiQueryDataSetKeeper::AddDataToSet(boost::shared_ptr<NFmiOwnerInfo> &theD
 
 		if(currentOrigTime == origTime)
 		{
-			*it = boost::shared_ptr<NFmiQueryDataKeeper>(new NFmiQueryDataKeeper(theData));
-			// koska kyseessä oli vain toisen datan korvaava toimenpide, voidaan lisäys-operaatio lopettaa tähän....
-			return ;
+			*it = boost::shared_ptr<NFmiQueryDataKeeper>(new NFmiQueryDataKeeper(theData)); // korvataan löydetty dataKeeper uudella
+			wasReplace = true;
 		}
 	}
 
 	// Tämä on data uudella origin ajalla. 
 	// 1. Lisää se listaan.
-	itsQueryDatas.push_back(boost::shared_ptr<NFmiQueryDataKeeper>(new NFmiQueryDataKeeper(theData)));
+	itsLatestOriginTime = latestOrigTime;
+	if(wasReplace == false)
+		itsQueryDatas.push_back(boost::shared_ptr<NFmiQueryDataKeeper>(new NFmiQueryDataKeeper(theData)));
 	// 2. Laske kaikille setin datoille indeksit uudestaan.
-	RecalculateIndexies(latestOrigTime);
+	RecalculateIndexies(itsLatestOriginTime);
 	// 3. Poista listasta kaikki datat joiden indeksi on suurempi kuin itsMaxLatestDataCount:in arvo sallii.
 	DeleteTooOldDatas();
 }
