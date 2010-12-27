@@ -36,6 +36,7 @@
 #include <fstream>
 
 float NFmiDrawParam::itsFileVersionNumber=3.0;
+
 //--------------------------------------------------------
 // NFmiDrawParam(void)
 //--------------------------------------------------------
@@ -1389,13 +1390,4 @@ bool NFmiDrawParam::UseArchiveModelData(void) const
 			return true;
 	}
 	return false;
-}
-
-void NFmiDrawParam::ModifyColors(double theBrightningFactor, bool fDoIsolineColors, bool fDoContourColors, bool fDosymbolColors)
-{
-	if(fDoIsolineColors)
-	{
-		itsIsolineColor = NFmiColorSpaces::GetBrighterColor(itsIsolineColor, theBrightningFactor);
-
-	}
 }
