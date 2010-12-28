@@ -61,6 +61,8 @@ public:
 	int ModelRunIndex(void) const {return itsModelRunIndex;}
 	void ModelRunIndex(int newValue) {itsModelRunIndex = newValue;}
 	bool UseArchiveModelData(void) const;
+	bool IsModelRunDataType(void) const;
+	static bool IsModelRunDataType(NFmiInfoData::Type theDataType);
 	const NFmiMetTime& ModelOriginTimeCalculated(void) const {return itsModelOriginTimeCalculated;}
 	void ModelOriginTimeCalculated(const NFmiMetTime &newValue) {itsModelOriginTimeCalculated = newValue;}
 	int TimeSerialModelRunCount(void) const {return itsTimeSerialModelRunCount;}
@@ -73,8 +75,8 @@ public:
 	int ModelRunDifferenceIndex(void) const {return itsModelRunDifferenceIndex;}
 	void ModelRunDifferenceIndex(int newValue) {itsModelRunDifferenceIndex = newValue;}
 
-	NFmiInfoData::Type DataType(void);
-	// huom! tämä asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppiä!!!!!!
+	NFmiInfoData::Type DataType(void) const {return itsDataType;}
+	// HUOM! tämä asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppiä!!!!!!
 	void DataType(NFmiInfoData::Type newValue){itsDataType = newValue;};
 
 	bool              Init (const std::string& theFilename = std::string());

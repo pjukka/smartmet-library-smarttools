@@ -1375,19 +1375,26 @@ const std::string& NFmiDrawParam::ParameterAbbreviation(void) const
 	}
 }
 
-NFmiInfoData::Type NFmiDrawParam::DataType(void)
-{
-	return itsDataType;
-}
-
 bool NFmiDrawParam::UseArchiveModelData(void) const
 {
-	if(itsDataType == NFmiInfoData::kViewable || itsDataType == NFmiInfoData::kHybridData)
+	if(IsModelRunDataType())
 	{
 		if(itsModelOriginTime != NFmiMetTime::gMissingTime)
 			return true;
 		if(itsModelRunIndex < 0)
 			return true;
 	}
+	return false;
+}
+
+bool NFmiDrawParam::IsModelRunDataType(void) const
+{
+	return NFmiDrawParam::IsModelRunDataType(this->DataType());
+}
+
+bool NFmiDrawParam::IsModelRunDataType(NFmiInfoData::Type theDataType)
+{
+	if(theDataType == NFmiInfoData::kViewable || theDataType == NFmiInfoData::kHybridData || theDataType == NFmiInfoData::kModelHelpData)
+		return true;
 	return false;
 }
