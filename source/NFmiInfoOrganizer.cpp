@@ -478,18 +478,32 @@ static int IsGoodSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, con
 
 // Hakee parhaan luotaus infon tuottajalle. Eli jos kyseessä esim hirlam tuottaja, katsotaan löytyykö
 // hybridi dataa ja sitten tyydytään viewable-dataa (= painepinta)
-boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindSoundingInfo(const NFmiProducer &theProducer)
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindSoundingInfo(const NFmiProducer &theProducer, int theIndex)
 {
 	boost::shared_ptr<NFmiFastQueryInfo> exceptableInfo;
 	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
 	{
 		boost::shared_ptr<NFmiFastQueryInfo> aInfo = iter->second->GetDataKeeper()->GetIter();
 		int result = ::IsGoodSoundingData(aInfo, theProducer, false);
-		if(result == 2)
-			return aInfo;
-		else if(result == 1)
-			exceptableInfo = aInfo;
+		if(result != 0 && theIndex < 0)
+		{ // haetaan vanhempaa malliajo dataa
+			boost::shared_ptr<NFmiQueryDataKeeper> qDataKeeper = iter->second->GetDataKeeper(theIndex);
+			if(qDataKeeper)
+				aInfo = qDataKeeper->GetIter();
+			else
+				aInfo = boost::shared_ptr<NFmiFastQueryInfo>(); // ei löytynyt vanhoista malliajoista, pitää nollata pointteri 
+		}
+		if(aInfo)
+		{
+			if(result == 2)
+				return aInfo;
+			else if(result == 1)
+				exceptableInfo = aInfo;
+		}
 	}
+
+	if(exceptableInfo)
+		return exceptableInfo;
 
 	boost::shared_ptr<NFmiFastQueryInfo> aInfo = FindInfo(NFmiInfoData::kEditable);
 	if(aInfo)
