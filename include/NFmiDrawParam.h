@@ -74,6 +74,11 @@ public:
 	}
 	int ModelRunDifferenceIndex(void) const {return itsModelRunDifferenceIndex;}
 	void ModelRunDifferenceIndex(int newValue) {itsModelRunDifferenceIndex = newValue;}
+	unsigned long DataComparisonProdId(void) const {return itsDataComparisonProdId;}
+	void DataComparisonProdId(unsigned long newValue) {itsDataComparisonProdId = newValue;}
+	NFmiInfoData::Type DataComparisonType(void) const {return itsDataComparisonType;}
+	void DataComparisonType(NFmiInfoData::Type newValue) {itsDataComparisonType = newValue;}
+	bool DoDataComparison(void);
 
 	NFmiInfoData::Type DataType(void) const {return itsDataType;}
 	// HUOM! t‰m‰ asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppi‰!!!!!!
@@ -697,6 +702,10 @@ private:
 	int itsTimeSerialModelRunCount; // t‰h‰n m‰‰r‰t‰‰n kuinka monta viimeista ajoa n‰ytet‰‰n mallille 
 									// kerrallaa aikasarjassa. Jos arvo on 0 (default), ei n‰ytet‰ kuin viimeinen ajo normaalisti.
 	int itsModelRunDifferenceIndex; // t‰m‰n avulla on tarkoitus verrata eri malliajoja. Jos t‰m‰ on >= 0, ei ole vertailua, jos se on -1 verrataan edelliseen ajoon, -2:lla verrataan sit‰ edelliseen jne
+
+	// Mallidatoja voidaan verrata analyysi ja havainto datoihin. Siis sellaiseen dataan, mill‰ on vain yhdet arvot kullekin havainto hetkelle.
+	unsigned long itsDataComparisonProdId; // Jos t‰m‰ on 0, ei vertailu-optio ole p‰‰ll‰. Muuten t‰ss‰ on halutun vertailudatan tuottaja id (analyysi/havainto datan)
+	NFmiInfoData::Type itsDataComparisonType; // t‰ss‰ on k‰ytetty datatyyppi esim. kAnalyzeData tai kObservations
 };
 //@{ \name Globaalit NFmiDrawParam-luokan uudelleenohjaus-operaatiot
 inline std::ostream& operator<<(std::ostream& os, const NFmiDrawParam& item){return item.Write(os);}

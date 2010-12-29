@@ -175,6 +175,8 @@ NFmiDrawParam::NFmiDrawParam()
 , itsModelRunIndex(0)
 , itsTimeSerialModelRunCount(0)
 , itsModelRunDifferenceIndex(0)
+, itsDataComparisonProdId(0)
+, itsDataComparisonType(NFmiInfoData::kNoDataType)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -323,6 +325,8 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam
 , itsModelRunIndex(0)
 , itsTimeSerialModelRunCount(0)
 , itsModelRunDifferenceIndex(0)
+, itsDataComparisonProdId(0)
+, itsDataComparisonType(NFmiInfoData::kNoDataType)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -476,6 +480,8 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 , itsModelRunIndex(other.itsModelRunIndex)
 , itsTimeSerialModelRunCount(other.itsTimeSerialModelRunCount)
 , itsModelRunDifferenceIndex(other.itsModelRunDifferenceIndex)
+, itsDataComparisonProdId(other.itsDataComparisonProdId)
+, itsDataComparisonType(other.itsDataComparisonType)
 {
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
@@ -508,6 +514,8 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 			itsModelRunIndex = theDrawParam->itsModelRunIndex;
 			itsTimeSerialModelRunCount = theDrawParam->itsTimeSerialModelRunCount;
 			itsModelRunDifferenceIndex = theDrawParam->itsModelRunDifferenceIndex;
+			itsDataComparisonProdId = theDrawParam->itsDataComparisonProdId;
+			itsDataComparisonType = theDrawParam->itsDataComparisonType;
 		}
 		itsPriority = theDrawParam->Priority();
 
@@ -989,6 +997,8 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 		extraData.Add(itsModelRunIndex); // modelRunIndex on 2. uusista double-extra-parametreista
 		extraData.Add(itsTimeSerialModelRunCount); // modelRunIndex on 3. uusista double-extra-parametreista
 		extraData.Add(itsModelRunDifferenceIndex); // itsModelRunDifferenceIndex on 4. uusista double-extra-parametreista
+		extraData.Add(itsDataComparisonProdId); // itsDataComparisonProdId on 5. uusista double-extra-parametreista
+		extraData.Add(itsDataComparisonType); // itsDataComparisonType on 6. uusista double-extra-parametreista
 		
 		extraData.Add(::MetTime2String(itsModelOriginTime)); // modelRunIndex on 1. uusista string-extra-parametreista
 
@@ -1314,6 +1324,12 @@ std::istream & NFmiDrawParam::Read (std::istream &file)
 				itsModelRunDifferenceIndex = 0; // 0 on default, eli ei ole käytössä
 				if(extraData.itsDoubleValues.size() >= 4)
 					ModelRunDifferenceIndex(static_cast<int>(extraData.itsDoubleValues[3])); // laitetaan asetus-funktion läpi, jossa raja tarkistukset
+				itsDataComparisonProdId = 0;
+				if(extraData.itsDoubleValues.size() >= 5)
+					DataComparisonProdId(static_cast<unsigned long>(extraData.itsDoubleValues[4])); // laitetaan asetus-funktion läpi, jossa raja tarkistukset
+				itsDataComparisonType = NFmiInfoData::kNoDataType;
+				if(extraData.itsDoubleValues.size() >= 6)
+					DataComparisonType(static_cast<NFmiInfoData::Type>(static_cast<int>(extraData.itsDoubleValues[5]))); // laitetaan asetus-funktion läpi, jossa raja tarkistukset
 
 				itsModelOriginTime = NFmiMetTime::gMissingTime; // tämä on oletus arvo eli ei ole käytössä
 				if(extraData.itsStringValues.size() >= 1)
@@ -1396,5 +1412,15 @@ bool NFmiDrawParam::IsModelRunDataType(NFmiInfoData::Type theDataType)
 {
 	if(theDataType == NFmiInfoData::kViewable || theDataType == NFmiInfoData::kHybridData || theDataType == NFmiInfoData::kModelHelpData)
 		return true;
+	return false;
+}
+
+bool NFmiDrawParam::DoDataComparison(void)
+{
+	if(itsDataComparisonProdId != 0)
+	{
+		if(itsDataComparisonType != NFmiInfoData::kNoDataType)
+			return true;
+	}
 	return false;
 }
