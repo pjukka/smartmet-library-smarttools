@@ -940,3 +940,11 @@ double NFmiInfoOrganizer::CountDataSize(void)
 
 	return dataSize;
 }
+
+int NFmiInfoOrganizer::CleanUnusedDataFromMemory(void)
+{
+	int dataRemovedCounter = 0;
+	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
+		dataRemovedCounter += iter->second->CleanUnusedDataFromMemory();
+	return dataRemovedCounter;
+}

@@ -60,6 +60,7 @@ public:
 					  ,int theUndoLevel
 					  ,int theMaxLatestDataCount
 					  ,int theModelRunTimeGap);
+	int CleanUnusedDataFromMemory(void);
 
 	// ***************************************************************************************************************
 	// Tässä perässä on pienin mahdollinen julkinen rajapinta, jonka sain siivottua originaali NFmiInfoOrganizr:ista. 
