@@ -8,12 +8,23 @@
 
 // ************* NFmiQueryDataKeeper-class **********************
 
+NFmiQueryDataKeeper::NFmiQueryDataKeeper(void)
+:itsData()
+,itsLastTimeUsedTimer()
+,itsIndex(0)
+,itsIteratorList()
+,itsOriginTime(NFmiMetTime::gMissingTime)
+,itsDataFileName()
+{
+}
+
 NFmiQueryDataKeeper::NFmiQueryDataKeeper(boost::shared_ptr<NFmiOwnerInfo> &theOriginalData)
 :itsData(theOriginalData)
 ,itsLastTimeUsedTimer()
-,itsKeepInMemoryTime(10)
 ,itsIndex(0)
 ,itsIteratorList()
+,itsOriginTime(theOriginalData->OriginTime())
+,itsDataFileName(theOriginalData->DataFileName())
 {
 }
 
@@ -23,6 +34,7 @@ NFmiQueryDataKeeper::~NFmiQueryDataKeeper(void)
 
 boost::shared_ptr<NFmiOwnerInfo> NFmiQueryDataKeeper::OriginalData(void) 
 {
+	itsLastTimeUsedTimer.StartTimer();
 	return itsData;
 }
 
@@ -31,6 +43,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiQueryDataKeeper::GetIter(void)
 {
 	// TODO: Tämä vaatii sitten säie turvallisen lukituksen
 
+	itsLastTimeUsedTimer.StartTimer();
 	// Katsotaan onko listassa yhtään Info-iteraattoria, joka ei ole käytössä (ref-count = 1)
 	for(size_t i = 0; i < itsIteratorList.size(); i++)
 	{
@@ -49,26 +62,31 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiQueryDataKeeper::GetIter(void)
 	return infoIter;
 }
 
-// ************* NFmiQueryDataSetKeeper-class **********************
+int NFmiQueryDataKeeper::LastUsedInMS(void) const
+{
+	return itsLastTimeUsedTimer.CurrentTimeDiffInMSeconds();
+}
 
-int NFmiQueryDataSetKeeper::gStaticDefaultModelRunTimeGap = 6*60; // säädetään tämä 6 tuntiin, koska se on yleisin malliajoväli (RCR, MBE, Arome, GFS)
+// ************* NFmiQueryDataSetKeeper-class **********************
 
 NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(void)
 :itsQueryDatas()
 ,itsMaxLatestDataCount(0)
-,itsModelRunTimeGap(gStaticDefaultModelRunTimeGap)
+,itsModelRunTimeGap(0)
 ,itsFilePattern()
 ,itsLatestOriginTime()
 ,itsDataType(NFmiInfoData::kNoDataType)
+,itsKeepInMemoryTime(5)
 {
 }
 
-NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> &theData, int theMaxLatestDataCount, int theModelRunTimeGap)
+NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> &theData, int theMaxLatestDataCount, int theModelRunTimeGap, int theKeepInMemoryTime)
 :itsQueryDatas()
 ,itsMaxLatestDataCount(theMaxLatestDataCount)
 ,itsModelRunTimeGap(theModelRunTimeGap)
 ,itsFilePattern()
 ,itsLatestOriginTime()
+,itsKeepInMemoryTime(theKeepInMemoryTime)
 {
 	AddData(theData, true); // true tarkoittaa että kyse on 1. lisättävästä datasta
 }
@@ -139,10 +157,28 @@ static int CalcIndex(const NFmiMetTime &theLatestOrigTime, const NFmiMetTime &th
 	return round(-diffInMinutes/theModelRunTimeGap);
 }
 
+static bool IsNewer(const boost::shared_ptr<NFmiQueryDataKeeper> &theDataKeeper1, const boost::shared_ptr<NFmiQueryDataKeeper> &theDataKeeper2)
+{
+	return theDataKeeper1->OriginTime() > theDataKeeper2->OriginTime();
+}
+
 void NFmiQueryDataSetKeeper::RecalculateIndexies(const NFmiMetTime &theLatestOrigTime)
 {
-	for(ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); ++it)
-		(*it)->Index(::CalcIndex(theLatestOrigTime, (*it)->OriginalData()->OriginTime(), itsModelRunTimeGap));
+	if(itsModelRunTimeGap < 0)
+	{ // kyse on editoidusta datasta, jolla ei ole vakio malliajo väliä. Laitetaan lista vain aikajärjestykseen ja indeksoidaan numerojärjestyksessä
+		itsQueryDatas.sort(::IsNewer);
+		int index = 0;
+		for(ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); ++it)
+		{
+			(*it)->Index(index);
+			index--;
+		}
+	}
+	else
+	{
+		for(ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); ++it)
+			(*it)->Index(::CalcIndex(theLatestOrigTime, (*it)->OriginalData()->OriginTime(), itsModelRunTimeGap));
+	}
 }
 
 struct OldDataRemover
@@ -207,6 +243,12 @@ static NFmiMetTime CalcWantedOrigTime(const NFmiMetTime &theLatestOrigTime, int 
 	return wantedOrigTime;
 }
 
+static std::string GetFullFileName(const std::string &theFileFilter, const std::string &theFileName)
+{
+	NFmiFileString fileName(theFileFilter);
+	fileName.FileName(theFileName);
+	return static_cast<char*>(fileName);
+}
 
 bool NFmiQueryDataSetKeeper::DoOnDemandOldDataLoad(int theIndex)
 {
@@ -220,9 +262,7 @@ bool NFmiQueryDataSetKeeper::DoOnDemandOldDataLoad(int theIndex)
 			{
 				try
 				{
-					NFmiFileString fileName(itsFilePattern);
-					fileName.FileName(*it);
-					std::string usedFileName = fileName;
+					std::string usedFileName = ::GetFullFileName(itsFilePattern, *it);
 					NFmiQueryInfo info;
 					std::ifstream in(usedFileName.c_str());
 					if(in)
@@ -233,11 +273,7 @@ bool NFmiQueryDataSetKeeper::DoOnDemandOldDataLoad(int theIndex)
 							if(info.OriginTime() == wantedOrigTime)
 							{
 								in.close();
-								// TODO lue data tässä käyttöön
-								NFmiQueryData *data = new NFmiQueryData(usedFileName);
-								boost::shared_ptr<NFmiOwnerInfo> ownerInfoPtr(new NFmiOwnerInfo(data, itsDataType, usedFileName, itsFilePattern));
-								AddDataToSet(ownerInfoPtr);
-								return true;
+								return ReadDataFileInUse(usedFileName);
 							}
 						}
 					}
@@ -247,8 +283,48 @@ bool NFmiQueryDataSetKeeper::DoOnDemandOldDataLoad(int theIndex)
 				}
 			}
 		}
+		else if(itsModelRunTimeGap < 0)
+			ReadAllOldDatasInMemory(); // editoidut datat (tai vastaavat, joilla ei ole siis säännöllisiä tekoaikoja) pitää lukea kaikki muistiin, muuten ei voida laskea niiden indeksejä
 	}
 	return false;
+}
+
+bool NFmiQueryDataSetKeeper::ReadDataFileInUse(const std::string &theFileName)
+{
+	try
+	{
+		NFmiQueryData *data = new NFmiQueryData(theFileName);
+		boost::shared_ptr<NFmiOwnerInfo> ownerInfoPtr(new NFmiOwnerInfo(data, itsDataType, theFileName, itsFilePattern));
+		AddDataToSet(ownerInfoPtr);
+		return true;
+	}
+	catch(...)
+	{ // pitää vain varmistaa että jos tiedosto on viallinen, poikkeukset napataan kiinni tässä
+	}
+	return false;
+}
+
+std::set<std::string> NFmiQueryDataSetKeeper::GetAllFileNames(void)
+{
+	std::set<std::string> fileNames;
+	for(ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); ++it)
+		fileNames.insert((*it)->DataFileName());
+	return fileNames;
+}
+
+void NFmiQueryDataSetKeeper::ReadAllOldDatasInMemory(void)
+{
+	std::set<std::string> filesInMemory = GetAllFileNames();
+	std::list<std::string> filesOnDrive = NFmiFileSystem::PatternFiles(itsFilePattern);
+	for(std::list<std::string>::iterator it = filesOnDrive.begin(); it != filesOnDrive.end(); ++it)
+	{
+		std::set<std::string>::iterator it2 = filesInMemory.find(*it);
+		if(it2 == filesInMemory.end())
+		{ // kyseistä tiedostoa ei löytynyt muistista, koitetaan lukea se nyt
+			std::string usedFileName = ::GetFullFileName(itsFilePattern, *it);
+			ReadDataFileInUse(usedFileName);
+		}
+	}
 }
 
 size_t NFmiQueryDataSetKeeper::DataCount(void)
@@ -263,4 +339,66 @@ size_t NFmiQueryDataSetKeeper::DataByteCount(void)
 		sizeInBytes += (*it)->OriginalData()->Size() * sizeof(float);
 
 	return sizeInBytes;
+}
+
+// palauttaa true, jos data on jo 'vanhaa' eli sen voi poistaa muistista.
+bool NFmiQueryDataSetKeeper::CheckKeepTime(ListType::iterator &it)
+{
+	if((*it)->Index() != 0)
+	{ // vain viimeisin data jää tutkimatta, koska sitä ei ole tarkoitus poistaa muistista koskaan
+		if((*it)->LastUsedInMS() > itsKeepInMemoryTime * 60 * 1000)
+			return true;
+	}
+	return false;
+}
+
+// 1. Jos jotain arkisto-dataa ei ole käytetty tarpeeksi pitkään aikaan, poistetaan ne muistista.
+// 2. Viimeisintä dataa ei poisteta koskaan muistista.
+// 3. Jos kyse editoidusta datasta (esim. kepa-data, ei säännöllistä ilmestymis tiheyttä, vaan niitä syntyy satunnaisina aikoina), 
+// pitää tutkia kaikki arkisto ajat ennen niiden siivoamista. Jos yhtäkään arkisto datoista on käytetty aikarajan sisällä, 
+// ei mitään heitetä pois muistista.
+// 4. Palauttaa kuinka monta dataa poistettiin muistista operaation aikana 
+int NFmiQueryDataSetKeeper::CleanUnusedDataFromMemory(void)
+{
+	int dataRemovedCounter = 0;
+	if(itsModelRunTimeGap > 0)
+	{ // normaalit mallidatat
+		for(ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); )
+		{
+			if(CheckKeepTime(it))
+			{
+				it = itsQueryDatas.erase(it);
+				dataRemovedCounter++;
+			}
+			else
+				++it;
+		}
+	}
+	else if(itsModelRunTimeGap < 0)
+	{ // editoitu data
+		bool oneUsedTimeNewer = false;
+		for(ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); ++it)
+		{
+			if((*it)->Index() != 0 && CheckKeepTime(it) == false)
+			{
+				oneUsedTimeNewer = true;
+				break;
+			}
+		}
+		if(oneUsedTimeNewer == false)
+		{
+			for(ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); )
+			{
+				if((*it)->Index() != 0)
+				{
+					it = itsQueryDatas.erase(it);
+					dataRemovedCounter++;
+				}
+				else
+					++it;
+			}
+		}
+	}
+
+	return dataRemovedCounter;
 }

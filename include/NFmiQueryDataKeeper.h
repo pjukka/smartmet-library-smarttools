@@ -7,6 +7,7 @@
 #include "NFmiInfoData.h"
 #include "boost/shared_ptr.hpp"
 #include <list>
+#include <set>
 
 class NFmiOwnerInfo;
 class NFmiFastQueryInfo;
@@ -26,18 +27,22 @@ public:
 	boost::shared_ptr<NFmiFastQueryInfo> GetIter(void); // Tämä palauttaa vapaana olevan Info-iteraattori kopion dataan.
 	int Index(void) const {return itsIndex;}
 	void Index(int newValue) {itsIndex = newValue;}
+	const NFmiMetTime& OriginTime(void) const {return itsOriginTime;}
+	const std::string& DataFileName(void) {return itsDataFileName;}
+	int LastUsedInMS(void) const;
 
 private:
 	boost::shared_ptr<NFmiOwnerInfo> itsData; // tämä on originaali data
 	NFmiMilliSecondTimer itsLastTimeUsedTimer;  // aina kun kyseistä dataa käytetään, käytetään StartTimer-metodia, jotta myöhemmin voidaan 
 												// laskea, voidaanko kyseinen data siivota pois muistista (jos dataa ei ole käytetty tarpeeksi pitkään aikaan)
-	int itsKeepInMemoryTime; // kuinka kauan pidetään data muistissa, jos sitä ei ole käytetty. yksikkö on minuutteja
 	int itsIndex; // malliajo datoissa 0 arvo tarkoittaa viimeisintä ja -1 sitä edellistä jne.
 	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > itsIteratorList; // originaali datasta tehnään tarvittaessa n kpl iteraattori kopioita, ulkopuoliset rutiinit/säikeet
 																		// käyttävät aina vain iteraattori-kopioita alkuperäisestä, jolloin niitä voidaan käyttää eri säikeissä yht'aikaa.
 																		// nämä luodaan on demandina, eli jos InfoOrganizerilta pyydetään dataa, ja listassa ei ole vapaata iteraattoria
 																		// luodaan tällöin uusi kopio joka palautetaan.
 																		// TODO: Miten tiedän että joku rutiini/säie on lopettanut iteraattorin käytön? Ehkä shared_ptr:n use_count:in avulla?
+	NFmiMetTime itsOriginTime; // tähän talletetaan datan origin-time vertailuja helpottamaan
+	std::string itsDataFileName; // tähän talletetaan datan tiedosto nimi
 };
 
 // NFmiQueryDataSetKeeper-luokka pitää kirjaa n kpl viimeisitä malliajoista/datasta
@@ -47,7 +52,7 @@ public:
 	typedef std::list<boost::shared_ptr<NFmiQueryDataKeeper> > ListType;
 
 	NFmiQueryDataSetKeeper(void);
-	NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> &theData, int theMaxLatestDataCount = 0, int theModelRunTimeGap = gStaticDefaultModelRunTimeGap);
+	NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> &theData, int theMaxLatestDataCount = 0, int theModelRunTimeGap = 0, int theKeepInMemoryTime = 5);
 	~NFmiQueryDataSetKeeper(void);
 
 	void AddData(boost::shared_ptr<NFmiOwnerInfo> &theData, bool fFirstData = false);
@@ -58,6 +63,10 @@ public:
 	void MaxLatestDataCount(int newValue) {itsMaxLatestDataCount = newValue;}
 	int ModelRunTimeGap(void) const {return itsModelRunTimeGap;}
 	void ModelRunTimeGap(int newValue) {itsModelRunTimeGap = newValue;}
+	std::set<std::string> GetAllFileNames(void);
+	int CleanUnusedDataFromMemory(void);
+	int KeepInMemoryTime(void) const {return itsKeepInMemoryTime;}
+	void KeepInMemoryTime(int newValue) {itsKeepInMemoryTime = newValue;}
 
 	size_t DataCount(void);
 	size_t DataByteCount(void);
@@ -67,12 +76,15 @@ private:
 	void RecalculateIndexies(const NFmiMetTime &theLatestOrigTime);
 	void DeleteTooOldDatas(void);
 	bool DoOnDemandOldDataLoad(int theIndex);
+	void ReadAllOldDatasInMemory(void);
+	bool ReadDataFileInUse(const std::string &theFileName);
+	bool CheckKeepTime(ListType::iterator &it);
 
 	ListType itsQueryDatas; // tässä on n kpl viimeisintä malliajoa tallessa (tai esim. havaintojen tapauksessa vain viimeisin data)
 	int itsMaxLatestDataCount; // kuinka monta viimeisintä malliajoa/dataa maksimissään kullekin datalle on, 0 jos kyse esim. havainnoista, joille ei ole kuin viimeisin data.
 	int itsModelRunTimeGap; // millä ajoväleillä kyseisen datan mallia ajetaan (yksikkö minuutteja), jos kyse havainnosta, eli ei ole kuin viimeinen data, arvo 0 ja jos kyse esim. editoidusta datasta (epämääräinen ilmestymisväli) on arvo -1.
 	std::string itsFilePattern; // erilaiset datat erotellaan fileFilterin avulla (esim. "D:\smartmet\wrk\data\local\*_hirlam_skandinavia_mallipinta.sqd")
 	NFmiMetTime itsLatestOriginTime; // tähän talletetaan aina viimeisimmän datan origin-time vertailuja helpottamaan
-	static int gStaticDefaultModelRunTimeGap; // tässä on määrätty default model run time gap minuuteissa
 	NFmiInfoData::Type itsDataType; // tähän laitetaan 1. datan datattyyppi (pitäisi olla yhtenäinen kaikille setissä oleville datoille)
+	int itsKeepInMemoryTime; // kuinka kauan pidetään data muistissa, jos sitä ei ole käytetty. yksikkö on minuutteja
 };
