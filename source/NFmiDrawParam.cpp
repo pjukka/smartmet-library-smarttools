@@ -1410,7 +1410,7 @@ bool NFmiDrawParam::IsModelRunDataType(void) const
 
 bool NFmiDrawParam::IsModelRunDataType(NFmiInfoData::Type theDataType)
 {
-	if(theDataType == NFmiInfoData::kViewable || theDataType == NFmiInfoData::kHybridData || theDataType == NFmiInfoData::kModelHelpData)
+	if(theDataType == NFmiInfoData::kViewable || theDataType == NFmiInfoData::kHybridData || theDataType == NFmiInfoData::kModelHelpData || theDataType == NFmiInfoData::kKepaData)
 		return true;
 	return false;
 }
