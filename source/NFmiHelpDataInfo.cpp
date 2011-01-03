@@ -42,7 +42,7 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 ,itsCombineDataPathAndFileName()
 ,itsCombineDataMaxTimeSteps(0)
 ,fMakeSoundingIndexData(false)
-
+,itsAdditionalArchiveFileCount(0)
 ,itsBaseNameSpace()
 {}
 
@@ -66,6 +66,7 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
 ,itsCombineDataPathAndFileName(theOther.itsCombineDataPathAndFileName)
 ,itsCombineDataMaxTimeSteps(theOther.itsCombineDataMaxTimeSteps)
 ,fMakeSoundingIndexData(theOther.fMakeSoundingIndexData)
+,itsAdditionalArchiveFileCount(theOther.itsAdditionalArchiveFileCount)
 
 ,itsBaseNameSpace(theOther.itsBaseNameSpace)
 {}
@@ -94,6 +95,7 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 		itsCombineDataPathAndFileName = theOther.itsCombineDataPathAndFileName;
 		itsCombineDataMaxTimeSteps = theOther.itsCombineDataMaxTimeSteps;
 		fMakeSoundingIndexData = theOther.fMakeSoundingIndexData;
+		itsAdditionalArchiveFileCount = theOther.itsAdditionalArchiveFileCount;
 
 		itsBaseNameSpace = theOther.itsBaseNameSpace;
 	}
@@ -123,6 +125,7 @@ void NFmiHelpDataInfo::Clear(void)
 	itsCombineDataPathAndFileName = "";
 	itsCombineDataMaxTimeSteps = 0;
 	fMakeSoundingIndexData = false;
+	itsAdditionalArchiveFileCount = 0;
 }
 
 static void FixPathEndWithSeparator(std::string &theFixedPathStr)
@@ -197,6 +200,8 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 		itsCombineDataPathAndFileName = NFmiSettings::Optional<string>(itsBaseNameSpace + "::CombineDataPathAndFileName", "");
 		itsCombineDataMaxTimeSteps = NFmiSettings::Optional<int>(itsBaseNameSpace + "::CombineDataMaxTimeSteps", 0);
 		fMakeSoundingIndexData = NFmiSettings::Optional<bool>(itsBaseNameSpace + "::MakeSoundingIndexData", false);
+		itsAdditionalArchiveFileCount = NFmiSettings::Optional<int>(itsBaseNameSpace + "::AdditionalArchiveFileCount", 0);
+
 		if(IsCombineData())
 			::MakeCombinedDataFilePattern(*this, theHelpDataSystem);
 
