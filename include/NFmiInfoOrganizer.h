@@ -43,6 +43,7 @@ class NFmiLevel;
 class NFmiProducer;
 class NFmiQueryInfo;
 class NFmiTimeDescriptor;
+class NFmiMetTime;
 
 class NFmiInfoOrganizer
 {
@@ -87,6 +88,7 @@ public:
 	boost::shared_ptr<NFmiFastQueryInfo> CrossSectionMacroParamData(void);
 
 	NFmiParamBag GetParams(int theProducerId1);
+	int GetNearestUnRegularTimeIndex(NFmiDrawParam &theDrawParam, const NFmiMetTime &theTime);
 
 	NFmiDrawParam* CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	NFmiDrawParam* CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
@@ -127,6 +129,7 @@ private:
 
 	boost::shared_ptr<NFmiFastQueryInfo> Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted);
 	boost::shared_ptr<NFmiFastQueryInfo> GetInfo(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, int theIndex = 0);
+	boost::shared_ptr<NFmiFastQueryInfo> GetInfo(NFmiDrawParam &theDrawParam);
 	boost::shared_ptr<NFmiFastQueryInfo> CrossSectionInfo(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType, int theIndex = 0);
 	boost::shared_ptr<NFmiFastQueryInfo> GetSynopPlotParamInfo(NFmiInfoData::Type theType);
 	boost::shared_ptr<NFmiFastQueryInfo> GetSoundingPlotParamInfo(NFmiInfoData::Type theType);

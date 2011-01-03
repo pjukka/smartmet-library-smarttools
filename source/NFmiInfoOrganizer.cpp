@@ -197,12 +197,16 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(NFmiDrawParam &theD
 	if(fCrossSectionInfoWanted)
 		return CrossSectionInfo(theDrawParam.Param(), dataType, theDrawParam.ModelRunIndex());
 	else
-	{
-		NFmiLevel* level = &theDrawParam.Level();
-		if(level && level->GetIdent() == 0) // jos tämä on ns. default-level otus (GetIdent() == 0), annetaan 0-pointteri Info-metodiin
-			level = 0;
-		return GetInfo(theDrawParam.Param(), level, dataType, ::UseParIdOnly(dataType), theDrawParam.ModelRunIndex());
-	}
+		return GetInfo(theDrawParam);
+}
+
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(NFmiDrawParam &theDrawParam)
+{
+	NFmiLevel* level = &theDrawParam.Level();
+	NFmiInfoData::Type dataType = theDrawParam.DataType();
+	if(level && level->GetIdent() == 0) // jos tämä on ns. default-level otus (GetIdent() == 0), annetaan 0-pointteri Info-metodiin
+		level = 0;
+	return GetInfo(theDrawParam.Param(), level, dataType, ::UseParIdOnly(dataType), theDrawParam.ModelRunIndex());
 }
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData)
@@ -947,4 +951,24 @@ int NFmiInfoOrganizer::CleanUnusedDataFromMemory(void)
 	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
 		dataRemovedCounter += iter->second->CleanUnusedDataFromMemory();
 	return dataRemovedCounter;
+}
+
+// Jos kyse ns. editoidusta datasta (esim. kepa-data), joilla on epäsäännöllinen ilmestymis aikaväli,
+// etsitään qdatakeeperin listoilta lähin origin aika ennen annettua aikaa ja palautetaan sen indeksi.
+// Jos ei löydy aikaa ennen annettua aikaa, palautetaan viimeinen indeksi (eli vanhimman ajan indeksi).
+// Jos ei löytynyt sopivaa epsäännöllistä dataKeeperiä, palautetaan arvo 99, joka kertoo että ei löydy.
+int NFmiInfoOrganizer::GetNearestUnRegularTimeIndex(NFmiDrawParam &theDrawParam, const NFmiMetTime &theTime)
+{
+	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
+	{
+		if(iter->second->ModelRunTimeGap() == -1)
+		{
+			boost::shared_ptr<NFmiFastQueryInfo> aInfo = GetInfo(theDrawParam);
+			if(aInfo)
+			{ // löytyi haluttu dataKeeper, nyt katsotaan minkä indeksin saadaan palautettua
+				return iter->second->GetNearestUnRegularTimeIndex(theTime);
+			}
+		}
+	}
+	return 0;
 }

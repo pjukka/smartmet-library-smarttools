@@ -402,3 +402,47 @@ int NFmiQueryDataSetKeeper::CleanUnusedDataFromMemory(void)
 
 	return dataRemovedCounter;
 }
+
+
+
+int NFmiQueryDataSetKeeper::GetNearestUnRegularTimeIndex(const NFmiMetTime &theTime)
+{
+	if(ModelRunTimeGap() == -1)
+	{
+		ReadAllOldDatasInMemory();
+		std::map<long, int> timeDiffsWithIndexies;
+		for(ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); ++it)
+		{
+			// HUOM! etsitään pienintä negatiivista lukua, sitten nollaa, jos kumpaakaan ei löydy, palautetaan pienimmän positiivisen luvun indeksi
+			long diffInMinutes = (*it)->OriginTime().DifferenceInMinutes(theTime);
+			int index = (*it)->Index();
+			timeDiffsWithIndexies.insert(std::make_pair(diffInMinutes, index));
+		}
+
+		if(timeDiffsWithIndexies.size())
+		{
+			if(timeDiffsWithIndexies.size() <= 1)
+				return timeDiffsWithIndexies.begin()->second;
+
+			std::map<long, int>::iterator it2 = timeDiffsWithIndexies.begin();
+			long diffValue1 = it2->first;
+			int indexValue1 = it2->second;
+			long diffValue2 = diffValue1;
+			for( ; it2 != timeDiffsWithIndexies.end(); )
+			{
+				++it2;
+				diffValue2 = it2->first;
+				if(diffValue1 < 0 && diffValue2 >= 0)
+					return indexValue1;
+				else if(diffValue1 = 0 && diffValue2 > 0)
+					return indexValue1;
+				else if(diffValue1 > 0)
+					return indexValue1;
+
+				diffValue1 = it2->first;
+				indexValue1 = it2->second;
+			}
+		}
+	}
+	return 0;
+}

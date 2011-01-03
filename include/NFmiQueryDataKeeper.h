@@ -67,6 +67,8 @@ public:
 	int CleanUnusedDataFromMemory(void);
 	int KeepInMemoryTime(void) const {return itsKeepInMemoryTime;}
 	void KeepInMemoryTime(int newValue) {itsKeepInMemoryTime = newValue;}
+	void ReadAllOldDatasInMemory(void);
+	int GetNearestUnRegularTimeIndex(const NFmiMetTime &theTime);
 
 	size_t DataCount(void);
 	size_t DataByteCount(void);
@@ -76,7 +78,6 @@ private:
 	void RecalculateIndexies(const NFmiMetTime &theLatestOrigTime);
 	void DeleteTooOldDatas(void);
 	bool DoOnDemandOldDataLoad(int theIndex);
-	void ReadAllOldDatasInMemory(void);
 	bool ReadDataFileInUse(const std::string &theFileName);
 	bool CheckKeepTime(ListType::iterator &it);
 
