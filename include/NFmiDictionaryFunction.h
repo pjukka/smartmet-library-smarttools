@@ -10,13 +10,6 @@
 #include "NFmiSettings.h"
 
 // HUOM! Tämä on kopio NFmiEditMapGeneralDataDoc-luokan metodista, kun en voinut antaa tänne dokumenttia
-inline std::string GetDictionaryString(const char *theMagicWord)
-{
-	const std::string baseWords = "MetEditor::Dictionary::";
-
-	std::string finalMagicWord(baseWords);
-	finalMagicWord += theMagicWord;
-	return NFmiSettings::Optional<std::string>(finalMagicWord.c_str(), std::string("XXXXX"));
-}
+std::string GetDictionaryString(const char *theMagicWord);
 
 #endif
