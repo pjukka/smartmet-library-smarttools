@@ -1,6 +1,6 @@
 
 #include "NFmiQueryDataKeeper.h"
-#include "NFmiSmartInfo2.h"
+#include "NFmiSmartInfo.h"
 #include "NFmiFileSystem.h"
 #include "NFmiFileString.h"
 #include "NFmiQueryData.h"
@@ -54,7 +54,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiQueryDataKeeper::GetIter(void)
 	// Ei lˆytynyt vapaata (tai ollenkaan) Info-iteraattoria, pit‰‰ luoda sellainen ja lis‰t‰ listaan ja paluttaa se
 	boost::shared_ptr<NFmiFastQueryInfo> infoIter;
 	if(OriginalData()->DataType() == NFmiInfoData::kEditable)
-		infoIter = boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo2(*(dynamic_cast<NFmiSmartInfo2*>(OriginalData().get())))); // HUOM! Vain editoitu data on smartInfo2 -tyyppi‰, ja clone ei sovi t‰ss‰ koska nyt tehd‰‰n 'matala' kopio. Ett‰ saataisiin kaunis ratkaisu, pit‰isi tehd‰ joku shallowClone virtuaali metodi
+		infoIter = boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(*(dynamic_cast<NFmiSmartInfo*>(OriginalData().get())))); // HUOM! Vain editoitu data on smartInfo2 -tyyppi‰, ja clone ei sovi t‰ss‰ koska nyt tehd‰‰n 'matala' kopio. Ett‰ saataisiin kaunis ratkaisu, pit‰isi tehd‰ joku shallowClone virtuaali metodi
 	else
 		infoIter = boost::shared_ptr<NFmiFastQueryInfo>(new NFmiOwnerInfo(*(OriginalData().get())));
 

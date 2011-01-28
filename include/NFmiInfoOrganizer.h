@@ -17,7 +17,7 @@
 // omassa threadissaa ja threadi sitten lopuksi itse tuhoaa automaattisesti datan.
 //
 // Toteutus: NFmiOwnerInfo on tavallisten queryDatojen säilytys luokka. 
-// NFmiSmartInfo2 on käytössä vain editoitavalle datalle.
+// NFmiSmartInfo on käytössä vain editoitavalle datalle.
 // Huom! Myös SmartMetiin tiputetut datat pitää lisätä tänne fileFiltterin kanssa.
 // TODO: keksi parempi nimi tai muuta lopuksi NFmiInfoOrganizer-nimiseksi ja 
 // tuhoa alkuperäinen luokka.
@@ -30,7 +30,7 @@
 #include "boost/shared_ptr.hpp"
 #include <map>
 
-class NFmiSmartInfo2;
+class NFmiSmartInfo;
 class NFmiOwnerInfo;
 class NFmiFastQueryInfo;
 class NFmiDrawParamFactory;
@@ -124,7 +124,7 @@ private:
 	NFmiInfoOrganizer& operator=(const NFmiInfoOrganizer&);
 	NFmiInfoOrganizer(const NFmiInfoOrganizer&);
 
-	bool AddEditedData(NFmiSmartInfo2 *theEditedData, int theUndoLevel);
+	bool AddEditedData(NFmiSmartInfo *theEditedData, int theUndoLevel);
 	bool Add(NFmiOwnerInfo* theInfo, int theMaxLatestDataCount, int theModelRunTimeGap);
 
 	boost::shared_ptr<NFmiFastQueryInfo> Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted);
@@ -137,7 +137,7 @@ private:
 	NFmiDrawParam* CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, boost::shared_ptr<NFmiFastQueryInfo> &theInfo2);
 
-	boost::shared_ptr<NFmiQueryDataKeeper> itsEditedDataKeeper; // pitää sisällään oikeasti NFmiSmartInfo2-olion
+	boost::shared_ptr<NFmiQueryDataKeeper> itsEditedDataKeeper; // pitää sisällään oikeasti NFmiSmartInfo-olion
 	boost::shared_ptr<NFmiQueryDataKeeper> itsCopyOfEditedDataKeeper;
 	MapType itsDataMap; // sijoitus mappiin tapahtuu filepatternin avulla
 

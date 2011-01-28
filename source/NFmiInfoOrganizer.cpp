@@ -1,7 +1,7 @@
 
 #include "NFmiInfoOrganizer.h"
 #include "NFmiDrawParamFactory.h"
-#include "NFmiSmartInfo2.h"
+#include "NFmiSmartInfo.h"
 #include "NFmiQueryDataKeeper.h"
 #include "NFmiDrawParam.h"
 #include "NFmiQueryInfo.h"
@@ -57,14 +57,14 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 	if(theData)
 	{
 		if(theDataType == NFmiInfoData::kEditable)
-			status = AddEditedData(new NFmiSmartInfo2(theData, theDataType, theDataFileName, theDataFilePattern), theUndoLevel);
+			status = AddEditedData(new NFmiSmartInfo(theData, theDataType, theDataFileName, theDataFilePattern), theUndoLevel);
 		else
 			status = Add(new NFmiOwnerInfo(theData, theDataType, theDataFileName, theDataFilePattern), theMaxLatestDataCount, theModelRunTimeGap); // muun tyyppiset datat kuin editoitavat menevät mappiin
 	}
 	return status;
 }
 
-bool NFmiInfoOrganizer::AddEditedData(NFmiSmartInfo2 *theEditedData, int theUndoLevel)
+bool NFmiInfoOrganizer::AddEditedData(NFmiSmartInfo *theEditedData, int theUndoLevel)
 {
 	if(theEditedData)
 	{

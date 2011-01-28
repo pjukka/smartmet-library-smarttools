@@ -1,33 +1,33 @@
 
-#include "NFmiSmartInfo2.h"
+#include "NFmiSmartInfo.h"
 #include "NFmiQueryData.h"
 #include "NFmiModifiableQDatasBookKeeping.h"
 
 
-NFmiSmartInfo2::NFmiSmartInfo2(NFmiQueryData *theOwnedData, NFmiInfoData::Type theDataType, const std::string &theDataFileName, const std::string &theDataFilePattern)
+NFmiSmartInfo::NFmiSmartInfo(NFmiQueryData *theOwnedData, NFmiInfoData::Type theDataType, const std::string &theDataFileName, const std::string &theDataFilePattern)
 :NFmiOwnerInfo(theOwnedData, theDataType, theDataFileName, theDataFilePattern)
 ,itsQDataBookKeepingPtr()
 {
 	itsQDataBookKeepingPtr = boost::shared_ptr<NFmiModifiableQDatasBookKeeping>(new NFmiModifiableQDatasBookKeeping(SizeLocations()));
 }
 
-NFmiSmartInfo2::NFmiSmartInfo2(const NFmiOwnerInfo &theInfo)
+NFmiSmartInfo::NFmiSmartInfo(const NFmiOwnerInfo &theInfo)
 :NFmiOwnerInfo(theInfo)
 ,itsQDataBookKeepingPtr()
 {
 }
 
-NFmiSmartInfo2::NFmiSmartInfo2(const NFmiSmartInfo2 &theInfo)
+NFmiSmartInfo::NFmiSmartInfo(const NFmiSmartInfo &theInfo)
 :NFmiOwnerInfo(theInfo)
 ,itsQDataBookKeepingPtr(theInfo.itsQDataBookKeepingPtr)
 {
 }
 
-NFmiSmartInfo2::~NFmiSmartInfo2(void)
+NFmiSmartInfo::~NFmiSmartInfo(void)
 {
 }
 
-NFmiSmartInfo2& NFmiSmartInfo2::operator=(const NFmiSmartInfo2 &theInfo)
+NFmiSmartInfo& NFmiSmartInfo::operator=(const NFmiSmartInfo &theInfo)
 {
 	if(this != &theInfo)
 	{
@@ -37,15 +37,15 @@ NFmiSmartInfo2& NFmiSmartInfo2::operator=(const NFmiSmartInfo2 &theInfo)
 	return *this;
 }
 
-NFmiSmartInfo2* NFmiSmartInfo2::Clone(void) const
+NFmiSmartInfo* NFmiSmartInfo::Clone(void) const
 {
 	NFmiQueryData *cloneData = itsDataPtr.get()->Clone(); // datasta tehtävä tässä kopio!
-	NFmiSmartInfo2 *copy = new NFmiSmartInfo2(cloneData, itsDataType, itsDataFileName, itsDataFilePattern); // tämä ei osaa tehdä kaikesta tarvittavasta datasta kopiota
-	copy->CopyClonedDatas(*this); // tässä laitetaan kaikki loput tarvittavat NFmiSmartInfo2-data osat kopioitavaksi clooniin.
+	NFmiSmartInfo *copy = new NFmiSmartInfo(cloneData, itsDataType, itsDataFileName, itsDataFilePattern); // tämä ei osaa tehdä kaikesta tarvittavasta datasta kopiota
+	copy->CopyClonedDatas(*this); // tässä laitetaan kaikki loput tarvittavat NFmiSmartInfo-data osat kopioitavaksi clooniin.
 	return copy;
 }
 
-void NFmiSmartInfo2::CopyClonedDatas(const NFmiSmartInfo2 &theOther)
+void NFmiSmartInfo::CopyClonedDatas(const NFmiSmartInfo &theOther)
 {
 	if(this != &theOther)
 	{
@@ -53,47 +53,47 @@ void NFmiSmartInfo2::CopyClonedDatas(const NFmiSmartInfo2 &theOther)
 	}
 }
 
-void NFmiSmartInfo2::UndoLevel(long theDepth)	// theDepth kuvaa kuinka monta Undota voidaan tehdä.
+void NFmiSmartInfo::UndoLevel(long theDepth)	// theDepth kuvaa kuinka monta Undota voidaan tehdä.
 {
 	itsQDataBookKeepingPtr->UndoLevel(theDepth, *itsRefRawData);
 }
 
-bool NFmiSmartInfo2::LocationSelectionSnapShot(void)
+bool NFmiSmartInfo::LocationSelectionSnapShot(void)
 {
 	return itsQDataBookKeepingPtr->LocationSelectionSnapShot();
 }
 
-bool NFmiSmartInfo2::LocationSelectionUndo(void)
+bool NFmiSmartInfo::LocationSelectionUndo(void)
 {
 	return itsQDataBookKeepingPtr->LocationSelectionUndo();
 }
 
-bool NFmiSmartInfo2::LocationSelectionRedo(void)
+bool NFmiSmartInfo::LocationSelectionRedo(void)
 {
 	return itsQDataBookKeepingPtr->LocationSelectionRedo();
 }
 
-bool NFmiSmartInfo2::LocationSelectionUndoData(void)
+bool NFmiSmartInfo::LocationSelectionUndoData(void)
 {
 	return itsQDataBookKeepingPtr->LocationSelectionUndoData();
 }
 
-bool NFmiSmartInfo2::LocationSelectionRedoData(void)
+bool NFmiSmartInfo::LocationSelectionRedoData(void)
 {
 	return itsQDataBookKeepingPtr->LocationSelectionRedoData();
 }
 
-void NFmiSmartInfo2::LocationSelectionUndoLevel(int theNewUndoLevel)
+void NFmiSmartInfo::LocationSelectionUndoLevel(int theNewUndoLevel)
 {
 	itsQDataBookKeepingPtr->LocationSelectionUndoLevel(theNewUndoLevel);
 }
 
-bool NFmiSmartInfo2::LoadedFromFile(void)
+bool NFmiSmartInfo::LoadedFromFile(void)
 {
 	return itsQDataBookKeepingPtr->LoadedFromFile();
 }
 
-void NFmiSmartInfo2::LoadedFromFile(bool loadedFromFile)
+void NFmiSmartInfo::LoadedFromFile(bool loadedFromFile)
 {
 	itsQDataBookKeepingPtr->LoadedFromFile(loadedFromFile);
 }
@@ -106,7 +106,7 @@ void NFmiSmartInfo2::LoadedFromFile(bool loadedFromFile)
 //   true, muuten kutsutaan
 //   taas emon Next:iä ja jatketaan kunnes emon
 //   Next palauttaa falsen.
-bool NFmiSmartInfo2::NextLocation()
+bool NFmiSmartInfo::NextLocation()
 {
 	bool returnVal = false;
 
@@ -117,87 +117,87 @@ bool NFmiSmartInfo2::NextLocation()
 	return returnVal;
 }
 
-bool NFmiSmartInfo2::SnapShotData(const std::string& theAction, const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
+bool NFmiSmartInfo::SnapShotData(const std::string& theAction, const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
 {
 	return itsQDataBookKeepingPtr->SnapShotData(theAction, theHarmonizerBookKeepingData, *itsRefRawData);
 }
 
-bool NFmiSmartInfo2::Undo(void)
+bool NFmiSmartInfo::Undo(void)
 {
 	return itsQDataBookKeepingPtr->Undo();
 }
 
-bool NFmiSmartInfo2::Redo(void)
+bool NFmiSmartInfo::Redo(void)
 {
 	return itsQDataBookKeepingPtr->Redo();
 }
 
-bool NFmiSmartInfo2::UndoData(const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
+bool NFmiSmartInfo::UndoData(const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
 {
 	return itsQDataBookKeepingPtr->UndoData(theHarmonizerBookKeepingData, *itsRefRawData);
 }
 
-bool NFmiSmartInfo2::RedoData(void)
+bool NFmiSmartInfo::RedoData(void)
 {
 	return itsQDataBookKeepingPtr->RedoData(*itsRefRawData);
 }
 
-const NFmiHarmonizerBookKeepingData* NFmiSmartInfo2::CurrentHarmonizerBookKeepingData(void) const
+const NFmiHarmonizerBookKeepingData* NFmiSmartInfo::CurrentHarmonizerBookKeepingData(void) const
 {
 	return itsQDataBookKeepingPtr->CurrentHarmonizerBookKeepingData();
 }
 
-bool NFmiSmartInfo2::IsDirty(void) const 
+bool NFmiSmartInfo::IsDirty(void) const 
 {
 	return itsQDataBookKeepingPtr->IsDirty();
 }
 
-void NFmiSmartInfo2::Dirty(bool newState)
+void NFmiSmartInfo::Dirty(bool newState)
 {
 	itsQDataBookKeepingPtr->Dirty(newState);
 }
 
-int NFmiSmartInfo2::MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea)
+int NFmiSmartInfo::MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea)
 {
 	return itsQDataBookKeepingPtr->MaskedCount(theMaskType, theIndex, theSearchArea, itsGridXNumber, itsGridYNumber);
 }
 
-void NFmiSmartInfo2::InverseMask(unsigned long theMaskType)
+void NFmiSmartInfo::InverseMask(unsigned long theMaskType)
 {
 	itsQDataBookKeepingPtr->InverseMask(theMaskType);
 }
 
-void NFmiSmartInfo2::MaskAllLocations(const bool& newState, unsigned long theMaskType)
+void NFmiSmartInfo::MaskAllLocations(const bool& newState, unsigned long theMaskType)
 {
 	itsQDataBookKeepingPtr->MaskAllLocations(newState, theMaskType);
 }
 
-unsigned long NFmiSmartInfo2::LocationMaskedCount(unsigned long theMaskType)
+unsigned long NFmiSmartInfo::LocationMaskedCount(unsigned long theMaskType)
 {
 	return itsQDataBookKeepingPtr->LocationMaskedCount(theMaskType);
 }
 
-bool NFmiSmartInfo2::Mask(const NFmiBitMask& theMask, unsigned long theMaskType)
+bool NFmiSmartInfo::Mask(const NFmiBitMask& theMask, unsigned long theMaskType)
 {
 	return itsQDataBookKeepingPtr->Mask(theMask, theMaskType);
 }
 
-const NFmiBitMask& NFmiSmartInfo2::Mask(unsigned long theMaskType) const
+const NFmiBitMask& NFmiSmartInfo::Mask(unsigned long theMaskType) const
 {
 	return itsQDataBookKeepingPtr->Mask(theMaskType);
 }
 
-void NFmiSmartInfo2::MaskLocation(const bool& newState, unsigned long theMaskType)
+void NFmiSmartInfo::MaskLocation(const bool& newState, unsigned long theMaskType)
 {
 	itsQDataBookKeepingPtr->MaskLocation(newState, theMaskType, LocationIndex());
 }
 
-void NFmiSmartInfo2::MaskType(unsigned long theMaskType)
+void NFmiSmartInfo::MaskType(unsigned long theMaskType)
 {
 	itsQDataBookKeepingPtr->MaskType(theMaskType);
 }
 
-unsigned long NFmiSmartInfo2::MaskType(void)
+unsigned long NFmiSmartInfo::MaskType(void)
 {
 	return itsQDataBookKeepingPtr->MaskType();
 }

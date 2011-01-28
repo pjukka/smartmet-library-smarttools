@@ -18,16 +18,16 @@
 class NFmiModifiableQDatasBookKeeping;
 class NFmiHarmonizerBookKeepingData;
 
-class NFmiSmartInfo2 : public NFmiOwnerInfo
+class NFmiSmartInfo : public NFmiOwnerInfo
 {
 public:
-	NFmiSmartInfo2(const NFmiOwnerInfo &theInfo); // matala kopio, eli jaettu data
-	NFmiSmartInfo2(const NFmiSmartInfo2 &theInfo); // matala kopio, eli jaettu data
-	NFmiSmartInfo2(NFmiQueryData *theOwnedData, NFmiInfoData::Type theDataType, const std::string &theDataFileName, const std::string &theDataFilePattern); // ottaa datan omistukseensa emossa
-	~NFmiSmartInfo2(void);
+	NFmiSmartInfo(const NFmiOwnerInfo &theInfo); // matala kopio, eli jaettu data
+	NFmiSmartInfo(const NFmiSmartInfo &theInfo); // matala kopio, eli jaettu data
+	NFmiSmartInfo(NFmiQueryData *theOwnedData, NFmiInfoData::Type theDataType, const std::string &theDataFileName, const std::string &theDataFilePattern); // ottaa datan omistukseensa emossa
+	~NFmiSmartInfo(void);
 
-	NFmiSmartInfo2& operator=(const NFmiSmartInfo2 &theInfo); // matala kopio, eli jaettu data
-	NFmiSmartInfo2* Clone(void) const; // syv‰ kopio, eli kloonille luodaan oma queryData sen omistukseen
+	NFmiSmartInfo& operator=(const NFmiSmartInfo &theInfo); // matala kopio, eli jaettu data
+	NFmiSmartInfo* Clone(void) const; // syv‰ kopio, eli kloonille luodaan oma queryData sen omistukseen
 										// TODO: katso pit‰‰kˆ metodin nimi muuttaa, koska emoissa Clone on 
 										// virtuaali funktio, jossa eri paluu-luokka.
 
@@ -62,9 +62,9 @@ public:
 	void MaskType(unsigned long theMaskType);
 	unsigned long MaskType(void);
 protected:
-	void CopyClonedDatas(const NFmiSmartInfo2 &theOther);
+	void CopyClonedDatas(const NFmiSmartInfo &theOther);
 
 	boost::shared_ptr<NFmiModifiableQDatasBookKeeping> itsQDataBookKeepingPtr;
 private:
-	NFmiSmartInfo2(void); // ei toteuteta tyhj‰‰ konstruktoria
+	NFmiSmartInfo(void); // ei toteuteta tyhj‰‰ konstruktoria
 };

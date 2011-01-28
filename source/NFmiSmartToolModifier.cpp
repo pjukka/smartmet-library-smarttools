@@ -10,7 +10,7 @@
 
 #include "NFmiSmartToolModifier.h"
 #include "NFmiFastQueryInfo.h"
-#include "NFmiSmartInfo2.h"
+#include "NFmiSmartInfo.h"
 #include "NFmiSmartToolIntepreter.h"
 #include "NFmiSmartToolCalculation.h"
 #include "NFmiSmartToolCalculationSection.h"
@@ -489,8 +489,8 @@ void NFmiSmartToolModifier::ModifyConditionalData(boost::shared_ptr<NFmiSmartToo
 
 static void DoSafeMaskOperation(boost::shared_ptr<NFmiFastQueryInfo> &theInfo1, boost::shared_ptr<NFmiFastQueryInfo> &theInfo2)
 {
-	NFmiSmartInfo2 *info1 = dynamic_cast<NFmiSmartInfo2*>(theInfo1.get());
-	NFmiSmartInfo2 *info2 = dynamic_cast<NFmiSmartInfo2*>(theInfo2.get());
+	NFmiSmartInfo *info1 = dynamic_cast<NFmiSmartInfo*>(theInfo1.get());
+	NFmiSmartInfo *info2 = dynamic_cast<NFmiSmartInfo*>(theInfo2.get());
 	if(info1 && info2)
 	{
 		info1->Mask(info2->Mask(NFmiMetEditorTypes::kFmiSelectionMask), NFmiMetEditorTypes::kFmiSelectionMask);
@@ -1038,9 +1038,9 @@ static boost::shared_ptr<NFmiFastQueryInfo> CreateShallowCopyOfHighestInfo(boost
 {
 	if(theInfo)
 	{
-		NFmiSmartInfo2 *smartInfo = dynamic_cast<NFmiSmartInfo2*>(theInfo.get());
+		NFmiSmartInfo *smartInfo = dynamic_cast<NFmiSmartInfo*>(theInfo.get());
 		if(smartInfo)
-			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo2(*smartInfo));
+			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(*smartInfo));
 
 		NFmiOwnerInfo *ownerInfo = dynamic_cast<NFmiOwnerInfo*>(theInfo.get());
 		if(ownerInfo)
@@ -1097,7 +1097,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateRealScriptVari
 	NFmiQueryInfo innerInfo(paramDesc, itsModifiedTimes ? *itsModifiedTimes : baseInfo->TimeDescriptor(), baseInfo->HPlaceDescriptor(), baseInfo->VPlaceDescriptor());
 	NFmiQueryData *data = new NFmiQueryData(innerInfo);
 	data->Init();
-	boost::shared_ptr<NFmiFastQueryInfo> returnInfo(new NFmiSmartInfo2(data, NFmiInfoData::kScriptVariableData, "", ""));
+	boost::shared_ptr<NFmiFastQueryInfo> returnInfo(new NFmiSmartInfo(data, NFmiInfoData::kScriptVariableData, "", ""));
 	return returnInfo;
 }
 
