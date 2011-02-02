@@ -114,14 +114,14 @@ static void CheckIfStopped(NFmiStopFunctor *theStopFunctor)
 
 static void CalcAllSoundingIndexParamFields(NFmiFastQueryInfo &theSourceInfo, NFmiFastQueryInfo &theResultInfo, bool useFastFill, NFmiStopFunctor *theStopFunctor)
 {
-	bool fObsDataFound = false; // toistaiseksi ei käytössä
-	bool useAnalyzeData = false; // toistaiseksi ei käytössä
-	NFmiSmartInfo *analyzeData = 0;
+    // bool fObsDataFound = false; // toistaiseksi ei käytössä
+	// bool useAnalyzeData = false; // toistaiseksi ei käytössä
+	// NFmiSmartInfo *analyzeData = 0;
 
 	NFmiSoundingDataOpt1 soundingDataOpt1;
 	for(theResultInfo.ResetLocation(); theResultInfo.NextLocation(); )
 	{
-		bool surfaceBaseStatus = false;
+	    // bool surfaceBaseStatus = false;
 		if(useFastFill)
 			theSourceInfo.LocationIndex(theResultInfo.LocationIndex());
 		::FillSoundingDataOpt1(&theSourceInfo, soundingDataOpt1, theResultInfo.Time(), theResultInfo.LatLon(), useFastFill);
@@ -133,7 +133,7 @@ static void CalcAllSoundingIndexParamFields(NFmiFastQueryInfo &theSourceInfo, NF
 				::CheckIfStopped(theStopFunctor); // joka 20 hilapisteellä katsotaan, pitääkö lopettaa
 
 			FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theResultInfo.Param().GetParamIdent());
-			bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
+			// bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
 
 			// HUOM!!!! muista muuttaa luotaus-parametri pelkäksi surface arvoksi, koska loppu menee itsestään sitten
 			float valueOpt1 = NFmiSoundingIndexCalculator::CalcOpt1(soundingDataOpt1, soundingParameter);
