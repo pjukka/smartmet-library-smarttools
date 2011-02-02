@@ -129,7 +129,7 @@ static void FixPathEndWithSeparator(std::string &theFixedPathStr)
 {
 	if(theFixedPathStr.empty() == false)
 	{
-		NFmiFileString tmpFileStr = theFixedPathStr;
+	    NFmiFileString tmpFileStr(theFixedPathStr);
 		tmpFileStr.NormalizeDelimiter(); // varmistetaan myös että polun merkit ovat oikein päin
 		theFixedPathStr = static_cast<char*>(tmpFileStr);
 
@@ -143,7 +143,7 @@ static void FixPatternSeparators(std::string &theFixedPatternStr)
 {
 	if(theFixedPatternStr.empty() == false)
 	{
-		NFmiFileString tmpFileStr = theFixedPatternStr;
+	    NFmiFileString tmpFileStr(theFixedPatternStr);
 		tmpFileStr.NormalizeDelimiter(); // varmistetaan että polun merkit ovat oikein päin
 		theFixedPatternStr = static_cast<char*>(tmpFileStr);
 	}
