@@ -46,8 +46,8 @@ NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theDa
 							 ,std::string theDataFileName, std::string theDataFilePattern
 							 ,NFmiInfoData::Type theType)
 :NFmiFastQueryInfo(theInfo)
-,itsDataType(theType)
 ,itsModifiableQDatasBookKeeping(0)
+,itsDataType(theType)
 {
 	itsDataReference = theData;
 	itsDataFileName = theDataFileName;
@@ -57,11 +57,11 @@ NFmiSmartInfo::NFmiSmartInfo(const NFmiQueryInfo & theInfo, NFmiQueryData* theDa
 
 NFmiSmartInfo::NFmiSmartInfo (const NFmiSmartInfo & theInfo)
 :NFmiFastQueryInfo(theInfo)
-,itsDataFileName(theInfo.itsDataFileName)
-,itsDataFilePattern(theInfo.itsDataFilePattern)
-,itsDataType(theInfo.itsDataType)
 ,itsModifiableQDatasBookKeeping(theInfo.itsModifiableQDatasBookKeeping)
 ,itsDataReference(theInfo.itsDataReference)
+,itsDataType(theInfo.itsDataType)
+,itsDataFileName(theInfo.itsDataFileName)
+,itsDataFilePattern(theInfo.itsDataFilePattern)
 {
 }
 
