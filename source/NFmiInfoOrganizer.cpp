@@ -369,7 +369,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
 // Info-metodiin. Ks. kommenttia sieltä.
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType, int theIndex)
 {
-	if(theType == NFmiInfoData::kCrossSectionMacroParam)
+	if(theType == NFmiInfoData::kCrossSectionMacroParam || theType == NFmiInfoData::kMacroParam)
 		return CrossSectionMacroParamData();
 	boost::shared_ptr<NFmiFastQueryInfo> backupData; // etsitää tähän 1. data joka muuten sopii kriteereihin, mutta 
 									// jonka tuottaja nimi on eri kuin haluttu. Jos oikealla nimellä ei löydy dataa, käytetään tätä.
