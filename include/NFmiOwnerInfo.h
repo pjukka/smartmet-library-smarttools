@@ -21,8 +21,6 @@ public:
 	NFmiOwnerInfo* Clone(void) const; // syvä kopio, eli kloonille luodaan oma queryData sen omistukseen
 										// TODO: katso pitääkö metodin nimi muuttaa, koska emoissa Clone on 
 										// virtuaali funktio, jossa eri paluu-luokka.
-	NFmiInfoData::Type DataType(void) const {return itsDataType;};
-	void DataType(NFmiInfoData::Type newType){itsDataType = newType;};
 	const std::string& DataFileName(void) const {return itsDataFileName;}
 	void DataFileName(const std::string& theDataFileName){itsDataFileName = theDataFileName;}
 	const std::string& DataFilePattern(void) const {return itsDataFilePattern;}
@@ -31,7 +29,6 @@ public:
 	boost::shared_ptr<NFmiQueryData> DataReference(void) {return itsDataPtr;}
 
 protected:
-	NFmiInfoData::Type itsDataType;
 	boost::shared_ptr<NFmiQueryData> itsDataPtr;
 	std::string itsDataFileName;
 	std::string itsDataFilePattern; // tätä käytetään tunnistamaan mm. info-organizerissa, että onko data samanlaista, eli pyyhitäänkö vanha tälläinen data pois alta
