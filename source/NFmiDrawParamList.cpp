@@ -119,7 +119,7 @@ void NFmiDrawParamList::ClearBorrowedParams(void)
 	for(Reset(); Next(); )
 	{
 		if(Current()->BorrowedParam())
-			Remove(true);
+			Remove();
 	}
 	HasBorrowedParams(false);
 }
@@ -172,13 +172,13 @@ void NFmiDrawParamList::Clear()
 //--------------------------------------------------------
 // Remove
 //--------------------------------------------------------
-bool NFmiDrawParamList::Remove(bool fDeleteData)
+bool NFmiDrawParamList::Remove(void)
 {
 	if(fBeforeFirstItem || itsIter == itsList.end())
 		return false;
 	else
 	{
-		itsList.erase(itsIter);
+		itsIter = itsList.erase(itsIter);
 		fDirtyList = true;
 		return true;
    }
@@ -371,7 +371,7 @@ bool NFmiDrawParamList::RemoveMacroParam(const std::string &theName)
 			if(Current()->ParameterAbbreviation() == wantedName)
 			{
 				status = true;
-				Remove(true); // true=deletoi drawparamin
+				Remove();
 			}
 		}
 	}

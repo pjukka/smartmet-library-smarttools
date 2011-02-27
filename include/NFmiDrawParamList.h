@@ -73,7 +73,7 @@ public:
 	bool Add(boost::shared_ptr<NFmiDrawParam> &theParam, unsigned long theIndex);
 	void BorrowParams(NFmiDrawParamList & theList);
 	void ClearBorrowedParams(void);
-	bool Remove(bool fDeleteData = false);
+	bool Remove(void);
 	bool Index(unsigned long index);
 //	bool Find(NFmiDrawParam* item);
 
