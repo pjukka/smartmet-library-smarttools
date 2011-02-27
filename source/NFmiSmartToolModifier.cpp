@@ -1014,12 +1014,11 @@ void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaM
 		*fCheckLimits = false;
 	else
 	{
-		NFmiDrawParam* drawParam = itsInfoOrganizer->CreateDrawParam(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
+		boost::shared_ptr<NFmiDrawParam> drawParam = itsInfoOrganizer->CreateDrawParam(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
 		if(drawParam)
 		{
 			*theLowerLimit = static_cast<float>(drawParam->AbsoluteMinValue());
 			*theUpperLimit = static_cast<float>(drawParam->AbsoluteMaxValue());
-			delete drawParam;
 		}
 	}
 }

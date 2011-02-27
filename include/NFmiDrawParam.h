@@ -39,6 +39,7 @@
 #include "NFmiInfoData.h"
 #include "NFmiDataMatrix.h" // täältä tulee myös checkedVector
 #include "NFmiMetTime.h"
+#include "boost/shared_ptr.hpp"
 
 class NFmiDrawingEnvironment;
 
@@ -52,6 +53,7 @@ public:
 	virtual  ~NFmiDrawParam (void);
 
 	void Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawingOptions = false);
+	void Init(const boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fInitOnlyDrawingOptions = false);
 	void HideParam(bool newValue){fHidden = newValue;};
 	void EditParam(bool newValue){fEditedParam = newValue;};
 	bool IsParamHidden(void) const {return fHidden;};

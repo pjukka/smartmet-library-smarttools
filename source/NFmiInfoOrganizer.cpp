@@ -170,14 +170,14 @@ static bool CheckLevel(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmi
 	return false;
 }
 
-boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound, bool &fGetDataFromServer)
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound, bool &fGetDataFromServer)
 {
 	fGetDataFromServer = false;
 	boost::shared_ptr<NFmiFastQueryInfo> aInfo = Info(theDrawParam, fCrossSectionInfoWanted);
-	if(aInfo == 0 && fGetLatestIfArchiveNotFound && theDrawParam.ModelRunIndex() < 0)
+	if(aInfo == 0 && fGetLatestIfArchiveNotFound && theDrawParam->ModelRunIndex() < 0)
 	{
-		NFmiDrawParam tmpDrawParam(theDrawParam);
-		tmpDrawParam.ModelRunIndex(0); 
+		boost::shared_ptr<NFmiDrawParam> tmpDrawParam(new NFmiDrawParam(*theDrawParam));
+		tmpDrawParam->ModelRunIndex(0); 
 		aInfo = Info(tmpDrawParam, fCrossSectionInfoWanted); // koetetaan sitten hakea viimeisintä dataa
 		if(aInfo)
 			fGetDataFromServer = true;
@@ -185,28 +185,28 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(NFmiDrawParam &theD
 	return aInfo;
 }
 
-boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound)
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound)
 {
 	bool getDataFromServer = false;
 	return Info(theDrawParam, fCrossSectionInfoWanted, fGetLatestIfArchiveNotFound, getDataFromServer);
 }
 
-boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted)
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fCrossSectionInfoWanted)
 {
-	NFmiInfoData::Type dataType = theDrawParam.DataType();
+	NFmiInfoData::Type dataType = theDrawParam->DataType();
 	if(fCrossSectionInfoWanted)
-		return CrossSectionInfo(theDrawParam.Param(), dataType, theDrawParam.ModelRunIndex());
+		return CrossSectionInfo(theDrawParam->Param(), dataType, theDrawParam->ModelRunIndex());
 	else
 		return GetInfo(theDrawParam);
 }
 
-boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(NFmiDrawParam &theDrawParam)
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(boost::shared_ptr<NFmiDrawParam> &theDrawParam)
 {
-	NFmiLevel* level = &theDrawParam.Level();
-	NFmiInfoData::Type dataType = theDrawParam.DataType();
+	NFmiLevel* level = &theDrawParam->Level();
+	NFmiInfoData::Type dataType = theDrawParam->DataType();
 	if(level && level->GetIdent() == 0) // jos tämä on ns. default-level otus (GetIdent() == 0), annetaan 0-pointteri Info-metodiin
 		level = 0;
-	return GetInfo(theDrawParam.Param(), level, dataType, ::UseParIdOnly(dataType), theDrawParam.ModelRunIndex());
+	return GetInfo(theDrawParam->Param(), level, dataType, ::UseParIdOnly(dataType), theDrawParam->ModelRunIndex());
 }
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData)
@@ -659,14 +659,14 @@ NFmiParamBag NFmiInfoOrganizer::GetParams(int theProducerId1)
 // etsitään info, jonka tuottaja ja parametri saadaan theDataIdent:stä.
 // Jos tälläinen info löytyy, pyydetään itsDrawParamFactory luomaan
 // drawParam kyseiselle parametrille löydetyn infon avulla.
-NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
+boost::shared_ptr<NFmiDrawParam> NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType)
 {
 // Huomaa, että itsDrawParamFactory luo pointterin drawParam new:llä, joten
 // drawParam pitää muistaa tuhota  NFmiInfoOrganizer:n ulkopuolella
-	NFmiDrawParam* drawParam = 0;
+	boost::shared_ptr<NFmiDrawParam> drawParam;
 	if(theType == NFmiInfoData::kSatelData || theType == NFmiInfoData::kConceptualModelData) // spesiaali keissi satelliitti kuville, niillä ei ole infoa
 	{
-		drawParam = new NFmiDrawParam(theIdent, NFmiLevel(), 1, theType);
+		drawParam = boost::shared_ptr<NFmiDrawParam>(new NFmiDrawParam(theIdent, NFmiLevel(), 1, theType));
 		drawParam->ParameterAbbreviation(static_cast<char*>(theIdent.GetParamName()));
 		return drawParam;
 	}
@@ -681,20 +681,19 @@ NFmiDrawParam* NFmiInfoOrganizer::CreateDrawParam(const NFmiDataIdent& theIdent,
 }
 
 // hakee poikkileikkausta varten haluttua dataa ja luo siihen sopivan drawparamin
-NFmiDrawParam* NFmiInfoOrganizer::CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType)
+boost::shared_ptr<NFmiDrawParam> NFmiInfoOrganizer::CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType)
 {
-	NFmiDrawParam* drawParam = 0;
-	drawParam = itsDrawParamFactory->CreateCrossSectionDrawParam(theDataIdent);
+	boost::shared_ptr<NFmiDrawParam> drawParam = itsDrawParamFactory->CreateCrossSectionDrawParam(theDataIdent);
 	if(drawParam)
 		drawParam->DataType(theType); // data tyyppi pitää myös asettaa!!
 	return drawParam;
 }
 
-NFmiDrawParam* NFmiInfoOrganizer::CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent
+boost::shared_ptr<NFmiDrawParam> NFmiInfoOrganizer::CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent
 														  ,const NFmiLevel* theLevel
 														  ,NFmiInfoData::Type theType)
 {
-	NFmiDrawParam *drawParam = itsDrawParamFactory->CreateDrawParam(theDataIdent, theLevel); // false merkitsee, että parametria ei taas aseteta tuolla metodissa
+	boost::shared_ptr<NFmiDrawParam> drawParam = itsDrawParamFactory->CreateDrawParam(theDataIdent, theLevel); // false merkitsee, että parametria ei taas aseteta tuolla metodissa
 	if(drawParam)
 		drawParam->DataType(theType);
 	return drawParam;
@@ -957,7 +956,7 @@ int NFmiInfoOrganizer::CleanUnusedDataFromMemory(void)
 // etsitään qdatakeeperin listoilta lähin origin aika ennen annettua aikaa ja palautetaan sen indeksi.
 // Jos ei löydy aikaa ennen annettua aikaa, palautetaan viimeinen indeksi (eli vanhimman ajan indeksi).
 // Jos ei löytynyt sopivaa epsäännöllistä dataKeeperiä, palautetaan arvo 99, joka kertoo että ei löydy.
-int NFmiInfoOrganizer::GetNearestUnRegularTimeIndex(NFmiDrawParam &theDrawParam, const NFmiMetTime &theTime)
+int NFmiInfoOrganizer::GetNearestUnRegularTimeIndex(boost::shared_ptr<NFmiDrawParam> &theDrawParam, const NFmiMetTime &theTime)
 {
 	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
 	{

@@ -71,8 +71,8 @@ public:
 	// Pit‰‰kˆ lis‰ksi laittaa extra-infoa eri datoista, ett‰ siivous rutiini tiet‰‰ milloin niit‰ on viimeksi k‰ytetty,
 	// mit‰ muuta infoa tarvitaan kirjanpitoon ja muuhin?
 	// ***************************************************************************************************************
-	boost::shared_ptr<NFmiFastQueryInfo> Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound, bool &fGetDataFromServer);
-	boost::shared_ptr<NFmiFastQueryInfo> Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound);
+	boost::shared_ptr<NFmiFastQueryInfo> Info(boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound, bool &fGetDataFromServer);
+	boost::shared_ptr<NFmiFastQueryInfo> Info(boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound);
   	boost::shared_ptr<NFmiFastQueryInfo> Info(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly = false, bool fLevelData = false);
 	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(const std::string &theFileNameFilter); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
 	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(int theProducerId, int theProducerId2 = -1, int theProducerId3 = -1, int theProducerId4 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
@@ -88,10 +88,10 @@ public:
 	boost::shared_ptr<NFmiFastQueryInfo> CrossSectionMacroParamData(void);
 
 	NFmiParamBag GetParams(int theProducerId1);
-	int GetNearestUnRegularTimeIndex(NFmiDrawParam &theDrawParam, const NFmiMetTime &theTime);
+	int GetNearestUnRegularTimeIndex(boost::shared_ptr<NFmiDrawParam> &theDrawParam, const NFmiMetTime &theTime);
 
-	NFmiDrawParam* CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
-	NFmiDrawParam* CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
+	boost::shared_ptr<NFmiDrawParam> CreateDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+	boost::shared_ptr<NFmiDrawParam> CreateCrossSectionDrawParam(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType);
 
 	bool Clear(void);
 	void ClearData(NFmiInfoData::Type theDataType);
@@ -127,14 +127,14 @@ private:
 	bool AddEditedData(NFmiSmartInfo *theEditedData, int theUndoLevel);
 	bool Add(NFmiOwnerInfo* theInfo, int theMaxLatestDataCount, int theModelRunTimeGap);
 
-	boost::shared_ptr<NFmiFastQueryInfo> Info(NFmiDrawParam &theDrawParam, bool fCrossSectionInfoWanted);
+	boost::shared_ptr<NFmiFastQueryInfo> Info(boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fCrossSectionInfoWanted);
 	boost::shared_ptr<NFmiFastQueryInfo> GetInfo(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, int theIndex = 0);
-	boost::shared_ptr<NFmiFastQueryInfo> GetInfo(NFmiDrawParam &theDrawParam);
+	boost::shared_ptr<NFmiFastQueryInfo> GetInfo(boost::shared_ptr<NFmiDrawParam> &theDrawParam);
 	boost::shared_ptr<NFmiFastQueryInfo> CrossSectionInfo(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType, int theIndex = 0);
 	boost::shared_ptr<NFmiFastQueryInfo> GetSynopPlotParamInfo(NFmiInfoData::Type theType);
 	boost::shared_ptr<NFmiFastQueryInfo> GetSoundingPlotParamInfo(NFmiInfoData::Type theType);
 	boost::shared_ptr<NFmiFastQueryInfo> GetWantedProducerInfo(NFmiInfoData::Type theType, FmiProducerName theProducerName);
-	NFmiDrawParam* CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
+	boost::shared_ptr<NFmiDrawParam> CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, boost::shared_ptr<NFmiFastQueryInfo> &theInfo2);
 
 	boost::shared_ptr<NFmiQueryDataKeeper> itsEditedDataKeeper; // pit‰‰ sis‰ll‰‰n oikeasti NFmiSmartInfo-olion

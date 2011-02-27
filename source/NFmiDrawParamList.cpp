@@ -31,14 +31,14 @@
 #include "NFmiDrawParamList.h"
 #include "NFmiDrawParam.h"
 #include <algorithm>
-#include <list>
 
 //--------------------------------------------------------
 // Constructor  NFmiDrawParamList
 //--------------------------------------------------------
-NFmiDrawParamList::NFmiDrawParamList(void):
+NFmiDrawParamList::NFmiDrawParamList(void)
+:fBeforeFirstItem(true),
 itsList(),
-itsIter(itsList.Start()),
+itsIter(itsList.begin()),
 fDirtyList(true),
 fHasBorrowedParams(false)
 {
@@ -49,24 +49,25 @@ fHasBorrowedParams(false)
 //--------------------------------------------------------
 NFmiDrawParamList::~NFmiDrawParamList(void)
 {
-	Clear(true);
+	Clear();
 }
 
 //--------------------------------------------------------
 // Add
 //--------------------------------------------------------
-bool NFmiDrawParamList::Add (NFmiDrawParam* theParam)
+bool NFmiDrawParamList::Add(boost::shared_ptr<NFmiDrawParam> &theParam)
 {
 	if(theParam)
 	{
 		if(theParam->DataType() == NFmiInfoData::kSatelData) // kSatelData tarkoittaa oikeasti vain kuva muotoista dataa eli ei välttämättä satelliitti dataa siis
 		{ // satelliitti-kuvat pitää laitaa aina 1. näytölle, koska ne peittävät muut
-			itsList.AddStart(theParam);
+			itsList.push_front(theParam);
 			fDirtyList = true;
 			return true;
 		}
-		else if(itsList.AddEnd(theParam))
+		else
 		{
+			itsList.push_back(theParam);
 			fDirtyList = true;
 			return true;
 		}
@@ -75,17 +76,27 @@ bool NFmiDrawParamList::Add (NFmiDrawParam* theParam)
 }
 //--------------------------------------------------------
 // Add
+// Index count starts from 1 i.e first item in list is with index number 1
+// and second is 2 and so on.
+// If index is bigger than list, addition is done to end of list.
+// If given index <=0 addition is done to the start of list.
 //--------------------------------------------------------
-bool NFmiDrawParamList::Add(NFmiDrawParam * theParam, unsigned long theIndex)
+bool NFmiDrawParamList::Add(boost::shared_ptr<NFmiDrawParam> &theParam, unsigned long theIndex)
 {
    if(theParam)
    {
-	   NFmiPtrList < NFmiDrawParam > :: Iterator iter = itsList.Index(theIndex);
-	   if(iter.AddBefore(theParam))
+	   if(theIndex <= 1)
+			itsList.push_front(theParam);
+	   else if(theIndex > itsList.size())
+			itsList.push_back(theParam);
+	   else
 	   {
-			fDirtyList = true;
-			return true;
+		   IterType pos = itsList.begin();
+		   std::advance(pos, theIndex - 1);
+		   itsList.insert(pos, theParam);
 	   }
+		fDirtyList = true;
+		return true;
    }
    return false;
 }
@@ -95,7 +106,7 @@ void NFmiDrawParamList::BorrowParams(NFmiDrawParamList &theList)
 {
 	for(theList.Reset(); theList.Next(); )
 	{
-		NFmiDrawParam *tmp = new NFmiDrawParam(*(theList.Current()));
+		DataType tmp = boost::shared_ptr<NFmiDrawParam>(new NFmiDrawParam(*(theList.Current())));
 		tmp->BorrowedParam(true);
 		Add(tmp);
 		HasBorrowedParams(true);
@@ -116,38 +127,46 @@ void NFmiDrawParamList::ClearBorrowedParams(void)
 //--------------------------------------------------------
 // Current
 //--------------------------------------------------------
-NFmiDrawParam* NFmiDrawParamList::Current (void)
+boost::shared_ptr<NFmiDrawParam> NFmiDrawParamList::Current(void)
 {
-	return itsIter.CurrentPtr();
+	if(fBeforeFirstItem || itsIter == itsList.end())
+		return boost::shared_ptr<NFmiDrawParam>();
+	else 
+		return *itsIter;
 }
 //--------------------------------------------------------
 // Reset
 //--------------------------------------------------------
-bool NFmiDrawParamList::Reset (void)
+bool NFmiDrawParamList::Reset(void)
 {
-   itsIter = itsList.Start();
-   return true;
+	itsIter = itsList.begin();
+	fBeforeFirstItem = true;
+	return true;
 }
 //--------------------------------------------------------
 // Next
 //--------------------------------------------------------
-bool NFmiDrawParamList::Next (void)
+bool NFmiDrawParamList::Next(void)
 {
-   return itsIter.Next();
-}
-//--------------------------------------------------------
-// Previous
-//--------------------------------------------------------
-bool NFmiDrawParamList::Previous (void)
-{
-   return itsIter.Previous();
+	if(itsIter == itsList.end())
+		return false;
+	if(fBeforeFirstItem)
+	{
+		fBeforeFirstItem = false;
+		return true;
+	}
+	else
+	{
+		++itsIter;
+		return itsIter != itsList.end();
+	}
 }
 //--------------------------------------------------------
 // Clear
 //--------------------------------------------------------
-void NFmiDrawParamList::Clear(bool fDeleteData)
+void NFmiDrawParamList::Clear()
 {
-	itsList.Clear(fDeleteData);
+	itsList.clear();
 	fDirtyList = true;
 }
 //--------------------------------------------------------
@@ -155,26 +174,43 @@ void NFmiDrawParamList::Clear(bool fDeleteData)
 //--------------------------------------------------------
 bool NFmiDrawParamList::Remove(bool fDeleteData)
 {
-   if(itsIter.Remove(fDeleteData))
-   {
+	if(fBeforeFirstItem || itsIter == itsList.end())
+		return false;
+	else
+	{
+		itsList.erase(itsIter);
 		fDirtyList = true;
 		return true;
    }
-   return false;
 }
 //--------------------------------------------------------
 // Index
 //--------------------------------------------------------
 bool NFmiDrawParamList::Index(unsigned long index)
 {
-	itsIter = itsList.Index(index);
-	if(Current())
+	if(index <= 0)
+	{
+		Reset();
+		return false;
+	}
+	else if(index > itsList.size())
+	{
+		fBeforeFirstItem = false;
+		itsIter = itsList.end();
+		return false;
+	}
+	else
+	{
+		fBeforeFirstItem = false;
+		itsIter = itsList.begin();
+		std::advance(itsIter, index - 1);
 		return true;
-	return false;
+	}
 }
 //--------------------------------------------------------
 // Find
 //--------------------------------------------------------
+/*
 bool NFmiDrawParamList::Find(NFmiDrawParam* item)
 {
 	if(item)
@@ -186,7 +222,7 @@ bool NFmiDrawParamList::Find(NFmiDrawParam* item)
 	}
 	return false;
 }
-
+*/
 //--------------------------------------------------------
 // Update
 //--------------------------------------------------------
@@ -218,7 +254,7 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 {
 	for(Reset(); Next();)
 	{
-		NFmiDrawParam * drawParam = Current();
+		boost::shared_ptr<NFmiDrawParam> drawParam = Current();
 		if(theParam.GetParamIdent() == NFmiInfoData::kFmiSpSynoPlot) // pirun synop-parametrille pitää taas tehdä virityksiä
 		{
 			if(fUseOnlyParamId || drawParam->Param() == theParam)
@@ -247,7 +283,7 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 // Ei poista niitä parametreja, jotka ovat theParamIdsNotRemoved-listalla. Löy-
 // tynyt paramId poistetaan theParamIdsNotRemoved-listalta, että niitä ei
 // lisättäisi myöhemmin tähän listaan.
-void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel, bool fDeleteData)
+void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel)
 {
 	std::list<int> tmpParIdList;
 	int size = static_cast<int>(theParamIdsNotRemoved.size());
@@ -264,7 +300,7 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int
 				{
 					it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->Param().GetParamIdent()));
 					if(it == tmpParIdList.end())
-						Remove(fDeleteData);
+						Remove();
 					else
 						tmpParIdList.erase(it);
 				}
@@ -281,7 +317,7 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int
 				{
 					it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->Param().GetParamIdent()));
 					if(it == tmpParIdList.end())
-						Remove(fDeleteData);
+						Remove();
 					else
 						tmpParIdList.erase(it);
 				}
@@ -299,7 +335,7 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int
  * tynyt paramId poistetaan theParamIdsNotRemoved-listalta, että niitä ei
  * lisättäisi myöhemmin tähän listaan.
  */
-void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved, bool fDeleteData)
+void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved)
 {
 	std::list<std::pair<int, NFmiLevel> >::iterator it;
 	for(Reset(); Next();)
@@ -311,7 +347,7 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pa
 				std::pair<int, NFmiLevel> tmp(Current()->Param().GetParamIdent(), Current()->Level());
 				it = std::find(theParamIdsAndLevelsNotRemoved.begin(), theParamIdsAndLevelsNotRemoved.end(), tmp);
 				if(it == theParamIdsAndLevelsNotRemoved.end())
-					Remove(fDeleteData);
+					Remove();
 				else
 					theParamIdsAndLevelsNotRemoved.erase(it);
 			}
@@ -359,22 +395,21 @@ bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 		// 1. siirretään alusta loppuun
 		if(index == 1 && theMovement < 0)
 		{
-			NFmiSortedPtrList <NFmiDrawParam>::Iterator iter = itsList.Start();
-			iter.Next();
-			NFmiDrawParam *item = iter.CurrentPtr();
-			itsList.RemoveStart(false);
-			itsList.AddEnd(item);
+			IterType iter = itsList.begin();
+			DataType drawParam = *iter;
+			itsList.pop_front();
+			itsList.push_back(drawParam);
 			fDirtyList = true;
 			return true;
 		}
 		//  2. siirretään lopusta alkuun
 		else if(index == paramCount && theMovement > 0)
 		{
-			NFmiSortedPtrList <NFmiDrawParam>::Iterator iter = itsList.End();
-			iter.Previous();
-			NFmiDrawParam *item = iter.CurrentPtr();
-			itsList.RemoveEnd(false);
-			itsList.AddStart(item);
+			IterType iter = itsList.end();
+			--iter;
+			DataType drawParam = *iter;
+			itsList.pop_back();
+			itsList.push_front(drawParam);
 			fDirtyList = true;
 			return true;
 		}
@@ -394,14 +429,29 @@ bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 				index = FmiMin(index, paramCount);
 				if(index != oldIndex) // jos todella tapahtuu siirto, tehdään se ja laitetaan lista likaiseksi
 				{
-					itsList.Swap(index, oldIndex);
-					fDirtyList = true;
+					Swap(index, oldIndex);
 					return true;
 				}
 			}
 		}
 	}
 	return false;
+}
+
+// Tämä tekee tarkistamattoman kahden itemin swapin listassa.
+// indeksit alkoivat 1:stä, eli listan 1. itemi on indeksi 1:ssä.
+void NFmiDrawParamList::Swap(int index1, int index2)
+{
+	if(Index(index1))
+	{
+		IterType iter1 = itsIter;
+		if(Index(index2))
+		{
+			IterType iter2 = itsIter;
+			(*iter1).swap(*iter2);
+			fDirtyList = true;
+		}
+	}
 }
 
 /*!
@@ -438,11 +488,12 @@ int NFmiDrawParamList::FindEdited(void)
 void NFmiDrawParamList::CopyList(NFmiDrawParamList &theList, bool clearFirst)
 {
 	if(clearFirst)
-		Clear(true);
+		Clear();
 
 	for(theList.Reset(); theList.Next(); )
 	{
-		Add(new NFmiDrawParam(*theList.Current()));
+		DataType tmp = boost::shared_ptr<NFmiDrawParam>(new NFmiDrawParam(*(theList.Current())));
+		Add(tmp);
 	}
 	ActivateOnlyOne();
 }
