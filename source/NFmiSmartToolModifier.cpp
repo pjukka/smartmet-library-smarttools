@@ -472,7 +472,6 @@ void NFmiSmartToolModifier::ModifyConditionalData(boost::shared_ptr<NFmiSmartToo
 						theCalculationBlock->itsElseCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex, theMacroParamValue);
 					if(theMacroParamValue.fSetValue)
 					{
-						info->DestroyData();
 						return ; // eli jos oli yhden pisteen laskusta kyse, lopetetaan loppi heti
 					}
 				}
@@ -480,10 +479,8 @@ void NFmiSmartToolModifier::ModifyConditionalData(boost::shared_ptr<NFmiSmartToo
 		}
 		catch(...)
 		{
-			info->DestroyData();
 			throw ;
 		}
-		info->DestroyData();
 	}
 }
 
@@ -566,10 +563,8 @@ void NFmiSmartToolModifier::ModifyData2(boost::shared_ptr<NFmiSmartToolCalculati
 		}
 		catch(...)
 		{
-			info->DestroyData();
 			throw ;
 		}
-		info->DestroyData();
 	}
 }
 
