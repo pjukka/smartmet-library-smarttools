@@ -326,9 +326,9 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
 		return CrossSectionMacroParamData(); // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 
 	boost::shared_ptr<NFmiFastQueryInfo> foundData;
-	if(::MatchData(itsEditedDataKeeper->GetIter(), theType, theDataIdent, fUseParIdOnly, theLevel))
+	if(itsEditedDataKeeper && ::MatchData(itsEditedDataKeeper->GetIter(), theType, theDataIdent, fUseParIdOnly, theLevel))
 		foundData = itsEditedDataKeeper->GetIter();
-	else if(::MatchData(itsCopyOfEditedDataKeeper->GetIter(), theType, theDataIdent, fUseParIdOnly, theLevel))
+	else if(itsCopyOfEditedDataKeeper && ::MatchData(itsCopyOfEditedDataKeeper->GetIter(), theType, theDataIdent, fUseParIdOnly, theLevel))
 		foundData = itsCopyOfEditedDataKeeper->GetIter();
 	else
 	{
@@ -374,7 +374,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CrossSectionInfo(const N
 	boost::shared_ptr<NFmiFastQueryInfo> backupData; // etsitää tähän 1. data joka muuten sopii kriteereihin, mutta 
 									// jonka tuottaja nimi on eri kuin haluttu. Jos oikealla nimellä ei löydy dataa, käytetään tätä.
 	boost::shared_ptr<NFmiFastQueryInfo> foundData;
-	if(::MatchCrossSectionData(itsEditedDataKeeper->GetIter(), theType, theDataIdent, true))
+	if(itsEditedDataKeeper && ::MatchCrossSectionData(itsEditedDataKeeper->GetIter(), theType, theDataIdent, true))
 		foundData = itsEditedDataKeeper->GetIter();
 	else
 	{
