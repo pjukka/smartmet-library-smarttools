@@ -35,6 +35,26 @@
 
 using namespace std;
 
+static boost::shared_ptr<NFmiFastQueryInfo> CreateShallowCopyOfHighestInfo(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+	if(theInfo)
+	{
+		NFmiSmartInfo *smartInfo = dynamic_cast<NFmiSmartInfo*>(theInfo.get());
+		if(smartInfo)
+			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(*smartInfo));
+
+		NFmiOwnerInfo *ownerInfo = dynamic_cast<NFmiOwnerInfo*>(theInfo.get());
+		if(ownerInfo)
+			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiOwnerInfo(*ownerInfo));
+
+		NFmiFastQueryInfo *fastInfo = dynamic_cast<NFmiFastQueryInfo*>(theInfo.get());
+		if(fastInfo)
+			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*fastInfo));
+	}
+
+	return boost::shared_ptr<NFmiFastQueryInfo>();
+}
+
 NFmiSmartToolCalculationBlockVector::NFmiSmartToolCalculationBlockVector(void)
 :itsCalculationBlocks()
 {
@@ -897,7 +917,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
 					tmpInfo->FirstLevel();
 					if(tmpInfo->Level()->GetIdent() == kFmiHybridLevel)
 					{ // lähdetään tässä siitä että jos löytyy mallipinta-dataa, mikä sopii tarkoitukseen, se valitaan ensisijaisesti
-						info = boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*tmpInfo.get()));
+						info = ::CreateShallowCopyOfHighestInfo(tmpInfo);
 						break;
 					}
 					else if(tmpInfo->Level()->GetIdent() == kFmiPressureLevel)
@@ -920,7 +940,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
 		}
 	}
 	if(info == 0 && possiblePressureLevelDataInfo != 0) // jos ei löytynyt sopivaa mallipinta-dataa, mutta painepinta-dataa löytyi, otetaan se käyttöön
-		info = boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*possiblePressureLevelDataInfo.get()));
+		info = ::CreateShallowCopyOfHighestInfo(possiblePressureLevelDataInfo);
 	if(info)
 		mustUsePressureInterpolation = true;
 	return info;
@@ -932,19 +952,9 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateCopyOfAnalyzeI
 	if(info)
 	{
 		if(info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) && (theLevel == 0 || info->Level(*theLevel)))
-			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*info));
+			return ::CreateShallowCopyOfHighestInfo(info);
 	}
 	return info;
-}
-
-static boost::shared_ptr<NFmiFastQueryInfo> CreateShallowCopyInfo(boost::shared_ptr<NFmiFastQueryInfo> theOrigInfo)
-{
-	if(theOrigInfo)
-	{
-		boost::shared_ptr<NFmiFastQueryInfo> copyOfInfo(new NFmiFastQueryInfo(*theOrigInfo.get()));
-		return copyOfInfo;
-	}
-	return boost::shared_ptr<NFmiFastQueryInfo>();
 }
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
@@ -962,12 +972,12 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 		{ // tämä macroParam data viritys on multi threaddaavaa serveriä varten, eli macroparam data pitää olla thread-kohtainen
 			// ja se on aina annettu luodulle NFmiSmartToolModifier-luokan instansille erikseen.
 			if(UsedMacroParamData())
-				info = boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*UsedMacroParamData().get()));
+				info = ::CreateShallowCopyOfHighestInfo(UsedMacroParamData());
 			else
 				throw runtime_error("NFmiSmartToolModifier::CreateInfo - error in program, no macroParam data available.");
 		}
 		else
-			info = ::CreateShallowCopyInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), dataType, true, fUseLevelData));
+			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), dataType, true, fUseLevelData));
 		if(info == 0)
 			info = GetPossibleLevelInterpolatedInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 	}
@@ -976,10 +986,10 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 		if(fUseLevelData && theAreaMaskInfo.GetLevel() != 0) // jos pitää käyttää level dataa (SumZ ja MinH funktiot), ei saa antaa level infoa parametrin yhteydessä
 			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNoLevel") + "\n" + theAreaMaskInfo.GetMaskText());
 		if(fUseLevelData || fDoCrossSectionCalculation) // jos leveldata-flagi päällä, yritetään ensin, löytyykö hybridi dataa
-			info = ::CreateShallowCopyInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), NFmiInfoData::kHybridData, false, fUseLevelData | fDoCrossSectionCalculation)); // tähän pieni hybrid-koukku, jos haluttiin level dataa
+			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), NFmiInfoData::kHybridData, false, fUseLevelData | fDoCrossSectionCalculation)); // tähän pieni hybrid-koukku, jos haluttiin level dataa
 		if(info == 0)
 		{
-			info = ::CreateShallowCopyInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData | fDoCrossSectionCalculation));
+			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData | fDoCrossSectionCalculation));
 		}
 		if(info == 0 && theAreaMaskInfo.GetDataType() == NFmiInfoData::kAnalyzeData) // analyysi datalle piti tehdä pika viritys tähän
 			info = CreateCopyOfAnalyzeInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel());
@@ -989,13 +999,13 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 		{
 			NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
 			aLevel.SetIdent(kFmiHybridLevel);
-			info = ::CreateShallowCopyInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), &aLevel, NFmiInfoData::kHybridData, false, fUseLevelData));
+			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), &aLevel, NFmiInfoData::kHybridData, false, fUseLevelData));
 		}
 		if(info == 0 && theAreaMaskInfo.GetLevel() != 0) // kokeillaan vielä jos halutaan 'height' (type 105) datan leveliä
 		{
 			NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
 			aLevel.SetIdent(kFmiHeight);
-			info = ::CreateShallowCopyInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), &aLevel, NFmiInfoData::kViewable, false, fUseLevelData));
+			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), &aLevel, NFmiInfoData::kViewable, false, fUseLevelData));
 		}
 	}
 	if(!info)
@@ -1027,26 +1037,6 @@ struct FindScriptVariable
 
 	int itsParId;
 };
-
-static boost::shared_ptr<NFmiFastQueryInfo> CreateShallowCopyOfHighestInfo(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
-{
-	if(theInfo)
-	{
-		NFmiSmartInfo *smartInfo = dynamic_cast<NFmiSmartInfo*>(theInfo.get());
-		if(smartInfo)
-			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(*smartInfo));
-
-		NFmiOwnerInfo *ownerInfo = dynamic_cast<NFmiOwnerInfo*>(theInfo.get());
-		if(ownerInfo)
-			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiOwnerInfo(*ownerInfo));
-
-		NFmiFastQueryInfo *fastInfo = dynamic_cast<NFmiFastQueryInfo*>(theInfo.get());
-		if(fastInfo)
-			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*fastInfo));
-	}
-
-	return boost::shared_ptr<NFmiFastQueryInfo>();
-}
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateScriptVariableInfo(const NFmiDataIdent &theDataIdent)
 {

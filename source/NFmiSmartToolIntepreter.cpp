@@ -1259,11 +1259,15 @@ bool NFmiSmartToolIntepreter::FindParamAndLevelAndProducerAndSetMaskInfo(const s
 {
 	NFmiProducer producer(GetPossibleProducerInfo(theProducerText));
 	if(producer.GetIdent() == gMesanProdId)
-		theDataType = NFmiInfoData::kAnalyzeData; // ikävää koodia, mutta analyysi data tyyppi pitää asettaa jos ANAL-tuottajaa käytetty
+		theDataType = NFmiInfoData::kAnalyzeData; // ikävää koodia, mutta analyysi data tyyppi pitää asettaa jos ANA-tuottajaa käytetty
 	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer))
 	{
 		NFmiLevel level(GetPossibleLevelInfo(theLevelText, theDataType));
 		theMaskInfo->SetLevel(&level);
+		if(level.LevelType() == kFmiHybridLevel)
+			theMaskInfo->SetDataType(NFmiInfoData::kHybridData);
+		else if(level.LevelType() == kFmiPressure)
+			theMaskInfo->SetDataType(NFmiInfoData::kViewable);
 		return true;
 	}
 	return false;
