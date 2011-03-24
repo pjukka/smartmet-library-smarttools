@@ -222,18 +222,18 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 	// Paitsi jos aikoja datoissa on alle 3 kpl
 	// Lisäksi threadit käynnistetään alle normaalin prioriteetin, että kone ei tukahdu kun näitä käynnistetään.
 
+#ifdef UNIX
+		fUseOnlyOneThread = true; // kolmeen osaan jaettu datan rakennus ei toimi jostain syystä linux puolella
+#endif
+
 	unsigned long timeSize = theResultData.Info()->SizeTimes();
-#ifndef BOOST_DISABLE_THREADS
 	if(fUseOnlyOneThread || timeSize < 3)
 	{ // jos aikoja oli alle kolme, lasketaan data yhdessä funktiossa
-#endif // BOOST_DISABLE_THREADS
-
 		if(fDoCerrReporting)
 			std::cerr << "making data in single thread" << std::endl;
 		boost::shared_ptr<NFmiFastQueryInfo> sourceInfo(new NFmiFastQueryInfo(&theSourceData));
 		boost::shared_ptr<NFmiFastQueryInfo> resultInfo(new NFmiFastQueryInfo(&theResultData));
 		::CalculatePartOfSoundingData(sourceInfo, resultInfo, 0, timeSize-1, useFastFill, theStopFunctor, 1, fDoCerrReporting);
-#ifndef BOOST_DISABLE_THREADS
 	}
 	else
 	{
@@ -274,8 +274,6 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 		if(fDoCerrReporting)
 			std::cerr << "all threads ended" << std::endl;
 	}
-#endif // BOOST_DISABLE_THREADS
-
 }
 
 float NFmiSoundingIndexCalculator::CalcOpt1(NFmiSoundingDataOpt1 &theSoundingDataOpt1, FmiSoundingParameters theParam)
