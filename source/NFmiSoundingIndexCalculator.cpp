@@ -211,7 +211,7 @@ static void CalcTimeIndexStartsForThreeThreads(unsigned long timeSize, unsigned 
 #endif
 
 // Jos useFastFill on true, on datoilla sama hila ja aika descriptor rakenne
-void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor)
+void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread)
 {
 	NFmiSoundingFunctions::CalcDP(1, 56); // tämä funktio pitää varmistaa että se on alustettu, koska siellä on pari staattista muuttujaa, jotka 
 											// alustetaan ensimmäisellä kerralla ja multi-threaddaavassa jutussa se voisi olla ongelma.
@@ -224,7 +224,7 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 
 	unsigned long timeSize = theResultData.Info()->SizeTimes();
 #ifndef BOOST_DISABLE_THREADS
-	if(timeSize < 3)
+	if(fUseOnlyOneThread || timeSize < 3)
 	{ // jos aikoja oli alle kolme, lasketaan data yhdessä funktiossa
 #endif // BOOST_DISABLE_THREADS
 
@@ -711,7 +711,7 @@ static NFmiQueryInfo MakeSoundingIndexInfo(NFmiQueryData &theSourceData, const s
 	return info;
 }
 
-boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor)
+boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread)
 {
 	// 1. lue uusin pohjadata käyttöön
 	boost::shared_ptr<NFmiQueryData> sourceData(NFmiQueryDataUtil::ReadNewestData(theSourceFileFilter));
@@ -730,7 +730,7 @@ boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingI
 	if(data == 0)
 		throw std::runtime_error("Error in CreateNewSoundingIndexData, could not create result data.");
 	// 4. täytä qdata
-	NFmiSoundingIndexCalculator::CalculateWholeSoundingData(*sourceData.get(), *data.get(), true, fDoCerrReporting, theStopFunctor);
+	NFmiSoundingIndexCalculator::CalculateWholeSoundingData(*sourceData.get(), *data.get(), true, fDoCerrReporting, theStopFunctor, fUseOnlyOneThread);
 
 	return data;
 }
