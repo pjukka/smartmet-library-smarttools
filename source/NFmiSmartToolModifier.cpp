@@ -263,6 +263,7 @@ boost::shared_ptr<NFmiSmartToolCalculation> NFmiSmartToolModifier::CreateConditi
 		if(size)
 		{
 			areaMaskHandler = boost::shared_ptr<NFmiSmartToolCalculation>(new NFmiSmartToolCalculation());
+			areaMaskHandler->SetCalculationText(theAreaMaskSectionInfo->GetCalculationText());
 			for(size_t i=0; i<size; i++)
 // HUOM!!!! editoitavaN DATAN QDatasta pitää tehdä kopiot, muuten maskit eivät toimi
 // kaikissa tilanteissa oikein!! KORJAA TÄMÄ!!!!!
@@ -304,6 +305,7 @@ boost::shared_ptr<NFmiSmartToolCalculation> NFmiSmartToolModifier::CreateCalcula
 	{
 		checkedVector<boost::shared_ptr<NFmiAreaMaskInfo> > &areaMaskInfos = theCalcInfo->GetCalculationOperandInfoVector();
 		calculation = boost::shared_ptr<NFmiSmartToolCalculation>(new NFmiSmartToolCalculation());
+		calculation->SetCalculationText(theCalcInfo->GetCalculationText());
 		calculation->SetCalculationText(theCalcInfo->GetCalculationText());
 		bool mustUsePressureInterpolation = false; // tätäei käytetä tässä, mutta pakko laittaa metodin interfacen takia
 		calculation->SetResultInfo(CreateInfo(*theCalcInfo->GetResultDataInfo(), mustUsePressureInterpolation));
