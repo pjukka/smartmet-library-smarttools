@@ -34,7 +34,7 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	NFmiInfoOrganizer dataBase;
 	if(!InitDataBase(&dataBase, theModifiedData, theHelperDataFileNames, createDrawParamFileIfNotExist, fMakeStaticIfOneTimeStepData))
 	{
-		std::cerr << "Tietokannan alustus epäonnistui, ei jatketa." << std::endl;
+		std::cerr << "Database initialization failed, aborting." << std::endl;
 		return 0;
 	}
 
