@@ -728,7 +728,7 @@ void NFmiInfoOrganizer::ClearData(NFmiInfoData::Type theDataType)
 
 			if(iter->second->GetDataKeeper()->GetIter()->DataType() == theDataType)
 			{
-				itsDataMap.erase(iter); // tämä poisto-operaatio siirtää iteraattorin seuraavaan
+				iter = itsDataMap.erase(iter);
 			}
 			else
 				++iter; // jos ei poistettu objektia, pitää iteraattoria edistää....
@@ -822,7 +822,7 @@ void NFmiInfoOrganizer::ClearDynamicHelpData()
 	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); )
 	{
 		if(std::find(ignoreTypesVector.begin(), ignoreTypesVector.end(), iter->second->GetDataKeeper()->GetIter()->DataType()) == ignoreTypesVector.end())
-			itsDataMap.erase(iter); // jos data poistetaan, menee iter seuraavaan pisteeseen
+			iter = itsDataMap.erase(iter);
 		else
 			++iter; // jos dataa ei poistettu, pitää sitä siirtää tässä pykälä eteenpäin
 	}
