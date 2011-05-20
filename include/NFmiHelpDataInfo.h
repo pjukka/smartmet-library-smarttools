@@ -146,7 +146,7 @@ public:
 	NFmiDataIdent GetNextSatelChannel(const NFmiDataIdent &theDataIdent, FmiDirection theDir);
 	void AddDynamic(const NFmiHelpDataInfo &theInfo);
 	void AddStatic(const NFmiHelpDataInfo &theInfo);
-	void MarkAllDynamicDatasAsNotReaded();
+	void ResetAllDynamicDataTimeStamps();
 	NFmiHelpDataInfo* FindHelpDataInfo(const std::string &theFileNameFilter);
 	std::vector<std::string> GetUniqueCustomMenuList(void);
 	std::vector<NFmiHelpDataInfo> GetCustomMenuHelpDataList(const std::string &theCustomFolder);

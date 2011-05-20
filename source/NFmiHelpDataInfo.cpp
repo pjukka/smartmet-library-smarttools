@@ -462,7 +462,7 @@ void NFmiHelpDataInfoSystem::InitSettings(const NFmiHelpDataInfoSystem &theOther
 	}
 }
 
-void NFmiHelpDataInfoSystem::MarkAllDynamicDatasAsNotReaded()
+void NFmiHelpDataInfoSystem::ResetAllDynamicDataTimeStamps()
 {
 	size_t ssize = itsDynamicHelpDataInfos.size();
 	for(size_t i = 0; i<ssize; i++)
