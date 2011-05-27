@@ -874,7 +874,7 @@ boost::shared_ptr<NFmiDataIterator> NFmiSmartToolModifier::CreateIterator(const 
 		case NFmiAreaMask::FunctionTimeIntergration:
 			{
 				NFmiPoint p(theAreaMaskInfo.GetOffsetPoint1());
-				iterator = boost::shared_ptr<NFmiDataIterator>(new NFmiRelativeTimeIntegrationIterator(theInfo.get(),
+				iterator = boost::shared_ptr<NFmiDataIterator>(new NFmiRelativeTimeIntegrationIterator2(theInfo.get(),
 																   static_cast<int>(p.Y() - p.X() + 1),
 																   static_cast<int>(p.Y())));
 				break;
