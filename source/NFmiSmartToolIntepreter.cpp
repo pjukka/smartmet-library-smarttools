@@ -228,7 +228,7 @@ NFmiParamBag NFmiSmartToolIntepreter::ModifiedParams(void)
 	std::set<int>::iterator endIt = modifiedParams.end();
 	for( ; it != endIt; ++it)
 	{
-		params.Add(NFmiDataIdent(NFmiParam(*it, converter.ToString(*it))));
+		params.Add(NFmiDataIdent(NFmiParam(*it, converter.ToString(*it), kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly)));
 	}
 	params.SetActivities(true);
 	return params;
@@ -1026,7 +1026,7 @@ bool NFmiSmartToolIntepreter::InterpretPossibleScriptVariable(const std::string 
 		throw runtime_error(::GetDictionaryString("SmartToolErrorScriptVariableSecondTime") + ": " + theVariableText);
 	else if(it != itsTokenScriptVariableNames.end()) // muuttujaa x käytetty uudestaan
 	{
-		NFmiParam param((*it).second, (*it).first);
+		NFmiParam param((*it).second, (*it).first, kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly);
 		NFmiProducer producer; // tällä ei ole väliä
 		NFmiDataIdent dataIdent(param, producer);
 		theMaskInfo->SetOperationType(NFmiAreaMask::InfoVariable);
@@ -1037,7 +1037,7 @@ bool NFmiSmartToolIntepreter::InterpretPossibleScriptVariable(const std::string 
 	}
 	else if(fNewScriptVariable) // var x, eli 1. alustus
 	{
-		NFmiParam param(itsScriptVariableParamIdCounter, theVariableText);
+		NFmiParam param(itsScriptVariableParamIdCounter, theVariableText, kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly);
 		itsTokenScriptVariableNames.insert(ScriptVariableMap::value_type(theVariableText, itsScriptVariableParamIdCounter));
 		itsScriptVariableParamIdCounter++; // kasvatetaan seuraavaa uutta muutujaa varten
 		NFmiProducer producer; // tällä ei ole väliä
@@ -1328,7 +1328,7 @@ bool NFmiSmartToolIntepreter::GetParamFromVariable(const std::string &theVariabl
 			return false;
 	}
 	else
-		theParam = NFmiParam((*it).second, (*it).first);
+		theParam = NFmiParam((*it).second, (*it).first, kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly);
 	return true;
 }
 
@@ -1341,7 +1341,7 @@ bool NFmiSmartToolIntepreter::GetParamFromVariableById(const std::string &theVar
 		NFmiValueString numericPart(theVariableText.substr(3));
 		if(numericPart.IsNumeric())
 		{
-		  theParam = NFmiParam(static_cast<long>(numericPart), theVariableText);
+		  theParam = NFmiParam(static_cast<long>(numericPart), theVariableText, kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly);
 		  return true;
 		}
 	}
@@ -1760,7 +1760,7 @@ NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &thePara
 			throw runtime_error(::GetDictionaryString("SmartToolErrorWantedParam1") + " '" + theParamText + "' " + ::GetDictionaryString("SmartToolErrorWantedParam2"));
 	}
 	else
-		param = NFmiParam((*it).second, (*it).first);
+		param = NFmiParam((*it).second, (*it).first, kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly);
 	return param;
 }
 
