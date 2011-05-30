@@ -198,51 +198,17 @@ if not WINDOWS:
     env_mt.Append( CPPDEFINES= "_REENTRANT" )
 
 
-if WINDOWS:
-    for fn in Glob("source/*.cpp"): 
-        s= os.path.basename( str(fn) )
-        obj_s= OBJDIR+"/"+ s.replace(".cpp","")
-
-        objs += env.Object( obj_s, fn )
-        objs_mt += env.Object( obj_s + "_mt", fn )
-
-else:
-    if DEBUG:
-        e_O0= env          # No change, anyways
-        e_O0_mt= env       # No change, anyways
-
-        e_noerror= env.Clone()
-        e_noerror["CXXFLAGS"].remove( "-Werror" )
-        e_noerror["CXXFLAGS"].append( "-Wno-error" )
-
-        e_noerror_mt= env_mt.Clone()
-        e_noerror_mt["CXXFLAGS"].remove( "-Werror" )
-        e_noerror_mt["CXXFLAGS"].append( "-Wno-error" )
-    else:
-        e_O0= env.Clone()
-        e_O0["CXXFLAGS"].remove("-O2")
-        e_O0["CXXFLAGS"].append("-O0")
-        e_O0["CXXFLAGS"].remove("-Wuninitialized")    # not supported without '-O'
-
-        e_O0_mt= env_mt.Clone()
-        e_O0_mt["CXXFLAGS"].remove("-O2")
-        e_O0_mt["CXXFLAGS"].append("-O0")
-        e_O0_mt["CXXFLAGS"].remove("-Wuninitialized")    # not supported without '-O'
-
-        e_noerror= env    # anyways no -Werror
-        e_noerror_mt= env    # anyways no -Werror
-   
-    for fn in Glob("source/*.cpp"): 
-        s= os.path.basename( str(fn) )
-        obj_s= OBJDIR+"/"+ s.replace(".cpp","")
-        
-        objs += env.Object( obj_s, fn )
-        objs_mt += env_mt.Object( obj_s + "_mt", fn )
+for fn in Glob("source/*.cpp"): 
+	s= os.path.basename( str(fn) )
+	obj_s= OBJDIR+"/"+ s.replace(".cpp","")
+	
+	objs += env.Object( obj_s, fn )
+	objs_mt += env_mt.Object( obj_s + "_mt", fn )
 
 
 # Make just the static lib (at least it should be default for just 'scons')
 
 env.Library( "smartmet_smarttools", objs )
-env.Library( "smartmet_smarttools-mt", objs_mt )
+env_mt.Library( "smartmet_smarttools-mt", objs_mt )
 
 
