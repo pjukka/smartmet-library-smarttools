@@ -154,7 +154,7 @@ static int CalcIndex(const NFmiMetTime &theLatestOrigTime, const NFmiMetTime &th
 	if(theModelRunTimeGap == 0)
 		return 0;
 	int diffInMinutes = theLatestOrigTime.DifferenceInMinutes(theOrigCurrentTime);
-	return round(-diffInMinutes/theModelRunTimeGap);
+	return static_cast<int>(round(-diffInMinutes/theModelRunTimeGap));
 }
 
 static bool IsNewer(const boost::shared_ptr<NFmiQueryDataKeeper> &theDataKeeper1, const boost::shared_ptr<NFmiQueryDataKeeper> &theDataKeeper2)

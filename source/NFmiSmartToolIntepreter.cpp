@@ -1266,7 +1266,7 @@ bool NFmiSmartToolIntepreter::FindParamAndLevelAndProducerAndSetMaskInfo(const s
 		theMaskInfo->SetLevel(&level);
 		if(level.LevelType() == kFmiHybridLevel)
 			theMaskInfo->SetDataType(NFmiInfoData::kHybridData);
-		else if(level.LevelType() == kFmiPressure)
+		else if(FmiParameterName(level.LevelType()) == kFmiPressure)
 			theMaskInfo->SetDataType(NFmiInfoData::kViewable);
 		return true;
 	}
@@ -1377,7 +1377,7 @@ bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVar
 		  float levelValue = static_cast<float>(numericPart);
 		  // pitaisi tunnistaa level tyyppi arvosta kait, nyt oletus että painepinta
 		  FmiLevelType levelType = kFmiHybridLevel; // jos käyttäjä on antanut lev45, tällöin halutaan hybrid level 45 ei painepinta 45. painepinnat saa automaattisesti pelkällä numerolla
-		  theLevel = NFmiLevel(levelType, theVariableText, static_cast<float>(numericPart));
+		  theLevel = NFmiLevel(levelType, theVariableText, levelValue);
 		  return true;
 		}
 	}

@@ -1002,7 +1002,7 @@ std::ostream& NFmiDrawParam::Write (std::ostream &file) const
 		extraData.Add(itsModelRunIndex); // modelRunIndex on 2. uusista double-extra-parametreista
 		extraData.Add(itsTimeSerialModelRunCount); // modelRunIndex on 3. uusista double-extra-parametreista
 		extraData.Add(itsModelRunDifferenceIndex); // itsModelRunDifferenceIndex on 4. uusista double-extra-parametreista
-		extraData.Add(itsDataComparisonProdId); // itsDataComparisonProdId on 5. uusista double-extra-parametreista
+		extraData.Add(static_cast<double>(itsDataComparisonProdId)); // itsDataComparisonProdId on 5. uusista double-extra-parametreista
 		extraData.Add(itsDataComparisonType); // itsDataComparisonType on 6. uusista double-extra-parametreista
 		
 		extraData.Add(::MetTime2String(itsModelOriginTime)); // modelRunIndex on 1. uusista string-extra-parametreista
