@@ -73,6 +73,8 @@ public:
 	void MakeSoundingIndexData(bool newValue) {fMakeSoundingIndexData = newValue;}
 	bool ForceFileFilterName(void) const {return fForceFileFilterName;}
 	void ForceFileFilterName(bool newValue) {fForceFileFilterName = newValue;}
+	int AdditionalArchiveFileCount(void) const {return itsAdditionalArchiveFileCount;}
+	void AdditionalArchiveFileCount(int newValue) {itsAdditionalArchiveFileCount = newValue;}
 
 	const std::string& PartialDataCacheFileNameFilter(void) const {return itsPartialDataCacheFileNameFilter;}
 	void PartialDataCacheFileNameFilter(const std::string &newValue) {itsPartialDataCacheFileNameFilter = newValue;}
@@ -106,6 +108,8 @@ private:
 	int itsCombineDataMaxTimeSteps; // jos ei haluaa rajoittaa kuinka iso yhdistelm‰ datasta tehd‰‰n, t‰m‰n voi m‰‰ritell‰
 	bool fMakeSoundingIndexData; // jos t‰m‰ on true, SmartMet tekee datasta oman sounding-index datan
 	std::string itsBaseNameSpace;
+	int itsAdditionalArchiveFileCount;	// defaultti on 0, joitakin datoja (esim. kepa-datoja, joita tuotetaan n. 15-20 per p‰iv‰) 
+										// halutaan s‰ilytt‰‰ enemm‰n kuin muita NFmiInfoOrganizer:issa. T‰ll‰ s‰‰dˆll‰ saadaan pidetty‰ ylim‰‰r‰iset datat.
 };
 
 class NFmiHelpDataInfoSystem
@@ -116,7 +120,6 @@ public:
 	,itsStaticHelpDataInfos()
 	,itsCacheDirectory()
 	,itsCacheTmpDirectory()
-	,itsCachePartialDataDirectory()
 	,itsCacheTmpFileNameFix()
 	,fUseQueryDataCache(false)
 	,fDoCleanCache(false)
@@ -125,6 +128,7 @@ public:
 	,itsCacheMediumFileSizeMB(40)
 	,itsCacheLargeFileSizeMB(200)
 	,itsCacheMaximumFileSizeMB(10000)
+	,itsCachePartialDataDirectory()
 	,itsBaseNameSpace()
 	{}
 
@@ -142,7 +146,7 @@ public:
 	NFmiDataIdent GetNextSatelChannel(const NFmiDataIdent &theDataIdent, FmiDirection theDir);
 	void AddDynamic(const NFmiHelpDataInfo &theInfo);
 	void AddStatic(const NFmiHelpDataInfo &theInfo);
-	void MarkAllDynamicDatasAsNotReaded();
+	void ResetAllDynamicDataTimeStamps();
 	NFmiHelpDataInfo* FindHelpDataInfo(const std::string &theFileNameFilter);
 	std::vector<std::string> GetUniqueCustomMenuList(void);
 	std::vector<NFmiHelpDataInfo> GetCustomMenuHelpDataList(const std::string &theCustomFolder);

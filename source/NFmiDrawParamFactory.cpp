@@ -29,14 +29,13 @@
 // ======================================================================
 
 #include "NFmiDrawParamFactory.h"
-#include "NFmiSmartInfo.h"
 #include "NFmiValueString.h"
 #include "NFmiDrawParam.h"
 #include "NFmiFileSystem.h"
 
 #include <assert.h>
 
-static void InitDrawParam(NFmiDrawParam* theDrawParam, const std::string &theFileName, bool createDrawParamFileIfNotExist)
+static void InitDrawParam(boost::shared_ptr<NFmiDrawParam> &theDrawParam, const std::string &theFileName, bool createDrawParamFileIfNotExist)
 {
 	if(theDrawParam)
 	{
@@ -79,7 +78,7 @@ NFmiDrawParamFactory::~NFmiDrawParamFactory(void)
 //--------------------------------------------------------
 // DrawParam
 //--------------------------------------------------------
-NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam (const NFmiDataIdent& theIdent
+boost::shared_ptr<NFmiDrawParam> NFmiDrawParamFactory::CreateDrawParam (const NFmiDataIdent& theIdent
 													 ,const NFmiLevel* theLevel)
 
 //  Tässä metodissa valitaan sääparametrin theParam perusteella piirtoa
@@ -94,50 +93,51 @@ NFmiDrawParam* NFmiDrawParamFactory::CreateDrawParam (const NFmiDataIdent& theId
 // 7.1.2002/Marko Muutin dataidentin alustuksen niin, että se otetaan annetusta
 // infosta, jolloin se on aina oikein. Info on aina asetettu halutun parametrin
 // kohdalle, kun se tulee tänne.
-	NFmiDrawParam* drawParam = new NFmiDrawParam(theIdent, theLevel ? *theLevel : NFmiLevel(), 1); // 1 = priority
-	return CreateDrawParam(&drawParam, false);
+	boost::shared_ptr<NFmiDrawParam> drawParam = boost::shared_ptr<NFmiDrawParam>(new NFmiDrawParam(theIdent, theLevel ? *theLevel : NFmiLevel(), 1)); // 1 = priority
+	return CreateDrawParam(drawParam, false);
 }
 
 // luodaan drawparam crossSectionDataa varten. Huom käytetyt tiedostonimet
 // poikkeavat muista drawparamien tiedostonimistä.
 // Eli esim. DrawParam_4_CrossSection.dpa
-NFmiDrawParam * NFmiDrawParamFactory::CreateCrossSectionDrawParam(const NFmiDataIdent& theIdent)
+boost::shared_ptr<NFmiDrawParam> NFmiDrawParamFactory::CreateCrossSectionDrawParam(const NFmiDataIdent& theIdent)
 {
-	NFmiDrawParam* drawParam = new NFmiDrawParam(theIdent, NFmiLevel(), 1); // 1 = priority
-	return CreateDrawParam(&drawParam, true);
+	boost::shared_ptr<NFmiDrawParam> drawParam = boost::shared_ptr<NFmiDrawParam>(new NFmiDrawParam(theIdent, NFmiLevel(), 1)); // 1 = priority
+	return CreateDrawParam(drawParam, true);
 }
 
-NFmiDrawParam* NFmiDrawParamFactory::CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent)
+boost::shared_ptr<NFmiDrawParam> NFmiDrawParamFactory::CreateEmptyInfoDrawParam(const NFmiDataIdent& theIdent)
 {
-	NFmiDrawParam* drawParam = new NFmiDrawParam;
+	boost::shared_ptr<NFmiDrawParam> drawParam(new NFmiDrawParam());
 	if(drawParam)
 		drawParam->Param(theIdent);
-	return CreateDrawParam(&drawParam, false);
+	return CreateDrawParam(drawParam, false);
 }
 
 // Halusin laittaa yhteen metodiin kaiken drawParam-alustuksen ja virhetilanteiden käsittelyn, koska
-// muuten olisi tullut melkein kolme idensttistä metodi runkoa. Tämä on tosin ruma funktio, koska
+// muuten olisi tullut melkein kolme identtistä metodi runkoa. Tämä on tosin ruma funktio, koska
 // tämä mahdollisesti tuhoaa annetun DrawParamin tai sitten palautta sen jatkokäsittelyjä varten. Joten 
 // HUOM!!!! Eli parametrina annettua theDrawParam:ia pitää tarkastaa tämän kutsun jälkeen, koska se on 
 // saatettu tuhota!!!!!
 // Rumaa koodia, oikea tapa olisi ehkä tehdä nuo kolme metodia (CreateDrawParam, CreateCrossSectionDrawParam, 
 // CreateEmptyInfoDrawParam) yhdeksi metodiksi, joka hoitaa kaiken kerralla.
-NFmiDrawParam * NFmiDrawParamFactory::CreateDrawParam(NFmiDrawParam **theDrawParam, bool fDoCrossSection)
+
+// HUOM!!!! share_ptr käyttö muutti tätä funktiota ja erillisiä tuhoamisia ei tarvitse tehdä.
+boost::shared_ptr<NFmiDrawParam> NFmiDrawParamFactory::CreateDrawParam(boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fDoCrossSection)
 {
 	try
 	{
-		if(*theDrawParam)
+		if(theDrawParam)
 		{
-			std::string fileName = CreateFileName(*theDrawParam, fDoCrossSection);
-			InitDrawParam(*theDrawParam, fileName, fCreateDrawParamFileIfNotExist);
+			std::string fileName = CreateFileName(theDrawParam, fDoCrossSection);
+			InitDrawParam(theDrawParam, fileName, fCreateDrawParamFileIfNotExist);
 		}
 	}
 	catch(...)
 	{
-		delete *theDrawParam;
-		*theDrawParam = 0;
+		theDrawParam = boost::shared_ptr<NFmiDrawParam>();
 	}
-	return *theDrawParam;
+	return theDrawParam;
 }
 
 //--------------------------------------------------------
@@ -151,7 +151,7 @@ bool NFmiDrawParamFactory::Init()
 //--------------------------------------------------------
 // CreateFileName, private
 //--------------------------------------------------------
-std::string NFmiDrawParamFactory::CreateFileName(NFmiDrawParam* drawParam, bool fCrossSectionCase)
+std::string NFmiDrawParamFactory::CreateFileName(boost::shared_ptr<NFmiDrawParam> &drawParam, bool fCrossSectionCase)
 {
 	std::string fileName(itsLoadDirectory);
 	if(!itsLoadDirectory.empty())

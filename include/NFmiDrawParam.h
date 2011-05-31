@@ -39,6 +39,7 @@
 #include "NFmiInfoData.h"
 #include "NFmiDataMatrix.h" // täältä tulee myös checkedVector
 #include "NFmiMetTime.h"
+#include "boost/shared_ptr.hpp"
 
 class NFmiDrawingEnvironment;
 
@@ -52,6 +53,7 @@ public:
 	virtual  ~NFmiDrawParam (void);
 
 	void Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawingOptions = false);
+	void Init(const boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fInitOnlyDrawingOptions = false);
 	void HideParam(bool newValue){fHidden = newValue;};
 	void EditParam(bool newValue){fEditedParam = newValue;};
 	bool IsParamHidden(void) const {return fHidden;};
@@ -61,6 +63,8 @@ public:
 	int ModelRunIndex(void) const {return itsModelRunIndex;}
 	void ModelRunIndex(int newValue) {itsModelRunIndex = newValue;}
 	bool UseArchiveModelData(void) const;
+	bool IsModelRunDataType(void) const;
+	static bool IsModelRunDataType(NFmiInfoData::Type theDataType);
 	const NFmiMetTime& ModelOriginTimeCalculated(void) const {return itsModelOriginTimeCalculated;}
 	void ModelOriginTimeCalculated(const NFmiMetTime &newValue) {itsModelOriginTimeCalculated = newValue;}
 	int TimeSerialModelRunCount(void) const {return itsTimeSerialModelRunCount;}
@@ -70,9 +74,16 @@ public:
 		if(itsTimeSerialModelRunCount < 0)
 			itsTimeSerialModelRunCount = 0;
 	}
+	int ModelRunDifferenceIndex(void) const {return itsModelRunDifferenceIndex;}
+	void ModelRunDifferenceIndex(int newValue) {itsModelRunDifferenceIndex = newValue;}
+	unsigned long DataComparisonProdId(void) const {return itsDataComparisonProdId;}
+	void DataComparisonProdId(unsigned long newValue) {itsDataComparisonProdId = newValue;}
+	NFmiInfoData::Type DataComparisonType(void) const {return itsDataComparisonType;}
+	void DataComparisonType(NFmiInfoData::Type newValue) {itsDataComparisonType = newValue;}
+	bool DoDataComparison(void);
 
-	NFmiInfoData::Type DataType(void);
-	// huom! tämä asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppiä!!!!!!
+	NFmiInfoData::Type DataType(void) const {return itsDataType;}
+	// HUOM! tämä asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppiä!!!!!!
 	void DataType(NFmiInfoData::Type newValue){itsDataType = newValue;};
 
 	bool              Init (const std::string& theFilename = std::string());
@@ -692,6 +703,11 @@ private:
 	NFmiMetTime itsModelOriginTimeCalculated; // tähän lasketaan relatiivisen malliajon mukainen origin aika, jotä käytetään sitten mm. tooltipeissä ja muualla
 	int itsTimeSerialModelRunCount; // tähän määrätään kuinka monta viimeista ajoa näytetään mallille 
 									// kerrallaa aikasarjassa. Jos arvo on 0 (default), ei näytetä kuin viimeinen ajo normaalisti.
+	int itsModelRunDifferenceIndex; // tämän avulla on tarkoitus verrata eri malliajoja. Jos tämä on >= 0, ei ole vertailua, jos se on -1 verrataan edelliseen ajoon, -2:lla verrataan sitä edelliseen jne
+
+	// Mallidatoja voidaan verrata analyysi ja havainto datoihin. Siis sellaiseen dataan, millä on vain yhdet arvot kullekin havainto hetkelle.
+	unsigned long itsDataComparisonProdId; // Jos tämä on 0, ei vertailu-optio ole päällä. Muuten tässä on halutun vertailudatan tuottaja id (analyysi/havainto datan)
+	NFmiInfoData::Type itsDataComparisonType; // tässä on käytetty datatyyppi esim. kAnalyzeData tai kObservations
 };
 //@{ \name Globaalit NFmiDrawParam-luokan uudelleenohjaus-operaatiot
 inline std::ostream& operator<<(std::ostream& os, const NFmiDrawParam& item){return item.Write(os);}

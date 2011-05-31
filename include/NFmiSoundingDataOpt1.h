@@ -63,10 +63,10 @@ public:
 	NFmiSoundingDataOpt1(void){};
 
 	// TODO Fill-metodeille pit‰‰ laittaa haluttu parametri-lista parametriksi (jolla t‰ytet‰‰n sitten dynaamisesti NFmiDataMatrix-otus)
-	bool FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly = false);
-	bool FillSoundingData(NFmiFastQueryInfo* theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName, NFmiFastQueryInfo* theGroundDataInfo, bool useFastFill = false);
+	bool FillSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly = false);
+	bool FillSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName, boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo, bool useFastFill = false);
 	void CutEmptyData(void); // t‰m‰ leikkaa Fill.. -metodeissa laskettuja data vektoreita niin ett‰ pelk‰t puuttuvat kerrokset otetaan pois
-	static bool HasRealSoundingData(NFmiFastQueryInfo &theSoundingLevelInfo);
+	static bool HasRealSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theSoundingLevelInfo);
 
 	// FillSoundingData-metodeilla t‰ytet‰‰n kunkin parametrin vektorit ja t‰ll‰ saa haluamansa parametrin vektorin k‰yttˆˆn
 	std::deque<float>& GetParamData(FmiParameterName theId);
@@ -130,13 +130,13 @@ public:
 private:
 	bool CheckLFCIndexCache(FmiLCLCalcType theLCLCalcTypeIn, double &theLfcIndexValueOut, double &theELValueOut);
 	void FillLFCIndexCache(FmiLCLCalcType theLCLCalcType, double theLfcIndexValue, double theELValue);
-	void FixPressureDataSoundingWithGroundData(NFmiFastQueryInfo* theGroundDataInfo);
+	void FixPressureDataSoundingWithGroundData(boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo);
 	unsigned int GetHighestNonMissingValueLevelIndex(FmiParameterName theParaId);
 	float GetPressureAtHeight(double H);
 	void ClearDatas(void);
-	bool FillParamData(NFmiFastQueryInfo* theInfo, FmiParameterName theId);
-	bool FillParamData(NFmiFastQueryInfo* theInfo, FmiParameterName theId, const NFmiMetTime& theTime, const NFmiPoint& theLatlon);
-	bool FastFillParamData(NFmiFastQueryInfo* theInfo, FmiParameterName theId);
+	bool FillParamData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId);
+	bool FillParamData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId, const NFmiMetTime& theTime, const NFmiPoint& theLatlon);
+	bool FastFillParamData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId);
 	void InitZeroHeight(void); // t‰t‰ kutsutaan FillParamData-metodeista
 	void CalculateHumidityData(void);
 

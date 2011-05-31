@@ -42,7 +42,7 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 ,itsCombineDataPathAndFileName()
 ,itsCombineDataMaxTimeSteps(0)
 ,fMakeSoundingIndexData(false)
-
+,itsAdditionalArchiveFileCount(0)
 ,itsBaseNameSpace()
 {}
 
@@ -66,6 +66,7 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
 ,itsCombineDataPathAndFileName(theOther.itsCombineDataPathAndFileName)
 ,itsCombineDataMaxTimeSteps(theOther.itsCombineDataMaxTimeSteps)
 ,fMakeSoundingIndexData(theOther.fMakeSoundingIndexData)
+,itsAdditionalArchiveFileCount(theOther.itsAdditionalArchiveFileCount)
 
 ,itsBaseNameSpace(theOther.itsBaseNameSpace)
 {}
@@ -94,6 +95,7 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 		itsCombineDataPathAndFileName = theOther.itsCombineDataPathAndFileName;
 		itsCombineDataMaxTimeSteps = theOther.itsCombineDataMaxTimeSteps;
 		fMakeSoundingIndexData = theOther.fMakeSoundingIndexData;
+		itsAdditionalArchiveFileCount = theOther.itsAdditionalArchiveFileCount;
 
 		itsBaseNameSpace = theOther.itsBaseNameSpace;
 	}
@@ -123,13 +125,14 @@ void NFmiHelpDataInfo::Clear(void)
 	itsCombineDataPathAndFileName = "";
 	itsCombineDataMaxTimeSteps = 0;
 	fMakeSoundingIndexData = false;
+	itsAdditionalArchiveFileCount = 0;
 }
 
 static void FixPathEndWithSeparator(std::string &theFixedPathStr)
 {
 	if(theFixedPathStr.empty() == false)
 	{
-	    NFmiFileString tmpFileStr(theFixedPathStr);
+		NFmiFileString tmpFileStr = theFixedPathStr;
 		tmpFileStr.NormalizeDelimiter(); // varmistetaan myös että polun merkit ovat oikein päin
 		theFixedPathStr = static_cast<char*>(tmpFileStr);
 
@@ -143,7 +146,7 @@ static void FixPatternSeparators(std::string &theFixedPatternStr)
 {
 	if(theFixedPatternStr.empty() == false)
 	{
-	    NFmiFileString tmpFileStr(theFixedPatternStr);
+		NFmiFileString tmpFileStr = theFixedPatternStr;
 		tmpFileStr.NormalizeDelimiter(); // varmistetaan että polun merkit ovat oikein päin
 		theFixedPatternStr = static_cast<char*>(tmpFileStr);
 	}
@@ -197,6 +200,8 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 		itsCombineDataPathAndFileName = NFmiSettings::Optional<string>(itsBaseNameSpace + "::CombineDataPathAndFileName", "");
 		itsCombineDataMaxTimeSteps = NFmiSettings::Optional<int>(itsBaseNameSpace + "::CombineDataMaxTimeSteps", 0);
 		fMakeSoundingIndexData = NFmiSettings::Optional<bool>(itsBaseNameSpace + "::MakeSoundingIndexData", false);
+		itsAdditionalArchiveFileCount = NFmiSettings::Optional<int>(itsBaseNameSpace + "::AdditionalArchiveFileCount", 0);
+
 		if(IsCombineData())
 			::MakeCombinedDataFilePattern(*this, theHelpDataSystem);
 
@@ -457,7 +462,7 @@ void NFmiHelpDataInfoSystem::InitSettings(const NFmiHelpDataInfoSystem &theOther
 	}
 }
 
-void NFmiHelpDataInfoSystem::MarkAllDynamicDatasAsNotReaded()
+void NFmiHelpDataInfoSystem::ResetAllDynamicDataTimeStamps()
 {
 	size_t ssize = itsDynamicHelpDataInfos.size();
 	for(size_t i = 0; i<ssize; i++)

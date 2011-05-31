@@ -1,35 +1,21 @@
+#pragma once
 //**********************************************************
 // C++ Class Name : NFmiSmartToolCalculation 
 // ---------------------------------------------------------
-// Filetype: (HEADER)
-// Filepath: G:/siirto/marko/oc/NFmiSmartToolCalculation.h 
-// 
-// 
-// GDPro Properties 
-// ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 4.0 ) 
-//  - GD System Name    : aSmartTools 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : smarttools 1 
-// ---------------------------------------------------  
 //  Author         : pietarin 
 //  Creation Date  : Thur - Jun 20, 2002 
 // 
-//  Change Log     : 
-// 
 // T‰m‰ luokka hoitaa yhden laskurivin esim. T = T + 1
 //**********************************************************
-#ifndef  NFMISMARTTOOLCALCULATION_H
-#define  NFMISMARTTOOLCALCULATION_H
 
 #include <string>
 #include "NFmiAreaMask.h"
 #include "NFmiPoint.h"
 #include "NFmiDataMatrix.h"
 #include "NFmiMetTime.h"
+#include "boost/shared_ptr.hpp"
 
-class NFmiSmartInfo;
+class NFmiFastQueryInfo;
 class NFmiDataModifier;
 
 class NFmiMacroParamValue
@@ -56,12 +42,11 @@ public:
 
 	NFmiSmartToolCalculation(void);
 	~NFmiSmartToolCalculation(void);
-	void Clear(void);
 
-	void SetResultInfo(NFmiSmartInfo* value) {itsResultInfo = value; CheckIfModularParameter();}
-	NFmiSmartInfo* GetResultInfo(void) {return itsResultInfo;}
-	checkedVector<NFmiAreaMask*>* GetCalculations(void) {return &itsCalculations;}
-	void AddCalculation(NFmiAreaMask* theCalculation);
+	void SetResultInfo(boost::shared_ptr<NFmiFastQueryInfo> &value) {itsResultInfo = value; CheckIfModularParameter();}
+	boost::shared_ptr<NFmiFastQueryInfo> GetResultInfo(void) {return itsResultInfo;}
+	checkedVector<boost::shared_ptr<NFmiAreaMask> >& GetCalculations(void) {return itsCalculations;}
+	void AddCalculation(boost::shared_ptr<NFmiAreaMask> &theCalculation);
 	const std::string& GetCalculationText(void){return itsCalculationText;}
 	void SetCalculationText(const std::string& theText){itsCalculationText = theText;}
 	void SetLimits(float theLowerLimit, float theUpperLimit, bool theDoLimitCheck);
@@ -70,7 +55,7 @@ public:
 
 private:
 	std::string itsCalculationText; // originaali teksti, mist‰ t‰m‰ lasku on tulkittu
-	typedef checkedVector<NFmiAreaMask*>::iterator CalcIter;
+	typedef checkedVector<boost::shared_ptr<NFmiAreaMask> >::iterator CalcIter;
 
 	float GetInsideLimitsValue(float theValue);
 	float itsLowerLimit; // n‰iden avulla kontrolloidaan mahdollisia min ja max arvoja
@@ -89,10 +74,10 @@ private:
 	void eval_math_function(double &result, int theFunction);
 	void eval_ThreeArgumentFunction(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 	void eval_ThreeArgumentFunctionZ(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	NFmiDataModifier* CreateIntegrationFuction(NFmiAreaMask::FunctionType func);
+	boost::shared_ptr<NFmiDataModifier> CreateIntegrationFuction(NFmiAreaMask::FunctionType func);
 	void atom(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 	void get_token(void);
-	NFmiAreaMask* token; // t‰ss‰ on kulloinenkin laskun osa tarkastelussa
+	boost::shared_ptr<NFmiAreaMask> token; // t‰ss‰ on kulloinenkin laskun osa tarkastelussa
 	CalcIter itsCalcIterator; // get_token siirt‰‰ t‰t‰
 	// Lis‰ksi piti maskia varten bin‰‰ri versio evaluaatio systeemist‰
 	bool bin_eval_exp(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
@@ -106,8 +91,8 @@ private:
 	void bin_eval_exp6(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 	void bin_atom(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 
-	NFmiSmartInfo* itsResultInfo; // omistaa+tuhoaa
-	checkedVector<NFmiAreaMask*> itsCalculations; // omistaa+tuhoaa
+	boost::shared_ptr<NFmiFastQueryInfo> itsResultInfo; // omistaa+tuhoaa
+	checkedVector<boost::shared_ptr<NFmiAreaMask> > itsCalculations; // omistaa+tuhoaa
 	float itsHeightValue;
 	float itsPressureHeightValue;
 
@@ -123,4 +108,4 @@ private:
 	void CheckIfModularParameter(void);
 	double FixCircularValues(double theValue);
 };
-#endif
+

@@ -37,6 +37,7 @@
 #include "NFmiDataMatrix.h"
 #include "NFmiInfoData.h"
 #include "NFmiDrawParam.h"
+#include "boost\shared_ptr.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4512) // poistaa VC++ k‰‰nt‰j‰n C4512 "assignment operator could not be generated" varoituksen
@@ -53,34 +54,38 @@ class NFmiDrawParamList
 
 public:
 
-	NFmiDrawParamList (void);
-	~NFmiDrawParamList (void);
+	typedef boost::shared_ptr<NFmiDrawParam> DataType;
+	typedef std::list<DataType> ListType;
+	typedef ListType::iterator IterType;
 
-	NFmiDrawParam*  Current (void);
-	void	  CopyList(NFmiDrawParamList &theList, bool clearFirst);
-	bool      Reset (void);
-	bool      Next (void);
-	bool      Previous (void);
-	void      Clear (bool fDeleteData = false);
-	void      Clear (const NFmiProducer& theProducer, checkedVector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel = 0, bool fDeleteData = false);
-	void      Clear (const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved, bool fDeleteData = false);
-	bool      Add (NFmiDrawParam * theParam);
-	bool      Add (NFmiDrawParam * theParam, unsigned long theIndex);
-	void      BorrowParams(NFmiDrawParamList & theList);
-	void      ClearBorrowedParams(void);
-	bool      Remove (bool fDeleteData = false);
-	bool      Index(unsigned long index);
-	bool		Find(NFmiDrawParam* item);
 
-	void			HideAllParams(bool newState);
-	void			DisableEditing(void);
-	void			DeactivateAll(void);
-	bool		Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId = false);
+	NFmiDrawParamList(void);
+	~NFmiDrawParamList(void);
 
-	void            Update(void);
-	bool      IsDirty (void){ return fDirtyList; };
-	void            Dirty (bool fDirty){ fDirtyList = fDirty; };
-	unsigned long NumberOfItems(void){return itsList.NumberOfItems();};
+	boost::shared_ptr<NFmiDrawParam> Current(void);
+	void CopyList(NFmiDrawParamList &theList, bool clearFirst);
+	bool Reset(void);
+	bool Next(void);
+	void Clear(void);
+	void Clear(const NFmiProducer& theProducer, checkedVector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel = 0);
+	void Clear(const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved);
+	bool Add(boost::shared_ptr<NFmiDrawParam> &theParam);
+	bool Add(boost::shared_ptr<NFmiDrawParam> &theParam, unsigned long theIndex);
+	void BorrowParams(NFmiDrawParamList & theList);
+	void ClearBorrowedParams(void);
+	bool Remove(void);
+	bool Index(unsigned long index);
+//	bool Find(NFmiDrawParam* item);
+
+	void HideAllParams(bool newState);
+	void DisableEditing(void);
+	void DeactivateAll(void);
+	bool Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId = false);
+
+	void Update(void);
+	bool IsDirty (void){ return fDirtyList; };
+	void Dirty(bool fDirty){ fDirtyList = fDirty; };
+	unsigned long NumberOfItems(void){return static_cast<unsigned long>(itsList.size());};
 	bool RemoveMacroParam(const std::string &theName);
 	bool MoveActiveParam(int theMovement);
 	int FindActive(void);
@@ -90,8 +95,15 @@ public:
 	void ActivateOnlyOne(void);
 
 private:
-	NFmiSortedPtrList < NFmiDrawParam > itsList;
-	NFmiPtrList < NFmiDrawParam > :: Iterator itsIter;
+	void Swap(int index1, int index2);
+
+	bool fBeforeFirstItem; // muutin luokan k‰ytt‰m‰‰n std:list:ia ja halusin kuitenkin ett‰ luokka toimii kuten ennen, 
+							// joten t‰ll‰ varmistan ett‰ Reset() -kutsun j‰lkeen ollaan tilassa, mista ei viel‰ saa ulos 
+							// drawParamia, vaan vasta yhden Next-kutsun j‰lkeen saa 1. listan olion.
+	ListType itsList;
+	IterType itsIter;
+//	NFmiSortedPtrList < NFmiDrawParam > itsList;
+//	NFmiPtrList < NFmiDrawParam > :: Iterator itsIter;
 	bool fDirtyList;
 	bool fHasBorrowedParams; // onko t‰ll‰ listalla 'lainattuja' parametreja
 };

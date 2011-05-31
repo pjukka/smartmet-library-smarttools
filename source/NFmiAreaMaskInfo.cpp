@@ -2,7 +2,7 @@
 // C++ Class Name : NFmiAreaMaskInfo 
 // ---------------------------------------------------------
 // Filetype: (SOURCE)
-// Filepath: G:/siirto/marko/oc/NFmiAreaMaskInfo.cpp 
+// Filepath: G:/siirto/marko/oc/NFmiAreaMaskInfo2.cpp 
 // 
 // 
 // GDPro Properties 

@@ -2,23 +2,8 @@
 /*!
  * C++ Class Name : NFmiSmartToolCalculationSection
  * ---------------------------------------------------------
- * Filetype: (SOURCE)
- * Filepath: G:/siirto/marko/oc/NFmiSmartToolCalculationSection.cpp
- *
- *
- * GDPro Properties
- * ---------------------------------------------------
- *  - GD Symbol Type    : CLD_Class
- *  - GD Method         : UML ( 4.0 )
- *  - GD System Name    : aSmartTools
- *  - GD View Type      : Class Diagram
- *  - GD View Name      : smarttools 1
- * ---------------------------------------------------
  *  Author         : pietarin
- *  Creation Date  : Thur - Jun 20, 2002
- *
- *  Change Log     :
- *
+ *  Creation Date  : 8.11. 2010
  */
 // ======================================================================
 
@@ -39,34 +24,25 @@ NFmiSmartToolCalculationSection::NFmiSmartToolCalculationSection(void)
 }
 NFmiSmartToolCalculationSection::~NFmiSmartToolCalculationSection(void)
 {
-	Clear();
 }
 //--------------------------------------------------------
 // Calculate
 //--------------------------------------------------------
 void NFmiSmartToolCalculationSection::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue)
 {
-	int size = itsCalculations.size();
-
-	for(int i=0; i<size; i++)
+	for(size_t i=0; i < itsCalculations.size(); i++)
 		itsCalculations[i]->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
 }
 
-void NFmiSmartToolCalculationSection::AddCalculations(NFmiSmartToolCalculation* value)
+void NFmiSmartToolCalculationSection::AddCalculations(boost::shared_ptr<NFmiSmartToolCalculation> &value)
 {
 	if(value)
 		itsCalculations.push_back(value);
 }
 
-void NFmiSmartToolCalculationSection::Clear(void)
+boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolCalculationSection::FirstVariableInfo(void)
 {
-	std::for_each(itsCalculations.begin(), itsCalculations.end(), PointerDestroyer());
-	itsCalculations.clear();
-}
-
-NFmiSmartInfo* NFmiSmartToolCalculationSection::FirstVariableInfo(void)
-{
-	NFmiSmartInfo *info = 0;
+	boost::shared_ptr<NFmiFastQueryInfo> info;
 	if(itsCalculations.size())
 		info = itsCalculations[0]->GetResultInfo();
 	return info;
@@ -76,7 +52,7 @@ NFmiSmartInfo* NFmiSmartToolCalculationSection::FirstVariableInfo(void)
 struct TimeSetter
 {
 	TimeSetter(const NFmiMetTime &theTime):itsTime(theTime){}
-	void operator()(NFmiSmartToolCalculation* theCalculation){theCalculation->SetTime(itsTime);}
+	void operator()(boost::shared_ptr<NFmiSmartToolCalculation> &theCalculation){theCalculation->SetTime(itsTime);}
 
 	const NFmiMetTime &itsTime;
 };

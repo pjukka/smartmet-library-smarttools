@@ -1,7 +1,7 @@
 
 #include "NFmiTEMPCode.h"
 #include "NFmiStringTools.h"
-#include "NFmiSmartInfo.h"
+#include "NFmiFastQueryInfo.h"
 #include "NFmiQueryDataUtil.h"
 #include "NFmiTimeList.h"
 #include "NFmiLocationBag.h"
@@ -898,11 +898,11 @@ static NFmiParamBag MakeParamBag(const NFmiProducer &theWantedProducer)
 static NFmiLevelBag MakeLevelBag(std::vector<NFmiTEMPCode> &theSoundings)
 {
 	size_t ssize = theSoundings.size();
-	unsigned int maxLevelSize = 0;
+	float maxLevelSize = 0;
 	for(size_t i=0; i<ssize; i++)
 	{ // etsitää luotaus missä eniten levelejä, ja otetaan se 'pohjaksi' level bagiin
 		if(theSoundings[i].LevelData().size() > maxLevelSize)
-			maxLevelSize = static_cast<unsigned int>(theSoundings[i].LevelData().size());
+			maxLevelSize = static_cast<float>(theSoundings[i].LevelData().size());
 	}
 	NFmiLevelBag levels(kFmiSoundingLevel, 1, maxLevelSize, 1);
 	return levels;

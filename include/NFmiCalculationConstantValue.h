@@ -1,32 +1,18 @@
+#pragma once
 //**********************************************************
 // C++ Class Name : NFmiCalculationConstantValue 
-// ---------------------------------------------------------
-// Filetype: (HEADER)
-// Filepath: G:/siirto/marko/oc/NFmiCalculationConstantValue.h 
-// 
-// 
-// GDPro Properties 
-// ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 4.0 ) 
-//  - GD System Name    : aSmartTools 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : smarttools 1 
 // ---------------------------------------------------  
 //  Author         : pietarin 
-//  Creation Date  : Thur - Jun 20, 2002 
-// 
-//  Change Log     : 
+//  Creation Date  : 9.11. 2010 
 // 
 //**********************************************************
-#ifndef  NFMICALCULATIONCONSTANTVALUE_H
-#define  NFMICALCULATIONCONSTANTVALUE_H
 
 #include "NFmiAreaMaskImpl.h"
 #include "NFmiInfoAreaMask.h"
 
 class NFmiDataModifier;
 class NFmiDataIterator;
+class NFmiFastQueryInfo;
 
 // Tämä luokka antaa laskuihin mukaan ajan mukana muuttuvat kertoimet. Aikasarja-editorista huom!
 class NFmiCalculationConstantValue : public NFmiAreaMaskImpl
@@ -95,7 +81,7 @@ class NFmiCalculationRampFuction : public NFmiInfoAreaMask
 public:
    double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
 
-   NFmiCalculationRampFuction(const NFmiCalculationCondition& theOperation, Type theMaskType, NFmiInfoData::Type theDataType, NFmiQueryInfo* theInfo, bool ownsInfo = false, BinaryOperator thePostBinaryOperator = kNoValue);
+   NFmiCalculationRampFuction(const NFmiCalculationCondition& theOperation, Type theMaskType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, BinaryOperator thePostBinaryOperator = kNoValue);
    ~NFmiCalculationRampFuction(void);
 
 private:
@@ -112,15 +98,12 @@ public:
    NFmiCalculationRampFuctionWithAreaMask(const NFmiCalculationCondition & theOperation,
 										   Type theMaskType,
 										   NFmiInfoData::Type theDataType,
-										   NFmiAreaMask * theAreaMask,
-										   bool ownsAreaMask = false,
+										   boost::shared_ptr<NFmiAreaMask> &theAreaMask,
 										   BinaryOperator thePostBinaryOperator = kNoValue);
    ~NFmiCalculationRampFuctionWithAreaMask(void);
 
 private:
-	NFmiAreaMask* itsAreaMask;
-	bool fOwnsAreaMask;
-	bool fDestroySmartInfoData; // Jossain tilanteissa tälle luokalle annetaan smartinfo, josta pitää tuhota datat erikseen.
+	boost::shared_ptr<NFmiAreaMask> itsAreaMask;
 	bool fIsTimeIntepolationNeededInValue; // erikois optimointia Value-metodin ja Time-metodin käytössä
 };
 
@@ -131,13 +114,11 @@ class NFmiCalculationIntegrationFuction : public NFmiInfoAreaMask
 public:
    double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
 
-   NFmiCalculationIntegrationFuction(NFmiDataIterator *theDataIterator, NFmiDataModifier *theDataModifier, Type theMaskType, NFmiInfoData::Type theDataType, NFmiQueryInfo* theInfo, bool ownsInfo = false, bool destroySmartInfoData = false);
+   NFmiCalculationIntegrationFuction(boost::shared_ptr<NFmiDataIterator> &theDataIterator, boost::shared_ptr<NFmiDataModifier> &theDataModifier, Type theMaskType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
    ~NFmiCalculationIntegrationFuction(void);
 
 private:
 
-	NFmiDataModifier *itsDataModifier; // omistaa ja tuhoaa
-	NFmiDataIterator *itsDataIterator; // omistaa ja tuhoaa
+	boost::shared_ptr<NFmiDataModifier> itsDataModifier;
+	boost::shared_ptr<NFmiDataIterator> itsDataIterator;
 };
-
-#endif

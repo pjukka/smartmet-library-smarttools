@@ -1,26 +1,11 @@
+#pragma once
 //**********************************************************
 // C++ Class Name : NFmiAreaMaskInfo 
 // ---------------------------------------------------------
-// Filetype: (HEADER)
-// Filepath: G:/siirto/marko/oc/NFmiAreaMaskInfo.h 
-// 
-// 
-// GDPro Properties 
-// ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 4.0 ) 
-//  - GD System Name    : aSmartTools 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : smarttools 1 
-// ---------------------------------------------------  
 //  Author         : pietarin 
-//  Creation Date  : Thur - Jun 20, 2002 
-// 
-//  Change Log     : 
+//  Creation Date  : 8.11. 2010 
 // 
 //**********************************************************
-#ifndef  NFMIAREAMASKINFO_H
-#define  NFMIAREAMASKINFO_H
 
 #include "NFmiAreaMask.h"
 #include "NFmiDataIdent.h"
@@ -29,14 +14,6 @@
 #include "NFmiSoundingIndexCalculator.h"
 
 class NFmiLevel;
-
-//template<typename T>
-struct PointerDestroyer
-{
-	template<typename T>
-	void operator()(T* thePtr)
-	{delete thePtr;}
-};
 
 class NFmiAreaMaskInfo 
 {
@@ -94,4 +71,3 @@ private:
 	int itsIntegrationFunctionType; // 1=SumT tyylinen ja 2=SumZ tyylinen ja 3=MinH tyylinen funktio
 	FmiSoundingParameters itsSoundingParameter;
 };
-#endif

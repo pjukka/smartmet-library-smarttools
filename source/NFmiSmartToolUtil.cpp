@@ -10,7 +10,7 @@
 
 #include "NFmiSmartToolUtil.h"
 #include "NFmiInfoOrganizer.h"
-#include "NFmiSmartInfo.h"
+#include "NFmiFastQueryInfo.h"
 #include "NFmiSmartToolModifier.h"
 #include "NFmiQueryData.h"
 #include "NFmiStreamQueryData.h"
@@ -50,13 +50,13 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 		return 0;
 	}
 
+	boost::shared_ptr<NFmiFastQueryInfo> editedInfo = dataBase.FindInfo(NFmiInfoData::kEditable);
 	try // suoritetaan macro sitten
 	{
 		if(goThroughLevels == false)
 			smartToolModifier.ModifyData(theTimes, false, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
 		else
 		{
-			NFmiSmartInfo *editedInfo = dataBase.EditedInfo();
 			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
 				smartToolModifier.ModifyData(theTimes, false, false); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
 		}
@@ -68,8 +68,8 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	}
 
 	NFmiQueryData* data = 0;
-	if(dataBase.EditedInfo() && dataBase.EditedInfo()->RefQueryData())
-		data = dataBase.EditedInfo()->RefQueryData()->Clone();
+	if(editedInfo && editedInfo->RefQueryData())
+		data = editedInfo->RefQueryData()->Clone();
 	return data;
 }
 
@@ -107,7 +107,7 @@ bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryDa
 		theDataBase->WorkingDirectory(GetWorkingDirectory());
 		theDataBase->Init(std::string(""), createDrawParamFileIfNotExist, false, false); // tähän annetaan drawparametrien lataus polku, mutta niitä ei käytetä tässä tapauksessa
 																		// false tarkoittaa että ei tehdä kopiota editoidusta datasta, tässä se on turhaa
-		theDataBase->AddData(theModifiedData, "xxxfileName", "", NFmiInfoData::kEditable, 0); // 0=undolevel
+		theDataBase->AddData(theModifiedData, "xxxfileName", "", NFmiInfoData::kEditable, 0, 0, 0); // 0=undolevel
 		if(theHelperDataFileNames && theHelperDataFileNames->size())
 			InitDataBaseHelperData(*theDataBase, *theHelperDataFileNames, fMakeStaticIfOneTimeStepData);
 		return true;
@@ -128,7 +128,7 @@ bool NFmiSmartToolUtil::InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, c
 				if(fMakeStaticIfOneTimeStepData || sQData.QueryData()->Info()->Param(kFmiTopoGraf))
 					dataType = NFmiInfoData::kStationary;
 			}
-			theDataBase.AddData(sQData.QueryData(true), theHelperDataFileNames[i], "", dataType, 0); // 0=undolevel
+			theDataBase.AddData(sQData.QueryData(true), theHelperDataFileNames[i], "", dataType, 0, 0, 0); // 0=undolevel
 		}
 	}
 	return true;

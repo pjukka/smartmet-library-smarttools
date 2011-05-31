@@ -1,68 +1,35 @@
-//**********************************************************
-// C++ Class Name : NFmiSmartInfo
-// ---------------------------------------------------------
-// Filetype: (HEADER)
-// Filepath: D:/projekti/GDPro/GDTemp/NFmiSmartInfo.h
-//
-//
-// GDPro Properties
-// ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class
-//  - GD Method         : UML ( 2.1.4 )
-//  - GD System Name    : Met-editor Plan 2
-//  - GD View Type      : Class Diagram
-//  - GD View Name      : Markon ehdotus
-// ---------------------------------------------------
-//  Author         : pietarin
-//  Creation Date  : Tues - Feb 9, 1999
-//
-//
-//  Description:
-//
-//  Change Log:
-// Changed 1999.08.25/Marko	Lis‰sin itsDataType dataosan, jonka avulla smartinfoja voidaan
-//							j‰rjest‰‰ NFmiInfoOrganizer:in avulla.
-// Changed 1999.09.06/Marko Muutin LocationMaskStep()-metodien rajapintaa niin, ett‰ voidaan
-//							m‰‰r‰t‰ resetoidaanko ensin arvot vai ei.
-//
-//**********************************************************
-#ifndef  NFMISMARTINFO_H
-#define  NFMISMARTINFO_H
+#pragma once
 
-#include "NFmiFastQueryInfo.h"
-#include "NFmiHarmonizerBookKeepingData.h"
+// T‰m‰ luokka tulee nykyisen NFmiSmartInfo-luokan tilalle.
+// Uusi luokka on tarkoitettu vain SmartMetissa olevan 
+// editoitavan datan k‰sittely. Eli t‰‰ll‰ on tietoa mm.
+// valitusta maskista (selction, display jne.).
+// Undo/Redo toiminnot ja Harmonisaattorin vastaava 
+// kirjanpito.
+// Luokka tehd‰‰n uusiksi siksi, ett‰ sit‰ yksinkertaistetaan
+// ja ett‰ esim. undo/redo datojen omistus ja tuhoaminen tehd‰‰n
+// automaattisesti smart-pointtereilla eik‰ niin kuin nykyisin
+// erillisen DestroyData-funktion avulla.
+// TODO: keksi parempi nimi, toi poista lopuksi NFmiSmartInfo
+// -luokka ja laita t‰m‰ sen nimiseksi.
 
-#include <deque>
-#include <set>
+#include "NFmiOwnerInfo.h"
 
-class NFmiBitMask;
-class NFmiRect;
 class NFmiModifiableQDatasBookKeeping;
+class NFmiHarmonizerBookKeepingData;
 
-class NFmiSmartInfo : public NFmiFastQueryInfo
+class NFmiSmartInfo : public NFmiOwnerInfo
 {
- public:
+public:
+	NFmiSmartInfo(const NFmiOwnerInfo &theInfo); // matala kopio, eli jaettu data
+	NFmiSmartInfo(const NFmiSmartInfo &theInfo); // matala kopio, eli jaettu data
+	NFmiSmartInfo(NFmiQueryData *theOwnedData, NFmiInfoData::Type theDataType, const std::string &theDataFileName, const std::string &theDataFilePattern); // ottaa datan omistukseensa emossa
+	~NFmiSmartInfo(void);
 
-	NFmiSmartInfo(const NFmiQueryInfo & theInfo
-				 ,NFmiQueryData* theData, std::string theDataFileName, std::string theDataFilePattern
-				 ,NFmiInfoData::Type theType = NFmiInfoData::kEditable);
-	NFmiSmartInfo (const NFmiSmartInfo & theInfo);
-	~NFmiSmartInfo();
-
-	NFmiSmartInfo* Clone(void) const;
-	NFmiSmartInfo& operator=(const NFmiSmartInfo& theSmartInfo);
-	void DestroyData(bool deleteQData = true);
-	NFmiQueryData* DataReference(void);
-
-	int MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea);
-	void InverseMask(unsigned long theMaskType);
-	void MaskAllLocations (const bool& newState, unsigned long theMaskType);
-	unsigned long LocationMaskedCount(unsigned long theMaskType);
-	bool Mask(const NFmiBitMask& theMask, unsigned long theMaskType);
-	const NFmiBitMask& Mask(unsigned long theMaskType) const;
-	void MaskLocation (const bool& newState, unsigned long theMaskType);
-	void MaskType(unsigned long theMaskType);
-	unsigned long MaskType(void);
+	NFmiSmartInfo& operator=(const NFmiSmartInfo &theInfo); // matala kopio, eli jaettu data
+	NFmiSmartInfo* Clone(void) const; // syv‰ kopio, eli kloonille luodaan oma queryData sen omistukseen
+										// TODO: katso pit‰‰kˆ metodin nimi muuttaa, koska emoissa Clone on 
+										// virtuaali funktio, jossa eri paluu-luokka.
 
 	bool NextLocation (void);
 
@@ -73,36 +40,31 @@ class NFmiSmartInfo : public NFmiFastQueryInfo
 	bool RedoData(void);
 	void UndoLevel(long theDepth);
 
-	const std::string& DataFileName(void){return itsDataFileName;}
-	void DataFileName(const std::string& theDataFileName){itsDataFileName = theDataFileName;}
-	const std::string& DataFilePattern(void) const {return itsDataFilePattern;}
-	void DataFilePattern(const std::string &theDataFilePattern) {itsDataFilePattern = theDataFilePattern;}
-
-	bool LoadedFromFile(void);
-	void LoadedFromFile(bool loadedFromFile);
-	bool IsDirty(void) const;
-	void Dirty(bool newState);
-
 	bool LocationSelectionSnapShot(void);	// ota maskit talteen
 	bool LocationSelectionUndo(void);		// kysyy onko undo mahdollinen
 	bool LocationSelectionRedo(void);		// kysyy onko redo mahdollinen
 	bool LocationSelectionUndoData(void);	// suorittaa todellisen undon
 	bool LocationSelectionRedoData(void);	// suorittaa todellisen redon
 	void LocationSelectionUndoLevel(int theNewUndoLevel); // undolevel asetetaan t‰ll‰
-
-	NFmiInfoData::Type DataType(void) const {return itsDataType;}; // 1999.08.24/Marko
-	void DataType(NFmiInfoData::Type newType){itsDataType = newType;}; // 1999.08.24/Marko
-
+	bool LoadedFromFile(void);
+	void LoadedFromFile(bool loadedFromFile);
+	bool IsDirty(void) const;
+	void Dirty(bool newState);
 	const NFmiHarmonizerBookKeepingData* CurrentHarmonizerBookKeepingData(void) const; // palauttaa nyt k‰ytˆss‰ olevan harmonisaattori parambagin
 
- private:
-//   Vain pointteri, ei tuhota destruktorissa.
-	NFmiModifiableQDatasBookKeeping *itsModifiableQDatasBookKeeping;
+	int MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea);
+	void InverseMask(unsigned long theMaskType);
+	void MaskAllLocations (const bool& newState, unsigned long theMaskType);
+	unsigned long LocationMaskedCount(unsigned long theMaskType);
+	bool Mask(const NFmiBitMask& theMask, unsigned long theMaskType);
+	const NFmiBitMask& Mask(unsigned long theMaskType) const;
+	void MaskLocation (const bool& newState, unsigned long theMaskType);
+	void MaskType(unsigned long theMaskType);
+	unsigned long MaskType(void);
+protected:
+	void CopyClonedDatas(const NFmiSmartInfo &theOther);
 
-	NFmiQueryData* itsDataReference;
-	NFmiInfoData::Type itsDataType;
-	std::string itsDataFileName;
-	std::string itsDataFilePattern; // t‰t‰ k‰ytet‰‰n tunnistamaan mm. info-organizerissa, ett‰ onko data samanlaista, eli pyyhit‰‰nkˆ vanha t‰ll‰inen data pois alta
+	boost::shared_ptr<NFmiModifiableQDatasBookKeeping> itsQDataBookKeepingPtr;
+private:
+	NFmiSmartInfo(void); // ei toteuteta tyhj‰‰ konstruktoria
 };
-
-#endif

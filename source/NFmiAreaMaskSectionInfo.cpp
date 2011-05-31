@@ -29,27 +29,20 @@
 //--------------------------------------------------------
 // Constructor/Destructor 
 //--------------------------------------------------------
-NFmiAreaMaskSectionInfo::NFmiAreaMaskSectionInfo ()
+NFmiAreaMaskSectionInfo::NFmiAreaMaskSectionInfo()
 {
 }
-NFmiAreaMaskSectionInfo::~NFmiAreaMaskSectionInfo ()
+NFmiAreaMaskSectionInfo::~NFmiAreaMaskSectionInfo()
 {
-	Clear();
 }
 
-NFmiAreaMaskInfo* NFmiAreaMaskSectionInfo::MaskInfo(int theIndex)
+boost::shared_ptr<NFmiAreaMaskInfo> NFmiAreaMaskSectionInfo::MaskInfo(int theIndex)
 {
 	if(theIndex >= 0 && static_cast<unsigned int>(theIndex) < itsAreaMaskInfoVector.size())
 		return itsAreaMaskInfoVector[theIndex];
-	return 0;
+	return boost::shared_ptr<NFmiAreaMaskInfo>();
 }
-void NFmiAreaMaskSectionInfo::Add(NFmiAreaMaskInfo* theMask)
+void NFmiAreaMaskSectionInfo::Add(boost::shared_ptr<NFmiAreaMaskInfo> &theMask)
 {
 	itsAreaMaskInfoVector.push_back(theMask);
-}
-
-void NFmiAreaMaskSectionInfo::Clear(void)
-{
-	std::for_each(itsAreaMaskInfoVector.begin(), itsAreaMaskInfoVector.end(), PointerDestroyer());
-	itsAreaMaskInfoVector.clear();
 }
