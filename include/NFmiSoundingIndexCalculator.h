@@ -11,7 +11,7 @@
 #define NFMISOUNDINGINDEXCALCULATOR_H
 
 #include <string>
-#include "boost\shared_ptr.hpp"
+#include <boost/shared_ptr.hpp>
 
 class NFmiQueryData;
 class NFmiFastQueryInfo;
