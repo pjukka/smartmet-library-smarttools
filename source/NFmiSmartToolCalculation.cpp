@@ -121,8 +121,9 @@ void NFmiSmartToolCalculation::Calculate(const NFmiPoint &theLatlon, unsigned lo
 		}
 	}
 	// lopuksi asetetaan macroParamValue, jos niin on haluttu ja resultInfo on macroParam-tyyppi‰
-	if(theMacroParamValue.fSetValue && itsResultInfo->DataType() == NFmiInfoData::kMacroParam || itsResultInfo->DataType() == NFmiInfoData::kCrossSectionMacroParam)
-		theMacroParamValue.itsValue = static_cast<float>(value);
+	if(theMacroParamValue.fSetValue &&
+	   (itsResultInfo->DataType() == NFmiInfoData::kMacroParam || itsResultInfo->DataType() == NFmiInfoData::kCrossSectionMacroParam))
+	  theMacroParamValue.itsValue = static_cast<float>(value);
 }
 
 // ei ota huomioon missing arvoa, koska se pit‰‰ ottaa huomioon jo ennen t‰m‰n kutsua.
