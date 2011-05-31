@@ -184,6 +184,7 @@ static void CalculatePartOfSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &th
 		std::cerr << "thread nro: " << index << " end here."<< std::endl;
 }
 
+#ifndef UNIX
 static void CalcTimeIndexStartsForThreeThreads(unsigned long timeSize, unsigned long &theTimeStart1, unsigned long &theTimeStart2, unsigned long &theTimeStart3)
 {
 	unsigned long partSize = timeSize/3;
@@ -206,6 +207,7 @@ static void CalcTimeIndexStartsForThreeThreads(unsigned long timeSize, unsigned 
 		theTimeStart3 = partSize*2+1; // viimeinen threadi saa tehdä yhden ylimääräisen aika-askeleen
 	}
 }
+#endif
 
 // Jos useFastFill on true, on datoilla sama hila ja aika descriptor rakenne
 void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread)
@@ -232,6 +234,7 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 		boost::shared_ptr<NFmiFastQueryInfo> resultInfo(new NFmiFastQueryInfo(&theResultData));
 		::CalculatePartOfSoundingData(sourceInfo, resultInfo, 0, timeSize-1, useFastFill, theStopFunctor, 1, fDoCerrReporting);
 	}
+#ifndef UNIX
 	else
 	{
 		if(fDoCerrReporting)
@@ -271,6 +274,7 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 		if(fDoCerrReporting)
 			std::cerr << "all threads ended" << std::endl;
 	}
+#endif
 }
 
 float NFmiSoundingIndexCalculator::CalcOpt1(NFmiSoundingDataOpt1 &theSoundingDataOpt1, FmiSoundingParameters theParam)
@@ -601,7 +605,7 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 	return static_cast<float>(value);
 }
 
-float NFmiSoundingIndexCalculator::Calc(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, FmiSoundingParameters theParam)
+float NFmiSoundingIndexCalculator::Calc(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, FmiSoundingParameters theParam)
 {
 	NFmiSoundingData soundingData;
 	if(::FillSoundingData(theInfo, soundingData, theTime, theLatlon))
