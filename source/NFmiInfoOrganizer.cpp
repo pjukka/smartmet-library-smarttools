@@ -148,7 +148,7 @@ static bool UseParIdOnly(NFmiInfoData::Type theDataType)
 	return false;
 }
 
-static bool CheckDataType(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiInfoData::Type theType)
+static bool CheckDataType(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiInfoData::Type theType)
 {
 	bool anyDataOk = (theType == NFmiInfoData::kAnyData);
 	if(theInfo && (theInfo->DataType() == theType || anyDataOk))
@@ -156,14 +156,14 @@ static bool CheckDataType(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiInf
 	return false;
 }
 
-static bool CheckDataIdent(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiDataIdent& theDataIdent, bool fUseParIdOnly)
+static bool CheckDataIdent(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiDataIdent& theDataIdent, bool fUseParIdOnly)
 {
 	if(theInfo && (fUseParIdOnly ? theInfo->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())): theInfo->Param(theDataIdent)))
 		return true;
 	return false;
 }
 
-static bool CheckLevel(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiLevel *theLevel)
+static bool CheckLevel(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiLevel *theLevel)
 {
 	if(theInfo && (!theLevel || (theLevel && theInfo->Level(*theLevel))))
 		return true;
@@ -257,7 +257,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CrossSectionMacroParamDa
 	return itsCrossSectionMacroParamData;
 }
 
-static bool MatchData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiInfoData::Type theType, const NFmiDataIdent& theDataIdent, bool fUseParIdOnly, const NFmiLevel *theLevel)
+static bool MatchData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiInfoData::Type theType, const NFmiDataIdent& theDataIdent, bool fUseParIdOnly, const NFmiLevel *theLevel)
 {
 	if(::CheckDataType(theInfo, theType) && ::CheckDataIdent(theInfo, theDataIdent, fUseParIdOnly) && ::CheckLevel(theInfo, theLevel))
 		return true;
@@ -265,7 +265,7 @@ static bool MatchData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiInfoDat
 	return false;
 }
 
-static bool MatchCrossSectionData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiInfoData::Type theType, const NFmiDataIdent& theDataIdent, bool fUseParIdOnly)
+static bool MatchCrossSectionData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiInfoData::Type theType, const NFmiDataIdent& theDataIdent, bool fUseParIdOnly)
 {
 	if(::CheckDataType(theInfo, theType) && ::CheckDataIdent(theInfo, theDataIdent, fUseParIdOnly) && theInfo->SizeLevels() > 1)
 		return true;
@@ -724,14 +724,21 @@ void NFmiInfoOrganizer::ClearData(NFmiInfoData::Type theDataType)
 		for(;;)
 		{
 			if(iter == itsDataMap.end())
-				break;
+			  break;
 
 			if(iter->second->GetDataKeeper()->GetIter()->DataType() == theDataType)
 			{
-				iter = itsDataMap.erase(iter);
+#ifdef UNIX
+			  // RHEL5 and RHEL6 bug??
+			  MapType::iterator tmp = iter;
+			  ++iter;
+			  itsDataMap.erase(tmp);
+#else
+			  iter = itsDataMap.erase(iter);
+#endif
 			}
 			else
-				++iter; // jos ei poistettu objektia, pit‰‰ iteraattoria edist‰‰....
+			  ++iter; // jos ei poistettu objektia, pit‰‰ iteraattoria edist‰‰....
 		}
 	}
 }
@@ -739,7 +746,7 @@ void NFmiInfoOrganizer::ClearData(NFmiInfoData::Type theDataType)
 // this kind of m‰‰ritell‰‰n t‰ll‰ hetkell‰:
 // parametrien, leveleiden ja mahdollisen gridin avulla (ei location bagin avulla)
 // TODO: tarvitaanko t‰ll‰ist‰ tarkastelua, parametritlistat tai levelit voiva muuttua jonain p‰iv‰n‰ saman tyyppisess‰ datassa, pit‰isikˆ tehd‰ t‰st‰ lˆysempi tarkastelu?!?
-bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, boost::shared_ptr<NFmiFastQueryInfo> &theInfo2)
+bool NFmiInfoOrganizer::IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, const boost::shared_ptr<NFmiFastQueryInfo> &theInfo2)
 {
 	// parametrit ja tuottajat samoja
 	if(theInfo1 && theInfo2)
@@ -801,7 +808,7 @@ void NFmiInfoOrganizer::ClearThisKindOfData(NFmiQueryInfo* theInfo, NFmiInfoData
 
 		for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
 		{
-			boost::shared_ptr<NFmiFastQueryInfo> &info = iter->second->GetDataKeeper()->GetIter();
+		    boost::shared_ptr<NFmiFastQueryInfo> info = iter->second->GetDataKeeper()->GetIter();
 			if(IsInfosTwoOfTheKind(theInfo, theDataType, theFileNamePattern, info))
 			{
 				theRemovedDatasTimesOut = info->TimeDescriptor();
@@ -822,7 +829,16 @@ void NFmiInfoOrganizer::ClearDynamicHelpData()
 	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); )
 	{
 		if(std::find(ignoreTypesVector.begin(), ignoreTypesVector.end(), iter->second->GetDataKeeper()->GetIter()->DataType()) == ignoreTypesVector.end())
+		  {
+#ifdef UNIX
+			// RHEL5 and RHEL6 bug?
+			MapType::iterator tmp = iter;
+			++iter;
+			itsDataMap.erase(tmp);
+#else
 			iter = itsDataMap.erase(iter);
+#endif
+		  }
 		else
 			++iter; // jos dataa ei poistettu, pit‰‰ sit‰ siirt‰‰ t‰ss‰ pyk‰l‰ eteenp‰in
 	}

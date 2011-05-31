@@ -135,7 +135,7 @@ private:
 	boost::shared_ptr<NFmiFastQueryInfo> GetSoundingPlotParamInfo(NFmiInfoData::Type theType);
 	boost::shared_ptr<NFmiFastQueryInfo> GetWantedProducerInfo(NFmiInfoData::Type theType, FmiProducerName theProducerName);
 	boost::shared_ptr<NFmiDrawParam> CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
-	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, boost::shared_ptr<NFmiFastQueryInfo> &theInfo2);
+	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, const boost::shared_ptr<NFmiFastQueryInfo> &theInfo2);
 
 	boost::shared_ptr<NFmiQueryDataKeeper> itsEditedDataKeeper; // pit‰‰ sis‰ll‰‰n oikeasti NFmiSmartInfo-olion
 	boost::shared_ptr<NFmiQueryDataKeeper> itsCopyOfEditedDataKeeper;
