@@ -6,7 +6,7 @@
 #include "NFmiDrawParam.h"
 #include "NFmiQueryInfo.h"
 #include "NFmiGrid.h"
-#include "NFmiLatlonArea.h"
+#include "NFmiLatLonArea.h"
 #include "NFmiQueryDataUtil.h"
 
 #ifdef _MSC_VER
