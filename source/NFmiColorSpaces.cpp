@@ -20,9 +20,9 @@ NFmiColorSpaces::RGB_color::RGB_color(int r_, int g_, int b_)
 }
 
 NFmiColorSpaces::RGB_color::RGB_color(const NFmiColor &theColor)
-:r(FmiRound(theColor.GetRed()*255.f))
-,g(FmiRound(theColor.GetGreen()*255.f))
-,b(FmiRound(theColor.GetBlue()*255.f))
+  :r(static_cast<int>(FmiRound(theColor.GetRed()*255.f)))
+  ,g(static_cast<int>(FmiRound(theColor.GetGreen()*255.f)))
+  ,b(static_cast<int>(FmiRound(theColor.GetBlue()*255.f)))
 {
 }
 
@@ -100,7 +100,9 @@ NFmiColorSpaces::HSL_color NFmiColorSpaces::RGBtoHSL(int red, int green, int blu
 		s = (max1-min1)/(2 - (max1+min1)); //(max1-min1 > 0)?
 	}
 
-	return HSL_color(FmiRound(h), FmiRound(s * 100), FmiRound(l * 100));
+	return HSL_color(static_cast<int>(FmiRound(h)),
+					 static_cast<int>(FmiRound(s * 100)),
+					 static_cast<int>(FmiRound(l * 100)));
 }
 
 // <summary>
@@ -114,7 +116,9 @@ NFmiColorSpaces::RGB_color NFmiColorSpaces::HSLtoRGB(double h, double s, double 
 	if(s == 0)
 	{
 		// achromatic color (gray scale)
-		return RGB_color(FmiRound(l*255.0), FmiRound(l*255.0), FmiRound(l*255.0));
+	  return RGB_color(static_cast<int>(FmiRound(l*255.0)),
+					   static_cast<int>(FmiRound(l*255.0)),
+					   static_cast<int>(FmiRound(l*255.0)));
 	}
 	else
 	{
@@ -148,7 +152,9 @@ NFmiColorSpaces::RGB_color NFmiColorSpaces::HSLtoRGB(double h, double s, double 
 				T[i] = p;
 		}
 
-		return RGB_color(FmiRound(T[0]*255.0), FmiRound(T[1]*255.0), FmiRound(T[2]*255.0));
+		return RGB_color(static_cast<int>(FmiRound(T[0]*255.0)),
+						 static_cast<int>(FmiRound(T[1]*255.0)),
+						 static_cast<int>(FmiRound(T[2]*255.0)));
 	}
 }
 
@@ -170,6 +176,10 @@ NFmiColor NFmiColorSpaces::GetBrighterColor(const NFmiColor &theColor, double th
 		lightness = 0;
 
 	RGB_color rgbCol2 = NFmiColorSpaces::HSLtoRGB(hslCol.h, hslCol.s/100., lightness/100.);
-	return NFmiColor(rgbCol2.r/255.f, rgbCol2.g/255.f, rgbCol2.b/255.f, theColor.Alpha());
+
+	return NFmiColor(static_cast<float>(rgbCol2.r)/255.f,
+					 static_cast<float>(rgbCol2.g)/255.f,
+					 static_cast<float>(rgbCol2.b)/255.f,
+					 theColor.Alpha());
 }
 
