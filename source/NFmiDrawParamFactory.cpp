@@ -160,7 +160,7 @@ std::string NFmiDrawParamFactory::CreateFileName(boost::shared_ptr<NFmiDrawParam
 
 	if(drawParam)
 	{
-		int paramId = drawParam->Param().GetParam()->GetIdent();
+	    unsigned long paramId = drawParam->Param().GetParam()->GetIdent();
 
 		fileName += NFmiStringTools::Convert(paramId);
 		if(fCrossSectionCase)
@@ -177,7 +177,7 @@ std::string NFmiDrawParamFactory::CreateFileName(boost::shared_ptr<NFmiDrawParam
 				{
 					fileName += "_level_";
 					NFmiLevel& level = drawParam->Level();
-					int levelTypeId = level.LevelTypeId();
+					unsigned long levelTypeId = level.LevelTypeId();
 					fileName += NFmiStringTools::Convert(levelTypeId);
 					fileName += "_";
 					fileName += NFmiStringTools::Convert(level.LevelValue());
