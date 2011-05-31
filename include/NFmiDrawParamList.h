@@ -37,7 +37,7 @@
 #include "NFmiDataMatrix.h"
 #include "NFmiInfoData.h"
 #include "NFmiDrawParam.h"
-#include "boost\shared_ptr.hpp"
+#include <boost/shared_ptr.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4512) // poistaa VC++ k‰‰nt‰j‰n C4512 "assignment operator could not be generated" varoituksen
