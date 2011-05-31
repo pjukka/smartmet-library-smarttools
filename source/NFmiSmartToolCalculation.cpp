@@ -162,7 +162,7 @@ bool NFmiSmartToolCalculation::IsMasked(const NFmiPoint &theLatlon, int theLocat
 	return bin_eval_exp(theLatlon, theTime, theTimeIndex);
 }
 
-void NFmiSmartToolCalculation::AddCalculation(boost::shared_ptr<NFmiAreaMask> &theCalculation)
+void NFmiSmartToolCalculation::AddCalculation(const boost::shared_ptr<NFmiAreaMask> &theCalculation)
 {
 	if(theCalculation)
 	{

@@ -253,7 +253,7 @@ boost::shared_ptr<NFmiSmartToolCalculationBlock> NFmiSmartToolModifier::CreateCa
 	return block;
 }
 
-boost::shared_ptr<NFmiSmartToolCalculation> NFmiSmartToolModifier::CreateConditionalSection(boost::shared_ptr<NFmiAreaMaskSectionInfo> &theAreaMaskSectionInfo)
+boost::shared_ptr<NFmiSmartToolCalculation> NFmiSmartToolModifier::CreateConditionalSection(const boost::shared_ptr<NFmiAreaMaskSectionInfo> &theAreaMaskSectionInfo)
 {
 	boost::shared_ptr<NFmiSmartToolCalculation> areaMaskHandler;
 	if(theAreaMaskSectionInfo)
@@ -277,7 +277,7 @@ boost::shared_ptr<NFmiSmartToolCalculation> NFmiSmartToolModifier::CreateConditi
 	return areaMaskHandler;
 }
 
-boost::shared_ptr<NFmiSmartToolCalculationSection> NFmiSmartToolModifier::CreateCalculationSection(boost::shared_ptr<NFmiSmartToolCalculationSectionInfo> &theCalcSectionInfo)
+boost::shared_ptr<NFmiSmartToolCalculationSection> NFmiSmartToolModifier::CreateCalculationSection(const boost::shared_ptr<NFmiSmartToolCalculationSectionInfo> &theCalcSectionInfo)
 {
 	boost::shared_ptr<NFmiSmartToolCalculationSection> section;
 	if(theCalcSectionInfo)
@@ -297,7 +297,7 @@ boost::shared_ptr<NFmiSmartToolCalculationSection> NFmiSmartToolModifier::Create
 	return section;
 }
 
-boost::shared_ptr<NFmiSmartToolCalculation> NFmiSmartToolModifier::CreateCalculation(boost::shared_ptr<NFmiSmartToolCalculationInfo> &theCalcInfo)
+boost::shared_ptr<NFmiSmartToolCalculation> NFmiSmartToolModifier::CreateCalculation(const boost::shared_ptr<NFmiSmartToolCalculationInfo> &theCalcInfo)
 {
 	boost::shared_ptr<NFmiSmartToolCalculation> calculation;
 	size_t size = theCalcInfo->GetCalculationOperandInfoVector().size();
@@ -439,14 +439,14 @@ bool NFmiSmartToolModifier::IsInterpretedSkriptMacroParam(void)
 	return itsSmartToolIntepreter ? itsSmartToolIntepreter->IsInterpretedSkriptMacroParam() : false;
 }
 
-void NFmiSmartToolModifier::ModifyBlockData(boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue)
+void NFmiSmartToolModifier::ModifyBlockData(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue)
 {
 	ModifyData2(theCalculationBlock->itsFirstCalculationSection, theMacroParamValue);
 	ModifyConditionalData(theCalculationBlock, theMacroParamValue);
 	ModifyData2(theCalculationBlock->itsLastCalculationSection, theMacroParamValue);
 }
 
-void NFmiSmartToolModifier::ModifyConditionalData(boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue)
+void NFmiSmartToolModifier::ModifyConditionalData(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue)
 {
 	if(theCalculationBlock->itsIfAreaMaskSection && theCalculationBlock->itsIfCalculationBlocks)
 	{
@@ -506,7 +506,7 @@ void NFmiSmartToolModifier::ModifyConditionalData(boost::shared_ptr<NFmiSmartToo
 	}
 }
 
-static void DoSafeMaskOperation(boost::shared_ptr<NFmiFastQueryInfo> &theInfo1, boost::shared_ptr<NFmiFastQueryInfo> &theInfo2)
+static void DoSafeMaskOperation(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo1, boost::shared_ptr<NFmiFastQueryInfo> &theInfo2)
 {
 	NFmiSmartInfo *info1 = dynamic_cast<NFmiSmartInfo*>(theInfo1.get());
 	NFmiSmartInfo *info2 = dynamic_cast<NFmiSmartInfo*>(theInfo2.get());
@@ -516,7 +516,7 @@ static void DoSafeMaskOperation(boost::shared_ptr<NFmiFastQueryInfo> &theInfo1, 
 	}
 }
 
-void NFmiSmartToolModifier::SetInfosMaskType(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+void NFmiSmartToolModifier::SetInfosMaskType(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
 {
 	if(fModifySelectedLocationsOnly)
 	{
@@ -855,7 +855,7 @@ boost::shared_ptr<NFmiDataModifier> NFmiSmartToolModifier::CreateIntegrationFuct
 	return modifier;
 }
 
-boost::shared_ptr<NFmiDataIterator> NFmiSmartToolModifier::CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+boost::shared_ptr<NFmiDataIterator> NFmiSmartToolModifier::CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
 {
 	boost::shared_ptr<NFmiDataIterator> iterator;
 	NFmiAreaMask::CalculationOperationType mType = theAreaMaskInfo.GetOperationType();

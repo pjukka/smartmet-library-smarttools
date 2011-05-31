@@ -34,7 +34,7 @@ void NFmiSmartToolCalculationSection::Calculate(const NFmiPoint &theLatlon, unsi
 		itsCalculations[i]->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
 }
 
-void NFmiSmartToolCalculationSection::AddCalculations(boost::shared_ptr<NFmiSmartToolCalculation> &value)
+void NFmiSmartToolCalculationSection::AddCalculations(const boost::shared_ptr<NFmiSmartToolCalculation> &value)
 {
 	if(value)
 		itsCalculations.push_back(value);

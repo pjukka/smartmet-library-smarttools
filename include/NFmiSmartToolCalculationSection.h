@@ -31,7 +31,7 @@ public:
 	NFmiSmartToolCalculationSection(void);
 	~NFmiSmartToolCalculationSection(void);
 
-	void AddCalculations(boost::shared_ptr<NFmiSmartToolCalculation>  &value);
+	void AddCalculations(const boost::shared_ptr<NFmiSmartToolCalculation>  &value);
 	checkedVector<boost::shared_ptr<NFmiSmartToolCalculation> >& GetCalculations(void){return itsCalculations;}
 
 private:

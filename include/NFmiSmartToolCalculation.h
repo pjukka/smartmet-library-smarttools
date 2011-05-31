@@ -43,10 +43,10 @@ public:
 	NFmiSmartToolCalculation(void);
 	~NFmiSmartToolCalculation(void);
 
-	void SetResultInfo(boost::shared_ptr<NFmiFastQueryInfo> &value) {itsResultInfo = value; CheckIfModularParameter();}
+	void SetResultInfo(const boost::shared_ptr<NFmiFastQueryInfo> &value) {itsResultInfo = value; CheckIfModularParameter();}
 	boost::shared_ptr<NFmiFastQueryInfo> GetResultInfo(void) {return itsResultInfo;}
 	checkedVector<boost::shared_ptr<NFmiAreaMask> >& GetCalculations(void) {return itsCalculations;}
-	void AddCalculation(boost::shared_ptr<NFmiAreaMask> &theCalculation);
+	void AddCalculation(const boost::shared_ptr<NFmiAreaMask> &theCalculation);
 	const std::string& GetCalculationText(void){return itsCalculationText;}
 	void SetCalculationText(const std::string& theText){itsCalculationText = theText;}
 	void SetLimits(float theLowerLimit, float theUpperLimit, bool theDoLimitCheck);
