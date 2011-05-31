@@ -53,7 +53,7 @@ public:
 	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
 	void SetTime(const NFmiMetTime &theTime);
 	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
-	void Add(boost::shared_ptr<NFmiSmartToolCalculationBlock> &theBlock);
+	void Add(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theBlock);
 	Iterator Begin(void) {return itsCalculationBlocks.begin();}
 	Iterator End(void) {return itsCalculationBlocks.end();}
 
@@ -105,7 +105,7 @@ private:
 	boost::shared_ptr<NFmiFastQueryInfo> UsedMacroParamData(void);
 	void ModifyConditionalData(boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
 	void ModifyBlockData(boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
-	boost::shared_ptr<NFmiSmartToolCalculationBlockVector> CreateCalculationBlockVector(boost::shared_ptr<NFmiSmartToolCalculationBlockInfoVector> &theBlockInfoVector);
+	boost::shared_ptr<NFmiSmartToolCalculationBlockVector> CreateCalculationBlockVector(const boost::shared_ptr<NFmiSmartToolCalculationBlockInfoVector> &theBlockInfoVector);
 	boost::shared_ptr<NFmiSmartToolCalculationBlock> CreateCalculationBlock(NFmiSmartToolCalculationBlockInfo &theBlockInfo);
 	boost::shared_ptr<NFmiFastQueryInfo> CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent);
 	boost::shared_ptr<NFmiFastQueryInfo> GetScriptVariableInfo(const NFmiDataIdent &theDataIdent);

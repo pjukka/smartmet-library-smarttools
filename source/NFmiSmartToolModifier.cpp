@@ -35,7 +35,7 @@
 
 using namespace std;
 
-static boost::shared_ptr<NFmiFastQueryInfo> CreateShallowCopyOfHighestInfo(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+static boost::shared_ptr<NFmiFastQueryInfo> CreateShallowCopyOfHighestInfo(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
 {
 	if(theInfo)
 	{
@@ -90,7 +90,7 @@ void NFmiSmartToolCalculationBlockVector::Calculate(const NFmiPoint &theLatlon, 
 		(*it)->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
 }
 
-void NFmiSmartToolCalculationBlockVector::Add(boost::shared_ptr<NFmiSmartToolCalculationBlock> &theBlock)
+void NFmiSmartToolCalculationBlockVector::Add(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theBlock)
 { // ottaa omistukseen theBlock:in!!
 	itsCalculationBlocks.push_back(theBlock);
 }
@@ -201,7 +201,7 @@ void NFmiSmartToolModifier::InitSmartTool(const std::string &theSmartToolText, b
 	}
 }
 
-boost::shared_ptr<NFmiSmartToolCalculationBlockVector> NFmiSmartToolModifier::CreateCalculationBlockVector(boost::shared_ptr<NFmiSmartToolCalculationBlockInfoVector> &theBlockInfoVector)
+boost::shared_ptr<NFmiSmartToolCalculationBlockVector> NFmiSmartToolModifier::CreateCalculationBlockVector(const boost::shared_ptr<NFmiSmartToolCalculationBlockInfoVector> &theBlockInfoVector)
 {
 	if(theBlockInfoVector && (!theBlockInfoVector->Empty()))
 	{
