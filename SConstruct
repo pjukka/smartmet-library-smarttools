@@ -136,7 +136,6 @@ if DEBUG:
             "-ansi",
             "-Wcast-align",
             "-Wcast-qual",
-            "-Wconversion",
             "-Winline",
             "-Wno-multichar",
             "-Wno-pmf-conversions",
