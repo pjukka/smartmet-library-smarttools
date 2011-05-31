@@ -62,7 +62,7 @@ class NFmiMultiLevelMask
 	const NFmiBitMask& Mask (unsigned long theMaskType) const;
 	void MaskSize(unsigned long theMaskSize) {};
 	unsigned long MaskedCount(unsigned long theMaskType);
-	int MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea, int theXGridSize, int theYGridSize);
+	int MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea, unsigned int theXGridSize, unsigned int theYGridSize);
 
  private:
 	NFmiBitMask itsSelectionMask;

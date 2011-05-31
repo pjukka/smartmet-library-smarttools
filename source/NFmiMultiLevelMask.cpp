@@ -284,20 +284,20 @@ unsigned long NFmiMultiLevelMask::MaskedCount(unsigned long theMaskType)
 
 // Laskee kuinka monta pistettä on maskattu annetun laatikon alueella, jonka vasen alakulma
 // annetun indeksin kohdalla.
-int NFmiMultiLevelMask::MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea, int theXGridSize, int theYGridSize)
+int NFmiMultiLevelMask::MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea, unsigned int theXGridSize, unsigned int theYGridSize)
 {
 	assert(theXGridSize);
-	int indexYPos = theIndex/theXGridSize;
-	int indexXPos = theIndex%theXGridSize;
-	int count = 0;
-	int endRow = static_cast<int>(indexYPos + theSearchArea.Bottom());
-	int startRow = static_cast<int>(indexYPos + theSearchArea.Top());
-	int startColumn = static_cast<int>(indexXPos + theSearchArea.Left());
-	int endColumn = static_cast<int>(indexXPos + theSearchArea.Right());
+	unsigned long indexYPos = theIndex/theXGridSize;
+	unsigned long indexXPos = theIndex%theXGridSize;
+	unsigned long count = 0;
+	unsigned long endRow = static_cast<unsigned long>(indexYPos + theSearchArea.Bottom());
+	unsigned long startRow = static_cast<unsigned long>(indexYPos + theSearchArea.Top());
+	unsigned long startColumn = static_cast<unsigned long>(indexXPos + theSearchArea.Left());
+	unsigned long endColumn = static_cast<unsigned long>(indexXPos + theSearchArea.Right());
 
-	for(int i=startRow; i<=endRow; i++)
+	for(unsigned long i=startRow; i<=endRow; i++)
 	{
-		for(int j=startColumn; j<=endColumn; j++)
+		for(unsigned long j=startColumn; j<=endColumn; j++)
 		{
 			if(i < 0 || i >= theYGridSize)
 				count++;
@@ -305,7 +305,7 @@ int NFmiMultiLevelMask::MaskedCount(unsigned long theMaskType, unsigned long the
 				count++;
 			else
 			{
-				int index = i*theXGridSize + j;
+				unsigned long index = i*theXGridSize + j;
 				if(IsMasked(index, theMaskType))
 					count++;
 			}
