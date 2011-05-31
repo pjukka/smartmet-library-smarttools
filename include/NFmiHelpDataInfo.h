@@ -120,6 +120,7 @@ public:
 	,itsStaticHelpDataInfos()
 	,itsCacheDirectory()
 	,itsCacheTmpDirectory()
+	,itsCachePartialDataDirectory()
 	,itsCacheTmpFileNameFix()
 	,fUseQueryDataCache(false)
 	,fDoCleanCache(false)
@@ -128,7 +129,6 @@ public:
 	,itsCacheMediumFileSizeMB(40)
 	,itsCacheLargeFileSizeMB(200)
 	,itsCacheMaximumFileSizeMB(10000)
-	,itsCachePartialDataDirectory()
 	,itsBaseNameSpace()
 	{}
 
