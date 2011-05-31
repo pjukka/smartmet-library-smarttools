@@ -442,7 +442,7 @@ static NFmiSilamStationList::Station GetSilamStationFromString(const std::string
 		in >> str;
 		if(in.fail())
 			throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestillä ei ole oikeastaan väliä, lähinnä kommentti
-		if(str.size() >= 2 && (str[0] == 'O' && str[1] == 'T') || (str[0] == 'P' && str[1] == 'L')) // tyyppi ilmeisesti alkaa OT tai PL alulla
+		if(str.size() >= 2 && ((str[0] == 'O' && str[1] == 'T') || (str[0] == 'P' && str[1] == 'L'))) // tyyppi ilmeisesti alkaa OT tai PL alulla
 			break;
 		station.itsCountry += str;
 	}while(true);
