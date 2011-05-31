@@ -33,7 +33,7 @@
 
 using namespace NFmiSoundingFunctions;
 
-bool NFmiSoundingIndexCalculator::FillSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiSoundingData &theSoundingData, const NFmiMetTime &theTime, const NFmiLocation &theLocation, boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo)
+bool NFmiSoundingIndexCalculator::FillSoundingData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiSoundingData &theSoundingData, const NFmiMetTime &theTime, const NFmiLocation &theLocation, const boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo)
 {
 	if(theInfo)
 	{
@@ -45,7 +45,7 @@ bool NFmiSoundingIndexCalculator::FillSoundingData(boost::shared_ptr<NFmiFastQue
 	return false;
 }
 
-bool NFmiSoundingIndexCalculator::FillSoundingDataOpt1(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiSoundingDataOpt1 &theSoundingData, const NFmiMetTime &theTime, const NFmiLocation &theLocation, boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo)
+bool NFmiSoundingIndexCalculator::FillSoundingDataOpt1(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiSoundingDataOpt1 &theSoundingData, const NFmiMetTime &theTime, const NFmiLocation &theLocation, const boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo)
 {
 	if(theInfo)
 	{
@@ -57,18 +57,18 @@ bool NFmiSoundingIndexCalculator::FillSoundingDataOpt1(boost::shared_ptr<NFmiFas
 	return false;
 }
 
-static bool FillSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiSoundingData &theSoundingData, const NFmiMetTime &theTime, const NFmiPoint &theLatlon)
+static bool FillSoundingData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiSoundingData &theSoundingData, const NFmiMetTime &theTime, const NFmiPoint &theLatlon)
 {
 	static NFmiString bsName("bsname");
 	if(theInfo)
 	{
-		if(theInfo->IsGrid())
-			return theSoundingData.FillSoundingData(theInfo, theTime, theInfo->OriginTime(), theLatlon, bsName, boost::shared_ptr<NFmiFastQueryInfo>());
+	  if(theInfo->IsGrid())
+		return theSoundingData.FillSoundingData(theInfo, theTime, theInfo->OriginTime(), theLatlon, bsName, boost::shared_ptr<NFmiFastQueryInfo>());
 	}
 	return false;
 }
 
-static bool FillSoundingDataOpt1(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiSoundingDataOpt1 &theSoundingDataOpt1, const NFmiMetTime &theTime, const NFmiPoint &theLatlon, bool useFastFill)
+static bool FillSoundingDataOpt1(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiSoundingDataOpt1 &theSoundingDataOpt1, const NFmiMetTime &theTime, const NFmiPoint &theLatlon, bool useFastFill)
 {
 	static NFmiString bsName("bsname");
 	if(theInfo)
@@ -114,13 +114,13 @@ static void CheckIfStopped(NFmiStopFunctor *theStopFunctor)
 
 static void CalcAllSoundingIndexParamFields(boost::shared_ptr<NFmiFastQueryInfo> &theSourceInfo, boost::shared_ptr<NFmiFastQueryInfo> &theResultInfo, bool useFastFill, NFmiStopFunctor *theStopFunctor)
 {
-	bool fObsDataFound = false; // toistaiseksi ei käytössä
-	bool useAnalyzeData = false; // toistaiseksi ei käytössä
+    // bool fObsDataFound = false; // toistaiseksi ei käytössä
+	// bool useAnalyzeData = false; // toistaiseksi ei käytössä
 
 	NFmiSoundingDataOpt1 soundingDataOpt1;
 	for(theResultInfo->ResetLocation(); theResultInfo->NextLocation(); )
 	{
-		bool surfaceBaseStatus = false;
+	    // bool surfaceBaseStatus = false;
 		if(useFastFill)
 			theSourceInfo->LocationIndex(theResultInfo->LocationIndex());
 		::FillSoundingDataOpt1(theSourceInfo, soundingDataOpt1, theResultInfo->Time(), theResultInfo->LatLon(), useFastFill);
@@ -132,7 +132,7 @@ static void CalcAllSoundingIndexParamFields(boost::shared_ptr<NFmiFastQueryInfo>
 				::CheckIfStopped(theStopFunctor); // joka 20 hilapisteellä katsotaan, pitääkö lopettaa
 
 			FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theResultInfo->Param().GetParamIdent());
-			bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
+			// bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
 
 			// HUOM!!!! muista muuttaa luotaus-parametri pelkäksi surface arvoksi, koska loppu menee itsestään sitten
 			float valueOpt1 = NFmiSoundingIndexCalculator::CalcOpt1(soundingDataOpt1, soundingParameter);
@@ -184,8 +184,6 @@ static void CalculatePartOfSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &th
 		std::cerr << "thread nro: " << index << " end here."<< std::endl;
 }
 
-#ifndef BOOST_DISABLE_THREADS
-
 static void CalcTimeIndexStartsForThreeThreads(unsigned long timeSize, unsigned long &theTimeStart1, unsigned long &theTimeStart2, unsigned long &theTimeStart3)
 {
 	unsigned long partSize = timeSize/3;
@@ -208,7 +206,6 @@ static void CalcTimeIndexStartsForThreeThreads(unsigned long timeSize, unsigned 
 		theTimeStart3 = partSize*2+1; // viimeinen threadi saa tehdä yhden ylimääräisen aika-askeleen
 	}
 }
-#endif
 
 // Jos useFastFill on true, on datoilla sama hila ja aika descriptor rakenne
 void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread)

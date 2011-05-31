@@ -444,7 +444,7 @@ bool NFmiSoundingDataOpt1::GetValuesStartingLookingFromPressureLevel(double &T, 
 
 // oletuksia paljon:
 // theInfo on validi, aika ja paikka on jo asetettu
-bool NFmiSoundingDataOpt1::FillParamData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId)
+bool NFmiSoundingDataOpt1::FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId)
 {
 	try
 	{
@@ -474,7 +474,7 @@ bool NFmiSoundingDataOpt1::FillParamData(boost::shared_ptr<NFmiFastQueryInfo> &t
 }
 
 // Oletus, t‰ss‰ info on jo parametrissa ja ajassa kohdallaan.
-bool NFmiSoundingDataOpt1::FastFillParamData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId)
+bool NFmiSoundingDataOpt1::FastFillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId)
 {
 	bool status = false;
 	std::deque<float>&data = GetParamData(theId);
@@ -524,7 +524,7 @@ bool NFmiSoundingDataOpt1::FastFillParamData(boost::shared_ptr<NFmiFastQueryInfo
 	return status;
 }
 
-bool NFmiSoundingDataOpt1::FillParamData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId, const NFmiMetTime& theTime, const NFmiPoint& theLatlon)
+bool NFmiSoundingDataOpt1::FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId, const NFmiMetTime& theTime, const NFmiPoint& theLatlon)
 {
 	bool status = false;
 	std::deque<float>&data = GetParamData(theId);
@@ -621,7 +621,7 @@ void NFmiSoundingDataOpt1::CutEmptyData(void)
 
 }
 
-static bool FindTimeIndexies(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiMetTime &theStartTime, long minuteRange, unsigned long &timeIndex1, unsigned long &timeIndex2)
+static bool FindTimeIndexies(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiMetTime &theStartTime, long minuteRange, unsigned long &timeIndex1, unsigned long &timeIndex2)
 {
 	theInfo->FindNearestTime(theStartTime, kBackward);
 	timeIndex1 = theInfo->TimeIndex();
@@ -640,7 +640,7 @@ static bool FindTimeIndexies(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, cons
 	return true;
 }
 
-static bool FindAmdarSoundingTime(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiMetTime &theTime, NFmiLocation &theLocation)
+static bool FindAmdarSoundingTime(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiMetTime &theTime, NFmiLocation &theLocation)
 {
 	theInfo->FirstLocation();  // amdareissa vain yksi dummy paikka, laitetaan se p‰‰lle
 	NFmiMetTime timeStart(theTime);
@@ -700,7 +700,7 @@ static bool FindAmdarSoundingTime(boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
 }
 
 // T‰lle anntaan asema dataa ja ei tehd‰ mink‰‰nlaisia interpolointeja.
-bool NFmiSoundingDataOpt1::FillSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly)
+bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiLocation& theLocation, int useStationIdOnly)
 {
 	NFmiMetTime usedTime = theTime;
 	NFmiLocation usedLocation(theLocation);
@@ -752,7 +752,7 @@ bool NFmiSoundingDataOpt1::FillSoundingData(boost::shared_ptr<NFmiFastQueryInfo>
 }
 
 // T‰lle annetaan hiladataa, ja interpolointi tehd‰‰n tarvittaessa ajassa ja paikassa.
-bool NFmiSoundingDataOpt1::FillSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName, boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo, bool useFastFill)
+bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName, const boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo, bool useFastFill)
 {
 	ClearDatas();
 	if(theInfo && theInfo->IsGrid())
@@ -813,7 +813,7 @@ static void CutStartOfVector(vectorContainer &theVec, int theCutIndex)
 // HUOM! Oletus ett‰ lˆytyi ainakin yksi kerros, joka oli alle t‰m‰n pintakerroksen, koska
 // en tee taulukkojen resize:a ainakaan nyt, eli taulukossa pit‰‰ olla tilaa t‰lle uudelle
 // pintakerrokselle.
-void NFmiSoundingDataOpt1::FixPressureDataSoundingWithGroundData(boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo)
+void NFmiSoundingDataOpt1::FixPressureDataSoundingWithGroundData(const boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo)
 {
 	if(theGroundDataInfo)
 	{
