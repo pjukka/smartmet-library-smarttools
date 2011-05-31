@@ -434,7 +434,7 @@ int NFmiQueryDataSetKeeper::GetNearestUnRegularTimeIndex(const NFmiMetTime &theT
 				diffValue2 = it2->first;
 				if(diffValue1 < 0 && diffValue2 >= 0)
 					return indexValue1;
-				else if(diffValue1 = 0 && diffValue2 > 0)
+				else if(diffValue1 == 0 && diffValue2 > 0)
 					return indexValue1;
 				else if(diffValue1 > 0)
 					return indexValue1;
