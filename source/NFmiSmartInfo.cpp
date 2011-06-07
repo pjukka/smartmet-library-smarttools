@@ -42,6 +42,11 @@ NFmiSmartInfo* NFmiSmartInfo::Clone(void) const
 	NFmiQueryData *cloneData = itsDataPtr.get()->Clone(); // datasta tehtävä tässä kopio!
 	NFmiSmartInfo *copy = new NFmiSmartInfo(cloneData, itsDataType, itsDataFileName, itsDataFilePattern); // tämä ei osaa tehdä kaikesta tarvittavasta datasta kopiota
 	copy->CopyClonedDatas(*this); // tässä laitetaan kaikki loput tarvittavat NFmiSmartInfo-data osat kopioitavaksi clooniin.
+	// Pitää asettaa iteraattorit myös kohdalleen
+	copy->Param(Param()); // Tämä pitää asettaa parametrilla, pelkkä indeksin asetus ei riitä (aliparametri juttu)!!!
+	copy->TimeIndex(TimeIndex());
+	copy->LevelIndex(LevelIndex());
+	copy->LocationIndex(LocationIndex());
 	return copy;
 }
 
