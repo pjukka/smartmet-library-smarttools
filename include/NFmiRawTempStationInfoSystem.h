@@ -82,7 +82,7 @@ public:
 	const NFmiLocation* CurrentLocation(const std::string &theIcaoStr);
 private:
 
-	double GetLatOrLonFromString(const std::string &theLatOrLonStr, const std::string &theLineStr, const std::string &theInitFileName, char posMark, char negMark);
+//	double GetLatOrLonFromString(const std::string &theLatOrLonStr, const std::string &theLineStr, const std::string &theInitFileName, char posMark, char negMark);
 	bool GetAviationStationFromString(const std::string &theStationStr, const std::string &theInitFileName, AviationStation &theStationOut);
 
 	std::string itsInitLogMessage; // onnistuneen initialisoinnin viesti, miss‰ voi olla varoituksia lokiin.
@@ -118,5 +118,48 @@ private:
 	checkedVector<NFmiSilamStationList::Station> itsLocations;
 };
 
+// T‰h‰n puretaan NOAA:n taulukost asema rivi, esim:
+// 02;974;EFHK;Helsinki-Vantaa;;Finland;6;60-19N;024-58E;60-19N;024-58E;51;56;P
+class NFmiWmoStation
+{
+public:
+
+	NFmiWmoStation(void)
+	:itsWmoId(0) // jostain syyst‰ "Buckland, Buckland Airport" asemalla on 0 id, joten 0:aa ei voi pit‰‰ puuttuvan aseman arvona
+	,itsName() // t‰m‰ on pakollinen kentt‰, jos t‰m‰ on tyhj‰, asemaa ei ole m‰‰ritetty
+	,itsIcaoStr()
+	,itsState()
+	,itsCountry()
+	,itsLatlon(NFmiPoint::gMissingLatlon)
+	{
+	}
+
+	bool IsValid(void) const
+	{
+		return itsName.empty() == false;
+	}
+
+	unsigned long itsWmoId; // wmo-id esim 2792 (= 02-974)
+	std::string itsName; // Helsinki-Vantaa
+	std::string itsIcaoStr; // icao tunnus EFHK
+	std::string itsState; // ainakin US asemilla on state, muilla ei kai ole
+	std::string itsCountry; // Finland
+	NFmiPoint itsLatlon;
+};
+
+class NFmiLogger;
+
+class NFmiWmoStationLookUpSystem
+{
+public:
+	NFmiWmoStationLookUpSystem(void);
+	void Init(const std::string &theInitFileName, int theStationCountHint = -1);
+	const std::string& InitLogMessage(void) const {return itsInitLogMessage;}
+	const NFmiWmoStation& GetStation(unsigned long theWmoId);
+private:
+	std::vector<NFmiWmoStation> itsStations; // t‰h‰n alustetaan aina haluttu m‰‰r‰ asemia, jotka t‰ytet‰‰n jos niille lˆytyy m‰‰rityksi‰.
+											// T‰m‰n avulla voidaan hakea wmo-id:n avulla suoraan taulukosta tietoja asemasta NOPEASTI!
+	std::string itsInitLogMessage; // onnistuneen tai ep‰onnistuneen initialisoinnin viesti, miss‰ voi olla varoituksia lokiin.
+};
 
 #endif // NFMIRAWTEMPSTATIONINFOSYSTEM_H
