@@ -603,7 +603,7 @@ static bool GetWmoStationFromString(const std::string &theStationStr, const std:
 void NFmiWmoStationLookUpSystem::Init(const std::string &theInitFileName, int theStationCountHint)
 {
 	if(theStationCountHint == -1)
-		itsStations.resize(102000); // näin monta asemaa on suunnilleen NOAA:n nsd_bbsss.txt -tiedostossa
+		itsStations.resize(102000); // näin monta asemaa on suunnilleen NOAA:n nsd_bbsss.txt -tiedostossa (tekee n. 21 MB kokoisen 'tyhjän' taulukon)
 	else
 		itsStations.resize(theStationCountHint);
 
