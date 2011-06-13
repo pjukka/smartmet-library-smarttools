@@ -6,6 +6,14 @@
 #include "NFmiQueryData.h"
 #include <fstream>
 
+#ifdef _MSC_VER
+#pragma warning (disable : 4244 4267 4512) // boost:in thread kirjastosta tulee ik‰v‰sti 4244 varoituksia
+#endif
+#include <boost/thread.hpp>
+#ifdef _MSC_VER
+#pragma warning (default : 4244 4267 4512) // laitetaan 4244 takaisin p‰‰lle, koska se on t‰rke‰ (esim. double -> int auto castaus varoitus)
+#endif
+
 // ************* NFmiQueryDataKeeper-class **********************
 
 NFmiQueryDataKeeper::NFmiQueryDataKeeper(void)
@@ -95,6 +103,27 @@ NFmiQueryDataSetKeeper::~NFmiQueryDataSetKeeper(void)
 {
 }
 
+/*
+static void QDataListDestroyer(NFmiQueryDataSetKeeper::ListType *theQDataListToBeDestroyed)
+{
+	if(theQDataListToBeDestroyed)
+	{
+		theQDataListToBeDestroyed->clear();
+		delete theQDataListToBeDestroyed;
+	}
+}
+
+static void DestroyQDatasInSeparateThread(NFmiQueryDataSetKeeper::ListType &theQDataListToBeDestroyed)
+{
+	NFmiQueryDataSetKeeper::ListType *swapList = new NFmiQueryDataSetKeeper::ListType;
+	theQDataListToBeDestroyed.swap(*swapList); // siirret‰‰n tuhottava lista toiseen lista-olioon
+	// K‰ynnistet‰‰n uusi threadi, joka hoitaa lopullisen tuhoamisen
+	boost::thread wrk_thread(::QDataListDestroyer, swapList);
+
+	// ei j‰‰d‰ odottamaan lopetusta
+}
+*/
+
 // Lis‰t‰t‰‰n annettu data keeper-settiin.
 // Jos	itsMaxLatestDataCount on 0, tyhjennnet‰‰n olemassa olevat listat ja datat ja laitetaan annettu data k‰yttˆˆn.
 // Jos	itsMaxLatestDataCount on > 0, katsotaan mihin kohtaan (mille indeksille) data sijoittuu, mahdollisesti vanhimman datan joutuu siivoamaan pois.
@@ -105,7 +134,12 @@ void NFmiQueryDataSetKeeper::AddData(boost::shared_ptr<NFmiOwnerInfo> &theData, 
 		itsDataType = theData->DataType();
 		if(fFirstData || itsMaxLatestDataCount == 0)
 		{
+			// Halusin siirt‰‰ t‰m‰n datojen tuhoamisen omaan threadiin, koska ainakin debugatessa salama-kaudella, salama datan tuhomaminen kest‰‰, koska siin‰ on kymmeni‰ tuhansia dynaamisesti luotuja NFmiMetTime-olioita tuhottavana
 			itsQueryDatas.clear(); 
+
+			//::DestroyQDatasInSeparateThread(itsQueryDatas); // ei riit‰ ett‰ tuhoaminen siirret‰‰n omaan threadiin, OwnerInfon rakennuskin kest‰‰!
+
+
 			itsQueryDatas.push_back(boost::shared_ptr<NFmiQueryDataKeeper>(new NFmiQueryDataKeeper(theData)));
 			itsFilePattern = theData->DataFilePattern();
 			itsLatestOriginTime = theData->OriginTime();
