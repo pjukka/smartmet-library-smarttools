@@ -589,17 +589,32 @@ checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos
 checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos(NFmiInfoData::Type theType, bool fGroundData, int theProducerId, int theProducerId2)
 {
 	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infoVector;
-	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
+	if(theType == NFmiInfoData::kEditable)
 	{
-		boost::shared_ptr<NFmiFastQueryInfo> info = iter->second->GetDataKeeper()->GetIter();
-		if(info && info->DataType() == theType)
+		boost::shared_ptr<NFmiFastQueryInfo> info = itsEditedDataKeeper->GetIter();
+		if(info)
+			infoVector.push_back(itsEditedDataKeeper->GetIter());
+	}
+	else if(theType == NFmiInfoData::kCopyOfEdited)
+	{
+		boost::shared_ptr<NFmiFastQueryInfo> info = itsCopyOfEditedDataKeeper->GetIter();
+		if(info)
+			infoVector.push_back(itsEditedDataKeeper->GetIter());
+	}
+	else
+	{
+		for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
 		{
-			if((fGroundData == true && info->SizeLevels() == 1) || (fGroundData == false && info->SizeLevels() > 1))
+			boost::shared_ptr<NFmiFastQueryInfo> info = iter->second->GetDataKeeper()->GetIter();
+			if(info && info->DataType() == theType)
 			{
-				// HUOM! info->Producer() on potentiaalisti vaarallinen kutsu multi-threaddaavassa tilanteessa.
-				int currentProdId = static_cast<int>(info->Producer()->GetIdent());
-				if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2))
-					infoVector.push_back(info);
+				if((fGroundData == true && info->SizeLevels() == 1) || (fGroundData == false && info->SizeLevels() > 1))
+				{
+					// HUOM! info->Producer() on potentiaalisti vaarallinen kutsu multi-threaddaavassa tilanteessa.
+					int currentProdId = static_cast<int>(info->Producer()->GetIdent());
+					if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2))
+						infoVector.push_back(info);
+				}
 			}
 		}
 	}
