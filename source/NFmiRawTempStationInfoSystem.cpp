@@ -125,7 +125,7 @@ void NFmiRawTempStationInfoSystem::Init(const std::string &theInitFileName)
 			buffer.resize(maxBufferSize);
 			in.getline(&buffer[0], maxBufferSize);
 
-			int realSize = strlen(buffer.c_str());
+			int realSize = static_cast<int>(strlen(buffer.c_str()));
 			buffer.resize(realSize);
 			buffer = ::RemoveExtraSpaces(buffer);
 			if(::GetStationFromString(buffer, theInitFileName, station))
@@ -491,7 +491,7 @@ void NFmiSilamStationList::Init(const std::string &theInitFileName)
 			buffer.resize(maxBufferSize);
 			in.getline(&buffer[0], maxBufferSize);
 
-			int realSize = strlen(buffer.c_str());
+			int realSize = static_cast<int>(strlen(buffer.c_str()));
 			buffer.resize(realSize);
 			buffer = ::RemoveExtraSpaces(buffer);
 
