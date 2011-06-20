@@ -1,8 +1,8 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 11.6.6
-Release: 1.el5.fmi
+Version: 11.6.20
+Release: 1.el6.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
@@ -35,6 +35,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}-mt.a
 
 %changelog
+* Mon Jun 20 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.6.20-1.el5.fmi
+- Improvements needed for new grib tools
 * Mon Jun  6 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.6.6-1.el5.fmi
 - Newbase headers changed, rebuild forced
 * Tue May 31 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.5.31-1.el6.fmi
