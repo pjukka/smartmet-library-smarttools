@@ -1447,7 +1447,12 @@ bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVari
 		theMaskInfo->SetDataIdent(dataIdent);
 		theMaskInfo->SetUseDefaultProducer(false);
 		if(fUseWildDataType)
-			theMaskInfo->SetDataType(NFmiInfoData::kAnyData);
+		{
+			if(theProducer.GetIdent() == 0) // tämä on viritys, jos on annettu esim. "par180_ec" parametri, menee se any-data kategoriaan, ellei ei tarkisteta onko oikeasti annettu tuottajakin
+				theMaskInfo->SetDataType(NFmiInfoData::kAnyData);
+			else
+				theMaskInfo->SetDataType(theDataType);
+		}
 		else if(theProducer.GetIdent() == 999) // tämä 999 on viritys, mutta se on määrätty helpdatainfo.dat tiedostossa kepa-datan feikki id numeroksi. Oikeaa id:tä ei voi käyttää, koska se on sama kuin editoitavalla datalla.
 			theMaskInfo->SetDataType(NFmiInfoData::kKepaData);
 		else
