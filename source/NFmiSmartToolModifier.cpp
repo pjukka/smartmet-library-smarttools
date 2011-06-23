@@ -609,7 +609,7 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 			boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 			// HUOM!!! pitäisikö tähän laittaa joku debug-info raportti, jos level on reset-tilassa
 
-			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info));
+			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info));
 			break;
 			}
 		case NFmiAreaMask::RampFunction:
