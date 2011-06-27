@@ -180,6 +180,7 @@ private:
 	bool IsVariableThreeArgumentFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	bool IsVariableFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	bool IsVariablePeekFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
+	bool IsVariableMetFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	bool IsVariableMathFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 
 	NFmiProducerSystem *itsProducerSystem;  // ei omista
@@ -227,6 +228,11 @@ private:
 	typedef std::map<std::string, NFmiAreaMask::FunctionType> FunctionMap;
 	static FunctionMap itsTokenFunctions;
 	static FunctionMap itsTokenThreeArgumentFunctions;
+
+	typedef std::pair<NFmiAreaMask::FunctionType, int> MetFunctionMapValue; // MetFunktioihin talletetaan 'taika'-sanan lis‰ksi Funktio tyyppi ja funktion argumenttien lukum‰‰r‰.
+	typedef std::map<std::string, MetFunctionMapValue> MetFunctionMap; // 'Meteorologiset' funktiot. N‰ill‰ funktioilla k‰sitell‰‰n queryData-olioita eli pyydet‰‰n erilaisia 
+																		// arvoja siit‰ (esim. advektiota Adv(T_Hir)).
+	static MetFunctionMap itsTokenMetFunctions;
 
 	typedef std::map<std::string, NFmiAreaMask::CalculationOperationType> PeekFunctionMap;
 	static PeekFunctionMap itsTokenPeekFunctions;

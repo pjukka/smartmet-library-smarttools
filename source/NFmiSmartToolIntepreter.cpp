@@ -145,6 +145,7 @@ NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenStaticParamet
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenCalculatedParameterNamesAndIds;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenThreeArgumentFunctions;
+NFmiSmartToolIntepreter::MetFunctionMap NFmiSmartToolIntepreter::itsTokenMetFunctions;
 NFmiSmartToolIntepreter::PeekFunctionMap NFmiSmartToolIntepreter::itsTokenPeekFunctions;
 NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctions;
 
@@ -1568,6 +1569,8 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 	// katsotaan onko jokin peek-funktioista
 	if(IsVariablePeekFunction(theVariableText, theMaskInfo))
 		return true;
+	if(IsVariableMetFunction(theVariableText, theMaskInfo))
+		return true;
 	// sitten katsotaan onko jokin integraatio funktioista
 	std::string tmp(theVariableText);
 	FunctionMap::iterator it = itsTokenFunctions.find(NFmiStringTools::LowerCase(tmp));
@@ -1603,7 +1606,7 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 				}
 			}
 		}
-		// sitten tutkitaan, onko kyseessä aikaintegrointi eli 7 'tokenia'
+		// sitten tutkitaan, onko kyseessä alueintegrointi eli 7 'tokenia'
 		else if(i==6 && (tokens[0].first == string("(")) && (tokens[6].first == string(")")))
 		{
 			if(tokens[1].second == VARIABLE && tokens[2].second == NUMBER && tokens[3].second == NUMBER && tokens[4].second == NUMBER && tokens[5].second == NUMBER)
@@ -1640,7 +1643,7 @@ bool NFmiSmartToolIntepreter::IsVariablePeekFunction(const std::string &theVaria
 		string tmp;
 		checkedVector<pair<string, types> > tokens;
 		int i;
-		for(i=0; i<7 && GetToken(); i++) // maksimissaan 7 kertaa
+		for(i=0; i<5 && GetToken(); i++) // maksimissaan 5 kertaa
 		{
 			tmp = token; // luetaan muuttuja/vakio/funktio tai mikä lie
 			tmp = HandlePossibleUnaryMarkers(tmp);
@@ -1648,7 +1651,7 @@ bool NFmiSmartToolIntepreter::IsVariablePeekFunction(const std::string &theVaria
 			if(tmp == string(")")) // etsitään lopetus sulkua
 				break;
 		}
-		// ensin tutkitaan, onko kyseessä peekxy eli yhteensä 5 'tokenia' peekxy(T 1 1)
+		// ensin tutkitaan, onko kyseessä peekxy eli yhteensä 5 'tokenia' peekxy(T 1 1), huom! sulut on mukana tokeneissa
 		if(i==4 && (tokens[0].first == string("(")) && (tokens[4].first == string(")")))
 		{
 			if(tokens[1].second == VARIABLE && tokens[2].second == NUMBER && tokens[3].second == NUMBER)
@@ -1662,6 +1665,55 @@ bool NFmiSmartToolIntepreter::IsVariablePeekFunction(const std::string &theVaria
 					NFmiValueString valueString2(tokens[3].first);
 					double value2 = static_cast<double>(valueString2);
 					theMaskInfo->SetOffsetPoint1(NFmiPoint(value1, value2));
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
+{
+	std::string aVariableText(theVariableText);
+	MetFunctionMap::iterator it = itsTokenMetFunctions.find(NFmiStringTools::LowerCase(aVariableText)); // tässä tarkastellaan case insensitiivisesti
+	if(it != itsTokenMetFunctions.end())
+	{
+		string tmp;
+		checkedVector<pair<string, types> > tokens;
+		int argumentCount = (*it).second.second; // näin monta argumentti on odotettavissa tälle funktio tyypille 
+		int tokenCount = argumentCount + (argumentCount-1) + 2; // ja siinä on argumentCount-1 pilkkua välissä!  + 2 on alku ja loppu sulut
+		for(int i=0; i < tokenCount && GetToken(); i++)
+		{
+			tmp = token; // luetaan muuttuja/vakio/funktio tai mikä lie
+			tmp = HandlePossibleUnaryMarkers(tmp);
+			// pitää tarkistaa että on oikeissa kohdissa pilkut, mutta ne on ohitettava vain sitten
+			if(tmp == string(",")) // tarkistetaan pilkut
+			{
+				bool isIndexPar = i % 2 == 0; // onko indeksi parillinen
+				bool overNonPossibleStartPos = i > 1; // onko indeksi edennyt ohi alun, missä ei voi olla pilkkuja
+				bool underNonPossibleEndPos = i < tokenCount-2; // onko indeksi vielä alle lopun sen kohdan, minkä jälkeen ei voi olla enää pilkkuja
+				if((isIndexPar && overNonPossibleStartPos && underNonPossibleEndPos) == false)
+					break; // jotain vikaa oli lausekkeessa
+			}
+			tokens.push_back(std::make_pair(tmp, tok_type));
+		}
+		// ensin tutkitaan, oliko funktiossa oikea määrä argumentteja esim. grad(T_Hir), missä on tokeneita 1 + 2 (sulut)
+		if(tokens.size() == argumentCount+2 && (tokens[0].first == string("(")) && (tokens[tokens.size()-1].first == string(")")))
+		{
+			if(tokens[1].second == VARIABLE) // tehdään tämä toimimaan ensin grad-tapaus  // && tokens[2].second == NUMBER && tokens[3].second == NUMBER)
+			{
+				InterpretVariable(tokens[1].first, theMaskInfo);
+				if(theMaskInfo->GetOperationType() == NFmiAreaMask::InfoVariable)
+				{
+					theMaskInfo->SetFunctionType((*it).second.first);
+/*
+					NFmiValueString valueString1(tokens[2].first);
+					double value1 = static_cast<double>(valueString1);
+					NFmiValueString valueString2(tokens[3].first);
+					double value2 = static_cast<double>(valueString2);
+					theMaskInfo->SetOffsetPoint1(NFmiPoint(value1, value2));
+*/
 					return true;
 				}
 			}
@@ -2108,6 +2160,12 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxh"), NFmiAreaMask::Max));
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("minh"), NFmiAreaMask::Min));
+
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad"), MetFunctionMapValue(NFmiAreaMask::Grad, 1)));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, 1)));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div"), MetFunctionMapValue(NFmiAreaMask::Divergence, 1)));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, 1)));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, 2))); // roottori ottaa kaksi argumenttia (tuulen u- ja v-komponentit)
 
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy"), NFmiAreaMask::FunctionPeekXY));
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy2"), NFmiAreaMask::FunctionPeekXY2));

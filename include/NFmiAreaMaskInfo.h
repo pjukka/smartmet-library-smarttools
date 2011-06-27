@@ -51,6 +51,8 @@ public:
 	void SetMathFunctionType(NFmiAreaMask::MathFunctionType newValue) {itsMathFunctionType = newValue;};
 	int IntegrationFunctionType(void) const {return itsIntegrationFunctionType;}
 	void IntegrationFunctionType(int newValue) {itsIntegrationFunctionType = newValue;}
+	int MetFunctionArgumentCount(void) const {return itsMetFunctionArgumentCount;}
+	void MetFunctionArgumentCount(int newValue) {itsMetFunctionArgumentCount = newValue;}
 	FmiSoundingParameters SoundingParameter(void) const {return itsSoundingParameter;}
 	void SoundingParameter(FmiSoundingParameters newValue) {itsSoundingParameter = newValue;}
 private:
@@ -69,5 +71,6 @@ private:
 	NFmiPoint itsOffsetPoint2; // paikkaoffset (loppu x ja y offset)
 	NFmiAreaMask::MathFunctionType itsMathFunctionType;
 	int itsIntegrationFunctionType; // 1=SumT tyylinen ja 2=SumZ tyylinen ja 3=MinH tyylinen funktio
+	int itsMetFunctionArgumentCount; // kuinka monta pilkulla eroteltua argumenttia on odotettavissa tähän 'meteorologiseen' funktioon (mm. grad, adv, div, lap, rot jne....).
 	FmiSoundingParameters itsSoundingParameter;
 };
