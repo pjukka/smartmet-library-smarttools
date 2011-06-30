@@ -590,6 +590,50 @@ void NFmiSmartToolModifier::ModifyData2(boost::shared_ptr<NFmiSmartToolCalculati
 	}
 }
 
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreatePeekFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool fMustUsePressureInterpolation)
+{
+	boost::shared_ptr<NFmiAreaMask> areaMask;
+	// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
+	// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
+	boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, fMustUsePressureInterpolation);
+	if(theAreaMaskInfo.GetUseDefaultProducer())
+	{ // Pit‰‰ tehd‰ syv‰ kopio datasta, ett‰ datan muuttuminen ei vaikuta laskuihin.
+		boost::shared_ptr<NFmiFastQueryInfo> tmp(dynamic_cast<NFmiFastQueryInfo*>(info->Clone()));
+		info = tmp;
+	}
+	boost::shared_ptr<NFmiFastQueryInfo> editedInfo = itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable);
+	NFmiAreaMask::CalculationOperationType maskType = theAreaMaskInfo.GetOperationType();
+	if(maskType == NFmiAreaMask::FunctionPeekXY)
+		areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskPeekXY(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), NFmiAreaMask::kNoValue));
+	else if(maskType == NFmiAreaMask::FunctionPeekXY2)
+		areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskPeekXY2(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, this->fMacroParamCalculation ? UsedMacroParamData() : editedInfo, static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), NFmiAreaMask::kNoValue));
+	else if(maskType == NFmiAreaMask::FunctionPeekXY3)
+		areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskPeekXY3(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, this->fMacroParamCalculation ? UsedMacroParamData() : editedInfo, theAreaMaskInfo.GetOffsetPoint1().X(), theAreaMaskInfo.GetOffsetPoint1().Y(), NFmiAreaMask::kNoValue));
+
+	if(fUseLevelData)
+		itsParethesisCounter++;
+
+	return areaMask;
+}
+
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMetFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool fMustUsePressureInterpolation)
+{
+	boost::shared_ptr<NFmiAreaMask> areaMask;
+	// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
+	// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
+	boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, fMustUsePressureInterpolation);
+	if(theAreaMaskInfo.GetUseDefaultProducer())
+	{ // Pit‰‰ tehd‰ syv‰ kopio datasta, ett‰ datan muuttuminen ei vaikuta laskuihin.
+		boost::shared_ptr<NFmiFastQueryInfo> tmp(dynamic_cast<NFmiFastQueryInfo*>(info->Clone()));
+		info = tmp;
+	}
+	NFmiAreaMask::FunctionType funcType = theAreaMaskInfo.GetFunctionType();
+	if(funcType == NFmiAreaMask::Grad)
+		areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskGrad(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, NFmiAreaMask::kNoValue));
+
+	return areaMask;
+}
+
 //--------------------------------------------------------
 // CreateAreaMask
 //--------------------------------------------------------
@@ -652,24 +696,12 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 		case NFmiAreaMask::FunctionPeekXY2:
 		case NFmiAreaMask::FunctionPeekXY3:
 			{
-			// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
-			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
-			boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-			if(theAreaMaskInfo.GetUseDefaultProducer())
-			{ // Pit‰‰ tehd‰ syv‰ kopio datasta, ett‰ datan muuttuminen ei vaikuta laskuihin.
-				boost::shared_ptr<NFmiFastQueryInfo> tmp(dynamic_cast<NFmiFastQueryInfo*>(info->Clone()));
-				info = tmp;
+			areaMask = CreatePeekFunctionAreaMask(theAreaMaskInfo, mustUsePressureInterpolation);
+			break;
 			}
-			boost::shared_ptr<NFmiFastQueryInfo> editedInfo = itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable);
-			if(maskType == NFmiAreaMask::FunctionPeekXY)
-				areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskPeekXY(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), NFmiAreaMask::kNoValue));
-			else if(maskType == NFmiAreaMask::FunctionPeekXY2)
-				areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskPeekXY2(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, this->fMacroParamCalculation ? UsedMacroParamData() : editedInfo, static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X()), static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y()), NFmiAreaMask::kNoValue));
-			else if(maskType == NFmiAreaMask::FunctionPeekXY3)
-				areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskPeekXY3(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, this->fMacroParamCalculation ? UsedMacroParamData() : editedInfo, theAreaMaskInfo.GetOffsetPoint1().X(), theAreaMaskInfo.GetOffsetPoint1().Y(), NFmiAreaMask::kNoValue));
-
-			if(fUseLevelData)
-				itsParethesisCounter++;
+		case NFmiAreaMask::MetFunction:
+			{
+			areaMask = CreateMetFunctionAreaMask(theAreaMaskInfo, mustUsePressureInterpolation);
 			break;
 			}
 		case NFmiAreaMask::CalculatedVariable:

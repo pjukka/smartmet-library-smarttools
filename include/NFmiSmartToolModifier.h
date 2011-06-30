@@ -101,6 +101,8 @@ public:
 	const std::string& GetStrippedMacroText(void) const;
 	bool IsInterpretedSkriptMacroParam(void); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns. macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
 private:
+	boost::shared_ptr<NFmiAreaMask> CreatePeekFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool fMustUsePressureInterpolation);
+	boost::shared_ptr<NFmiAreaMask> CreateMetFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool fMustUsePressureInterpolation);
 	void SetInfosMaskType(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
 	boost::shared_ptr<NFmiFastQueryInfo> UsedMacroParamData(void);
 	void ModifyConditionalData(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
