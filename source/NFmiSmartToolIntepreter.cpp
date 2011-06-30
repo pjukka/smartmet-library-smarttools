@@ -1681,7 +1681,7 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 	{
 		string tmp;
 		checkedVector<pair<string, types> > tokens;
-		int argumentCount = (*it).second.second; // näin monta argumentti on odotettavissa tälle funktio tyypille 
+		int argumentCount = (*it).second.second; // näin monta argumenttia on odotettavissa tälle funktio tyypille 
 		int tokenCount = argumentCount + (argumentCount-1) + 2; // ja siinä on argumentCount-1 pilkkua välissä!  + 2 on alku ja loppu sulut
 		for(int i=0; i < tokenCount && GetToken(); i++)
 		{
@@ -1706,6 +1706,7 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 				InterpretVariable(tokens[1].first, theMaskInfo);
 				if(theMaskInfo->GetOperationType() == NFmiAreaMask::InfoVariable)
 				{
+					theMaskInfo->SetOperationType(NFmiAreaMask::MetFunction);
 					theMaskInfo->SetFunctionType((*it).second.first);
 /*
 					NFmiValueString valueString1(tokens[2].first);
@@ -1717,6 +1718,10 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 					return true;
 				}
 			}
+		}
+		else
+		{
+			// TODO: miten tässä saa aikaan hyvän virheilmoituksen JA heitetäänkö se poikkeuksena?!?!?
 		}
 	}
 	return false;
