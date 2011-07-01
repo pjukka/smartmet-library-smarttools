@@ -39,6 +39,7 @@
 #include <set>
 #include <queue>
 #include "boost/shared_ptr.hpp"
+#include "boost/tuple/tuple.hpp"
 
 class NFmiSmartToolCalculationSectionInfo;
 class NFmiAreaMaskSectionInfo;
@@ -129,7 +130,6 @@ private:
 	bool InterpretMaskSection(const std::string &theMaskSectorText, boost::shared_ptr<NFmiAreaMaskSectionInfo> &theAreaMaskSectionInfo);
 	bool InterpretMasks(std::string &theMaskSectionText, boost::shared_ptr<NFmiAreaMaskSectionInfo> &theAreaMaskSectionInfo);
 	bool InterpretCalculationSection(std::string &theCalculationSectionText, boost::shared_ptr<NFmiSmartToolCalculationSectionInfo> &theSectionInfo);
-	boost::shared_ptr<NFmiAreaMaskInfo> CreateWantedAreaMaskInfo(const std::string &theMaskSectionText, std::queue<boost::shared_ptr<NFmiAreaMaskInfo> > &theMaskQueue);
 	boost::shared_ptr<NFmiSmartToolCalculationInfo> InterpretCalculationLine(const std::string &theCalculationLineText);
 	bool InterpretNextMask(const std::string &theMaskSectionText);
 
@@ -229,7 +229,9 @@ private:
 	static FunctionMap itsTokenFunctions;
 	static FunctionMap itsTokenThreeArgumentFunctions;
 
-	typedef std::pair<NFmiAreaMask::FunctionType, int> MetFunctionMapValue; // MetFunktioihin talletetaan 'taika'-sanan lis‰ksi Funktio tyyppi ja funktion argumenttien lukum‰‰r‰.
+	typedef boost::tuple<NFmiAreaMask::FunctionType, int, std::string> MetFunctionMapValue; // MetFunktioihin talletetaan 'taika'-sanan lis‰ksi Funktio tyyppi ja 
+																							// funktion argumenttien lukum‰‰r‰ ja funktion oikea 'muoto' stringin‰, 
+																							// joka pit‰‰ sis‰ll‰‰n esim. grad-funktion tapauksessa "grad(param)"
 	typedef std::map<std::string, MetFunctionMapValue> MetFunctionMap; // 'Meteorologiset' funktiot. N‰ill‰ funktioilla k‰sitell‰‰n queryData-olioita eli pyydet‰‰n erilaisia 
 																		// arvoja siit‰ (esim. advektiota Adv(T_Hir)).
 	static MetFunctionMap itsTokenMetFunctions;

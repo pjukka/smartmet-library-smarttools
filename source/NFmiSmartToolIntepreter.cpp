@@ -670,7 +670,7 @@ bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, bo
 	for(; GetToken(); )
 	{
 		tmp = token; // luetaan muuttuja/vakio/funktio tai mik‰ lie
-		boost::shared_ptr<NFmiAreaMaskInfo> maskInfo(new NFmiAreaMaskInfo());
+		boost::shared_ptr<NFmiAreaMaskInfo> maskInfo(new NFmiAreaMaskInfo(theMaskSectionText));
 		InterpretToken(tmp, maskInfo);
 		theAreaMaskSectionInfo->Add(maskInfo);
 	}
@@ -679,40 +679,6 @@ bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, bo
 	if(theAreaMaskSectionInfo->GetAreaMaskInfoVector().size() >= 3)
 		return true;
 	throw runtime_error(::GetDictionaryString("SmartToolErrorConditionalWasNotComplete") + ":\n" + theMaskSectionText);
-}
-
-boost::shared_ptr<NFmiAreaMaskInfo> NFmiSmartToolIntepreter::CreateWantedAreaMaskInfo(const std::string &theMaskSectionText, queue<boost::shared_ptr<NFmiAreaMaskInfo> > &theMaskQueue)
-{
-	boost::shared_ptr<NFmiAreaMaskInfo> maskInfo1 = theMaskQueue.front(); // t‰ss‰ pit‰‰ olla muuttuja esim T, p, jne.
-	theMaskQueue.pop();
-	boost::shared_ptr<NFmiAreaMaskInfo> maskInfo2 = theMaskQueue.front(); // t‰ss‰ pit‰‰ olla vertailu operator esim. >, < jne.
-	theMaskQueue.pop();
-	boost::shared_ptr<NFmiAreaMaskInfo> maskInfo3 = theMaskQueue.front(); // t‰ss‰ pit‰‰ olla vakio esim. 2.5
-	// ************************************************************************
-	// HUOM!! t‰m‰ pit‰‰ muuttaa niin, ett‰ voisi olla vaikka seuraavia maskeja
-	// (T < DP), (T > T_850 - 15), (T/2.2 > T_850) jne.
-	// ************************************************************************
-	theMaskQueue.pop();
-	if(maskInfo1->GetOperationType() == NFmiAreaMask::InfoMask || maskInfo1->GetOperationType() == NFmiAreaMask::CalculationMask)
-	{
-		if(maskInfo2->GetOperationType() == NFmiAreaMask::Comparison)
-		{
-			if(maskInfo3->GetOperationType() == NFmiAreaMask::Constant)
-			{
-				boost::shared_ptr<NFmiAreaMaskInfo> finalMaskInfo(new NFmiAreaMaskInfo());
-				if(maskInfo1->GetOperationType() == NFmiAreaMask::InfoMask)
-					finalMaskInfo->SetOperationType(NFmiAreaMask::InfoMask);
-				else
-					finalMaskInfo->SetOperationType(NFmiAreaMask::CalculationMask);
-				finalMaskInfo->SetDataIdent(maskInfo1->GetDataIdent());
-				finalMaskInfo->SetUseDefaultProducer(maskInfo1->GetUseDefaultProducer());
-				NFmiCalculationCondition maskCondition(maskInfo2->GetMaskCondition().Condition(), maskInfo3->GetMaskCondition().LowerLimit());
-				finalMaskInfo->SetMaskCondition(maskCondition);
-				return finalMaskInfo;
-			}
-		}
-	}
-	throw runtime_error(::GetDictionaryString("SmartToolErrorConditionalWasIllegal") + ":\n" + theMaskSectionText);
 }
 
 //--------------------------------------------------------
@@ -781,7 +747,7 @@ boost::shared_ptr<NFmiSmartToolCalculationInfo> NFmiSmartToolIntepreter::Interpr
 			tmp = token;
 			fNewScriptVariable = true;
 		}
-		boost::shared_ptr<NFmiAreaMaskInfo> assignedVariable(new NFmiAreaMaskInfo());
+		boost::shared_ptr<NFmiAreaMaskInfo> assignedVariable(new NFmiAreaMaskInfo(calculationLineText));
 		InterpretVariable(tmp, assignedVariable, fNewScriptVariable);  // ei saa antaa auto_ptr-otust‰ t‰ss‰, muuten se menett‰‰ omistuksen!
 		NFmiInfoData::Type dType = assignedVariable->GetDataType();
 		if(!(dType == NFmiInfoData::kEditable || dType == NFmiInfoData::kScriptVariableData || dType == NFmiInfoData::kAnyData || dType == NFmiInfoData::kMacroParam))
@@ -794,7 +760,7 @@ boost::shared_ptr<NFmiSmartToolCalculationInfo> NFmiSmartToolIntepreter::Interpr
 		for(; GetToken(); )
 		{
 			tmp = token; // luetaan muuttuja/vakio/funktio tai mik‰ lie
-			boost::shared_ptr<NFmiAreaMaskInfo> variableInfo(new NFmiAreaMaskInfo());
+			boost::shared_ptr<NFmiAreaMaskInfo> variableInfo(new NFmiAreaMaskInfo(calculationLineText));
 			InterpretToken(tmp, variableInfo);
 			calculationInfo->AddCalculationInfo(variableInfo);
 		}
@@ -1681,7 +1647,7 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 	{
 		string tmp;
 		checkedVector<pair<string, types> > tokens;
-		int argumentCount = (*it).second.second; // n‰in monta argumenttia on odotettavissa t‰lle funktio tyypille 
+		int argumentCount = (*it).second.get<1>(); // n‰in monta argumenttia on odotettavissa t‰lle funktio tyypille 
 		int tokenCount = argumentCount + (argumentCount-1) + 2; // ja siin‰ on argumentCount-1 pilkkua v‰liss‰!  + 2 on alku ja loppu sulut
 		for(int i=0; i < tokenCount && GetToken(); i++)
 		{
@@ -1707,7 +1673,7 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 				if(theMaskInfo->GetOperationType() == NFmiAreaMask::InfoVariable)
 				{
 					theMaskInfo->SetOperationType(NFmiAreaMask::MetFunction);
-					theMaskInfo->SetFunctionType((*it).second.first);
+					theMaskInfo->SetFunctionType((*it).second.get<0>());
 /*
 					NFmiValueString valueString1(tokens[2].first);
 					double value1 = static_cast<double>(valueString1);
@@ -1721,7 +1687,13 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 		}
 		else
 		{
-			// TODO: miten t‰ss‰ saa aikaan hyv‰n virheilmoituksen JA heitet‰‰nkˆ se poikkeuksena?!?!?
+			std::string errorStr("Function '");
+			errorStr += theVariableText;
+			errorStr += "' error in line: ";
+			errorStr += theMaskInfo->GetOrigLineText();
+			errorStr += "\nProper form for this function is: ";
+			errorStr += (*it).second.get<2>();
+			throw std::runtime_error(errorStr);
 		}
 	}
 	return false;
@@ -2166,11 +2138,11 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxh"), NFmiAreaMask::Max));
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("minh"), NFmiAreaMask::Min));
 
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad"), MetFunctionMapValue(NFmiAreaMask::Grad, 1)));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, 1)));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div"), MetFunctionMapValue(NFmiAreaMask::Divergence, 1)));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, 1)));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, 2))); // roottori ottaa kaksi argumenttia (tuulen u- ja v-komponentit)
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad"), MetFunctionMapValue(NFmiAreaMask::Grad, 1, "grad(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, 1, "adv(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div"), MetFunctionMapValue(NFmiAreaMask::Divergence, 1, "div(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, 1, "lap(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, 2, "rot(uPar, vPar)"))); // roottori ottaa kaksi argumenttia (tuulen u- ja v-komponentit)
 
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy"), NFmiAreaMask::FunctionPeekXY));
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy2"), NFmiAreaMask::FunctionPeekXY2));
