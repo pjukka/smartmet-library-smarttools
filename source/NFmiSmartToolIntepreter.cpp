@@ -1687,11 +1687,16 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 		}
 		else
 		{
-			std::string errorStr("Function '");
+			std::string errorStr(::GetDictionaryString("Function"));
+			errorStr += " '";
 			errorStr += theVariableText;
-			errorStr += "' error in line: ";
+			errorStr += "' ";
+			errorStr += ::GetDictionaryString("error in line");
+			errorStr += ": ";
 			errorStr += theMaskInfo->GetOrigLineText();
-			errorStr += "\nProper form for this function is: ";
+			errorStr += "\n";
+			errorStr += ::GetDictionaryString("Proper form for this function is");
+			errorStr += ": ";
 			errorStr += (*it).second.get<2>();
 			throw std::runtime_error(errorStr);
 		}
@@ -2139,10 +2144,10 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("minh"), NFmiAreaMask::Min));
 
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad"), MetFunctionMapValue(NFmiAreaMask::Grad, 1, "grad(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, 1, "adv(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div"), MetFunctionMapValue(NFmiAreaMask::Divergence, 1, "div(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, 1, "lap(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, 2, "rot(uPar, vPar)"))); // roottori ottaa kaksi argumenttia (tuulen u- ja v-komponentit)
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, 1, "adv(param)")));
+//		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, 1, "lap(param)")));
+//		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, 2, "rot(uPar, vPar)"))); // roottori ottaa kaksi argumenttia (tuulen u- ja v-komponentit)
 
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy"), NFmiAreaMask::FunctionPeekXY));
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy2"), NFmiAreaMask::FunctionPeekXY2));
