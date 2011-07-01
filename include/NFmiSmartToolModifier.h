@@ -121,6 +121,7 @@ private:
 	boost::shared_ptr<NFmiAreaMask> CreateAreaMask(const NFmiAreaMaskInfo &theInfo);
 	boost::shared_ptr<NFmiAreaMask> CreateEndingAreaMask(void);
 	boost::shared_ptr<NFmiFastQueryInfo> CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+	boost::shared_ptr<NFmiFastQueryInfo> CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation, unsigned long theWantedParamId);
 	boost::shared_ptr<NFmiFastQueryInfo> GetPossibleLevelInterpolatedInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
 	void CreateCalculationModifiers(void);
 	void CreateFirstCalculationSection(void);

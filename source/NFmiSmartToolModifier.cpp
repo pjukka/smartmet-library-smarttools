@@ -616,20 +616,59 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreatePeekFunctionAreaMas
 	return areaMask;
 }
 
+boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation, unsigned long theWantedParamId)
+{
+	NFmiAreaMaskInfo wantedAreaMaskInfo(theAreaMaskInfo);
+	NFmiDataIdent dataIdent = wantedAreaMaskInfo.GetDataIdent();
+	dataIdent.GetParam()->SetIdent(theWantedParamId);
+	wantedAreaMaskInfo.SetDataIdent(dataIdent);
+	return CreateInfo(wantedAreaMaskInfo, mustUsePressureInterpolation);
+}
+
+void DoErrorExceptionForMetFunction(const NFmiAreaMaskInfo &theAreaMaskInfo, const std::string &theStartStr, const std::string &theMiddleStr)
+{
+	std::string errorStr(theStartStr);
+	errorStr += " '";
+	errorStr += theAreaMaskInfo.GetMaskText();
+	errorStr += "' ";
+	errorStr += theMiddleStr;
+	errorStr += ":\n";
+	errorStr += theAreaMaskInfo.GetOrigLineText();
+	throw runtime_error(errorStr);
+}
+
 boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMetFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool fMustUsePressureInterpolation)
 {
 	boost::shared_ptr<NFmiAreaMask> areaMask;
 	// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
 	// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
 	boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, fMustUsePressureInterpolation);
+	if(info == 0)
+		DoErrorExceptionForMetFunction(theAreaMaskInfo, ::GetDictionaryString("Can't find wanted parameter for given function"), ::GetDictionaryString("with line"));
+
 	if(theAreaMaskInfo.GetUseDefaultProducer())
 	{ // Pit‰‰ tehd‰ syv‰ kopio datasta, ett‰ datan muuttuminen ei vaikuta laskuihin.
 		boost::shared_ptr<NFmiFastQueryInfo> tmp(dynamic_cast<NFmiFastQueryInfo*>(info->Clone()));
 		info = tmp;
 	}
 	NFmiAreaMask::FunctionType funcType = theAreaMaskInfo.GetFunctionType();
-	if(funcType == NFmiAreaMask::Grad)
+	if(funcType == NFmiAreaMask::Grad || funcType == NFmiAreaMask::Divergence)
+	{
 		areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskGrad(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, NFmiAreaMask::kNoValue));
+		if(funcType == NFmiAreaMask::Divergence)
+			dynamic_cast<NFmiInfoAreaMaskGrad*>(areaMask.get())->CalculateDivergence(true);
+	}
+	else if(funcType == NFmiAreaMask::Adv)
+	{
+		boost::shared_ptr<NFmiFastQueryInfo> infoUwind = CreateInfo(theAreaMaskInfo, fMustUsePressureInterpolation, kFmiWindUMS);
+		boost::shared_ptr<NFmiFastQueryInfo> infoVwind = CreateInfo(theAreaMaskInfo, fMustUsePressureInterpolation, kFmiWindVMS);
+		if(infoUwind && infoVwind)
+			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskAdvection(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, infoUwind, infoVwind, NFmiAreaMask::kNoValue));
+		else
+			DoErrorExceptionForMetFunction(theAreaMaskInfo, ::GetDictionaryString("Can't find u- or -v wind components for wanted parameter in given function"), ::GetDictionaryString("with line"));
+	}
+	else
+		DoErrorExceptionForMetFunction(theAreaMaskInfo, ::GetDictionaryString("SmartMet program error with Met-function"), ::GetDictionaryString("error with line"));
 
 	return areaMask;
 }
