@@ -20,7 +20,7 @@ class NFmiAreaMaskInfo
 
 public:
 
-	NFmiAreaMaskInfo(void);
+	NFmiAreaMaskInfo(const std::string &theOrigLineText = "");
 	~NFmiAreaMaskInfo(void);
 
 	void SetDataIdent(const NFmiDataIdent& value) {itsDataIdent = value;}
@@ -41,6 +41,8 @@ public:
 	void SetLevel(NFmiLevel *theLevel);
 	const std::string& GetMaskText(void) const{return itsMaskText;}
 	void SetMaskText(const std::string& theText){itsMaskText = theText;}
+	const std::string& GetOrigLineText(void) const{return itsOrigLineText;}
+	void SetOrigLineText(const std::string& theText){itsOrigLineText = theText;}
 	NFmiAreaMask::FunctionType GetFunctionType(void)const {return itsFunctionType;}
 	void SetFunctionType(NFmiAreaMask::FunctionType newType){itsFunctionType = newType;}
 	const NFmiPoint& GetOffsetPoint1(void) const{return itsOffsetPoint1;}
@@ -65,7 +67,8 @@ private:
 	NFmiAreaMask::BinaryOperator itsBinaryOperator;
 	NFmiInfoData::Type itsDataType; // jos kyseess‰ infoVariable, tarvitaan viel‰ datan tyyppi, ett‰ parametri saadaan tietokannasta (=infoOrganizerista)
 	NFmiLevel *itsLevel; // mahd. level tieto, omistaa ja tuhoaa
-	std::string itsMaskText; // originaali teksti, mist‰ t‰m‰ maskinfo on tulkittu
+	std::string itsMaskText; // originaali teksti, mist‰ t‰m‰ maskinfo on tulkittu, t‰m‰ on siis vain yksi sana tai luku
+	std::string itsOrigLineText; // originaali koko rivin teksti, mist‰ t‰m‰ currentti sana (itsMaskText) on otettu (t‰t‰ k‰ytet‰‰n virhe teksteiss‰)
 	NFmiAreaMask::FunctionType itsFunctionType; // onko mahd. funktio esim. min, max jne. (ei matemaattisia funktioita kuten sin, cos, pow, jne.)
 	NFmiPoint itsOffsetPoint1; // esim. aikaoffset (x alku ja y loppu) tai paikkaoffset (alku x ja y offset)
 	NFmiPoint itsOffsetPoint2; // paikkaoffset (loppu x ja y offset)

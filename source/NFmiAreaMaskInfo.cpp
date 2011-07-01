@@ -28,7 +28,7 @@
 //--------------------------------------------------------
 // Constructor/Destructor 
 //--------------------------------------------------------
-NFmiAreaMaskInfo::NFmiAreaMaskInfo()
+NFmiAreaMaskInfo::NFmiAreaMaskInfo(const std::string &theOrigLineText)
 :itsDataIdent()
 ,fUseDefaultProducer(true)
 ,itsMaskCondition()
@@ -38,6 +38,7 @@ NFmiAreaMaskInfo::NFmiAreaMaskInfo()
 ,itsDataType(NFmiInfoData::kNoDataType)
 ,itsLevel(0)
 ,itsMaskText()
+,itsOrigLineText(theOrigLineText)
 ,itsFunctionType(NFmiAreaMask::NotFunction)
 ,itsOffsetPoint1()
 ,itsOffsetPoint2()
