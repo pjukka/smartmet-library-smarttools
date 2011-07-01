@@ -49,6 +49,27 @@ NFmiAreaMaskInfo::NFmiAreaMaskInfo(const std::string &theOrigLineText)
 {
 }
 
+NFmiAreaMaskInfo::NFmiAreaMaskInfo(const NFmiAreaMaskInfo &theOther)
+:itsDataIdent(theOther.itsDataIdent)
+,fUseDefaultProducer(theOther.fUseDefaultProducer)
+,itsMaskCondition(theOther.itsMaskCondition)
+,itsOperationType(theOther.itsOperationType)
+,itsCalculationOperator(theOther.itsCalculationOperator)
+,itsBinaryOperator(theOther.itsBinaryOperator)
+,itsDataType(theOther.itsDataType)
+,itsLevel(theOther.itsLevel ? new NFmiLevel(*theOther.itsLevel) : 0)
+,itsMaskText(theOther.itsMaskText)
+,itsOrigLineText(theOther.itsOrigLineText)
+,itsFunctionType(theOther.itsFunctionType)
+,itsOffsetPoint1(theOther.itsOffsetPoint1)
+,itsOffsetPoint2(theOther.itsOffsetPoint2)
+,itsMathFunctionType(theOther.itsMathFunctionType)
+,itsIntegrationFunctionType(theOther.itsIntegrationFunctionType)
+,itsMetFunctionArgumentCount(theOther.itsMetFunctionArgumentCount)
+,itsSoundingParameter(theOther.itsSoundingParameter)
+{
+}
+
 NFmiAreaMaskInfo::~NFmiAreaMaskInfo(void)
 {
 	delete itsLevel;
