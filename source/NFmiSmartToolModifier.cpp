@@ -667,6 +667,15 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMetFunctionAreaMask
 		else
 			DoErrorExceptionForMetFunction(theAreaMaskInfo, ::GetDictionaryString("Can't find u- or -v wind components for wanted parameter in given function"), ::GetDictionaryString("with line"));
 	}
+	else if(funcType == NFmiAreaMask::Lap)
+		areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskLaplace(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, NFmiAreaMask::kNoValue));
+	else if(funcType == NFmiAreaMask::Rot)
+	{
+		if(theAreaMaskInfo.GetDataIdent().GetParamIdent() == kFmiTotalWindMS)
+			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskRotor(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, NFmiAreaMask::kNoValue));
+		else
+			DoErrorExceptionForMetFunction(theAreaMaskInfo, ::GetDictionaryString("Only usable param with rot-function in wind (=par19)"), ::GetDictionaryString("in the line"));
+	}
 	else
 		DoErrorExceptionForMetFunction(theAreaMaskInfo, ::GetDictionaryString("SmartMet program error with Met-function"), ::GetDictionaryString("error with line"));
 
@@ -843,6 +852,7 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 
 	if(areaMask)
 	{
+		areaMask->Initialize(); // virtuaalinen initialisointi konstruktion jälkeen
 		areaMask->SetCalculationOperationType(maskType);
 		if(mustUsePressureInterpolation)
 		{

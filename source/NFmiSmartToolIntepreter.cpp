@@ -2146,8 +2146,8 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad"), MetFunctionMapValue(NFmiAreaMask::Grad, 1, "grad(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div"), MetFunctionMapValue(NFmiAreaMask::Divergence, 1, "div(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, 1, "adv(param)")));
-//		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, 1, "lap(param)")));
-//		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, 2, "rot(uPar, vPar)"))); // roottori ottaa kaksi argumenttia (tuulen u- ja v-komponentit)
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, 1, "lap(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, 1, "rot(wind)"))); // roottori ottaa totalwind:in parametrina, siitä saadaan tuulen u- ja v-komponentit
 
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy"), NFmiAreaMask::FunctionPeekXY));
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy2"), NFmiAreaMask::FunctionPeekXY2));
