@@ -217,7 +217,6 @@ void NFmiSmartToolCalculation::eval_exp1(double &result, const NFmiPoint &theLat
 // Add or subtract two terms.
 void NFmiSmartToolCalculation::eval_exp2(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-//	register char op;
 	NFmiAreaMask::CalculationOperator op;
 	double temp;
 
@@ -239,7 +238,6 @@ void NFmiSmartToolCalculation::eval_exp2(double &result, const NFmiPoint &theLat
 // Multiply or divide two factors.
 void NFmiSmartToolCalculation::eval_exp3(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-//	register char op;
 	NFmiAreaMask::CalculationOperator op;
 	double temp;
 
@@ -680,7 +678,6 @@ void NFmiSmartToolCalculation::bin_eval_exp1(bool &maskresult, double &result, c
 // Process a binary expression. && ja || eli AND ja OR
 void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-//	register char op;
 	NFmiAreaMask::BinaryOperator op;
 	bool tempmask;
 	double temp;
@@ -708,7 +705,6 @@ void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult, double &result,
 // Process a comparison expression <, >, ==, <=, >=
 void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-//	register char op;
 	FmiMaskOperation op;
 	bool tempmask;
 	double temp;
@@ -758,7 +754,6 @@ void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result,
 // Add or subtract two terms.
 void NFmiSmartToolCalculation::bin_eval_exp2(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-//	register char op;
 	NFmiAreaMask::CalculationOperator op;
 	double temp;
 
@@ -779,7 +774,6 @@ void NFmiSmartToolCalculation::bin_eval_exp2(bool &maskresult, double &result, c
 // Multiply or divide two factors.
 void NFmiSmartToolCalculation::bin_eval_exp3(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
 {
-//	register char op;
 	NFmiAreaMask::CalculationOperator op;
 	double temp;
 
