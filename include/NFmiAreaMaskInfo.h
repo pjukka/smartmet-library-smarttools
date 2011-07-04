@@ -58,6 +58,8 @@ public:
 	void MetFunctionArgumentCount(int newValue) {itsMetFunctionArgumentCount = newValue;}
 	FmiSoundingParameters SoundingParameter(void) const {return itsSoundingParameter;}
 	void SoundingParameter(FmiSoundingParameters newValue) {itsSoundingParameter = newValue;}
+	int ModelRunIndex(void) const {return itsModelRunIndex;}
+	void ModelRunIndex(int newValue) {itsModelRunIndex = newValue;}
 private:
 	NFmiDataIdent itsDataIdent;
 	bool fUseDefaultProducer;
@@ -77,4 +79,5 @@ private:
 	int itsIntegrationFunctionType; // 1=SumT tyylinen ja 2=SumZ tyylinen ja 3=MinH tyylinen funktio
 	int itsMetFunctionArgumentCount; // kuinka monta pilkulla eroteltua argumenttia on odotettavissa tähän 'meteorologiseen' funktioon (mm. grad, adv, div, lap, rot jne....).
 	FmiSoundingParameters itsSoundingParameter;
+	int itsModelRunIndex;
 };

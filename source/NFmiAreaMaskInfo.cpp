@@ -46,6 +46,7 @@ NFmiAreaMaskInfo::NFmiAreaMaskInfo(const std::string &theOrigLineText)
 ,itsIntegrationFunctionType(0)
 ,itsMetFunctionArgumentCount(0)
 ,itsSoundingParameter(kSoundingParNone)
+,itsModelRunIndex(1)
 {
 }
 
@@ -67,6 +68,7 @@ NFmiAreaMaskInfo::NFmiAreaMaskInfo(const NFmiAreaMaskInfo &theOther)
 ,itsIntegrationFunctionType(theOther.itsIntegrationFunctionType)
 ,itsMetFunctionArgumentCount(theOther.itsMetFunctionArgumentCount)
 ,itsSoundingParameter(theOther.itsSoundingParameter)
+,itsModelRunIndex(theOther.itsModelRunIndex)
 {
 }
 
