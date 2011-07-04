@@ -73,11 +73,11 @@ public:
 	// ***************************************************************************************************************
 	boost::shared_ptr<NFmiFastQueryInfo> Info(boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound, bool &fGetDataFromServer);
 	boost::shared_ptr<NFmiFastQueryInfo> Info(boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fCrossSectionInfoWanted, bool fGetLatestIfArchiveNotFound);
-  	boost::shared_ptr<NFmiFastQueryInfo> Info(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly = false, bool fLevelData = false);
-	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(const std::string &theFileNameFilter); // palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
-	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(int theProducerId, int theProducerId2 = -1, int theProducerId3 = -1, int theProducerId4 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
+  	boost::shared_ptr<NFmiFastQueryInfo> Info(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly = false, bool fLevelData = false, int theModelRunIndex = 0);
+	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(const std::string &theFileNameFilter, int theModelRunIndex = 0); // palauttaa vectorin halutunlaisia infoja
+	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(int theProducerId, int theProducerId2 = -1, int theProducerId3 = -1, int theProducerId4 = -1); // palauttaa vectorin halutun tuottajan infoja
 	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(NFmiInfoData::Type theDataType);
-	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(NFmiInfoData::Type theType, bool fGroundData, int theProducerId, int theProducerId2 = -1); // palauttaa vectorin halutun tuottajan infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota
+	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(NFmiInfoData::Type theType, bool fGroundData, int theProducerId, int theProducerId2 = -1); // palauttaa vectorin halutun tuottajan infoja
 	boost::shared_ptr<NFmiFastQueryInfo> FindInfo(NFmiInfoData::Type theDataType, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
 	boost::shared_ptr<NFmiFastQueryInfo> FindInfo(NFmiInfoData::Type theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
 	boost::shared_ptr<NFmiFastQueryInfo> FindSoundingInfo(const NFmiProducer &theProducer, int theIndex = 0); // Hakee parhaan luotaus infon tuottajalle
@@ -128,9 +128,9 @@ private:
 	bool Add(NFmiOwnerInfo* theInfo, int theMaxLatestDataCount, int theModelRunTimeGap);
 
 	boost::shared_ptr<NFmiFastQueryInfo> Info(boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fCrossSectionInfoWanted);
-	boost::shared_ptr<NFmiFastQueryInfo> GetInfo(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, int theIndex = 0);
+	boost::shared_ptr<NFmiFastQueryInfo> GetInfo(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, int theModelRunIndex = 0);
 	boost::shared_ptr<NFmiFastQueryInfo> GetInfo(boost::shared_ptr<NFmiDrawParam> &theDrawParam);
-	boost::shared_ptr<NFmiFastQueryInfo> CrossSectionInfo(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType, int theIndex = 0);
+	boost::shared_ptr<NFmiFastQueryInfo> CrossSectionInfo(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType, int theModelRunIndex = 0);
 	boost::shared_ptr<NFmiFastQueryInfo> GetSynopPlotParamInfo(NFmiInfoData::Type theType);
 	boost::shared_ptr<NFmiFastQueryInfo> GetSoundingPlotParamInfo(NFmiInfoData::Type theType);
 	boost::shared_ptr<NFmiFastQueryInfo> GetWantedProducerInfo(NFmiInfoData::Type theType, FmiProducerName theProducerName);

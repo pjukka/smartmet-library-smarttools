@@ -209,12 +209,12 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(boost::shared_pt
 	return GetInfo(theDrawParam->Param(), level, dataType, ::UseParIdOnly(dataType), theDrawParam->ModelRunIndex());
 }
 
-boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData)
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData, int theModelRunIndex)
 {
 	if(fLevelData)
-		return CrossSectionInfo(theIdent, theType);
+		return CrossSectionInfo(theIdent, theType, theModelRunIndex);
 	else 
-		return GetInfo(theIdent, theLevel, theType, (fUseParIdOnly || ::UseParIdOnly(theType)));
+		return GetInfo(theIdent, theLevel, theType, (fUseParIdOnly || ::UseParIdOnly(theType)), theModelRunIndex);
 }
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetWantedProducerInfo(NFmiInfoData::Type theType, FmiProducerName theProducerName)
@@ -275,12 +275,12 @@ static bool MatchCrossSectionData(const boost::shared_ptr<NFmiFastQueryInfo> &th
 
 // Palauttaa annetun datan, paitsi jos kyse on arkisto datasta, tarkistetaan että sellainen löytyy ja palautetaan se (parametri asetettuna oikein).
 // Jos ei löydy oikeaa arkisto dataa, palautetaan 0-pointteri.
-static boost::shared_ptr<NFmiFastQueryInfo> DoArchiveCheck(boost::shared_ptr<NFmiFastQueryInfo> &theData, const NFmiDataIdent& theDataIdent, bool fUseParIdOnly, const NFmiLevel* theLevel, int theIndex, NFmiInfoOrganizer::MapType::iterator &theDataKeeperIter)
+static boost::shared_ptr<NFmiFastQueryInfo> DoArchiveCheck(boost::shared_ptr<NFmiFastQueryInfo> &theData, const NFmiDataIdent& theDataIdent, bool fUseParIdOnly, const NFmiLevel* theLevel, int theModelRunIndex, NFmiInfoOrganizer::MapType::iterator &theDataKeeperIter)
 {
 	boost::shared_ptr<NFmiFastQueryInfo> aInfo = theData;
-	if(aInfo && theIndex < 0)
+	if(aInfo && theModelRunIndex < 0)
 	{
-		boost::shared_ptr<NFmiQueryDataKeeper> qDataKeeper = theDataKeeperIter->second->GetDataKeeper(theIndex);
+		boost::shared_ptr<NFmiQueryDataKeeper> qDataKeeper = theDataKeeperIter->second->GetDataKeeper(theModelRunIndex);
 		if(qDataKeeper)
 			aInfo = qDataKeeper->GetIter(); // tässä katsotaan löytyykö vielä haluttu arkisto data
 		else
@@ -312,7 +312,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
 									   , const NFmiLevel* theLevel
 									   , NFmiInfoData::Type theType
 									   , bool fUseParIdOnly
-									   , int theIndex)
+									   , int theModelRunIndex)
 {
 	boost::shared_ptr<NFmiFastQueryInfo> backupData; // etsitää tähän 1. data joka muuten sopii kriteereihin, mutta 
 									// jonka tuottaja nimi on eri kuin haluttu. Jos oikealla nimellä ei löydy dataa, käytetään tätä.
@@ -342,12 +342,12 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
 				{
 					if(theDataIdent.GetProducer()->GetName() == aInfo->Param().GetProducer()->GetName())
 					{
-						foundData = ::DoArchiveCheck(aInfo, theDataIdent, fUseParIdOnly, theLevel, theIndex, iter); // tämä saa olla 0-pointteri, jos kyse oli arkistodatasta
+						foundData = ::DoArchiveCheck(aInfo, theDataIdent, fUseParIdOnly, theLevel, theModelRunIndex, iter); // tämä saa olla 0-pointteri, jos kyse oli arkistodatasta
 						if(foundData)
 							break;
 					}
 					else if(backupData == 0)
-						backupData = ::DoArchiveCheck(aInfo, theDataIdent, fUseParIdOnly, theLevel, theIndex, iter);
+						backupData = ::DoArchiveCheck(aInfo, theDataIdent, fUseParIdOnly, theLevel, theModelRunIndex, iter);
 				}
 			}
 		}
@@ -367,7 +367,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
 // eikä etsitä tiettyä leveliä.
 // HUOM! Tein tähän CrossSectionInfo-metodiin saman tuottaja nimi ohitus virityksen kuin
 // Info-metodiin. Ks. kommenttia sieltä.
-boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType, int theIndex)
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CrossSectionInfo(const NFmiDataIdent& theDataIdent, NFmiInfoData::Type theType, int theModelRunIndex)
 {
 	if(theType == NFmiInfoData::kCrossSectionMacroParam || theType == NFmiInfoData::kMacroParam)
 		return CrossSectionMacroParamData();
@@ -386,12 +386,12 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CrossSectionInfo(const N
 			{
 				if(theDataIdent.GetProducer()->GetName() == aInfo->Param().GetProducer()->GetName())
 				{
-					foundData = ::DoArchiveCheck(aInfo, theDataIdent, false, 0, theIndex, iter); // tämä saa olla 0-pointteri, jos kyse oli arkistodatasta
+					foundData = ::DoArchiveCheck(aInfo, theDataIdent, false, 0, theModelRunIndex, iter); // tämä saa olla 0-pointteri, jos kyse oli arkistodatasta
 					if(foundData)
 						break;
 				}
 				else if(backupData == 0)
-					backupData = ::DoArchiveCheck(aInfo, theDataIdent, false, 0, theIndex, iter); // tähän laitetaan siis vain prod-namesta poikkeava data (tämä tapahtuu mm. kun käyttäjä tekee changeAllProducers-toiminnon)
+					backupData = ::DoArchiveCheck(aInfo, theDataIdent, false, 0, theModelRunIndex, iter); // tähän laitetaan siis vain prod-namesta poikkeava data (tämä tapahtuu mm. kun käyttäjä tekee changeAllProducers-toiminnon)
 			}
 		}
 	}
@@ -527,7 +527,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindSoundingInfo(const N
 // Mielestäni vastauksia pitäisi tulla korkeintaan yksi, mutta ehkä tulevaisuudessa voisi tulla lista.
 // HUOM! Palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota delete:llä.
 // Ei käy läpi kEditable, eikä kCopyOfEdited erikois datoja!
-checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos(const std::string &theFileNameFilter)
+checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos(const std::string &theFileNameFilter, int theModelRunIndex)
 {
 	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infoVector;
 
@@ -536,7 +536,12 @@ checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos
 		for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
 		{
 			if(iter->second->FilePattern() == theFileNameFilter)
-				infoVector.push_back(iter->second->GetDataKeeper()->GetIter());
+			{
+				if(theModelRunIndex < 0)
+					infoVector.push_back(iter->second->GetDataKeeper(theModelRunIndex)->GetIter());
+				else
+					infoVector.push_back(iter->second->GetDataKeeper()->GetIter());
+			}
 		}
 	}
 	return infoVector;
