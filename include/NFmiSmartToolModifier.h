@@ -18,6 +18,9 @@
 
 #include "NFmiParamBag.h"
 #include "NFmiDataMatrix.h"
+#include "NFmiInfoData.h"
+#include "NFmiLevelType.h"
+
 #include <string>
 #include <boost/shared_ptr.hpp>
 
@@ -130,6 +133,7 @@ private:
 	boost::shared_ptr<NFmiSmartToolCalculation> CreateConditionalSection(const boost::shared_ptr<NFmiAreaMaskSectionInfo> &theAreaMaskSectionInfo);
 	boost::shared_ptr<NFmiAreaMask> CreateSoundingIndexFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	boost::shared_ptr<NFmiFastQueryInfo> CreateCopyOfAnalyzeInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel);
+	boost::shared_ptr<NFmiFastQueryInfo> GetWantedAreaMaskData(const NFmiAreaMaskInfo &theAreaMaskInfo, bool fUseParIdOnly, NFmiInfoData::Type theOverRideDataType = NFmiInfoData::kNoDataType, FmiLevelType theOverRideLevelType = kFmiNoLevelType);
 
 	NFmiInfoOrganizer *itsInfoOrganizer; // eli database, ei omista ei tuhoa
 	NFmiSmartToolIntepreter *itsSmartToolIntepreter; // omistaa, tuhoaa

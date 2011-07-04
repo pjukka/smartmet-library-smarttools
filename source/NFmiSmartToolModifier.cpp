@@ -1000,7 +1000,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
 					tmpInfo->FirstLevel();
 					if(tmpInfo->Level()->GetIdent() == kFmiHybridLevel)
 					{ // lähdetään tässä siitä että jos löytyy mallipinta-dataa, mikä sopii tarkoitukseen, se valitaan ensisijaisesti
-						info = ::CreateShallowCopyOfHighestInfo(tmpInfo);
+						info = tmpInfo;
 						break;
 					}
 					else if(tmpInfo->Level()->GetIdent() == kFmiPressureLevel)
@@ -1023,9 +1023,20 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
 		}
 	}
 	if(info == 0 && possiblePressureLevelDataInfo != 0) // jos ei löytynyt sopivaa mallipinta-dataa, mutta painepinta-dataa löytyi, otetaan se käyttöön
-		info = ::CreateShallowCopyOfHighestInfo(possiblePressureLevelDataInfo);
+		info = possiblePressureLevelDataInfo;
 	if(info)
+	{
+		// Tarkistetaan vielä haluttiinko vanhaa malliajodataa
+		if(theAreaMaskInfo.ModelRunIndex() < 0)
+		{
+			checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infos = itsInfoOrganizer->GetInfos(info->DataFilePattern());
+			if(infos.size())
+				info = infos[0];
+		}
+
+		info = ::CreateShallowCopyOfHighestInfo(info);
 		mustUsePressureInterpolation = true;
+	}
 	return info;
 }
 
@@ -1038,6 +1049,24 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateCopyOfAnalyzeI
 			return ::CreateShallowCopyOfHighestInfo(info);
 	}
 	return info;
+}
+
+boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetWantedAreaMaskData(const NFmiAreaMaskInfo &theAreaMaskInfo, bool fUseParIdOnly, NFmiInfoData::Type theOverRideDataType, FmiLevelType theOverRideLevelType)
+{
+	NFmiInfoData::Type usedDataType = theAreaMaskInfo.GetDataType();
+	if(theOverRideDataType != NFmiInfoData::kNoDataType)
+		usedDataType = theOverRideDataType;
+
+	boost::shared_ptr<NFmiFastQueryInfo> info;
+	if(theOverRideLevelType == kFmiNoLevelType)
+		info = itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), usedDataType, fUseParIdOnly, fUseLevelData | fDoCrossSectionCalculation, theAreaMaskInfo.ModelRunIndex());
+	else
+	{
+		NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
+		aLevel.SetIdent(theOverRideLevelType);
+		info = itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), &aLevel, usedDataType, fUseParIdOnly, fUseLevelData, theAreaMaskInfo.ModelRunIndex());
+	}
+	return ::CreateShallowCopyOfHighestInfo(info); // tehdään vielä 'kevyt' kopio löytyneestä datasta
 }
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
@@ -1060,7 +1089,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 				throw runtime_error("NFmiSmartToolModifier::CreateInfo - error in program, no macroParam data available.");
 		}
 		else
-			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), dataType, true, fUseLevelData));
+			info = GetWantedAreaMaskData(theAreaMaskInfo, true);
+//			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), dataType, true, fUseLevelData));
 		if(info == 0)
 			info = GetPossibleLevelInterpolatedInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 	}
@@ -1069,27 +1099,33 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 		if(fUseLevelData && theAreaMaskInfo.GetLevel() != 0) // jos pitää käyttää level dataa (SumZ ja MinH funktiot), ei saa antaa level infoa parametrin yhteydessä
 			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNoLevel") + "\n" + theAreaMaskInfo.GetMaskText());
 		if(fUseLevelData || fDoCrossSectionCalculation) // jos leveldata-flagi päällä, yritetään ensin, löytyykö hybridi dataa
-			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), NFmiInfoData::kHybridData, false, fUseLevelData | fDoCrossSectionCalculation)); // tähän pieni hybrid-koukku, jos haluttiin level dataa
+			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kHybridData);
+//			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), NFmiInfoData::kHybridData, false, fUseLevelData | fDoCrossSectionCalculation)); // tähän pieni hybrid-koukku, jos haluttiin level dataa
 		if(info == 0)
-		{
-			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData | fDoCrossSectionCalculation));
-		}
+			info = GetWantedAreaMaskData(theAreaMaskInfo, false);
+//			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType(), false, fUseLevelData | fDoCrossSectionCalculation));
 		if(info == 0 && theAreaMaskInfo.GetDataType() == NFmiInfoData::kAnalyzeData) // analyysi datalle piti tehdä pika viritys tähän
 			info = CreateCopyOfAnalyzeInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel());
 		if(info == 0)
 			info = GetPossibleLevelInterpolatedInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 		if(info == 0 && theAreaMaskInfo.GetLevel() != 0) // kokeillaan vielä jos halutaan hybridi datan leveliä
+			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kHybridData, kFmiHybridLevel);
+/*
 		{
 			NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
 			aLevel.SetIdent(kFmiHybridLevel);
 			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), &aLevel, NFmiInfoData::kHybridData, false, fUseLevelData));
 		}
+*/
 		if(info == 0 && theAreaMaskInfo.GetLevel() != 0) // kokeillaan vielä jos halutaan 'height' (type 105) datan leveliä
+			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kViewable, kFmiHeight);
+/*
 		{
 			NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
 			aLevel.SetIdent(kFmiHeight);
 			info = ::CreateShallowCopyOfHighestInfo(itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), &aLevel, NFmiInfoData::kViewable, false, fUseLevelData));
 		}
+*/
 	}
 	if(!info)
 		throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNotFound") + "\n" + theAreaMaskInfo.GetMaskText());
