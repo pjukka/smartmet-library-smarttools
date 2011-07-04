@@ -116,15 +116,15 @@ private:
 	NFmiLevel GetPossibleLevelInfo(const std::string &theLevelText, NFmiInfoData::Type theDataType);
 	NFmiProducer GetPossibleProducerInfo(const std::string &theProducerText);
 	bool IsProducerOrig(std::string &theProducerText);
-	bool FindParamAndLevelAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
-	bool FindParamAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
-	bool FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
+	bool FindParamAndLevelAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, int theModelRunIndex);
+	bool FindParamAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, int theModelRunIndex);
+	bool FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, int theModelRunIndex);
 	bool ExtractParamAndLevel(const std::string &theVariableText, std::string *theParamNameOnly, std::string *theLevelNameOnly);
 	bool IsVariableMacroParam(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	bool IsVariableDeltaZ(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	bool IsVariableRampFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
-	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
-	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, const NFmiProducer &theProducer);
+	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, int theModelRunIndex);
+	bool FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, const NFmiProducer &theProducer, int theModelRunIndex);
 	void InterpretDelimiter(const std::string &theDelimText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	void InterpretToken(const std::string &theTokenText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	bool InterpretMaskSection(const std::string &theMaskSectorText, boost::shared_ptr<NFmiAreaMaskSectionInfo> &theAreaMaskSectionInfo);
@@ -168,11 +168,11 @@ private:
 	bool IsVariableBinaryOperator(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	NFmiAreaMask::CalculationOperator InterpretCalculationOperator(const std::string &theOperatorText);
 	void InterpretVariable(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, bool fNewScriptVariable = false);
-	bool InterpretVariableCheckTokens(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, bool fOrigWanted, bool fLevelExist, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theLevelNameOnly, const std::string &theProducerNameOnly);
+	bool InterpretVariableCheckTokens(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, bool fOrigWanted, bool fLevelExist, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theLevelNameOnly, const std::string &theProducerNameOnly, int theModelRunIndex);
 	bool InterpretPossibleScriptVariable(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, bool fNewScriptVariable);
 	void CheckVariableString(const std::string &theVariableText, std::string &theParamText,
 							 bool &fLevelExist, std::string &theLevelText,
-							 bool &fProducerExist, std::string &theProducerText);
+							 bool &fProducerExist, std::string &theProducerText, int &theModelRunIndex);
 	template<typename mapType>
 	bool IsInMap(mapType& theMap, const std::string &theSearchedItem);
 	bool IsVariableConstantValue(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
@@ -182,6 +182,7 @@ private:
 	bool IsVariablePeekFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	bool IsVariableMetFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	bool IsVariableMathFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
+	void SearchUntil(std::string::iterator &theExp_ptr, char *theTempCharPtr, char theSearchedCh);
 
 	NFmiProducerSystem *itsProducerSystem;  // ei omista
 	std::string itsCheckOutSectionText; // esim. if-sectionin koko teksti

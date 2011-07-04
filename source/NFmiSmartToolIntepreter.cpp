@@ -789,7 +789,7 @@ boost::shared_ptr<NFmiSmartToolCalculationInfo> NFmiSmartToolIntepreter::Interpr
 // Obtain the next token. Palauttaa true, jos sellainen saatiin, jos ollaan lopussa, palauttaa false.
 bool NFmiSmartToolIntepreter::GetToken(void)
 {
-	register char *temp;
+	char *temp;
 
 	tok_type = NOTYPE;
 	temp = token;
@@ -832,6 +832,12 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 			*temp++ = *exp_ptr++;
 			if(exp_ptr >= exp_end)
 				break; // at end of expression
+			if(*exp_ptr == '[') // Ollaan tultu kohtaan missa annetaan malliajo eli esim. T_HIR[-1], nyt jatketaan kunnes löytyy lopetus merkki eli ']'
+			{
+				SearchUntil(exp_ptr, temp, ']');
+				tok_type = VARIABLE;
+				return true;
+			}
 		}
 		tok_type = VARIABLE;
 	}
@@ -848,6 +854,31 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 
 	*temp = '\0';
 	return true;
+}
+
+// Tämä on tosi kämäistä pointteri virittely koodia, mikä on vanhaa perua. En uskalla nyt laittaa koko smarttool-kielen tulkintaa
+// uusiksi, joten joudun virittelemään aika pahasti tätä koodia tässä.
+// Nykyään en tekisi tulkki-koodia missään tapauksessä näin.
+// theTempCharPtr -osoittaa oikeasti token-dataosan currenttiin char:iin. Se pitää sulkea tässä (asettaa 0 viimeiseen kohtaan).
+// Lisäksi tämän kutsun jälkeen ei saa lopettaa NFmiSmartToolIntepreter::GetToken -metodia normaalisti, koska tuo pointteri
+// ei osoitakaan enää sinne minne oltiin edetty funktiossa, vaan sitä aiempaan tilaan. Kokeilin antaa pointterin pointterin, mutta 
+// sitten syntaksi meni jo niin kinkkiseksi että luovutin.
+void NFmiSmartToolIntepreter::SearchUntil(std::string::iterator &theExp_ptr, char *theTempCharPtr, char theSearchedCh)
+{
+	while(*theExp_ptr != theSearchedCh)
+	{
+		if(theExp_ptr >= exp_end)
+			break; // at end of expression
+		*theTempCharPtr++ = *theExp_ptr++;
+	}
+	if(*theExp_ptr == theSearchedCh)
+	{
+		if(theExp_ptr != exp_end)
+			*theTempCharPtr++ = *theExp_ptr++;
+		*theTempCharPtr = 0; 
+	}
+	else
+		throw runtime_error(::GetDictionaryString("Unable to find model-run end marker ']' from given formula. If you start something with '[' marker, remember to end it too."));
 }
 
 // Return true if c is a delimiter.
@@ -960,6 +991,10 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 	bool levelExist = false;
 	bool producerExist = false;
 	fUseAnyDataTypeBecauseUsingProdID = false; // alustetaan falseksi, asetus true:ksi tapahtuu siellä, missä katsotaan onko tuottaja annettu PROD104 tyyliin
+	int modelRunIndex = 1; // 1 = viimeisin malliajo data
+							// 0 = viimeisin data, mutta niin että jos on tullut hir-pintadatasta 06 utc ajo ja painepinta datasta viimeisin on 00 utc, 
+							// tällöin painepinta datan 0 viimeisin ajo on tyhjää (explisiittisesti on haluttu 06 viimeisintä malliajoa)
+							// -1 - -n on edellisiä malliajoja -1 on siis edellinen ja -2 on viimeksi edellinen jne.
 
 	// tutkitaan ensin onko mahdollisesti variable-muuttuja, jolloin voimme sallia _-merkin käytön muuttujissa
 	if(InterpretPossibleScriptVariable(theVariableText, theMaskInfo, fNewScriptVariable))
@@ -967,11 +1002,11 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 
 	CheckVariableString(theVariableText, paramNameOnly,
 						  levelExist, levelNameOnly,
-						  producerExist, producerNameOnly);
+						  producerExist, producerNameOnly, modelRunIndex);
 
 	bool origWanted = producerExist ? IsProducerOrig(producerNameOnly) : false; // lisäsin ehdon, koska boundchecker valitti tyhjän stringin vertailua IsProducerOrig-metodissa.
 
-	if(InterpretVariableCheckTokens(theVariableText, theMaskInfo, origWanted, levelExist, producerExist, paramNameOnly, levelNameOnly, producerNameOnly))
+	if(InterpretVariableCheckTokens(theVariableText, theMaskInfo, origWanted, levelExist, producerExist, paramNameOnly, levelNameOnly, producerNameOnly, modelRunIndex))
 	{
 		if(fNewScriptVariable)
 			throw runtime_error(::GetDictionaryString("SmartToolErrorTokenWordUsedAsVariable") + ": " + theVariableText);
@@ -1018,32 +1053,32 @@ bool NFmiSmartToolIntepreter::InterpretPossibleScriptVariable(const std::string 
 	return false;
 }
 
-bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, bool fOrigWanted, bool fLevelExist, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theLevelNameOnly, const std::string &theProducerNameOnly)
+bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, bool fOrigWanted, bool fLevelExist, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theLevelNameOnly, const std::string &theProducerNameOnly, int theModelRunIndex)
 {
 	if(fLevelExist && fProducerExist) // kokeillaan ensin, löytyykö param+level+producer
 	{
-		if(FindParamAndLevelAndProducerAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, theProducerNameOnly, NFmiAreaMask::InfoVariable, fOrigWanted ? NFmiInfoData::kCopyOfEdited : NFmiInfoData::kViewable, theMaskInfo))
+		if(FindParamAndLevelAndProducerAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, theProducerNameOnly, NFmiAreaMask::InfoVariable, fOrigWanted ? NFmiInfoData::kCopyOfEdited : NFmiInfoData::kViewable, theMaskInfo, theModelRunIndex))
 			return true;
 	}
 	else if(fLevelExist) // kokeillaan ensin, löytyykö param+level+producer
 	{
 		// Jos tuottajaa ei ole mainittu, oletetaan, että kyseessä on editoitava parametri.
-		if(FindParamAndLevelAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, NFmiAreaMask::InfoVariable, NFmiInfoData::kEditable, theMaskInfo))
+		if(FindParamAndLevelAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, NFmiAreaMask::InfoVariable, NFmiInfoData::kEditable, theMaskInfo, theModelRunIndex))
 			return true;
 	}
 	else if(fProducerExist) // kokeillaan ensin, löytyykö param+level+producer
 	{
-		if(FindParamAndProducerAndSetMaskInfo(theParamNameOnly, theProducerNameOnly, NFmiAreaMask::InfoVariable, fOrigWanted ? NFmiInfoData::kCopyOfEdited : NFmiInfoData::kViewable, theMaskInfo))
+		if(FindParamAndProducerAndSetMaskInfo(theParamNameOnly, theProducerNameOnly, NFmiAreaMask::InfoVariable, fOrigWanted ? NFmiInfoData::kCopyOfEdited : NFmiInfoData::kViewable, theMaskInfo, theModelRunIndex))
 			return true;
 	}
 
-	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, NFmiAreaMask::InfoVariable, NFmiInfoData::kEditable, theMaskInfo))
+	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, NFmiAreaMask::InfoVariable, NFmiInfoData::kEditable, theMaskInfo, theModelRunIndex))
 		return true;
 
-	if(FindParamAndSetMaskInfo(theVariableText, itsTokenStaticParameterNamesAndIds, NFmiAreaMask::InfoVariable, NFmiInfoData::kStationary, theMaskInfo))
+	if(FindParamAndSetMaskInfo(theVariableText, itsTokenStaticParameterNamesAndIds, NFmiAreaMask::InfoVariable, NFmiInfoData::kStationary, theMaskInfo, theModelRunIndex))
 		return true;
 
-	if(FindParamAndSetMaskInfo(theVariableText, itsTokenCalculatedParameterNamesAndIds, NFmiAreaMask::CalculatedVariable, NFmiInfoData::kCalculatedValue, theMaskInfo))
+	if(FindParamAndSetMaskInfo(theVariableText, itsTokenCalculatedParameterNamesAndIds, NFmiAreaMask::CalculatedVariable, NFmiInfoData::kCalculatedValue, theMaskInfo, theModelRunIndex))
 		return true;
 
 	if(IsVariableConstantValue(theVariableText, theMaskInfo))
@@ -1090,61 +1125,75 @@ bool NFmiSmartToolIntepreter::IsProducerOrig(std::string &theProducerText)
 // ei ole muutujaa, koska se on pakollinen.
 void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariableText, std::string &theParamText,
 												  bool &fLevelExist, std::string &theLevelText,
-												  bool &fProducerExist, std::string &theProducerText)
+												  bool &fProducerExist, std::string &theProducerText, int &theModelRunIndex)
 {
 	theParamText = theLevelText = theProducerText = "";
 	fLevelExist = fProducerExist = false;
 
-	string::size_type pos1 = theVariableText.find(string("_"));
-	string::size_type pos2 = theVariableText.find(string("_"), pos1+1);
-	if(pos1 != string::npos)
+	std::vector<std::string> variableParts = NFmiStringTools::Split(theVariableText, "_");
+	std::vector<std::string> lastParamParts  = NFmiStringTools::Split(variableParts[variableParts.size()-1], "["); // viimeisen parametri osion yhteydessä voi olla [-1] -osio, missä on kerrottu haluttu malliajo
+	if(lastParamParts.size() > 2)
 	{
-		theParamText = string(theVariableText.begin(), theVariableText.begin() + pos1);
-		pos1++;
-		string tmp(theVariableText.begin() + pos1, pos2 != string::npos ? theVariableText.begin() + pos2 : theVariableText.end());
-		if(IsPossiblyLevelItem(tmp))
+		std::string errStr = ::GetDictionaryString("Error with variable text");
+		errStr += ": ";
+		errStr += theVariableText;
+		errStr += "\n";
+		errStr += ::GetDictionaryString("Too many '[' markers.");
+		throw runtime_error(errStr);
+	}
+	else if(lastParamParts.size() == 2)
+	{
+		variableParts[variableParts.size()-1] = lastParamParts[0]; // pitää laittaa viimeiseen osioon malliajo-tiedosta 'riisuttu' teksti osio
+		std::string modelRunPart = lastParamParts[1];
+		modelRunPart = NFmiStringTools::TrimR(modelRunPart, ']');
+		theModelRunIndex = NFmiStringTools::Convert<int>(modelRunPart);
+	}
+
+	theParamText = variableParts[0]; // parametri teksti on aina 1. osiossa
+
+	if(variableParts.size() >= 2)
+	{
+		std::string secondPartStr = variableParts[1];
+		if(IsPossiblyLevelItem(secondPartStr))
 		{
 			fLevelExist = true;
-			theLevelText = tmp;
+			theLevelText = secondPartStr;
 		}
-		else if(IsPossiblyProducerItem(tmp, itsTokenProducerNamesAndIds))
+		else if(IsPossiblyProducerItem(secondPartStr, itsTokenProducerNamesAndIds))
 		{
 			fProducerExist = true;
-			theProducerText = tmp;
+			theProducerText = secondPartStr;
 		}
 		else
 			throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithUndescore") + ":\n" + theVariableText);
+	}
 
-		if(pos2 != string::npos)
+	if(variableParts.size() >= 3)
+	{
+		std::string thirdPartStr = variableParts[2];
+		if(IsPossiblyLevelItem(thirdPartStr))
 		{
-			pos2++;
-			string tmpstr(theVariableText.begin() + pos2, theVariableText.end());
-			if(IsPossiblyLevelItem(tmpstr))
+			if(fLevelExist == false)
 			{
-				if(fLevelExist == false)
-				{
-					fLevelExist = true;
-					theLevelText = tmpstr;
-				}
-				else
-					throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithTwoLevels") + ":\n" + theVariableText);
-			}
-			else if(IsPossiblyProducerItem(tmpstr, itsTokenProducerNamesAndIds))
-			{
-				if(fProducerExist == false)
-				{
-					fProducerExist = true;
-					theProducerText = tmpstr;
-				}
-				else
-					throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithTwoProducers") + ":\n" + theVariableText);
+				fLevelExist = true;
+				theLevelText = thirdPartStr;
 			}
 			else
-				throw runtime_error(::GetDictionaryString("SmartToolErrorVariableNoLevelOrProducer") + ":\n" + theVariableText);
+				throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithTwoLevels") + ":\n" + theVariableText);
 		}
+		else if(IsPossiblyProducerItem(thirdPartStr, itsTokenProducerNamesAndIds))
+		{
+			if(fProducerExist == false)
+			{
+				fProducerExist = true;
+				theProducerText = thirdPartStr;
+			}
+			else
+				throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithTwoProducers") + ":\n" + theVariableText);
+		}
+		else
+			throw runtime_error(::GetDictionaryString("SmartToolErrorVariableNoLevelOrProducer") + ":\n" + theVariableText);
 	}
-	else
-		theParamText = theVariableText;
 }
 
 bool NFmiSmartToolIntepreter::IsPossiblyProducerItem(const std::string &theText, ProducerMap &theMap)
@@ -1199,9 +1248,9 @@ bool NFmiSmartToolIntepreter::ExtractParamAndLevel(const std::string &theVariabl
 	return false;
 }
 
-bool NFmiSmartToolIntepreter::FindParamAndLevelAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
+bool NFmiSmartToolIntepreter::FindParamAndLevelAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, int theModelRunIndex)
 {
-	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo))
+	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, theModelRunIndex))
 	{
 		NFmiLevel level(GetPossibleLevelInfo(theLevelText, theDataType));
 		theMaskInfo->SetLevel(&level);
@@ -1210,24 +1259,24 @@ bool NFmiSmartToolIntepreter::FindParamAndLevelAndSetMaskInfo(const std::string 
 	return false;
 }
 
-bool NFmiSmartToolIntepreter::FindParamAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
+bool NFmiSmartToolIntepreter::FindParamAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, int theModelRunIndex)
 {
 	NFmiProducer producer(GetPossibleProducerInfo(theProducerText));
 	if(producer.GetIdent() == gMesanProdId)
 		theDataType = NFmiInfoData::kAnalyzeData; // ikävää koodia, mutta analyysi data tyyppi pitää asettaa jos ANAL-tuottajaa käytetty
 	else if(producer.GetIdent() == NFmiProducerSystem::gHelpEditorDataProdId)
 		theDataType = NFmiInfoData::kEditingHelpData; // ikävää koodia, editor help datalle pitää saada oma tuottaja id
-	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer))
+	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer, theModelRunIndex))
 		return true;
 	return false;
 }
 
-bool NFmiSmartToolIntepreter::FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
+bool NFmiSmartToolIntepreter::FindParamAndLevelAndProducerAndSetMaskInfo(const std::string &theVariableText, const std::string &theLevelText,const std::string &theProducerText, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, int theModelRunIndex)
 {
 	NFmiProducer producer(GetPossibleProducerInfo(theProducerText));
 	if(producer.GetIdent() == gMesanProdId)
 		theDataType = NFmiInfoData::kAnalyzeData; // ikävää koodia, mutta analyysi data tyyppi pitää asettaa jos ANA-tuottajaa käytetty
-	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer))
+	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer, theModelRunIndex))
 	{
 		NFmiLevel level(GetPossibleLevelInfo(theLevelText, theDataType));
 		theMaskInfo->SetLevel(&level);
@@ -1383,7 +1432,7 @@ bool NFmiSmartToolIntepreter::IsCaseInsensitiveEqual(const std::string &theStr1,
 	return false;
 }
 
-bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
+bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, int theModelRunIndex)
 {
 	NFmiParam param;
 	bool fUseWildDataType = false;
@@ -1394,6 +1443,7 @@ bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVari
 		theMaskInfo->SetOperationType(theOperType);
 		theMaskInfo->SetDataIdent(dataIdent);
 		theMaskInfo->SetUseDefaultProducer(true);
+		theMaskInfo->ModelRunIndex(theModelRunIndex);
 		if(fUseWildDataType)
 			theMaskInfo->SetDataType(NFmiInfoData::kAnyData);
 		else
@@ -1403,7 +1453,7 @@ bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVari
 	return false;
 }
 
-bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, const NFmiProducer &theProducer)
+bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVariableText, ParamMap& theParamMap, NFmiAreaMask::CalculationOperationType theOperType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, const NFmiProducer &theProducer, int theModelRunIndex)
 {
 	NFmiParam param;
 	bool fUseWildDataType = false;
@@ -1413,6 +1463,7 @@ bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVari
 		theMaskInfo->SetOperationType(theOperType);
 		theMaskInfo->SetDataIdent(dataIdent);
 		theMaskInfo->SetUseDefaultProducer(false);
+		theMaskInfo->ModelRunIndex(theModelRunIndex);
 		if(fUseWildDataType)
 		{
 			if(theProducer.GetIdent() == 0) // tämä on viritys, jos on annettu esim. "par180_ec" parametri, menee se any-data kategoriaan, ellei ei tarkisteta onko oikeasti annettu tuottajakin
