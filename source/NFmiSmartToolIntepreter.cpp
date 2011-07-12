@@ -146,6 +146,7 @@ NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenCalculatedPar
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenThreeArgumentFunctions;
 NFmiSmartToolIntepreter::MetFunctionMap NFmiSmartToolIntepreter::itsTokenMetFunctions;
+NFmiSmartToolIntepreter::VertFunctionMap NFmiSmartToolIntepreter::itsTokenVertFunctions;
 NFmiSmartToolIntepreter::PeekFunctionMap NFmiSmartToolIntepreter::itsTokenPeekFunctions;
 NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctions;
 
@@ -1117,6 +1118,16 @@ bool NFmiSmartToolIntepreter::IsProducerOrig(std::string &theProducerText)
 	return false;
 }
 
+bool NFmiSmartToolIntepreter::IsFunctionNameWithUnderScore(const std::string &theVariableText)
+{
+	std::string tmpVariableStr = theVariableText;
+	// HUOM! Mm. uusissa vertikaali-funktioissa on '_'-merkkejä, jotka pitää ignoorata jossain paikoissa koodia
+	VertFunctionMap::iterator it = itsTokenVertFunctions.find(NFmiStringTools::LowerCase(tmpVariableStr)); 
+	if(it != itsTokenVertFunctions.end())
+		return true; // Kyse oli jostain uudesta vertikaali funktiosta
+
+	return false;
+}
 // Saa parametrina kokonaisen parametri stringin, joka voi sisältää
 // parametrin lisäksi myös levelin ja producerin.
 // Teksti voi siis olla vaikka: T, T_850, T_Ec, T_850_Ec
@@ -1127,6 +1138,9 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 												  bool &fLevelExist, std::string &theLevelText,
 												  bool &fProducerExist, std::string &theProducerText, int &theModelRunIndex)
 {
+	if(IsFunctionNameWithUnderScore(theVariableText))
+		return ; // Kyse oli jostain uudesta funktiosta, joissa on alaviiva, eikä tehdä nyt tässä mitään
+
 	theParamText = theLevelText = theProducerText = "";
 	fLevelExist = fProducerExist = false;
 
@@ -1588,6 +1602,9 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 		return true;
 	if(IsVariableMetFunction(theVariableText, theMaskInfo))
 		return true;
+	if(IsVariableVertFunction(theVariableText, theMaskInfo))
+		return true;
+
 	// sitten katsotaan onko jokin integraatio funktioista
 	std::string tmp(theVariableText);
 	FunctionMap::iterator it = itsTokenFunctions.find(NFmiStringTools::LowerCase(tmp));
@@ -1725,13 +1742,6 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 				{
 					theMaskInfo->SetOperationType(NFmiAreaMask::MetFunction);
 					theMaskInfo->SetFunctionType((*it).second.get<0>());
-/*
-					NFmiValueString valueString1(tokens[2].first);
-					double value1 = static_cast<double>(valueString1);
-					NFmiValueString valueString2(tokens[3].first);
-					double value2 = static_cast<double>(valueString2);
-					theMaskInfo->SetOffsetPoint1(NFmiPoint(value1, value2));
-*/
 					return true;
 				}
 			}
@@ -1754,6 +1764,56 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 	}
 	return false;
 }
+
+bool NFmiSmartToolIntepreter::IsVariableVertFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
+{
+	std::string aVariableText(theVariableText);
+	VertFunctionMap::iterator it = itsTokenVertFunctions.find(NFmiStringTools::LowerCase(aVariableText)); // tässä tarkastellaan case insensitiivisesti
+	if(it != itsTokenVertFunctions.end())
+	{
+		// 1. Vertikaali funktioiden tapauksessa tarkistetaan tässä, että on '('-merkki, sitten yksi muuttuja ja pilkku, muuten saa lausekkeita ja muita miten haluaa...
+		// 2. Ensimmäinen parametri pitää olla pelkistetty yksi parametri (esim. WS_Hir), ei lauseketta esim. WS_Hir - WS_EC (ainakaan vielä), jotta 
+		//	  voidaan käydä dataa läpi level-by-level tyyliin eikä kuten vanhoilla vertikaali funktioilla, missä oli keinotekoiset stepit, joita käytiin läpi (juuri siksi että parametrin sijasta saattoi olla lauseke.)
+		// 3. Lopuissa parametreissa voi olla laskuja, muuttujia tai lausekkeita.
+		GetToken();
+		string tmp = token;
+		if(tmp == string("("))
+		{
+			GetToken();
+			string firstVariableStr = token;
+			GetToken();
+			tmp = token;
+			if(tmp == string(","))
+			{
+				InterpretVariable(firstVariableStr, theMaskInfo);
+				if(theMaskInfo->GetOperationType() == NFmiAreaMask::InfoVariable)
+				{
+					theMaskInfo->SetOperationType(NFmiAreaMask::VertFunctionStart);
+					theMaskInfo->SetFunctionType((*it).second.get<0>());
+					theMaskInfo->SetSecondaryFunctionType((*it).second.get<1>());
+					theMaskInfo->FunctionArgumentCount((*it).second.get<2>());
+					return true;
+				}
+			}
+		}
+
+		// Jos löytyi Vertikaali-Funktio, mutta ehdot eivät täyttyneet, tehdään virheilmoitus.
+		std::string errorStr(::GetDictionaryString("Function"));
+		errorStr += " '";
+		errorStr += theVariableText;
+		errorStr += "' ";
+		errorStr += ::GetDictionaryString("error in line");
+		errorStr += ": ";
+		errorStr += theMaskInfo->GetOrigLineText();
+		errorStr += "\n";
+		errorStr += ::GetDictionaryString("Proper form for this function is");
+		errorStr += ": ";
+		errorStr += (*it).second.get<3>();
+		throw std::runtime_error(errorStr);
+	}
+	return false;
+}
+
 
 std::string NFmiSmartToolIntepreter::HandlePossibleUnaryMarkers(const std::string &theCurrentString)
 {
@@ -2199,6 +2259,9 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, 1, "adv(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, 1, "lap(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, 1, "rot(wind)"))); // roottori ottaa totalwind:in parametrina, siitä saadaan tuulen u- ja v-komponentit
+
+		// tässä on vertikaaliset-funktiot
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertP, 3, string("vertp_max(par, p1, p2)"))));
 
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy"), NFmiAreaMask::FunctionPeekXY));
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy2"), NFmiAreaMask::FunctionPeekXY2));

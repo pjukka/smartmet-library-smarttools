@@ -46,6 +46,8 @@ public:
 	void SetOrigLineText(const std::string& theText){itsOrigLineText = theText;}
 	NFmiAreaMask::FunctionType GetFunctionType(void)const {return itsFunctionType;}
 	void SetFunctionType(NFmiAreaMask::FunctionType newType){itsFunctionType = newType;}
+	NFmiAreaMask::FunctionType GetSecondaryFunctionType(void)const {return itsSecondaryFunctionType;}
+	void SetSecondaryFunctionType(NFmiAreaMask::FunctionType newType){itsSecondaryFunctionType = newType;}
 	const NFmiPoint& GetOffsetPoint1(void) const{return itsOffsetPoint1;}
 	void SetOffsetPoint1(const NFmiPoint& newValue){itsOffsetPoint1 = newValue;}
 	const NFmiPoint& GetOffsetPoint2(void) const{return itsOffsetPoint2;}
@@ -54,8 +56,8 @@ public:
 	void SetMathFunctionType(NFmiAreaMask::MathFunctionType newValue) {itsMathFunctionType = newValue;};
 	int IntegrationFunctionType(void) const {return itsIntegrationFunctionType;}
 	void IntegrationFunctionType(int newValue) {itsIntegrationFunctionType = newValue;}
-	int MetFunctionArgumentCount(void) const {return itsMetFunctionArgumentCount;}
-	void MetFunctionArgumentCount(int newValue) {itsMetFunctionArgumentCount = newValue;}
+	int FunctionArgumentCount(void) const {return itsFunctionArgumentCount;}
+	void FunctionArgumentCount(int newValue) {itsFunctionArgumentCount = newValue;}
 	FmiSoundingParameters SoundingParameter(void) const {return itsSoundingParameter;}
 	void SoundingParameter(FmiSoundingParameters newValue) {itsSoundingParameter = newValue;}
 	int ModelRunIndex(void) const {return itsModelRunIndex;}
@@ -73,11 +75,12 @@ private:
 	std::string itsMaskText; // originaali teksti, mist‰ t‰m‰ maskinfo on tulkittu, t‰m‰ on siis vain yksi sana tai luku
 	std::string itsOrigLineText; // originaali koko rivin teksti, mist‰ t‰m‰ currentti sana (itsMaskText) on otettu (t‰t‰ k‰ytet‰‰n virhe teksteiss‰)
 	NFmiAreaMask::FunctionType itsFunctionType; // onko mahd. funktio esim. min, max jne. (ei matemaattisia funktioita kuten sin, cos, pow, jne.)
+	NFmiAreaMask::FunctionType itsSecondaryFunctionType; // T‰h‰n laitetaan mm. vertikaali funktioissa k‰ytetty korkeus tyyppi esim. VertP tai VertZ
 	NFmiPoint itsOffsetPoint1; // esim. aikaoffset (x alku ja y loppu) tai paikkaoffset (alku x ja y offset)
 	NFmiPoint itsOffsetPoint2; // paikkaoffset (loppu x ja y offset)
 	NFmiAreaMask::MathFunctionType itsMathFunctionType;
 	int itsIntegrationFunctionType; // 1=SumT tyylinen ja 2=SumZ tyylinen ja 3=MinH tyylinen funktio
-	int itsMetFunctionArgumentCount; // kuinka monta pilkulla eroteltua argumenttia on odotettavissa t‰h‰n 'meteorologiseen' funktioon (mm. grad, adv, div, lap, rot jne....).
+	int itsFunctionArgumentCount; // kuinka monta pilkulla eroteltua argumenttia on odotettavissa t‰h‰n 'meteorologiseen' funktioon (mm. grad, adv, div, lap, rot jne....).
 	FmiSoundingParameters itsSoundingParameter;
 	int itsModelRunIndex;
 };

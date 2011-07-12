@@ -90,6 +90,8 @@ private:
 	void bin_eval_exp5(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 	void bin_eval_exp6(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 	void bin_atom(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+	void CalcThreeArgumentFunction(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+	void CalcVertFunction(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
 
 	boost::shared_ptr<NFmiFastQueryInfo> itsResultInfo; // omistaa+tuhoaa
 	checkedVector<boost::shared_ptr<NFmiAreaMask> > itsCalculations; // omistaa+tuhoaa

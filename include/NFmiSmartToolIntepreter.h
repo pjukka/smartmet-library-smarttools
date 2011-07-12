@@ -181,8 +181,10 @@ private:
 	bool IsVariableFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	bool IsVariablePeekFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	bool IsVariableMetFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
+	bool IsVariableVertFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	bool IsVariableMathFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	void SearchUntil(std::string::iterator &theExp_ptr, char *theTempCharPtr, char theSearchedCh);
+	bool IsFunctionNameWithUnderScore(const std::string &theVariableText);
 
 	NFmiProducerSystem *itsProducerSystem;  // ei omista
 	std::string itsCheckOutSectionText; // esim. if-sectionin koko teksti
@@ -236,6 +238,17 @@ private:
 	typedef std::map<std::string, MetFunctionMapValue> MetFunctionMap; // 'Meteorologiset' funktiot. N‰ill‰ funktioilla k‰sitell‰‰n queryData-olioita eli pyydet‰‰n erilaisia 
 																		// arvoja siit‰ (esim. advektiota Adv(T_Hir)).
 	static MetFunctionMap itsTokenMetFunctions;
+
+
+	typedef boost::tuple<NFmiAreaMask::FunctionType, NFmiAreaMask::FunctionType, int, std::string> VertFunctionMapValue; // Vert(ikaali)Funktioihin talletetaan 'taika'-sanan 
+																							// lis‰ksi Funktio tyyppi1 (avg,max,find, jne.) ja tyyppi2 (vertikaali rajojen muoto, eli ala- ja yl‰rajojen m‰‰ritykset,
+																							// joilla voi olla arvoja VertP = Pressure, VertZ = height, VertFL = flight-level tai VertHyb = hybridi levelit) 
+																							// ja funktion argumenttien lukum‰‰r‰ (int) ja funktion oikea 'muoto' stringin‰, 
+																							// joka pit‰‰ sis‰ll‰‰n esim. grad-funktion tapauksessa "grad(param)"
+	typedef std::map<std::string, VertFunctionMapValue> VertFunctionMap; // Vertikaali funktiot. N‰ill‰ funktioilla k‰sitell‰‰n queryData-olioita eli pyydet‰‰n erilaisia 
+																		// arvoja siit‰ (esim. vertp_max(WS_hir, p1, p2) hakee hirlamin maksimi tuulen nopeuden p1 ja p2 painepintojen v‰lilt‰).
+	static VertFunctionMap itsTokenVertFunctions;
+
 
 	typedef std::map<std::string, NFmiAreaMask::CalculationOperationType> PeekFunctionMap;
 	static PeekFunctionMap itsTokenPeekFunctions;
