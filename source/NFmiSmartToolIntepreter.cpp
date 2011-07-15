@@ -2267,15 +2267,11 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertP, 3, string("vertp_avg(par, p1, p2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::VertP, 3, string("vertp_sum(par, p1, p2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_get"), VertFunctionMapValue(NFmiAreaMask::Get, NFmiAreaMask::VertP, 2, string("vertp_get(par, pressure)"))));
-		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh"), VertFunctionMapValue(NFmiAreaMask::Find, NFmiAreaMask::VertP, 4, string("vertp_findh(par, p1, p2, value)"))));
-/*
-		// vertp-funktiot
-		vertp_get
-		vertp_findh // löydetty korkeus
-		vertp_findc // löydettyjen lukumäärä (count)
-		vertp_maxh  // maksimikohdan korkeus
-		vertp_minh  // minimikohdan korkeus
-*/
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh"), VertFunctionMapValue(NFmiAreaMask::FindH, NFmiAreaMask::VertP, 5, string("vertp_findh(par, p1, p2, value, nth)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findc"), VertFunctionMapValue(NFmiAreaMask::FindC, NFmiAreaMask::VertP, 4, string("vertp_findc(par, p1, p2, value)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_maxh"), VertFunctionMapValue(NFmiAreaMask::MaxH, NFmiAreaMask::VertP, 3, string("vertp_maxh(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertP, 3, string("vertp_minh(par, p1, p2)"))));
+
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy"), NFmiAreaMask::FunctionPeekXY));
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy2"), NFmiAreaMask::FunctionPeekXY2));
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy3"), NFmiAreaMask::FunctionPeekXY3));
