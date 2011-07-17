@@ -1128,6 +1128,30 @@ bool NFmiSmartToolIntepreter::IsFunctionNameWithUnderScore(const std::string &th
 
 	return false;
 }
+
+// tämä heittää poikkeuksen virheilmoituksineen (auttavamman), jos tämä muuttuja muistuttaa uusia alaviiva -funktioita
+void NFmiSmartToolIntepreter::CheckIfVariableResemblesVerticalFunction(const std::string &theVariableText)
+{
+	std::string tmpVariableStr(theVariableText);
+	NFmiStringTools::LowerCase(tmpVariableStr);
+	// jos theVariableText:istä löytyy vert-sana, tehdään vertikaali funktioihin liittyvä virheilmoitus
+	string::size_type pos = tmpVariableStr.find(string("vert"));
+	if(pos != string::npos)
+	{
+		std::string errorStr(::GetDictionaryString("Given variable or function"));
+		errorStr += " '";
+		errorStr += theVariableText;
+		errorStr += "' ";
+		errorStr += ::GetDictionaryString("resembles vertical functions.");
+		errorStr += "\n";
+		errorStr += ::GetDictionaryString("If it was, there was a typo.");
+		errorStr += " ";
+		errorStr += ::GetDictionaryString("Try something like: vertp_max or vertz_findh.");
+		throw std::runtime_error(errorStr);
+	}
+}
+
+
 // Saa parametrina kokonaisen parametri stringin, joka voi sisältää
 // parametrin lisäksi myös levelin ja producerin.
 // Teksti voi siis olla vaikka: T, T_850, T_Ec, T_850_Ec
@@ -1179,7 +1203,11 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 			theProducerText = secondPartStr;
 		}
 		else
+		{
+			CheckIfVariableResemblesVerticalFunction(theVariableText); // tämä heittää poikkeuksen virheilmoituksineen (auttavamman), jos tämä muuttuja muistuttaa uusia alaviiva -funktioita
+			// muuten tee standardi virheilmoitus
 			throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithUndescore") + ":\n" + theVariableText);
+		}
 	}
 
 	if(variableParts.size() >= 3)
@@ -2271,6 +2299,39 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findc"), VertFunctionMapValue(NFmiAreaMask::FindC, NFmiAreaMask::VertP, 4, string("vertp_findc(par, p1, p2, value)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_maxh"), VertFunctionMapValue(NFmiAreaMask::MaxH, NFmiAreaMask::VertP, 3, string("vertp_maxh(par, p1, p2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertP, 3, string("vertp_minh(par, p1, p2)"))));
+
+		// vertfl-funktiot eli näitä operoidaan aina lentopinnoilla flight-level [hft]
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertFL, 3, string("vertfl_max(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertFL, 3, string("vertfl_min(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertFL, 3, string("vertfl_avg(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::VertFL, 3, string("vertfl_sum(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_get"), VertFunctionMapValue(NFmiAreaMask::Get, NFmiAreaMask::VertFL, 2, string("vertfl_get(par, pressure)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh"), VertFunctionMapValue(NFmiAreaMask::FindH, NFmiAreaMask::VertFL, 5, string("vertfl_findh(par, p1, p2, value, nth)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findc"), VertFunctionMapValue(NFmiAreaMask::FindC, NFmiAreaMask::VertFL, 4, string("vertfl_findc(par, p1, p2, value)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_maxh"), VertFunctionMapValue(NFmiAreaMask::MaxH, NFmiAreaMask::VertFL, 3, string("vertfl_maxh(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertFL, 3, string("vertfl_minh(par, p1, p2)"))));
+
+		// vertz-funktiot eli näitä operoidaan aina metrisillä korkeuksilla [m]
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertZ, 3, string("vertz_max(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertZ, 3, string("vertz_min(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertZ, 3, string("vertz_avg(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::VertZ, 3, string("vertz_sum(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_get"), VertFunctionMapValue(NFmiAreaMask::Get, NFmiAreaMask::VertZ, 2, string("vertz_get(par, pressure)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh"), VertFunctionMapValue(NFmiAreaMask::FindH, NFmiAreaMask::VertZ, 5, string("vertz_findh(par, p1, p2, value, nth)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findc"), VertFunctionMapValue(NFmiAreaMask::FindC, NFmiAreaMask::VertZ, 4, string("vertz_findc(par, p1, p2, value)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_maxh"), VertFunctionMapValue(NFmiAreaMask::MaxH, NFmiAreaMask::VertZ, 3, string("vertz_maxh(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertZ, 3, string("vertz_minh(par, p1, p2)"))));
+
+		// verthyb-funktiot eli näitä operoidaan aina mallipintadatan hybrid-level arvoilla esim. hirlamissa arvot ovat 60 - 1
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertHyb, 3, string("verthyb_max(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertHyb, 3, string("verthyb_min(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertHyb, 3, string("verthyb_avg(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::VertHyb, 3, string("verthyb_sum(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_get"), VertFunctionMapValue(NFmiAreaMask::Get, NFmiAreaMask::VertHyb, 2, string("verthyb_get(par, pressure)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_findh"), VertFunctionMapValue(NFmiAreaMask::FindH, NFmiAreaMask::VertHyb, 5, string("verthyb_findh(par, p1, p2, value, nth)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_findc"), VertFunctionMapValue(NFmiAreaMask::FindC, NFmiAreaMask::VertHyb, 4, string("verthyb_findc(par, p1, p2, value)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_maxh"), VertFunctionMapValue(NFmiAreaMask::MaxH, NFmiAreaMask::VertHyb, 3, string("verthyb_maxh(par, p1, p2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertHyb, 3, string("verthyb_minh(par, p1, p2)"))));
 
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy"), NFmiAreaMask::FunctionPeekXY));
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy2"), NFmiAreaMask::FunctionPeekXY2));

@@ -185,6 +185,7 @@ private:
 	bool IsVariableMathFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
 	void SearchUntil(std::string::iterator &theExp_ptr, char *theTempCharPtr, char theSearchedCh);
 	bool IsFunctionNameWithUnderScore(const std::string &theVariableText);
+	void CheckIfVariableResemblesVerticalFunction(const std::string &theVariableText); 
 
 	NFmiProducerSystem *itsProducerSystem;  // ei omista
 	std::string itsCheckOutSectionText; // esim. if-sectionin koko teksti
