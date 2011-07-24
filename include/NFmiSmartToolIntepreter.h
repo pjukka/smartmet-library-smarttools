@@ -260,7 +260,6 @@ private:
 	typedef std::map<std::string, int> ScriptVariableMap;
 	ScriptVariableMap itsTokenScriptVariableNames; // skriptiss‰ varatut muuttujat (var x = ?) talletetaan t‰nne, ett‰ voidaan tarkistaa niiden olemassa olo
 	int itsScriptVariableParamIdCounter; // pit‰‰ keksia muutujille id, joten tehd‰‰ juokseva counter
-	bool fUseAnyDataTypeBecauseUsingProdID; // jos skripti muuttujan tuottaja annetaan id:n‰ (T_PROD104 eli analyysi), pit‰‰ data tyypiksi laittaa anydata
 
 	// normaali ja macroParam sijoituksia halutaan seurata, ett‰ ei tapahdu vahinkoja eli niit‰ olisi sekaisin, jolloin seuramukset ovat vahingollisia
 	bool fNormalAssigmentFound; // loytyykˆ skriptist‰ normaaleja sijoituksia esim. T = ???

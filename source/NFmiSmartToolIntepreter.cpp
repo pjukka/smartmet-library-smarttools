@@ -991,7 +991,6 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 	string producerNameOnly;
 	bool levelExist = false;
 	bool producerExist = false;
-	fUseAnyDataTypeBecauseUsingProdID = false; // alustetaan falseksi, asetus true:ksi tapahtuu siell‰, miss‰ katsotaan onko tuottaja annettu PROD104 tyyliin
 	int modelRunIndex = 1; // 1 = viimeisin malliajo data
 							// 0 = viimeisin data, mutta niin ett‰ jos on tullut hir-pintadatasta 06 utc ajo ja painepinta datasta viimeisin on 00 utc, 
 							// t‰llˆin painepinta datan 0 viimeisin ajo on tyhj‰‰ (explisiittisesti on haluttu 06 viimeisint‰ malliajoa)
@@ -1011,12 +1010,7 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 	{
 		if(fNewScriptVariable)
 			throw runtime_error(::GetDictionaryString("SmartToolErrorTokenWordUsedAsVariable") + ": " + theVariableText);
-		else
-		{
-			if(fUseAnyDataTypeBecauseUsingProdID)
-				theMaskInfo->SetDataType(NFmiInfoData::kAnyData);
-			return ;
-		}
+		return ;
 	}
 
 	throw runtime_error(::GetDictionaryString("SmartToolErrorStrangeVariable") + ": " + theVariableText);
@@ -1415,8 +1409,7 @@ bool NFmiSmartToolIntepreter::GetProducerFromVariableById(const std::string &the
 		NFmiValueString numericPart(theVariableText.substr(4));
 		if(numericPart.IsNumeric())
 		{
-		  theProducer = NFmiProducer(static_cast<long>(numericPart), theVariableText);
-			fUseAnyDataTypeBecauseUsingProdID = true; // laitetaan trueksi, koska tuottaja annettu PROD104 tyyliin
+			theProducer = NFmiProducer(static_cast<long>(numericPart), theVariableText);
 			return true;
 		}
 	}
@@ -2074,6 +2067,23 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("vis"), kFmiVisibility));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("gust"), kFmiHourlyMaximumGust));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wsmax"), kFmiHourlyMaximumWindSpeed));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("boundarylh"), kFmiMixedLayerDepth));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("snowfall"), kFmiSnowAccumulation));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cloudwater"), kFmiCloudWater));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cloudice"), static_cast<FmiParameterName>(277)));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("stationp"), kFmiPressureAtStationLevel));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("zeroh"), kFmiFreezingLevel));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("snowdepth"), kFmiWaterEquivalentOfSnow));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("icecover"), kFmiIceCover));
+
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso1"), kFmiProbabilityOfWindLimit1));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso2"), kFmiProbabilityOfWindLimit2));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso3"), kFmiProbabilityOfWindLimit3));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso4"), kFmiProbabilityOfWindLimit4));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso5"), kFmiProbabilityOfWindLimit5));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso6"), kFmiProbabilityOfWindLimit6));
+
 
 		// ****** sounding index funktiot  HUOM! ne k‰sitell‰‰n case insensitivein‰!! *************************
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclsur"), static_cast<FmiParameterName>(kSoundingParLCLSur)));
