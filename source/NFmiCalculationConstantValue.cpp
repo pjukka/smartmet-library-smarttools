@@ -23,7 +23,7 @@ NFmiCalculationConstantValue::~NFmiCalculationConstantValue()
 //--------------------------------------------------------
 // Value 
 //--------------------------------------------------------
-double NFmiCalculationConstantValue::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex, bool fUseTimeInterpolationAlways)
+double NFmiCalculationConstantValue::Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways)
 {
 	return itsValue;
 }
@@ -44,9 +44,9 @@ NFmiCalculationRampFuction::NFmiCalculationRampFuction(const NFmiCalculationCond
 NFmiCalculationRampFuction::~NFmiCalculationRampFuction(void)
 {}
 
-double NFmiCalculationRampFuction::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex, bool fUseTimeInterpolationAlways)
+double NFmiCalculationRampFuction::Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways)
 {
-	double value = NFmiInfoAreaMask::Value(theLatlon, theTime, theTimeIndex, fUseTimeInterpolationAlways);
+	double value = NFmiInfoAreaMask::Value(theCalculationParams, fUseTimeInterpolationAlways);
 	return itsMaskCondition.MaskValue(value);
 }
 
@@ -62,11 +62,11 @@ NFmiCalculationIntegrationFuction::~NFmiCalculationIntegrationFuction(void)
 {
 }
 
-double NFmiCalculationIntegrationFuction::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex, bool fUseTimeInterpolationAlways)
+double NFmiCalculationIntegrationFuction::Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways)
 {
 	// HUOM!!! Tähän tuli pikaviritys:
 	// asetan vain lähimmän pisteen ja ajan kohdalleen.
-	if(itsInfo->NearestPoint(theLatlon) && itsInfo->TimeToNearestStep(theTime, kForward))
+	if(itsInfo->NearestPoint(theCalculationParams.itsLatlon) && itsInfo->TimeToNearestStep(theCalculationParams.itsTime, kForward))
 	{
 		itsDataIterator->DoForEach(itsDataModifier.get());
 		return itsDataModifier->CalculationResult();
@@ -75,10 +75,10 @@ double NFmiCalculationIntegrationFuction::Value(const NFmiPoint &theLatlon, cons
 }
 
 // Ramppifunktioiden laskut AreaMask:ien avulla (mm. lat, lon ja elevationangle tapaukset).
-double NFmiCalculationRampFuctionWithAreaMask::Value(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex, bool fUseTimeInterpolationAlways)
+double NFmiCalculationRampFuctionWithAreaMask::Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways)
 {
-	itsAreaMask->Time(theTime);
-	double value = itsAreaMask->Value(theLatlon, theTime, theTimeIndex, fUseTimeInterpolationAlways);
+	itsAreaMask->Time(theCalculationParams.itsTime);
+	double value = itsAreaMask->Value(theCalculationParams, fUseTimeInterpolationAlways);
 	return itsMaskCondition.MaskValue(value);
 }
 

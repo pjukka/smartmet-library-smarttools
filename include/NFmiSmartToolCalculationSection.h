@@ -12,6 +12,7 @@
 //**********************************************************
 
 #include "NFmiDataMatrix.h"
+#include "NFmiAreaMask.h"
 #include "boost/shared_ptr.hpp"
 
 class NFmiPoint;
@@ -24,7 +25,7 @@ class NFmiSmartToolCalculationSection
 {
 
 public:
-	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
+	void Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue);
 	void SetTime(const NFmiMetTime &theTime);
 	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
 

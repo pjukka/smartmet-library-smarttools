@@ -20,7 +20,7 @@ class NFmiCalculationConstantValue : public NFmiAreaMaskImpl
 {
 
 public:
-   double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
+   double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
 
    NFmiCalculationConstantValue(double value = 0);
    ~NFmiCalculationConstantValue();
@@ -41,7 +41,7 @@ class NFmiCalculationDeltaZValue : public NFmiAreaMaskImpl
 {
 
 public:
-   double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways)
+   double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways)
    {
 	   return NFmiCalculationDeltaZValue::itsHeightValue;
    }
@@ -80,7 +80,7 @@ class NFmiCalculationRampFuction : public NFmiInfoAreaMask
 {
 
 public:
-   double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
+   double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
 
    NFmiCalculationRampFuction(const NFmiCalculationCondition& theOperation, Type theMaskType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, BinaryOperator thePostBinaryOperator = kNoValue);
    ~NFmiCalculationRampFuction(void);
@@ -94,7 +94,7 @@ class NFmiCalculationRampFuctionWithAreaMask : public NFmiAreaMaskImpl
 {
 
 public:
-   double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
+   double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
 
    NFmiCalculationRampFuctionWithAreaMask(const NFmiCalculationCondition & theOperation,
 										   Type theMaskType,
@@ -113,7 +113,7 @@ class NFmiCalculationIntegrationFuction : public NFmiInfoAreaMask
 {
 
 public:
-   double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
+   double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
 
    NFmiCalculationIntegrationFuction(boost::shared_ptr<NFmiDataIterator> &theDataIterator, boost::shared_ptr<NFmiDataModifier> &theDataModifier, Type theMaskType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
    ~NFmiCalculationIntegrationFuction(void);

@@ -94,19 +94,19 @@ static T MakeValidNumber(T theValue)
 //--------------------------------------------------------
 // Calculate
 //--------------------------------------------------------
-void NFmiSmartToolCalculation::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue)
+void NFmiSmartToolCalculation::Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue)
 {
 	if(theMacroParamValue.fDoCrossSectionCalculations)
 	{
 		fUsePressureLevelCalculation = true;
 		itsPressureHeightValue = theMacroParamValue.itsPressureHeight;
 	}
-	double value = eval_exp(theLatlon, theTime, theTimeIndex);
+	double value = eval_exp(theCalculationParams);
 
 	value = MakeValidNumber(value); // muuttaa luvun missingiksi, jos nan tai +-inf
 	if(value != kFloatMissing) // tuli ongelmia missing asetuksissa, pit‰‰ mietti vaikka jokin funktio, jolla asetetaan puuttuva arvo // pit‰‰ pysty‰ sittenkin asettamaan arvoksi kFloatMissing:in!!!
 	{
-		itsResultInfo->LocationIndex(theLocationIndex); // kohde dataa juoksutetaan, joten lokaatio indeksien pit‰‰ olla synkassa!!!
+		itsResultInfo->LocationIndex(theCalculationParams.itsLocationIndex); // kohde dataa juoksutetaan, joten lokaatio indeksien pit‰‰ olla synkassa!!!
 		value = FixCircularValues(value); // ensin tehd‰‰n circular tarkistus ja sitten vasta min/max
 		value = GetInsideLimitsValue(static_cast<float>(value)); // asetetaan value viel‰ drawparamista satuihin rajoihin, ettei esim. RH voi olla alle 0 tai yli 100 %
 
@@ -116,7 +116,7 @@ void NFmiSmartToolCalculation::Calculate(const NFmiPoint &theLatlon, unsigned lo
 	{
 		if(fAllowMissingValueAssignment)
 		{
-			itsResultInfo->LocationIndex(theLocationIndex); // kohde dataa juoksutetaan, joten lokaatio indeksien pit‰‰ olla synkassa!!!
+			itsResultInfo->LocationIndex(theCalculationParams.itsLocationIndex); // kohde dataa juoksutetaan, joten lokaatio indeksien pit‰‰ olla synkassa!!!
 			itsResultInfo->FloatValue(static_cast<float>(value)); // nyt voidaan asettaa puuttuva arvo dataan
 		}
 	}
@@ -157,9 +157,9 @@ void NFmiSmartToolCalculation::SetLimits(float theLowerLimit, float theUpperLimi
 	}
 }
 
-bool NFmiSmartToolCalculation::IsMasked(const NFmiPoint &theLatlon, int theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex)
+bool NFmiSmartToolCalculation::IsMasked(const NFmiCalculationParams &theCalculationParams)
 {
-	return bin_eval_exp(theLatlon, theTime, theTimeIndex);
+	return bin_eval_exp(theCalculationParams);
 }
 
 void NFmiSmartToolCalculation::AddCalculation(const boost::shared_ptr<NFmiAreaMask> &theCalculation)
@@ -189,7 +189,7 @@ void NFmiSmartToolCalculation::SetTime(const NFmiMetTime &theTime)
 
 // eval_exp-metodit otettu H. Schilbertin  C++: the Complete Refeference third ed.
 // jouduin muuttamaan niit‰ v‰h‰n sopimaan t‰h‰n ymp‰ristˆˆn.
-double NFmiSmartToolCalculation::eval_exp(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+double NFmiSmartToolCalculation::eval_exp(const NFmiCalculationParams &theCalculationParams)
 {
 	double result = kFloatMissing;
 
@@ -200,7 +200,7 @@ double NFmiSmartToolCalculation::eval_exp(const NFmiPoint &theLatlon, const NFmi
 	if(!token || token->GetCalculationOperationType() == NFmiAreaMask::NoType || token->GetCalculationOperationType() == NFmiAreaMask::EndOfOperations)
 		throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorNoCalculations") + ":\n" + GetCalculationText());
 
-	eval_exp1(result, theLatlon, theTime, theTimeIndex);
+	eval_exp1(result, theCalculationParams);
 	if(token->GetCalculationOperationType() != NFmiAreaMask::EndOfOperations)
 		throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidEnding") + ":\n" + GetCalculationText());
 	return result;
@@ -209,22 +209,22 @@ double NFmiSmartToolCalculation::eval_exp(const NFmiPoint &theLatlon, const NFmi
 // Process an assignment.
 // T‰m‰ on jo hoidettu toisella tavalla omassa koodissa, joten ohitan t‰m‰n,
 // mutta j‰t‰n kommentteihin, jos tarvitsen tulevaisuudessa.
-void NFmiSmartToolCalculation::eval_exp1(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::eval_exp1(double &result, const NFmiCalculationParams &theCalculationParams)
 {
-	eval_exp2(result, theLatlon, theTime, theTimeIndex);
+	eval_exp2(result, theCalculationParams);
 }
 
 // Add or subtract two terms.
-void NFmiSmartToolCalculation::eval_exp2(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::eval_exp2(double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	NFmiAreaMask::CalculationOperator op;
 	double temp;
 
-	eval_exp3(result, theLatlon, theTime, theTimeIndex);
+	eval_exp3(result, theCalculationParams);
 	while((op = token->GetCalculationOperator()) == NFmiAreaMask::Add || op == NFmiAreaMask::Sub)
 	{
 		get_token();
-		eval_exp3(temp, theLatlon, theTime, theTimeIndex);
+		eval_exp3(temp, theCalculationParams);
 
 		if(result == kFloatMissing || temp==kFloatMissing)
 		  result = kFloatMissing;
@@ -236,16 +236,16 @@ void NFmiSmartToolCalculation::eval_exp2(double &result, const NFmiPoint &theLat
 }
 
 // Multiply or divide two factors.
-void NFmiSmartToolCalculation::eval_exp3(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::eval_exp3(double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	NFmiAreaMask::CalculationOperator op;
 	double temp;
 
-	eval_exp4(result, theLatlon, theTime, theTimeIndex);
+	eval_exp4(result, theCalculationParams);
 	while((op = token->GetCalculationOperator()) == NFmiAreaMask::Mul || op == NFmiAreaMask::Div || op == NFmiAreaMask::Mod)
 	{
 		get_token();
-		eval_exp4(temp, theLatlon, theTime, theTimeIndex);
+		eval_exp4(temp, theCalculationParams);
 
 		if(result == kFloatMissing || temp==kFloatMissing)
 		  result = kFloatMissing;
@@ -259,15 +259,15 @@ void NFmiSmartToolCalculation::eval_exp3(double &result, const NFmiPoint &theLat
 }
 
 // Process an exponent
-void NFmiSmartToolCalculation::eval_exp4(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::eval_exp4(double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	double temp;
 
-	eval_exp5(result, theLatlon, theTime, theTimeIndex);
+	eval_exp5(result, theCalculationParams);
 	if(token->GetCalculationOperator() == NFmiAreaMask::Pow)
 	{
 		get_token();
-		eval_exp4(temp, theLatlon, theTime, theTimeIndex);
+		eval_exp4(temp, theCalculationParams);
 		if(temp==0.0)
 		{
 			result = 1.0;
@@ -281,12 +281,12 @@ void NFmiSmartToolCalculation::eval_exp4(double &result, const NFmiPoint &theLat
 }
 
 // Evaluate a unary + or -.
-void NFmiSmartToolCalculation::eval_exp5(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::eval_exp5(double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	NFmiAreaMask::CalculationOperator op = token->GetCalculationOperator();
 	if(op == NFmiAreaMask::Add || op == NFmiAreaMask::Sub)
 		get_token();
-	eval_exp6(result, theLatlon, theTime, theTimeIndex);
+	eval_exp6(result, theCalculationParams);
 
 	if(op == NFmiAreaMask::Sub && result!=kFloatMissing)
 		result = -result;
@@ -310,12 +310,12 @@ static void DEBUGOUT2(bool doOutPut, const string &theComment, double theValue)
 #endif
 
 // Process a parenthesized expression.
-void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	if(token->GetCalculationOperationType() == NFmiAreaMask::StartParenthesis)
 	{
 		get_token();
-		eval_exp2(result, theLatlon, theTime, theTimeIndex);
+		eval_exp2(result, theCalculationParams);
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis)
 			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParenthesis") + ":\n" + GetCalculationText());
 		get_token();
@@ -324,25 +324,25 @@ void NFmiSmartToolCalculation::eval_exp6(double &result, const NFmiPoint &theLat
 	{
 		NFmiAreaMask::MathFunctionType function = token->GetMathFunctionType();
 		get_token();
-		eval_exp2(result, theLatlon, theTime, theTimeIndex);
+		eval_exp2(result, theCalculationParams);
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
 			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") + ":\n" + GetCalculationText());
 		eval_math_function(result, function);
 		get_token();
 	}
 	else if(token->GetCalculationOperationType() == NFmiAreaMask::ThreeArgumentFunctionStart)
-		CalcThreeArgumentFunction(result, theLatlon, theTime, theTimeIndex);
+		CalcThreeArgumentFunction(result, theCalculationParams);
 	else if(token->GetCalculationOperationType() == NFmiAreaMask::VertFunctionStart)
-		CalcVertFunction(result, theLatlon, theTime, theTimeIndex);
+		CalcVertFunction(result, theCalculationParams);
 	else
-		atom(result, theLatlon, theTime, theTimeIndex);
+		atom(result, theCalculationParams);
 }
 
-void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiCalculationParams &theCalculationParams)
 {
 	result = kFloatMissing;
 	if(theIntegrationFunctionType == 2 || theIntegrationFunctionType == 3)
-		eval_ThreeArgumentFunctionZ(result, argument1, argument2, func, theIntegrationFunctionType, theLatlon, theTime, theTimeIndex);
+		eval_ThreeArgumentFunctionZ(result, argument1, argument2, func, theIntegrationFunctionType, theCalculationParams);
 	else
 	{
 		if(argument1 != kFloatMissing && argument2 != kFloatMissing)
@@ -352,9 +352,9 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(double &result, double
 			CalcIter startCalcIterator = itsCalcIterator; // pit‰‰kˆ olla edellinen??, pit‰‰ olla ep‰selv‰‰, mutta pakko
 			// 2. katso onko kyseess‰ aika- vai korkeus lasku ja haaraudu
 			// 3. jos aikalasku, laske alkuaika ja loppu aika
-			NFmiMetTime startTime(theTime);
+			NFmiMetTime startTime(theCalculationParams.itsTime);
 			startTime.ChangeByHours(static_cast<long>(argument1));
-			NFmiMetTime endTime(theTime);
+			NFmiMetTime endTime(theCalculationParams.itsTime);
 			endTime.ChangeByHours(static_cast<long>(argument2));
 			NFmiMetTime currentTime(startTime);
 			// 4. mieti mik‰ on aikahyppy (oletus 1h) jos pelkk‰‰ EC-dataa, voisi aikahyppy olla 3h tai 6h
@@ -374,7 +374,7 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(double &result, double
 						itsCalcIterator = startCalcIterator;
 						get_token(); // pit‰‰ tehd‰ viel‰ t‰m‰, muuten osoittaa edelliseen pilkku-operaattoriin
 						// 7. k‰y aika-loopissa l‰pi eval_exp2-laskut
-						eval_exp2(value, theLatlon, currentTime, theTimeIndex); // theTimeIndex on nyt puppua
+						eval_exp2(value, theCalculationParams); // theTimeIndex on nyt puppua
 						// 8. sijoita tulos datamodifier:iin
 						modifier->Calculate(static_cast<float>(value));
 						// 9. 'next'
@@ -423,7 +423,7 @@ static bool IsEqualEnough(T value1, T value2, T usedEpsilon)
 		return true;
 	return false;
 }
-void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiCalculationParams &theCalculationParams)
 {
 	result = kFloatMissing;
 	if(argument1 != kFloatMissing && argument2 != kFloatMissing)
@@ -454,7 +454,7 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(double &result, doubl
 					itsCalcIterator = startCalcIterator;
 					get_token(); // pit‰‰ tehd‰ viel‰ t‰m‰, muuten osoittaa edelliseen pilkku-operaattoriin
 					// 7. k‰y aika-loopissa l‰pi eval_exp2-laskut
-					eval_exp2(value, theLatlon, theTime, theTimeIndex); // theTimeIndex on nyt puppua
+					eval_exp2(value, theCalculationParams); // theTimeIndex on nyt puppua
 					// 8. sijoita tulos datamodifier:iin
 					modifier->Calculate(static_cast<float>(value));
 					if(theIntegrationFunctionType == 3)
@@ -603,14 +603,14 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
 	}
 }
 
-void NFmiSmartToolCalculation::atom(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::atom(double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	if(fUseHeightCalculation)
-		result = token->HeightValue(itsHeightValue, theLatlon, theTime);
+		result = token->HeightValue(itsHeightValue, theCalculationParams);
 	else if(fUsePressureLevelCalculation)
-		result = token->PressureValue(itsPressureHeightValue, theLatlon, theTime);
+		result = token->PressureValue(itsPressureHeightValue, theCalculationParams);
 	else
-		result = token->Value(theLatlon, theTime, theTimeIndex, fUseTimeInterpolationAlways);
+		result = token->Value(theCalculationParams, fUseTimeInterpolationAlways);
 	get_token();
 }
 
@@ -632,7 +632,7 @@ void NFmiSmartToolCalculation::get_token(void)
 }
 
 // Laskun alustus, alustetaan iteraattori ja token.
-bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiCalculationParams &theCalculationParams)
 {
 	bool maskresult = true;
 	double result = kFloatMissing;
@@ -644,7 +644,7 @@ bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiPoint &theLatlon, const NF
 	if(!token || token->GetCalculationOperationType() == NFmiAreaMask::NoType || token->GetCalculationOperationType() == NFmiAreaMask::EndOfOperations)
 		throw  runtime_error(::GetDictionaryString("SmartToolCalculationErrorNoCalculations") + ":\n" + GetCalculationText());
 
-	bin_eval_exp1(maskresult, result, theLatlon, theTime, theTimeIndex);
+	bin_eval_exp1(maskresult, result, theCalculationParams);
 	if(token->GetCalculationOperationType() != NFmiAreaMask::EndOfOperations)
 		throw  runtime_error(::GetDictionaryString("SmartToolCalculationErrorConditionalEnding") + ":\n" + GetCalculationText());
 	return maskresult;
@@ -653,24 +653,24 @@ bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiPoint &theLatlon, const NF
 // Process an assignment.
 // T‰m‰ on jo hoidettu toisella tavalla omassa koodissa, joten ohitan t‰m‰n,
 // mutta j‰t‰n kommentteihin, jos tarvitsen tulevaisuudessa.
-void NFmiSmartToolCalculation::bin_eval_exp1(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::bin_eval_exp1(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams)
 {
-	bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
+	bin_eval_exp1_1(maskresult, result, theCalculationParams);
 }
 
 // T‰m‰ pit‰‰ siirt‰‰ prioriteetissa alle yhteen laskun
 // Process a binary expression. && ja || eli AND ja OR
-void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	NFmiAreaMask::BinaryOperator op;
 	bool tempmask;
 	double temp;
 
-	bin_eval_exp1_2(maskresult, result, theLatlon, theTime, theTimeIndex);
+	bin_eval_exp1_2(maskresult, result, theCalculationParams);
 	while((op = token->PostBinaryOperator()) == NFmiAreaMask::kAnd || op == NFmiAreaMask::kOr)
 	{
 		get_token();
-		bin_eval_exp1_2(tempmask, temp, theLatlon, theTime, theTimeIndex);
+		bin_eval_exp1_2(tempmask, temp, theCalculationParams);
 		switch(op)
 		{
 		case NFmiAreaMask::kAnd:
@@ -687,19 +687,19 @@ void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult, double &result,
 
 // T‰m‰ pit‰‰ siirt‰‰ prioriteetissa alle yhteen laskun
 // Process a comparison expression <, >, ==, <=, >=
-void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	FmiMaskOperation op;
 	bool tempmask;
 	double temp;
 	NFmiAreaMask::CalculationOperationType opType1 = token->GetCalculationOperationType();
 
-	bin_eval_exp2(maskresult, result, theLatlon, theTime, theTimeIndex);
+	bin_eval_exp2(maskresult, result, theCalculationParams);
 	while((op = token->Condition().Condition()) != kFmiNoMaskOperation)
 	{
 		get_token();
 		NFmiAreaMask::CalculationOperationType opType2 = token->GetCalculationOperationType();
-		bin_eval_exp2(tempmask, temp, theLatlon, theTime, theTimeIndex);
+		bin_eval_exp2(tempmask, temp, theCalculationParams);
 
 		// resultit eiv‰t saa olla missin-arvoja, paitsi jos ne ovat Constant-maskista, eli halutaan nimenomaan verrata jotain missing-arvoon
 		bool allowMissingComparison = (result == kFloatMissing && opType1 == NFmiAreaMask::Constant) || (temp == kFloatMissing && opType2 == NFmiAreaMask::Constant);
@@ -736,16 +736,16 @@ void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult, double &result,
 }
 
 // Add or subtract two terms.
-void NFmiSmartToolCalculation::bin_eval_exp2(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::bin_eval_exp2(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	NFmiAreaMask::CalculationOperator op;
 	double temp;
 
-	bin_eval_exp3(maskresult, result, theLatlon, theTime, theTimeIndex);
+	bin_eval_exp3(maskresult, result, theCalculationParams);
 	while((op = token->GetCalculationOperator()) == NFmiAreaMask::Add || op == NFmiAreaMask::Sub)
 	{
 		get_token();
-		bin_eval_exp3(maskresult, temp, theLatlon, theTime, theTimeIndex);
+		bin_eval_exp3(maskresult, temp, theCalculationParams);
 		if(result == kFloatMissing || temp == kFloatMissing)
 		  result = kFloatMissing;
 		else if(op == NFmiAreaMask::Sub)
@@ -756,16 +756,16 @@ void NFmiSmartToolCalculation::bin_eval_exp2(bool &maskresult, double &result, c
 }
 
 // Multiply or divide two factors.
-void NFmiSmartToolCalculation::bin_eval_exp3(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::bin_eval_exp3(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	NFmiAreaMask::CalculationOperator op;
 	double temp;
 
-	bin_eval_exp4(maskresult, result, theLatlon, theTime, theTimeIndex);
+	bin_eval_exp4(maskresult, result, theCalculationParams);
 	while((op = token->GetCalculationOperator()) == NFmiAreaMask::Mul || op == NFmiAreaMask::Div || op == NFmiAreaMask::Mod)
 	{
 		get_token();
-		bin_eval_exp4(maskresult, temp, theLatlon, theTime, theTimeIndex);
+		bin_eval_exp4(maskresult, temp, theCalculationParams);
 		if(result == kFloatMissing || temp == kFloatMissing)
 		  result = kFloatMissing;
 		else if(op == NFmiAreaMask::Mul)
@@ -778,15 +778,15 @@ void NFmiSmartToolCalculation::bin_eval_exp3(bool &maskresult, double &result, c
 }
 
 // Process an exponent
-void NFmiSmartToolCalculation::bin_eval_exp4(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::bin_eval_exp4(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	double temp;
 
-	bin_eval_exp5(maskresult, result, theLatlon, theTime, theTimeIndex);
+	bin_eval_exp5(maskresult, result, theCalculationParams);
 	if(token->GetCalculationOperator() == NFmiAreaMask::Pow)
 	{
 		get_token();
-		bin_eval_exp4(maskresult, temp, theLatlon, theTime, theTimeIndex);
+		bin_eval_exp4(maskresult, temp, theCalculationParams);
 		if(temp==0.0)
 		{
 			result = 1.0;
@@ -800,40 +800,40 @@ void NFmiSmartToolCalculation::bin_eval_exp4(bool &maskresult, double &result, c
 }
 
 // Evaluate a unary + or -.
-void NFmiSmartToolCalculation::bin_eval_exp5(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::bin_eval_exp5(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	NFmiAreaMask::CalculationOperator op = token->GetCalculationOperator();
 	if(op == NFmiAreaMask::Add || op == NFmiAreaMask::Sub)
 		get_token();
-	bin_eval_exp6(maskresult, result, theLatlon, theTime, theTimeIndex);
+	bin_eval_exp6(maskresult, result, theCalculationParams);
 
 	if(op == NFmiAreaMask::Sub && result != kFloatMissing)
 		result = -result;
 }
 
-void NFmiSmartToolCalculation::CalcThreeArgumentFunction(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::CalcThreeArgumentFunction(double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	// huom! t‰ss‰ ei k‰ytet‰ bin_eval-kutsuja, koska t‰ss‰ lasketaan vain yksi luku, mik‰ palautetaan bin_eval-systeemiin
 	NFmiAreaMask::FunctionType func = token->GetFunctionType(); // eli onko kyse min, max vai mist‰ funktiosta
 	int integrationFunctionType = token->IntegrationFunctionType(); // t‰m‰ kertoo onko kyse vertikaali vai ajallisesta integroinnista kyse
 	get_token();
 	double argument1 = kFloatMissing;
-	eval_exp2(argument1, theLatlon, theTime, theTimeIndex);
+	eval_exp2(argument1, theCalculationParams);
 	if(token->GetCalculationOperationType() != NFmiAreaMask::CommaOperator) // n‰iden funktioiden argumentit erotetaan pilkuilla
 		throw  runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParamSeparation") + ":\n" + GetCalculationText());
 	get_token();
 	double argument2 = kFloatMissing;
-	eval_exp2(argument2, theLatlon, theTime, theTimeIndex);
+	eval_exp2(argument2, theCalculationParams);
 	if(token->GetCalculationOperationType() != NFmiAreaMask::CommaOperator) // n‰iden funktioiden argumentit erotetaan pilkuilla
 		throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParamSeparation") + ":\n" + GetCalculationText());
-	eval_ThreeArgumentFunction(result, argument1, argument2, func, integrationFunctionType, theLatlon, theTime, theTimeIndex);
+	eval_ThreeArgumentFunction(result, argument1, argument2, func, integrationFunctionType, theCalculationParams);
 
 	if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
 		throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") + ":\n" + GetCalculationText());
 	get_token();
 }
 
-void NFmiSmartToolCalculation::CalcVertFunction(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::CalcVertFunction(double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	boost::shared_ptr<NFmiAreaMask> verticalFunctionToken = token; // t‰h‰n otetaan talteen vertikaalilasku olio
 	int trueArgumentCount = verticalFunctionToken->FunctionArgumentCount() - 1;
@@ -842,7 +842,7 @@ void NFmiSmartToolCalculation::CalcVertFunction(double &result, const NFmiPoint 
 	{
 		get_token();
 		double argument = kFloatMissing;
-		eval_exp2(argument, theLatlon, theTime, theTimeIndex);
+		eval_exp2(argument, theCalculationParams);
 		bool commaOperator = (token->GetCalculationOperationType() == NFmiAreaMask::CommaOperator);
 		bool endParethesisOperator = (argumentCounter >= trueArgumentCount - 1) && (token->GetCalculationOperationType() == NFmiAreaMask::EndParenthesis);
 		if(!(commaOperator || endParethesisOperator)) // n‰iden funktioiden argumentit erotetaan pilkuilla tai ne loppuu sulkuun
@@ -851,7 +851,7 @@ void NFmiSmartToolCalculation::CalcVertFunction(double &result, const NFmiPoint 
 	}
 
 	verticalFunctionToken->SetArguments(argumentVector);
-	result = verticalFunctionToken->Value(theLatlon, theTime, theTimeIndex, false);
+	result = verticalFunctionToken->Value(theCalculationParams, false);
 
 	if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
 		throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") + ":\n" + GetCalculationText());
@@ -859,12 +859,12 @@ void NFmiSmartToolCalculation::CalcVertFunction(double &result, const NFmiPoint 
 }
 
 // Process a parenthesized expression.
-void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	if(token->GetCalculationOperationType() == NFmiAreaMask::StartParenthesis)
 	{
 		get_token();
-		bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
+		bin_eval_exp1_1(maskresult, result, theCalculationParams);
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis)
 			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParenthesis") + ":\n" + GetCalculationText());
 		get_token();
@@ -873,29 +873,29 @@ void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult, double &result, c
 	{
 		NFmiAreaMask::MathFunctionType function = token->GetMathFunctionType();
 		get_token();
-		bin_eval_exp1_1(maskresult, result, theLatlon, theTime, theTimeIndex);
+		bin_eval_exp1_1(maskresult, result, theCalculationParams);
 		if(token->GetCalculationOperationType() != NFmiAreaMask::EndParenthesis) // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
 			throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") + ":\n" + GetCalculationText());
 		eval_math_function(result, function);
 		get_token();
 	}
 	else if(token->GetCalculationOperationType() == NFmiAreaMask::ThreeArgumentFunctionStart)
-		CalcThreeArgumentFunction(result, theLatlon, theTime, theTimeIndex);
+		CalcThreeArgumentFunction(result, theCalculationParams);
 	else if(token->GetCalculationOperationType() == NFmiAreaMask::VertFunctionStart)
-		CalcVertFunction(result, theLatlon, theTime, theTimeIndex);
+		CalcVertFunction(result, theCalculationParams);
 	else
-		bin_atom(maskresult, result, theLatlon, theTime, theTimeIndex);
+		bin_atom(maskresult, result, theCalculationParams);
 }
 
 
-void NFmiSmartToolCalculation::bin_atom(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex)
+void NFmiSmartToolCalculation::bin_atom(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams)
 {
 	if(fUseHeightCalculation)
-		result = token->HeightValue(itsHeightValue, theLatlon, theTime);
+		result = token->HeightValue(itsHeightValue, theCalculationParams);
 	else if(fUsePressureLevelCalculation)
-		result = token->PressureValue(itsPressureHeightValue, theLatlon, theTime);
+		result = token->PressureValue(itsPressureHeightValue, theCalculationParams);
 	else
-		result = token->Value(theLatlon, theTime, theTimeIndex, fUseTimeInterpolationAlways);
+		result = token->Value(theCalculationParams, fUseTimeInterpolationAlways);
 	get_token();
 }
 

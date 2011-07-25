@@ -20,6 +20,7 @@
 #include "NFmiDataMatrix.h"
 #include "NFmiInfoData.h"
 #include "NFmiLevelType.h"
+#include "NFmiAreaMask.h"
 
 #include <string>
 #include <boost/shared_ptr.hpp>
@@ -55,7 +56,7 @@ public:
 	~NFmiSmartToolCalculationBlockVector(void);
 	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
 	void SetTime(const NFmiMetTime &theTime);
-	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
+	void Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue);
 	void Add(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theBlock);
 	Iterator Begin(void) {return itsCalculationBlocks.begin();}
 	Iterator End(void) {return itsCalculationBlocks.end();}
@@ -72,7 +73,7 @@ public:
 	~NFmiSmartToolCalculationBlock(void);
 	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
 	void SetTime(const NFmiMetTime &theTime);
-	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
+	void Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue);
 
 	boost::shared_ptr<NFmiSmartToolCalculationSection> itsFirstCalculationSection;
 	boost::shared_ptr<NFmiSmartToolCalculation> itsIfAreaMaskSection;

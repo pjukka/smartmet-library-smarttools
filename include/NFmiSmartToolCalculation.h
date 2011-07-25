@@ -36,8 +36,8 @@ public:
 class NFmiSmartToolCalculation 
 {
 public:
-	bool IsMasked(const NFmiPoint &theLatlon, int theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex);
-	void Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue);
+	bool IsMasked(const NFmiCalculationParams &theCalculationParams);
+	void Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue);
 	void SetTime(const NFmiMetTime &theTime); // optimointia laskuja varten
 
 	NFmiSmartToolCalculation(void);
@@ -64,34 +64,34 @@ private:
 
 // eval_exp-metodit otettu H. Schilbertin  C++: the Complete Refeference third ed.
 // jouduin muuttamaan niitä vähän sopimaan tähän ympäristöön.
-	double eval_exp(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void eval_exp1(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void eval_exp2(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void eval_exp3(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void eval_exp4(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void eval_exp5(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void eval_exp6(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+	double eval_exp(const NFmiCalculationParams &theCalculationParams);
+	void eval_exp1(double &result, const NFmiCalculationParams &theCalculationParams);
+	void eval_exp2(double &result, const NFmiCalculationParams &theCalculationParams);
+	void eval_exp3(double &result, const NFmiCalculationParams &theCalculationParams);
+	void eval_exp4(double &result, const NFmiCalculationParams &theCalculationParams);
+	void eval_exp5(double &result, const NFmiCalculationParams &theCalculationParams);
+	void eval_exp6(double &result, const NFmiCalculationParams &theCalculationParams);
 	void eval_math_function(double &result, int theFunction);
-	void eval_ThreeArgumentFunction(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void eval_ThreeArgumentFunctionZ(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+	void eval_ThreeArgumentFunction(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiCalculationParams &theCalculationParams);
+	void eval_ThreeArgumentFunctionZ(double &result, double argument1, double argument2, NFmiAreaMask::FunctionType func, int theIntegrationFunctionType, const NFmiCalculationParams &theCalculationParams);
 	boost::shared_ptr<NFmiDataModifier> CreateIntegrationFuction(NFmiAreaMask::FunctionType func);
-	void atom(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+	void atom(double &result, const NFmiCalculationParams &theCalculationParams);
 	void get_token(void);
 	boost::shared_ptr<NFmiAreaMask> token; // tässä on kulloinenkin laskun osa tarkastelussa
 	CalcIter itsCalcIterator; // get_token siirtää tätä
 	// Lisäksi piti maskia varten binääri versio evaluaatio systeemistä
-	bool bin_eval_exp(const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void bin_eval_exp1(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void bin_eval_exp1_1(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void bin_eval_exp1_2(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void bin_eval_exp2(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void bin_eval_exp3(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void bin_eval_exp4(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void bin_eval_exp5(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void bin_eval_exp6(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void bin_atom(bool &maskresult, double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void CalcThreeArgumentFunction(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
-	void CalcVertFunction(double &result, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, int theTimeIndex);
+	bool bin_eval_exp(const NFmiCalculationParams &theCalculationParams);
+	void bin_eval_exp1(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams);
+	void bin_eval_exp1_1(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams);
+	void bin_eval_exp1_2(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams);
+	void bin_eval_exp2(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams);
+	void bin_eval_exp3(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams);
+	void bin_eval_exp4(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams);
+	void bin_eval_exp5(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams);
+	void bin_eval_exp6(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams);
+	void bin_atom(bool &maskresult, double &result, const NFmiCalculationParams &theCalculationParams);
+	void CalcThreeArgumentFunction(double &result, const NFmiCalculationParams &theCalculationParams);
+	void CalcVertFunction(double &result, const NFmiCalculationParams &theCalculationParams);
 
 	boost::shared_ptr<NFmiFastQueryInfo> itsResultInfo; // omistaa+tuhoaa
 	checkedVector<boost::shared_ptr<NFmiAreaMask> > itsCalculations; // omistaa+tuhoaa

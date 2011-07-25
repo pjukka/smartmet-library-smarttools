@@ -82,12 +82,12 @@ void NFmiSmartToolCalculationBlockVector::SetTime(const NFmiMetTime &theTime)
 		(*it)->SetTime(theTime);
 }
 
-void NFmiSmartToolCalculationBlockVector::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue)
+void NFmiSmartToolCalculationBlockVector::Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue)
 {
 	Iterator it = Begin();
 	Iterator endIt = End();
 	for( ; it != endIt; ++it)
-		(*it)->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
+		(*it)->Calculate(theCalculationParams, theMacroParamValue);
 }
 
 void NFmiSmartToolCalculationBlockVector::Add(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theBlock)
@@ -144,20 +144,20 @@ void NFmiSmartToolCalculationBlock::SetTime(const NFmiMetTime &theTime)
 		itsLastCalculationSection->SetTime(theTime);
 }
 
-void NFmiSmartToolCalculationBlock::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue)
+void NFmiSmartToolCalculationBlock::Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue)
 {
 	if(itsFirstCalculationSection)
-		itsFirstCalculationSection->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
+		itsFirstCalculationSection->Calculate(theCalculationParams, theMacroParamValue);
 
-	if(itsIfAreaMaskSection && itsIfAreaMaskSection->IsMasked(theLatlon, theLocationIndex, theTime, theTimeIndex))
-		itsIfCalculationBlocks->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
-	else if(itsElseIfAreaMaskSection && itsElseIfAreaMaskSection->IsMasked(theLatlon, theLocationIndex, theTime, theTimeIndex))
-		itsElseIfCalculationBlocks->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
+	if(itsIfAreaMaskSection && itsIfAreaMaskSection->IsMasked(theCalculationParams))
+		itsIfCalculationBlocks->Calculate(theCalculationParams, theMacroParamValue);
+	else if(itsElseIfAreaMaskSection && itsElseIfAreaMaskSection->IsMasked(theCalculationParams))
+		itsElseIfCalculationBlocks->Calculate(theCalculationParams, theMacroParamValue);
 	else if(itsElseCalculationBlocks)
-		itsElseCalculationBlocks->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
+		itsElseCalculationBlocks->Calculate(theCalculationParams, theMacroParamValue);
 
 	if(itsLastCalculationSection)
-		itsLastCalculationSection->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
+		itsLastCalculationSection->Calculate(theCalculationParams, theMacroParamValue);
 }
 
 //--------------------------------------------------------
@@ -456,42 +456,43 @@ void NFmiSmartToolModifier::ModifyConditionalData(const boost::shared_ptr<NFmiSm
 
 		try
 		{
+			NFmiCalculationParams calculationParams;
 			SetInfosMaskType(info);
 			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
 			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 			{
-				NFmiMetTime time1(modifiedTimes.Time());
+				calculationParams.itsTime = modifiedTimes.Time();
 				if(theMacroParamValue.fSetValue)
-					time1 = theMacroParamValue.itsTime;
-				info->Time(time1); // asetetaan myös tämä, että saadaan oikea timeindex
-				theCalculationBlock->itsIfAreaMaskSection->SetTime(time1); // yritetään optimoida laskuja hieman kun mahdollista
-				theCalculationBlock->itsIfCalculationBlocks->SetTime(time1); // yritetään optimoida laskuja hieman kun mahdollista
+					calculationParams.itsTime = theMacroParamValue.itsTime;
+				info->Time(calculationParams.itsTime); // asetetaan myös tämä, että saadaan oikea timeindex
+				calculationParams.itsTimeIndex = info->TimeIndex();
+				theCalculationBlock->itsIfAreaMaskSection->SetTime(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
+				theCalculationBlock->itsIfCalculationBlocks->SetTime(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
 				if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks)
 				{
-					theCalculationBlock->itsElseIfAreaMaskSection->SetTime(time1);
-					theCalculationBlock->itsElseIfCalculationBlocks->SetTime(time1);
+					theCalculationBlock->itsElseIfAreaMaskSection->SetTime(calculationParams.itsTime);
+					theCalculationBlock->itsElseIfCalculationBlocks->SetTime(calculationParams.itsTime);
 				}
 				if(theCalculationBlock->itsElseCalculationBlocks)
-					theCalculationBlock->itsElseCalculationBlocks->SetTime(time1);
+					theCalculationBlock->itsElseCalculationBlocks->SetTime(calculationParams.itsTime);
 
 				for(info->ResetLocation(); info->NextLocation(); )
 				{
-					NFmiPoint latlon(info->LatLon());
+					calculationParams.itsLatlon = info->LatLon();
 					if(theMacroParamValue.fSetValue)
 					{
-						latlon = theMacroParamValue.itsLatlon;
-						info->Location(latlon); // pitää laittaa nearestlocation päälle, että tuloksia voidaan myöhemmin hakea interpolaation avulla
+						calculationParams.itsLatlon = theMacroParamValue.itsLatlon;
+						info->Location(calculationParams.itsLatlon); // pitää laittaa nearestlocation päälle, että tuloksia voidaan myöhemmin hakea interpolaation avulla
 					}
-					unsigned long locationIndex = info->LocationIndex(); // tämä locationindex juttu liittyy kai optimointiin, jota ei tehdä enää, pitäisikö poistaa
-					int timeIndex = info->TimeIndex();
-					if(theCalculationBlock->itsIfAreaMaskSection->IsMasked(latlon, locationIndex, time1, timeIndex))
-						theCalculationBlock->itsIfCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex, theMacroParamValue);
-					else if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks && theCalculationBlock->itsElseIfAreaMaskSection->IsMasked(latlon, locationIndex, time1, timeIndex))
+					calculationParams.itsLocationIndex = info->LocationIndex(); // tämä locationindex juttu liittyy kai optimointiin, jota ei tehdä enää, pitäisikö poistaa
+					if(theCalculationBlock->itsIfAreaMaskSection->IsMasked(calculationParams))
+						theCalculationBlock->itsIfCalculationBlocks->Calculate(calculationParams, theMacroParamValue);
+					else if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks && theCalculationBlock->itsElseIfAreaMaskSection->IsMasked(calculationParams))
 					{
-						theCalculationBlock->itsElseIfCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex, theMacroParamValue);
+						theCalculationBlock->itsElseIfCalculationBlocks->Calculate(calculationParams, theMacroParamValue);
 					}
 					else if(theCalculationBlock->itsElseCalculationBlocks)
-						theCalculationBlock->itsElseCalculationBlocks->Calculate(latlon, locationIndex, time1, timeIndex, theMacroParamValue);
+						theCalculationBlock->itsElseCalculationBlocks->Calculate(calculationParams, theMacroParamValue);
 					if(theMacroParamValue.fSetValue)
 					{
 						return ; // eli jos oli yhden pisteen laskusta kyse, lopetetaan loppi heti
@@ -540,6 +541,7 @@ void NFmiSmartToolModifier::ModifyData2(boost::shared_ptr<NFmiSmartToolCalculati
 			return ;
 		try
 		{
+			NFmiCalculationParams calculationParams;
 			SetInfosMaskType(info);
 			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
 
@@ -555,22 +557,23 @@ void NFmiSmartToolModifier::ModifyData2(boost::shared_ptr<NFmiSmartToolCalculati
 			{
 				for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 				{
-					NFmiMetTime time1(modifiedTimes.Time());
+					calculationParams.itsTime = modifiedTimes.Time();
 					if(theMacroParamValue.fSetValue)
-						time1 = theMacroParamValue.itsTime;
-					if(info->Time(time1)) // asetetaan myös tämä, että saadaan oikea timeindex
+						calculationParams.itsTime = theMacroParamValue.itsTime;
+					if(info->Time(calculationParams.itsTime)) // asetetaan myös tämä, että saadaan oikea timeindex
 					{
-						theCalculationSection->SetTime(time1); // yritetään optimoida laskuja hieman kun mahdollista
+						theCalculationSection->SetTime(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
 						for(info->ResetLocation(); info->NextLocation(); )
 						{
-							NFmiPoint latlon(info->LatLon());
+							calculationParams.itsLatlon = info->LatLon();
 							if(theMacroParamValue.fSetValue)
 							{
-								latlon = theMacroParamValue.itsLatlon;
-								info->Location(latlon); // pitää laittaa nearestlocation päälle, että tuloksia voidaan myöhemmin hakea interpolaation avulla
+								calculationParams.itsLatlon = theMacroParamValue.itsLatlon;
+								info->Location(calculationParams.itsLatlon); // pitää laittaa nearestlocation päälle, että tuloksia voidaan myöhemmin hakea interpolaation avulla
 							}
+							calculationParams.itsLocationIndex = info->LocationIndex();
 							// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseistä optimointi juttua ei kai enää käytetä
-							theCalculationSection->GetCalculations()[i]->Calculate(latlon, info->LocationIndex(), time1, info->TimeIndex(), theMacroParamValue);
+							theCalculationSection->GetCalculations()[i]->Calculate(calculationParams, theMacroParamValue);
 
 							if(theMacroParamValue.fSetValue)
 								break;

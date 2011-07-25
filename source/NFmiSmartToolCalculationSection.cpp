@@ -28,10 +28,10 @@ NFmiSmartToolCalculationSection::~NFmiSmartToolCalculationSection(void)
 //--------------------------------------------------------
 // Calculate
 //--------------------------------------------------------
-void NFmiSmartToolCalculationSection::Calculate(const NFmiPoint &theLatlon, unsigned long theLocationIndex, const NFmiMetTime &theTime, int theTimeIndex, NFmiMacroParamValue &theMacroParamValue)
+void NFmiSmartToolCalculationSection::Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue)
 {
 	for(size_t i=0; i < itsCalculations.size(); i++)
-		itsCalculations[i]->Calculate(theLatlon, theLocationIndex, theTime, theTimeIndex, theMacroParamValue);
+		itsCalculations[i]->Calculate(theCalculationParams, theMacroParamValue);
 }
 
 void NFmiSmartToolCalculationSection::AddCalculations(const boost::shared_ptr<NFmiSmartToolCalculation> &value)
