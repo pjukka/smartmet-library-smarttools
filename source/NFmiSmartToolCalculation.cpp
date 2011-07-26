@@ -367,14 +367,16 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(double &result, double
 				boost::shared_ptr<NFmiDataModifier> modifier = CreateIntegrationFuction(func); // tämä palauttaa aina jotain, tai heittää poikkeuksen
 				try
 				{
+					NFmiCalculationParams modifiedCalculationParams(theCalculationParams);
 					fUseTimeInterpolationAlways = true;
 					do
 					{
+						modifiedCalculationParams.itsTime = currentTime;
 						// 6. muista aina asettaa token/laskuiteraattori 'alkuun'
 						itsCalcIterator = startCalcIterator;
 						get_token(); // pitää tehdä vielä tämä, muuten osoittaa edelliseen pilkku-operaattoriin
 						// 7. käy aika-loopissa läpi eval_exp2-laskut
-						eval_exp2(value, theCalculationParams); // theTimeIndex on nyt puppua
+						eval_exp2(value, modifiedCalculationParams); // theTimeIndex on nyt puppua
 						// 8. sijoita tulos datamodifier:iin
 						modifier->Calculate(static_cast<float>(value));
 						// 9. 'next'
