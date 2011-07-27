@@ -9,6 +9,7 @@
 #include "NFmiDataModifier.h"
 #include "NFmiDataIterator.h"
 #include "NFmiFastQueryInfo.h"
+#include "NFmiDrawParam.h"
 
 //--------------------------------------------------------
 // Constructor/Destructor 
@@ -103,3 +104,53 @@ NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(void)
 :NFmiAreaMaskImpl()
 {
 }
+
+
+#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
+
+#include "NFmiStationView.h"
+
+
+NFmiStation2GridMask::NFmiStation2GridMask(Type theMaskType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+:NFmiInfoAreaMask(NFmiCalculationCondition(), theMaskType, theDataType, theInfo, NFmiAreaMask::kNoValue)
+,itsLastCalculatedTime(NFmiMetTime::gMissingTime)
+,itsGriddedStationData()
+,itsArea(0)
+,itsDoc(0)
+,itsStation2GridSize(1,1)
+{
+}
+
+NFmiStation2GridMask::~NFmiStation2GridMask(void)
+{
+}
+
+double NFmiStation2GridMask::Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways)
+{
+	DoGriddingCheck(theCalculationParams);
+	return itsGriddedStationData.GetValue(theCalculationParams.itsLocationIndex, kFloatMissing);
+}
+
+void NFmiStation2GridMask::SetGriddingHelpers(NFmiArea *theArea, NFmiEditMapGeneralDataDoc *theDoc, const NFmiPoint &theStation2GridSize)
+{
+	itsArea = theArea;
+	itsDoc = theDoc;
+	itsStation2GridSize = theStation2GridSize;
+}
+
+void NFmiStation2GridMask::DoGriddingCheck(const NFmiCalculationParams &theCalculationParams)
+{
+	if(itsLastCalculatedTime != theCalculationParams.itsTime)
+	{ // alustetaan hila
+		itsLastCalculatedTime = theCalculationParams.itsTime;
+		if(itsDoc && itsArea)
+		{
+			boost::shared_ptr<NFmiDrawParam> drawParam(new NFmiDrawParam(itsDataIdent, itsLevel, 0, itsDataType));
+			itsGriddedStationData.Resize(static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.X()), static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.Y()), kFloatMissing);
+			NFmiStationView::GridStationData(itsDoc, itsArea, drawParam, itsGriddedStationData, theCalculationParams.itsTime);
+		}
+	}
+}
+
+
+#endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL

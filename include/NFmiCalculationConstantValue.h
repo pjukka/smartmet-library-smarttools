@@ -123,3 +123,42 @@ private:
 	boost::shared_ptr<NFmiDataModifier> itsDataModifier;
 	boost::shared_ptr<NFmiDataIterator> itsDataIterator;
 };
+
+// t‰m‰ luokka on ik‰v‰sti riippuvainen 
+// 1. NFmiEditMapGeneralDataDoc -luokasta (smartmetbizcode\generaldoc -moduuli) 
+// 2. NFmiStationView -luokasta (smartmetbizcode\stationviews -moduuli)
+// 3. AVS ToolMaster-kirjastosta (joka tekee varsinaisen griddauksen)
+// Siksi se on mukana vain optionaalisesti, eli m‰‰rit‰ FMI_SUPPORT_STATION_DATA_SMARTTOOL
+// jos haluat t‰m‰n k‰yttˆˆn.
+#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
+
+class NFmiEditMapGeneralDataDoc;
+
+// t‰m‰ maski osaa laskea halutulle asemadatalle hilatut arvot halutulle alueelle
+// Jos maskin itsInfo on station-dataa, sen laskut tehd‰‰n toisella tavalla kuin 'normaalin' hila-datan kanssa
+// 1. Se pit‰‰ initilisoida kerran joka erillist‰ aikaa kohden eli lasketaan matriisiin valmiiksi kaikki arvot kerralla
+// 2. Kun maskin arvoja pyydet‰‰n Value-metodissa, ne saadaan valmiiksi lasketusta taulukosta (aika initialisointi voi tapahtua myˆs siell‰)
+class NFmiStation2GridMask : public NFmiInfoAreaMask
+{
+
+public:
+   NFmiStation2GridMask(Type theMaskType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
+   ~NFmiStation2GridMask(void);
+
+   double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
+   void SetGriddingHelpers(NFmiArea *theArea, NFmiEditMapGeneralDataDoc *theDoc, const NFmiPoint &theStation2GridSize);
+
+private:
+  void DoGriddingCheck(const NFmiCalculationParams &theCalculationParams);
+
+  NFmiMetTime itsLastCalculatedTime; // t‰lle ajanhetkelle on station data laskettu (tai puuttuva aika), mutta onko se sama kuin itsTime, jos ei ole, pit‰‰ laskea juuri t‰lle ajalle
+  NFmiDataMatrix<float> itsGriddedStationData; // t‰ss‰ on asemadatasta lasketut hilatut arvot
+
+  // N‰ille muuttujille pit‰‰ asettaa arvot erillisell‰ SetGridHelpers-funktiolla
+  NFmiArea *itsArea; 
+  NFmiEditMapGeneralDataDoc *itsDoc;
+  NFmiPoint itsStation2GridSize; // t‰m‰n kokoiseen hilaan asema data lasketaan (itsGriddedStationData -koko)
+
+};
+
+#endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
