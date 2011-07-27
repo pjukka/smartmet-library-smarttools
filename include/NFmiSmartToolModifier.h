@@ -46,6 +46,7 @@ class NFmiSmartToolCalculation;
 class NFmiSmartToolCalculationInfo;
 class NFmiSmartToolCalculationBlockInfo;
 class NFmiSmartToolCalculationBlockInfoVector;
+class MyGrid;
 
 class NFmiSmartToolCalculationBlockVector
 {
@@ -83,6 +84,10 @@ public:
 	boost::shared_ptr<NFmiSmartToolCalculationBlockVector> itsElseCalculationBlocks;
 	boost::shared_ptr<NFmiSmartToolCalculationSection> itsLastCalculationSection;
 };
+
+#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
+class NFmiEditMapGeneralDataDoc;
+#endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
 
 class NFmiSmartToolModifier
 {
@@ -157,6 +162,16 @@ private:
 	int itsParethesisCounter; // kun käytetään esim. Sumz-funktion 2. pilkun jälkeen level-dataa,
 							  // pitää laskea sulkujen avulla, milloin funktio loppuu.
 							  // HUOM! sulkujen lisäksi pitää laskea myös erilaisten funktioiden alut.
+
+	boost::shared_ptr<MyGrid> itsWorkingGrid; // Tähän talletetaan ns. työskentely gidi, eli missä on työskentely alueen area-määritys ja laskennallinen hila koko.
+
+#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
+public:
+	void SetGeneralDoc(NFmiEditMapGeneralDataDoc *theDoc);
+private:
+	NFmiEditMapGeneralDataDoc *itsDoc;
+#endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
+
 };
 
 

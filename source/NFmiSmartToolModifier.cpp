@@ -30,6 +30,7 @@
 #include "NFmiQueryData.h"
 #include "NFmiInfoAreaMaskSoundingIndex.h"
 #include "NFmiDictionaryFunction.h"
+#include "NFmiQueryDataUtil.h"
 
 #include <stdexcept>
 
@@ -175,6 +176,10 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer
 ,fDoCrossSectionCalculation(false)
 ,itsCommaCounter(0)
 ,itsParethesisCounter(0)
+,itsWorkingGrid(new MyGrid())
+#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
+,itsDoc(0)
+#endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
 {
 }
 NFmiSmartToolModifier::~NFmiSmartToolModifier(void)
@@ -309,6 +314,9 @@ boost::shared_ptr<NFmiSmartToolCalculation> NFmiSmartToolModifier::CreateCalcula
 		calculation->SetCalculationText(theCalcInfo->GetCalculationText());
 		bool mustUsePressureInterpolation = false; // tätäei käytetä tässä, mutta pakko laittaa metodin interfacen takia
 		calculation->SetResultInfo(CreateInfo(*theCalcInfo->GetResultDataInfo(), mustUsePressureInterpolation));
+		if(calculation->GetResultInfo() && calculation->GetResultInfo()->Grid())
+			itsWorkingGrid = boost::shared_ptr<MyGrid>(new MyGrid(*calculation->GetResultInfo()->Grid())); // tämä työskentely alueen hila ja area otettava talteen
+
 		float lowerLimit = kFloatMissing;
 		float upperLimit = kFloatMissing;
 		bool checkLimits = true; // yleensä parametreille käytetdään min/max rajoja, mutta ei esim TotalWind tai W&C:lle
@@ -863,6 +871,29 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 
 	if(areaMask)
 	{
+		if(areaMask->Info() && areaMask->Info()->Grid() == 0)
+		{ // jos oli info dataa ja vielä asemadatasta, tarkistetaan että kyse oli vielä infoData-tyypistä, muuten oli virheellinen lauseke
+#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
+			if(maskType == NFmiAreaMask::InfoVariable)
+			{
+				NFmiStation2GridMask *station2GridMask = new NFmiStation2GridMask(areaMask->MaskType(), areaMask->GetDataType(), areaMask->Info());
+				station2GridMask->SetGriddingHelpers(itsWorkingGrid->itsArea, itsDoc, NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
+				areaMask = boost::shared_ptr<NFmiAreaMask>(station2GridMask);
+			}
+			else
+#endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
+			{
+				std::string errStr;
+				errStr += ::GetDictionaryString("Trying to use unsupported smarttool function with station (non-grid) data.\n'");
+				errStr += theAreaMaskInfo.GetMaskText();
+				errStr += ::GetDictionaryString("' ");
+				errStr += ::GetDictionaryString("in line:");
+				errStr += ::GetDictionaryString("\n");
+				errStr += theAreaMaskInfo.GetOrigLineText();
+				throw std::runtime_error(errStr);
+			}
+		}
+
 		areaMask->Initialize(); // virtuaalinen initialisointi konstruktion jälkeen
 		areaMask->SetCalculationOperationType(maskType);
 		if(mustUsePressureInterpolation)
@@ -1124,6 +1155,13 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kAnalyzeData);
 		if(info == 0) // kokeillaan vielä fraktiili-dataa (esim. EC:n fraktiili dataa jne)
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kClimatologyData);
+
+#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
+		if(info == 0) // kokeillaan vielä havainto dataa (eli ne on yleensä asemadataa)
+			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kObservations);
+#endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
+
+
 	}
 	if(!info)
 		throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNotFound") + "\n" + theAreaMaskInfo.GetMaskText());
@@ -1220,3 +1258,11 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::UsedMacroParamData(v
 		return itsInfoOrganizer->MacroParamData();
 }
 
+#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
+
+void NFmiSmartToolModifier::SetGeneralDoc(NFmiEditMapGeneralDataDoc *theDoc)
+{
+	itsDoc = theDoc;
+}
+
+#endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
