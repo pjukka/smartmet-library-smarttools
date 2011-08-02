@@ -140,6 +140,7 @@ class NFmiEditMapGeneralDataDoc;
 // 2. Kun maskin arvoja pyydet‰‰n Value-metodissa, ne saadaan valmiiksi lasketusta taulukosta (aika initialisointi voi tapahtua myˆs siell‰)
 class NFmiStation2GridMask : public NFmiInfoAreaMask
 {
+	typedef std::map<NFmiMetTime, NFmiDataMatrix<float> > DataCache;
 
 public:
    NFmiStation2GridMask(Type theMaskType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
@@ -151,8 +152,10 @@ public:
 private:
   void DoGriddingCheck(const NFmiCalculationParams &theCalculationParams);
 
+//  NFmiDataMatrix<float> itsGriddedStationData; // t‰ss‰ on asemadatasta lasketut hilatut arvot
+  DataCache itsGriddedStationData;
+  NFmiDataMatrix<float> *itsCurrentGriddedStationData; // t‰h‰n on laitettu se matriisi, joka sis‰lt‰‰ halutun ajan asemadatasta lasketut hilatut arvot
   NFmiMetTime itsLastCalculatedTime; // t‰lle ajanhetkelle on station data laskettu (tai puuttuva aika), mutta onko se sama kuin itsTime, jos ei ole, pit‰‰ laskea juuri t‰lle ajalle
-  NFmiDataMatrix<float> itsGriddedStationData; // t‰ss‰ on asemadatasta lasketut hilatut arvot
 
   // N‰ille muuttujille pit‰‰ asettaa arvot erillisell‰ SetGridHelpers-funktiolla
   NFmiArea *itsArea; 
