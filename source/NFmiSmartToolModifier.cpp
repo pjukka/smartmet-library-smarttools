@@ -879,6 +879,12 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 				NFmiStation2GridMask *station2GridMask = new NFmiStation2GridMask(areaMask->MaskType(), areaMask->GetDataType(), areaMask->Info());
 				station2GridMask->SetGriddingHelpers(itsWorkingGrid->itsArea, itsDoc, NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
 				areaMask = boost::shared_ptr<NFmiAreaMask>(station2GridMask);
+				if(areaMask->Info()->LevelType() == kFmiSoundingLevel) 
+				{ // Luotaus data on poikkeus, jonka haluttu painepinta level pitää asettaa tässä erikseen.
+					// Lisäksi levelType pitää vaihtaa pressuresta kFmiSoundingLevel!
+					NFmiLevel soundingLevel(kFmiSoundingLevel, theAreaMaskInfo.GetLevel()->GetName(), theAreaMaskInfo.GetLevel()->LevelValue());
+					areaMask->Level(soundingLevel);
+				}
 			}
 			else
 #endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
@@ -1159,6 +1165,15 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
 		if(info == 0) // kokeillaan vielä havainto dataa (eli ne on yleensä asemadataa)
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kObservations);
+		if(info == 0) // kokeillaan vielä eri level vaihtoehtoja
+			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kObservations, kFmiHeight);
+		if(info == 0) // kokeillaan vielä luotaus datan leveltyyppi
+			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kObservations, kFmiSoundingLevel);
+		if(info == 0) // kokeillaan vielä yksittäisten tutkien dataa level moodissa
+			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kSingleStationRadarData, kFmiPressureLevel);
+		if(info == 0) // kokeillaan vielä yksittäisten tutkien dataa ilman level moodia (esim. vertikaali-funktioiden yhteydessä)
+			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kSingleStationRadarData);
+
 #endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
 
 
