@@ -1256,6 +1256,8 @@ bool NFmiSmartToolIntepreter::IsPossiblyLevelItem(const std::string &theText)
 		return true;
 	else if(IsWantedStart(theText, "fl"))
 		return true;
+	else if(IsWantedStart(theText, "z"))
+		return true;
 	return false;
 }
 
@@ -1440,6 +1442,18 @@ bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVar
 		    // Testataan validius
 		    static_cast<long>(numericPart);
 			FmiLevelType levelType = kFmiFlightLevel;
+			theLevel = NFmiLevel(levelType, theVariableText, static_cast<float>(numericPart));
+			return true;
+		}
+	}
+	else if(IsWantedStart(theVariableText, "z"))
+	{
+		NFmiValueString numericPart(theVariableText.substr(1));
+		if(numericPart.IsNumeric())
+		{
+		    // Testataan validius
+		    static_cast<long>(numericPart);
+			FmiLevelType levelType = kFmiHeight;
 			theLevel = NFmiLevel(levelType, theVariableText, static_cast<float>(numericPart));
 			return true;
 		}
@@ -1977,6 +1991,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("t"), kFmiTemperature));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("p"), kFmiPressure));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rh"), kFmiHumidity));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("tpot"), kFmiPotentialTemperature));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("thetaw"), kFmiPseudoAdiabaticPotentialTemperature));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("kind"), kFmiKIndex));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("dp"), kFmiDewPoint));
@@ -2009,6 +2024,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrcon"), kFmiPrecipitationConv));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrlar"), kFmiPrecipitationLarge));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape"), kFmiCAPE));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cin"), kFmiCIN));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("tke"), kFmiTurbulentKineticEnergy));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("icing"), kFmiIcing));
 
@@ -2188,12 +2204,19 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 
 		// Alustetaan ensin tuottaja listaan muut tarvittavat tuottajat, Huom! nimi pienell‰, koska
 		// tehd‰‰n case insensitiivej‰ tarkasteluja!!
-//		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("synop"), kFmiSYNOP));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("met"), static_cast<FmiProducerName>(999)));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("orig"), kFmiMETEOR));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ana"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("help"), static_cast<FmiProducerName>(NFmiProducerSystem::gHelpEditorDataProdId)));
+
+		// havainto datoja
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("synop"), kFmiSYNOP));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("metar"), kFmiMETAR));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("wxt"), kFmiTestBed));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("road"), kFmiRoadObs));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("temp"), kFmiTEMP));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("nrd"), kFmiRADARNRD));
 
 		if(theProducerSystem)
 		{
