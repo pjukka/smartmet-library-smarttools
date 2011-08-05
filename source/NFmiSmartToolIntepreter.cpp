@@ -2355,16 +2355,16 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_maxh"), VertFunctionMapValue(NFmiAreaMask::MaxH, NFmiAreaMask::VertZ, 3, string("vertz_maxh(par, z1, z2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertZ, 3, string("vertz_minh(par, z1, z2)"))));
 
-		// verthyb-funktiot eli näitä operoidaan aina mallipintadatan hybrid-level arvoilla esim. hirlamissa arvot ovat 60 - 1
-		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertHyb, 3, string("verthyb_max(par, hyb1, hyb2)"))));
-		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertHyb, 3, string("verthyb_min(par, hyb1, hyb2)"))));
-		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertHyb, 3, string("verthyb_avg(par, hyb1, hyb2)"))));
-		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::VertHyb, 3, string("verthyb_sum(par, hyb1, hyb2)"))));
-		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_get"), VertFunctionMapValue(NFmiAreaMask::Get, NFmiAreaMask::VertHyb, 2, string("verthyb_get(par, hyb)"))));
-		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_findh"), VertFunctionMapValue(NFmiAreaMask::FindH, NFmiAreaMask::VertHyb, 5, string("verthyb_findh(par, hyb1, hyb2, value, nth)"))));
-		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_findc"), VertFunctionMapValue(NFmiAreaMask::FindC, NFmiAreaMask::VertHyb, 4, string("verthyb_findc(par, hyb1, hyb2, value)"))));
-		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_maxh"), VertFunctionMapValue(NFmiAreaMask::MaxH, NFmiAreaMask::VertHyb, 3, string("verthyb_maxh(par, hyb1, hyb2)"))));
-		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("verthyb_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertHyb, 3, string("verthyb_minh(par, hyb1, hyb2)"))));
+		// vertlev-funktiot eli näitä operoidaan aina mallipintadatan hybrid-level arvoilla esim. hirlamissa arvot ovat 60 - 1
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertHyb, 3, string("vertlev_max(par, hyb1, hyb2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertHyb, 3, string("vertlev_min(par, hyb1, hyb2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertHyb, 3, string("vertlev_avg(par, hyb1, hyb2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::VertHyb, 3, string("vertlev_sum(par, hyb1, hyb2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_get"), VertFunctionMapValue(NFmiAreaMask::Get, NFmiAreaMask::VertHyb, 2, string("vertlev_get(par, hyb)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh"), VertFunctionMapValue(NFmiAreaMask::FindH, NFmiAreaMask::VertHyb, 5, string("vertlev_findh(par, hyb1, hyb2, value, nth)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findc"), VertFunctionMapValue(NFmiAreaMask::FindC, NFmiAreaMask::VertHyb, 4, string("vertlev_findc(par, hyb1, hyb2, value)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_maxh"), VertFunctionMapValue(NFmiAreaMask::MaxH, NFmiAreaMask::VertHyb, 3, string("vertlev_maxh(par, hyb1, hyb2)"))));
+		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertHyb, 3, string("vertlev_minh(par, hyb1, hyb2)"))));
 
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy"), NFmiAreaMask::FunctionPeekXY));
 		itsTokenPeekFunctions.insert(std::make_pair(string("peekxy2"), NFmiAreaMask::FunctionPeekXY2));
