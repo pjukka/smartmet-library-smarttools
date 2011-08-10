@@ -120,23 +120,31 @@ static void CalcAllSoundingIndexParamFields(boost::shared_ptr<NFmiFastQueryInfo>
 	NFmiSoundingDataOpt1 soundingDataOpt1;
 	for(theResultInfo->ResetLocation(); theResultInfo->NextLocation(); )
 	{
-	    // bool surfaceBaseStatus = false;
-		if(useFastFill)
-			theSourceInfo->LocationIndex(theResultInfo->LocationIndex());
-		::FillSoundingDataOpt1(theSourceInfo, soundingDataOpt1, theResultInfo->Time(), theResultInfo->LatLon(), useFastFill);
-
-		unsigned long counter = 0;
-		for(theResultInfo->ResetParam(); theResultInfo->NextParam(); counter++)
+		try
 		{
-			if(counter%20 == 0)
-				::CheckIfStopped(theStopFunctor); // joka 20 hilapisteellä katsotaan, pitääkö lopettaa
+			// bool surfaceBaseStatus = false;
+			if(useFastFill)
+				theSourceInfo->LocationIndex(theResultInfo->LocationIndex());
+			::FillSoundingDataOpt1(theSourceInfo, soundingDataOpt1, theResultInfo->Time(), theResultInfo->LatLon(), useFastFill);
 
-			FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theResultInfo->Param().GetParamIdent());
-			// bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
+			unsigned long counter = 0;
+			for(theResultInfo->ResetParam(); theResultInfo->NextParam(); counter++)
+			{
+				if(counter%20 == 0)
+					::CheckIfStopped(theStopFunctor); // joka 20 hilapisteellä katsotaan, pitääkö lopettaa
 
-			// HUOM!!!! muista muuttaa luotaus-parametri pelkäksi surface arvoksi, koska loppu menee itsestään sitten
-			float valueOpt1 = NFmiSoundingIndexCalculator::CalcOpt1(soundingDataOpt1, soundingParameter);
-			theResultInfo->FloatValue(valueOpt1);
+				FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theResultInfo->Param().GetParamIdent());
+				// bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
+
+				// HUOM!!!! muista muuttaa luotaus-parametri pelkäksi surface arvoksi, koska loppu menee itsestään sitten
+				float valueOpt1 = NFmiSoundingIndexCalculator::CalcOpt1(soundingDataOpt1, soundingParameter);
+				theResultInfo->FloatValue(valueOpt1);
+			}
+		}
+		catch(...)
+		{
+			// jouduin laittamaan try-catch blokin tänne, koska aina silloin tällöin jossain vaiheessa lentää poikkeus, joka lopettaa laskennat
+			// tässä ei tehdä mitään, mutta laskennat jatkuvat ainakin seuraavasta pisteestä...
 		}
 	}
 }
