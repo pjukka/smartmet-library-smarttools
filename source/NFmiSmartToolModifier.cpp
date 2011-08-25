@@ -1041,7 +1041,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
 		for(size_t i = 0; i<infoVector.size(); i++)
 		{
 			boost::shared_ptr<NFmiFastQueryInfo> tmpInfo = infoVector[i];
-			if(flightLevelWanted ? (tmpInfo->HeightValueAvailable()) : (tmpInfo->PressureValueAvailable() || tmpInfo->PressureLevelDataAvailable()))
+			if(flightLevelWanted ? (tmpInfo->HeightValueAvailable()) : (tmpInfo->PressureDataAvailable()))
 			{
 				if(tmpInfo->Param(static_cast<FmiParameterName>(theAreaMaskInfo.GetDataIdent().GetParamIdent())))
 				{
