@@ -601,7 +601,7 @@ void NFmiSmartToolModifier::ModifyData2(boost::shared_ptr<NFmiSmartToolCalculati
 	}
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreatePeekFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool fMustUsePressureInterpolation)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreatePeekFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &fMustUsePressureInterpolation)
 {
 	boost::shared_ptr<NFmiAreaMask> areaMask;
 	// HUOM!! Tähän vaaditaan syvä data kopio!!!
@@ -648,7 +648,7 @@ void DoErrorExceptionForMetFunction(const NFmiAreaMaskInfo &theAreaMaskInfo, con
 	throw runtime_error(errorStr);
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMetFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool fMustUsePressureInterpolation)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMetFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &fMustUsePressureInterpolation)
 {
 	boost::shared_ptr<NFmiAreaMask> areaMask;
 	// HUOM!! Tähän vaaditaan syvä data kopio!!!
@@ -1110,9 +1110,12 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetWantedAreaMaskDat
 		info = itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), usedDataType, fUseParIdOnly, fUseLevelData | fDoCrossSectionCalculation, theAreaMaskInfo.ModelRunIndex());
 	else
 	{
-		NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
-		aLevel.SetIdent(theOverRideLevelType);
-		info = itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), &aLevel, usedDataType, fUseParIdOnly, fUseLevelData, theAreaMaskInfo.ModelRunIndex());
+		if(theAreaMaskInfo.GetLevel()) // level voi olla 0-pointteri, joten se pitää tarkistaa
+		{
+			NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
+			aLevel.SetIdent(theOverRideLevelType);
+			info = itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), &aLevel, usedDataType, fUseParIdOnly, fUseLevelData, theAreaMaskInfo.ModelRunIndex());
+		}
 	}
 	return ::CreateShallowCopyOfHighestInfo(info); // tehdään vielä 'kevyt' kopio löytyneestä datasta
 }
