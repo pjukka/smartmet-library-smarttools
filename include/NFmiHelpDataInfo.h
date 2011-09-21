@@ -134,7 +134,7 @@ public:
 
 	void Clear(void)
 	{}
-	void InitFromSettings(const std::string &theInitNameSpace, std::string theHelpEditorFileNameFilter = "");
+	void InitFromSettings(const std::string &theInitNameSpace, std::string theHelpEditorFileNameFilter = "", std::string theHelpDataName = "");
 	void StoreToSettings(void);
 	void InitSettings(const NFmiHelpDataInfoSystem &theOther, bool fDoHelpDataInfo);
 

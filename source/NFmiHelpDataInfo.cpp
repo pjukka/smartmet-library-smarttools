@@ -385,7 +385,7 @@ void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey, checked
 	}
 }
 
-void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpaceStr, std::string theHelpEditorFileNameFilter)
+void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpaceStr, std::string theHelpEditorFileNameFilter, std::string theHelpDataName)
 {
 	itsBaseNameSpace = theBaseNameSpaceStr;
 	itsCacheDirectory = NFmiSettings::Require<std::string>(itsBaseNameSpace + "::CacheDirectory");
@@ -415,6 +415,7 @@ void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpac
 	if(theHelpEditorFileNameFilter.empty() == false)
 	{
 		NFmiHelpDataInfo helpDataInfo;
+		helpDataInfo.Name(theHelpDataName);
 		helpDataInfo.FileNameFilter(theHelpEditorFileNameFilter);
 		helpDataInfo.DataType(NFmiInfoData::kEditingHelpData);
 		AddDynamic(helpDataInfo);
