@@ -116,7 +116,7 @@ NFmiStation2GridMask::NFmiStation2GridMask(Type theMaskType, NFmiInfoData::Type 
 ,itsGriddedStationData()
 ,itsCurrentGriddedStationData(0)
 ,itsLastCalculatedTime(NFmiMetTime::gMissingTime)
-,itsArea(0)
+,itsAreaPtr()
 ,itsDoc(0)
 ,itsStation2GridSize(1,1)
 {
@@ -137,7 +137,7 @@ double NFmiStation2GridMask::Value(const NFmiCalculationParams &theCalculationPa
 
 void NFmiStation2GridMask::SetGriddingHelpers(NFmiArea *theArea, NFmiEditMapGeneralDataDoc *theDoc, const NFmiPoint &theStation2GridSize)
 {
-	itsArea = theArea;
+	itsAreaPtr.reset(theArea->Clone());
 	itsDoc = theDoc;
 	itsStation2GridSize = theStation2GridSize;
 }
@@ -153,11 +153,11 @@ void NFmiStation2GridMask::DoGriddingCheck(const NFmiCalculationParams &theCalcu
 		else
 		{
 			// lasketaan halutun ajan hila
-			if(itsDoc && itsArea)
+			if(itsDoc && itsAreaPtr.get())
 			{
 				boost::shared_ptr<NFmiDrawParam> drawParam(new NFmiDrawParam(itsDataIdent, itsLevel, 0, itsDataType));
 				NFmiDataMatrix<float> griddedData(static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.X()), static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.Y()), kFloatMissing);
-				NFmiStationView::GridStationData(itsDoc, itsArea, drawParam, griddedData, theCalculationParams.itsTime);
+				NFmiStationView::GridStationData(itsDoc, itsAreaPtr.get(), drawParam, griddedData, theCalculationParams.itsTime);
 				std::pair<DataCache::iterator, bool> insertResult = itsGriddedStationData.insert(std::make_pair(theCalculationParams.itsTime, griddedData));
 				if(insertResult.second)
 					itsCurrentGriddedStationData = &((*insertResult.first).second);

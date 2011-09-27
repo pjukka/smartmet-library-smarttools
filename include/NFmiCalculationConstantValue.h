@@ -158,7 +158,7 @@ private:
   NFmiMetTime itsLastCalculatedTime; // t‰lle ajanhetkelle on station data laskettu (tai puuttuva aika), mutta onko se sama kuin itsTime, jos ei ole, pit‰‰ laskea juuri t‰lle ajalle
 
   // N‰ille muuttujille pit‰‰ asettaa arvot erillisell‰ SetGridHelpers-funktiolla
-  NFmiArea *itsArea; 
+  std::auto_ptr<NFmiArea> itsAreaPtr; // omistaa ja tuhoaa!!
   NFmiEditMapGeneralDataDoc *itsDoc;
   NFmiPoint itsStation2GridSize; // t‰m‰n kokoiseen hilaan asema data lasketaan (itsGriddedStationData -koko)
 
