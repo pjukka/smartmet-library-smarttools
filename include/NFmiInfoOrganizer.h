@@ -60,7 +60,8 @@ public:
 					  ,NFmiInfoData::Type theDataType
 					  ,int theUndoLevel
 					  ,int theMaxLatestDataCount
-					  ,int theModelRunTimeGap);
+					  ,int theModelRunTimeGap
+					  ,bool &fDataWasDeletedOut);
 	int CleanUnusedDataFromMemory(void);
 
 	// ***************************************************************************************************************
@@ -125,7 +126,7 @@ private:
 	NFmiInfoOrganizer(const NFmiInfoOrganizer&);
 
 	bool AddEditedData(NFmiSmartInfo *theEditedData, int theUndoLevel);
-	bool Add(NFmiOwnerInfo* theInfo, int theMaxLatestDataCount, int theModelRunTimeGap);
+	bool Add(NFmiOwnerInfo* theInfo, int theMaxLatestDataCount, int theModelRunTimeGap, bool &fDataWasDeletedOut);
 
 	boost::shared_ptr<NFmiFastQueryInfo> Info(boost::shared_ptr<NFmiDrawParam> &theDrawParam, bool fCrossSectionInfoWanted);
 	boost::shared_ptr<NFmiFastQueryInfo> GetInfo(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, int theModelRunIndex = 0);

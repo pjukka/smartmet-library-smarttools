@@ -96,7 +96,8 @@ NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> 
 ,itsLatestOriginTime()
 ,itsKeepInMemoryTime(theKeepInMemoryTime)
 {
-	AddData(theData, true); // true tarkoittaa ett‰ kyse on 1. lis‰tt‰v‰st‰ datasta
+	bool dataWasDeleted = false;
+	AddData(theData, true, dataWasDeleted); // true tarkoittaa ett‰ kyse on 1. lis‰tt‰v‰st‰ datasta
 }
 
 NFmiQueryDataSetKeeper::~NFmiQueryDataSetKeeper(void)
@@ -127,7 +128,7 @@ static void DestroyQDatasInSeparateThread(NFmiQueryDataSetKeeper::ListType &theQ
 // Lis‰t‰t‰‰n annettu data keeper-settiin.
 // Jos	itsMaxLatestDataCount on 0, tyhjennnet‰‰n olemassa olevat listat ja datat ja laitetaan annettu data k‰yttˆˆn.
 // Jos	itsMaxLatestDataCount on > 0, katsotaan mihin kohtaan (mille indeksille) data sijoittuu, mahdollisesti vanhimman datan joutuu siivoamaan pois.
-void NFmiQueryDataSetKeeper::AddData(boost::shared_ptr<NFmiOwnerInfo> &theData, bool fFirstData)
+void NFmiQueryDataSetKeeper::AddData(boost::shared_ptr<NFmiOwnerInfo> &theData, bool fFirstData, bool &fDataWasDeletedOut)
 {
 	if(theData)
 	{
@@ -145,7 +146,7 @@ void NFmiQueryDataSetKeeper::AddData(boost::shared_ptr<NFmiOwnerInfo> &theData, 
 			itsLatestOriginTime = theData->OriginTime();
 		}
 		else
-			AddDataToSet(theData);
+			AddDataToSet(theData, fDataWasDeletedOut);
 	}
 }
 
@@ -153,7 +154,7 @@ void NFmiQueryDataSetKeeper::AddData(boost::shared_ptr<NFmiOwnerInfo> &theData, 
 // Siirret‰‰n kaikkia datoja tarpeen mukaan indekseiss‰.
 // Jos datoja on liikaa setiss‰, poistetaan ylim‰‰r‰iset (yli max indeksiset).
 // Jos sama data lˆytyy jo setist‰ (= sama origin-aika), korvaa listassa oleva t‰ll‰ (esim. on tehty uusi korjattu malliajo datahaku).
-void NFmiQueryDataSetKeeper::AddDataToSet(boost::shared_ptr<NFmiOwnerInfo> &theData)
+void NFmiQueryDataSetKeeper::AddDataToSet(boost::shared_ptr<NFmiOwnerInfo> &theData, bool &fDataWasDeletedOut)
 {
 	// etsi ja korvaa, jos setist‰ lˆytyy jo saman origin-timen data
 	NFmiMetTime origTime = theData->OriginTime();
@@ -179,8 +180,23 @@ void NFmiQueryDataSetKeeper::AddDataToSet(boost::shared_ptr<NFmiOwnerInfo> &theD
 		itsQueryDatas.push_back(boost::shared_ptr<NFmiQueryDataKeeper>(new NFmiQueryDataKeeper(theData)));
 	// 2. Laske kaikille setin datoille indeksit uudestaan.
 	RecalculateIndexies(itsLatestOriginTime);
-	// 3. Poista listasta kaikki datat joiden indeksi on suurempi kuin itsMaxLatestDataCount:in arvo sallii.
+	// 3. Ota talteen lis‰tyn datan origTime
+	NFmiMetTime addedDataOrigTime = theData->OriginTime();
+	// 4. Poista listasta kaikki datat joiden indeksi on suurempi kuin itsMaxLatestDataCount:in arvo sallii.
 	DeleteTooOldDatas();
+	// 5. Tutki lˆytyykˆ lis‰tty data viel‰ listalta
+	fDataWasDeletedOut = OrigTimeDataExist(addedDataOrigTime) == false;
+}
+
+// Etsi annettua origin-aikaa vastaava dataa listalta, jos ei lˆydy, palauta false, muuten true.
+bool NFmiQueryDataSetKeeper::OrigTimeDataExist(const NFmiMetTime &theOrigTime)
+{
+	for(ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); ++it)
+	{
+		if((*it)->OriginTime() == theOrigTime)
+			return true;
+	}
+	return false;
 }
 
 static int CalcIndex(const NFmiMetTime &theLatestOrigTime, const NFmiMetTime &theOrigCurrentTime, int theModelRunTimeGap)
@@ -329,8 +345,9 @@ bool NFmiQueryDataSetKeeper::ReadDataFileInUse(const std::string &theFileName)
 	{
 		NFmiQueryData *data = new NFmiQueryData(theFileName);
 		boost::shared_ptr<NFmiOwnerInfo> ownerInfoPtr(new NFmiOwnerInfo(data, itsDataType, theFileName, itsFilePattern));
-		AddDataToSet(ownerInfoPtr);
-		return true;
+		bool dataWasDeleted = false;
+		AddDataToSet(ownerInfoPtr, dataWasDeleted);
+		return (dataWasDeleted == false);
 	}
 	catch(...)
 	{ // pit‰‰ vain varmistaa ett‰ jos tiedosto on viallinen, poikkeukset napataan kiinni t‰ss‰

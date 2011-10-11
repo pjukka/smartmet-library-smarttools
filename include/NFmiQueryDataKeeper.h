@@ -55,7 +55,7 @@ public:
 	NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> &theData, int theMaxLatestDataCount = 0, int theModelRunTimeGap = 0, int theKeepInMemoryTime = 5);
 	~NFmiQueryDataSetKeeper(void);
 
-	void AddData(boost::shared_ptr<NFmiOwnerInfo> &theData, bool fFirstData = false);
+	void AddData(boost::shared_ptr<NFmiOwnerInfo> &theData, bool fFirstData, bool &fDataWasDeletedOut);
 	boost::shared_ptr<NFmiQueryDataKeeper> GetDataKeeper(int theIndex = 0);
 	const std::string& FilePattern(void) const {return itsFilePattern;}
 	void FilePattern(const std::string &newValue) {itsFilePattern = newValue;}
@@ -74,12 +74,13 @@ public:
 	size_t DataByteCount(void);
 
 private:
-	void AddDataToSet(boost::shared_ptr<NFmiOwnerInfo> &theData);
+	void AddDataToSet(boost::shared_ptr<NFmiOwnerInfo> &theData, bool &fDataWasDeletedOut);
 	void RecalculateIndexies(const NFmiMetTime &theLatestOrigTime);
 	void DeleteTooOldDatas(void);
 	bool DoOnDemandOldDataLoad(int theIndex);
 	bool ReadDataFileInUse(const std::string &theFileName);
 	bool CheckKeepTime(ListType::iterator &it);
+	bool OrigTimeDataExist(const NFmiMetTime &theOrigTime);
 
 	ListType itsQueryDatas; // t‰ss‰ on n kpl viimeisint‰ malliajoa tallessa (tai esim. havaintojen tapauksessa vain viimeisin data)
 	int itsMaxLatestDataCount; // kuinka monta viimeisint‰ malliajoa/dataa maksimiss‰‰n kullekin datalle on, 0 jos kyse esim. havainnoista, joille ei ole kuin viimeisin data.

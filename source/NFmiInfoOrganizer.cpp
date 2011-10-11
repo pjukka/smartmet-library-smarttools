@@ -51,15 +51,17 @@ bool NFmiInfoOrganizer::AddData(NFmiQueryData* theData
 								 ,NFmiInfoData::Type theDataType
 								 ,int theUndoLevel
 								 ,int theMaxLatestDataCount
-								 ,int theModelRunTimeGap)
+								 ,int theModelRunTimeGap
+								 ,bool &fDataWasDeletedOut)
 {
 	bool status = false;
+	fDataWasDeletedOut = false;
 	if(theData)
 	{
 		if(theDataType == NFmiInfoData::kEditable)
 			status = AddEditedData(new NFmiSmartInfo(theData, theDataType, theDataFileName, theDataFilePattern), theUndoLevel);
 		else
-			status = Add(new NFmiOwnerInfo(theData, theDataType, theDataFileName, theDataFilePattern), theMaxLatestDataCount, theModelRunTimeGap); // muun tyyppiset datat kuin editoitavat menev‰t mappiin
+			status = Add(new NFmiOwnerInfo(theData, theDataType, theDataFileName, theDataFilePattern), theMaxLatestDataCount, theModelRunTimeGap, fDataWasDeletedOut); // muun tyyppiset datat kuin editoitavat menev‰t mappiin
 	}
 	return status;
 }
@@ -115,8 +117,9 @@ void NFmiInfoOrganizer::UpdateEditedDataCopy(void)
 	::SetDataKeeperToZero(itsCopyOfEditedDataKeeper);
 }
 
-bool NFmiInfoOrganizer::Add(NFmiOwnerInfo* theInfo, int theMaxLatestDataCount, int theModelRunTimeGap)
+bool NFmiInfoOrganizer::Add(NFmiOwnerInfo* theInfo, int theMaxLatestDataCount, int theModelRunTimeGap, bool &fDataWasDeletedOut)
 {
+	fDataWasDeletedOut = false;
 	if(theInfo)
 	{
 		boost::shared_ptr<NFmiOwnerInfo> dataPtr(theInfo);
@@ -127,7 +130,7 @@ bool NFmiInfoOrganizer::Add(NFmiOwnerInfo* theInfo, int theMaxLatestDataCount, i
 				pos->second->MaxLatestDataCount(theMaxLatestDataCount);	
 			if(pos->second->ModelRunTimeGap() != theModelRunTimeGap)
 				pos->second->ModelRunTimeGap(theModelRunTimeGap);	
-			pos->second->AddData(dataPtr);
+			pos->second->AddData(dataPtr, false, fDataWasDeletedOut);
 		}
 		else
 		{ // lis‰t‰‰n kyseinen data keeper-set listaan
