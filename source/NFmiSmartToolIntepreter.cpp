@@ -1768,7 +1768,7 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 			tokens.push_back(std::make_pair(tmp, tok_type));
 		}
 		// ensin tutkitaan, oliko funktiossa oikea m‰‰r‰ argumentteja esim. grad(T_Hir), miss‰ on tokeneita 1 + 2 (sulut)
-		if(tokens.size() == argumentCount+2 && (tokens[0].first == string("(")) && (tokens[tokens.size()-1].first == string(")")))
+		if(static_cast<long>(tokens.size()) == argumentCount+2 && (tokens[0].first == string("(")) && (tokens[tokens.size()-1].first == string(")")))
 		{
 			if(tokens[1].second == VARIABLE) // tehd‰‰n t‰m‰ toimimaan ensin grad-tapaus  // && tokens[2].second == NUMBER && tokens[3].second == NUMBER)
 			{
