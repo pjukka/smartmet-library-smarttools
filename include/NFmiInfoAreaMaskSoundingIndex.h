@@ -25,6 +25,7 @@ public:
 	void SoundingParam(FmiSoundingParameters newValue) {itsSoundingParam = newValue;}
 
 	// tätä kaytetaan smarttool-modifierin yhteydessä
+    using NFmiInfoAreaMask::Value;
 	double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
 
 private:
