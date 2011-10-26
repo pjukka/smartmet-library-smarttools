@@ -9,7 +9,7 @@
 #include "NFmiStation.h"
 
 class NFmiQueryData;
-class NFmiHPlaceDescriptor;
+class NFmiAviationStationInfoSystem;
 class NFmiProducer;
 class NFmiTEMPCode;
 class NFmiVPlaceDescriptor;
@@ -39,7 +39,7 @@ namespace DecodeTEMP
 	// T‰lle funktiolle annetaan haluttu l‰j‰ TEMP koodia 
 	// (stringiss‰ voi olla vaikka kuinka monta eri TEMP sanomaa per‰kk‰in).
 	// Funktio purkaa ne ja laittaa datan new:lla luotuun QueryData-olioon.
-	NFmiQueryData* MakeNewDataFromTEMPStr(const std::string &theTEMPStr, std::string &theCheckReportStr, NFmiHPlaceDescriptor *theTempStations, const NFmiPoint &theUnknownStationLocation, const NFmiProducer &theWantedProducer, bool fRoundTimesToNearestSynopticTimes);
+	NFmiQueryData* MakeNewDataFromTEMPStr(const std::string &theTEMPStr, std::string &theCheckReportStr, NFmiAviationStationInfoSystem &theTempStations, const NFmiPoint &theUnknownStationLocation, const NFmiProducer &theWantedProducer, bool fRoundTimesToNearestSynopticTimes);
 
 	// T‰m‰ funktio tekee annetusta Tempcode-vectorista querydatan.
 	// TempCode-vektorissa on siis luotauksia tempcode-olioihin talletettuna.
@@ -52,7 +52,7 @@ class NFmiTEMPCode
 {
 public:
 	NFmiTEMPCode(void);
-	NFmiTEMPCode(NFmiHPlaceDescriptor *theTempStations, const NFmiPoint &theUnknownStationLocation);
+	NFmiTEMPCode(NFmiAviationStationInfoSystem *theTempStations, const NFmiPoint &theUnknownStationLocation);
 	~NFmiTEMPCode(void);
 
 	// Saa A,B,C ja D koodit. Tarkistaa ne ja purkaa. Palauttaa luvun, joka kertoo kuinka monta 
@@ -83,7 +83,7 @@ private:
 	NFmiMetTime itsTime;
 	NFmiStation itsStation;
 	bool fTempMobil; // onko kyseess‰ temp mobil koodia, joka pit‰‰ purkaa hieman erilailla
-	NFmiHPlaceDescriptor *itsTempStations; // Ei omista.  Jos t‰ss‰ on luotausinfo, sit‰ voidaan pit‰‰ luotaus asemien "tietokantana"
+	NFmiAviationStationInfoSystem *itsTempStations; // Ei omista.  Jos t‰ss‰ on luotausinfo, sit‰ voidaan pit‰‰ luotaus asemien "tietokantana"
 	NFmiPoint itsUnknownStationLocation;
 
 	std::map<double, TEMPLevelData> itsLevels;

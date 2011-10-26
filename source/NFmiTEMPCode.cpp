@@ -7,6 +7,7 @@
 #include "NFmiLocationBag.h"
 #include "NFmiTotalWind.h"
 #include "NFmiDictionaryFunction.h"
+#include "NFmiAviationStationInfoSystem.h"
 #include <sstream>
 #include <set>
 
@@ -24,7 +25,7 @@ NFmiTEMPCode::NFmiTEMPCode(void)
 {
 }
 
-NFmiTEMPCode::NFmiTEMPCode(NFmiHPlaceDescriptor *theTempStations, const NFmiPoint &theUnknownStationLocation)
+NFmiTEMPCode::NFmiTEMPCode(NFmiAviationStationInfoSystem *theTempStations, const NFmiPoint &theUnknownStationLocation)
 :itsOriginalCodeAStr()
 ,itsOriginalCodeBStr()
 ,itsOriginalCodeCStr()
@@ -381,7 +382,7 @@ static bool GetPandH(const std::string &thePPhhh_Str, double &P, double &h)
 	return true;
 }
 
-static bool DecodeHeader(std::stringstream &ssin, NFmiStation &theStation, NFmiMetTime &theTime, bool &fTempMobil, char theWantedSectionChar, bool fInitializeValues, NFmiHPlaceDescriptor *theTempStations, const NFmiPoint &theUnknownStationLocation, bool &fConvertKt2Ms)
+static bool DecodeHeader(std::stringstream &ssin, NFmiStation &theStation, NFmiMetTime &theTime, bool &fTempMobil, char theWantedSectionChar, bool fInitializeValues, NFmiAviationStationInfoSystem *theTempStations, const NFmiPoint &theUnknownStationLocation, bool &fConvertKt2Ms)
 {
 	std::string first_Str; // esim. "USFI99"
 	ssin >> first_Str;
@@ -498,17 +499,19 @@ static bool DecodeHeader(std::stringstream &ssin, NFmiStation &theStation, NFmiM
 
 			// HUOM! tässä pitäisi olla joku asema tietokanta käytössä, mistä saisi aseman sijainnin
 			unsigned long stationId = NFmiStringTools::Convert<unsigned long>(IIiii_Str);
-			if(theTempStations && theTempStations->Location(stationId))
+			NFmiAviationStation *tempStation = theTempStations ? theTempStations->FindStation(stationId) : 0;
+			if(tempStation)
 			{
-				const NFmiLocation *loc = theTempStations->Location();
-				station = NFmiStation(loc->GetIdent(), loc->GetName(), loc->GetLongitude(), loc->GetLatitude());
+				station = NFmiStation(*tempStation);
 			}
-			else
+			else if(theUnknownStationLocation != NFmiPoint::gMissingLatlon)
 			{
 				station.SetLatitude(theUnknownStationLocation.Y());
 				station.SetLongitude(theUnknownStationLocation.X());
 				station.SetName(IIiii_Str);
 			}
+			else 
+				return false; // ei löytynyt asemaa asemalistasta, ja unknown-asema oli "missing"-lokaatiossa, hylätään sanoma kokonaan
 		}
 
 		if(fInitializeValues)
@@ -979,7 +982,7 @@ static std::string MakeCheckReport(NFmiQueryData *theData, int theErrorCount, in
 	return str;
 }
 
-NFmiQueryData* DecodeTEMP::MakeNewDataFromTEMPStr(const std::string &theTEMPStr, std::string &theCheckReportStr, NFmiHPlaceDescriptor *theTempStations, const NFmiPoint &theUnknownStationLocation, const NFmiProducer &theWantedProducer, bool fRoundTimesToNearestSynopticTimes)
+NFmiQueryData* DecodeTEMP::MakeNewDataFromTEMPStr(const std::string &theTEMPStr, std::string &theCheckReportStr, NFmiAviationStationInfoSystem &theTempStations, const NFmiPoint &theUnknownStationLocation, const NFmiProducer &theWantedProducer, bool fRoundTimesToNearestSynopticTimes)
 {
 	theCheckReportStr = ::GetDictionaryString("TempCodeInsertDlgStartCheckingStr");
 	std::vector<std::string> codeParcels = NFmiStringTools::Split(theTEMPStr, "=");
@@ -997,7 +1000,7 @@ NFmiQueryData* DecodeTEMP::MakeNewDataFromTEMPStr(const std::string &theTEMPStr,
 	}
 
 	std::vector<NFmiTEMPCode> tempCodeVec;
-	NFmiTEMPCode tempCode(theTempStations, theUnknownStationLocation);
+	NFmiTEMPCode tempCode(&theTempStations, theUnknownStationLocation);
 	int errorCount = 0;
 	for(int i=0; i<static_cast<int>(codeParcels.size()); )
 	{
