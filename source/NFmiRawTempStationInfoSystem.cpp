@@ -155,7 +155,7 @@ void NFmiRawTempStationInfoSystem::Init(const std::string &theInitFileName)
 }
 
 // ***********************************************************************
-// *****************  AviationStationInfoSystem  *************************
+// *****************  NFmiAviationStationInfoSystem_Obsolite  ************
 // ***********************************************************************
 
 // Lukee initialisointi tiedostosta asema tiedot, heitt‰‰ poikkeuksen jos ongelmia.
@@ -199,14 +199,14 @@ void NFmiRawTempStationInfoSystem::Init(const std::string &theInitFileName)
 // 01;016;----;Senja-Grasmyrskogen;;Norway;6;69-17N;017-46E;;;50;;
 // 01;023;ENDU;Bardufoss;;Norway;6;69-04N;018-32E;;;7;79;P
 // jne....
-void NFmiAviationStationInfoSystem::Init(const std::string &theInitFileName)
+void NFmiAviationStationInfoSystem_Obsolite::Init(const std::string &theInitFileName)
 {
 	itsInitLogMessage = "";
 	itsLocations = NFmiHPlaceDescriptor(); // tyhjennet‰‰n ensin asemalista
 	NFmiLocationBag locBag;
 
 	if(theInitFileName.empty())
-		throw std::runtime_error("NFmiAviationStationInfoSystem::Init - empty settings filename given.");
+		throw std::runtime_error("NFmiAviationStationInfoSystem_Obsolite::Init - empty settings filename given.");
 
 	NFmiCommentStripper stripComments(false); // ei stripata # eli pound kommentteja, koska stripperiss‰ on bugi
 	if(stripComments.ReadAndStripFile(theInitFileName))
@@ -243,7 +243,7 @@ void NFmiAviationStationInfoSystem::Init(const std::string &theInitFileName)
 		itsLocations = NFmiHPlaceDescriptor(locBag); // tyhjennet‰‰n ensin asemalista
 		if(fVerboseMode)
 		{
-			itsInitLogMessage = "Initializing NFmiAviationStationInfoSystem data went OK, from file: ";
+			itsInitLogMessage = "Initializing NFmiAviationStationInfoSystem_Obsolite data went OK, from file: ";
 			itsInitLogMessage += theInitFileName;
 			if(itsLocations.Size() == 0)
 				itsInitLogMessage += "\nWarning: 0 sounding stations found.";
@@ -259,7 +259,7 @@ void NFmiAviationStationInfoSystem::Init(const std::string &theInitFileName)
 		}
 	}
 	else
-		throw std::runtime_error(std::string("NFmiAviationStationInfoSystem::Init - trouble reading file: ") + theInitFileName);
+		throw std::runtime_error(std::string("NFmiAviationStationInfoSystem_Obsolite::Init - trouble reading file: ") + theInitFileName);
 }
 
 // esim. 70-56N (ilmeisesti myˆs sekunnit voi olla mukana, jolloin olisi 70-56-24N)
@@ -312,7 +312,7 @@ static double GetLatOrLonFromString(const std::string &theLatOrLonStr, const std
 // purkaa rivin
 // 01;001;ENJA;Jan Mayen;;Norway;6;70-56N;008-40W;70-56N;008-40W;10;9;P
 // osiin, ja rakentaan AviationStation-otuksen.
-bool NFmiAviationStationInfoSystem::GetAviationStationFromString(const std::string &theStationStr, const std::string &theInitFileName, AviationStation &theStationOut)
+bool NFmiAviationStationInfoSystem_Obsolite::GetAviationStationFromString(const std::string &theStationStr, const std::string &theInitFileName, AviationStation &theStationOut)
 {
 	std::vector<std::string> strVector = NFmiStringTools::Split(theStationStr, ";");
 	if(strVector.size() > 1 && strVector.size() < 13)
@@ -372,13 +372,13 @@ bool NFmiAviationStationInfoSystem::GetAviationStationFromString(const std::stri
 	return true;
 }
 
-const NFmiLocation* NFmiAviationStationInfoSystem::CurrentLocation(const std::string &theIcaoStr)
+const NFmiLocation* NFmiAviationStationInfoSystem_Obsolite::CurrentLocation(const std::string &theIcaoStr)
 {
 	return itsLocations.Location();
 }
 
 // HUOM!!! Oletus hplaceDesc sis‰lt‰‰ AviationStation:eita.
-bool NFmiAviationStationInfoSystem::FindAviationStation(const std::string &theIcaoStr)
+bool NFmiAviationStationInfoSystem_Obsolite::FindAviationStation(const std::string &theIcaoStr)
 {
 	for(itsLocations.Reset(); itsLocations.Next(); )
 	{
@@ -389,13 +389,13 @@ bool NFmiAviationStationInfoSystem::FindAviationStation(const std::string &theIc
 	return false;
 }
 
-bool NFmiAviationStationInfoSystem::FindStation(unsigned long theStationId)
+bool NFmiAviationStationInfoSystem_Obsolite::FindStation(unsigned long theStationId)
 {
 	return itsLocations.Location(theStationId);
 }
 
 // ***********************************************************************
-// *****************  AviationStationInfoSystem  *************************
+// *****************  NFmiAviationStationInfoSystem_Obsolite  ************
 // ***********************************************************************
 
 

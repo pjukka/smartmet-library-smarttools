@@ -64,10 +64,10 @@ private:
 	std::string itsIcaoStr; // icao tunnus (esim. EFHK)
 };
 
-class NFmiAviationStationInfoSystem
+class NFmiAviationStationInfoSystem_Obsolite // use class NFmiAviationStationInfoSystem from NFmiAviationStationInfoSystem.h instead
 {
 public:
-	NFmiAviationStationInfoSystem(bool verboseMode = false)
+	NFmiAviationStationInfoSystem_Obsolite(bool verboseMode = false)
 	:itsInitLogMessage()
 	,itsLocations()
 	,fVerboseMode(verboseMode)
