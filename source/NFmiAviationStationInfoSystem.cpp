@@ -82,7 +82,7 @@ static bool GetAviationStationFromCsvString(const std::string &theStationStr, NF
 			catch(...)
 			{}
 
-			if(latlonOk && (fIcaoNeeded == false || fIcaoNeeded && icaoOk) && (fWmoNeeded == false || fWmoNeeded && wmoOk))
+			if(latlonOk && (fIcaoNeeded == false || (fIcaoNeeded && icaoOk)) && (fWmoNeeded == false || (fWmoNeeded && wmoOk)))
 			{
 				if(wmoId == missingWmoId)
 					wmoId = currentWmoIdCounter++;
