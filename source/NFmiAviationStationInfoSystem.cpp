@@ -43,6 +43,7 @@ NFmiAviationStation* NFmiAviationStationInfoSystem::FindStation(unsigned long th
 // FIN;FI;Finland;-;;Helsinki;Vantaa;;FIaaEFHK;EFHK;;2974;;HEL;m;EFHK;A;ICA09;;;;2974;A;WMO11;29740;;;;;60.31666667;24.96666667;G;WMO11 WMO10;51;C;WMO11 WMO10;56;C;WMO11 WMO10;Europe/Helsinki;FI-01560;;;;;;60;24
 static bool GetAviationStationFromCsvString(const std::string &theStationStr, NFmiAviationStation &theStationOut, bool fIcaoNeeded, bool fWmoNeeded)
 {
+	static unsigned long currentWmoIdCounter = 128000;
 	if(theStationStr.size() > 2)
 	{
 		if(theStationStr[0] == '#')
@@ -60,7 +61,6 @@ static bool GetAviationStationFromCsvString(const std::string &theStationStr, NF
 			std::string icaoStr = stationParts[15];
 			const unsigned long missingWmoId = 9999999;
 			unsigned long wmoId = missingWmoId;
-			unsigned long currentWmoIdCounter = 128000;
 			double lat = -9999;
 			double lon = -9999;
 			if(icaoStr.size() == 4)
