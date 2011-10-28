@@ -1,7 +1,7 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 11.10.27
+Version: 11.10.28
 Release: 1.el5.fmi
 License: FMI
 Group: Development/Libraries
@@ -35,7 +35,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}-mt.a
 
 %changelog
-* Tue Oct 27 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.10.27-1.el6.fmi
+* Fri Oct 28 2011 Mika Heiskaneen <mika.heiskanen@fmi.fi> - 11.10.28-1.el6.fmi
+- Bug fix to handling station numbers
+* Thu Oct 27 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.10.27-1.el6.fmi
 - New code to handle observations from stations
 * Mon Oct 17 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.10.17-3.el5.fmi
 - newbase headers changed again
