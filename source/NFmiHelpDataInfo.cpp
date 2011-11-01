@@ -223,6 +223,16 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 	}
 }
 
+void NFmiHelpDataInfo::ImageArea(NFmiArea *newValue) 
+{ 
+	if(itsImageArea)
+	{
+		delete itsImageArea;
+		itsImageArea = 0;
+	}
+	itsImageArea = newValue; 
+}
+
 static std::string MakeCacheFilePattern(const NFmiHelpDataInfo &theDataInfo, const NFmiHelpDataInfoSystem &theHelpDataSystem)
 {
 	NFmiFileString fileStr(theDataInfo.FileNameFilter());

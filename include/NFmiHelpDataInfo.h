@@ -53,7 +53,7 @@ public:
 	const NFmiDataIdent& ImageDataIdent(void) const {return itsImageDataIdent;}
 	void ImageDataIdent(const NFmiDataIdent& newValue) { itsImageDataIdent = newValue; }
 	const NFmiArea* ImageArea(void) const {return itsImageArea;}
-	void ImageArea(NFmiArea *newValue) { if (!itsImageArea) itsImageArea = newValue; } // Can only be called once
+	void ImageArea(NFmiArea *newValue);
 	bool NotifyOnLoad(void) const {return fNotifyOnLoad;}
 	void NotifyOnLoad(bool newValue) {fNotifyOnLoad = newValue;}
 	const std::string& NotificationLabel(void) const {return itsNotificationLabel;}
@@ -151,6 +151,7 @@ public:
 	std::vector<std::string> GetUniqueCustomMenuList(void);
 	std::vector<NFmiHelpDataInfo> GetCustomMenuHelpDataList(const std::string &theCustomFolder);
 	const checkedVector<NFmiHelpDataInfo>& DynamicHelpDataInfos(void) const {return itsDynamicHelpDataInfos;}
+	const checkedVector<NFmiHelpDataInfo>& StaticHelpDataInfos(void) const {return itsStaticHelpDataInfos;}
 
 	const std::string& CacheDirectory(void) const {return itsCacheDirectory;}
 	void CacheDirectory(const std::string &newValue) {itsCacheDirectory = newValue;}
