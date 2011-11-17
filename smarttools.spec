@@ -1,8 +1,8 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 11.11.16
-Release: 1.el5.fmi
+Version: 11.11.17
+Release: 1.el6.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
@@ -35,6 +35,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}-mt.a
 
 %changelog
+* Thu Nov 17 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.11.17-1.el5.fmi
+- Recompiled with -fPIC for q2engine
 * Wed Nov 16 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.11.16-1.el5.fmi
 - Recompiled due to newbase API changes
 * Tue Nov  8 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.11.8-1.el5.fmi
