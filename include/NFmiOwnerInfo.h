@@ -13,6 +13,7 @@
 class NFmiOwnerInfo : public NFmiFastQueryInfo
 {
 public:
+	NFmiOwnerInfo(void);
 	NFmiOwnerInfo(const NFmiOwnerInfo &theInfo); // matala kopio, eli jaettu data
 	NFmiOwnerInfo(NFmiQueryData *theOwnedData, NFmiInfoData::Type theDataType, const std::string &theDataFileName, const std::string &theDataFilePattern); // ottaa datan omistukseensa
 	~NFmiOwnerInfo(void);
@@ -32,6 +33,4 @@ protected:
 	boost::shared_ptr<NFmiQueryData> itsDataPtr;
 	std::string itsDataFileName;
 	std::string itsDataFilePattern; // t‰t‰ k‰ytet‰‰n tunnistamaan mm. info-organizerissa, ett‰ onko data samanlaista, eli pyyhit‰‰nkˆ vanha t‰ll‰inen data pois alta
-private:
-	NFmiOwnerInfo(void); // ei toteuteta tyhj‰‰ konstruktoria
 };

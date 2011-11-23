@@ -3,6 +3,11 @@
 #include "NFmiQueryData.h"
 #include "NFmiModifiableQDatasBookKeeping.h"
 
+NFmiSmartInfo::NFmiSmartInfo(void)
+:NFmiOwnerInfo()
+,itsQDataBookKeepingPtr()
+{
+}
 
 NFmiSmartInfo::NFmiSmartInfo(NFmiQueryData *theOwnedData, NFmiInfoData::Type theDataType, const std::string &theDataFileName, const std::string &theDataFilePattern)
 :NFmiOwnerInfo(theOwnedData, theDataType, theDataFileName, theDataFilePattern)

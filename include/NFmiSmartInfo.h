@@ -21,6 +21,7 @@ class NFmiHarmonizerBookKeepingData;
 class NFmiSmartInfo : public NFmiOwnerInfo
 {
 public:
+	NFmiSmartInfo(void);
 	NFmiSmartInfo(const NFmiOwnerInfo &theInfo); // matala kopio, eli jaettu data
 	NFmiSmartInfo(const NFmiSmartInfo &theInfo); // matala kopio, eli jaettu data
 	NFmiSmartInfo(NFmiQueryData *theOwnedData, NFmiInfoData::Type theDataType, const std::string &theDataFileName, const std::string &theDataFilePattern); // ottaa datan omistukseensa emossa
@@ -65,6 +66,4 @@ protected:
 	void CopyClonedDatas(const NFmiSmartInfo &theOther);
 
 	boost::shared_ptr<NFmiModifiableQDatasBookKeeping> itsQDataBookKeepingPtr;
-private:
-	NFmiSmartInfo(void); // ei toteuteta tyhj‰‰ konstruktoria
 };

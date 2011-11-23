@@ -2,6 +2,14 @@
 #include "NFmiOwnerInfo.h"
 #include "NFmiQueryData.h"
 
+NFmiOwnerInfo::NFmiOwnerInfo(void)
+:NFmiFastQueryInfo()
+,itsDataPtr()
+,itsDataFileName()
+,itsDataFilePattern()
+{
+}
+
 NFmiOwnerInfo::NFmiOwnerInfo(NFmiQueryData *theOwnedData, NFmiInfoData::Type theDataType, 
 							 const std::string &theDataFileName, const std::string &theDataFilePattern)
 :NFmiFastQueryInfo(theOwnedData)
