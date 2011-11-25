@@ -248,6 +248,11 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetSoundingPlotParamInfo
 	return GetWantedProducerInfo(theType, kFmiTEMP);
 }
 
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetMetarPlotParamInfo(NFmiInfoData::Type theType)
+{
+	return GetWantedProducerInfo(theType, kFmiMETAR);
+}
+
 // HUOM! N‰m‰ makroParamData jutut pit‰‰ mietti‰ uusiksi, jos niit‰ aletaan k‰sittelem‰‰n eri s‰ikeiss‰. T‰llˆin
 // Niist‰ pit‰‰ luoda aina ilmeisesti paikalliset kopiot?!?!
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::MacroParamData(void) 
@@ -321,6 +326,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
 									// jonka tuottaja nimi on eri kuin haluttu. Jos oikealla nimell‰ ei lˆydy dataa, k‰ytet‰‰n t‰t‰.
 	if(theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpSynoPlot || theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpMinMaxPlot) // synop plot paramille pit‰‰ tehd‰ kikka (ja min/max plot 9996)
 		return GetSynopPlotParamInfo(theType);
+	if(theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpMetarPlot) // metar plot paramille pit‰‰ tehd‰ kikka (9995)
+		return GetMetarPlotParamInfo(theType);
 	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pit‰‰ tehd‰ kikka
 		return GetSoundingPlotParamInfo(theType);
 	if(theType == NFmiInfoData::kMacroParam || theType == NFmiInfoData::kQ3MacroParam) // macro- parametrit lasketaan t‰ll‰
