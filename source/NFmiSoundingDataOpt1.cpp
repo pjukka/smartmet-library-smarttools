@@ -734,8 +734,8 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
 				FillParamData(theInfo, kFmiTemperature);
 				FillParamData(theInfo, kFmiDewPoint);
 				FillParamData(theInfo, kFmiPressure);
-				if(!FillParamData(theInfo, kFmiGeopHeight))
-					if(!FillParamData(theInfo, kFmiGeomHeight))
+				if(!FillParamData(theInfo, kFmiGeomHeight))
+					if(!FillParamData(theInfo, kFmiGeopHeight))
 					FillParamData(theInfo, kFmiFlAltitude); // eri datoissa on geom ja geop heightia, kokeillaan molempia tarvittaessa
 				FillParamData(theInfo, kFmiWindSpeedMS);
 				FillParamData(theInfo, kFmiWindDirection);

@@ -702,8 +702,8 @@ bool NFmiSoundingData::FillSoundingData(const boost::shared_ptr<NFmiFastQueryInf
 				FillParamData(theInfo, kFmiTemperature);
 				FillParamData(theInfo, kFmiDewPoint);
 				FillParamData(theInfo, kFmiPressure);
-				if(!FillParamData(theInfo, kFmiGeopHeight))
-					if(!FillParamData(theInfo, kFmiGeomHeight))
+				if(!FillParamData(theInfo, kFmiGeomHeight))
+					if(!FillParamData(theInfo, kFmiGeopHeight))
 					FillParamData(theInfo, kFmiFlAltitude); // eri datoissa on geom ja geop heightia, kokeillaan molempia tarvittaessa
 				FillParamData(theInfo, kFmiWindSpeedMS);
 				FillParamData(theInfo, kFmiWindDirection);
@@ -734,8 +734,8 @@ bool NFmiSoundingData::FillSoundingData(const boost::shared_ptr<NFmiFastQueryInf
 		FillParamData(theInfo, kFmiTemperature, theTime, theLatlon);
 		FillParamData(theInfo, kFmiDewPoint, theTime, theLatlon);
 		FillParamData(theInfo, kFmiPressure, theTime, theLatlon);
-		if(!FillParamData(theInfo, kFmiGeopHeight, theTime, theLatlon))
-			FillParamData(theInfo, kFmiGeomHeight, theTime, theLatlon); // eri datoissa on geom ja geop heightia, kokeillaan molempia tarvittaessa
+		if(!FillParamData(theInfo, kFmiGeomHeight, theTime, theLatlon))
+			FillParamData(theInfo, kFmiGeopHeight, theTime, theLatlon); // eri datoissa on geom ja geop heightia, kokeillaan molempia tarvittaessa
 		FillParamData(theInfo, kFmiWindSpeedMS, theTime, theLatlon);
 		FillParamData(theInfo, kFmiWindDirection, theTime, theLatlon);
 		FillParamData(theInfo, kFmiWindUMS, theTime, theLatlon);
