@@ -80,7 +80,7 @@ public:
 	void HideAllParams(bool newState);
 	void DisableEditing(void);
 	void DeactivateAll(void);
-	bool Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId = false);
+	bool Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId = false, bool fIgnoreLevelInfo = false);
 
 	void Update(void);
 	bool IsDirty (void){ return fDirtyList; };

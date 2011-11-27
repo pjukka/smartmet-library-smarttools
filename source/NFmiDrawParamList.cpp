@@ -250,7 +250,7 @@ void NFmiDrawParamList::DeactivateAll(void)
 		Current()->Activate(false);
 }
 
-bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId)
+bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* theLevel, NFmiInfoData::Type theDataType, bool fUseOnlyParamId, bool fIgnoreLevelInfo)
 {
 	for(Reset(); Next();)
 	{
@@ -266,6 +266,8 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 			{
 				if(theDataType == NFmiInfoData::kAnyData || drawParam->DataType() == theDataType)
 				{
+					if(fIgnoreLevelInfo)
+						return true;
 					if(theLevel == 0 && drawParam->Level().LevelType() == 0)
 						return true;
 					if(drawParam->Level().LevelType() == 0 && (theLevel->LevelType() == kFmiAnyLevelType || theLevel->LevelType() == kFmiMeanSeaLevel))
