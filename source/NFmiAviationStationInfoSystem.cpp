@@ -145,13 +145,14 @@ void NFmiAviationStationInfoSystem::InitFromMasterTableCsv(const std::string &th
 
 		if(fVerboseMode)
 		{
+			std::string stationTypeStr = fWmoStationsWanted ? "Wmo" : "Icao";
 			int totalStationCount = static_cast<int>(fWmoStationsWanted ? itsWmoStations.size() : itsIcaoStations.size());
-			itsInitLogMessage = "Initializing sounding station data went OK, from file: ";
+			itsInitLogMessage = std::string("Initializing ") + stationTypeStr + " station data went OK, from file: ";
 			itsInitLogMessage += theInitFileName;
 			if(totalStationCount == 0)
-				itsInitLogMessage += "\nWarning: 0 icao stations found.";
+				itsInitLogMessage += std::string("\nWarning: 0 ") + stationTypeStr + " stations found.";
 			else
-				itsInitLogMessage += std::string("\nInfo: ") + NFmiStringTools::Convert<int>(totalStationCount) + " icao stations found.";
+				itsInitLogMessage += std::string("\nInfo: ") + NFmiStringTools::Convert<int>(totalStationCount) + " " + stationTypeStr + " stations found.";
 			int diff = counter - totalStationCount;
 			if(diff > 0)
 			{
@@ -162,7 +163,172 @@ void NFmiAviationStationInfoSystem::InitFromMasterTableCsv(const std::string &th
 		}
 	}
 	else
-		throw std::runtime_error(std::string("NFmiAviationStationInfoSystem::Init - trouble reading file: ") + theInitFileName);
+		throw std::runtime_error(std::string("NFmiAviationStationInfoSystem::InitFromMasterTableCsv - trouble reading file: ") + theInitFileName);
+}
+
+// theDegreeStr on puhtaasti arvo asteina (kokonaisluku)
+// theMinutesWithOrientationStr on arvo asteiden minuutteina ja jossa on  pohjoisella pallonpuoliskolla N ja etel‰isell‰ pallonpuoliskolla S kirjain per‰ss‰
+static double GetLatOrLon(const std::string &theLatOrLonStr, bool fDoLatitude)
+{
+	if(theLatOrLonStr.empty())
+		throw std::runtime_error(std::string("GetLatitude - invalid lat/lon string"));
+
+	std::vector<std::string> stringParts = NFmiStringTools::Split(theLatOrLonStr, " ");
+	if(stringParts.size() != 2)
+		throw std::runtime_error(std::string("GetLatitude - invalid lat/lon string"));
+	if(stringParts[0].size() < 2 || stringParts[1].size() != 3)
+		throw std::runtime_error(std::string("GetLatitude - invalid lat/lon string"));
+
+	double value = NFmiStringTools::Convert<double>(stringParts[0]);
+	std::string minutesWithOrientationStr(stringParts[1]);
+	std::string minutesStr(minutesWithOrientationStr.begin(), minutesWithOrientationStr.begin()+2);
+	std::string orientationStr(minutesWithOrientationStr.begin()+2, minutesWithOrientationStr.end());
+	value += (NFmiStringTools::Convert<double>(minutesStr) / 60. * 100.)/100.;
+	if(fDoLatitude)
+	{
+		if(orientationStr == "S")
+			value = -value;
+	}
+	else
+	{
+		if(orientationStr == "W")
+			value = -value;
+	}
+	return value;
+}
+
+// ensimm‰inen rivi tiedostossa on kommentti rivi kuten seuraava rivi ilman kommentti merkkej‰ '//'
+// RegionId	RegionName	CountryArea	CountryCode	StationId	IndexNbr	IndexSubNbr	StationName	Latitude	Longitude	Hp	HpFlag	Hha	HhaFlag	PressureDefId	SO-1	SO-2	SO-3	SO-4	SO-5	SO-6	SO-7	SO-8	ObsHs	UA-1	UA-2	UA-3	UA-4	ObsRems
+//
+// loput rivit tiedostossa on asema data rivej‰, joissa erotin on tabulaattori ja sarake j‰rjestys on kuten 1. kommentti rivill‰ on ilmoitettu
+// 1	AFRICA / AFRIQUE	ALGERIA / ALGERIE	1030	57	60351	0	JIJEL- ACHOUAT	36 48N	05 53E	10		8			X	X	X	X	X	X	X	X	H00-24	.	.	.	.	A;CLIMAT(C);EVAP;M/B;METAR;SOILTEMP;SPECI;SUNDUR
+//
+// Kiinnostavat kohdat ovat (huom. t‰ss‰ kuvauksessa sarakkeet alkaa 1.:sta, koodissa indeksit alkavat 0:sta): 
+// 6. sarake (wmo-id)
+// 8. sarake (asema nimi)
+// 9. sarake (lat asteet ja minuutit)
+// 10. sarake (lon asteet ja minuutit)
+static bool GetAviationStationFromWmoFlatTableString(const std::string &theStationStr, NFmiAviationStation &theStationOut)
+{
+	static unsigned long currentWmoIdCounter = 128000;
+	if(theStationStr.size() > 2)
+	{
+		// HUOM! vaikka data formaatti ei tuekaan kommentteja, annetaan kommenttien tarkistus koodin olla t‰ss‰ varmuuden vuoksi
+		if(theStationStr[0] == '#')
+			return false;
+		if(theStationStr[0] == '/' && theStationStr[1] == '/')
+			return false;
+
+		std::vector<std::string> stationParts = NFmiStringTools::Split(theStationStr, "\t");
+		if(stationParts.size() >= 13)
+		{
+			bool latlonOk = false;
+			bool wmoOk = false;
+			std::string nameStr = stationParts[7];
+			const unsigned long missingWmoId = 9999999;
+			unsigned long wmoId = missingWmoId;
+			double lat = -9999;
+			double lon = -9999;
+			try
+			{
+				wmoId = NFmiStringTools::Convert<unsigned long>(stationParts[5]);
+				wmoOk = true;
+			}
+			catch(...)
+			{}
+
+			try
+			{
+				lat = ::GetLatOrLon(stationParts[8], true);
+				lon = ::GetLatOrLon(stationParts[9], false);
+				latlonOk = true;
+			}
+			catch(...)
+			{}
+
+			if(latlonOk && wmoOk)
+			{
+				if(wmoId == missingWmoId)
+					wmoId = currentWmoIdCounter++;
+				theStationOut.SetIdent(wmoId);
+				theStationOut.SetLatitude(lat);
+				theStationOut.SetLongitude(lon);
+				theStationOut.SetName(nameStr);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+void NFmiAviationStationInfoSystem::InitFromWmoFlatTable(const std::string &theInitFileName)
+{
+	itsInitLogMessage = "";
+	 // tyhjennet‰‰n ensin asemalistat
+	itsIcaoStations.clear();
+	itsWmoStations.clear();
+
+	if(theInitFileName.empty())
+		throw std::runtime_error("NFmiAviationStationInfoSystem::InitFromWmoFlatTable - empty settings filename given.");
+	if(fWmoStationsWanted == false)
+		throw std::runtime_error("NFmiAviationStationInfoSystem::InitFromWmoFlatTable - Wmo flat table supports only wmo stations, and now Icao stations are set to be the target.");
+
+	std::string fileContent;
+	if(NFmiFileSystem::ReadFile2String(theInitFileName, fileContent))
+	{
+		std::stringstream in(fileContent);
+
+		const int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+		std::string buffer;
+		int i = 0;
+		int counter = 0;
+		do
+		{
+			buffer.resize(maxBufferSize);
+			in.getline(&buffer[0], maxBufferSize);
+			size_t realSize = strlen(buffer.c_str());
+			buffer.resize(realSize);
+
+			try
+			{
+				NFmiAviationStation station;
+				if(::GetAviationStationFromWmoFlatTableString(buffer, station))
+				{
+					counter++;
+					itsWmoStations.insert(std::make_pair(station.GetIdent(), station));
+				}
+				else
+				{
+					std::cerr << "Error with line: " << buffer << std::endl;
+				}
+			}
+			catch(std::runtime_error & /* e */ )
+			{
+			}
+
+			i++;
+		}while(in.good());
+
+		if(fVerboseMode)
+		{
+			int totalStationCount = static_cast<int>(itsWmoStations.size());
+			itsInitLogMessage = "Initializing wmo station data went OK, from file: ";
+			itsInitLogMessage += theInitFileName;
+			if(totalStationCount == 0)
+				itsInitLogMessage += "\nWarning: 0 wmo stations found.";
+			else
+				itsInitLogMessage += std::string("\nInfo: ") + NFmiStringTools::Convert<int>(totalStationCount) + " wmo stations found.";
+			int diff = counter - totalStationCount;
+			if(diff > 0)
+			{
+				itsInitLogMessage += "\nWarning: there were probably ";
+				itsInitLogMessage += NFmiStringTools::Convert<int>(diff);
+				itsInitLogMessage += " 'extra' stations in file, meaning that there were more station lines than different station were found, use unique stations.";
+			}
+		}
+	}
+	else
+		throw std::runtime_error(std::string("NFmiAviationStationInfoSystem::InitFromWmoFlatTable - trouble reading file: ") + theInitFileName);
 }
 
 
