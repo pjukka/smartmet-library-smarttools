@@ -52,6 +52,7 @@ public:
 
 	const std::string& InitLogMessage(void) const {return itsInitLogMessage;}
 	void InitFromMasterTableCsv(const std::string &theInitFileName);
+	void InitFromWmoFlatTable(const std::string &theInitFileName);
 	NFmiAviationStation* FindStation(const std::string &theIcaoId);
 	NFmiAviationStation* FindStation(unsigned long theWmoId);
 	bool WmoStationsWanted(void) const {return fWmoStationsWanted;}
