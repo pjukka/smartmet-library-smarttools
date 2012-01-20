@@ -2015,7 +2015,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("hsade"), kFmiWeatherSymbol1));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("hessaa"), kFmiWeatherSymbol3));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("w"), kFmiVerticalVelocityMMS));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("z"), kFmiGeopHeight));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("z"), kFmiGeomHeight));
 
 		// laitetaan kokoelma parametritkin kieleen, että niitä voi sijoittaa kerralla yhdellä komennolla
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wind"), kFmiTotalWindMS));
