@@ -34,6 +34,12 @@ void NFmiSmartToolCalculationSection::Calculate(const NFmiCalculationParams &the
 		itsCalculations[i]->Calculate(theCalculationParams, theMacroParamValue);
 }
 
+void NFmiSmartToolCalculationSection::Calculate_ver2(const NFmiCalculationParams &theCalculationParams)
+{
+	for(size_t i=0; i < itsCalculations.size(); i++)
+		itsCalculations[i]->Calculate_ver2(theCalculationParams);
+}
+
 void NFmiSmartToolCalculationSection::AddCalculations(const boost::shared_ptr<NFmiSmartToolCalculation> &value)
 {
 	if(value)

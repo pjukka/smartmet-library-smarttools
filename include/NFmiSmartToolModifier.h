@@ -58,6 +58,7 @@ public:
 	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
 	void SetTime(const NFmiMetTime &theTime);
 	void Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue);
+	void Calculate_ver2(const NFmiCalculationParams &theCalculationParams);
 	void Add(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theBlock);
 	Iterator Begin(void) {return itsCalculationBlocks.begin();}
 	Iterator End(void) {return itsCalculationBlocks.end();}
@@ -75,6 +76,7 @@ public:
 	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
 	void SetTime(const NFmiMetTime &theTime);
 	void Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue);
+	void Calculate_ver2(const NFmiCalculationParams &theCalculationParams);
 
 	boost::shared_ptr<NFmiSmartToolCalculationSection> itsFirstCalculationSection;
 	boost::shared_ptr<NFmiSmartToolCalculation> itsIfAreaMaskSection;
@@ -94,8 +96,7 @@ class NFmiSmartToolModifier
 public:
 	void InitSmartTool(const std::string &theSmartToolText, bool fThisIsMacroParamSkript = false);
 	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation);
-	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation, NFmiMacroParamValue &theMacroParamValue);
-	float CalcSmartToolValue(NFmiMacroParamValue &theMacroParamValue);
+	void ModifyData_ver2(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation);
 	float CalcSmartToolValue(const NFmiMetTime &theTime, const NFmiPoint &theLatlon);
 	void CalcCrossSectionSmartToolValues(NFmiDataMatrix<float> &theValues, checkedVector<float> &thePressures, checkedVector<NFmiPoint> &theLatlonPoints, const checkedVector<NFmiMetTime> &thePointTimes);
 
@@ -110,12 +111,16 @@ public:
 	const std::string& GetStrippedMacroText(void) const;
 	bool IsInterpretedSkriptMacroParam(void); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns. macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
 private:
+	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation, NFmiMacroParamValue &theMacroParamValue);
+	float CalcSmartToolValue(NFmiMacroParamValue &theMacroParamValue);
 	boost::shared_ptr<NFmiAreaMask> CreatePeekFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &fMustUsePressureInterpolation);
 	boost::shared_ptr<NFmiAreaMask> CreateMetFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &fMustUsePressureInterpolation);
 	void SetInfosMaskType(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
 	boost::shared_ptr<NFmiFastQueryInfo> UsedMacroParamData(void);
 	void ModifyConditionalData(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
+	void ModifyConditionalData_ver2(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock);
 	void ModifyBlockData(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue);
+	void ModifyBlockData_ver2(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock);
 	boost::shared_ptr<NFmiSmartToolCalculationBlockVector> CreateCalculationBlockVector(const boost::shared_ptr<NFmiSmartToolCalculationBlockInfoVector> &theBlockInfoVector);
 	boost::shared_ptr<NFmiSmartToolCalculationBlock> CreateCalculationBlock(NFmiSmartToolCalculationBlockInfo &theBlockInfo);
 	boost::shared_ptr<NFmiFastQueryInfo> CreateRealScriptVariableInfo(const NFmiDataIdent &theDataIdent);
@@ -127,6 +132,7 @@ private:
 	boost::shared_ptr<NFmiDataModifier> CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	boost::shared_ptr<NFmiDataIterator> CreateIterator(const NFmiAreaMaskInfo &theAreaMaskInfo, const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
 	void ModifyData2(boost::shared_ptr<NFmiSmartToolCalculationSection> &theCalculationSection, NFmiMacroParamValue &theMacroParamValue);
+	void ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalculationSection> &theCalculationSection);
 	boost::shared_ptr<NFmiAreaMask> CreateAreaMask(const NFmiAreaMaskInfo &theInfo);
 	boost::shared_ptr<NFmiAreaMask> CreateEndingAreaMask(void);
 	boost::shared_ptr<NFmiFastQueryInfo> CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);

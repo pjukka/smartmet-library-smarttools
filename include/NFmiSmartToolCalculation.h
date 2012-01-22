@@ -38,6 +38,7 @@ class NFmiSmartToolCalculation
 public:
 	bool IsMasked(const NFmiCalculationParams &theCalculationParams);
 	void Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue);
+	void Calculate_ver2(const NFmiCalculationParams &theCalculationParams);
 	void SetTime(const NFmiMetTime &theTime); // optimointia laskuja varten
 
 	NFmiSmartToolCalculation(void);

@@ -26,6 +26,7 @@ class NFmiSmartToolCalculationSection
 
 public:
 	void Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue);
+	void Calculate_ver2(const NFmiCalculationParams &theCalculationParams);
 	void SetTime(const NFmiMetTime &theTime);
 	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
 

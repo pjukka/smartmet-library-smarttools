@@ -91,6 +91,14 @@ void NFmiSmartToolCalculationBlockVector::Calculate(const NFmiCalculationParams 
 		(*it)->Calculate(theCalculationParams, theMacroParamValue);
 }
 
+void NFmiSmartToolCalculationBlockVector::Calculate_ver2(const NFmiCalculationParams &theCalculationParams)
+{
+	Iterator it = Begin();
+	Iterator endIt = End();
+	for( ; it != endIt; ++it)
+		(*it)->Calculate_ver2(theCalculationParams);
+}
+
 void NFmiSmartToolCalculationBlockVector::Add(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theBlock)
 { // ottaa omistukseen theBlock:in!!
 	itsCalculationBlocks.push_back(theBlock);
@@ -159,6 +167,22 @@ void NFmiSmartToolCalculationBlock::Calculate(const NFmiCalculationParams &theCa
 
 	if(itsLastCalculationSection)
 		itsLastCalculationSection->Calculate(theCalculationParams, theMacroParamValue);
+}
+
+void NFmiSmartToolCalculationBlock::Calculate_ver2(const NFmiCalculationParams &theCalculationParams)
+{
+	if(itsFirstCalculationSection)
+		itsFirstCalculationSection->Calculate_ver2(theCalculationParams);
+
+	if(itsIfAreaMaskSection && itsIfAreaMaskSection->IsMasked(theCalculationParams))
+		itsIfCalculationBlocks->Calculate_ver2(theCalculationParams);
+	else if(itsElseIfAreaMaskSection && itsElseIfAreaMaskSection->IsMasked(theCalculationParams))
+		itsElseIfCalculationBlocks->Calculate_ver2(theCalculationParams);
+	else if(itsElseCalculationBlocks)
+		itsElseCalculationBlocks->Calculate_ver2(theCalculationParams);
+
+	if(itsLastCalculationSection)
+		itsLastCalculationSection->Calculate_ver2(theCalculationParams);
 }
 
 //--------------------------------------------------------
@@ -416,10 +440,6 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, boo
 	fModifySelectedLocationsOnly = fSelectedLocationsOnly;
 	try
 	{
-		// Seed the random-number generator with current time so that
-		// the numbers will be different every time we run.
-		srand( static_cast<unsigned int>(time( NULL ))); // mahd. satunnais funktion käytön takia, pitää 'sekoittaa' random generaattori
-
 		checkedVector<NFmiSmartToolCalculationBlockInfo>& smartToolCalculationBlockInfos = itsSmartToolIntepreter->SmartToolCalculationBlocks();
 		size_t size = smartToolCalculationBlockInfos.size();
 		for(size_t i=0; i<size; i++)
@@ -429,6 +449,34 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, boo
 			if(block)
 			{
 				ModifyBlockData(block, theMacroParamValue);
+			}
+		}
+		ClearScriptVariableInfos(); // lopuksi nämä skripti-muuttujat tyhjennetään
+	}
+	catch(...)
+	{
+		ClearScriptVariableInfos(); // lopuksi nämä skripti-muuttujat tyhjennetään
+		fMacroRunnable = false;
+		throw ;
+	}
+}
+
+void NFmiSmartToolModifier::ModifyData_ver2(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation)
+{
+	itsModifiedTimes = theModifiedTimes;
+	fMacroParamCalculation = isMacroParamCalculation;
+	fModifySelectedLocationsOnly = fSelectedLocationsOnly;
+	try
+	{
+		checkedVector<NFmiSmartToolCalculationBlockInfo>& smartToolCalculationBlockInfos = itsSmartToolIntepreter->SmartToolCalculationBlocks();
+		size_t size = smartToolCalculationBlockInfos.size();
+		for(size_t i=0; i<size; i++)
+		{
+			NFmiSmartToolCalculationBlockInfo blockInfo = smartToolCalculationBlockInfos[i];
+			boost::shared_ptr<NFmiSmartToolCalculationBlock> block = CreateCalculationBlock(blockInfo);
+			if(block)
+			{
+				ModifyBlockData_ver2(block);
 			}
 		}
 		ClearScriptVariableInfos(); // lopuksi nämä skripti-muuttujat tyhjennetään
@@ -452,6 +500,13 @@ void NFmiSmartToolModifier::ModifyBlockData(const boost::shared_ptr<NFmiSmartToo
 	ModifyData2(theCalculationBlock->itsFirstCalculationSection, theMacroParamValue);
 	ModifyConditionalData(theCalculationBlock, theMacroParamValue);
 	ModifyData2(theCalculationBlock->itsLastCalculationSection, theMacroParamValue);
+}
+
+void NFmiSmartToolModifier::ModifyBlockData_ver2(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock)
+{
+	ModifyData2_ver2(theCalculationBlock->itsFirstCalculationSection);
+	ModifyConditionalData_ver2(theCalculationBlock);
+	ModifyData2_ver2(theCalculationBlock->itsLastCalculationSection);
 }
 
 void NFmiSmartToolModifier::ModifyConditionalData(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue)
@@ -505,6 +560,56 @@ void NFmiSmartToolModifier::ModifyConditionalData(const boost::shared_ptr<NFmiSm
 					{
 						return ; // eli jos oli yhden pisteen laskusta kyse, lopetetaan loppi heti
 					}
+				}
+			}
+		}
+		catch(...)
+		{
+			throw ;
+		}
+	}
+}
+
+void NFmiSmartToolModifier::ModifyConditionalData_ver2(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock)
+{
+	if(theCalculationBlock->itsIfAreaMaskSection && theCalculationBlock->itsIfCalculationBlocks)
+	{
+		if(theCalculationBlock->FirstVariableInfo() == 0)
+			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorUnknownProblem"));
+		boost::shared_ptr<NFmiFastQueryInfo> info(dynamic_cast<NFmiFastQueryInfo*>(theCalculationBlock->FirstVariableInfo()->Clone()));
+
+		try
+		{
+			NFmiCalculationParams calculationParams;
+			SetInfosMaskType(info);
+			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
+			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
+			{
+				calculationParams.itsTime = modifiedTimes.Time();
+				info->Time(calculationParams.itsTime); // asetetaan myös tämä, että saadaan oikea timeindex
+				calculationParams.itsTimeIndex = info->TimeIndex();
+				theCalculationBlock->itsIfAreaMaskSection->SetTime(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
+				theCalculationBlock->itsIfCalculationBlocks->SetTime(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
+				if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks)
+				{
+					theCalculationBlock->itsElseIfAreaMaskSection->SetTime(calculationParams.itsTime);
+					theCalculationBlock->itsElseIfCalculationBlocks->SetTime(calculationParams.itsTime);
+				}
+				if(theCalculationBlock->itsElseCalculationBlocks)
+					theCalculationBlock->itsElseCalculationBlocks->SetTime(calculationParams.itsTime);
+
+				for(info->ResetLocation(); info->NextLocation(); )
+				{
+					calculationParams.itsLatlon = info->LatLon();
+					calculationParams.itsLocationIndex = info->LocationIndex(); // tämä locationindex juttu liittyy kai optimointiin, jota ei tehdä enää, pitäisikö poistaa
+					if(theCalculationBlock->itsIfAreaMaskSection->IsMasked(calculationParams))
+						theCalculationBlock->itsIfCalculationBlocks->Calculate_ver2(calculationParams);
+					else if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks && theCalculationBlock->itsElseIfAreaMaskSection->IsMasked(calculationParams))
+					{
+						theCalculationBlock->itsElseIfCalculationBlocks->Calculate_ver2(calculationParams);
+					}
+					else if(theCalculationBlock->itsElseCalculationBlocks)
+						theCalculationBlock->itsElseCalculationBlocks->Calculate_ver2(calculationParams);
 				}
 			}
 		}
@@ -589,6 +694,55 @@ void NFmiSmartToolModifier::ModifyData2(boost::shared_ptr<NFmiSmartToolCalculati
 					}
 					if(theMacroParamValue.fSetValue)
 						break;
+				}
+
+			}
+
+		}
+		catch(...)
+		{
+			throw ;
+		}
+	}
+}
+
+void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalculationSection> &theCalculationSection)
+{
+	if(theCalculationSection && theCalculationSection->FirstVariableInfo())
+	{
+		boost::shared_ptr<NFmiFastQueryInfo> info(dynamic_cast<NFmiFastQueryInfo*>(theCalculationSection->FirstVariableInfo()->Clone()));
+		if(info == 0)
+			return ;
+		try
+		{
+			NFmiCalculationParams calculationParams;
+			SetInfosMaskType(info);
+			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
+
+			// Muutin lasku systeemin suoritusta, koska tuli ongelmia mm. muuttujien kanssa, kun niitä käytettiin samassa calculationSectionissa
+			// CalculationSection = lasku rivejä peräkkäin esim.
+			// T = T + 1
+			// P = P + 1
+			// jne. ilman IF-lauseita
+			// ENNEN laskettiin tälläinen sectio siten että käytiin läpi koko sectio samalla paikalla ja ajalla ja sitten siirryttiin eteenpäin.
+			// NYT lasketaan aina yksi laskurivi läpi kaikkien aikojen ja paikkojen, ja sitten siirrytään seuraavalle lasku riville.
+			size_t size = theCalculationSection->GetCalculations().size();
+			for(size_t i=0; i<size; i++)
+			{
+				for(modifiedTimes.Reset(); modifiedTimes.Next(); )
+				{
+					calculationParams.itsTime = modifiedTimes.Time();
+					if(info->Time(calculationParams.itsTime)) // asetetaan myös tämä, että saadaan oikea timeindex
+					{
+						theCalculationSection->SetTime(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
+						for(info->ResetLocation(); info->NextLocation(); )
+						{
+							calculationParams.itsLatlon = info->LatLon();
+							calculationParams.itsLocationIndex = info->LocationIndex();
+							// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseistä optimointi juttua ei kai enää käytetä
+							theCalculationSection->GetCalculations()[i]->Calculate_ver2(calculationParams);
+						}
+					}
 				}
 
 			}

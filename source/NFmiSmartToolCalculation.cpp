@@ -69,13 +69,9 @@ template<typename T>
 static bool IsValidNumber(T theValue)
 {
 #ifdef UNIX
-	if(isnan(theValue))
-		return false;
 	if(!finite(theValue))
 		return false;
 #else
-	if(_isnan(theValue))
-		return false;
 	if(!_finite(theValue))
 		return false;
 #endif
@@ -124,6 +120,29 @@ void NFmiSmartToolCalculation::Calculate(const NFmiCalculationParams &theCalcula
 	if(theMacroParamValue.fSetValue &&
 	   (itsResultInfo->DataType() == NFmiInfoData::kMacroParam || itsResultInfo->DataType() == NFmiInfoData::kCrossSectionMacroParam))
 	  theMacroParamValue.itsValue = static_cast<float>(value);
+}
+
+void NFmiSmartToolCalculation::Calculate_ver2(const NFmiCalculationParams &theCalculationParams)
+{
+	double value = eval_exp(theCalculationParams);
+
+	value = MakeValidNumber(value); // muuttaa luvun missingiksi, jos nan tai +-inf
+	if(value != kFloatMissing) // tuli ongelmia missing asetuksissa, pit‰‰ mietti vaikka jokin funktio, jolla asetetaan puuttuva arvo // pit‰‰ pysty‰ sittenkin asettamaan arvoksi kFloatMissing:in!!!
+	{
+		itsResultInfo->LocationIndex(theCalculationParams.itsLocationIndex); // kohde dataa juoksutetaan, joten lokaatio indeksien pit‰‰ olla synkassa!!!
+		value = FixCircularValues(value); // ensin tehd‰‰n circular tarkistus ja sitten vasta min/max
+		value = GetInsideLimitsValue(static_cast<float>(value)); // asetetaan value viel‰ drawparamista satuihin rajoihin, ettei esim. RH voi olla alle 0 tai yli 100 %
+
+		itsResultInfo->FloatValue(static_cast<float>(value)); // miten info saadaan osoittamaan oikeaan kohtaan?!?
+	}
+	else
+	{
+		if(fAllowMissingValueAssignment)
+		{
+			itsResultInfo->LocationIndex(theCalculationParams.itsLocationIndex); // kohde dataa juoksutetaan, joten lokaatio indeksien pit‰‰ olla synkassa!!!
+			itsResultInfo->FloatValue(static_cast<float>(value)); // nyt voidaan asettaa puuttuva arvo dataan
+		}
+	}
 }
 
 // ei ota huomioon missing arvoa, koska se pit‰‰ ottaa huomioon jo ennen t‰m‰n kutsua.
