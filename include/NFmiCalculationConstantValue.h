@@ -24,6 +24,8 @@ public:
 
    NFmiCalculationConstantValue(double value = 0);
    ~NFmiCalculationConstantValue();
+   NFmiCalculationConstantValue(const NFmiCalculationConstantValue &theOther);
+   NFmiAreaMask* Clone(void) const;
 
    void SetValue(double value){itsValue = value;}
    double GetValue(void) const {return itsValue;}
@@ -48,6 +50,8 @@ public:
 
    NFmiCalculationDeltaZValue(void);
    ~NFmiCalculationDeltaZValue(){};
+   NFmiCalculationDeltaZValue(const NFmiCalculationDeltaZValue &theOther);
+   NFmiAreaMask* Clone(void) const;
 
    // tätä funktiota käyttämällä asetetaan korkeus 'siivun' paksuus. HUOM! se on staattinen kuten on
    // itsHeightValue-dataosakin, joten se tulee kaikille 'DeltaZ':oille yhteiseksi arvoksi.
@@ -69,6 +73,8 @@ class NFmiCalculationSpecialCase : public NFmiAreaMaskImpl
 public:
 	NFmiCalculationSpecialCase(NFmiAreaMask::CalculationOperator theValue = NotOperation);
 	~NFmiCalculationSpecialCase(void){};
+	NFmiCalculationSpecialCase(const NFmiCalculationSpecialCase &theOther);
+	NFmiAreaMask* Clone(void) const;
 
 
 private:
@@ -84,6 +90,8 @@ public:
 
    NFmiCalculationRampFuction(const NFmiCalculationCondition& theOperation, Type theMaskType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, BinaryOperator thePostBinaryOperator = kNoValue);
    ~NFmiCalculationRampFuction(void);
+   NFmiCalculationRampFuction(const NFmiCalculationRampFuction &theOther);
+   NFmiAreaMask* Clone(void) const;
 
 private:
 
@@ -102,6 +110,8 @@ public:
 										   boost::shared_ptr<NFmiAreaMask> &theAreaMask,
 										   BinaryOperator thePostBinaryOperator = kNoValue);
    ~NFmiCalculationRampFuctionWithAreaMask(void);
+   NFmiCalculationRampFuctionWithAreaMask(const NFmiCalculationRampFuctionWithAreaMask &theOther);
+   NFmiAreaMask* Clone(void) const;
 
 private:
 	boost::shared_ptr<NFmiAreaMask> itsAreaMask;
@@ -119,6 +129,7 @@ public:
    ~NFmiCalculationIntegrationFuction(void);
 
 private:
+   NFmiCalculationIntegrationFuction(const NFmiCalculationIntegrationFuction &theOther);
 
 	boost::shared_ptr<NFmiDataModifier> itsDataModifier;
 	boost::shared_ptr<NFmiDataIterator> itsDataIterator;
@@ -145,6 +156,8 @@ class NFmiStation2GridMask : public NFmiInfoAreaMask
 public:
    NFmiStation2GridMask(Type theMaskType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
    ~NFmiStation2GridMask(void);
+   NFmiStation2GridMask(const NFmiStation2GridMask &theOther);
+   NFmiAreaMask* Clone(void) const;
 
    double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
    void SetGriddingHelpers(NFmiArea *theArea, NFmiEditMapGeneralDataDoc *theDoc, const NFmiPoint &theStation2GridSize);

@@ -21,6 +21,9 @@ public:
 
 	virtual ~NFmiInfoAreaMaskSoundingIndex(void);
 	NFmiInfoAreaMaskSoundingIndex(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiSoundingParameters theSoundingParam);
+	NFmiInfoAreaMaskSoundingIndex(const NFmiInfoAreaMaskSoundingIndex &theOther);
+	NFmiAreaMask* Clone(void) const;
+
 	FmiSoundingParameters SoundingParam(void) const {return itsSoundingParam;}
 	void SoundingParam(FmiSoundingParameters newValue) {itsSoundingParam = newValue;}
 
@@ -31,8 +34,6 @@ public:
 private:
 	FmiSoundingParameters itsSoundingParam;
 
-	// ei toteutusta näille!!!
-	NFmiInfoAreaMaskSoundingIndex(const NFmiInfoAreaMaskSoundingIndex & theMask);
 	NFmiInfoAreaMaskSoundingIndex & operator=(const NFmiInfoAreaMaskPeekXY & theMask);
 
 }; // class NFmiInfoAreaMaskSoundingIndex

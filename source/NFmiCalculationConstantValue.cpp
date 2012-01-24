@@ -21,6 +21,18 @@ NFmiCalculationConstantValue::NFmiCalculationConstantValue(double value)
 NFmiCalculationConstantValue::~NFmiCalculationConstantValue()
 {
 }
+
+NFmiCalculationConstantValue::NFmiCalculationConstantValue(const NFmiCalculationConstantValue &theOther)
+:NFmiAreaMaskImpl(theOther)
+,itsValue(theOther.itsValue)
+{
+}
+
+NFmiAreaMask* NFmiCalculationConstantValue::Clone(void) const
+{
+	return new NFmiCalculationConstantValue(*this);
+}
+
 //--------------------------------------------------------
 // Value 
 //--------------------------------------------------------
@@ -35,6 +47,15 @@ NFmiCalculationSpecialCase::NFmiCalculationSpecialCase(NFmiAreaMask::Calculation
 	SetCalculationOperator(theValue);
 }
 
+NFmiCalculationSpecialCase::NFmiCalculationSpecialCase(const NFmiCalculationSpecialCase &theOther)
+:NFmiAreaMaskImpl(theOther)
+{
+}
+
+NFmiAreaMask* NFmiCalculationSpecialCase::Clone(void) const
+{
+	return new NFmiCalculationSpecialCase(*this);
+}
 
 
 NFmiCalculationRampFuction::NFmiCalculationRampFuction(const NFmiCalculationCondition& theOperation, Type theMaskType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, BinaryOperator thePostBinaryOperator)
@@ -44,6 +65,16 @@ NFmiCalculationRampFuction::NFmiCalculationRampFuction(const NFmiCalculationCond
 
 NFmiCalculationRampFuction::~NFmiCalculationRampFuction(void)
 {}
+
+NFmiCalculationRampFuction::NFmiCalculationRampFuction(const NFmiCalculationRampFuction &theOther)
+:NFmiInfoAreaMask(theOther)
+{
+}
+
+NFmiAreaMask* NFmiCalculationRampFuction::Clone(void) const
+{
+	return new NFmiCalculationRampFuction(*this);
+}
 
 double NFmiCalculationRampFuction::Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways)
 {
@@ -98,6 +129,18 @@ NFmiCalculationRampFuctionWithAreaMask::~NFmiCalculationRampFuctionWithAreaMask(
 {
 }
 
+NFmiCalculationRampFuctionWithAreaMask::NFmiCalculationRampFuctionWithAreaMask(const NFmiCalculationRampFuctionWithAreaMask &theOther)
+:NFmiAreaMaskImpl(theOther)
+,itsAreaMask(theOther.itsAreaMask ? theOther.itsAreaMask->Clone() : 0)
+,fIsTimeIntepolationNeededInValue(theOther.fIsTimeIntepolationNeededInValue)
+{
+}
+
+NFmiAreaMask* NFmiCalculationRampFuctionWithAreaMask::Clone(void) const
+{
+	return new NFmiCalculationRampFuctionWithAreaMask(*this);
+}
+
 double NFmiCalculationDeltaZValue::itsHeightValue;
 
 NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(void)
@@ -105,6 +148,15 @@ NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(void)
 {
 }
 
+NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(const NFmiCalculationDeltaZValue &theOther)
+:NFmiAreaMaskImpl(theOther)
+{
+}
+
+NFmiAreaMask* NFmiCalculationDeltaZValue::Clone(void) const
+{
+	return new NFmiCalculationDeltaZValue(*this);
+}
 
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
 
@@ -123,6 +175,21 @@ NFmiStation2GridMask::NFmiStation2GridMask(Type theMaskType, NFmiInfoData::Type 
 }
 
 NFmiStation2GridMask::~NFmiStation2GridMask(void)
+{
+}
+
+NFmiStation2GridMask::NFmiStation2GridMask(const NFmiStation2GridMask &theOther)
+:NFmiInfoAreaMask(theOther)
+,itsGriddedStationData(theOther.itsGriddedStationData)
+,itsCurrentGriddedStationData(0) // tämä laitetaan aina 0:ksi
+,itsLastCalculatedTime(theOther.itsLastCalculatedTime)
+,itsAreaPtr(theOther.itsAreaPtr.get() ? theOther.itsAreaPtr.get()->Clone() : 0)
+,itsDoc(theOther.itsDoc)
+,itsStation2GridSize(theOther.itsStation2GridSize)
+{
+}
+
+NFmiAreaMask* NFmiStation2GridMask::Clone(void) const
 {
 }
 
