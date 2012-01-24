@@ -971,3 +971,10 @@ double NFmiSmartToolCalculation::FixCircularValues(double theValue)
 	return theValue;
 }
 
+checkedVector<boost::shared_ptr<NFmiSmartToolCalculation> > NFmiSmartToolCalculation::DoShallowCopy(const checkedVector<boost::shared_ptr<NFmiSmartToolCalculation> > &theCalculationVector)
+{
+	checkedVector<boost::shared_ptr<NFmiSmartToolCalculation> > returnVector(theCalculationVector.size());
+	for(size_t i = 0; i < theCalculationVector.size(); i++)
+		returnVector[i] = boost::shared_ptr<NFmiSmartToolCalculation>(new NFmiSmartToolCalculation(*theCalculationVector[i]));
+	return returnVector;
+}

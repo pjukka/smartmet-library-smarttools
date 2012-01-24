@@ -20,8 +20,15 @@
 // Constructor/Destructor
 //--------------------------------------------------------
 NFmiSmartToolCalculationSection::NFmiSmartToolCalculationSection(void)
+:itsCalculations()
 {
 }
+
+NFmiSmartToolCalculationSection::NFmiSmartToolCalculationSection(const NFmiSmartToolCalculationSection &theOther)
+:itsCalculations(NFmiSmartToolCalculation::DoShallowCopy(theOther.itsCalculations))
+{
+}
+
 NFmiSmartToolCalculationSection::~NFmiSmartToolCalculationSection(void)
 {
 }

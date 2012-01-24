@@ -65,8 +65,21 @@ static boost::shared_ptr<NFmiFastQueryInfo> CreateShallowCopyOfHighestInfo(const
 	return boost::shared_ptr<NFmiFastQueryInfo>();
 }
 
+static checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlock> > DoShallowCopy(const checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlock> > &theCalculationBlockVector)
+{
+	checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlock> > returnVector(theCalculationBlockVector.size());
+	for(size_t i = 0; i < theCalculationBlockVector.size(); i++)
+		returnVector[i] = boost::shared_ptr<NFmiSmartToolCalculationBlock>(new NFmiSmartToolCalculationBlock(*theCalculationBlockVector[i]));
+	return returnVector;
+}
+
 NFmiSmartToolCalculationBlockVector::NFmiSmartToolCalculationBlockVector(void)
 :itsCalculationBlocks()
+{
+}
+
+NFmiSmartToolCalculationBlockVector::NFmiSmartToolCalculationBlockVector(const NFmiSmartToolCalculationBlockVector &theOther)
+:itsCalculationBlocks(::DoShallowCopy(theOther.itsCalculationBlocks))
 {
 }
 
@@ -89,7 +102,7 @@ void NFmiSmartToolCalculationBlockVector::SetTime(const NFmiMetTime &theTime)
 	Iterator it = Begin();
 	Iterator endIt = End();
 	for( ; it != endIt; ++it)
-		(*it)->SetTime(theTime);
+		(*it)->Time(theTime);
 }
 
 void NFmiSmartToolCalculationBlockVector::Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue)
@@ -124,6 +137,17 @@ NFmiSmartToolCalculationBlock::NFmiSmartToolCalculationBlock(void)
 {
 }
 
+NFmiSmartToolCalculationBlock::NFmiSmartToolCalculationBlock(const NFmiSmartToolCalculationBlock &theOther)
+:itsFirstCalculationSection(theOther.itsFirstCalculationSection ? new NFmiSmartToolCalculationSection(*theOther.itsFirstCalculationSection) : 0)
+,itsIfAreaMaskSection(theOther.itsIfAreaMaskSection ? new NFmiSmartToolCalculation(*theOther.itsIfAreaMaskSection) : 0)
+,itsIfCalculationBlocks(theOther.itsIfCalculationBlocks ? new NFmiSmartToolCalculationBlockVector(*theOther.itsIfCalculationBlocks) : 0)
+,itsElseIfAreaMaskSection(theOther.itsElseIfAreaMaskSection ? new NFmiSmartToolCalculation(*theOther.itsElseIfAreaMaskSection) : 0)
+,itsElseIfCalculationBlocks(theOther.itsElseIfCalculationBlocks ? new NFmiSmartToolCalculationBlockVector(*theOther.itsElseIfCalculationBlocks) : 0)
+,itsElseCalculationBlocks(theOther.itsElseCalculationBlocks ? new NFmiSmartToolCalculationBlockVector(*theOther.itsElseCalculationBlocks) : 0)
+,itsLastCalculationSection(theOther.itsLastCalculationSection ? new NFmiSmartToolCalculationSection(*theOther.itsLastCalculationSection) : 0)
+{
+}
+
 NFmiSmartToolCalculationBlock::~NFmiSmartToolCalculationBlock(void)
 {
 }
@@ -144,10 +168,11 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolCalculationBlock::FirstVariabl
 	return info;
 }
 
-void NFmiSmartToolCalculationBlock::SetTime(const NFmiMetTime &theTime)
+void NFmiSmartToolCalculationBlock::Time(const NFmiMetTime &theTime)
 {
-	if(itsFirstCalculationSection)
-		itsFirstCalculationSection->SetTime(theTime);
+	// Koska NFmiSmartToolModifier::ModifyBlockData(_ver2) -metodit jakavat osan työstä toisaalle, ei tämä käsittele alku- ja loppu CalculationSection:eita!!!!
+//	if(itsFirstCalculationSection)
+//		itsFirstCalculationSection->SetTime(theTime);
 	if(itsIfAreaMaskSection)
 		itsIfAreaMaskSection->Time(theTime);
 	if(itsIfCalculationBlocks)
@@ -158,8 +183,8 @@ void NFmiSmartToolCalculationBlock::SetTime(const NFmiMetTime &theTime)
 		itsElseIfCalculationBlocks->SetTime(theTime);
 	if(itsElseCalculationBlocks)
 		itsElseCalculationBlocks->SetTime(theTime);
-	if(itsLastCalculationSection)
-		itsLastCalculationSection->SetTime(theTime);
+//	if(itsLastCalculationSection)
+//		itsLastCalculationSection->SetTime(theTime);
 }
 
 void NFmiSmartToolCalculationBlock::Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue)
@@ -180,8 +205,9 @@ void NFmiSmartToolCalculationBlock::Calculate(const NFmiCalculationParams &theCa
 
 void NFmiSmartToolCalculationBlock::Calculate_ver2(const NFmiCalculationParams &theCalculationParams)
 {
-	if(itsFirstCalculationSection)
-		itsFirstCalculationSection->Calculate_ver2(theCalculationParams);
+	// Koska NFmiSmartToolModifier::ModifyBlockData(_ver2) -metodit jakavat osan työstä toisaalle, ei tämä käsittele alku- ja loppu CalculationSection:eita!!!!
+//	if(itsFirstCalculationSection)
+//		itsFirstCalculationSection->Calculate_ver2(theCalculationParams);
 
 	if(itsIfAreaMaskSection && itsIfAreaMaskSection->IsMasked(theCalculationParams))
 		itsIfCalculationBlocks->Calculate_ver2(theCalculationParams);
@@ -190,8 +216,8 @@ void NFmiSmartToolCalculationBlock::Calculate_ver2(const NFmiCalculationParams &
 	else if(itsElseCalculationBlocks)
 		itsElseCalculationBlocks->Calculate_ver2(theCalculationParams);
 
-	if(itsLastCalculationSection)
-		itsLastCalculationSection->Calculate_ver2(theCalculationParams);
+//	if(itsLastCalculationSection)
+//		itsLastCalculationSection->Calculate_ver2(theCalculationParams);
 }
 
 //--------------------------------------------------------
@@ -506,6 +532,7 @@ bool NFmiSmartToolModifier::IsInterpretedSkriptMacroParam(void)
 
 void NFmiSmartToolModifier::ModifyBlockData(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue)
 {
+	// HUOM!! Koska jostain syystä alku ja loppu CalculationSection:it lasketaan erikseen, pitää muistaa että ModifyConditionalData-osiossa ei saa käsitellä näitä sectioneita!!!!
 	ModifyData2(theCalculationBlock->itsFirstCalculationSection, theMacroParamValue);
 	ModifyConditionalData(theCalculationBlock, theMacroParamValue);
 	ModifyData2(theCalculationBlock->itsLastCalculationSection, theMacroParamValue);
@@ -513,6 +540,7 @@ void NFmiSmartToolModifier::ModifyBlockData(const boost::shared_ptr<NFmiSmartToo
 
 void NFmiSmartToolModifier::ModifyBlockData_ver2(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock)
 {
+	// HUOM!! Koska jostain syystä alku ja loppu CalculationSection:it lasketaan erikseen, pitää muistaa että ModifyConditionalData-osiossa ei saa käsitellä näitä sectioneita!!!!
 	ModifyData2_ver2(theCalculationBlock->itsFirstCalculationSection);
 	ModifyConditionalData_ver2(theCalculationBlock);
 	ModifyData2_ver2(theCalculationBlock->itsLastCalculationSection);
@@ -579,6 +607,111 @@ void NFmiSmartToolModifier::ModifyConditionalData(const boost::shared_ptr<NFmiSm
 	}
 }
 
+// Kun dataa käydään läpi NextLocation-menetelmällä, ja kyseessä on NFmiSmartInfo-olio, on niillä tiedossa sisäinen bitmaski, jonka
+// avulla osataan tarvittaessa hyppiä ei kiinnostavien paikkojen yli. Nyt en halua tehdä joka threadille aina Clone:a näistä infoista.
+// Mutta otan talteen tarvittavan bitmaksin, jos sellainen oli käytössä ja hypin sen avulla ohi ei-toivottujen pisteiden.
+static const NFmiBitMask* GetUsedBitmask(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, bool modifySelectedLocationsOnly)
+{
+	if(modifySelectedLocationsOnly)
+	{
+		NFmiSmartInfo *smartInfo = dynamic_cast<NFmiSmartInfo *>(theInfo.get());
+		if(smartInfo)
+		{
+			return &(smartInfo->Mask(NFmiMetEditorTypes::kFmiSelectionMask));
+		}
+	}
+	return 0; // ei ole maskia käytössä
+}
+
+// globaali asetus luokka for_each-funktioon
+template<typename T>
+class TimeSetter
+{
+public:
+	TimeSetter(const NFmiMetTime &theTime):itsTime(theTime){}
+	void operator()(boost::shared_ptr<T> &theMask){theMask->Time(itsTime);}
+
+	const NFmiMetTime &itsTime;
+};
+
+// Tämä luokka laskee worker-threadi parvelle aina sopivan locationIndex-välin laskettavaksi.
+// Idea on siis se että hila laskut jaetaan sopivan mittäisiin pätkiin esim. 50 pituisiin
+// ja kukin worker threadi aina vuorollaan kysisi, minkä pätkän nyt voisi tehdä.
+class LocationIndexRangeCalculator
+{
+public:
+  typedef boost::shared_mutex MutexType;
+  typedef boost::shared_lock<MutexType> ReadLock; // Read-lockia ei oikeasti tarvita, mutta laitan sen tähän, jos joskus tarvitaankin
+  typedef boost::unique_lock<MutexType> WriteLock;
+
+	LocationIndexRangeCalculator(unsigned long theLocationSize, unsigned long theChunkSize)
+	:itsStartLocationIndex(0)
+	,itsEndLocationIndex(theLocationSize)
+	,itsCurrentLocationIndex(0)
+	,itsChunkSize(theChunkSize)
+	,fNoMoreWork((theLocationSize > 0) ? false : true)
+	{
+	}
+
+	LocationIndexRangeCalculator(unsigned long theStartLocationIndex, unsigned long theEndLocationIndex, unsigned long theChunkSize)
+	:itsStartLocationIndex(theStartLocationIndex)
+	,itsEndLocationIndex(theEndLocationIndex)
+	,itsCurrentLocationIndex(theStartLocationIndex)
+	,fNoMoreWork((theStartLocationIndex <= theEndLocationIndex) ? false : true)
+	{
+	}
+
+	bool GetCurrentLocationRange(unsigned long &theStartIndexOut, unsigned long &theEndIndexOut)
+	{
+		WriteLock lock(itsMutex);
+		if(fNoMoreWork)
+			return false;
+		theStartIndexOut = itsCurrentLocationIndex;
+		itsCurrentLocationIndex += itsChunkSize;
+		if(itsCurrentLocationIndex >= itsEndLocationIndex)
+		{
+			itsCurrentLocationIndex = itsEndLocationIndex;
+			fNoMoreWork = true;
+		}
+		theEndIndexOut = itsCurrentLocationIndex;
+		itsCurrentLocationIndex++; // viedään indeksi yksi eteenpäin seuraavan threadin alkua varten
+		return true;
+	}
+
+private:
+	unsigned long itsStartLocationIndex;
+	unsigned long itsEndLocationIndex;
+	unsigned long itsCurrentLocationIndex;
+	unsigned long itsChunkSize;
+	MutexType itsMutex;
+	bool fNoMoreWork;
+
+	LocationIndexRangeCalculator(const LocationIndexRangeCalculator & ); // ei toteuteta kopio konstruktoria
+};
+
+template<typename T>
+static void DoPartialGridCalculationInThread(LocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<T> &theCalculation, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
+{
+	unsigned long startIndex = 0;
+	unsigned long endIndex = 0;
+	for( ; theLocationIndexRangeCalculator.GetCurrentLocationRange(startIndex, endIndex); )
+	{
+		for(unsigned long i = startIndex; i <= endIndex; i++)
+		{
+			if(theUsedBitmask == 0 || theUsedBitmask->IsMasked(i))
+			{
+				if(theInfo->LocationIndex(i))
+				{
+					theCalculationParams.itsLatlon = theInfo->LatLon();
+					theCalculationParams.itsLocationIndex = theInfo->LocationIndex();
+					// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseistä optimointi juttua ei kai enää käytetä
+					theCalculation->Calculate_ver2(theCalculationParams);
+				}
+			}
+		}
+	}
+}
+
 void NFmiSmartToolModifier::ModifyConditionalData_ver2(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock)
 {
 	if(theCalculationBlock->itsIfAreaMaskSection && theCalculationBlock->itsIfCalculationBlocks)
@@ -586,40 +719,50 @@ void NFmiSmartToolModifier::ModifyConditionalData_ver2(const boost::shared_ptr<N
 		if(theCalculationBlock->FirstVariableInfo() == 0)
 			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorUnknownProblem"));
 		boost::shared_ptr<NFmiFastQueryInfo> info(dynamic_cast<NFmiFastQueryInfo*>(theCalculationBlock->FirstVariableInfo()->Clone()));
+		if(info == 0)
+			return ;
 
 		try
 		{
+			info->LatLon(); // tämä on pyydettävä kerran multi-thread jutuissa, koska tämä rakentaa kaikille info-kopioille yhteisen latlon-cache:n
 			NFmiCalculationParams calculationParams;
 			SetInfosMaskType(info);
 			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
+			const NFmiBitMask *usedBitmask = ::GetUsedBitmask(info, fModifySelectedLocationsOnly);
+
+			unsigned int usedThreadCount = boost::thread::hardware_concurrency();
+			std::vector<boost::shared_ptr<NFmiFastQueryInfo> > infoVector;
+			for(size_t i=0; i < usedThreadCount; i++)
+				infoVector.push_back(NFmiAreaMask::DoShallowCopy(info));
+			std::vector<boost::shared_ptr<NFmiSmartToolCalculationBlock> > calculationBlockVector; // tehdään joka coren säikeelle oma calculaatioBlokki kopio
+			for(size_t i=0; i < usedThreadCount; i++)
+				calculationBlockVector.push_back(boost::shared_ptr<NFmiSmartToolCalculationBlock>(new NFmiSmartToolCalculationBlock(*theCalculationBlock)));
+
 			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 			{
 				calculationParams.itsTime = modifiedTimes.Time();
 				info->Time(calculationParams.itsTime); // asetetaan myös tämä, että saadaan oikea timeindex
 				calculationParams.itsTimeIndex = info->TimeIndex();
-				theCalculationBlock->itsIfAreaMaskSection->Time(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
-				theCalculationBlock->itsIfCalculationBlocks->SetTime(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
-				if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks)
-				{
-					theCalculationBlock->itsElseIfAreaMaskSection->Time(calculationParams.itsTime);
-					theCalculationBlock->itsElseIfCalculationBlocks->SetTime(calculationParams.itsTime);
-				}
-				if(theCalculationBlock->itsElseCalculationBlocks)
-					theCalculationBlock->itsElseCalculationBlocks->SetTime(calculationParams.itsTime);
+				theCalculationBlock->Time(calculationParams.itsTime);
+				std::for_each(calculationBlockVector.begin(), calculationBlockVector.end(), TimeSetter<NFmiSmartToolCalculationBlock>(calculationParams.itsTime)); // calculaatioiden kopioiden ajat pitää myös asettaa
+				std::for_each(infoVector.begin(), infoVector.end(), TimeSetter<NFmiFastQueryInfo>(calculationParams.itsTime)); // info kopioiden ajat pitää myös asettaa
+				std::vector<NFmiCalculationParams> calculationParamsVector;
+				for(size_t i=0; i < usedThreadCount; i++)
+					calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, missä on jo aika oikein
+				LocationIndexRangeCalculator locationIndexRangeCalculator(info->SizeLocations(), 100);
 
+				boost::thread_group calcParts;
+				for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
+					calcParts.add_thread(new boost::thread(::DoPartialGridCalculationInThread<NFmiSmartToolCalculationBlock>, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationBlockVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
+				calcParts.join_all(); // odotetaan että threadit lopettavat
+/*
 				for(info->ResetLocation(); info->NextLocation(); )
 				{
 					calculationParams.itsLatlon = info->LatLon();
 					calculationParams.itsLocationIndex = info->LocationIndex(); // tämä locationindex juttu liittyy kai optimointiin, jota ei tehdä enää, pitäisikö poistaa
-					if(theCalculationBlock->itsIfAreaMaskSection->IsMasked(calculationParams))
-						theCalculationBlock->itsIfCalculationBlocks->Calculate_ver2(calculationParams);
-					else if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks && theCalculationBlock->itsElseIfAreaMaskSection->IsMasked(calculationParams))
-					{
-						theCalculationBlock->itsElseIfCalculationBlocks->Calculate_ver2(calculationParams);
-					}
-					else if(theCalculationBlock->itsElseCalculationBlocks)
-						theCalculationBlock->itsElseCalculationBlocks->Calculate_ver2(calculationParams);
+					theCalculationBlock->Calculate_ver2(calculationParams);
 				}
+*/
 			}
 		}
 		catch(...)
@@ -715,111 +858,6 @@ void NFmiSmartToolModifier::ModifyData2(boost::shared_ptr<NFmiSmartToolCalculati
 	}
 }
 
-// Tämä luokka laskee worker-threadi parvelle aina sopivan locationIndex-välin laskettavaksi.
-// Idea on siis se että hila laskut jaetaan sopivan mittäisiin pätkiin esim. 50 pituisiin
-// ja kukin worker threadi aina vuorollaan kysisi, minkä pätkän nyt voisi tehdä.
-class LocationIndexRangeCalculator
-{
-public:
-  typedef boost::shared_mutex MutexType;
-  typedef boost::shared_lock<MutexType> ReadLock; // Read-lockia ei oikeasti tarvita, mutta laitan sen tähän, jos joskus tarvitaankin
-  typedef boost::unique_lock<MutexType> WriteLock;
-
-	LocationIndexRangeCalculator(unsigned long theLocationSize, unsigned long theChunkSize)
-	:itsStartLocationIndex(0)
-	,itsEndLocationIndex(theLocationSize)
-	,itsCurrentLocationIndex(0)
-	,itsChunkSize(theChunkSize)
-	,fNoMoreWork((theLocationSize > 0) ? false : true)
-	{
-	}
-
-	LocationIndexRangeCalculator(unsigned long theStartLocationIndex, unsigned long theEndLocationIndex, unsigned long theChunkSize)
-	:itsStartLocationIndex(theStartLocationIndex)
-	,itsEndLocationIndex(theEndLocationIndex)
-	,itsCurrentLocationIndex(theStartLocationIndex)
-	,fNoMoreWork((theStartLocationIndex <= theEndLocationIndex) ? false : true)
-	{
-	}
-
-	bool GetCurrentLocationRange(unsigned long &theStartIndexOut, unsigned long &theEndIndexOut)
-	{
-		WriteLock lock(itsMutex);
-		if(fNoMoreWork)
-			return false;
-		theStartIndexOut = itsCurrentLocationIndex;
-		itsCurrentLocationIndex += itsChunkSize;
-		if(itsCurrentLocationIndex >= itsEndLocationIndex)
-		{
-			itsCurrentLocationIndex = itsEndLocationIndex;
-			fNoMoreWork = true;
-		}
-		theEndIndexOut = itsCurrentLocationIndex;
-		itsCurrentLocationIndex++; // viedään indeksi yksi eteenpäin seuraavan threadin alkua varten
-		return true;
-	}
-
-private:
-	unsigned long itsStartLocationIndex;
-	unsigned long itsEndLocationIndex;
-	unsigned long itsCurrentLocationIndex;
-	unsigned long itsChunkSize;
-	MutexType itsMutex;
-	bool fNoMoreWork;
-
-	LocationIndexRangeCalculator(const LocationIndexRangeCalculator & ); // ei toteuteta kopio konstruktoria
-};
-
-
-// globaali asetus luokka for_each-funktioon
-template<typename T>
-class TimeSetter
-{
-public:
-	TimeSetter(const NFmiMetTime &theTime):itsTime(theTime){}
-	void operator()(boost::shared_ptr<T> &theMask){theMask->Time(itsTime);}
-
-	const NFmiMetTime &itsTime;
-};
-
-// Kun dataa käydään läpi NextLocation-menetelmällä, ja kyseessä on NFmiSmartInfo-olio, on niillä tiedossa sisäinen bitmaski, jonka
-// avulla osataan tarvittaessa hyppiä ei kiinnostavien paikkojen yli. Nyt en halua tehdä joka threadille aina Clone:a näistä infoista.
-// Mutta otan talteen tarvittavan bitmaksin, jos sellainen oli käytössä ja hypin sen avulla ohi ei-toivottujen pisteiden.
-static const NFmiBitMask* GetUsedBitmask(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, bool modifySelectedLocationsOnly)
-{
-	if(modifySelectedLocationsOnly)
-	{
-		NFmiSmartInfo *smartInfo = dynamic_cast<NFmiSmartInfo *>(theInfo.get());
-		if(smartInfo)
-		{
-			return &(smartInfo->Mask(NFmiMetEditorTypes::kFmiSelectionMask));
-		}
-	}
-	return 0; // ei ole maskia käytössä
-}
-
-static void DoPartialGridCalculationInThread(LocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<NFmiSmartToolCalculation> &theSmartToolCalculation, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
-{
-	unsigned long startIndex = 0;
-	unsigned long endIndex = 0;
-	for( ; theLocationIndexRangeCalculator.GetCurrentLocationRange(startIndex, endIndex); )
-	{
-		for(unsigned long i = startIndex; i <= endIndex; i++)
-		{
-			if(theUsedBitmask == 0 || theUsedBitmask->IsMasked(i))
-			{
-				if(theInfo->LocationIndex(i))
-				{
-					theCalculationParams.itsLatlon = theInfo->LatLon();
-					theCalculationParams.itsLocationIndex = theInfo->LocationIndex();
-					// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseistä optimointi juttua ei kai enää käytetä
-					theSmartToolCalculation->Calculate_ver2(theCalculationParams);
-				}
-			}
-		}
-	}
-}
-
 void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalculationSection> &theCalculationSection)
 {
 	if(theCalculationSection && theCalculationSection->FirstVariableInfo())
@@ -866,11 +904,11 @@ void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalc
 						std::vector<NFmiCalculationParams> calculationParamsVector;
 						for(size_t i=0; i < usedThreadCount; i++)
 							calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, missä on jo aika oikein
-						LocationIndexRangeCalculator locationIndexRangeCalculator(info->SizeLocations(), 500);
+						LocationIndexRangeCalculator locationIndexRangeCalculator(info->SizeLocations(), 100);
 
 						boost::thread_group calcParts;
 						for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
-							calcParts.add_thread(new boost::thread(::DoPartialGridCalculationInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
+							calcParts.add_thread(new boost::thread(::DoPartialGridCalculationInThread<NFmiSmartToolCalculation>, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
 						calcParts.join_all(); // odotetaan että threadit lopettavat
 /*
 						for(info->ResetLocation(); info->NextLocation(); )

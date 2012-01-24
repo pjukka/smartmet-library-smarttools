@@ -54,6 +54,7 @@ public:
 	typedef checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlock> >::iterator Iterator;
 
 	NFmiSmartToolCalculationBlockVector(void);
+	NFmiSmartToolCalculationBlockVector(const NFmiSmartToolCalculationBlockVector &theOther);
 	~NFmiSmartToolCalculationBlockVector(void);
 	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
 	void SetTime(const NFmiMetTime &theTime);
@@ -72,9 +73,10 @@ class NFmiSmartToolCalculationBlock
 {
 public:
 	NFmiSmartToolCalculationBlock(void);
+	NFmiSmartToolCalculationBlock(const NFmiSmartToolCalculationBlock &theOther);
 	~NFmiSmartToolCalculationBlock(void);
 	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
-	void SetTime(const NFmiMetTime &theTime);
+	void Time(const NFmiMetTime &theTime);
 	void Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue);
 	void Calculate_ver2(const NFmiCalculationParams &theCalculationParams);
 

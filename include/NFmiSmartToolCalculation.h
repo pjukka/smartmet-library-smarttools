@@ -44,6 +44,7 @@ public:
 	NFmiSmartToolCalculation(void);
 	NFmiSmartToolCalculation(const NFmiSmartToolCalculation &theOther);
 	~NFmiSmartToolCalculation(void);
+	static checkedVector<boost::shared_ptr<NFmiSmartToolCalculation> > DoShallowCopy(const checkedVector<boost::shared_ptr<NFmiSmartToolCalculation> > &theCalculationVector);
 
 	void SetResultInfo(const boost::shared_ptr<NFmiFastQueryInfo> &value) {itsResultInfo = value; CheckIfModularParameter();}
 	boost::shared_ptr<NFmiFastQueryInfo> GetResultInfo(void) {return itsResultInfo;}

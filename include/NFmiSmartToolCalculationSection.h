@@ -31,6 +31,7 @@ public:
 	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
 
 	NFmiSmartToolCalculationSection(void);
+	NFmiSmartToolCalculationSection(const NFmiSmartToolCalculationSection &theOther);
 	~NFmiSmartToolCalculationSection(void);
 
 	void AddCalculations(const boost::shared_ptr<NFmiSmartToolCalculation>  &value);
