@@ -58,7 +58,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolCalculationSection::FirstVaria
 struct TimeSetter
 {
 	TimeSetter(const NFmiMetTime &theTime):itsTime(theTime){}
-	void operator()(boost::shared_ptr<NFmiSmartToolCalculation> &theCalculation){theCalculation->SetTime(itsTime);}
+	void operator()(boost::shared_ptr<NFmiSmartToolCalculation> &theCalculation){theCalculation->Time(itsTime);}
 
 	const NFmiMetTime &itsTime;
 };
