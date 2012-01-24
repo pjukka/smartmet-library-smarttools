@@ -45,9 +45,12 @@ using namespace std;
 // Constructor/Destructor
 //--------------------------------------------------------
 NFmiSmartToolCalculation::NFmiSmartToolCalculation(void)
-:itsLowerLimit(0)
+:itsCalculationText()
+,itsLowerLimit(0)
 ,itsUpperLimit(1)
 ,fDoLimitCheck(true)
+,token()
+,itsCalcIterator()
 ,itsResultInfo()
 ,itsCalculations()
 ,itsHeightValue(0)
@@ -58,6 +61,26 @@ NFmiSmartToolCalculation::NFmiSmartToolCalculation(void)
 ,fAllowMissingValueAssignment(false)
 ,fCircularValue(false)
 ,itsCircularValueModulor(kFloatMissing)
+{
+}
+
+NFmiSmartToolCalculation::NFmiSmartToolCalculation(const NFmiSmartToolCalculation &theOther)
+:itsCalculationText(theOther.itsCalculationText)
+,itsLowerLimit(theOther.itsLowerLimit)
+,itsUpperLimit(theOther.itsUpperLimit)
+,fDoLimitCheck(theOther.fDoLimitCheck)
+,token() // t‰t‰ ei mielest‰ni pid‰ kopioida
+,itsCalcIterator() // t‰t‰ ei mielest‰ni pid‰ kopioida
+,itsResultInfo(NFmiAreaMask::DoShallowCopy(theOther.itsResultInfo))
+,itsCalculations(NFmiAreaMask::DoShallowCopy(theOther.itsCalculations))
+,itsHeightValue(theOther.itsHeightValue)
+,itsPressureHeightValue(theOther.itsPressureHeightValue)
+,fUseTimeInterpolationAlways(theOther.fUseTimeInterpolationAlways)
+,fUseHeightCalculation(theOther.fUseHeightCalculation)
+,fUsePressureLevelCalculation(theOther.fUsePressureLevelCalculation)
+,fAllowMissingValueAssignment(theOther.fAllowMissingValueAssignment)
+,fCircularValue(theOther.fCircularValue)
+,itsCircularValueModulor(theOther.itsCircularValueModulor)
 {
 }
 
@@ -198,7 +221,7 @@ struct TimeSetter
 	const NFmiMetTime &itsTime;
 };
 
-void NFmiSmartToolCalculation::SetTime(const NFmiMetTime &theTime)
+void NFmiSmartToolCalculation::Time(const NFmiMetTime &theTime)
 {
 	if(itsResultInfo) // maskin tapauksessa t‰m‰ on 0-pointteri (ja tulevaisuudessa t‰m‰ sijoitus info poistuu kokonaisuudessaan)
 		itsResultInfo->Time(theTime); // t‰m‰n ajan asetuksen pit‰‰ onnistua editoitavalle datalle
