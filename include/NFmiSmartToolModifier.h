@@ -78,7 +78,7 @@ public:
 	boost::shared_ptr<NFmiFastQueryInfo> FirstVariableInfo(void);
 	void Time(const NFmiMetTime &theTime);
 	void Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue);
-	void Calculate_ver2(const NFmiCalculationParams &theCalculationParams);
+	void Calculate_ver2(const NFmiCalculationParams &theCalculationParams, bool fDoMiddlePartOnly = false);
 
 	boost::shared_ptr<NFmiSmartToolCalculationSection> itsFirstCalculationSection;
 	boost::shared_ptr<NFmiSmartToolCalculation> itsIfAreaMaskSection;

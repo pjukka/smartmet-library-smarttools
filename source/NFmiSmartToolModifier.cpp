@@ -170,9 +170,9 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolCalculationBlock::FirstVariabl
 
 void NFmiSmartToolCalculationBlock::Time(const NFmiMetTime &theTime)
 {
-	// Koska NFmiSmartToolModifier::ModifyBlockData(_ver2) -metodit jakavat osan työstä toisaalle, ei tämä käsittele alku- ja loppu CalculationSection:eita!!!!
-//	if(itsFirstCalculationSection)
-//		itsFirstCalculationSection->SetTime(theTime);
+	if(itsFirstCalculationSection)
+		itsFirstCalculationSection->SetTime(theTime);
+
 	if(itsIfAreaMaskSection)
 		itsIfAreaMaskSection->Time(theTime);
 	if(itsIfCalculationBlocks)
@@ -183,8 +183,9 @@ void NFmiSmartToolCalculationBlock::Time(const NFmiMetTime &theTime)
 		itsElseIfCalculationBlocks->SetTime(theTime);
 	if(itsElseCalculationBlocks)
 		itsElseCalculationBlocks->SetTime(theTime);
-//	if(itsLastCalculationSection)
-//		itsLastCalculationSection->SetTime(theTime);
+
+	if(itsLastCalculationSection)
+		itsLastCalculationSection->SetTime(theTime);
 }
 
 void NFmiSmartToolCalculationBlock::Calculate(const NFmiCalculationParams &theCalculationParams, NFmiMacroParamValue &theMacroParamValue)
@@ -203,11 +204,13 @@ void NFmiSmartToolCalculationBlock::Calculate(const NFmiCalculationParams &theCa
 		itsLastCalculationSection->Calculate(theCalculationParams, theMacroParamValue);
 }
 
-void NFmiSmartToolCalculationBlock::Calculate_ver2(const NFmiCalculationParams &theCalculationParams)
+void NFmiSmartToolCalculationBlock::Calculate_ver2(const NFmiCalculationParams &theCalculationParams, bool fDoMiddlePartOnly)
 {
-	// Koska NFmiSmartToolModifier::ModifyBlockData(_ver2) -metodit jakavat osan työstä toisaalle, ei tämä käsittele alku- ja loppu CalculationSection:eita!!!!
-//	if(itsFirstCalculationSection)
-//		itsFirstCalculationSection->Calculate_ver2(theCalculationParams);
+	if(fDoMiddlePartOnly == false)
+	{
+		if(itsFirstCalculationSection)
+			itsFirstCalculationSection->Calculate_ver2(theCalculationParams);
+	}
 
 	if(itsIfAreaMaskSection && itsIfAreaMaskSection->IsMasked(theCalculationParams))
 		itsIfCalculationBlocks->Calculate_ver2(theCalculationParams);
@@ -216,8 +219,11 @@ void NFmiSmartToolCalculationBlock::Calculate_ver2(const NFmiCalculationParams &
 	else if(itsElseCalculationBlocks)
 		itsElseCalculationBlocks->Calculate_ver2(theCalculationParams);
 
-//	if(itsLastCalculationSection)
-//		itsLastCalculationSection->Calculate_ver2(theCalculationParams);
+	if(fDoMiddlePartOnly == false)
+	{
+		if(itsLastCalculationSection)
+			itsLastCalculationSection->Calculate_ver2(theCalculationParams);
+	}
 }
 
 //--------------------------------------------------------
@@ -532,7 +538,10 @@ bool NFmiSmartToolModifier::IsInterpretedSkriptMacroParam(void)
 
 void NFmiSmartToolModifier::ModifyBlockData(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue)
 {
-	// HUOM!! Koska jostain syystä alku ja loppu CalculationSection:it lasketaan erikseen, pitää muistaa että ModifyConditionalData-osiossa ei saa käsitellä näitä sectioneita!!!!
+	// HUOM!! Koska jostain syystä alku ja loppu CalculationSection:it lasketaan erikseen, pitää muistaa 
+	// että ModifyConditionalData-osiossa ei saa käsitellä näitä sectioneita!!!!
+	// Ok, nyt tiedän, että tämä johtuu siitä että ModifyData2(_ver2) -funktioissa laskut suoritetaan aina rivi kerrallaa (kaikki ajat ja paikat lääpi),
+	// kun taas if-elseif-else -rakenteissa lasketaan koko hökötys kerrallaan läpi.
 	ModifyData2(theCalculationBlock->itsFirstCalculationSection, theMacroParamValue);
 	ModifyConditionalData(theCalculationBlock, theMacroParamValue);
 	ModifyData2(theCalculationBlock->itsLastCalculationSection, theMacroParamValue);
@@ -540,7 +549,10 @@ void NFmiSmartToolModifier::ModifyBlockData(const boost::shared_ptr<NFmiSmartToo
 
 void NFmiSmartToolModifier::ModifyBlockData_ver2(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock)
 {
-	// HUOM!! Koska jostain syystä alku ja loppu CalculationSection:it lasketaan erikseen, pitää muistaa että ModifyConditionalData-osiossa ei saa käsitellä näitä sectioneita!!!!
+	// HUOM!! Koska jostain syystä alku ja loppu CalculationSection:it lasketaan erikseen, pitää muistaa 
+	// että ModifyConditionalData-osiossa ei saa käsitellä näitä sectioneita!!!!
+	// Ok, nyt tiedän, että tämä johtuu siitä että ModifyData2(_ver2) -funktioissa laskut suoritetaan aina rivi kerrallaa (kaikki ajat ja paikat lääpi),
+	// kun taas if-elseif-else -rakenteissa lasketaan koko hökötys kerrallaan läpi.
 	ModifyData2_ver2(theCalculationBlock->itsFirstCalculationSection);
 	ModifyConditionalData_ver2(theCalculationBlock);
 	ModifyData2_ver2(theCalculationBlock->itsLastCalculationSection);
@@ -689,6 +701,28 @@ private:
 	LocationIndexRangeCalculator(const LocationIndexRangeCalculator & ); // ei toteuteta kopio konstruktoria
 };
 
+static void DoPartialGridCalculationBlockInThread(LocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
+{
+	unsigned long startIndex = 0;
+	unsigned long endIndex = 0;
+	for( ; theLocationIndexRangeCalculator.GetCurrentLocationRange(startIndex, endIndex); )
+	{
+		for(unsigned long i = startIndex; i <= endIndex; i++)
+		{
+			if(theUsedBitmask == 0 || theUsedBitmask->IsMasked(i))
+			{
+				if(theInfo->LocationIndex(i))
+				{
+					theCalculationParams.itsLatlon = theInfo->LatLon();
+					theCalculationParams.itsLocationIndex = theInfo->LocationIndex();
+					// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseistä optimointi juttua ei kai enää käytetä
+					theCalculationBlock->Calculate_ver2(theCalculationParams, true);
+				}
+			}
+		}
+	}
+}
+
 template<typename T>
 static void DoPartialGridCalculationInThread(LocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<T> &theCalculation, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
 {
@@ -753,7 +787,7 @@ void NFmiSmartToolModifier::ModifyConditionalData_ver2(const boost::shared_ptr<N
 
 				boost::thread_group calcParts;
 				for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
-					calcParts.add_thread(new boost::thread(::DoPartialGridCalculationInThread<NFmiSmartToolCalculationBlock>, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationBlockVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
+					calcParts.add_thread(new boost::thread(::DoPartialGridCalculationBlockInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationBlockVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
 				calcParts.join_all(); // odotetaan että threadit lopettavat
 /*
 				for(info->ResetLocation(); info->NextLocation(); )
