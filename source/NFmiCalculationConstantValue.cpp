@@ -191,6 +191,7 @@ NFmiStation2GridMask::NFmiStation2GridMask(const NFmiStation2GridMask &theOther)
 
 NFmiAreaMask* NFmiStation2GridMask::Clone(void) const
 {
+	return new NFmiStation2GridMask(*this);
 }
 
 double NFmiStation2GridMask::Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways)
