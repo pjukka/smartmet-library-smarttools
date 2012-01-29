@@ -573,41 +573,43 @@ void NFmiSmartToolModifier::ModifyConditionalData(const boost::shared_ptr<NFmiSm
 			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
 			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 			{
-				calculationParams.itsTime = modifiedTimes.Time();
-				if(theMacroParamValue.fSetValue)
-					calculationParams.itsTime = theMacroParamValue.itsTime;
-				info->Time(calculationParams.itsTime); // asetetaan myös tämä, että saadaan oikea timeindex
-				calculationParams.itsTimeIndex = info->TimeIndex();
-				theCalculationBlock->itsIfAreaMaskSection->Time(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
-				theCalculationBlock->itsIfCalculationBlocks->SetTime(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
-				if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks)
+				if(info->Time(modifiedTimes.Time()))
 				{
-					theCalculationBlock->itsElseIfAreaMaskSection->Time(calculationParams.itsTime);
-					theCalculationBlock->itsElseIfCalculationBlocks->SetTime(calculationParams.itsTime);
-				}
-				if(theCalculationBlock->itsElseCalculationBlocks)
-					theCalculationBlock->itsElseCalculationBlocks->SetTime(calculationParams.itsTime);
+					calculationParams.itsTime = modifiedTimes.Time();
+					if(theMacroParamValue.fSetValue)
+						calculationParams.itsTime = theMacroParamValue.itsTime;
+					calculationParams.itsTimeIndex = info->TimeIndex();
+					theCalculationBlock->itsIfAreaMaskSection->Time(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
+					theCalculationBlock->itsIfCalculationBlocks->SetTime(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
+					if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks)
+					{
+						theCalculationBlock->itsElseIfAreaMaskSection->Time(calculationParams.itsTime);
+						theCalculationBlock->itsElseIfCalculationBlocks->SetTime(calculationParams.itsTime);
+					}
+					if(theCalculationBlock->itsElseCalculationBlocks)
+						theCalculationBlock->itsElseCalculationBlocks->SetTime(calculationParams.itsTime);
 
-				for(info->ResetLocation(); info->NextLocation(); )
-				{
-					calculationParams.itsLatlon = info->LatLon();
-					if(theMacroParamValue.fSetValue)
+					for(info->ResetLocation(); info->NextLocation(); )
 					{
-						calculationParams.itsLatlon = theMacroParamValue.itsLatlon;
-						info->Location(calculationParams.itsLatlon); // pitää laittaa nearestlocation päälle, että tuloksia voidaan myöhemmin hakea interpolaation avulla
-					}
-					calculationParams.itsLocationIndex = info->LocationIndex(); // tämä locationindex juttu liittyy kai optimointiin, jota ei tehdä enää, pitäisikö poistaa
-					if(theCalculationBlock->itsIfAreaMaskSection->IsMasked(calculationParams))
-						theCalculationBlock->itsIfCalculationBlocks->Calculate(calculationParams, theMacroParamValue);
-					else if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks && theCalculationBlock->itsElseIfAreaMaskSection->IsMasked(calculationParams))
-					{
-						theCalculationBlock->itsElseIfCalculationBlocks->Calculate(calculationParams, theMacroParamValue);
-					}
-					else if(theCalculationBlock->itsElseCalculationBlocks)
-						theCalculationBlock->itsElseCalculationBlocks->Calculate(calculationParams, theMacroParamValue);
-					if(theMacroParamValue.fSetValue)
-					{
-						return ; // eli jos oli yhden pisteen laskusta kyse, lopetetaan loppi heti
+						calculationParams.itsLatlon = info->LatLon();
+						if(theMacroParamValue.fSetValue)
+						{
+							calculationParams.itsLatlon = theMacroParamValue.itsLatlon;
+							info->Location(calculationParams.itsLatlon); // pitää laittaa nearestlocation päälle, että tuloksia voidaan myöhemmin hakea interpolaation avulla
+						}
+						calculationParams.itsLocationIndex = info->LocationIndex(); // tämä locationindex juttu liittyy kai optimointiin, jota ei tehdä enää, pitäisikö poistaa
+						if(theCalculationBlock->itsIfAreaMaskSection->IsMasked(calculationParams))
+							theCalculationBlock->itsIfCalculationBlocks->Calculate(calculationParams, theMacroParamValue);
+						else if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks && theCalculationBlock->itsElseIfAreaMaskSection->IsMasked(calculationParams))
+						{
+							theCalculationBlock->itsElseIfCalculationBlocks->Calculate(calculationParams, theMacroParamValue);
+						}
+						else if(theCalculationBlock->itsElseCalculationBlocks)
+							theCalculationBlock->itsElseCalculationBlocks->Calculate(calculationParams, theMacroParamValue);
+						if(theMacroParamValue.fSetValue)
+						{
+							return ; // eli jos oli yhden pisteen laskusta kyse, lopetetaan loppi heti
+						}
 					}
 				}
 			}
@@ -787,29 +789,31 @@ void NFmiSmartToolModifier::ModifyConditionalData_ver2(const boost::shared_ptr<N
 
 			for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 			{
-				calculationParams.itsTime = modifiedTimes.Time();
-				info->Time(calculationParams.itsTime); // asetetaan myös tämä, että saadaan oikea timeindex
-				calculationParams.itsTimeIndex = info->TimeIndex();
-				theCalculationBlock->Time(calculationParams.itsTime);
-				std::for_each(calculationBlockVector.begin(), calculationBlockVector.end(), TimeSetter<NFmiSmartToolCalculationBlock>(calculationParams.itsTime)); // calculaatioiden kopioiden ajat pitää myös asettaa
-				std::for_each(infoVector.begin(), infoVector.end(), TimeSetter<NFmiFastQueryInfo>(calculationParams.itsTime)); // info kopioiden ajat pitää myös asettaa
-				std::vector<NFmiCalculationParams> calculationParamsVector;
-				for(size_t i=0; i < usedThreadCount; i++)
-					calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, missä on jo aika oikein
-				LocationIndexRangeCalculator locationIndexRangeCalculator(info->SizeLocations(), 100);
-
-				boost::thread_group calcParts;
-				for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
-					calcParts.add_thread(new boost::thread(::DoPartialGridCalculationBlockInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationBlockVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
-				calcParts.join_all(); // odotetaan että threadit lopettavat
-/*
-				for(info->ResetLocation(); info->NextLocation(); )
+				if(info->Time(modifiedTimes.Time()))
 				{
-					calculationParams.itsLatlon = info->LatLon();
-					calculationParams.itsLocationIndex = info->LocationIndex(); // tämä locationindex juttu liittyy kai optimointiin, jota ei tehdä enää, pitäisikö poistaa
-					theCalculationBlock->Calculate_ver2(calculationParams);
+					calculationParams.itsTime = modifiedTimes.Time();
+					calculationParams.itsTimeIndex = info->TimeIndex();
+					theCalculationBlock->Time(calculationParams.itsTime);
+					std::for_each(calculationBlockVector.begin(), calculationBlockVector.end(), TimeSetter<NFmiSmartToolCalculationBlock>(calculationParams.itsTime)); // calculaatioiden kopioiden ajat pitää myös asettaa
+					std::for_each(infoVector.begin(), infoVector.end(), TimeSetter<NFmiFastQueryInfo>(calculationParams.itsTime)); // info kopioiden ajat pitää myös asettaa
+					std::vector<NFmiCalculationParams> calculationParamsVector;
+					for(size_t i=0; i < usedThreadCount; i++)
+						calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, missä on jo aika oikein
+					LocationIndexRangeCalculator locationIndexRangeCalculator(info->SizeLocations(), 100);
+
+					boost::thread_group calcParts;
+					for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
+						calcParts.add_thread(new boost::thread(::DoPartialGridCalculationBlockInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationBlockVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
+					calcParts.join_all(); // odotetaan että threadit lopettavat
+	/*
+					for(info->ResetLocation(); info->NextLocation(); )
+					{
+						calculationParams.itsLatlon = info->LatLon();
+						calculationParams.itsLocationIndex = info->LocationIndex(); // tämä locationindex juttu liittyy kai optimointiin, jota ei tehdä enää, pitäisikö poistaa
+						theCalculationBlock->Calculate_ver2(calculationParams);
+					}
+	*/
 				}
-*/
 			}
 		}
 		catch(...)
