@@ -726,7 +726,7 @@ static void DoPartialGridCalculationBlockInThread(LocationIndexRangeCalculator &
 			}
 		}
 	}
-	catch(std::exception &e)
+	catch(std::exception & /* e */ )
 	{
 		int x = 0;
 //		std::cerr << "Error in DoPartialGridCalculationBlockInThread: " << e.what() << std::endl;
@@ -738,8 +738,7 @@ static void DoPartialGridCalculationBlockInThread(LocationIndexRangeCalculator &
 	}
 }
 
-template<typename T>
-static void DoPartialGridCalculationInThread(LocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<T> &theCalculation, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
+static void DoPartialGridCalculationInThread(LocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<NFmiSmartToolCalculation> &theCalculation, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
 {
 	unsigned long startIndex = 0;
 	unsigned long endIndex = 0;
@@ -959,17 +958,8 @@ void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalc
 
 						boost::thread_group calcParts;
 						for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
-							calcParts.add_thread(new boost::thread(::DoPartialGridCalculationInThread<NFmiSmartToolCalculation>, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
+							calcParts.add_thread(new boost::thread(::DoPartialGridCalculationInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
 						calcParts.join_all(); // odotetaan että threadit lopettavat
-/*
-						for(info->ResetLocation(); info->NextLocation(); )
-						{
-							calculationParams.itsLatlon = info->LatLon();
-							calculationParams.itsLocationIndex = info->LocationIndex();
-							// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseistä optimointi juttua ei kai enää käytetä
-							smartToolCalculation->Calculate_ver2(calculationParams);
-						}
-*/
 					}
 				}
 
