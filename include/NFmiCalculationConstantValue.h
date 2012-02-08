@@ -43,7 +43,7 @@ class NFmiCalculationDeltaZValue : public NFmiAreaMaskImpl
 {
 
 public:
-   double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways)
+   double Value(const NFmiCalculationParams & /* theCalculationParams */ , bool /* fUseTimeInterpolationAlways */ )
    {
 	   return NFmiCalculationDeltaZValue::itsHeightValue;
    }
