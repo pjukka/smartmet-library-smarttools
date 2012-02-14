@@ -47,8 +47,8 @@ class NFmiMultiLevelMask
     NFmiMultiLevelMask (const NFmiMultiLevelMask& theMask);
     NFmiMultiLevelMask& operator=(const NFmiMultiLevelMask& theMask);
     ~NFmiMultiLevelMask (void);
-	unsigned long MaskType (void) const;
-	void MaskType (unsigned long theMaskType);
+	unsigned long MaskType (void) const { return itsMaskType; }
+	void MaskType (unsigned long theMaskType) {itsMaskType = theMaskType;}
 	const unsigned long& MaskSize(void) const;
 	void Mask (unsigned long theIndex, bool theNewState);
 	bool IsMasked (unsigned long theIndex) const;

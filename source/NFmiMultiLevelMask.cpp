@@ -73,21 +73,6 @@ NFmiMultiLevelMask::~NFmiMultiLevelMask (void)
 }
 
 //--------------------------------------------------------
-// MaskType
-//--------------------------------------------------------
-unsigned long NFmiMultiLevelMask::MaskType(void) const
-{
-	return itsMaskType;
-}
-//--------------------------------------------------------
-// MaskType
-//--------------------------------------------------------
-void NFmiMultiLevelMask::MaskType (unsigned long theMaskType)
-{
-	itsMaskType = theMaskType;
-	return;
-}
-//--------------------------------------------------------
 // MaskSize
 //--------------------------------------------------------
 const unsigned long& NFmiMultiLevelMask::MaskSize(void) const
