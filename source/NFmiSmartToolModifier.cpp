@@ -1598,6 +1598,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 	}
 	if(!info)
 		throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNotFound") + "\n" + theAreaMaskInfo.GetMaskText());
+	info->LatLon(); // t‰m‰ on varmistus uusia multi-thread laskuja varten, ett‰ jokaisella infolla on olemassa latlon-cache, ennen kuin menn‰‰n eri s‰ikeisiin hommiin
 	return info;
 }
 
