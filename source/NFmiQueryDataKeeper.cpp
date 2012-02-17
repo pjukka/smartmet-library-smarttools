@@ -53,7 +53,7 @@ boost::shared_ptr<NFmiOwnerInfo> NFmiQueryDataKeeper::OriginalData(void)
 // T‰m‰ palauttaa vapaana olevan Info-iteraattori kopion dataan.
 boost::shared_ptr<NFmiFastQueryInfo> NFmiQueryDataKeeper::GetIter(void)
 {
-	// TODO: T‰m‰ vaatii sitten s‰ie turvallisen lukituksen
+	WriteLock lock(itsMutex); // t‰m‰ funktio pit‰‰ suorittaa aina max yhdest‰ s‰ikeest‰ (ainakin kun tehd‰‰n moni-s‰ie laskuja smarttool-kielell‰, miss‰ on mukana asemadataa!!)
 
 	itsLastTimeUsedTimer.StartTimer();
 	// Katsotaan onko listassa yht‰‰n Info-iteraattoria, joka ei ole k‰ytˆss‰ (ref-count = 1)
