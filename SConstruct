@@ -56,6 +56,7 @@ else:
     env.Append( CXXFLAGS= [
         # MAINFLAGS from orig. Makefile ('-fPIC' is automatically added by SCons)
         #
+        "-fPIC", 
         "-Wall", 
         "-Wno-unused-parameter",
 #       "-Wno-variadic-macros",
