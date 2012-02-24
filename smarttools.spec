@@ -1,14 +1,14 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 12.2.7
-Release: 1.el5.fmi
+Version: 12.2.24
+Release: 1.el6.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase >= 12.2.7
+BuildRequires: libsmartmet-newbase >= 12.2.24
 Provides: %{LIBNAME}
 
 %description
@@ -32,9 +32,11 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,0775)
 %{_includedir}/smartmet/%{LIBNAME}
 %{_libdir}/libsmartmet_%{LIBNAME}.a
-%{_libdir}/libsmartmet_%{LIBNAME}-mt.a
 
 %changelog
+* Fri Feb 24 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.2.24-1.el6.fmi
+- Single threading removed due to extra maintenance required
+- A shitload of changes, fixes and improvements by Marko Pietarinen
 * Tue Feb  7 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.2.7-1.el5.fmi
 - Newbase headers changed
 * Thu Nov 24 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.11.24-1.el5.fmi
