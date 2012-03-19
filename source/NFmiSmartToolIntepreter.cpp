@@ -1493,7 +1493,7 @@ bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVari
 		theMaskInfo->SetDataIdent(dataIdent);
 		theMaskInfo->SetUseDefaultProducer(true);
 		theMaskInfo->ModelRunIndex(theModelRunIndex);
-		if(fUseWildDataType)
+		if(fUseWildDataType && theDataType != NFmiInfoData::kEditable) // HUOM! anydata-tyyppi sallitaan vain kun tarkastellaan ei editoitavia parametreja, tämä siksi että ei haluta esim. par165 menevän läpi smarttool-kielessä, koska se on ec:n meren aallon pituusparametri ja ilman tuottajaa haluataan vain tukea editoitua dataa ja topo-dataa
 			theMaskInfo->SetDataType(NFmiInfoData::kAnyData);
 		else
 			theMaskInfo->SetDataType(theDataType);
@@ -2016,6 +2016,8 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("hessaa"), kFmiWeatherSymbol3));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("w"), kFmiVerticalVelocityMMS));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("z"), kFmiGeomHeight));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("geom"), kFmiGeomHeight));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("geop"), kFmiGeopHeight));
 
 		// laitetaan kokoelma parametritkin kieleen, että niitä voi sijoittaa kerralla yhdellä komennolla
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wind"), kFmiTotalWindMS));
