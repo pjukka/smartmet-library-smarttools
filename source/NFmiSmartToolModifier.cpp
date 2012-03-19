@@ -1503,9 +1503,28 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
 	return info;
 }
 
+// tämä funktio on tehty siksi että voidaan hanskata z-parametri (poikkeus) yhtenäisellä tavalla
+boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetInfoFromOrganizer(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData, int theModelRunIndex)
+{
+	boost::shared_ptr<NFmiFastQueryInfo> info = itsInfoOrganizer->Info(theIdent, theLevel, theType, fUseParIdOnly, fLevelData, theModelRunIndex);
+	if(info == 0)
+	{
+		std::string parName(theIdent.GetParamName());
+		NFmiStringTools::LowerCase(parName);
+		if(parName == "z")
+		{ // z-parametri on poikkeus (siis smarttool-kielen tekstinä annettu "z" -parametri), eli tätä yritetään hakea sekä kFmiGeomHeight:ista (id=3), joka on default, ja kFmiGeopHeight:ista (id=2)
+			NFmiParam secondaryParam(*theIdent.GetParam());
+			secondaryParam.SetIdent(kFmiGeopHeight);
+			NFmiDataIdent secondaryDataIdent(secondaryParam, *theIdent.GetProducer());
+			info = itsInfoOrganizer->Info(secondaryDataIdent, theLevel, theType, fUseParIdOnly, fLevelData, theModelRunIndex);
+		}
+	}
+	return info;
+}
+
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateCopyOfAnalyzeInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel)
 {
-	boost::shared_ptr<NFmiFastQueryInfo> info = itsInfoOrganizer->Info(theDataIdent, theLevel, NFmiInfoData::kAnalyzeData);
+	boost::shared_ptr<NFmiFastQueryInfo> info = GetInfoFromOrganizer(theDataIdent, theLevel, NFmiInfoData::kAnalyzeData);
 	if(info)
 	{
 		if(info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) && (theLevel == 0 || info->Level(*theLevel)))
@@ -1522,14 +1541,14 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetWantedAreaMaskDat
 
 	boost::shared_ptr<NFmiFastQueryInfo> info;
 	if(theOverRideLevelType == kFmiNoLevelType)
-		info = itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), usedDataType, fUseParIdOnly, fUseLevelData | fDoCrossSectionCalculation, theAreaMaskInfo.ModelRunIndex());
+		info = GetInfoFromOrganizer(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), usedDataType, fUseParIdOnly, fUseLevelData | fDoCrossSectionCalculation, theAreaMaskInfo.ModelRunIndex());
 	else
 	{
 		if(theAreaMaskInfo.GetLevel()) // level voi olla 0-pointteri, joten se pitää tarkistaa
 		{
 			NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
 			aLevel.SetIdent(theOverRideLevelType);
-			info = itsInfoOrganizer->Info(theAreaMaskInfo.GetDataIdent(), &aLevel, usedDataType, fUseParIdOnly, fUseLevelData, theAreaMaskInfo.ModelRunIndex());
+			info = GetInfoFromOrganizer(theAreaMaskInfo.GetDataIdent(), &aLevel, usedDataType, fUseParIdOnly, fUseLevelData, theAreaMaskInfo.ModelRunIndex());
 		}
 	}
 	return ::CreateShallowCopyOfHighestInfo(info); // tehdään vielä 'kevyt' kopio löytyneestä datasta

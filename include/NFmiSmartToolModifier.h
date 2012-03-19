@@ -149,6 +149,7 @@ private:
 	boost::shared_ptr<NFmiAreaMask> CreateSoundingIndexFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
 	boost::shared_ptr<NFmiFastQueryInfo> CreateCopyOfAnalyzeInfo(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel);
 	boost::shared_ptr<NFmiFastQueryInfo> GetWantedAreaMaskData(const NFmiAreaMaskInfo &theAreaMaskInfo, bool fUseParIdOnly, NFmiInfoData::Type theOverRideDataType = NFmiInfoData::kNoDataType, FmiLevelType theOverRideLevelType = kFmiNoLevelType);
+	boost::shared_ptr<NFmiFastQueryInfo> GetInfoFromOrganizer(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly = false, bool fLevelData = false, int theModelRunIndex = 0);
 
 	NFmiInfoOrganizer *itsInfoOrganizer; // eli database, ei omista ei tuhoa
 	NFmiSmartToolIntepreter *itsSmartToolIntepreter; // omistaa, tuhoaa
