@@ -766,23 +766,30 @@ static void DoPartialGridCalculationBlockInThread(LocationIndexRangeCalculator &
 
 static void DoPartialGridCalculationInThread(LocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<NFmiSmartToolCalculation> &theCalculation, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
 {
-	unsigned long startIndex = 0;
-	unsigned long endIndex = 0;
-	for( ; theLocationIndexRangeCalculator.GetCurrentLocationRange(startIndex, endIndex); )
+	try
 	{
-		for(unsigned long i = startIndex; i <= endIndex; i++)
+		unsigned long startIndex = 0;
+		unsigned long endIndex = 0;
+		for( ; theLocationIndexRangeCalculator.GetCurrentLocationRange(startIndex, endIndex); )
 		{
-			if(theUsedBitmask == 0 || theUsedBitmask->IsMasked(i))
+			for(unsigned long i = startIndex; i <= endIndex; i++)
 			{
-				if(theInfo->LocationIndex(i))
+				if(theUsedBitmask == 0 || theUsedBitmask->IsMasked(i))
 				{
-					theCalculationParams.itsLatlon = theInfo->LatLon();
-					theCalculationParams.itsLocationIndex = theInfo->LocationIndex();
-					// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseist‰ optimointi juttua ei kai en‰‰ k‰ytet‰
-					theCalculation->Calculate_ver2(theCalculationParams);
+					if(theInfo->LocationIndex(i))
+					{
+						theCalculationParams.itsLatlon = theInfo->LatLon();
+						theCalculationParams.itsLocationIndex = theInfo->LocationIndex();
+						// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseist‰ optimointi juttua ei kai en‰‰ k‰ytet‰
+						theCalculation->Calculate_ver2(theCalculationParams);
+					}
 				}
 			}
 		}
+	}
+	catch(...)
+	{
+		// pakko ottaa vain vastaan poikkeukset, ei tehd‰ mit‰‰n
 	}
 }
 
