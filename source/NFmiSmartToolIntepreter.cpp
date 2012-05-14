@@ -311,7 +311,7 @@ static std::string::iterator EatWhiteSpaces(std::string::iterator & it,
 	if(it == endIter)
 		return it;
 
-	while(::isspace(*it))  
+	while(std::isspace(*it))  
 	{
 		++it;
 		if(it == endIter)
@@ -387,7 +387,7 @@ bool NFmiSmartToolIntepreter::IsPossibleCalculationLine(const std::string &theTe
 	if(theTextLine.find(string("=")) != string::npos)
 		return true;
 
-	if(std::find_if(theTextLine.begin(), theTextLine.end(), std::not1(std::ptr_fun(::isspace))) != theTextLine.end())
+	if(std::find_if(theTextLine.begin(), theTextLine.end(), std::not1(std::ptr_fun(std::isspace))) != theTextLine.end())
 		throw runtime_error(::GetDictionaryString("SmartToolErrorIllegalTextFound") + ": \n" + theTextLine);
 	return false;
 }
@@ -799,7 +799,7 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 	if(exp_ptr >= exp_end)
 		return false; // at end of expression
 
-	while(exp_ptr < exp_end && isspace(*exp_ptr))
+	while(exp_ptr < exp_end && std::isspace(*exp_ptr))
 		++exp_ptr; // skip over white space
 	if(exp_ptr >= exp_end)
 		return false; // at end of expression
