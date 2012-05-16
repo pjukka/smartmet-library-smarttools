@@ -165,12 +165,13 @@ NFmiAreaMask* NFmiCalculationDeltaZValue::Clone(void) const
 
 NFmiStation2GridMask::NFmiStation2GridMask(Type theMaskType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
 :NFmiInfoAreaMask(NFmiCalculationCondition(), theMaskType, theDataType, theInfo, NFmiAreaMask::kNoValue)
-,itsGriddedStationData()
+,itsGriddedStationData(new DataCache())
 ,itsCurrentGriddedStationData(0)
 ,itsLastCalculatedTime(NFmiMetTime::gMissingTime)
 ,itsAreaPtr()
 ,itsDoc(0)
 ,itsStation2GridSize(1,1)
+,itsCacheMutex(new MutexType())
 {
 }
 
@@ -186,6 +187,7 @@ NFmiStation2GridMask::NFmiStation2GridMask(const NFmiStation2GridMask &theOther)
 ,itsAreaPtr(theOther.itsAreaPtr.get() ? theOther.itsAreaPtr.get()->Clone() : 0)
 ,itsDoc(theOther.itsDoc)
 ,itsStation2GridSize(theOther.itsStation2GridSize)
+,itsCacheMutex(theOther.itsCacheMutex)
 {
 }
 
@@ -214,9 +216,11 @@ void NFmiStation2GridMask::DoGriddingCheck(const NFmiCalculationParams &theCalcu
 {
 	if(itsLastCalculatedTime != theCalculationParams.itsTime)
 	{ 
+		WriteLock lock(*itsCacheMutex); // tästä saa edetä vain yksi säie kerrallaan, eli joku joka ehtii, laskee cache-matriisin ja asettaa sen itsCurrentGriddedStationData:n arvoksi, muut sitten vain käyttävät sitä
+
 		// katsotaanko löytyykö valmiiksi laskettua hilaa halutulle ajalle
-		DataCache::iterator it = itsGriddedStationData.find(theCalculationParams.itsTime);
-		if(it != itsGriddedStationData.end())
+		DataCache::iterator it = itsGriddedStationData->find(theCalculationParams.itsTime);
+		if(it != itsGriddedStationData->end())
 			itsCurrentGriddedStationData = &((*it).second);
 		else
 		{
@@ -226,7 +230,7 @@ void NFmiStation2GridMask::DoGriddingCheck(const NFmiCalculationParams &theCalcu
 				boost::shared_ptr<NFmiDrawParam> drawParam(new NFmiDrawParam(itsDataIdent, itsLevel, 0, itsDataType));
 				NFmiDataMatrix<float> griddedData(static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.X()), static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.Y()), kFloatMissing);
 				NFmiStationView::GridStationData(itsDoc, itsAreaPtr.get(), drawParam, griddedData, theCalculationParams.itsTime);
-				std::pair<DataCache::iterator, bool> insertResult = itsGriddedStationData.insert(std::make_pair(theCalculationParams.itsTime, griddedData));
+				std::pair<DataCache::iterator, bool> insertResult = itsGriddedStationData->insert(std::make_pair(theCalculationParams.itsTime, griddedData));
 				if(insertResult.second)
 					itsCurrentGriddedStationData = &((*insertResult.first).second);
 				else

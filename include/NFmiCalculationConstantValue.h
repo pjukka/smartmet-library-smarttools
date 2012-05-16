@@ -11,6 +11,18 @@
 #include "NFmiInfoAreaMask.h"
 #include <boost/shared_ptr.hpp>
 
+#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
+
+#ifdef _MSC_VER
+#pragma warning (disable : 4244 4267 4512) // boost:in thread kirjastosta tulee ikävästi 4244 varoituksia
+#endif
+#include <boost/thread.hpp>
+#ifdef _MSC_VER
+#pragma warning (default : 4244 4267 4512) // laitetaan 4244 takaisin päälle, koska se on tärkeä (esim. double -> int auto castaus varoitus)
+#endif
+
+#endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
+
 class NFmiDataModifier;
 class NFmiDataIterator;
 class NFmiFastQueryInfo;
@@ -166,7 +178,7 @@ private:
   void DoGriddingCheck(const NFmiCalculationParams &theCalculationParams);
 
 //  NFmiDataMatrix<float> itsGriddedStationData; // tässä on asemadatasta lasketut hilatut arvot
-  DataCache itsGriddedStationData;
+  boost::shared_ptr<DataCache> itsGriddedStationData; // Tämä jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua työtä
   NFmiDataMatrix<float> *itsCurrentGriddedStationData; // tähän on laitettu se matriisi, joka sisältää halutun ajan asemadatasta lasketut hilatut arvot
   NFmiMetTime itsLastCalculatedTime; // tälle ajanhetkelle on station data laskettu (tai puuttuva aika), mutta onko se sama kuin itsTime, jos ei ole, pitää laskea juuri tälle ajalle
 
@@ -175,6 +187,11 @@ private:
   NFmiEditMapGeneralDataDoc *itsDoc;
   NFmiPoint itsStation2GridSize; // tämän kokoiseen hilaan asema data lasketaan (itsGriddedStationData -koko)
 
+	// Kun itsCurrentGriddedStationData -muuttujaa lasketaan tai asetetaan, sen saa tehdä kullekin ajalle vain kerran. Tämä lukko systeemi takaa sen.
+	typedef boost::shared_mutex MutexType;
+	typedef boost::shared_lock<MutexType> ReadLock; // Read-lockia ei oikeasti tarvita, mutta laitan sen tähän, jos joskus tarvitaankin
+	typedef boost::unique_lock<MutexType> WriteLock;
+	boost::shared_ptr<MutexType> itsCacheMutex; // TÄMÄ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua työtä
 };
 
 #endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
