@@ -75,6 +75,8 @@ public:
 	void ForceFileFilterName(bool newValue) {fForceFileFilterName = newValue;}
 	int AdditionalArchiveFileCount(void) const {return itsAdditionalArchiveFileCount;}
 	void AdditionalArchiveFileCount(int newValue) {itsAdditionalArchiveFileCount = newValue;}
+	bool IsEnabled(void) const {return fEnable;}
+	void Enable(bool newValue) {fEnable = newValue;}
 
 	const std::string& PartialDataCacheFileNameFilter(void) const {return itsPartialDataCacheFileNameFilter;}
 	void PartialDataCacheFileNameFilter(const std::string &newValue) {itsPartialDataCacheFileNameFilter = newValue;}
@@ -110,6 +112,8 @@ private:
 	std::string itsBaseNameSpace;
 	int itsAdditionalArchiveFileCount;	// defaultti on 0, joitakin datoja (esim. kepa-datoja, joita tuotetaan n. 15-20 per päivä) 
 										// halutaan säilyttää enemmän kuin muita NFmiInfoOrganizer:issa. Tällä säädöllä saadaan pidettyä ylimääräiset datat.
+	bool fEnable; // Tämä on pakollinen säätö optio siitä, että onko data käytössä. Tämä säätää ladataanko dataa cacheen, SmartMEtiin, tehdäänkö soundinIndex-dataa, 
+				  // yhdistelmä datoja. Lisäksi tuleeko data popup-valikoihin, tai mihinkään muihin datavalikoihin.
 };
 
 class NFmiHelpDataInfoSystem
