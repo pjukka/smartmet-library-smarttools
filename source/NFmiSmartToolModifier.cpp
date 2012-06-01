@@ -1145,27 +1145,30 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMetFunctionAreaMask
 		info = tmp;
 	}
 	NFmiAreaMask::FunctionType funcType = theAreaMaskInfo.GetFunctionType();
-	if(funcType == NFmiAreaMask::Grad || funcType == NFmiAreaMask::Divergence)
+	bool peekAlongTudes = false;
+	if(funcType == NFmiAreaMask::Grad2 || funcType == NFmiAreaMask::Divergence2 || funcType == NFmiAreaMask::Adv2 || funcType == NFmiAreaMask::Lap2 || funcType == NFmiAreaMask::Rot2)
+		peekAlongTudes = true;
+	if(funcType == NFmiAreaMask::Grad || funcType == NFmiAreaMask::Grad2 || funcType == NFmiAreaMask::Divergence || funcType == NFmiAreaMask::Divergence2)
 	{
-		areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskGrad(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, NFmiAreaMask::kNoValue));
+		areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskGrad(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, peekAlongTudes));
 		if(funcType == NFmiAreaMask::Divergence)
 			dynamic_cast<NFmiInfoAreaMaskGrad*>(areaMask.get())->CalculateDivergence(true);
 	}
-	else if(funcType == NFmiAreaMask::Adv)
+	else if(funcType == NFmiAreaMask::Adv || funcType == NFmiAreaMask::Adv2)
 	{
 		boost::shared_ptr<NFmiFastQueryInfo> infoUwind = CreateInfo(theAreaMaskInfo, fMustUsePressureInterpolation, kFmiWindUMS);
 		boost::shared_ptr<NFmiFastQueryInfo> infoVwind = CreateInfo(theAreaMaskInfo, fMustUsePressureInterpolation, kFmiWindVMS);
 		if(infoUwind && infoVwind)
-			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskAdvection(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, infoUwind, infoVwind, NFmiAreaMask::kNoValue));
+			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskAdvection(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, infoUwind, infoVwind, peekAlongTudes));
 		else
 			DoErrorExceptionForMetFunction(theAreaMaskInfo, ::GetDictionaryString("Can't find u- or -v wind components for wanted parameter in given function"), ::GetDictionaryString("with line"));
 	}
-	else if(funcType == NFmiAreaMask::Lap)
-		areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskLaplace(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, NFmiAreaMask::kNoValue));
-	else if(funcType == NFmiAreaMask::Rot)
+	else if(funcType == NFmiAreaMask::Lap || funcType == NFmiAreaMask::Lap2)
+		areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskLaplace(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, peekAlongTudes));
+	else if(funcType == NFmiAreaMask::Rot || funcType == NFmiAreaMask::Rot2)
 	{
 		if(theAreaMaskInfo.GetDataIdent().GetParamIdent() == kFmiTotalWindMS)
-			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskRotor(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, NFmiAreaMask::kNoValue));
+			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskRotor(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, theAreaMaskInfo.GetDataType(), info, peekAlongTudes));
 		else
 			DoErrorExceptionForMetFunction(theAreaMaskInfo, ::GetDictionaryString("Only usable param with rot-function in wind (=par19)"), ::GetDictionaryString("in the line"));
 	}

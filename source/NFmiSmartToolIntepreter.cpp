@@ -2323,6 +2323,12 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, 1, "lap(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, 1, "rot(wind)"))); // roottori ottaa totalwind:in parametrina, siitä saadaan tuulen u- ja v-komponentit
 
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad2"), MetFunctionMapValue(NFmiAreaMask::Grad2, 1, "grad2(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div2"), MetFunctionMapValue(NFmiAreaMask::Divergence2, 1, "div2(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv2"), MetFunctionMapValue(NFmiAreaMask::Adv2, 1, "adv2(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap2"), MetFunctionMapValue(NFmiAreaMask::Lap2, 1, "lap2(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2"), MetFunctionMapValue(NFmiAreaMask::Rot2, 1, "rot2(wind)"))); // roottori ottaa totalwind:in parametrina, siitä saadaan tuulen u- ja v-komponentit
+
 		// tässä on vertikaaliset-funktiot
 		// vertp-funktiot eli näitä operoidaan aina painepinnoilla [hPa]
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertP, 3, string("vertp_max(par, p1, p2)"))));
