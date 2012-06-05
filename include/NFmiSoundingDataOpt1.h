@@ -106,6 +106,7 @@ public:
 	double CalcLCLPressureLevel(FmiLCLCalcType theLCLCalcType);
 	double CalcLCLIndex(FmiLCLCalcType theLCLCalcType);
 	double CalcLCLHeightIndex(FmiLCLCalcType theLCLCalcType);
+//	double CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double &EL);
 	double CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double &EL);
 	double CalcLFCHeightIndex(FmiLCLCalcType theLCLCalcType, double &ELheigth);
 	double CalcCAPE500Index(FmiLCLCalcType theLCLCalcType, double theHeightLimit = kFloatMissing);

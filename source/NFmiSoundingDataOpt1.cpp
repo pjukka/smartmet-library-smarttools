@@ -15,6 +15,8 @@
 #include "NFmiAngle.h"
 #include "NFmiValueString.h"
 
+#include <fstream>
+
 // hakee lähimmän sopivan painepinnan, mistä löytyy halutuille parametreille arvot
 // Mutta ei sallita muokkausta ennen 1. validia leveliä!
 bool NFmiSoundingDataOpt1::GetTandTdValuesFromNearestPressureLevel(double P, double &theFoundP, double &theT, double &theTd)
@@ -1476,17 +1478,78 @@ bool NFmiSoundingDataOpt1::CheckLFCIndexCache(FmiLCLCalcType theLCLCalcTypeIn, d
 	return false;
 }
 
+class MyPoint
+{
+public:
+	MyPoint(double theX, double theY)
+	:x(theX)
+	,y(theY)
+	{
+	}
+
+	bool IsValid(void) const
+	{
+		return (x != kFloatMissing) && (y != kFloatMissing);
+	}
+
+	double x;
+	double y;
+};
+
+// Laske pisteiden (P1, P2) ja (P3, P4) muodostamien viivojen leikkauspiste.
+// Kaavat on haettu http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
+static MyPoint CalcTwoLineIntersectionPoint(const MyPoint &P1, const MyPoint &P2, const MyPoint &P3, const MyPoint &P4)
+{
+	if(P1.IsValid() && P2.IsValid() && P3.IsValid() && P4.IsValid())
+	{
+		double UaDenom = ((P4.x - P3.x)*(P1.y - P3.y) - (P4.y - P3.y) * (P1.x - P3.x));
+		double Udividor = ((P4.y - P3.y)*(P2.x - P1.x) - (P4.x - P3.x) * (P2.y - P1.y));
+		if(Udividor != 0) // jakajan 0 tarkastelu
+		{
+			double Ua = UaDenom / Udividor;
+
+			double UbDenom = ((P2.x - P1.x)*(P1.y - P3.y) - (P2.y - P1.y) * (P1.x - P3.x));
+			double Ub = UbDenom / Udividor;
+
+			double x = P1.x + Ua * (P2.x - P1.x);
+			double y = P1.y + Ub * (P2.y - P1.y);
+
+			return MyPoint(x, y);
+		}
+	}
+
+	return MyPoint(kFloatMissing, kFloatMissing); // virhetilanteissa puuttuvan tiedon piste
+}
+
+static double CalcCrossingPressureFromPoints(double P1, double P2, double T1, double T2, double theCurrentParcelT, double theLastParcelT)
+{
+	MyPoint p1(P1, T1);
+	MyPoint p2(P2, T2);
+	MyPoint p3(P1, theCurrentParcelT);
+	MyPoint p4(P2, theLastParcelT);
+
+	MyPoint intersectionPoint = ::CalcTwoLineIntersectionPoint(p1, p2, p3, p4);
+	return intersectionPoint.x;
+}
+
+
+// #define DEBUG_LFC_CALCULATIONS 1 // ota tämä pois kommentista, jos haluat tulostaa debug tietoa siitä, miten LFC lasketaan
+
 // Claculates LFC (Level of Free Convection)
 // which is the level above which the lifted parcel is warmer than environment
 // parcel is avg from 500 m layer at surface
 // HUOM! Lisäsin myös EL laskun eli EL on korkeus millä nostettu ilmapaketti muuttuu
 // jälleen kylmemmäksi kuin ympäristö (jos se koskaan oli lämpimämpää)
 // Tiedän tämä on ikävä kaksi vastuuta yhdellä metodilla, joista toinen ei edes näy metodin nimessä.
+/*
 double NFmiSoundingDataOpt1::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double &EL)
 {
 	double lfcIndexValue = kFloatMissing;
+#ifndef DEBUG_LFC_CALCULATIONS
 	if(CheckLFCIndexCache(theLCLCalcType, lfcIndexValue, EL))
 		return lfcIndexValue;
+#endif // DEBUG_LFC_CALCULATIONS
+
 
 	// 1. calc T,Td,P values from 500 m layer avg or surface values
 	double T=kFloatMissing,
@@ -1506,37 +1569,297 @@ double NFmiSoundingDataOpt1::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double 
 	std::deque<float> &pValues = GetParamData(kFmiPressure);
 	std::deque<float> &tValues = GetParamData(kFmiTemperature);
 	size_t ssize = pValues.size();
-	double TofLiftedParcer_previous = kFloatMissing;
+	double P_current = kFloatMissing;
 	double P_previous = kFloatMissing;
+	double T_current = kFloatMissing;
+	double T_previous = kFloatMissing;
 
 	double foundPValue = kFloatMissing;
-	double durrentDiff = 0; // ilmapaketin ja ympäristön T ero
+	double currentDiff = 0; // ilmapaketin ja ympäristön T ero
 	double lastDiff = 0; // ilmapaketin ja ympäristön T ero viime kierroksella
+	bool aboveSurfaceLevelCapeExist = false;
+	double previous_TofLiftedParcer = kFloatMissing;
+	bool lclPointProcessed = false;
+#ifdef DEBUG_LFC_CALCULATIONS
+	std::stringstream debugStrStream;
+	debugStrStream << ((theLCLCalcType == kLCLCalcSurface) ? "Surface" : (theLCLCalcType == kLCLCalc500m2) ? "500 mix" : "Most unstable") << "\nP = " << P << " LCL = " << LCLValue << std::endl;
+#endif // DEBUG_LFC_CALCULATIONS
 	for(size_t i = 0; i < ssize; i++)
 	{
-		if(pValues[i] != kFloatMissing && pValues[i] <= P) // aloitetaan LFC etsintä vasta 'aloitus' korkeuden jälkeen
+		P_current = pValues[i];
+		if(P_current != kFloatMissing && P_current < P) // aloitetaan LFC etsintä vasta 'aloitus' korkeuden jälkeen
 		{
-			if(tValues[i] != kFloatMissing) // kaikilla painepinnoilla ei ole lämpötilaa
+			T_current = tValues[i];
+			if(T_current != kFloatMissing) // kaikilla painepinnoilla ei ole lämpötilaa
 			{
-				double TofLiftedParcer = CalcTOfLiftedAirParcel(T, Td, P, pValues[i]);
+				if(lclPointProcessed == false && P_current < LCLValue && P_previous > LCLValue) // lcl-pisteeseen pitää saada yksi piste, muuten laskut menevät tietyissä tilanteissa vähän pieleen
+				{
+					lclPointProcessed = true;
+					P_current = LCLValue;
+					T_current = GetValueAtPressure(kFmiTemperature, static_cast<float>(LCLValue));
+					i--;
+				}
 
-				TofLiftedParcer_previous = TofLiftedParcer;
-				P_previous = pValues[i];
+				double TofLiftedParcer = CalcTOfLiftedAirParcel(T, Td, P, P_current);
 
-				durrentDiff = TofLiftedParcer - tValues[i];
-				if(durrentDiff > 0 && foundPValue == kFloatMissing) // vain alin korkeus talteen
-					foundPValue = pValues[i];
-				if(durrentDiff < 0 && lastDiff > 0) // jos siis paketti muuttui lämpimämmästä kylmemmäksi (ympäristöön verrattuna, ota talteen korkeus)
-					EL = pValues[i];
-				lastDiff = durrentDiff;
+				currentDiff = TofLiftedParcer - T_current;
+#ifdef DEBUG_LFC_CALCULATIONS
+				debugStrStream << i << ". " << "P[i] = " << P_current << " T[i] = " << T_current << " lifted T = " << TofLiftedParcer << " diff = " << ((currentDiff > 0) ? "+" : "") << currentDiff << std::endl;
+#endif // DEBUG_LFC_CALCULATIONS
+				if(aboveSurfaceLevelCapeExist == false && (currentDiff > 0 && lastDiff < 0))
+				{
+					aboveSurfaceLevelCapeExist = true; // Jos ilmapaketin lämpötila meni kylmemmältä lämpimämmälle puolelle, on luotauksessa pinnasta erillinen cape-alue, ja sen rajat määräävät LFC:n ja EL:n
+					foundPValue = ::CalcCrossingPressureFromPoints(P_current, P_previous, T_current, T_previous, TofLiftedParcer, previous_TofLiftedParcer);
+				}
+				if(currentDiff > 0 && foundPValue == kFloatMissing) // vain alin korkeus talteen
+				{
+					foundPValue = P_current;
+#ifdef DEBUG_LFC_CALCULATIONS
+					debugStrStream << "LFC found " << foundPValue << std::endl;
+#endif // DEBUG_LFC_CALCULATIONS
+				}
+				if(currentDiff < 0 && lastDiff > 0) // jos siis paketti muuttui lämpimämmästä kylmemmäksi (ympäristöön verrattuna, ota talteen korkeus)
+				{
+//					EL = P_current;
+					EL = ::CalcCrossingPressureFromPoints(P_current, P_previous, T_current, T_previous, TofLiftedParcer, previous_TofLiftedParcer);
+#ifdef DEBUG_LFC_CALCULATIONS
+					debugStrStream << "EL found " << EL << std::endl;
+#endif // DEBUG_LFC_CALCULATIONS
+				}
+				lastDiff = currentDiff;
+				previous_TofLiftedParcer = TofLiftedParcer;
+				P_previous = P_current;
+				T_previous = T_current;
 			}
 		}
 	}
 	if(foundPValue != kFloatMissing && LCLValue < foundPValue)
+	{
 		foundPValue = LCLValue; // LFC:n pitää olla ainakin LCL korkeudessa tai korkeammalla eli kun paineesta kysymys LCL >= LFC
+#ifdef DEBUG_LFC_CALCULATIONS
+		debugStrStream << "LFC value changed to LCL value " << LCLValue << std::endl;
+#endif // DEBUG_LFC_CALCULATIONS
+	}
+
+#ifdef DEBUG_LFC_CALCULATIONS
+	std::ofstream debugOut("D:\\lfc_debug_str.txt");
+	if(debugOut)
+	{
+		debugOut << debugStrStream.str();
+		debugOut.close();
+	}
+#endif // DEBUG_LFC_CALCULATIONS
 
 	FillLFCIndexCache(theLCLCalcType, foundPValue, EL);
 	return foundPValue;
+}
+*/
+
+class CapeAreaLfcData
+{
+public:
+	CapeAreaLfcData(void)
+	:itsCapeAreaSize(0)
+	,itsLFC(kFloatMissing)
+	,itsEL(kFloatMissing)
+	,itsSizePoints()
+	{
+	}
+
+	void Reset(void)
+	{
+		*this = CapeAreaLfcData();
+	}
+
+	void AddCapeAreaPoint(const MyPoint &thePoint) // x on positiivinen T-diff ja y on kyseisen levelin paine
+	{
+		itsSizePoints.push_back(thePoint);
+	}
+
+	void CalcData(void)
+	{ // Tätä kutsutaan kun luokalle on lisätty kaikki cape-alueen pisteet
+		if(itsSizePoints.size())
+		{
+			CalcCapeAreaSize();
+			if(itsCapeAreaSize > 0)
+			{
+				itsLFC = itsSizePoints[0].y;
+				itsEL = itsSizePoints[itsSizePoints.size()-1].y;
+			}
+		}
+	}
+
+	double CapeAreaSize(void) const {return itsCapeAreaSize;}
+	double LFC(void) const {return itsLFC;}
+	double EL(void) const {return itsEL;}
+
+private:
+	void CalcCapeAreaSize(void)
+	{
+		itsCapeAreaSize = 0;
+		if(itsSizePoints.size() >= 2)
+		{ // pitää olla vähintään 2 pistettä, että pinta-ala voidaan laskea
+			if(itsSizePoints[0].IsValid())
+			{
+				for(size_t i = 1; i < itsSizePoints.size(); i++)
+				{
+					if(itsSizePoints[i].IsValid())
+						itsCapeAreaSize += CalcTrapezoidArea(itsSizePoints[i-1], itsSizePoints[i]);
+					else
+					{ // joku piste sisälsi kFloatMissing arvon, koko data tulkitaan kelvottomaksi
+						itsCapeAreaSize = 0;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	double CalcTrapezoidArea(const MyPoint &P1, const MyPoint &P2)
+	{
+		// puolisuunnikkaan pinta-alan lasku (kolmio on erikoistapaus, jolloin toisen pisteen x-arvo on 0):
+		// A = (a + b) * h / 2 , missä
+		// a = P1.x
+		// b = P2.x
+		// h = abs(P1.y - P2.y)
+		double A = (P1.x + P2.x) * ::fabs(P1.y - P2.y) / 2.;
+		return A;
+	}
+
+	double itsCapeAreaSize; // viitteellinen CAPE alueen koko
+	double itsLFC;
+	double itsEL;
+	std::vector<MyPoint> itsSizePoints; // tähän talletetaan cape-alueen positiivinen lämpötilaerotus ja paine-taso. Näiden pisteiden avulla voidaan laskea suuntaa antava cape-alueen koko
+};
+
+static void InsertCapeAreaDataToMap(CapeAreaLfcData &theCapeAreaData, std::map<double, CapeAreaLfcData, std::greater<double> > &theCapeAreaDataMap)
+{
+	theCapeAreaData.CalcData();
+	if(theCapeAreaData.CapeAreaSize() > 0) // lisätään listaan vain jos area oli suurempi kuin 0
+		theCapeAreaDataMap.insert(std::make_pair(theCapeAreaData.CapeAreaSize(), theCapeAreaData));
+	// Lopuksi currentti capeAreaData pitää nollata
+	theCapeAreaData.Reset();
+}
+
+// Tämä on parannettu versio CalcLFCIndex -metodista.
+// Laskee luotauksen LFC:n ja EL:n käyttäen haluttua laskenta tyyppia (surface, 500 mix tai most unstable).
+// Käytännössä etsii suurimman CAPE-alueen (= alue luotauksessa, missä nostettu ilmapaketti on ympäristöä lämpimämpi) 
+// ja ottaa siitä sisään- (LFC) ja ulosmenokohdan (EL) paineena. 
+// Jos luotauksessa ei ole CAPE-aluetta, on arvot puuttuvaa.
+// Pinta CAPE-alue otetaan huomioon laskuissa.
+// Jos saatu LFC korkeus on lähempänä maanpintaa kuin LCL, laitetaan LFC:n arvoksi LCL.
+// Kun ilmapaketti nostetaan kerros kerrokselta, pitää laskuihin lisätä myös erikseen LCL-piste, koska siinä tapahtuu
+// ilmapaketti laskuissa käännepiste, ja jos sitä ei oteta huomioon, voi laskuihin tulla virhettä.
+// LAsketut tulokset talletetaan erilliseen LFC-cacheen ja jos cache:ssa on jo lasketut arvot, käytetään niitä.
+double NFmiSoundingDataOpt1::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double &EL)
+{
+	double lfcIndexValue = kFloatMissing;
+	// 1. Katso löytyykö valmiiksi lasketut arvot cachesta.
+	if(CheckLFCIndexCache(theLCLCalcType, lfcIndexValue, EL))
+		return lfcIndexValue;
+
+	// 2. Hae halutun laskentatavan (sur/500mix/mostUnstable) mukaiset T, Td ja P arvot.
+	double T = kFloatMissing,
+		   Td = kFloatMissing,
+		   P = kFloatMissing;
+	if(!GetValuesNeededInLCLCalculations(theLCLCalcType, T, Td, P))
+	{ // jos arvoja ei saada, täytä LFC cache puuttuvilla arvoilla.
+		FillLFCIndexCache(theLCLCalcType, kFloatMissing, kFloatMissing);
+		return kFloatMissing;
+	}
+	// 3. Laske LCL korkaus.
+	double LCL = NFmiSoundingFunctions::CalcLCLPressureFast(T, Td, P);
+	std::deque<float> &pValues = GetParamData(kFmiPressure);
+	std::deque<float> &tValues = GetParamData(kFmiTemperature);
+	double P_current = kFloatMissing;
+	double P_previous = kFloatMissing;
+	double T_current = kFloatMissing;
+	double T_previous = kFloatMissing;
+	double LFC = kFloatMissing;
+	double TLifted_current = kFloatMissing; // nostetun ilmapaketin lämpötila
+	double TLifted_previous = kFloatMissing;
+	double Diff_current = kFloatMissing; // nostetun paketin ja ympäröivän ilman lämpötila erotus
+	double Diff_previous = kFloatMissing;
+	bool lclPointProcessed = false;
+	bool firstLevel = true;
+	CapeAreaLfcData capeAreaData; // tähän kerätään currentin cape-alueen data
+	std::map<double, CapeAreaLfcData, std::greater<double> > capeAreaDataMap; // tähän kerätään kaikkien cape-alueiden datat sortattuna niin että suurin on ensimmäisenä
+
+	for(size_t i = 0; i < pValues.size(); i++)
+	{
+		// 4. Käy läpi kaikki ei puuttuvat P ja T kerrokset. Lisäksi aloitus korkeuden pitää olla sama (tai korkeammalla oleva pinta) 
+		// kuin saatiin P:n arvoksi aiemmin.
+		P_current = pValues[i];
+		T_current = tValues[i];
+		if(P_current != kFloatMissing && T_current != kFloatMissing && P_current <= P)
+		{
+				// 5. LCL-pisteeseen pitää saada yksi laskentapiste, muuten laskut menevät tietyissä tilanteissa vähän pieleen
+				if(lclPointProcessed == false && P_current < LCL && P_previous > LCL) 
+				{
+					lclPointProcessed = true;
+					P_current = LCL;
+					T_current = GetValueAtPressure(kFmiTemperature, static_cast<float>(LCL));
+					i--; // pitää laittaa indekse pykälää alemmaksi, että LCL-pisteen jälkeiset laskut menevät oikein
+				}
+
+				// 6. Laske nostetun ilmapaketin lämpötila
+				TLifted_current = CalcTOfLiftedAirParcel(T, Td, P, P_current);
+				// 7. Laske nostetun ilmapaketin ja ympäröivän ilman lämpötila erotus
+				Diff_current = TLifted_current - T_current;
+
+				if(firstLevel && Diff_current > 0)
+				{ // Jos on heti 'pinta' CAPE alue, sille pitää tehdä erillinen hanskaus
+					capeAreaData.AddCapeAreaPoint(MyPoint(Diff_current, P_current));
+				}
+				else if(Diff_current > 0 && Diff_previous < 0)
+				{ // Nyt mentiin CAPE-alueeseen, pitää lisätä kaksi pistettä eli entry-piste ja currentti piste
+					double entryPValue = ::CalcCrossingPressureFromPoints(P_current, P_previous, T_current, T_previous, TLifted_current, TLifted_previous);
+					capeAreaData.AddCapeAreaPoint(MyPoint(0, entryPValue));
+					capeAreaData.AddCapeAreaPoint(MyPoint(Diff_current, P_current));
+				}
+				else if(Diff_current < 0 && Diff_previous > 0)
+				{ // Nyt poistutaan CAPE-alueesta, pitää lisätä poistumis piste
+					double leavingPValue = ::CalcCrossingPressureFromPoints(P_current, P_previous, T_current, T_previous, TLifted_current, TLifted_previous);
+					capeAreaData.AddCapeAreaPoint(MyPoint(0, leavingPValue));
+					// Sitten pitää laskea LFC-datan arvot ja lisätä data mappiin jos CAPE:n alue oli suurempi kuin 0
+					::InsertCapeAreaDataToMap(capeAreaData, capeAreaDataMap);
+				}
+				else if(Diff_current > 0)
+				{ // Lisätään tämä leveli currenttiin CAPE alueeseen
+					capeAreaData.AddCapeAreaPoint(MyPoint(Diff_current, P_current));
+				}
+
+				// Loopin loppuksi pitää päivittää eri previous arvot
+				P_previous = P_current;
+				T_previous = T_current;
+				TLifted_previous = TLifted_current;
+				Diff_previous = Diff_current;
+				firstLevel = false; 
+		}
+	}
+
+	// Jos luotaus loppui vaikka kesken, katsotaan jos saatiin kuitenkin CAPE aluetta kasaan
+	::InsertCapeAreaDataToMap(capeAreaData, capeAreaDataMap);
+
+	// katsotaan löytyikö CAPE-alueita
+	if(capeAreaDataMap.size())
+	{ // valitaan niistä suurin ja käytetään sen LFC ja EL arvoja
+		std::map<double, CapeAreaLfcData, std::greater<double> >::iterator biggestCapeIter = capeAreaDataMap.begin();
+		LFC = biggestCapeIter->second.LFC();
+		EL = biggestCapeIter->second.EL();
+	}
+	else
+	{ // muuten arvot puuttuviksi
+		LFC = kFloatMissing;
+		EL = kFloatMissing;
+	}
+
+
+	if(LFC != kFloatMissing && LCL < LFC)
+		LFC = LCL; // LFC:n pitää olla ainakin LCL korkeudessa tai korkeammalla eli kun paineesta kysymys LCL >= LFC
+
+	FillLFCIndexCache(theLCLCalcType, LFC, EL);
+	return LFC;
 }
 
 // palauttaa LFC:n ja  EL:n korkeuden metreissä
