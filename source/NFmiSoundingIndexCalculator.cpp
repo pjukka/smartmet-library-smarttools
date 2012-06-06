@@ -192,50 +192,73 @@ static void CalculatePartOfSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &th
 		std::cerr << "thread nro: " << index << " end here."<< std::endl;
 }
 
-#ifndef UNIX
-static void CalcTimeIndexStartsForThreeThreads(unsigned long timeSize, unsigned long &theTimeStart1, unsigned long &theTimeStart2, unsigned long &theTimeStart3)
+static void CalculateSoundingDataOneTimeStepAtTime(boost::shared_ptr<NFmiFastQueryInfo> &theSourceInfo, boost::shared_ptr<NFmiFastQueryInfo> &theResultInfo, NFmiTimeIndexCalculator &theTimeIndexCalculator, bool useFastFill, NFmiStopFunctor *theStopFunctor, int index, bool fDoCerrReporting)
 {
-	unsigned long partSize = timeSize/3;
-	if(timeSize % 3 == 0)
+	try
 	{
-		theTimeStart1 = 0;
-		theTimeStart2 = partSize;
-		theTimeStart3 = partSize*2;
+		if(theSourceInfo->IsGrid() == false || theResultInfo->IsGrid() == false)
+			throw std::runtime_error("Error in CalculatePartOfSoundingData, source or result data was non grid-data.");
+
+		unsigned long workedTimeIndex = 0;
+		for( ; theTimeIndexCalculator.GetCurrentTimeIndex(workedTimeIndex) ; )
+		{
+			if(theResultInfo->TimeIndex(workedTimeIndex))
+			{
+				if(useFastFill == false || theSourceInfo->TimeIndex(theResultInfo->TimeIndex())) // optimointia, molemmissa samat ajat!!!
+				{
+					if(fDoCerrReporting)
+						std::cerr << "thread nro: " << index << " starting time step nro: " << workedTimeIndex << std::endl;
+					::CheckIfStopped(theStopFunctor);
+					::CalcAllSoundingIndexParamFields(theSourceInfo, theResultInfo, useFastFill, theStopFunctor);
+				}
+			}
+		}
 	}
-	else if(timeSize % 3 == 1)
+	catch(NFmiStopThreadException & /* stopException */ )
 	{
-		theTimeStart1 = 0;
-		theTimeStart2 = partSize;
-		theTimeStart3 = partSize*2; // viimeinen threadi saa tehd‰ yhden ylim‰‰r‰isen aika-askeleen
+		// lopetetaan sitten kun on niin haluttu
+		if(fDoCerrReporting)
+			std::cerr << "thread nro: " << index << " stops because it was told to do so." << std::endl;
 	}
-	else if(timeSize % 3 == 2)
+	catch(std::exception &e)
 	{
-		theTimeStart1 = 0;
-		theTimeStart2 = partSize; // toinen threadi saa tehd‰ yhden ylim‰‰r‰isen aika-askeleen
-		theTimeStart3 = partSize*2+1; // viimeinen threadi saa tehd‰ yhden ylim‰‰r‰isen aika-askeleen
+		// lopetetaan muutenkin, jos tulee poikkeus
+		if(fDoCerrReporting)
+			std::cerr << "thread nro: " << index << " stops because exception was thrown:\n" << e.what() << std::endl;
 	}
+	catch(...)
+	{
+		// lopetetaan muutenkin, jos tulee poikkeus
+		if(fDoCerrReporting)
+			std::cerr << "thread nro: " << index << " stops because unknown error." << std::endl;
+	}
+	if(fDoCerrReporting)
+		std::cerr << "thread nro: " << index << " end here."<< std::endl;
 }
-#endif
+
 
 // Jos useFastFill on true, on datoilla sama hila ja aika descriptor rakenne
-void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread)
+// theMaxThreadCount -parametrilla voidaan rajoittaa k‰ytett‰vien threadien m‰‰r‰‰. Jos sen arvo on <=0, 
+// ei rajoitusta ole ja k‰ytet‰‰n koneen kaikkia coreja (paitsi jos fUseOnlyOneThread = true, jolloin 
+// k‰ytet‰‰n vain yht‰ threadia).
+void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread, int theMaxThreadCount)
 {
 	NFmiSoundingFunctions::CalcDP(1, 56); // t‰m‰ funktio pit‰‰ varmistaa ett‰ se on alustettu, koska siell‰ on pari staattista muuttujaa, jotka 
 											// alustetaan ensimm‰isell‰ kerralla ja multi-threaddaavassa jutussa se voisi olla ongelma.
 
-	// Jaetaan laskut kolmeen osaan ja laitetaan ne laskettavaksi kolmeen eri threadiin.
-	// Jako menee aika indeksien mukaisella jaolla.
-	// Jokaiselle threadille annetaan omat kopiot fastInfo iteraattoreista.
-	// Paitsi jos aikoja datoissa on alle 3 kpl
-	// Lis‰ksi threadit k‰ynnistet‰‰n alle normaalin prioriteetin, ett‰ kone ei tukahdu kun n‰it‰ k‰ynnistet‰‰n.
-
 #ifdef UNIX
-		fUseOnlyOneThread = true; // kolmeen osaan jaettu datan rakennus ei toimi jostain syyst‰ linux puolella
+	fUseOnlyOneThread = true; // kolmeen osaan jaettu datan rakennus ei toimi jostain syyst‰ linux puolella
 #endif
 
 	unsigned long timeSize = theResultData.Info()->SizeTimes();
-	if(fUseOnlyOneThread || timeSize < 3)
-	{ // jos aikoja oli alle kolme, lasketaan data yhdess‰ funktiossa
+	unsigned int usedThreadCount = boost::thread::hardware_concurrency();
+	if(usedThreadCount > timeSize)
+		usedThreadCount = timeSize;
+	if(theMaxThreadCount > 0 && usedThreadCount > static_cast<unsigned int>(theMaxThreadCount))
+		usedThreadCount = static_cast<unsigned int>(theMaxThreadCount); // jos on haluttu s‰‰t‰‰ maksim threadien m‰‰r‰‰, s‰‰det‰‰n maksimia jos usedThreadCount olisi muuten ylitt‰nyt sen.
+
+	if(fUseOnlyOneThread || usedThreadCount < 2)
+	{ // jos aikoja oli alle kaksi, lasketaan data yhdess‰ funktiossa
 		if(fDoCerrReporting)
 			std::cerr << "making data in single thread" << std::endl;
 		boost::shared_ptr<NFmiFastQueryInfo> sourceInfo(new NFmiFastQueryInfo(&theSourceData));
@@ -246,39 +269,26 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 	else
 	{
 		if(fDoCerrReporting)
-			std::cerr << "making data in three threads" << std::endl;
-		unsigned long timeStart1 = 0;
-		unsigned long timeStart2 = 0;
-		unsigned long timeStart3 = 0;
-		// jaetaan aika indeksi kolmeen osaa ja k‰ynnistet‰‰n kolme worker threadia, jotka laskevat eri osia datasta
-		::CalcTimeIndexStartsForThreeThreads(timeSize, timeStart1, timeStart2, timeStart3);
-		unsigned long timeEnd1 = timeStart2 - 1;
-		unsigned long timeEnd2 = timeStart3 - 1;
-		unsigned long timeEnd3 = timeSize - 1;
+			std::cerr << "making data in multiple threads" << std::endl;
 
-		boost::shared_ptr<NFmiFastQueryInfo> sourceInfo1(new NFmiFastQueryInfo(&theSourceData));
-		boost::shared_ptr<NFmiFastQueryInfo> resultInfo1(new NFmiFastQueryInfo(&theResultData));
-		boost::shared_ptr<NFmiFastQueryInfo> sourceInfo2(new NFmiFastQueryInfo(&theSourceData));
-		boost::shared_ptr<NFmiFastQueryInfo> resultInfo2(new NFmiFastQueryInfo(&theResultData));
-		boost::shared_ptr<NFmiFastQueryInfo> sourceInfo3(new NFmiFastQueryInfo(&theSourceData));
-		boost::shared_ptr<NFmiFastQueryInfo> resultInfo3(new NFmiFastQueryInfo(&theResultData));
+		theSourceData.LatLonCache(); // Ennen multi-thread laskuja pit‰‰ varmistaa ett‰ kunkin datan (source + result) latlon-cache on alustettu, muutern tulee ongelmia.
+		theResultData.LatLonCache();
 
-		// HUOM! multi threaddauksessa otettava huomioon!!!!
-		// NFmiQueryData-luokassa on itsLatLonCache, joka on samalla k‰ytˆss‰ kaikilla
-		// erillisill‰ Info-iteraattoreilla. T‰m‰ on ns. lazy-init dataa, joka initialisoidaan kerran
-		// tarvittaessa. Nyt samoihin datoihin tehd‰‰n kolme info-iteraattoria ja t‰ss‰ kutsumalla yhdelle niist‰
-		// LatLon-metodia, varmistetaan ett‰ itsLatLonCache on initialisoitu, ennen kuin menn‰‰n
-		// suorittamaan kolmea threadia yht‰aikaa. T‰m‰ oli kaato bugi, kun kolme thtreadia kutsui Latlon:ia
-		// ja cache-data ei oltu viel‰ initialisoitu, jolloin sit‰ initialisoitiin kolme kertaa p‰‰llekk‰in. 
-		// Ongelma oli varsinkin isommille datoille (esim. mbe), joille kyseisen cachen rakentaminen kest‰‰ kauemmin.
-		NFmiPoint dummyPoint = resultInfo3->LatLon(); // Varmistetaan ett‰ NFmiQueryDatan itsLatLonCache on alustettu!!
-		dummyPoint = sourceInfo3->LatLon(); // Varmistetaan ett‰ NFmiQueryDatan itsLatLonCache on alustettu!!
+		// pakko luoda dynaamisesti eri threadeille tarvittavat kopiot source ja target datoista
+		std::vector<boost::shared_ptr<NFmiFastQueryInfo> > resultInfos(usedThreadCount);
+		std::vector<boost::shared_ptr<NFmiFastQueryInfo> > sourceInfos(usedThreadCount);
+		for(unsigned int i = 0; i < usedThreadCount; i++)
+		{
+			resultInfos[i] = boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(&theResultData));
+			sourceInfos[i] = boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(&theSourceData));
+		}
 
+		NFmiTimeIndexCalculator timeIndexCalculator(0, timeSize-1);
 		boost::thread_group calcParts;
-		calcParts.add_thread(new boost::thread(::CalculatePartOfSoundingData, sourceInfo3, resultInfo3, timeStart3, timeEnd3, useFastFill, theStopFunctor, 3, fDoCerrReporting));
-		calcParts.add_thread(new boost::thread(::CalculatePartOfSoundingData, sourceInfo2, resultInfo2, timeStart2, timeEnd2, useFastFill, theStopFunctor, 2, fDoCerrReporting));
-		calcParts.add_thread(new boost::thread(::CalculatePartOfSoundingData, sourceInfo1, resultInfo1, timeStart1, timeEnd1, useFastFill, theStopFunctor, 1, fDoCerrReporting));
+		for(unsigned int i = 0; i < usedThreadCount; i++)
+			calcParts.add_thread(new boost::thread(::CalculateSoundingDataOneTimeStepAtTime, sourceInfos[i], resultInfos[i], boost::ref(timeIndexCalculator), useFastFill, theStopFunctor, i+1, fDoCerrReporting));
 		calcParts.join_all(); // odotetaan ett‰ threadit lopettavat
+
 		if(fDoCerrReporting)
 			std::cerr << "all threads ended" << std::endl;
 	}
@@ -718,7 +728,7 @@ static NFmiQueryInfo MakeSoundingIndexInfo(NFmiQueryData &theSourceData, const s
 	return info;
 }
 
-boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread)
+boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread, int theMaxThreadCount)
 {
 	// 1. lue uusin pohjadata k‰yttˆˆn
 	boost::shared_ptr<NFmiQueryData> sourceData(NFmiQueryDataUtil::ReadNewestData(theSourceFileFilter));
@@ -737,7 +747,7 @@ boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingI
 	if(data == 0)
 		throw std::runtime_error("Error in CreateNewSoundingIndexData, could not create result data.");
 	// 4. t‰yt‰ qdata
-	NFmiSoundingIndexCalculator::CalculateWholeSoundingData(*sourceData.get(), *data.get(), true, fDoCerrReporting, theStopFunctor, fUseOnlyOneThread);
+	NFmiSoundingIndexCalculator::CalculateWholeSoundingData(*sourceData.get(), *data.get(), true, fDoCerrReporting, theStopFunctor, fUseOnlyOneThread, theMaxThreadCount);
 
 	return data;
 }

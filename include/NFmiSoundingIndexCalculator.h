@@ -102,8 +102,8 @@ public:
 	static float Calc(NFmiSoundingData &theSoundingData, FmiSoundingParameters theParam);
 	static float CalcOpt1(NFmiSoundingDataOpt1 &theSoundingDataOpt1, FmiSoundingParameters theParam);
 	static float Calc(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiPoint &theLatlon, const NFmiMetTime &theTime, FmiSoundingParameters theParam);
-	static void CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor = 0, bool fUseOnlyOneThread = true);
-	static boost::shared_ptr<NFmiQueryData> CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor = 0, bool fUseOnlyOneThread = true);
+	static void CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor = 0, bool fUseOnlyOneThread = true, int theMaxThreadCount = 0);
+	static boost::shared_ptr<NFmiQueryData> CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor = 0, bool fUseOnlyOneThread = true, int theMaxThreadCount = 0);
 };
 
 #endif // NFMISOUNDINGINDEXCALCULATOR_H
