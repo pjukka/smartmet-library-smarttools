@@ -29,6 +29,16 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	return ModifyData(theMacroText, theModifiedData, &times, theHelperDataFileNames, createDrawParamFileIfNotExist, goThroughLevels, fMakeStaticIfOneTimeStepData);
 }
 
+static void DoSmartToolModification(NFmiSmartToolModifier &theSmartToolModifier, NFmiTimeDescriptor *theTimes)
+{
+#ifdef UNIX
+	theSmartToolModifier.ModifyData(theTimes, false, false, 0); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
+#else // windows
+	// winkkarissa kutsutaan laskennan multi-thread versiota
+	theSmartToolModifier.ModifyData_ver2(theTimes, false, false, 0); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
+#endif
+}
+
 NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool goThroughLevels, bool fMakeStaticIfOneTimeStepData)
 {
 	NFmiInfoOrganizer dataBase;
@@ -54,11 +64,11 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	try // suoritetaan macro sitten
 	{
 		if(goThroughLevels == false)
-			smartToolModifier.ModifyData(theTimes, false, false, 0); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
+			::DoSmartToolModification(smartToolModifier, theTimes);
 		else
 		{
 			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
-				smartToolModifier.ModifyData(theTimes, false, false, 0); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
+				::DoSmartToolModification(smartToolModifier, theTimes);
 		}
 	}
 	catch(std::exception &e)
@@ -108,6 +118,7 @@ bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryDa
 		theDataBase->Init(std::string(""), createDrawParamFileIfNotExist, false, false); // tähän annetaan drawparametrien lataus polku, mutta niitä ei käytetä tässä tapauksessa
 																		// false tarkoittaa että ei tehdä kopiota editoidusta datasta, tässä se on turhaa
 		bool dataWasDeleted = false;
+		theModifiedData->LatLonCache(); // lasketaan latlon-cache valmiiksi, koska muuten multi-thread ympäristössä tulee sen kanssa ongelmia
 		theDataBase->AddData(theModifiedData, "xxxfileName", "", NFmiInfoData::kEditable, 0, 0, 0, dataWasDeleted); // 0=undolevel
 		if(theHelperDataFileNames && theHelperDataFileNames->size())
 			InitDataBaseHelperData(*theDataBase, *theHelperDataFileNames, fMakeStaticIfOneTimeStepData);
@@ -129,6 +140,7 @@ bool NFmiSmartToolUtil::InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, c
 				if(fMakeStaticIfOneTimeStepData || sQData.QueryData()->Info()->Param(kFmiTopoGraf))
 					dataType = NFmiInfoData::kStationary;
 			}
+			sQData.QueryData()->LatLonCache(); // lasketaan latlon-cache valmiiksi, koska muuten multi-thread ympäristössä tulee sen kanssa ongelmia
 			bool dataWasDeleted = false;
 			theDataBase.AddData(sQData.QueryData(true), theHelperDataFileNames[i], "", dataType, 0, 0, 0, dataWasDeleted); // 0=undolevel
 		}
