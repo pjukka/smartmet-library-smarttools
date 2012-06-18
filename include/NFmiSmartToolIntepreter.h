@@ -233,7 +233,7 @@ private:
 	static FunctionMap itsTokenFunctions;
 	static FunctionMap itsTokenThreeArgumentFunctions;
 
-	typedef boost::tuple<NFmiAreaMask::FunctionType, int, std::string> MetFunctionMapValue; // MetFunktioihin talletetaan 'taika'-sanan lis‰ksi Funktio tyyppi ja 
+	typedef boost::tuple<NFmiAreaMask::FunctionType, NFmiAreaMask::MetFunctionDirection, int, std::string> MetFunctionMapValue; // MetFunktioihin talletetaan 'taika'-sanan lis‰ksi Funktio tyyppi ja 
 																							// funktion argumenttien lukum‰‰r‰ ja funktion oikea 'muoto' stringin‰, 
 																							// joka pit‰‰ sis‰ll‰‰n esim. grad-funktion tapauksessa "grad(param)"
 	typedef std::map<std::string, MetFunctionMapValue> MetFunctionMap; // 'Meteorologiset' funktiot. N‰ill‰ funktioilla k‰sitell‰‰n queryData-olioita eli pyydet‰‰n erilaisia 

@@ -48,6 +48,8 @@ public:
 	void SetFunctionType(NFmiAreaMask::FunctionType newType){itsFunctionType = newType;}
 	NFmiAreaMask::FunctionType GetSecondaryFunctionType(void)const {return itsSecondaryFunctionType;}
 	void SetSecondaryFunctionType(NFmiAreaMask::FunctionType newType){itsSecondaryFunctionType = newType;}
+	NFmiAreaMask::MetFunctionDirection MetFunctionDirection(void) const {return itsMetFunctionDirection;}
+	void MetFunctionDirection(NFmiAreaMask::MetFunctionDirection newValue) {itsMetFunctionDirection = newValue;}
 	const NFmiPoint& GetOffsetPoint1(void) const{return itsOffsetPoint1;}
 	void SetOffsetPoint1(const NFmiPoint& newValue){itsOffsetPoint1 = newValue;}
 	const NFmiPoint& GetOffsetPoint2(void) const{return itsOffsetPoint2;}
@@ -76,6 +78,7 @@ private:
 	std::string itsOrigLineText; // originaali koko rivin teksti, mist‰ t‰m‰ currentti sana (itsMaskText) on otettu (t‰t‰ k‰ytet‰‰n virhe teksteiss‰)
 	NFmiAreaMask::FunctionType itsFunctionType; // onko mahd. funktio esim. min, max jne. (ei matemaattisia funktioita kuten sin, cos, pow, jne.)
 	NFmiAreaMask::FunctionType itsSecondaryFunctionType; // T‰h‰n laitetaan mm. vertikaali funktioissa k‰ytetty korkeus tyyppi esim. VertP tai VertZ
+	NFmiAreaMask::MetFunctionDirection itsMetFunctionDirection; // grad, adv, div rot ja lap -funktioille (ja n‰iden 2-versioille) m‰‰r‰t‰‰n myˆs suunta, joka voi olla X, Y tai molemmat
 	NFmiPoint itsOffsetPoint1; // esim. aikaoffset (x alku ja y loppu) tai paikkaoffset (alku x ja y offset)
 	NFmiPoint itsOffsetPoint2; // paikkaoffset (loppu x ja y offset)
 	NFmiAreaMask::MathFunctionType itsMathFunctionType;

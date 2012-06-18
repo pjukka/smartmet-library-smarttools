@@ -1750,7 +1750,7 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 	{
 		string tmp;
 		checkedVector<pair<string, types> > tokens;
-		int argumentCount = (*it).second.get<1>(); // näin monta argumenttia on odotettavissa tälle funktio tyypille 
+		int argumentCount = (*it).second.get<2>(); // näin monta argumenttia on odotettavissa tälle funktio tyypille 
 		int tokenCount = argumentCount + (argumentCount-1) + 2; // ja siinä on argumentCount-1 pilkkua välissä!  + 2 on alku ja loppu sulut
 		for(int i=0; i < tokenCount && GetToken(); i++)
 		{
@@ -1777,6 +1777,7 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 				{
 					theMaskInfo->SetOperationType(NFmiAreaMask::MetFunction);
 					theMaskInfo->SetFunctionType((*it).second.get<0>());
+					theMaskInfo->MetFunctionDirection((*it).second.get<1>());
 					return true;
 				}
 			}
@@ -1793,7 +1794,7 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 			errorStr += "\n";
 			errorStr += ::GetDictionaryString("Proper form for this function is");
 			errorStr += ": ";
-			errorStr += (*it).second.get<2>();
+			errorStr += (*it).second.get<3>();
 			throw std::runtime_error(errorStr);
 		}
 	}
@@ -2317,17 +2318,41 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxh"), NFmiAreaMask::Max));
 		itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("minh"), NFmiAreaMask::Min));
 
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad"), MetFunctionMapValue(NFmiAreaMask::Grad, 1, "grad(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div"), MetFunctionMapValue(NFmiAreaMask::Divergence, 1, "div(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, 1, "adv(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, 1, "lap(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, 1, "rot(wind)"))); // roottori ottaa totalwind:in parametrina, siitä saadaan tuulen u- ja v-komponentit
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad"), MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionXandY, 1, "grad(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div"), MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionXandY, 1, "div(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionXandY, 1, "adv(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, NFmiAreaMask::DirectionXandY, 1, "lap(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, NFmiAreaMask::DirectionXandY, 1, "rot(wind)"))); // roottori ottaa totalwind:in parametrina, siitä saadaan tuulen u- ja v-komponentit
 
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad2"), MetFunctionMapValue(NFmiAreaMask::Grad2, 1, "grad2(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div2"), MetFunctionMapValue(NFmiAreaMask::Divergence2, 1, "div2(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv2"), MetFunctionMapValue(NFmiAreaMask::Adv2, 1, "adv2(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap2"), MetFunctionMapValue(NFmiAreaMask::Lap2, 1, "lap2(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2"), MetFunctionMapValue(NFmiAreaMask::Rot2, 1, "rot2(wind)"))); // roottori ottaa totalwind:in parametrina, siitä saadaan tuulen u- ja v-komponentit
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("gradx"), MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionX, 1, "gradx(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("divx"), MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionX, 1, "divx(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("advx"), MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionX, 1, "advx(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lapx"), MetFunctionMapValue(NFmiAreaMask::Lap, NFmiAreaMask::DirectionX, 1, "lapx(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rotx"), MetFunctionMapValue(NFmiAreaMask::Rot, NFmiAreaMask::DirectionX, 1, "rotx(wind)"))); // roottori ottaa totalwind:in parametrina, siitä saadaan tuulen u- ja v-komponentit
+
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grady"), MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionY, 1, "grady(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("divy"), MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionY, 1, "divy(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("advy"), MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionY, 1, "advy(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lapy"), MetFunctionMapValue(NFmiAreaMask::Lap, NFmiAreaMask::DirectionY, 1, "lapy(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("roty"), MetFunctionMapValue(NFmiAreaMask::Rot, NFmiAreaMask::DirectionY, 1, "roty(wind)"))); // roottori ottaa totalwind:in parametrina, siitä saadaan tuulen u- ja v-komponentit
+
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad2"), MetFunctionMapValue(NFmiAreaMask::Grad2, NFmiAreaMask::DirectionXandY, 1, "grad2(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div2"), MetFunctionMapValue(NFmiAreaMask::Divergence2, NFmiAreaMask::DirectionXandY, 1, "div2(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv2"), MetFunctionMapValue(NFmiAreaMask::Adv2, NFmiAreaMask::DirectionXandY, 1, "adv2(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap2"), MetFunctionMapValue(NFmiAreaMask::Lap2, NFmiAreaMask::DirectionXandY, 1, "lap2(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2"), MetFunctionMapValue(NFmiAreaMask::Rot2, NFmiAreaMask::DirectionXandY, 1, "rot2(wind)"))); // roottori ottaa totalwind:in parametrina, siitä saadaan tuulen u- ja v-komponentit
+
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad2x"), MetFunctionMapValue(NFmiAreaMask::Grad2, NFmiAreaMask::DirectionX, 1, "grad2x(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div2x"), MetFunctionMapValue(NFmiAreaMask::Divergence2, NFmiAreaMask::DirectionX, 1, "div2x(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv2x"), MetFunctionMapValue(NFmiAreaMask::Adv2, NFmiAreaMask::DirectionX, 1, "adv2x(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap2x"), MetFunctionMapValue(NFmiAreaMask::Lap2, NFmiAreaMask::DirectionX, 1, "lap2x(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2x"), MetFunctionMapValue(NFmiAreaMask::Rot2, NFmiAreaMask::DirectionX, 1, "rot2x(wind)"))); // roottori ottaa totalwind:in parametrina, siitä saadaan tuulen u- ja v-komponentit
+
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad2y"), MetFunctionMapValue(NFmiAreaMask::Grad2, NFmiAreaMask::DirectionY, 1, "grad2y(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div2y"), MetFunctionMapValue(NFmiAreaMask::Divergence2, NFmiAreaMask::DirectionY, 1, "div2y(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv2y"), MetFunctionMapValue(NFmiAreaMask::Adv2, NFmiAreaMask::DirectionY, 1, "adv2y(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap2y"), MetFunctionMapValue(NFmiAreaMask::Lap2, NFmiAreaMask::DirectionY, 1, "lap2y(param)")));
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2y"), MetFunctionMapValue(NFmiAreaMask::Rot2, NFmiAreaMask::DirectionY, 1, "rot2y(wind)"))); // roottori ottaa totalwind:in parametrina, siitä saadaan tuulen u- ja v-komponentit
 
 		// tässä on vertikaaliset-funktiot
 		// vertp-funktiot eli näitä operoidaan aina painepinnoilla [hPa]
