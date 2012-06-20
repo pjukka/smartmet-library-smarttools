@@ -1540,6 +1540,7 @@ public:
 	,itsLFC(kFloatMissing)
 	,itsEL(kFloatMissing)
 	,itsSizePoints()
+	,fLFConWarmerSide(false)
 	{
 	}
 
@@ -1569,6 +1570,8 @@ public:
 	double CapeAreaSize(void) const {return itsCapeAreaSize;}
 	double LFC(void) const {return itsLFC;}
 	double EL(void) const {return itsEL;}
+	bool LFConWarmerSide(void) const {return fLFConWarmerSide;}
+	void LFConWarmerSide(bool newValue) {fLFConWarmerSide = newValue;}
 
 private:
 	void CalcCapeAreaSize(void)
@@ -1607,6 +1610,7 @@ private:
 	double itsLFC;
 	double itsEL;
 	std::vector<MyPoint> itsSizePoints; // tähän talletetaan cape-alueen positiivinen lämpötilaerotus ja paine-taso. Näiden pisteiden avulla voidaan laskea suuntaa antava cape-alueen koko
+	bool fLFConWarmerSide; // onko LCL luotauksen lämpimämmällä puolella, jos on, tulee LFC:ksi LCL ja tämä alue kelpaa LFC+EL arvoihin
 };
 
 typedef std::vector<CapeAreaLfcData> LFCSearchDataVec;
@@ -1629,9 +1633,10 @@ static void GetLFCandELValues(LFCSearchDataVec &theLFCDataVecIn, double LCLin, d
 	if(theLFCDataVecIn.size())
 	{
 		// käydään loopissa läpi CAPE-alueita ja katsotaan löytyykö cape-aluetta, jossa LFC on LCL:n ylä puolella, ja otetaan 1. sellainen käyttöön
+		// TAI jos LCL-piste on ollut lämpimämmällä puolella, laitetaan LFC:ksi LCL ja EL:ksi poistumis piste
 		for(size_t i = 0; i < theLFCDataVecIn.size(); i++)
 		{
-			if(LCLin >= theLFCDataVecIn[i].LFC())
+			if(LCLin >= theLFCDataVecIn[i].LFC() || theLFCDataVecIn[i].LFConWarmerSide())
 			{ 
 				LFCout = theLFCDataVecIn[i].LFC();
 				ELout = theLFCDataVecIn[i].EL();
@@ -1639,6 +1644,8 @@ static void GetLFCandELValues(LFCSearchDataVec &theLFCDataVecIn, double LCLin, d
 			}
 		}
 	}
+	if(LFCout != kFloatMissing && LFCout > LCLin) // jos löytyi LFC, mutta sen arvo on alempana kuin LCL, laitetaan  LFC:n arvoksi LCL
+		LFCout = LCLin;
 }
 
 // LFC ja EL lasketaan seuraavasti:
@@ -1680,6 +1687,7 @@ double NFmiSoundingDataOpt1::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double 
 	double Diff_current = kFloatMissing; // nostetun paketin ja ympäröivän ilman lämpötila erotus
 	double Diff_previous = kFloatMissing;
 	bool lclPointProcessed = false;
+	bool processingLCLpoint = false;
 	bool firstLevel = true;
 	CapeAreaLfcData capeAreaData; // tähän kerätään currentin cape-alueen data
 	LFCSearchDataVec capeAreaDataVec; // tähän kerätään kaikkien cape-alueiden datat sortattuna niin että suurin on ensimmäisenä
@@ -1699,12 +1707,15 @@ double NFmiSoundingDataOpt1::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double 
 					P_current = LCL;
 					T_current = GetValueAtPressure(kFmiTemperature, static_cast<float>(LCL));
 					i--; // pitää laittaa indekse pykälää alemmaksi, että LCL-pisteen jälkeiset laskut menevät oikein
+					processingLCLpoint = true;
 				}
 
 				// 6. Laske nostetun ilmapaketin lämpötila
 				TLifted_current = CalcTOfLiftedAirParcel(T, Td, P, P_current);
 				// 7. Laske nostetun ilmapaketin ja ympäröivän ilman lämpötila erotus
 				Diff_current = TLifted_current - T_current;
+				if(processingLCLpoint && Diff_current > 0)
+					capeAreaData.LFConWarmerSide(true);
 
 				if(firstLevel && Diff_current > 0)
 				{ // Jos on heti 'pinta' CAPE alue, sille pitää tehdä erillinen hanskaus
@@ -1734,6 +1745,7 @@ double NFmiSoundingDataOpt1::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double 
 				TLifted_previous = TLifted_current;
 				Diff_previous = Diff_current;
 				firstLevel = false; 
+				processingLCLpoint = false;
 		}
 	}
 
