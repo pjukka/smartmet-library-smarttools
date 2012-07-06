@@ -10,7 +10,7 @@
 #include <NFmiAngle.h>
 #include <NFmiDataModifierAvg.h>
 #include <NFmiFastQueryInfo.h>
-#include <NFmiInterpolation.h<
+#include <NFmiInterpolation.h>
 #include <NFmiSoundingData.h>
 #include <NFmiSoundingFunctions.h>
 #include <NFmiValueString.h>
