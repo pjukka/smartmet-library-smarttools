@@ -4,15 +4,16 @@
 // namespacessa on muutamia helper funktioita ja 'ylim‰‰r‰isen' datan talletus luokka.
 //---------------------------------------------------------- NFmiDataStoringHelpers.h
 
-#ifndef __NFMIDATASTORINGHELPERS_H__
-#define __NFMIDATASTORINGHELPERS_H__
+#ifndef NFMIDATASTORINGHELPERS_H
+#define NFMIDATASTORINGHELPERS_H
+
+#include <NFmiString.h>
+#include <NFmiStringTools.h>
+#include <NFmiTimeBag.h>
 
 #include <iterator>
 #include <vector>
 #include <string>
-#include "NFmiString.h"
-#include "NFmiStringTools.h"
-#include "NFmiTimeBag.h"
 
 
 namespace NFmiDataStoringHelpers
@@ -108,4 +109,4 @@ namespace NFmiDataStoringHelpers
 inline std::ostream& operator<<(std::ostream& os, const NFmiDataStoringHelpers::NFmiExtraDataStorage& item){item.Write(os); return os;}
 inline std::istream& operator>>(std::istream& is, NFmiDataStoringHelpers::NFmiExtraDataStorage& item){item.Read(is); return is;}
 
-#endif//__NFMIDATASTORINGHELPERS_H__
+#endif // NFMIDATASTORINGHELPERS_H

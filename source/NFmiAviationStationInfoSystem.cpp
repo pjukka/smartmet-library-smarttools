@@ -7,8 +7,8 @@
 
 
 #include "NFmiAviationStationInfoSystem.h"
-#include "NFmiFileSystem.h"
-#include "NFmiStringTools.h"
+#include <NFmiFileSystem.h>
+#include <NFmiStringTools.h>
 
 #include <sstream>
 #include <vector>

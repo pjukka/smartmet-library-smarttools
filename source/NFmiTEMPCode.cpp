@@ -1,15 +1,15 @@
 
-#include "NFmiTEMPCode.h"
-#include "NFmiStringTools.h"
-#include "NFmiFastQueryInfo.h"
-#include "NFmiQueryDataUtil.h"
-#include "NFmiTimeList.h"
-#include "NFmiLocationBag.h"
-#include "NFmiTotalWind.h"
-#include "NFmiDictionaryFunction.h"
 #include "NFmiAviationStationInfoSystem.h"
-#include <sstream>
+#include "NFmiDictionaryFunction.h"
+#include "NFmiTEMPCode.h"
+#include <NFmiFastQueryInfo.h>
+#include <NFmiLocationBag.h>
+#include <NFmiQueryDataUtil.h>
+#include <NFmiStringTools.h>
+#include <NFmiTimeList.h>
+#include <NFmiTotalWind.h>
 #include <set>
+#include <sstream>
 
 NFmiTEMPCode::NFmiTEMPCode(void)
 :itsOriginalCodeAStr()

@@ -9,12 +9,12 @@
 // popup-valikoihin voidaan laittaa useampia tuottajia.
 //---------------------------------------------------------- NFmiProducerSystem.h
 
-#ifndef __NFMIPRODUCERSYSTEM_H__
-#define __NFMIPRODUCERSYSTEM_H__
+#ifndef NFMIPRODUCERSYSTEM_H
+#define NFMIPRODUCERSYSTEM_H
 
-#include "NFmiProducer.h"
-#include "NFmiProducerName.h"
-#include "NFmiInfoData.h"
+#include <NFmiProducer.h>
+#include <NFmiProducerName.h>
+#include <NFmiInfoData.h>
 #include <string>
 #include <vector>
 
@@ -112,4 +112,4 @@ struct NFmiProducerHelperInfo
 };
 
 
-#endif // __NFMIPRODUCERSYSTEM_H__
+#endif // NFMIPRODUCERSYSTEM_H

@@ -8,12 +8,12 @@
 #pragma warning(disable : 4786) // poistaa n kpl VC++ kääntäjän varoitusta (liian pitkä nimi >255 merkkiä joka johtuu 'puretuista' STL-template nimistä)
 #endif
 
-#include "NFmiSmartToolUtil.h"
 #include "NFmiInfoOrganizer.h"
-#include "NFmiFastQueryInfo.h"
 #include "NFmiSmartToolModifier.h"
-#include "NFmiQueryData.h"
-#include "NFmiStreamQueryData.h"
+#include "NFmiSmartToolUtil.h"
+#include <NFmiFastQueryInfo.h>
+#include <NFmiQueryData.h>
+#include <NFmiStreamQueryData.h>
 
 #include <stdexcept>
 #ifndef UNIX

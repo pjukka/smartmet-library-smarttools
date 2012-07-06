@@ -16,8 +16,8 @@
 #ifndef  NFMISMARTTOOLUTIL_H
 #define  NFMISMARTTOOLUTIL_H
 
+#include <NFmiDataMatrix.h>
 #include <string>
-#include "NFmiDataMatrix.h"
 
 class NFmiQueryData;
 class NFmiTimeDescriptor;

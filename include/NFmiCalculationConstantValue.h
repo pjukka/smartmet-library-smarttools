@@ -7,8 +7,8 @@
 // 
 //**********************************************************
 
-#include "NFmiAreaMaskImpl.h"
-#include "NFmiInfoAreaMask.h"
+#include <NFmiAreaMaskImpl.h>
+#include <NFmiInfoAreaMask.h>
 #include <boost/shared_ptr.hpp>
 
 class NFmiDataModifier;

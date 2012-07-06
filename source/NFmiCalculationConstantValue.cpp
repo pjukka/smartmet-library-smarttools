@@ -5,11 +5,12 @@
 //  Creation Date  : 9.11. 2010 
 // 
 //**********************************************************
+
 #include "NFmiCalculationConstantValue.h"
-#include "NFmiDataModifier.h"
-#include "NFmiDataIterator.h"
-#include "NFmiFastQueryInfo.h"
 #include "NFmiDrawParam.h"
+#include <NFmiDataModifier.h>
+#include <NFmiDataIterator.h>
+#include <NFmiFastQueryInfo.h>
 
 //--------------------------------------------------------
 // Constructor/Destructor 

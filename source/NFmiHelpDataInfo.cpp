@@ -5,11 +5,11 @@
 #endif
 
 #include "NFmiHelpDataInfo.h"
-#include "NFmiArea.h"
-#include "NFmiAreaFactory.h"
-#include "NFmiStereographicArea.h"
-#include "NFmiSettings.h"
-#include "NFmiFileString.h"
+#include <NFmiArea.h>
+#include <NFmiAreaFactory.h>
+#include <NFmiStereographicArea.h>
+#include <NFmiSettings.h>
+#include <NFmiFileString.h>
 
 using namespace std;
 

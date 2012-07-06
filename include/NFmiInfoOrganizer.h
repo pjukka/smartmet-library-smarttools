@@ -22,12 +22,12 @@
 // TODO: keksi parempi nimi tai muuta lopuksi NFmiInfoOrganizer-nimiseksi ja 
 // tuhoa alkuperäinen luokka.
 
-#include "NFmiPoint.h"
-#include "NFmiDataMatrix.h"
-#include "NFmiInfoData.h"
-#include "NFmiParamBag.h"
-#include "NFmiProducerName.h"
-#include "boost/shared_ptr.hpp"
+#include <NFmiPoint.h>
+#include <NFmiDataMatrix.h>
+#include <NFmiInfoData.h>
+#include <NFmiParamBag.h>
+#include <NFmiProducerName.h>
+#include <boost/shared_ptr.hpp>
 #include <map>
 
 class NFmiSmartInfo;

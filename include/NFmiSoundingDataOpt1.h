@@ -10,10 +10,11 @@
 #ifndef NFMISOUNDINGDATAOPT1_H
 #define NFMISOUNDINGDATAOPT1_H
 
-#include "NFmiMetTime.h"
-#include "NFmiLocation.h"
-#include "NFmiParameterName.h"
 #include "NFmiSoundingData.h"
+
+#include <NFmiMetTime.h>
+#include <NFmiLocation.h>
+#include <NFmiParameterName.h>
 
 #include <deque>
 

@@ -1,7 +1,7 @@
 
 #include "NFmiSmartInfo.h"
-#include "NFmiQueryData.h"
 #include "NFmiModifiableQDatasBookKeeping.h"
+#include <NFmiQueryData.h>
 
 NFmiSmartInfo::NFmiSmartInfo(void)
 :NFmiOwnerInfo()

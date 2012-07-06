@@ -8,9 +8,9 @@
 //---------------------------------------------------------- NFmiWarningCenterSystem.h
 
 #include "NFmiProducerSystem.h"
-#include "NFmiSettings.h"
-#include "NFmiMetTime.h"
-#include "NFmiLevel.h"
+#include <NFmiSettings.h>
+#include <NFmiMetTime.h>
+#include <NFmiLevel.h>
 
 NFmiProducer NFmiProducerInfo::GetProducer(void)
 {
