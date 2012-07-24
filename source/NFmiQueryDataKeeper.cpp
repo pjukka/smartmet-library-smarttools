@@ -1,9 +1,9 @@
 
 #include "NFmiQueryDataKeeper.h"
 #include "NFmiSmartInfo.h"
-#include "NFmiFileSystem.h"
-#include "NFmiFileString.h"
-#include "NFmiQueryData.h"
+#include <NFmiFileSystem.h>
+#include <NFmiFileString.h>
+#include <NFmiQueryData.h>
 #include <fstream>
 
 #ifdef _MSC_VER

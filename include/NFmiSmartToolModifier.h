@@ -16,14 +16,13 @@
 // laskut suoritetaan.
 //**********************************************************
 
-#include "NFmiParamBag.h"
-#include "NFmiDataMatrix.h"
-#include "NFmiInfoData.h"
-#include "NFmiLevelType.h"
-#include "NFmiAreaMask.h"
-
-#include <string>
+#include <NFmiParamBag.h>
+#include <NFmiDataMatrix.h>
+#include <NFmiInfoData.h>
+#include <NFmiLevelType.h>
+#include <NFmiAreaMask.h>
 #include <boost/shared_ptr.hpp>
+#include <string>
 
 class NFmiInfoOrganizer;
 class NFmiSmartToolIntepreter;

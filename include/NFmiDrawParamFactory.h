@@ -27,8 +27,8 @@
 #ifndef  NFMIDRAWPARAMFACTORY_H
 #define  NFMIDRAWPARAMFACTORY_H
 
+#include <boost/shared_ptr.hpp>
 #include <string>
-#include "boost/shared_ptr.hpp"
 
 class NFmiDrawParam;
 class NFmiLevel;

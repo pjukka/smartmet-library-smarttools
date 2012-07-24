@@ -24,7 +24,8 @@
 #endif
 
 #include "NFmiAreaMaskInfo.h"
-#include "NFmiLevel.h"
+#include <NFmiLevel.h>
+
 //--------------------------------------------------------
 // Constructor/Destructor 
 //--------------------------------------------------------

@@ -15,9 +15,9 @@
 // operandeja (n kpl) ja operaatioita (n-1 kpl).
 //**********************************************************
 
-#include "NFmiDataMatrix.h"
+#include <NFmiDataMatrix.h>
+#include <boost/shared_ptr.hpp>
 #include <string>
-#include "boost/shared_ptr.hpp"
 
 class NFmiAreaMaskInfo;
 

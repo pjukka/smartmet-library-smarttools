@@ -7,17 +7,17 @@
  */
 // ======================================================================
 
-#include "NFmiSoundingIndexCalculator.h"
-#include "NFmiFastQueryInfo.h"
 #include "NFmiDrawParam.h"
-#include "NFmiGrid.h"
 #include "NFmiInfoOrganizer.h"
 #include "NFmiSoundingData.h"
 #include "NFmiSoundingDataOpt1.h"
 #include "NFmiSoundingFunctions.h"
-#include "NFmiValueString.h"
-#include "NFmiQueryData.h"
-#include "NFmiQueryDataUtil.h"
+#include "NFmiSoundingIndexCalculator.h"
+#include <NFmiFastQueryInfo.h>
+#include <NFmiGrid.h>
+#include <NFmiQueryData.h>
+#include <NFmiQueryDataUtil.h>
+#include <NFmiValueString.h>
 
 #ifndef BOOST_DISABLE_THREADS
 

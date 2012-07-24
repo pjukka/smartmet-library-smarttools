@@ -7,13 +7,13 @@
  */
 // ======================================================================
 
-#include "NFmiSoundingData.h"
-#include "NFmiFastQueryInfo.h"
-#include "NFmiDataModifierAvg.h"
-#include "NFmiInterpolation.h"
-#include "NFmiSoundingFunctions.h"
-#include "NFmiAngle.h"
-#include "NFmiValueString.h"
+#include <NFmiAngle.h>
+#include <NFmiDataModifierAvg.h>
+#include <NFmiFastQueryInfo.h>
+#include <NFmiInterpolation.h>
+#include <NFmiSoundingData.h>
+#include <NFmiSoundingFunctions.h>
+#include <NFmiValueString.h>
 
 using namespace NFmiSoundingFunctions;
 

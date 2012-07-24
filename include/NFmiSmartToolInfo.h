@@ -8,8 +8,8 @@
  *
  */
 
+#include <NFmiDataMatrix.h>
 #include <string>
-#include "NFmiDataMatrix.h"
 
 class NFmiSmartToolInfo
 {

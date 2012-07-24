@@ -7,13 +7,13 @@
 // NFmiHelpDataInfoSystem-luokka taas pit‰‰ sis‰ll‰‰n kaikki Metkun editorin 
 // k‰ytt‰m‰t apudatat.
 
-#ifndef __NFMIHELPDATAINFO_H__
-#define __NFMIHELPDATAINFO_H__
+#ifndef NFMIHELPDATAINFO_H
+#define NFMIHELPDATAINFO_H
 
-#include "NFmiInfoData.h"
-#include "NFmiDataIdent.h"
-#include "NFmiDataMatrix.h" // t‰‰lt‰ tulee checkedVector
-#include "NFmiProducerName.h" // t‰‰lt‰ tulee checkedVector
+#include <NFmiInfoData.h>
+#include <NFmiDataIdent.h>
+#include <NFmiDataMatrix.h>
+#include <NFmiProducerName.h>
 
 #include <iosfwd>
 #include <string>
@@ -213,4 +213,4 @@ private:
 	std::string itsBaseNameSpace;
 };
 
-#endif // __NFMIHELPDATAINFO_H__
+#endif // NFMIHELPDATAINFO_H

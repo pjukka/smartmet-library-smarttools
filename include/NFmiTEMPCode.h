@@ -2,11 +2,12 @@
 #ifndef NFMITEMPCODE_H
 #define NFMITEMPCODE_H
 
+#include <NFmiMetTime.h>
+#include <NFmiStation.h>
+
 #include <string>
 #include <vector>
 #include <map>
-#include "NFmiMetTime.h"
-#include "NFmiStation.h"
 
 class NFmiQueryData;
 class NFmiAviationStationInfoSystem;

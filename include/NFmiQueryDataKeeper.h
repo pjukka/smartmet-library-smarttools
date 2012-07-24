@@ -1,11 +1,12 @@
-#pragma once
+#ifndef NFMIQUERYDATAKEEPER_H
+#define NFMIQUERYDATAKEEPER_H
 
 
-#include "NFmiMilliSecondTimer.h"
-#include "NFmiDataMatrix.h"
-#include "NFmiMetTime.h"
-#include "NFmiInfoData.h"
-#include "boost/shared_ptr.hpp"
+#include <NFmiMilliSecondTimer.h>
+#include <NFmiDataMatrix.h>
+#include <NFmiMetTime.h>
+#include <NFmiInfoData.h>
+#include <boost/shared_ptr.hpp>
 #include <list>
 #include <set>
 
@@ -103,3 +104,5 @@ private:
 	NFmiInfoData::Type itsDataType; // tähän laitetaan 1. datan datattyyppi (pitäisi olla yhtenäinen kaikille setissä oleville datoille)
 	int itsKeepInMemoryTime; // kuinka kauan pidetään data muistissa, jos sitä ei ole käytetty. yksikkö on minuutteja
 };
+
+#endif // NFMIQUERYDATAKEEPER_H

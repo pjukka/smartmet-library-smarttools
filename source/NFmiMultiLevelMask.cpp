@@ -33,10 +33,10 @@
 // 
 //**********************************************************
 #include "NFmiMultiLevelMask.h"
-#include "NFmiRect.h"
 #include "NFmiMetEditorTypes.h"
+#include <NFmiRect.h>
+#include <cassert>
 
-#include <assert.h>
 //--------------------------------------------------------
 // Constructor/Destructor 
 //--------------------------------------------------------

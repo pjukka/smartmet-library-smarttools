@@ -2,7 +2,7 @@
 # SConstruct for building smarttools
 #
 # Usage:
-#       scons [-j 4] [-Q] [debug=1|profile=1] [objdir=<path>] smartmet_smarttools[-mt].a|lib
+#       scons [-j 4] [-Q] [debug=1|profile=1] [objdir=<path>] smartmet_smarttools.a|lib
 #
 # Notes:
 #       The three variants share the same output and object file names;
@@ -19,7 +19,7 @@
 import os.path
 
 Help(""" 
-    Usage: scons [-j 4] [-Q] [debug=1|profile=1] [objdir=<path>] [prefix=<path>] smartmet_smarttools[-mt].a|lib
+    Usage: scons [-j 4] [-Q] [debug=1|profile=1] [objdir=<path>] [prefix=<path>] smartmet_smarttools.a|lib
     
     Or just use 'make release|debug|profile', which point right back to us.
 """) 
@@ -56,6 +56,7 @@ else:
     env.Append( CXXFLAGS= [
         # MAINFLAGS from orig. Makefile ('-fPIC' is automatically added by SCons)
         #
+        "-fPIC", 
         "-Wall", 
         "-Wno-unused-parameter",
 #       "-Wno-variadic-macros",
@@ -82,9 +83,9 @@ if WINDOWS:
     env.Append( CPPPATH= [ BOOST_INSTALL_PATH ] )
     env.Append( LIBPATH= [ BOOST_INSTALL_PATH + "/lib" ] )
     if DEBUG:
-        BOOST_POSTFIX= "-vc90-mt-gd-1_35"
+        BOOST_POSTFIX= "-vc90-gd-1_35"
     else:
-        BOOST_POSTFIX= "-vc90-mt-1_35"
+        BOOST_POSTFIX= "-vc90-1_35"
         BOOST_PREFIX= "lib"
     env.Append( LIBS= [ BOOST_PREFIX+"boost_iostreams"+BOOST_POSTFIX,
                         BOOST_PREFIX+"boost_date_time"+BOOST_POSTFIX ] )
@@ -184,17 +185,10 @@ if PROFILE:
 #env.Library( "smartmet_smarttools", Glob("source/*.cpp") )
 
 objs= []
-objs_mt= []
-
-env_mt = env.Clone()
 
 env.Append( LIBS= [ "smartmet_newbase" ] )
-env.Append( CPPDEFINES="BOOST_DISABLE_THREADS" )
-
-env_mt.Append( LIBS= [ "smartmet_newbase-mt" ] )
-env_mt.Append( CPPDEFINES="FMI_MULTITHREAD" )
 if not WINDOWS:
-    env_mt.Append( CPPDEFINES= "_REENTRANT" )
+    env.Append( CPPDEFINES= "_REENTRANT" )
 
 
 for fn in Glob("source/*.cpp"): 
@@ -202,12 +196,9 @@ for fn in Glob("source/*.cpp"):
 	obj_s= OBJDIR+"/"+ s.replace(".cpp","")
 	
 	objs += env.Object( obj_s, fn )
-	objs_mt += env_mt.Object( obj_s + "_mt", fn )
-
 
 # Make just the static lib (at least it should be default for just 'scons')
 
 env.Library( "smartmet_smarttools", objs )
-env_mt.Library( "smartmet_smarttools-mt", objs_mt )
 
 

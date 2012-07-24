@@ -1,8 +1,9 @@
-#pragma once
+#ifndef NFMIHARMONIZERBOOKKEEPINGDATA_H
+#define NFMIHARMONIZERBOOKKEEPINGDATA_H
 
+#include <NFmiMetTime.h>
+#include <NFmiParamBag.h>
 #include <set>
-#include "NFmiMetTime.h"
-#include "NFmiParamBag.h"
 
 // smartinfon pit‰‰ pit‰‰ kirjaa harmonisaattoriin liittyvist‰ asioista
 // mitk‰ parametrit ja ajat ovat olleet mill‰kin hetkell‰ muokatttuina
@@ -29,3 +30,5 @@ private:
 	bool fHarmonizeAllTimes; // apuna edellisen set:in lis‰ksi, ett‰ jos k‰yd‰‰n l‰pi koko data
 	NFmiParamBag itsHarmonizerParams; // t‰h‰n merkit‰‰n parametrit, joita on muokattu eri tyˆkaluilla.
 };
+
+#endif // NFMIHARMONIZERBOOKKEEPINGDATA_H

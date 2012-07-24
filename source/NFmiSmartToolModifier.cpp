@@ -8,30 +8,31 @@
 #pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
 #endif
 
-#include "NFmiSmartToolModifier.h"
-#include "NFmiFastQueryInfo.h"
+#include "NFmiAreaMaskInfo.h"
+#include "NFmiAreaMaskSectionInfo.h"
+#include "NFmiCalculationConstantValue.h"
+#include "NFmiDictionaryFunction.h"
+#include "NFmiDrawParam.h"
+#include "NFmiInfoAreaMaskSoundingIndex.h"
+#include "NFmiInfoOrganizer.h"
+#include "NFmiMetEditorTypes.h"
 #include "NFmiSmartInfo.h"
-#include "NFmiSmartToolIntepreter.h"
 #include "NFmiSmartToolCalculation.h"
+#include "NFmiSmartToolCalculationInfo.h"
 #include "NFmiSmartToolCalculationSection.h"
 #include "NFmiSmartToolCalculationSectionInfo.h"
-#include "NFmiSmartToolCalculationInfo.h"
-#include "NFmiAreaMaskInfo.h"
-#include "NFmiCalculationConstantValue.h"
-#include "NFmiInfoAreaMask.h"
-#include "NFmiInfoOrganizer.h"
-#include "NFmiAreaMaskSectionInfo.h"
-#include "NFmiCalculatedAreaMask.h"
-#include "NFmiDataModifierClasses.h"
-#include "NFmiRelativeDataIterator.h"
-#include "NFmiRelativeTimeIntegrationIterator.h"
-#include "NFmiDrawParam.h"
-#include "NFmiMetEditorTypes.h"
-#include "NFmiQueryData.h"
-#include "NFmiInfoAreaMaskSoundingIndex.h"
-#include "NFmiDictionaryFunction.h"
-#include "NFmiQueryDataUtil.h"
-#include "NFmiBitMask.h"
+#include "NFmiSmartToolIntepreter.h"
+#include "NFmiSmartToolModifier.h"
+
+#include <NFmiBitMask.h>
+#include <NFmiCalculatedAreaMask.h>
+#include <NFmiDataModifierClasses.h>
+#include <NFmiFastQueryInfo.h>
+#include <NFmiInfoAreaMask.h>
+#include <NFmiQueryData.h>
+#include <NFmiQueryDataUtil.h>
+#include <NFmiRelativeDataIterator.h>
+#include <NFmiRelativeTimeIntegrationIterator.h>
 
 #include <stdexcept>
 

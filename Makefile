@@ -37,7 +37,6 @@ rpmrelease := $(shell grep "^Release:" $(LIB).spec  | cut -d\  -f 2 | tr . _)
 # What to install
 
 LIBFILE = libsmartmet_$(LIB).a
-LIBFILE_MT = libsmartmet_$(LIB)-mt.a
 
 # How to install
 
@@ -52,13 +51,13 @@ INSTALL_DATA = install -m 664
 SCONS_FLAGS += objdir=$(objdir) prefix=$(PREFIX)
 
 all release:
-	scons $(SCONS_FLAGS) $(LIBFILE) $(LIBFILE_MT)
+	scons $(SCONS_FLAGS) $(LIBFILE)
 
 debug:
-	scons $(SCONS_FLAGS) debug=1 $(LIBFILE) $(LIBFILE_MT)
+	scons $(SCONS_FLAGS) debug=1 $(LIBFILE)
 
 profile:
-	scons $(SCONS_FLAGS) profile=1 $(LIBFILE) $(LIBFILE_MT)
+	scons $(SCONS_FLAGS) profile=1 $(LIBFILE)
 
 clean:
 	@#scons -c objdir=$(objdir)
@@ -74,7 +73,6 @@ install:
 	done
 	@mkdir -p $(libdir)
 	$(INSTALL_DATA) $(LIBFILE) $(libdir)/$(LIBFILE)
-	$(INSTALL_DATA) $(LIBFILE_MT) $(libdir)/$(LIBFILE_MT)
 
 test:
 	cd test && make test
@@ -96,6 +94,8 @@ rpm: clean
 tag:
 	cvs -f tag 'libsmartmet_$(LIB)_$(rpmversion)-$(rpmrelease)' .
 
+cppcheck:
+	cppcheck -DUNIX -I include -I $(includedir) source
 headertest:
 	@echo "Checking self-sufficiency of each header:"
 	@echo

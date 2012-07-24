@@ -5,9 +5,10 @@
 // Koodit on pöölitty CodeProject:ista:
 // http://www.codeproject.com/KB/recipes/colorspace1.aspx
 
-#pragma once
+#ifndef NFMICOLORSPACES_H
+#define NFMICOLORSPACES_H
 
-#include "NFmiColor.h"
+#include <NFmiColor.h>
 
 namespace NFmiColorSpaces
 {
@@ -54,3 +55,5 @@ namespace NFmiColorSpaces
 	NFmiColor GetBrighterColor(const NFmiColor &theColor, double theBrightningFactor);
 
 }
+
+#endif

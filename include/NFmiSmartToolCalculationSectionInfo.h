@@ -13,9 +13,9 @@
 // Yksi rivi on aina yksi lasku ja laskussa pit‰‰ olla sijoitus johonkin parametriin (=).
 //**********************************************************
 
-#include "NFmiDataMatrix.h"
+#include <NFmiDataMatrix.h>
+#include <boost/shared_ptr.hpp>
 #include <set>
-#include "boost/shared_ptr.hpp"
 
 class NFmiSmartToolCalculationInfo;
 

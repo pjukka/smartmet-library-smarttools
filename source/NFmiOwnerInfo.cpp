@@ -1,6 +1,6 @@
 
 #include "NFmiOwnerInfo.h"
-#include "NFmiQueryData.h"
+#include <NFmiQueryData.h>
 
 NFmiOwnerInfo::NFmiOwnerInfo(void)
 :NFmiFastQueryInfo()

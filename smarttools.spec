@@ -1,14 +1,15 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 11.10.27
-Release: 1.el5.fmi
+Version: 12.7.6
+Release: 1.el6.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase >= 11.10.17
+BuildRequires: libsmartmet-newbase >= 12.7.6
+BuildRequires: boost-devel >= 1.50
 Provides: %{LIBNAME}
 
 %description
@@ -32,10 +33,34 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,0775)
 %{_includedir}/smartmet/%{LIBNAME}
 %{_libdir}/libsmartmet_%{LIBNAME}.a
-%{_libdir}/libsmartmet_%{LIBNAME}-mt.a
 
 %changelog
-* Tue Oct 27 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.10.27-1.el6.fmi
+* Fri Jul  6 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.7.6-1.el6.fmi
+- Fixed all issues reported by cppcheck
+* Thu Jul  5 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.7.5-1.el6.fmi
+- Migration to boost 1.50
+* Sat Mar 31 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.3.31-1.el5.fmi
+- Upgraded to boost 12.3.31 in el5
+* Wed Mar 28 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.3.28-1.el6.fmi
+- Upgraded to boost 1.49
+* Fri Mar 16 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.3.16-1.el6.fmi
+- newbase headers have changed
+* Fri Feb 24 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.2.24-1.el6.fmi
+- Single threading removed due to extra maintenance required
+- A shitload of changes, fixes and improvements by Marko Pietarinen
+* Tue Feb  7 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.2.7-1.el5.fmi
+- Newbase headers changed
+* Thu Nov 24 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.11.24-1.el5.fmi
+- Newbase headers changed
+* Thu Nov 17 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.11.17-1.el5.fmi
+- Recompiled with -fPIC for q2engine
+* Wed Nov 16 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.11.16-1.el5.fmi
+- Recompiled due to newbase API changes
+* Tue Nov  8 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.11.8-1.el5.fmi
+- Recompiled due to newbase API changes
+* Fri Oct 28 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.10.28-1.el6.fmi
+- Bug fix to handling station numbers
+* Thu Oct 27 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.10.27-1.el6.fmi
 - New code to handle observations from stations
 * Mon Oct 17 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.10.17-3.el5.fmi
 - newbase headers changed again

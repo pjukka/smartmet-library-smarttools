@@ -29,11 +29,12 @@
 // ======================================================================
 
 #include "NFmiDrawParamFactory.h"
-#include "NFmiValueString.h"
 #include "NFmiDrawParam.h"
-#include "NFmiFileSystem.h"
 
-#include <assert.h>
+#include <NFmiValueString.h>
+#include <NFmiFileSystem.h>
+
+#include <cassert>
 
 static void InitDrawParam(boost::shared_ptr<NFmiDrawParam> &theDrawParam, const std::string &theFileName, bool createDrawParamFileIfNotExist)
 {

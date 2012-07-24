@@ -8,12 +8,12 @@
 // Tämä luokka hoitaa yhden laskurivin esim. T = T + 1
 //**********************************************************
 
+#include <NFmiAreaMask.h>
+#include <NFmiPoint.h>
+#include <NFmiDataMatrix.h>
+#include <NFmiMetTime.h>
+#include <boost/shared_ptr.hpp>
 #include <string>
-#include "NFmiAreaMask.h"
-#include "NFmiPoint.h"
-#include "NFmiDataMatrix.h"
-#include "NFmiMetTime.h"
-#include "boost/shared_ptr.hpp"
 
 class NFmiFastQueryInfo;
 class NFmiDataModifier;

@@ -4,10 +4,10 @@
 #include "NFmiSmartInfo.h"
 #include "NFmiQueryDataKeeper.h"
 #include "NFmiDrawParam.h"
-#include "NFmiQueryInfo.h"
-#include "NFmiGrid.h"
-#include "NFmiLatLonArea.h"
-#include "NFmiQueryDataUtil.h"
+#include <NFmiQueryInfo.h>
+#include <NFmiGrid.h>
+#include <NFmiLatLonArea.h>
+#include <NFmiQueryDataUtil.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4239) // poistaa VC++ 2010 varoituksen: warning C4239: nonstandard extension used : 'argument' : conversion from 'boost::shared_ptr<T>' to 'boost::shared_ptr<T> &'

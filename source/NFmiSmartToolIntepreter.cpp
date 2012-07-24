@@ -13,14 +13,15 @@
 #include "NFmiAreaMaskInfo.h"
 #include "NFmiSmartToolCalculationSectionInfo.h"
 #include "NFmiAreaMaskSectionInfo.h"
-#include "NFmiPreProcessor.h"
 #include "NFmiSmartToolCalculationInfo.h"
-#include "NFmiValueString.h"
-#include "NFmiLevelType.h"
-#include "NFmiLevel.h"
-#include "NFmiEnumConverter.h"
 #include "NFmiDictionaryFunction.h"
 #include "NFmiProducerSystem.h"
+
+#include <NFmiPreProcessor.h>
+#include <NFmiValueString.h>
+#include <NFmiLevelType.h>
+#include <NFmiLevel.h>
+#include <NFmiEnumConverter.h>
 
 #include <algorithm>
 #include <utility>
