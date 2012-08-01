@@ -613,4 +613,29 @@ double FindNearestW(double T, double P)
 	return kFloatMissing;
 }
 
+// Laske pisteiden (P1, P2) ja (P3, P4) muodostamien viivojen leikkauspiste.
+// Kaavat on haettu http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
+MyPoint CalcTwoLineIntersectionPoint(const MyPoint &P1, const MyPoint &P2, const MyPoint &P3, const MyPoint &P4)
+{
+	if(P1.IsValid() && P2.IsValid() && P3.IsValid() && P4.IsValid())
+	{
+		double UaDenom = ((P4.x - P3.x)*(P1.y - P3.y) - (P4.y - P3.y) * (P1.x - P3.x));
+		double Udividor = ((P4.y - P3.y)*(P2.x - P1.x) - (P4.x - P3.x) * (P2.y - P1.y));
+		if(Udividor != 0) // jakajan 0 tarkastelu
+		{
+			double Ua = UaDenom / Udividor;
+
+			double UbDenom = ((P2.x - P1.x)*(P1.y - P3.y) - (P2.y - P1.y) * (P1.x - P3.x));
+			double Ub = UbDenom / Udividor;
+
+			double x = P1.x + Ua * (P2.x - P1.x);
+			double y = P1.y + Ub * (P2.y - P1.y);
+
+			return MyPoint(x, y);
+		}
+	}
+
+	return MyPoint(kFloatMissing, kFloatMissing); // virhetilanteissa puuttuvan tiedon piste
+}
+
 } // end of namespace NFmiSoundingFunctions
