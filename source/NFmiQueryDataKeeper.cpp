@@ -485,6 +485,8 @@ int NFmiQueryDataSetKeeper::GetNearestUnRegularTimeIndex(const NFmiMetTime &theT
 			long diffValue2 = diffValue1;
 			for( ; it2 != timeDiffsWithIndexies.end(); )
 			{
+				if(indexValue1 >= 0) // jos ollaan viimeisessä malliajo ajassa, se on otettava käyttöön
+					return indexValue1;
 				++it2;
 				diffValue2 = it2->first;
 				if(diffValue1 < 0 && diffValue2 >= 0)
