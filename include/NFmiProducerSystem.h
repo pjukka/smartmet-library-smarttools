@@ -34,7 +34,7 @@ public:
 	const std::string& UltraShortName(void) const {return itsUltraShortName;}
 	void UltraShortName(const std::string &newValue) {itsUltraShortName = newValue;}
 
-	unsigned long ProducerId(void) {return itsProducerId;}
+	unsigned long ProducerId(void) const {return itsProducerId;}
 	void ProducerId(unsigned long newValue) {itsProducerId = newValue;}
 	const std::string& Description(void) const {return itsDescription;}
 	void Description(const std::string &newValue) {itsDescription = newValue;}
