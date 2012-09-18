@@ -118,8 +118,8 @@ void NFmiSmartToolCalculation::Calculate(const NFmiCalculationParams &theCalcula
 		}
 	}
 	// lopuksi asetetaan macroParamValue, jos niin on haluttu ja resultInfo on macroParam-tyyppiä
-	if(theMacroParamValue.fSetValue &&
-	   (itsResultInfo->DataType() == NFmiInfoData::kMacroParam || itsResultInfo->DataType() == NFmiInfoData::kCrossSectionMacroParam))
+	NFmiInfoData::Type dataType = itsResultInfo->DataType();
+	if(theMacroParamValue.fSetValue && (dataType == NFmiInfoData::kMacroParam || dataType == NFmiInfoData::kCrossSectionMacroParam || dataType == NFmiInfoData::kScriptVariableData))
 	  theMacroParamValue.itsValue = static_cast<float>(value);
 }
 
