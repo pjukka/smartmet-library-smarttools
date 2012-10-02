@@ -1,14 +1,14 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 12.7.6
+Version: 12.10.2
 Release: 1.el6.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase >= 12.7.6
+BuildRequires: libsmartmet-newbase >= 12.9.27
 BuildRequires: boost-devel >= 1.50
 Provides: %{LIBNAME}
 
@@ -35,6 +35,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Tue Oct  2 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.10.2-1.el6.fmi
+- Newbase API changes force a recompile
 * Fri Jul  6 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.7.6-1.el6.fmi
 - Fixed all issues reported by cppcheck
 * Thu Jul  5 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.7.5-1.el6.fmi
