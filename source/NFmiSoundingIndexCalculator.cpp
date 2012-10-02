@@ -192,6 +192,7 @@ static void CalculatePartOfSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &th
 		std::cerr << "thread nro: " << index << " end here."<< std::endl;
 }
 
+#if 0 // G++ complains about an unused function otherwise
 static void CalculateSoundingDataOneTimeStepAtTime(boost::shared_ptr<NFmiFastQueryInfo> &theSourceInfo, boost::shared_ptr<NFmiFastQueryInfo> &theResultInfo, NFmiTimeIndexCalculator &theTimeIndexCalculator, bool useFastFill, NFmiStopFunctor *theStopFunctor, int index, bool fDoCerrReporting)
 {
 	try
@@ -235,7 +236,7 @@ static void CalculateSoundingDataOneTimeStepAtTime(boost::shared_ptr<NFmiFastQue
 	if(fDoCerrReporting)
 		std::cerr << "thread nro: " << index << " end here."<< std::endl;
 }
-
+#endif
 
 // Jos useFastFill on true, on datoilla sama hila ja aika descriptor rakenne
 // theMaxThreadCount -parametrilla voidaan rajoittaa käytettävien threadien määrää. Jos sen arvo on <=0, 
