@@ -24,12 +24,12 @@
 #include <NFmiEnumConverter.h>
 
 #include <algorithm>
-#include <utility>
+#include <cctype>
+#include <functional>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
-#include <functional>
-#include <cctype>
+#include <utility>
 
 static const unsigned int gMesanProdId = 160;
 
@@ -388,7 +388,7 @@ bool NFmiSmartToolIntepreter::IsPossibleCalculationLine(const std::string &theTe
 	if(theTextLine.find(string("=")) != string::npos)
 		return true;
 
-	if(std::find_if(theTextLine.begin(), theTextLine.end(), std::not1(std::ptr_fun(std::isspace))) != theTextLine.end())
+	if(std::find_if(theTextLine.begin(), theTextLine.end(), std::not1(std::ptr_fun(::isspace))) != theTextLine.end())
 		throw runtime_error(::GetDictionaryString("SmartToolErrorIllegalTextFound") + ": \n" + theTextLine);
 	return false;
 }
