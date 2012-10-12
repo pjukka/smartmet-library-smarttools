@@ -112,6 +112,9 @@ public:
 	NFmiParamBag ModifiedParams(void);
 	const std::string& GetStrippedMacroText(void) const;
 	bool IsInterpretedSkriptMacroParam(void); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns. macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
+
+	void ModifiedLevel(boost::shared_ptr<NFmiLevel> &theLevel);
+
 private:
 	void ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation, NFmiMacroParamValue &theMacroParamValue, NFmiThreadCallBacks *theThreadCallBacks);
 	float CalcSmartToolValue(NFmiMacroParamValue &theMacroParamValue);
@@ -173,6 +176,9 @@ private:
 							  // HUOM! sulkujen lisäksi pitää laskea myös erilaisten funktioiden alut.
 
 	boost::shared_ptr<MyGrid> itsWorkingGrid; // Tähän talletetaan ns. työskentely gidi, eli missä on työskentely alueen area-määritys ja laskennallinen hila koko.
+
+	boost::shared_ptr<NFmiLevel> itsModifiedLevel;	// Jos ollaan editoimassa level-dataa, tähän on tarkoitus laittaa kulloinenkin muokattava level talteen.
+													// Tämä asetetaan nyt vain NFmiSmartToolUtil::ModifyData-funktiosta, jossa käydään levelit läpi.
 
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
 public:
