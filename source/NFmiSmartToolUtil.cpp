@@ -29,16 +29,6 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	return ModifyData(theMacroText, theModifiedData, &times, theHelperDataFileNames, createDrawParamFileIfNotExist, goThroughLevels, fMakeStaticIfOneTimeStepData);
 }
 
-static void DoSmartToolModification(NFmiSmartToolModifier &theSmartToolModifier, NFmiTimeDescriptor *theTimes)
-{
-#ifdef UNIX
-	theSmartToolModifier.ModifyData(theTimes, false, false, 0); // false = ei tehd‰ muokkauksia vain valituille pisteille vaan kaikille pisteille
-#else // windows
-	// winkkarissa kutsutaan laskennan multi-thread versiota
-	theSmartToolModifier.ModifyData_ver2(theTimes, false, false, 0); // false = ei tehd‰ muokkauksia vain valituille pisteille vaan kaikille pisteille
-#endif
-}
-
 NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool goThroughLevels, bool fMakeStaticIfOneTimeStepData)
 {
 	NFmiInfoOrganizer dataBase;
@@ -64,11 +54,19 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	try // suoritetaan macro sitten
 	{
 		if(goThroughLevels == false)
-			::DoSmartToolModification(smartToolModifier, theTimes);
+			smartToolModifier.ModifyData_ver2(theTimes, false, false, 0); // false = ei tehd‰ muokkauksia vain valituille pisteille vaan kaikille pisteille
 		else
 		{
 			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
-				::DoSmartToolModification(smartToolModifier, theTimes);
+			{
+				if(editedInfo->SizeLevels() > 1) // jos kyseess‰ on level-data, pit‰‰ l‰pik‰yt‰v‰ leveli ottaa talteen, ett‰ smartToolModifier osaa luoda siihen osoittavia fastInfoja.
+				{
+					boost::shared_ptr<NFmiLevel> theLevel(new NFmiLevel(*editedInfo->Level()));
+					smartToolModifier.ModifiedLevel(theLevel);
+				}
+
+				smartToolModifier.ModifyData_ver2(theTimes, false, false, 0); // false = ei tehd‰ muokkauksia vain valituille pisteille vaan kaikille pisteille
+			}
 		}
 	}
 	catch(std::exception &e)
