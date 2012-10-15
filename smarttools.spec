@@ -1,7 +1,7 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 12.10.2
+Version: 12.10.15
 Release: 1.el6.fmi
 License: FMI
 Group: Development/Libraries
@@ -35,6 +35,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Mon Oct  15 2012 Roope Tervo <roope.tervo@fmi.fi> - 12.10.2-1.el6.fmi
+- Changes made by Mikko Partio
 * Tue Oct  2 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.10.2-1.el6.fmi
 - Newbase API changes force a recompile
 * Fri Jul  6 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.7.6-1.el6.fmi
