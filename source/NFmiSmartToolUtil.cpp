@@ -68,7 +68,11 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 		else
 		{
 			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
+			{
+				if(editedInfo->SizeLevels() > 1) // jos kyseess‰ level-data, pit‰‰ l‰pik‰yt‰v‰ leveli ottaa talteen, ett‰ smartToolModifier osaa luoda siihen osoittavia fastInfoja.
+					smartToolModifier.ModifiedLevel(boost::shared_ptr<NFmiLevel>(new NFmiLevel(*editedInfo->Level())));
 				::DoSmartToolModification(smartToolModifier, theTimes);
+			}
 		}
 	}
 	catch(std::exception &e)

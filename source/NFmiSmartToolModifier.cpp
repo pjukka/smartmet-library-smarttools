@@ -250,6 +250,7 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer
 ,itsCommaCounter(0)
 ,itsParethesisCounter(0)
 ,itsWorkingGrid(new MyGrid())
+,itsModifiedLevel()
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
 ,itsDoc(0)
 #endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
@@ -1652,7 +1653,11 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 				throw runtime_error("NFmiSmartToolModifier::CreateInfo - error in program, no macroParam data available.");
 		}
 		else
+		{
 			info = GetWantedAreaMaskData(theAreaMaskInfo, true);
+			if(info && itsModifiedLevel)
+				info->Level(*itsModifiedLevel);
+		}
 		if(info == 0)
 			info = GetPossibleLevelInterpolatedInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 	}
@@ -1790,6 +1795,11 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::UsedMacroParamData(v
 		return itsInfoOrganizer->CrossSectionMacroParamData();
 	else
 		return itsInfoOrganizer->MacroParamData();
+}
+
+void NFmiSmartToolModifier::ModifiedLevel(boost::shared_ptr<NFmiLevel> &theLevel)
+{
+	itsModifiedLevel = theLevel;
 }
 
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
