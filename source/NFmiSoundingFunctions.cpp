@@ -377,7 +377,7 @@ double IterateMixMoistDiffWithNewtonMethod(double W, double Tpot, double P, doub
 
 double CalcLCLPressureFast(double T, double Td, double P)
 {
-	static double lastLCL = 900; // tämä on optimointia, eli aloitetaan haku siitä mistä viimeinen lasku sai tulokseksi.
+	double lastLCL = 900; // aloitetaan haku jostain korkeudesta
 
 	int iterationCount = 0; // Tämän voi poistaa profiloinnin jälkeen
 	double lclPressure = kFloatMissing;
