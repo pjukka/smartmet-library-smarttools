@@ -38,6 +38,7 @@ namespace NFmiSoundingFunctions
 	double CalcSRH(double u_ID, double v_ID, double uP1, double uP2, double vP1, double vP2);
 
 	float CalcLogInterpolatedValue(float x1, float x2, float x, float y1, float y2);
+	float CalcLogModLinearInterpolatedValue(float x1, float x2, float x, float y1, float y2, unsigned int modulo);
 	float CalcLogInterpolatedWindWectorValue(float x1, float x2, float x, float wv1, float wv2);
 
 	template<typename T>
