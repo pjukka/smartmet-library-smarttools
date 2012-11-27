@@ -55,7 +55,7 @@ void NFmiProducerSystem::InitFromSettings(const std::string &theInitNameSpace)
 	itsProducers.clear();
 	itsInitializeLogStr = "";
 
-	int maxDirectoryCount = 50; // lets try to read 20 diffrent models producer infos
+	int maxDirectoryCount = 1000; // lets try to read 20 diffrent models producer infos
 	int prodCounter = 0;
 	for(int i=1; i <= maxDirectoryCount; i++)
 	{

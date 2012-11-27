@@ -77,6 +77,8 @@ public:
 	void AdditionalArchiveFileCount(int newValue) {itsAdditionalArchiveFileCount = newValue;}
 	bool IsEnabled(void) const {return fEnable;}
 	void Enable(bool newValue) {fEnable = newValue;}
+	bool NonFixedTimeGab(void) const {return fNonFixedTimeGab;}
+	void NonFixedTimeGab(bool newValue) {fNonFixedTimeGab = newValue;}
 
 	const std::string& PartialDataCacheFileNameFilter(void) const {return itsPartialDataCacheFileNameFilter;}
 	void PartialDataCacheFileNameFilter(const std::string &newValue) {itsPartialDataCacheFileNameFilter = newValue;}
@@ -114,6 +116,8 @@ private:
 										// halutaan säilyttää enemmän kuin muita NFmiInfoOrganizer:issa. Tällä säädöllä saadaan pidettyä ylimääräiset datat.
 	bool fEnable; // Tämä on pakollinen säätö optio siitä, että onko data käytössä. Tämä säätää ladataanko dataa cacheen, SmartMEtiin, tehdäänkö soundinIndex-dataa, 
 				  // yhdistelmä datoja. Lisäksi tuleeko data popup-valikoihin, tai mihinkään muihin datavalikoihin.
+	bool fNonFixedTimeGab;  // Tämä on valinnainen asetus. Onko datan malliajo väli määrittelemätön. Esim. silam-datat ovat epämääräisesti ajettuja, 
+							// myös virallinen editoitu data on määrittelemätön, mutta se hoidetaan erikois tapauksena.
 };
 
 class NFmiHelpDataInfoSystem

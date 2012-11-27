@@ -11,6 +11,7 @@
 #ifndef NFMISOUNDINGFUNCTIONS_H
 #define NFMISOUNDINGFUNCTIONS_H
 
+#include "NFmiGlobals.h"
 #include <cmath>
 
 namespace NFmiSoundingFunctions
@@ -46,6 +47,25 @@ namespace NFmiSoundingFunctions
 			return true;
 		return false;
 	}
+
+	class MyPoint
+	{
+	public:
+		MyPoint(double theX, double theY)
+		:x(theX)
+		,y(theY)
+		{
+		}
+
+		bool IsValid(void) const
+		{
+			return (x != kFloatMissing) && (y != kFloatMissing);
+		}
+
+		double x;
+		double y;
+	};
+	MyPoint CalcTwoLineIntersectionPoint(const MyPoint &P1, const MyPoint &P2, const MyPoint &P3, const MyPoint &P4);
 }
 
 #endif // NFMISOUNDINGDATA_H

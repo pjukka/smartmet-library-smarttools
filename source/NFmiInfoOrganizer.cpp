@@ -1017,3 +1017,26 @@ int NFmiInfoOrganizer::GetNearestUnRegularTimeIndex(boost::shared_ptr<NFmiDrawPa
 	}
 	return 0;
 }
+
+// Tämä tekee dynaamisesti matalan kopion, joka tarkoittaa että se kokeilee dynaamisesti mistä FastInfon lapsiluokasta on 
+// kyse ja tekee siitä matalan kopion (= dataa ei kopioida). Tätä tarvitaan, jos käyttöön pitää saada NFmiOwnerInfo- tai
+// NFmiSmartInfo- tason otuksia.
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::DoDynamicShallowCopy(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+	if(theInfo)
+	{
+		NFmiSmartInfo *smartInfo = dynamic_cast<NFmiSmartInfo*>(theInfo.get());
+		if(smartInfo)
+			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(*smartInfo));
+
+		NFmiOwnerInfo *ownerInfo = dynamic_cast<NFmiOwnerInfo*>(theInfo.get());
+		if(ownerInfo)
+			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiOwnerInfo(*ownerInfo));
+
+		NFmiFastQueryInfo *fastInfo = dynamic_cast<NFmiFastQueryInfo*>(theInfo.get());
+		if(fastInfo)
+			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*fastInfo));
+	}
+
+	return boost::shared_ptr<NFmiFastQueryInfo>();
+}

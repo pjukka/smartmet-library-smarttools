@@ -251,6 +251,7 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer
 ,itsCommaCounter(0)
 ,itsParethesisCounter(0)
 ,itsWorkingGrid(new MyGrid())
+,itsModifiedLevel()
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
 ,itsDoc(0)
 #endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
