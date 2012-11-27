@@ -179,9 +179,6 @@ private:
 	boost::shared_ptr<NFmiLevel> itsModifiedLevel; // Jos ollaan editoimassa level-dataa, t‰h‰n on tarkoitus laittaa kulloinenkin muokattava level talteen.
 													// T‰m‰ asetetaan nyt vain NFmiSmartToolUtil::ModifyData-funktiosta, jossa k‰yd‰‰n levelit l‰pi.
 
-	boost::shared_ptr<NFmiLevel> itsModifiedLevel;	// Jos ollaan editoimassa level-dataa, t‰h‰n on tarkoitus laittaa kulloinenkin muokattava level talteen.
-													// T‰m‰ asetetaan nyt vain NFmiSmartToolUtil::ModifyData-funktiosta, jossa k‰yd‰‰n levelit l‰pi.
-
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
 public:
 	void SetGeneralDoc(NFmiEditMapGeneralDataDoc *theDoc);
