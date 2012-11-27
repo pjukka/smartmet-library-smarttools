@@ -65,8 +65,8 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 					smartToolModifier.ModifiedLevel(theLevel);
 				}
 
-				// smartToolModifier.ModifyData_ver2(theTimes, false, false, 0); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
-				::DoSmartToolModification(smartToolModifier, theTimes);
+				smartToolModifier.ModifyData_ver2(theTimes, false, false, 0); // false = ei tehdä muokkauksia vain valituille pisteille vaan kaikille pisteille
+				// ::DoSmartToolModification(smartToolModifier, theTimes);
 			}
 		}
 	}
