@@ -2,7 +2,7 @@
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
 Version: 12.11.27
-Release: 1.el6.fmi
+Release: 2.el6.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
@@ -35,6 +35,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Tue Nov 27 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.11.27-2.el6.fmi
+- Merged branch smartmet_5_8_final to get bug fixes by Marko Pietarinen
 * Tue Nov 27 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.11.27-1.el6.fmi
 - Recompiled since newbase headers changed
 * Wed Nov  7 2012 Mika Heiskanen <mika.heiskanen@fmi.fi> - 12.11.7-1.el6.fmi
