@@ -557,7 +557,7 @@ bool NFmiTEMPCode::DecodeA(void)
 				bool status = ::GetTandTd(TTTaDD_Str, T, Td);
 				double WD = kFloatMissing;
 				double WS = kFloatMissing;
-				status = ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
+				status &= ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
 				TEMPLevelData levelData;
 				levelData.Clear();
 				levelData.itsTemperature = T;
@@ -626,9 +626,9 @@ bool NFmiTEMPCode::DecodeA(void)
 						return false;
 
 // TÄMÄ erikois kerroksien tarkastelu menee ihan pieleen
-					status = ::GetPandH(PnPnhnhnhn_Str, P, h);
-					status = ::GetTandTd(TTTaDD_Str, T, Td);
-					status = ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
+					status &= ::GetPandH(PnPnhnhnhn_Str, P, h);
+					status &= ::GetTandTd(TTTaDD_Str, T, Td);
+					status &= ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
 
 					levelData.Clear();
 					levelData.itsPressure = P;
@@ -700,7 +700,7 @@ bool NFmiTEMPCode::DecodeB(void)
 				ssin >> TTTaDD_Str;
 				if(TTTaDD_Str.size() != 5)
 					return false;
-				status = ::GetTandTd(TTTaDD_Str, T, Td);
+				status &= ::GetTandTd(TTTaDD_Str, T, Td);
 
 				levelData.Clear();
 				levelData.itsPressure = P;
@@ -743,7 +743,7 @@ bool NFmiTEMPCode::DecodeB(void)
 					ssin >> dddff_Str;
 					if(dddff_Str.size() != 5)
 						return false;
-					status = ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
+					status &= ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
 
 					levelData.Clear();
 					levelData.itsPressure = P;
