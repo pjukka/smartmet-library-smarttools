@@ -1342,7 +1342,7 @@ double NFmiSoundingData::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double &EL)
 	std::deque<float> &pValues = GetParamData(kFmiPressure);
 	std::deque<float> &tValues = GetParamData(kFmiTemperature);
 	size_t ssize = pValues.size();
-	double TofLiftedParcer_previous = kFloatMissing;
+
 	double P_previous = kFloatMissing;
 
 	double foundPValue = kFloatMissing;
@@ -1356,7 +1356,6 @@ double NFmiSoundingData::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double &EL)
 			{
 				double TofLiftedParcer = CalcTOfLiftedAirParcel(T, Td, P, pValues[i]);
 
-				TofLiftedParcer_previous = TofLiftedParcer;
 				P_previous = pValues[i];
 
 				durrentDiff = TofLiftedParcer - tValues[i];
