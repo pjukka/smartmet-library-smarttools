@@ -1343,8 +1343,6 @@ double NFmiSoundingData::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double &EL)
 	std::deque<float> &tValues = GetParamData(kFmiTemperature);
 	size_t ssize = pValues.size();
 
-	double P_previous = kFloatMissing;
-
 	double foundPValue = kFloatMissing;
 	double durrentDiff = 0; // ilmapaketin ja ympäristön T ero
 	double lastDiff = 0; // ilmapaketin ja ympäristön T ero viime kierroksella
@@ -1355,8 +1353,6 @@ double NFmiSoundingData::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double &EL)
 			if(tValues[i] != kFloatMissing) // kaikilla painepinnoilla ei ole lämpötilaa
 			{
 				double TofLiftedParcer = CalcTOfLiftedAirParcel(T, Td, P, pValues[i]);
-
-				P_previous = pValues[i];
 
 				durrentDiff = TofLiftedParcer - tValues[i];
 				if(durrentDiff > 0 && foundPValue == kFloatMissing) // vain alin korkeus talteen
