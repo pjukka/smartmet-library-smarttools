@@ -334,6 +334,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
 		return MacroParamData(); // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType == NFmiInfoData::kCrossSectionMacroParam)
 		return CrossSectionMacroParamData(); // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
+	if(theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpSelectedGridPoints)
+		return itsEditedDataKeeper->GetIter(); // editoitu data on tässä haluttu data
 
 	boost::shared_ptr<NFmiFastQueryInfo> foundData;
 	if(itsEditedDataKeeper && ::MatchData(itsEditedDataKeeper->GetIter(), theType, theDataIdent, fUseParIdOnly, theLevel))
