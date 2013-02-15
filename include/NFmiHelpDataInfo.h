@@ -44,6 +44,8 @@ public:
 	const std::string UsedFileNameFilter(const NFmiHelpDataInfoSystem &theHelpDataInfoSystem) const;
 	const std::string& LatestFileName(void) const {return itsLatestFileName;}
 	void LatestFileName(const std::string &newName) {itsLatestFileName = newName;}
+	std::string& LatestErroneousFileName(void) {return itsLatestErroneousFileName;}
+	void LatestErroneousFileName(const std::string &newValue) {itsLatestErroneousFileName = newValue;}
 	NFmiInfoData::Type DataType(void) const {return itsDataType;}
 	void DataType(NFmiInfoData::Type newValue) {itsDataType = newValue;}
 	time_t LatestFileTimeStamp(void) const {return itsLatestFileTimeStamp;}
@@ -89,6 +91,7 @@ private:
 	std::string itsPartialDataCacheFileNameFilter; // cachen käyttö ja partial-datat ovat oma lukunsa ja niitä varten pitää tehdä filefiltteri
 	bool fForceFileFilterName; // jos tämä on erikoistilanteissa asetettu true:ksi, ei välitetä mahdillisista cachen käytöistä, vaan UsedFilefilter-metodi palauttaa itsFileNameFilter:in arvon
 	std::string itsLatestFileName; // kun filtterillä on haettu tiedostot ja uusin on löytynyt, talletetaan se tähän
+	std::string itsLatestErroneousFileName; // Jos datatiedosto on jotenkin korruptoitunut, talletetaan viimeisimmän sellaisen nimi, jotta lokituksen yhteydessä ei tarvitse minuutin välein raportoida saman tiedoston kanssa olevista ongelmista.
 	NFmiInfoData::Type itsDataType; // esim. analyysi, havainto jne.
 	time_t itsLatestFileTimeStamp; // viimeksi luetus
 	int itsFakeProducerId; // joskus pitää muuttaa tuottaja id ennenkuin data otetaan käyttöön esim. kepa data, jos tämä on 0, ei tehdä mitään

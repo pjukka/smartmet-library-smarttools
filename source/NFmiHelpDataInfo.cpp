@@ -28,6 +28,7 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 ,itsPartialDataCacheFileNameFilter()
 ,fForceFileFilterName(false)
 ,itsLatestFileName()
+,itsLatestErroneousFileName()
 ,itsDataType(NFmiInfoData::kNoDataType)
 ,itsLatestFileTimeStamp(0)
 ,itsFakeProducerId(0)
@@ -54,6 +55,7 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
 ,itsPartialDataCacheFileNameFilter(theOther.itsPartialDataCacheFileNameFilter)
 ,fForceFileFilterName(theOther.fForceFileFilterName)
 ,itsLatestFileName(theOther.itsLatestFileName)
+,itsLatestErroneousFileName(theOther.itsLatestErroneousFileName)
 ,itsDataType(theOther.itsDataType)
 ,itsLatestFileTimeStamp(theOther.itsLatestFileTimeStamp)
 ,itsFakeProducerId(theOther.itsFakeProducerId)
@@ -84,6 +86,7 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 		itsPartialDataCacheFileNameFilter = theOther.itsPartialDataCacheFileNameFilter;
 		fForceFileFilterName = theOther.fForceFileFilterName;
 		itsLatestFileName = theOther.itsLatestFileName;
+		itsLatestErroneousFileName = theOther.itsLatestErroneousFileName;
 		itsDataType = theOther.itsDataType;
 		itsLatestFileTimeStamp = theOther.itsLatestFileTimeStamp;
 		itsFakeProducerId = theOther.itsFakeProducerId;
@@ -114,6 +117,7 @@ void NFmiHelpDataInfo::Clear(void)
 	itsPartialDataCacheFileNameFilter = "";
 	fForceFileFilterName = false;
 	itsLatestFileName = "";
+	itsLatestErroneousFileName = "";
 	itsDataType = NFmiInfoData::kNoDataType;
 	itsLatestFileTimeStamp = 0;
 	itsFakeProducerId = 0;
