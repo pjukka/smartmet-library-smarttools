@@ -15,6 +15,8 @@
 #include <NFmiDataMatrix.h>
 #include <NFmiProducerName.h>
 
+#include <boost/shared_ptr.hpp>
+
 #include <iosfwd>
 #include <string>
 
@@ -52,7 +54,7 @@ public:
 	void FakeProducerId(int newValue) { itsFakeProducerId = newValue; }
 	const NFmiDataIdent& ImageDataIdent(void) const {return itsImageDataIdent;}
 	void ImageDataIdent(const NFmiDataIdent& newValue) { itsImageDataIdent = newValue; }
-	const NFmiArea* ImageArea(void) const {return itsImageArea;}
+  const NFmiArea* ImageArea(void) const {return itsImageArea.get() ;}
 	void ImageArea(NFmiArea *newValue);
 	bool NotifyOnLoad(void) const {return fNotifyOnLoad;}
 	void NotifyOnLoad(bool newValue) {fNotifyOnLoad = newValue;}
@@ -97,7 +99,7 @@ private:
 	std::string itsImageProjectionString; // jos data on image-tyyppist‰ (satel,radar, jne.), on tiedostossa
 									// stringi, joka sis‰lt‰‰ projektio tiedon jonka NFmiAreaFactory ymm‰rt‰‰
 	NFmiDataIdent itsImageDataIdent; // tieto image paramin id:st‰, nimest‰ (vain id ja nimi talletetaan tiedostoon)
-	NFmiArea *itsImageArea; // t‰h‰n luodaan ed. stringin avulla projektio, t‰m‰ ei ole tallessa tiedostossa
+    boost::shared_ptr<NFmiArea> itsImageArea; // t‰h‰n luodaan ed. stringin avulla projektio, t‰m‰ ei ole tallessa tiedostossa
 	// Edelliset koskevat vain image-tyyppisi‰ juttuja
 
 	bool fNotifyOnLoad; // Jos datan latauksen yhteydess‰ halutaan tehd‰ ilmoitus, t‰m‰ on true. Oletus arvo on false

@@ -930,7 +930,7 @@ static NFmiQueryData* CreateDefaultMacroParamQueryData(const NFmiArea *theArea, 
 
 void NFmiInfoOrganizer::UpdateMacroParamDataSize(int x, int y)
 {
-	static std::auto_ptr<NFmiArea> dummyArea(new NFmiLatLonArea(NFmiPoint(19,57), NFmiPoint(32,71)));
+	static boost::shared_ptr<NFmiArea> dummyArea(new NFmiLatLonArea(NFmiPoint(19,57), NFmiPoint(32,71)));
 
 	// Luo uusi data jossa on yksi aika,param ja level ja luo hplaceDesc annetusta areasta ja hila koosta
 	NFmiQueryData* data = CreateDefaultMacroParamQueryData(dummyArea.get(), x, y);
@@ -947,7 +947,7 @@ void NFmiInfoOrganizer::UpdateMacroParamDataSize(int x, int y)
 
 void NFmiInfoOrganizer::UpdateCrossSectionMacroParamDataSize(int x, int y)
 {
-	static std::auto_ptr<NFmiArea> dummyArea(new NFmiLatLonArea(NFmiPoint(19,57), NFmiPoint(32,71)));
+	static boost::shared_ptr<NFmiArea> dummyArea(new NFmiLatLonArea(NFmiPoint(19,57), NFmiPoint(32,71)));
 
 	// Luo uusi data jossa on yksi aika,param ja level ja luo hplaceDesc annetusta areasta ja hila koosta
 	NFmiQueryData* data = CreateDefaultMacroParamQueryData(dummyArea.get(), x, y);

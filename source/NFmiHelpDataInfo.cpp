@@ -33,7 +33,7 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 ,itsFakeProducerId(0)
 ,itsImageProjectionString()
 ,itsImageDataIdent()
-,itsImageArea(0)
+,itsImageArea()
 ,fNotifyOnLoad(false)
 ,itsNotificationLabel()
 ,itsCustomMenuFolder()
@@ -89,7 +89,8 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 		itsFakeProducerId = theOther.itsFakeProducerId;
 		itsImageProjectionString = theOther.itsImageProjectionString;
 		itsImageDataIdent = theOther.itsImageDataIdent;
-		itsImageArea = theOther.itsImageArea ? theOther.itsImageArea->Clone() : 0;
+		if(theOther.itsImageArea)
+		  itsImageArea.reset(theOther.itsImageArea->Clone());
 		fNotifyOnLoad = theOther.fNotifyOnLoad;
 		itsNotificationLabel = theOther.itsNotificationLabel;
 		itsCustomMenuFolder = theOther.itsCustomMenuFolder;
@@ -119,8 +120,7 @@ void NFmiHelpDataInfo::Clear(void)
 	itsFakeProducerId = 0;
 	itsImageProjectionString = "";
 	itsImageDataIdent = NFmiDataIdent();
-	delete itsImageArea;
-	itsImageArea = 0;
+	itsImageArea.reset();
 	fNotifyOnLoad = false;
 	itsNotificationLabel = "";
 	itsCustomMenuFolder = "";
@@ -217,7 +217,7 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 		std::string imageProjectionKey(itsBaseNameSpace + "::ImageProjection");
 		if (NFmiSettings::IsSet(imageProjectionKey))
 		{
-			NFmiArea *area = NFmiAreaFactory::Create(NFmiSettings::Require<std::string>(imageProjectionKey)).release();
+		  boost::shared_ptr<NFmiArea> area = NFmiAreaFactory::Create(NFmiSettings::Require<std::string>(imageProjectionKey));
 			if(area)
 			{
 				if(area->XYArea().Width() != 1 || area->XYArea().Height() != 1)
@@ -235,12 +235,7 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 
 void NFmiHelpDataInfo::ImageArea(NFmiArea *newValue) 
 { 
-	if(itsImageArea)
-	{
-		delete itsImageArea;
-		itsImageArea = 0;
-	}
-	itsImageArea = newValue; 
+  itsImageArea.reset(newValue);
 }
 
 static std::string MakeCacheFilePattern(const NFmiHelpDataInfo &theDataInfo, const NFmiHelpDataInfoSystem &theHelpDataSystem)
