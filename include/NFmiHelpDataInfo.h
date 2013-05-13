@@ -81,6 +81,8 @@ public:
 	void Enable(bool newValue) {fEnable = newValue;}
 	bool NonFixedTimeGab(void) const {return fNonFixedTimeGab;}
 	void NonFixedTimeGab(bool newValue) {fNonFixedTimeGab = newValue;}
+	float ModelRunTimeGapInHours(void) const {return itsModelRunTimeGapInHours;}
+	void ModelRunTimeGapInHours(float newValue) {itsModelRunTimeGapInHours = newValue;}
 
 	const std::string& PartialDataCacheFileNameFilter(void) const {return itsPartialDataCacheFileNameFilter;}
 	void PartialDataCacheFileNameFilter(const std::string &newValue) {itsPartialDataCacheFileNameFilter = newValue;}
@@ -121,6 +123,9 @@ private:
 				  // yhdistelmä datoja. Lisäksi tuleeko data popup-valikoihin, tai mihinkään muihin datavalikoihin.
 	bool fNonFixedTimeGab;  // Tämä on valinnainen asetus. Onko datan malliajo väli määrittelemätön. Esim. silam-datat ovat epämääräisesti ajettuja, 
 							// myös virallinen editoitu data on määrittelemätön, mutta se hoidetaan erikois tapauksena.
+	float itsModelRunTimeGapInHours; // Joskus pitää laittaa tietyille datoille omat malliajo välit, jos ne poikkeavat totutuista
+									// Esim. EC:llä on normaalisti 12 h, mutta nyt 3vrk EC datat tulevat 6 tunnin välein, joten 3 vrk datoille pitää asettaa tämä 6:ksi.
+									// Default arvo on 0, jolloin tästä ei välitetä.
 };
 
 class NFmiHelpDataInfoSystem

@@ -47,6 +47,7 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(void)
 ,itsAdditionalArchiveFileCount(0)
 ,fEnable(true)
 ,fNonFixedTimeGab(false)
+,itsModelRunTimeGapInHours(0)
 {}
 
 NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
@@ -74,6 +75,7 @@ NFmiHelpDataInfo::NFmiHelpDataInfo(const NFmiHelpDataInfo &theOther)
 ,itsAdditionalArchiveFileCount(theOther.itsAdditionalArchiveFileCount)
 ,fEnable(theOther.fEnable)
 ,fNonFixedTimeGab(theOther.fNonFixedTimeGab)
+,itsModelRunTimeGapInHours(theOther.itsModelRunTimeGapInHours)
 {}
 
 NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
@@ -104,6 +106,7 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 		itsAdditionalArchiveFileCount = theOther.itsAdditionalArchiveFileCount;
 		fEnable = theOther.fEnable;
 		fNonFixedTimeGab = theOther.fNonFixedTimeGab;
+		itsModelRunTimeGapInHours = theOther.itsModelRunTimeGapInHours;
 
 		itsBaseNameSpace = theOther.itsBaseNameSpace;
 	}
@@ -137,6 +140,7 @@ void NFmiHelpDataInfo::Clear(void)
 	itsAdditionalArchiveFileCount = 0;
 	fEnable = true;
 	fNonFixedTimeGab = false;
+	itsModelRunTimeGapInHours = 0;
 }
 
 static void FixPathEndWithSeparator(std::string &theFixedPathStr)
@@ -214,6 +218,7 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 		itsAdditionalArchiveFileCount = NFmiSettings::Optional<int>(itsBaseNameSpace + "::AdditionalArchiveFileCount", 0);
 		fEnable = NFmiSettings::Require<bool>(itsBaseNameSpace + "::Enable");
 		fNonFixedTimeGab = NFmiSettings::Optional<bool>(itsBaseNameSpace + "::NonFixedTimeGab", false);
+		itsModelRunTimeGapInHours = NFmiSettings::Optional<float>(itsBaseNameSpace + "::ModelRunTimeGapInHours", 0);
 
 		if(IsCombineData())
 			::MakeCombinedDataFilePattern(*this, theHelpDataSystem);
