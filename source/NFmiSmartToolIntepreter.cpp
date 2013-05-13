@@ -1055,13 +1055,13 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &th
 		if(FindParamAndLevelAndProducerAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, theProducerNameOnly, NFmiAreaMask::InfoVariable, fOrigWanted ? NFmiInfoData::kCopyOfEdited : NFmiInfoData::kViewable, theMaskInfo, theModelRunIndex))
 			return true;
 	}
-	else if(fLevelExist) // kokeillaan ensin, löytyykö param+level+producer
+	else if(fLevelExist) // kokeillaan sitten, löytyykö param+level
 	{
 		// Jos tuottajaa ei ole mainittu, oletetaan, että kyseessä on editoitava parametri.
 		if(FindParamAndLevelAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, NFmiAreaMask::InfoVariable, NFmiInfoData::kEditable, theMaskInfo, theModelRunIndex))
 			return true;
 	}
-	else if(fProducerExist) // kokeillaan ensin, löytyykö param+level+producer
+	else if(fProducerExist) // kokeillaan sitten, löytyykö param+producer
 	{
 		if(FindParamAndProducerAndSetMaskInfo(theParamNameOnly, theProducerNameOnly, NFmiAreaMask::InfoVariable, fOrigWanted ? NFmiInfoData::kCopyOfEdited : NFmiInfoData::kViewable, theMaskInfo, theModelRunIndex))
 			return true;
@@ -1508,19 +1508,27 @@ bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVari
 	bool fUseWildDataType = false;
 	if(GetParamFromVariable(theVariableText, theParamMap, param, fUseWildDataType))
 	{
-		NFmiDataIdent dataIdent(param, theProducer);
+		NFmiProducer usedProducer(theProducer);
+		if(usedProducer.GetIdent() == NFmiInfoData::kFmiSpEcmwf3Vrk)
+		{// ikävää koodia, mutta tein kikka vitosen että saan EC:n 3vrk datat mukaan smarttool-kieleen
+			// ja laitoin koodin tähän funktioon, että se hanskaa samalla sekä pinta että painepinta datat
+			theDataType = NFmiInfoData::kModelHelpData;  // EC:n 3 vrk datat tyyppi asetettava, että ohittaa normaali ec datan
+			usedProducer = NFmiProducer(kFmiMTAECMWF, "Ec3vrk");
+		}
+
+		NFmiDataIdent dataIdent(param, usedProducer);
 		theMaskInfo->SetOperationType(theOperType);
 		theMaskInfo->SetDataIdent(dataIdent);
 		theMaskInfo->SetUseDefaultProducer(false);
 		theMaskInfo->ModelRunIndex(theModelRunIndex);
 		if(fUseWildDataType)
 		{
-			if(theProducer.GetIdent() == 0) // tämä on viritys, jos on annettu esim. "par180_ec" parametri, menee se any-data kategoriaan, ellei ei tarkisteta onko oikeasti annettu tuottajakin
+			if(usedProducer.GetIdent() == 0) // tämä on viritys, jos on annettu esim. "par180_ec" parametri, menee se any-data kategoriaan, ellei ei tarkisteta onko oikeasti annettu tuottajakin
 				theMaskInfo->SetDataType(NFmiInfoData::kAnyData);
 			else
 				theMaskInfo->SetDataType(theDataType);
 		}
-		else if(theProducer.GetIdent() == 999) // tämä 999 on viritys, mutta se on määrätty helpdatainfo.dat tiedostossa kepa-datan feikki id numeroksi. Oikeaa id:tä ei voi käyttää, koska se on sama kuin editoitavalla datalla.
+		else if(usedProducer.GetIdent() == 999) // tämä 999 on viritys, mutta se on määrätty helpdatainfo.dat tiedostossa kepa-datan feikki id numeroksi. Oikeaa id:tä ei voi käyttää, koska se on sama kuin editoitavalla datalla.
 			theMaskInfo->SetDataType(NFmiInfoData::kKepaData);
 		else
 			theMaskInfo->SetDataType(theDataType);
@@ -2212,6 +2220,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ana"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("help"), static_cast<FmiProducerName>(NFmiProducerSystem::gHelpEditorDataProdId)));
+		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ec3vrk"), static_cast<FmiProducerName>(NFmiInfoData::kFmiSpEcmwf3Vrk)));
 
 		// havainto datoja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("synop"), kFmiSYNOP));
