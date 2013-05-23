@@ -1,14 +1,14 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 13.3.21
+Version: 13.5.23
 Release: 1%{?dist}.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase >= 13.3.21-2
+BuildRequires: libsmartmet-newbase >= 13.5.22-2
 BuildRequires: boost-devel >= 1.52
 Provides: %{LIBNAME}
 
@@ -35,6 +35,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Thu May 23 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.5.23-1.fmi
+- Recompiled due to changes in newbase headers
 * Thu Mar 21 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.3.21-1.fmi
 - Replaced auto_ptr with shared_ptr
 * Wed Mar  6 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.3.6-1.fmi
