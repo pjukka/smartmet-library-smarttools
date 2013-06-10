@@ -334,6 +334,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
 		return MacroParamData(); // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
 	if(theType == NFmiInfoData::kCrossSectionMacroParam)
 		return CrossSectionMacroParamData(); // tässä ei parametreja ja leveleitä ihmetellä, koska ne muutetaan aina lennossa tarpeen vaatiessa
+	if(theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpSelectedGridPoints)
+		return itsEditedDataKeeper->GetIter(); // editoitu data on tässä haluttu data
 
 	boost::shared_ptr<NFmiFastQueryInfo> foundData;
 	if(itsEditedDataKeeper && ::MatchData(itsEditedDataKeeper->GetIter(), theType, theDataIdent, fUseParIdOnly, theLevel))
@@ -723,7 +725,13 @@ boost::shared_ptr<NFmiDrawParam> NFmiInfoOrganizer::CreateSynopPlotDrawParam(con
 														  ,const NFmiLevel* theLevel
 														  ,NFmiInfoData::Type theType)
 {
-	boost::shared_ptr<NFmiDrawParam> drawParam = itsDrawParamFactory->CreateDrawParam(theDataIdent, theLevel); // false merkitsee, että parametria ei taas aseteta tuolla metodissa
+	NFmiDataIdent usedDataIdent(theDataIdent);
+	if(usedDataIdent.GetProducer()->GetIdent() == 0)
+	{ // tämä pitää fiksata, että saan q2-serveriltä haetut synopit plottautumaan, jostain syystä originaali systeemissä synop-plottauksen tuottaja on dummy arvoilla täytetty
+		usedDataIdent.GetProducer()->SetIdent(kFmiSYNOP);
+		usedDataIdent.GetProducer()->SetName("Synop");
+	}
+	boost::shared_ptr<NFmiDrawParam> drawParam = itsDrawParamFactory->CreateDrawParam(usedDataIdent, theLevel); // false merkitsee, että parametria ei taas aseteta tuolla metodissa
 	if(drawParam)
 		drawParam->DataType(theType);
 	return drawParam;

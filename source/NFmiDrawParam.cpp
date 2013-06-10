@@ -1415,7 +1415,7 @@ bool NFmiDrawParam::IsModelRunDataType(void) const
 
 bool NFmiDrawParam::IsModelRunDataType(NFmiInfoData::Type theDataType)
 {
-	if(theDataType == NFmiInfoData::kViewable || theDataType == NFmiInfoData::kHybridData || theDataType == NFmiInfoData::kModelHelpData || theDataType == NFmiInfoData::kKepaData)
+	if(theDataType == NFmiInfoData::kViewable || theDataType == NFmiInfoData::kHybridData || theDataType == NFmiInfoData::kModelHelpData || theDataType == NFmiInfoData::kKepaData || theDataType == NFmiInfoData::kTrajectoryHistoryData)
 		return true;
 	if(theDataType == NFmiInfoData::kClimatologyData)
 		return true;

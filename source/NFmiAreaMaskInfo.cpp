@@ -1,23 +1,23 @@
 //**********************************************************
-// C++ Class Name : NFmiAreaMaskInfo 
+// C++ Class Name : NFmiAreaMaskInfo
 // ---------------------------------------------------------
 // Filetype: (SOURCE)
-// Filepath: G:/siirto/marko/oc/NFmiAreaMaskInfo2.cpp 
-// 
-// 
-// GDPro Properties 
+// Filepath: G:/siirto/marko/oc/NFmiAreaMaskInfo2.cpp
+//
+//
+// GDPro Properties
 // ---------------------------------------------------
-//  - GD Symbol Type    : CLD_Class 
-//  - GD Method         : UML ( 4.0 ) 
-//  - GD System Name    : aSmartTools 
-//  - GD View Type      : Class Diagram 
-//  - GD View Name      : smarttools 1 
-// ---------------------------------------------------  
-//  Author         : pietarin 
-//  Creation Date  : Thur - Jun 20, 2002 
-// 
-//  Change Log     : 
-// 
+//  - GD Symbol Type    : CLD_Class
+//  - GD Method         : UML ( 4.0 )
+//  - GD System Name    : aSmartTools
+//  - GD View Type      : Class Diagram
+//  - GD View Name      : smarttools 1
+// ---------------------------------------------------
+//  Author         : pietarin
+//  Creation Date  : Thur - Jun 20, 2002
+//
+//  Change Log     :
+//
 //**********************************************************
 #ifdef _MSC_VER
 #pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
@@ -27,7 +27,7 @@
 #include <NFmiLevel.h>
 
 //--------------------------------------------------------
-// Constructor/Destructor 
+// Constructor/Destructor
 //--------------------------------------------------------
 NFmiAreaMaskInfo::NFmiAreaMaskInfo(const std::string &theOrigLineText)
 :itsDataIdent()

@@ -14,6 +14,7 @@
 #include <NFmiFastQueryInfo.h>
 #include <NFmiInterpolation.h>
 #include <NFmiValueString.h>
+#include <NFmiQueryDataUtil.h>
 
 #include <fstream>
 
@@ -1607,6 +1608,8 @@ static void GetLFCandELValues(LFCSearchDataVec &theLFCDataVecIn, double LCLin, d
 		LFCout = LCLin;
 }
 
+static const double gUsedEpsilon = std::numeric_limits<double>::epsilon() * 500; // tämä pitää olla luokkaa 10 pot -14
+
 // LFC ja EL lasketaan seuraavasti:
 // 1. Laske LCL.
 // 2. Nosta ilmapakettia LCL-pisteen kautta 
@@ -1673,6 +1676,8 @@ double NFmiSoundingDataOpt1::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double 
 				TLifted_current = CalcTOfLiftedAirParcel(T, Td, P, P_current);
 				// 7. Laske nostetun ilmapaketin ja ympäröivän ilman lämpötila erotus
 				Diff_current = TLifted_current - T_current;
+				if(NFmiQueryDataUtil::IsEqualEnough(Diff_current, 0., gUsedEpsilon))
+					Diff_current = 0; // linux vs windows - float vs double laskenta ero sovittelu yritys
 				if(processingLCLpoint && Diff_current > 0)
 					capeAreaData.LFConWarmerSide(true);
 

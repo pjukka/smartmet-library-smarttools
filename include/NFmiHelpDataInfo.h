@@ -46,6 +46,8 @@ public:
 	const std::string UsedFileNameFilter(const NFmiHelpDataInfoSystem &theHelpDataInfoSystem) const;
 	const std::string& LatestFileName(void) const {return itsLatestFileName;}
 	void LatestFileName(const std::string &newName) {itsLatestFileName = newName;}
+	std::string& LatestErroneousFileName(void) {return itsLatestErroneousFileName;}
+	void LatestErroneousFileName(const std::string &newValue) {itsLatestErroneousFileName = newValue;}
 	NFmiInfoData::Type DataType(void) const {return itsDataType;}
 	void DataType(NFmiInfoData::Type newValue) {itsDataType = newValue;}
 	time_t LatestFileTimeStamp(void) const {return itsLatestFileTimeStamp;}
@@ -81,6 +83,8 @@ public:
 	void Enable(bool newValue) {fEnable = newValue;}
 	bool NonFixedTimeGab(void) const {return fNonFixedTimeGab;}
 	void NonFixedTimeGab(bool newValue) {fNonFixedTimeGab = newValue;}
+	float ModelRunTimeGapInHours(void) const {return itsModelRunTimeGapInHours;}
+	void ModelRunTimeGapInHours(float newValue) {itsModelRunTimeGapInHours = newValue;}
 
 	const std::string& PartialDataCacheFileNameFilter(void) const {return itsPartialDataCacheFileNameFilter;}
 	void PartialDataCacheFileNameFilter(const std::string &newValue) {itsPartialDataCacheFileNameFilter = newValue;}
@@ -91,6 +95,7 @@ private:
 	std::string itsPartialDataCacheFileNameFilter; // cachen käyttö ja partial-datat ovat oma lukunsa ja niitä varten pitää tehdä filefiltteri
 	bool fForceFileFilterName; // jos tämä on erikoistilanteissa asetettu true:ksi, ei välitetä mahdillisista cachen käytöistä, vaan UsedFilefilter-metodi palauttaa itsFileNameFilter:in arvon
 	std::string itsLatestFileName; // kun filtterillä on haettu tiedostot ja uusin on löytynyt, talletetaan se tähän
+	std::string itsLatestErroneousFileName; // Jos datatiedosto on jotenkin korruptoitunut, talletetaan viimeisimmän sellaisen nimi, jotta lokituksen yhteydessä ei tarvitse minuutin välein raportoida saman tiedoston kanssa olevista ongelmista.
 	NFmiInfoData::Type itsDataType; // esim. analyysi, havainto jne.
 	time_t itsLatestFileTimeStamp; // viimeksi luetus
 	int itsFakeProducerId; // joskus pitää muuttaa tuottaja id ennenkuin data otetaan käyttöön esim. kepa data, jos tämä on 0, ei tehdä mitään
@@ -120,6 +125,9 @@ private:
 				  // yhdistelmä datoja. Lisäksi tuleeko data popup-valikoihin, tai mihinkään muihin datavalikoihin.
 	bool fNonFixedTimeGab;  // Tämä on valinnainen asetus. Onko datan malliajo väli määrittelemätön. Esim. silam-datat ovat epämääräisesti ajettuja, 
 							// myös virallinen editoitu data on määrittelemätön, mutta se hoidetaan erikois tapauksena.
+	float itsModelRunTimeGapInHours; // Joskus pitää laittaa tietyille datoille omat malliajo välit, jos ne poikkeavat totutuista
+									// Esim. EC:llä on normaalisti 12 h, mutta nyt 3vrk EC datat tulevat 6 tunnin välein, joten 3 vrk datoille pitää asettaa tämä 6:ksi.
+									// Default arvo on 0, jolloin tästä ei välitetä.
 };
 
 class NFmiHelpDataInfoSystem
