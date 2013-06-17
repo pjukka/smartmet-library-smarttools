@@ -56,8 +56,8 @@ public:
 	void FakeProducerId(int newValue) { itsFakeProducerId = newValue; }
 	const NFmiDataIdent& ImageDataIdent(void) const {return itsImageDataIdent;}
 	void ImageDataIdent(const NFmiDataIdent& newValue) { itsImageDataIdent = newValue; }
-  const NFmiArea* ImageArea(void) const {return itsImageArea.get() ;}
-	void ImageArea(NFmiArea *newValue);
+    boost::shared_ptr<NFmiArea> ImageArea(void) const {return itsImageArea;}
+	void ImageArea(boost::shared_ptr<NFmiArea> &newValue);
 	bool NotifyOnLoad(void) const {return fNotifyOnLoad;}
 	void NotifyOnLoad(bool newValue) {fNotifyOnLoad = newValue;}
 	const std::string& NotificationLabel(void) const {return itsNotificationLabel;}
@@ -160,7 +160,7 @@ public:
 	NFmiHelpDataInfo& StaticHelpDataInfo(int theIndex);
 	int DynamicCount(void) const{return static_cast<int>(itsDynamicHelpDataInfos.size());}
 	int StaticCount(void) const{return static_cast<int>(itsStaticHelpDataInfos.size());}
-	const NFmiArea* GetDataFilePatternAndArea(NFmiInfoData::Type theDataType, FmiProducerName theProdId, FmiParameterName theParamId, const NFmiArea *theZoomedArea, std::string &theFilePattern, bool fDemandMatchingArea);
+	boost::shared_ptr<NFmiArea> GetDataFilePatternAndArea(NFmiInfoData::Type theDataType, FmiProducerName theProdId, FmiParameterName theParamId, const boost::shared_ptr<NFmiArea> &theZoomedArea, std::string &theFilePattern, bool fDemandMatchingArea);
 	NFmiDataIdent GetNextSatelChannel(const NFmiDataIdent &theDataIdent, FmiDirection theDir);
 	void AddDynamic(const NFmiHelpDataInfo &theInfo);
 	void AddStatic(const NFmiHelpDataInfo &theInfo);
@@ -195,7 +195,7 @@ public:
 	void CachePartialDataDirectory(const std::string &newValue) {itsCachePartialDataDirectory = newValue;}
 private:
 	void InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos, bool fStaticData);
-	bool IsSameTypeProjections(const NFmiArea *theFirst, const NFmiArea *theSecond);
+	bool IsSameTypeProjections(const boost::shared_ptr<NFmiArea> &theFirst, const boost::shared_ptr<NFmiArea> &theSecond);
 
 	checkedVector<NFmiHelpDataInfo> itsDynamicHelpDataInfos; // tähän tulee jatkuvasti päivitettävät datat kuten havainnot, tutka ja analyysi datat
 	checkedVector<NFmiHelpDataInfo> itsStaticHelpDataInfos; // tähän tulee kerran ladattavat jutut kuten maa/meri maskit ja klimatologiset jutut

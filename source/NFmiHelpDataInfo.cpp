@@ -242,9 +242,9 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 	}
 }
 
-void NFmiHelpDataInfo::ImageArea(NFmiArea *newValue) 
+void NFmiHelpDataInfo::ImageArea(boost::shared_ptr<NFmiArea> &newValue) 
 { 
-  itsImageArea.reset(newValue);
+  itsImageArea = newValue;
 }
 
 static std::string MakeCacheFilePattern(const NFmiHelpDataInfo &theDataInfo, const NFmiHelpDataInfoSystem &theHelpDataSystem)
@@ -334,7 +334,7 @@ NFmiDataIdent NFmiHelpDataInfoSystem::GetNextSatelChannel(const NFmiDataIdent &t
 // ja filepatternin.
 // Jos fDemandMatchingArea on true, pit‰‰ areoiden sopia niin ett‰ piirto onnistuu blittaamalla.
 // jos false, palautetaan area ja filepattern jos datatyyppi ja parametri ovat halutut.
-const NFmiArea* NFmiHelpDataInfoSystem::GetDataFilePatternAndArea(NFmiInfoData::Type theDataType, FmiProducerName theProdId, FmiParameterName theParamId, const NFmiArea *theZoomedArea, std::string &theFilePattern, bool fDemandMatchingArea)
+boost::shared_ptr<NFmiArea> NFmiHelpDataInfoSystem::GetDataFilePatternAndArea(NFmiInfoData::Type theDataType, FmiProducerName theProdId, FmiParameterName theParamId, const boost::shared_ptr<NFmiArea> &theZoomedArea, std::string &theFilePattern, bool fDemandMatchingArea)
 {
 	if(theDataType == NFmiInfoData::kSatelData)
 	{
@@ -360,7 +360,7 @@ const NFmiArea* NFmiHelpDataInfoSystem::GetDataFilePatternAndArea(NFmiInfoData::
 			}
 		}
 	}
-	return 0;
+	return boost::shared_ptr<NFmiArea>();
 }
 
 // Ovatko kaksi annettua projektiota siin‰ mieless‰ samanlaisia, ett‰ 
@@ -368,13 +368,13 @@ const NFmiArea* NFmiHelpDataInfoSystem::GetDataFilePatternAndArea(NFmiInfoData::
 // Eli palauta false = ei voi piirt‰‰ ja true = voi, 
 // jos projektio luokat ovat samoja ja jos kyseess‰ oli stereographic areat, niiden
 // orientaatiot pit‰‰ olla samat.
-bool NFmiHelpDataInfoSystem::IsSameTypeProjections(const NFmiArea *theFirst, const NFmiArea *theSecond)
+bool NFmiHelpDataInfoSystem::IsSameTypeProjections(const boost::shared_ptr<NFmiArea> &theFirst, const boost::shared_ptr<NFmiArea> &theSecond)
 {
 	if(theFirst && theSecond)
 	{
 		if(theFirst->ClassId() == theSecond->ClassId() && theFirst->ClassId() == kNFmiStereographicArea)
 		{
-			if(static_cast<const NFmiStereographicArea*>(theFirst)->Orientation() == static_cast<const NFmiStereographicArea*>(theSecond)->Orientation())
+            if(static_cast<const NFmiStereographicArea*>(theFirst.get())->Orientation() == static_cast<const NFmiStereographicArea*>(theSecond.get())->Orientation())
 				return true;
 			else
 				return false;

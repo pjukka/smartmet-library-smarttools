@@ -230,7 +230,7 @@ void NFmiStation2GridMask::DoGriddingCheck(const NFmiCalculationParams &theCalcu
 			{
 				boost::shared_ptr<NFmiDrawParam> drawParam(new NFmiDrawParam(itsDataIdent, itsLevel, 0, itsDataType));
 				NFmiDataMatrix<float> griddedData(static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.X()), static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.Y()), kFloatMissing);
-				NFmiStationView::GridStationData(itsDoc, itsAreaPtr.get(), drawParam, griddedData, theCalculationParams.itsTime);
+				NFmiStationView::GridStationData(itsDoc, itsAreaPtr, drawParam, griddedData, theCalculationParams.itsTime);
 				std::pair<DataCache::iterator, bool> insertResult = itsGriddedStationData->insert(std::make_pair(theCalculationParams.itsTime, griddedData));
 				if(insertResult.second)
 					itsCurrentGriddedStationData = &((*insertResult.first).second);
