@@ -656,7 +656,7 @@ bool NFmiTEMPCode::DecodeA(void)
 void NFmiTEMPCode::AddData(const TEMPLevelData &theLevelData)
 {
 	if(theLevelData.itsPressure != kFloatMissing)
-		itsLevels.insert(std::make_pair<double, TEMPLevelData>(theLevelData.itsPressure, theLevelData)); // laitetaan saatu leveli talteen
+		itsLevels.insert(std::make_pair(theLevelData.itsPressure, theLevelData)); // laitetaan saatu leveli talteen
 }
 
 bool NFmiTEMPCode::DecodeB(void)
