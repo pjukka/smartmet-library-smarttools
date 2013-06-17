@@ -46,6 +46,12 @@
 // Käytössäni on versio 0.2.5. Hain em. sivulta threadpool-0_2_5-src.zip -tiedoston, purin sen ja kopsasin threadpool\boost-hakemiston 
 // sisällön oikean boost:in boost-hakemistoon.
 #include <boost/threadpool.hpp>
+
+#include <boost/version.hpp>
+#if BOOST_VERSION < 105000
+#define TIME_UTC_ TIME_UTC
+#endif
+
 #endif // USE_THREAD_POOL
 
 #ifdef _MSC_VER
