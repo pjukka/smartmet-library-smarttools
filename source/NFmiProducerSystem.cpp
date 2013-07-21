@@ -57,6 +57,8 @@ void NFmiProducerSystem::InitFromSettings(const std::string &theInitNameSpace)
 
 	int maxDirectoryCount = 1000; // lets try to read 20 diffrent models producer infos
 	int prodCounter = 0;
+    int consecutiveMissingCount = 0; // kuinka monta peräkkäin on ollut puuttuvaa asetusta
+    const int maxConsecutiveMissingCount = 20; // ei kuitenkaan käydä läpi kaikkia 1000 mahdollisuutta, vaan jos on ollut näin monta puuttuvaa peräkkäin, niin lopetetaan
 	for(int i=1; i <= maxDirectoryCount; i++)
 	{
 		try
@@ -66,13 +68,17 @@ void NFmiProducerSystem::InitFromSettings(const std::string &theInitNameSpace)
 			NFmiProducerInfo prodInfo(GetProducerInfoFromSettings(usedNameSpaceBase));
 			Add(prodInfo);
 			prodCounter++;
+            consecutiveMissingCount = 0;
 		}
 		catch(std::exception & /* e */ )
 		{
+            consecutiveMissingCount++;
 		}
 		catch(...)
 		{
 		}
+        if(consecutiveMissingCount > maxConsecutiveMissingCount)
+            break; // tein tämän skippauksen, koska debug versiossa 1000 läpikäynti on aika hidasta, release versiossa ei juuri huomaa
 	}
 	if(prodCounter > 0)
 	{
