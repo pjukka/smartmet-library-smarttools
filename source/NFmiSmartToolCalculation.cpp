@@ -546,6 +546,8 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
 {
   static const double trigFactor = 2 * kPii / 360;
 
+  static unsigned int seed = rand();	// seed for thread safe rand_r
+
   if(result != kFloatMissing)
 	{
 	  switch(NFmiAreaMask::MathFunctionType(theFunction))
@@ -617,7 +619,7 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
 		  result = fabs(result);
 		  break;
 		case NFmiAreaMask::Rand:
-		  result = (static_cast<double>(rand()) / RAND_MAX) * result; // palauttaa luvun 0 ja result:in väliltä
+		  result = (static_cast<double>(rand_r(&seed)) / RAND_MAX) * result; // palauttaa luvun 0 ja result:in väliltä
 		  break;
 		default:
 		  throw  runtime_error(::GetDictionaryString("SmartToolCalculationErrorMathFunction") + ":\n" + GetCalculationText());
