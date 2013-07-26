@@ -1,15 +1,15 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 13.6.10
+Version: 13.7.22
 Release: 1%{?dist}.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase >= 13.6.10-1
-BuildRequires: boost-devel >= 1.52
+BuildRequires: libsmartmet-newbase >= 13.6.10
+BuildRequires: boost-devel >= 1.53
 Provides: %{LIBNAME}
 
 %description
@@ -35,6 +35,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Mon Jul 22 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.7.22-1.fmi
+- Improved thread safety in random number generation
+* Wed Jul  3 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.7.3-1.fmi
+- Updated to boost 1.54
 * Mon Jun 10 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.6.10-1.fmi
 - Added support for tracetory history data
 * Thu May 23 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.5.23-1.fmi
@@ -100,7 +104,7 @@ rm -rf $RPM_BUILD_ROOT
 - Fixed all error messages to be in English
 * Thu Mar 24 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.3.24-1.el5.fmi
 - Several updates plus upgraded newbase
-* Thu Jan  3 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.2.3-1.el5.fmi
+* Mon Jan  3 2011 Mika Heiskanen <mika.heiskanen@fmi.fi> - 11.2.3-1.el5.fmi
 - Numerous updates by Marko plus upgrade to latest newbase
 * Tue Sep 14 2010 Mika Heiskanen <mika.heiskanen@fmi.fi> - 10.9.14-1.el5.fmi
 - Upgrade to boost 1.44 and newbase 10.9.14-1
@@ -119,11 +123,11 @@ rm -rf $RPM_BUILD_ROOT
 - Compile single- and multithread versions
 * Fri Mar 27 2009 mheiskan <mika.heiskanen@fmi.fi> - 9.3.27-1.el5.fmi
 - Updates from Marko Pietarinen
-* Tue Jan 19 2009 Marko Pietarinen <marko.pietarinen@fmi.fi> - 9.1.20-1.el5.fmi
+* Mon Jan 19 2009 Marko Pietarinen <marko.pietarinen@fmi.fi> - 9.1.20-1.el5.fmi
 - Some bugfixes to newbase
 * Mon Jan 19 2009 Marko Pietarinen <marko.pietarinen@fmi.fi> - 9.1.19-1.el5.fmi
 - Smallish upgrades by Marko
-* Mon Sep 30 2008 westerba <antti.westerberg@fmi.fi> - 8.9.30-1.el5.fmi
+* Tue Sep 30 2008 westerba <antti.westerberg@fmi.fi> - 8.9.30-1.el5.fmi
 - Fixed typecast problems in NFmiSmartToolIntepreter.cpp
 * Mon Sep 29 2008 mheiskan <mika.heiskanen@fmi.fi> - 8.9.29-1.el5.fmi
 - Newbase header change forced rebuild
