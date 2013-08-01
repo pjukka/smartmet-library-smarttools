@@ -1,14 +1,14 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 13.7.22
+Version: 13.8.2
 Release: 1%{?dist}.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase >= 13.6.10
+BuildRequires: libsmartmet-newbase >= 13.8.2
 BuildRequires: boost-devel >= 1.53
 Provides: %{LIBNAME}
 
@@ -35,6 +35,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Fri Aug  2 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.8.2-1.fmi
+- Compiled with support for 0...360 views of the world
 * Mon Jul 22 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.7.22-1.fmi
 - Improved thread safety in random number generation
 * Wed Jul  3 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.7.3-1.fmi
