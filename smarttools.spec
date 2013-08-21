@@ -1,7 +1,7 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 13.8.2
+Version: 13.8.21
 Release: 1%{?dist}.fmi
 License: FMI
 Group: Development/Libraries
@@ -35,6 +35,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Wed Aug 21 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.8.21-1.fmi
+- Station data now uses comma as a field delimiter
 * Fri Aug  2 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.8.2-1.fmi
 - Compiled with support for 0...360 views of the world
 * Mon Jul 22 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.7.22-1.fmi
