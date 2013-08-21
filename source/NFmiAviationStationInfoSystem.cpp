@@ -39,8 +39,8 @@ NFmiAviationStation* NFmiAviationStationInfoSystem::FindStation(unsigned long th
 	return 0;
 }
 
-// country3;country2;country;region;subregion;city;station_name_current;station_name_special;stn_key;icao_xref;national_id_xref;wmo_xref;wban_xref;iata_xref;status;icao;icao_quality;icao_source;national_id;national_quality;national_id_source;wmo;wmo_quality;wmo_source;maslib;maslib_source;wban;wban_source;special;lat_prp;lon_prp;ll_quality;llsrc;elev_prp;elev_prp_quality;elev_aerodrome_source;elev_baro;elev_baro_quality;elev_baro_source;tz;postal_code;start;start_source;end;end_source;remarks;latgrp;longrp
-// FIN;FI;Finland;-;;Helsinki;Vantaa;;FIaaEFHK;EFHK;;2974;;HEL;m;EFHK;A;ICA09;;;;2974;A;WMO11;29740;;;;;60.31666667;24.96666667;G;WMO11 WMO10;51;C;WMO11 WMO10;56;C;WMO11 WMO10;Europe/Helsinki;FI-01560;;;;;;60;24
+// country3,country2,country,region,subregion,city,station_name_current,station_name_special,stn_key,icao_xref,national_id_xref,wmo_xref,wban_xref,iata_xref,status,icao,icao_quality,icao_source,national_id,national_quality,national_id_source,wmo;wmo_quality;wmo_source;maslib;maslib_source;wban;wban_source;special;lat_prp;lon_prp;ll_quality;llsrc;elev_prp;elev_prp_quality;elev_aerodrome_source;elev_baro;elev_baro_quality;elev_baro_source;tz;postal_code;start;start_source;end;end_source;remarks;latgrp;longrp
+// FIN,FI,Finland,-,,Helsinki,Vantaa,,FIaaEFHK,EFHK,,2974,,HEL,m,EFHK,A,ICA09,,,,2974,A,WMO11,29740,,,,,60.31666667,24.96666667,G,WMO11 WMO10,51,C,WMO11 WMO10,56,C,WMO11 WMO10,Europe/Helsinki,FI-01560,,,,,,60,24
 static bool GetAviationStationFromCsvString(const std::string &theStationStr, NFmiAviationStation &theStationOut, bool fIcaoNeeded, bool fWmoNeeded)
 {
 	static unsigned long currentWmoIdCounter = 128000;
@@ -51,7 +51,7 @@ static bool GetAviationStationFromCsvString(const std::string &theStationStr, NF
 		if(theStationStr[0] == '/' && theStationStr[1] == '/')
 			return false;
 
-		std::vector<std::string> stationParts = NFmiStringTools::Split(theStationStr, ";");
+		std::vector<std::string> stationParts = NFmiStringTools::Split(theStationStr, ",");
 		if(stationParts.size() >= 30)
 		{
 			bool latlonOk = false;
