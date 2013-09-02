@@ -328,7 +328,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
 		return GetSynopPlotParamInfo(theType);
 	if(theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpMetarPlot) // metar plot paramille pit‰‰ tehd‰ kikka (9995)
 		return GetMetarPlotParamInfo(theType);
-	if(theLevel && theLevel->LevelType() == kFmiSoundingLevel) // sounding plot paramille pit‰‰ tehd‰ kikka
+    if(theLevel && theLevel->LevelType() == kFmiSoundingLevel && (theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpSoundingPlot || theDataIdent.GetProducer()->GetIdent() == kFmiTEMP)) // sounding plot paramille pit‰‰ tehd‰ kikka
 		return GetSoundingPlotParamInfo(theType);
 	if(theType == NFmiInfoData::kMacroParam || theType == NFmiInfoData::kQ3MacroParam) // macro- parametrit lasketaan t‰ll‰
 		return MacroParamData(); // t‰ss‰ ei parametreja ja leveleit‰ ihmetell‰, koska ne muutetaan aina lennossa tarpeen vaatiessa
