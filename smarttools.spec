@@ -1,14 +1,14 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 13.8.21
+Version: 13.9.5
 Release: 1%{?dist}.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase >= 13.8.2
+BuildRequires: libsmartmet-newbase >= 13.9.5
 BuildRequires: boost-devel >= 1.53
 Provides: %{LIBNAME}
 
@@ -35,6 +35,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Thu Sep  5 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.9.5-1.fmi
+- Compiled with latest newbase with API changes in NFmiQueryData
+- Added checks for empty querydata to avoid segmentation faults
 * Wed Aug 21 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.8.21-1.fmi
 - Station data now uses comma as a field delimiter
 * Fri Aug  2 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.8.2-1.fmi
