@@ -1,14 +1,14 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 13.9.5
+Version: 13.9.23
 Release: 1%{?dist}.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source0: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase >= 13.9.5
+BuildRequires: libsmartmet-newbase >= 13.9.23
 BuildRequires: boost-devel >= 1.53
 Provides: %{LIBNAME}
 
@@ -35,6 +35,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Mon Sep 23 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.9.23-1.fmi
+- Recompiled due to newbase API changes
+- Moved colour tools from newbase to smarttools
 * Thu Sep  5 2013 Mika Heiskanen <mika.heiskanen@fmi.fi> - 13.9.5-1.fmi
 - Compiled with latest newbase with API changes in NFmiQueryData
 - Added checks for empty querydata to avoid segmentation faults
