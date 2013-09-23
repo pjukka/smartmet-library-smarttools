@@ -730,7 +730,7 @@ static void DoPartialGridCalculationBlockInThread(NFmiLocationIndexRangeCalculat
 class CalculationBlockParamsHolder
 {
 public:
-	CalculationBlockParamsHolder(LocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, boost::shared_ptr<NFmiSmartToolCalculation> &theCalculation, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
+	CalculationBlockParamsHolder(NFmiLocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, boost::shared_ptr<NFmiSmartToolCalculation> &theCalculation, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
 	:itsLocationIndexRangeCalculator(&theLocationIndexRangeCalculator)
 	,itsInfo(&theInfo)
 	,itsCalculationBlock(&theCalculationBlock)
