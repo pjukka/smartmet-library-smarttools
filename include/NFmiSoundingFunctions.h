@@ -16,6 +16,12 @@
 
 namespace NFmiSoundingFunctions
 {
+    double ESAT(double T);
+    double ESAT2(double Tk);
+    double ESAT3(double Tc);
+    double ESAT4(double Tc);
+
+
 	double FindNearestW(double T, double P);
 	double Tpot2t(double tpot, double p);
 	double CalcRH(double T, double Td);
