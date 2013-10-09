@@ -71,7 +71,7 @@ double WMR(double T, double P)
 }
 
 // http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/
-double ESAT(double T)
+double ESAT(double T) // T kelvineinä tai celsiuksina
 {
 	double T0 = 0.;
 	if(T < 105.)
@@ -101,13 +101,35 @@ double ESAT(double T)
     return esat;
 }
 
+double ESAT2(double Tk) // T kelvineinä (HUOM! kaavassa on jotain vikaa, EI TOIMI)
+{
+    double T0 = 273.15;
+    double esat2 = ::exp( -6763.6/(Tk+T0) - 4.9283* ::log((Tk+T0)) + 54.2190 );
+    return esat2;
+}
+
+double ESAT3(double Tc) // T celsiuksina
+{
+    double ESAT3 = 6.1078 * ::exp( 17.2693882 * Tc / (Tc + 237.3) ) ;
+    return ESAT3;
+}
+
+double ESAT4(double Tc) // T celsiuksina (tällä saadaan parhaat tulokset verrattuna ESAT-funktioon ja tässä on vain yksi exp kun ESAT:issa on 3xpow ja 1xlog10)
+{	
+    if(Tc > 105.)
+        Tc -= 273.15; // muutetaan celsiuksiksi
+
+    double esat4 = 6.112*::exp(17.67*Tc/(243.5+Tc));
+    return esat4;
+}
+
 // http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/
 double MIXR_SAT(double T, double P)
 {
    double Mw=18.0160; // molec mass of water
    double Md=28.9660; // molec mass of dry air
 
-   double X = ESAT(T); // Note: ESAT accepts temperatures in Celsius or K
+   double X = ESAT4(T); // Note: ESAT accepts temperatures in Celsius or K
    double MIXR_SAT = Mw/Md* X*1000. / (P - X);
    return MIXR_SAT;
 }
