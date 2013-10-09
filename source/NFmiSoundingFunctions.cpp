@@ -201,8 +201,8 @@ double OS(double T, double P)
 //;========================================================================
 double TSA(double OS, double P)
 {
-    if(P < 1.256)
-        P = 1.256; // Marko: TSA-funktio ei toimi esim. P = 1 arvoilla, tällöin läpötila saa arvokseen älyttömän suuria arvoja, kokeellisesti saatu minimi P raja oli 1.256
+    if(P < 1.3)
+        P = 1.3; // Marko: TSA-funktio ei toimi esim. P = 1 arvoilla, tällöin laskettu lämpötila saa arvokseen älyttömän suuria arvoja (~99 astetta celsiusta), kokeellisesti saatu minimi P raja oli 1.3
 	double A = OS + 273.16; // muutetaan tässä kelvineiksi
 	double TQ = 253.16;
 	double D = 120.;
