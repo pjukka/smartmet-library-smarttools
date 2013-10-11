@@ -118,6 +118,7 @@ static void CalcAllSoundingIndexParamFields(boost::shared_ptr<NFmiFastQueryInfo>
 	// bool useAnalyzeData = false; // toistaiseksi ei k‰ytˆss‰
 
 	NFmiSoundingDataOpt1 soundingDataOpt1;
+	unsigned long counter = 0;
 	for(theResultInfo->ResetLocation(); theResultInfo->NextLocation(); )
 	{
 		try
@@ -126,12 +127,14 @@ static void CalcAllSoundingIndexParamFields(boost::shared_ptr<NFmiFastQueryInfo>
 			if(useFastFill)
 				theSourceInfo->LocationIndex(theResultInfo->LocationIndex());
 			::FillSoundingDataOpt1(theSourceInfo, soundingDataOpt1, theResultInfo->Time(), theResultInfo->LatLon(), useFastFill);
+            if(theSourceInfo->Grid() && !soundingDataOpt1.IsDataGood())
+                continue; // jos oltiin mallidatassa ja datassa oli tiettyj‰ puutteita, ei tehd‰ laskentoja
 
-			unsigned long counter = 0;
-			for(theResultInfo->ResetParam(); theResultInfo->NextParam(); counter++)
+			for(theResultInfo->ResetParam(); theResultInfo->NextParam(); )
 			{
+                counter++;
 				if(counter%20 == 0)
-					::CheckIfStopped(theStopFunctor); // joka 20 hilapisteell‰ katsotaan, pit‰‰kˆ lopettaa
+					::CheckIfStopped(theStopFunctor); // joka 20 hila/paramtrilla -pisteell‰ katsotaan, pit‰‰kˆ lopettaa
 
 				FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theResultInfo->Param().GetParamIdent());
 				// bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
@@ -242,8 +245,9 @@ static void CalculateSoundingDataOneTimeStepAtTime(boost::shared_ptr<NFmiFastQue
 // theMaxThreadCount -parametrilla voidaan rajoittaa k‰ytett‰vien threadien m‰‰r‰‰. Jos sen arvo on <=0, 
 // ei rajoitusta ole ja k‰ytet‰‰n koneen kaikkia coreja (paitsi jos fUseOnlyOneThread = true, jolloin 
 // k‰ytet‰‰n vain yht‰ threadia).
-void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread, int theMaxThreadCount)
+void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread, int theMaxThreadCount, bool useFastESATCalculations)
 {
+    NFmiSoundingFunctions::UseFastESATCalculations(useFastESATCalculations);
 	NFmiSoundingFunctions::CalcDP(1, 56); // t‰m‰ funktio pit‰‰ varmistaa ett‰ se on alustettu, koska siell‰ on pari staattista muuttujaa, jotka 
 											// alustetaan ensimm‰isell‰ kerralla ja multi-threaddaavassa jutussa se voisi olla ongelma.
 
@@ -253,10 +257,10 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 
 	unsigned long timeSize = theResultData.Info()->SizeTimes();
 	unsigned int usedThreadCount = boost::thread::hardware_concurrency();
-	if(usedThreadCount > timeSize)
-		usedThreadCount = timeSize;
 	if(theMaxThreadCount > 0 && usedThreadCount > static_cast<unsigned int>(theMaxThreadCount))
 		usedThreadCount = static_cast<unsigned int>(theMaxThreadCount); // jos on haluttu s‰‰t‰‰ maksim threadien m‰‰r‰‰, s‰‰det‰‰n maksimia jos usedThreadCount olisi muuten ylitt‰nyt sen.
+
+    usedThreadCount = NFmiQueryDataUtil::CalcOptimalThreadCount(usedThreadCount, timeSize);
 
 	if(fUseOnlyOneThread || usedThreadCount < 2)
 	{ // jos aikoja oli alle kaksi, lasketaan data yhdess‰ funktiossa
@@ -729,7 +733,7 @@ static NFmiQueryInfo MakeSoundingIndexInfo(NFmiQueryData &theSourceData, const s
 	return info;
 }
 
-boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread, int theMaxThreadCount)
+boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread, int theMaxThreadCount, bool useFastESATCalculations)
 {
 	// 1. lue uusin pohjadata k‰yttˆˆn
 	boost::shared_ptr<NFmiQueryData> sourceData(NFmiQueryDataUtil::ReadNewestData(theSourceFileFilter));
@@ -748,7 +752,7 @@ boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingI
 	if(data == 0)
 		throw std::runtime_error("Error in CreateNewSoundingIndexData, could not create result data.");
 	// 4. t‰yt‰ qdata
-	NFmiSoundingIndexCalculator::CalculateWholeSoundingData(*sourceData.get(), *data.get(), true, fDoCerrReporting, theStopFunctor, fUseOnlyOneThread, theMaxThreadCount);
+    NFmiSoundingIndexCalculator::CalculateWholeSoundingData(*sourceData.get(), *data.get(), true, fDoCerrReporting, theStopFunctor, fUseOnlyOneThread, theMaxThreadCount, useFastESATCalculations);
 
 	return data;
 }
