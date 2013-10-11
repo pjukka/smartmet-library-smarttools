@@ -577,15 +577,53 @@ bool NFmiSoundingDataOpt1::FillParamData(const boost::shared_ptr<NFmiFastQueryIn
 	return status;
 }
 
-unsigned int NFmiSoundingDataOpt1::GetHighestNonMissingValueLevelIndex(FmiParameterName theParaId)
+unsigned long NFmiSoundingDataOpt1::GetHighestNonMissingValueLevelIndex(FmiParameterName theParaId)
 {
 	std::deque<float> &vec = GetParamData(theParaId);
 	std::deque<float>::size_type ssize = vec.size();
-	unsigned int index = 0;
-	for(unsigned int i = 0; i < ssize; i++)
+	unsigned long index = 0;
+	for(unsigned long i = 0; i < ssize; i++)
 		if(vec[i] != kFloatMissing)
 			index = i;
 	return index;
+}
+
+unsigned long NFmiSoundingDataOpt1::GetLowestNonMissingValueLevelIndex(FmiParameterName theParaId)
+{
+	std::deque<float> &vec = GetParamData(theParaId);
+	std::deque<float>::size_type ssize = vec.size();
+	for(unsigned long i = 0; i < ssize; i++)
+		if(vec[i] != kFloatMissing)
+			return i;
+    return gMissingIndex;
+}
+
+// Tarkistaa onko annetun parametrin alin ei puuttuva indeksi liian korkea, jotta data olisi hyvää (= ei liian puutteellista).
+// Jos data on liian puutteellista, palautetaan true, muuten false.
+bool NFmiSoundingDataOpt1::CheckForMissingLowLevelData(FmiParameterName theParaId, unsigned long theMissingIndexLimit)
+{
+    unsigned long index = GetLowestNonMissingValueLevelIndex(theParaId);
+    if(index == gMissingIndex || index > theMissingIndexLimit)
+        return true;
+    else
+        return false;
+}
+
+bool NFmiSoundingDataOpt1::IsDataGood()
+{
+	double T=kFloatMissing,
+		   Td=kFloatMissing,
+		   P=kFloatMissing;
+	if(!GetValuesNeededInLCLCalculations(kLCLCalcSurface, T, Td, P))
+        return false;
+
+    unsigned long missingIndexLimit = FmiRound(itsTemperatureData.size() * 0.2);  // jos viidesosa tärkeän parametrin ala alaosasta puuttuu, oletetaan että data on liian puutteellista ja kelvotonta
+    if(CheckForMissingLowLevelData(kFmiTemperature, missingIndexLimit))
+        return false;
+    if(CheckForMissingLowLevelData(kFmiDewPoint, missingIndexLimit))
+        return false;
+
+    return true;
 }
 
 // tämä leikkaa Fill.. -metodeissa laskettuja data vektoreita niin että pelkät puuttuvat kerrokset otetaan pois

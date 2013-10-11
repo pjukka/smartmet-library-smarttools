@@ -68,6 +68,7 @@ public:
 	bool FillSoundingData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiMetTime& theTime, const NFmiMetTime& theOriginTime, const NFmiPoint& theLatlon, const NFmiString &theName, const boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo, bool useFastFill = false);
 	void CutEmptyData(void); // tämä leikkaa Fill.. -metodeissa laskettuja data vektoreita niin että pelkät puuttuvat kerrokset otetaan pois
 	static bool HasRealSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theSoundingLevelInfo);
+    bool IsDataGood();
 
 	// FillSoundingData-metodeilla täytetään kunkin parametrin vektorit ja tällä saa haluamansa parametrin vektorin käyttöön
 	std::deque<float>& GetParamData(FmiParameterName theId);
@@ -133,7 +134,9 @@ private:
 	bool CheckLFCIndexCache(FmiLCLCalcType theLCLCalcTypeIn, double &theLfcIndexValueOut, double &theELValueOut);
 	void FillLFCIndexCache(FmiLCLCalcType theLCLCalcType, double theLfcIndexValue, double theELValue);
 	void FixPressureDataSoundingWithGroundData(const boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo);
-	unsigned int GetHighestNonMissingValueLevelIndex(FmiParameterName theParaId);
+	unsigned long GetHighestNonMissingValueLevelIndex(FmiParameterName theParaId);
+    unsigned long GetLowestNonMissingValueLevelIndex(FmiParameterName theParaId);
+    bool CheckForMissingLowLevelData(FmiParameterName theParaId, unsigned long theMissingIndexLimit);
 	float GetPressureAtHeight(double H);
 	void ClearDatas(void);
 	bool FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId);
