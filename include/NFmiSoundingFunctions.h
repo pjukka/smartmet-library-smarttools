@@ -20,7 +20,7 @@ namespace NFmiSoundingFunctions
     double ESAT2(double Tk);
     double ESAT3(double Tc);
     double ESAT4(double Tc);
-
+    void UseFastESATCalculations(bool newValue);
 
 	double FindNearestW(double T, double P);
 	double Tpot2t(double tpot, double p);

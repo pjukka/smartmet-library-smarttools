@@ -16,6 +16,9 @@
 
 namespace NFmiSoundingFunctions
 {
+    bool gUseFastESATCalculations = false;
+
+    void UseFastESATCalculations(bool newValue) {gUseFastESATCalculations = newValue;}
 
 // Funktio laskee kastepisteen (DP) lämpötilan (T) ja suhteellisen
 // kosteuden (RH) avulla. Lämpötila ja kastepiste ovat celsiuksina.
@@ -73,6 +76,9 @@ double WMR(double T, double P)
 // http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/
 double ESAT(double T) // T kelvineinä tai celsiuksina
 {
+    if(gUseFastESATCalculations)
+        return ESAT4(T);
+
 	double T0 = 0.;
 	if(T < 105.)
 		T0=273.15;
@@ -129,7 +135,7 @@ double MIXR_SAT(double T, double P)
    double Mw=18.0160; // molec mass of water
    double Md=28.9660; // molec mass of dry air
 
-   double X = ESAT4(T); // Note: ESAT accepts temperatures in Celsius or K
+   double X = ESAT(T); // Note: ESAT accepts temperatures in Celsius or K
    double MIXR_SAT = Mw/Md* X*1000. / (P - X);
    return MIXR_SAT;
 }
