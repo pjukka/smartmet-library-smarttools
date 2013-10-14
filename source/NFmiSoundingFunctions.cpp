@@ -13,6 +13,7 @@
 #include <NFmiInterpolation.h>
 
 #include <iostream>
+#include <map>
 
 namespace NFmiSoundingFunctions
 {

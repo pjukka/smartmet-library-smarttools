@@ -121,6 +121,13 @@ static void CalcAllSoundingIndexParamFields(boost::shared_ptr<NFmiFastQueryInfo>
 	unsigned long counter = 0;
 	for(theResultInfo->ResetLocation(); theResultInfo->NextLocation(); )
 	{
+/*
+        if(theResultInfo->LocationIndex() > 0)
+        {
+            PrintLiftedAirParcelDebugCounter();
+            break;
+        }
+*/
 		try
 		{
 			// bool surfaceBaseStatus = false;

@@ -17,8 +17,12 @@
 #include <NFmiParameterName.h>
 
 #include <deque>
+#include <unordered_map>
 
 class NFmiFastQueryInfo;
+
+#define USE_LIFTED_AIR_PARCEL_CACHE
+   void PrintLiftedAirParcelDebugCounter();
 
 class NFmiSoundingDataOpt1
 {
@@ -144,6 +148,9 @@ private:
 	bool FastFillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId);
 	void InitZeroHeight(void); // tätä kutsutaan FillParamData-metodeista
 	void CalculateHumidityData(void);
+#ifdef USE_LIFTED_AIR_PARCEL_CACHE
+    std::string MakeCacheString(double T, double Td, double fromP, double toP);
+#endif // USE_LIFTED_AIR_PARCEL_CACHE
 
 	NFmiLocation itsLocation;
 	NFmiMetTime	itsTime;
@@ -168,7 +175,10 @@ private:
 	bool fPressureDataAvailable;
 	bool fHeightDataAvailable;
 
-	LFCIndexCache itsLFCIndexCache;
+    LFCIndexCache itsLFCIndexCache;
+#ifdef USE_LIFTED_AIR_PARCEL_CACHE
+    std::unordered_map<std::string, double> itsLiftedAirParcelCache;
+#endif // USE_LIFTED_AIR_PARCEL_CACHE
 };
 
 #endif // NFMISOUNDINGDATAOPT1_H
