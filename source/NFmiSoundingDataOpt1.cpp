@@ -18,44 +18,6 @@
 
 #include <fstream>
 
-    // debuggaus infoa
-    struct CalcTOfLiftedAirParcel_debugInfo
-    {
-        CalcTOfLiftedAirParcel_debugInfo(double T, double Td, double fromP, double toP)
-            :mT(T)
-            ,mTd(Td)
-            ,mFromP(fromP)
-            ,mToP(toP)
-        {}
-
-        double mT;
-        double mTd;
-        double mFromP;
-        double mToP;
-    };
-
-    bool operator<(const CalcTOfLiftedAirParcel_debugInfo &d1, const CalcTOfLiftedAirParcel_debugInfo &d2)
-    {
-        if(d1.mT != d2.mT)
-            return d1.mT < d2.mT;
-        else if(d1.mTd != d2.mTd)
-            return d1.mTd < d2.mTd;
-        else if(d1.mFromP != d2.mFromP)
-            return d1.mFromP < d2.mFromP;
-        else
-            return d1.mToP < d2.mToP;
-    }
-
-    std::map<CalcTOfLiftedAirParcel_debugInfo, int> gLiftedAirParcelDebugCounter;
-
-    void PrintLiftedAirParcelDebugCounter()
-    {
-        std::cout << "LiftedAirParcel-values:" << std::endl;
-        for(std::map<CalcTOfLiftedAirParcel_debugInfo, int>::iterator it = gLiftedAirParcelDebugCounter.begin(); it != gLiftedAirParcelDebugCounter.end(); ++it)
-            std::cout << "Values: T=" << it->first.mT << ",Td=" << it->first.mTd << ",fromP=" << it->first.mFromP << ",toP=" << it->first.mToP << " count: " << it->second << std::endl;
-    }
-
-
 // hakee lähimmän sopivan painepinnan, mistä löytyy halutuille parametreille arvot
 // Mutta ei sallita muokkausta ennen 1. validia leveliä!
 bool NFmiSoundingDataOpt1::GetTandTdValuesFromNearestPressureLevel(double P, double &theFoundP, double &theT, double &theTd)
@@ -2203,28 +2165,23 @@ double NFmiSoundingDataOpt1::CalcWSatHeightIndex(double theH)
 	return GetValueAtHeight(kFmiWindSpeedMS, static_cast<float>(theH));
 }
 
-#ifdef USE_LIFTED_AIR_PARCEL_CACHE
 std::string NFmiSoundingDataOpt1::MakeCacheString(double T, double Td, double fromP, double toP)
 {
     char buffer[128] = {0};
-    int counter = sprintf(buffer, "%g,%g,%g,%g", T, Td, fromP, toP); 
+    int counter = sprintf(buffer, "%f,%f,%f,%f", T, Td, fromP, toP); 
     return std::string(buffer, counter);
 }
-#endif // USE_LIFTED_AIR_PARCEL_CACHE
 
 // Laske ilmapaketin lämpötila nostamalla ilmapakettia
 // Nosta kuiva-adiapaattisesti LCL-korkeuteen ja siitä eteenpäin kostea-adiapaattisesti
 double NFmiSoundingDataOpt1::CalcTOfLiftedAirParcel(double T, double Td, double fromP, double toP)
 {
-#ifdef USE_LIFTED_AIR_PARCEL_CACHE
     std::string cacheKeyStr = MakeCacheString(T, Td, fromP, toP);
-    std::unordered_map<std::string, double>::iterator it = itsLiftedAirParcelCache.find(cacheKeyStr);
+    LiftedAirParcelCacheType::iterator it = itsLiftedAirParcelCache.find(cacheKeyStr);
     if(it != itsLiftedAirParcelCache.end())
-        return it->second;
-#endif // USE_LIFTED_AIR_PARCEL_CACHE
-//    CalcTOfLiftedAirParcel_debugInfo di(T, Td, fromP, toP);
-//    gLiftedAirParcelDebugCounter[di]++;
+        return it->second; // palautetaan arvo cachesta
 
+    double Tparcel = kFloatMissing;
 	// 1. laske LCL kerroksen paine alkaen fromP:stä
 	double lclPressure = NFmiSoundingFunctions::CalcLCLPressureFast(T, Td, fromP);
 	if(lclPressure != kFloatMissing)
@@ -2235,11 +2192,7 @@ double NFmiSoundingDataOpt1::CalcTOfLiftedAirParcel(double T, double Td, double 
 		{
 			if(lclPressure <= toP) // jos lcl oli yli toP:n mb (eli pienempi kuin toP)
 			{ // nyt riittää pelkkä kuiva-adiapaattinen nosto fromP -> toP
-				double Tparcel = NFmiSoundingFunctions::Tpot2t(TpotStart, toP);
-#ifdef USE_LIFTED_AIR_PARCEL_CACHE
-                itsLiftedAirParcelCache[cacheKeyStr] = Tparcel;
-#endif // USE_LIFTED_AIR_PARCEL_CACHE
-				return Tparcel;
+				Tparcel = NFmiSoundingFunctions::Tpot2t(TpotStart, toP);
 			}
 			else
 			{
@@ -2253,19 +2206,13 @@ double NFmiSoundingDataOpt1::CalcTOfLiftedAirParcel(double T, double Td, double 
 				{
 					double AOS = NFmiSoundingFunctions::OS(TmoistLCL, 1000.);
 					// Sitten lasketaan lämpötila viimein 500 mb:hen
-					double Tparcel = NFmiSoundingFunctions::TSA(AOS, toP);
-#ifdef USE_LIFTED_AIR_PARCEL_CACHE
-                    itsLiftedAirParcelCache[cacheKeyStr] = Tparcel;
-#endif // USE_LIFTED_AIR_PARCEL_CACHE
-					return Tparcel;
+					Tparcel = NFmiSoundingFunctions::TSA(AOS, toP);
 				}
 			}
 		}
 	}
-#ifdef USE_LIFTED_AIR_PARCEL_CACHE
-    itsLiftedAirParcelCache[cacheKeyStr] = kFloatMissing;
-#endif // USE_LIFTED_AIR_PARCEL_CACHE
-	return kFloatMissing;
+    itsLiftedAirParcelCache[cacheKeyStr] = Tparcel;
+	return Tparcel;
 }
 
 // Haetaan minimi lämpötilan arvo ja sen korkeuden paine.
