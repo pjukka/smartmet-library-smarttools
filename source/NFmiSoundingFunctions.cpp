@@ -17,9 +17,6 @@
 
 namespace NFmiSoundingFunctions
 {
-    bool gUseFastESATCalculations = false;
-
-    void UseFastESATCalculations(bool newValue) {gUseFastESATCalculations = newValue;}
 
 // Funktio laskee kastepisteen (DP) lämpötilan (T) ja suhteellisen
 // kosteuden (RH) avulla. Lämpötila ja kastepiste ovat celsiuksina.
@@ -77,9 +74,6 @@ double WMR(double T, double P)
 // http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/
 double ESAT(double T) // T kelvineinä tai celsiuksina
 {
-    if(gUseFastESATCalculations)
-        return ESAT4(T);
-
 	double T0 = 0.;
 	if(T < 105.)
 		T0=273.15;
@@ -108,6 +102,7 @@ double ESAT(double T) // T kelvineinä tai celsiuksina
     return esat;
 }
 
+/*
 double ESAT2(double Tk) // T kelvineinä (HUOM! kaavassa on jotain vikaa, EI TOIMI)
 {
     double T0 = 273.15;
@@ -129,6 +124,7 @@ double ESAT4(double Tc) // T celsiuksina (tällä saadaan parhaat tulokset verratt
     double esat4 = 6.112*::exp(17.67*Tc/(243.5+Tc));
     return esat4;
 }
+*/
 
 // http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/
 double MIXR_SAT(double T, double P)
