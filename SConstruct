@@ -57,6 +57,7 @@ else:
         # MAINFLAGS from orig. Makefile ('-fPIC' is automatically added by SCons)
         #
         "-fPIC", 
+	"-std=c++0x",
         "-Wall", 
         "-Wno-unused-parameter",
 #       "-Wno-variadic-macros",
@@ -134,7 +135,6 @@ if DEBUG:
     
             # EXTRAFLAGS from orig. Makefile (for 'debug' target)
             #
-            "-ansi",
             "-Wcast-align",
             "-Wcast-qual",
             "-Winline",
