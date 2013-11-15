@@ -50,6 +50,20 @@ class NFmiInfoOrganizer
 public:
 	typedef std::map<std::string, boost::shared_ptr<NFmiQueryDataSetKeeper> > MapType;
 
+    struct ParamCheckFlags
+    {   // T‰m‰n rakenteen avulla voidaan halutessa varmistaa ainakin FindSoundingInfo -metodissa, ett‰ palautettavassa datassa on tiettyj‰ parametreja, esim.:
+        // fSounding -> P, T, Td, RH, WS, WD
+        // fTrajectory -> P, WS, WD, w
+        ParamCheckFlags(bool sounding = false, bool trajectory = false)
+            :fSounding(sounding)
+            ,fTrajectory(trajectory)
+        {}
+
+        bool fSounding;
+        bool fTrajectory;
+    };
+
+
 	NFmiInfoOrganizer(void);
 	~NFmiInfoOrganizer(void);
 
@@ -82,7 +96,7 @@ public:
 	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(NFmiInfoData::Type theType, bool fGroundData, int theProducerId, int theProducerId2 = -1); // palauttaa vectorin halutun tuottajan infoja
 	boost::shared_ptr<NFmiFastQueryInfo> FindInfo(NFmiInfoData::Type theDataType, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
 	boost::shared_ptr<NFmiFastQueryInfo> FindInfo(NFmiInfoData::Type theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
-	boost::shared_ptr<NFmiFastQueryInfo> FindSoundingInfo(const NFmiProducer &theProducer, int theIndex = 0); // Hakee parhaan luotaus infon tuottajalle
+	boost::shared_ptr<NFmiFastQueryInfo> FindSoundingInfo(const NFmiProducer &theProducer, int theIndex = 0, ParamCheckFlags paramCheckFlags = ParamCheckFlags()); // Hakee parhaan luotaus infon tuottajalle
 
 	// HUOM! N‰m‰ makroParamData jutut pit‰‰ mietti‰ uusiksi, jos niit‰ aletaan k‰sittelem‰‰n eri s‰ikeiss‰. T‰llˆin
 	// Niist‰ pit‰‰ luoda aina ilmeisesti paikalliset kopiot?!?!
@@ -139,6 +153,8 @@ private:
 	boost::shared_ptr<NFmiFastQueryInfo> GetWantedProducerInfo(NFmiInfoData::Type theType, FmiProducerName theProducerName);
 	boost::shared_ptr<NFmiDrawParam> CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, const boost::shared_ptr<NFmiFastQueryInfo> &theInfo2);
+    int IsGoodSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiProducer &theProducer, bool ignoreProducer, const ParamCheckFlags &paramCheckFlags);
+    bool HasGoodParamsForSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const ParamCheckFlags &paramCheckFlags);
 
 	boost::shared_ptr<NFmiQueryDataKeeper> itsEditedDataKeeper; // pit‰‰ sis‰ll‰‰n oikeasti NFmiSmartInfo-olion
 	boost::shared_ptr<NFmiQueryDataKeeper> itsCopyOfEditedDataKeeper;
@@ -154,4 +170,6 @@ private:
 	boost::shared_ptr<NFmiFastQueryInfo> itsCrossSectionMacroParamData; // poikkileikkaus makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
 	NFmiDataMatrix<float> itsCrossSectionMacroParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
 	bool fCreateEditedDataCopy; // luodaanko vai eikˆ luoda kopiota editoidusta datasta
+    std::vector<FmiParameterName> itsWantedSoundingParams;
+    std::vector<FmiParameterName> itsWantedTrajectoryParams;
 };

@@ -27,7 +27,19 @@ NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 ,itsCrossSectionMacroParamData()
 ,itsCrossSectionMacroParamMissingValueMatrix()
 ,fCreateEditedDataCopy(false)
+,itsWantedSoundingParams()
+,itsWantedTrajectoryParams()
 {
+    itsWantedSoundingParams.push_back(kFmiTemperature);
+    itsWantedSoundingParams.push_back(kFmiDewPoint);
+    itsWantedSoundingParams.push_back(kFmiHumidity);
+    itsWantedSoundingParams.push_back(kFmiWindSpeedMS);
+    itsWantedSoundingParams.push_back(kFmiWindDirection);
+
+    itsWantedTrajectoryParams.push_back(kFmiWindSpeedMS);
+    itsWantedTrajectoryParams.push_back(kFmiWindDirection);
+    itsWantedTrajectoryParams.push_back(kFmiVelocityPotential);
+    itsWantedTrajectoryParams.push_back(kFmiVerticalVelocityMMS);
 }
 
 NFmiInfoOrganizer::~NFmiInfoOrganizer(void)
@@ -470,11 +482,43 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindInfo(NFmiInfoData::T
 	return boost::shared_ptr<NFmiFastQueryInfo>();
 }
 
+static bool CheckForVerticalData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+    return theInfo->PressureDataAvailable() || theInfo->HeightDataAvailable();
+}
+
+static bool CheckForParams(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const std::vector<FmiParameterName> &wantedParams)
+{
+    if(::CheckForVerticalData(theInfo))
+    {
+        int paramsFound = 0;
+        for (size_t i = 0; i < wantedParams.size(); i++)
+        {
+            if(theInfo->Param(wantedParams[i]))
+                paramsFound++;
+        }
+        if(paramsFound)
+            return true;
+    }
+
+    return false;
+}
+
+bool NFmiInfoOrganizer::HasGoodParamsForSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const ParamCheckFlags &paramCheckFlags)
+{
+    if(paramCheckFlags.fSounding)
+        return ::CheckForParams(theInfo, itsWantedSoundingParams);
+    else if(paramCheckFlags.fTrajectory)
+        return ::CheckForParams(theInfo, itsWantedTrajectoryParams);
+
+    return true;
+}
+
 // vastaus 0 = ei ole
 // 1 = on sounding dataa, mutta ei välttämättä paras mahd.
 // 2 = on hyvää dataa
 // Tämä on malli datojen kanssa  niin että painepinta data on 1 ja hybridi on 2
-static int IsGoodSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiProducer &theProducer, bool ignoreProducer)
+int NFmiInfoOrganizer::IsGoodSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiProducer &theProducer, bool ignoreProducer, const ParamCheckFlags &paramCheckFlags)
 {
 	if(theInfo)
 	{
@@ -482,10 +526,13 @@ static int IsGoodSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, con
 		{
 			if(theInfo->SizeLevels() > 3) // pitää olla väh 4 leveliä ennen kuin kelpuutetaan sounding dataksi
 			{
-				if(theInfo->DataType() == NFmiInfoData::kHybridData)
-					return 2;
-				else
-					return 1;
+                if(HasGoodParamsForSoundingData(theInfo, paramCheckFlags))
+                {
+				    if(theInfo->DataType() == NFmiInfoData::kHybridData)
+					    return 2;
+				    else
+					    return 1;
+                }
 			}
 		}
 	}
@@ -494,13 +541,13 @@ static int IsGoodSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, con
 
 // Hakee parhaan luotaus infon tuottajalle. Eli jos kyseessä esim hirlam tuottaja, katsotaan löytyykö
 // hybridi dataa ja sitten tyydytään viewable-dataa (= painepinta)
-boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindSoundingInfo(const NFmiProducer &theProducer, int theIndex)
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindSoundingInfo(const NFmiProducer &theProducer, int theIndex, ParamCheckFlags paramCheckFlags)
 {
 	boost::shared_ptr<NFmiFastQueryInfo> exceptableInfo;
 	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
 	{
 		boost::shared_ptr<NFmiFastQueryInfo> aInfo = iter->second->GetDataKeeper()->GetIter();
-		int result = ::IsGoodSoundingData(aInfo, theProducer, false);
+		int result = IsGoodSoundingData(aInfo, theProducer, false, paramCheckFlags);
 		if(result != 0 && theIndex < 0)
 		{ // haetaan vanhempaa malliajo dataa
 			boost::shared_ptr<NFmiQueryDataKeeper> qDataKeeper = iter->second->GetDataKeeper(theIndex);
@@ -526,7 +573,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindSoundingInfo(const N
 	{
 		if(theProducer.GetIdent() == kFmiMETEOR || (*aInfo->Producer() == theProducer)) // tässä hanskataan 'editoitu' data, jolloin ignoorataan tuottaja
 		{
-			int result = ::IsGoodSoundingData(aInfo, theProducer, true);
+			int result = IsGoodSoundingData(aInfo, theProducer, true, paramCheckFlags);
 			if(result != 0)
 				exceptableInfo = aInfo;
 		}
