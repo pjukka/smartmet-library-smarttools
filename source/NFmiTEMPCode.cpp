@@ -386,6 +386,8 @@ static bool DecodeHeader(std::stringstream &ssin, NFmiStation &theStation, NFmiM
 {
 	std::string first_Str; // esim. "USFI99"
 	ssin >> first_Str;
+    if(first_Str.size() > 6 && std::isdigit(first_Str[0]))
+    	ssin >> first_Str; // joskus 1. stringinä on pitkä luku kutem esim. 0000034101, tämä pitää ohittaa
 	bool wyoming_raw_data = false;
 	if(::toupper(first_Str[0]) == 'T' && ::toupper(first_Str[1]) == 'T') // wyoming raw data alkaa TTAA, TTBB jne. osioilla
 		wyoming_raw_data = true;
@@ -403,7 +405,11 @@ static bool DecodeHeader(std::stringstream &ssin, NFmiStation &theStation, NFmiM
 	if(wyoming_raw_data)
 		MiMiMjMj_Str = first_Str;
 	else
+    {
 		ssin >> MiMiMjMj_Str;
+        if(MiMiMjMj_Str.size() != 4 && MiMiMjMj_Str.size() > 0 && std::isalpha(MiMiMjMj_Str[0]) && MiMiMjMj_Str[0] != 'T')
+    		ssin >> MiMiMjMj_Str; // joskus voi olla esim. RRB sana ennen TTxx -stringiä, tällöin vain luetaan seuraava sana
+    }
 	if(MiMiMjMj_Str.size() != 4)
 		return false;
 	bool doTempMobil = false; // jos false, normaali TEMP, muuten TEMP MOBIL
@@ -710,63 +716,65 @@ bool NFmiTEMPCode::DecodeB(void)
 
 			}while(ssin.good());
 
-			do // on kaksi tuuli osiota, jotka molemmat käydään läpi
-			{
-				do // Käydään sitten osio, missä on tuulien käännepisteet
-				{
-					double P = kFloatMissing;
-					double WD = kFloatMissing;
-					double WS = kFloatMissing;
+			if(XXPPP_Str == "21212") // etsitään vain merkittäviä tuulia, jotka tulevat 21212-ryhmän jälkeen
+            {
+			    do // on kaksi tuuli osiota, jotka molemmat käydään läpi
+			    {
+				    do // Käydään sitten osio, missä on tuulien käännepisteet
+				    {
+					    double P = kFloatMissing;
+					    double WD = kFloatMissing;
+					    double WS = kFloatMissing;
 
-					ssin >> XXPPP_Str;
-					if(XXPPP_Str.size() != 5)
-						return false;
-					if(XXPPP_Str == "41414")
-						break; // nyt tultiin tämän osion loppuun
-					if(XXPPP_Str == "51515") // joskus 51515 tulee ilman 41414:ää
-					{
-						_41414_groupMissing = true;
-						break; // nyt tultiin tämän osion loppuun
-					}
-					if(XXPPP_Str == "31313")
-					{
-						// en tiedä mikä tämä on, mutta luetaan pois
-						std::string tmp1, tmp2;
-						ssin >> tmp1;
-						ssin >> tmp2;
-						continue; // jatketaan looppia, seuraavaksi pitäisi tulla 41414
-					}
+					    ssin >> XXPPP_Str;
+					    if(XXPPP_Str.size() != 5)
+						    return false;
+					    if(XXPPP_Str == "41414")
+						    break; // nyt tultiin tämän osion loppuun
+					    if(XXPPP_Str == "51515") // joskus 51515 tulee ilman 41414:ää
+					    {
+						    _41414_groupMissing = true;
+						    break; // nyt tultiin tämän osion loppuun
+					    }
+					    if(XXPPP_Str == "31313")
+					    {
+						    // en tiedä mikä tämä on, mutta luetaan pois
+						    std::string tmp1, tmp2;
+						    ssin >> tmp1;
+						    ssin >> tmp2;
+						    continue; // jatketaan looppia, seuraavaksi pitäisi tulla 41414
+					    }
 
-					P = NFmiStringTools::Convert<double>(std::string(XXPPP_Str.begin()+2, XXPPP_Str.begin()+5));
-					if(P < 50.)
-						P += 1000.;
-					ssin >> dddff_Str;
-					if(dddff_Str.size() != 5)
-						return false;
-					status &= ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
+					    P = NFmiStringTools::Convert<double>(std::string(XXPPP_Str.begin()+2, XXPPP_Str.begin()+5));
+					    if(P < 50.)
+						    P += 1000.;
+					    ssin >> dddff_Str;
+					    if(dddff_Str.size() != 5)
+						    return false;
+					    status &= ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
 
-					levelData.Clear();
-					levelData.itsPressure = P;
-					levelData.itsWD = WD;
-					levelData.itsWS = WS;
-					AddData(levelData); // laitetaan saatu leveli talteen
+					    levelData.Clear();
+					    levelData.itsPressure = P;
+					    levelData.itsWD = WD;
+					    levelData.itsWS = WS;
+					    AddData(levelData); // laitetaan saatu leveli talteen
 
-				}while(ssin.good());
-				if(_41414_groupMissing == false)
-				{
-					std::string NhClCmCh_Str;
-					ssin >> NhClCmCh_Str;
-					std::string check_Str;
-					ssin >> check_Str;
-					if(check_Str != "51515")
-						break; // 1. tuuli osion jälkeen kun on tultu "41414" merkkiin, on kaksi juttu jotka luetaan
-								// toinen on synop pilvi osuus ja toinen on 51515 merkki, josta alkaa 2. tuuli osuus
-								// jos sitä ei löydy, voidaan olettaa että ollaan menty jo sen ohi ja lopetetaan.
-				}
-				else
-					_41414_groupMissing = false; // pitää 'nollata' tämä lippu jos se oli päällä
-			}while(ssin.good());
-
+				    }while(ssin.good());
+				    if(_41414_groupMissing == false)
+				    {
+					    std::string NhClCmCh_Str;
+					    ssin >> NhClCmCh_Str;
+					    std::string check_Str;
+					    ssin >> check_Str;
+					    if(check_Str != "51515")
+						    break; // 1. tuuli osion jälkeen kun on tultu "41414" merkkiin, on kaksi juttu jotka luetaan
+								    // toinen on synop pilvi osuus ja toinen on 51515 merkki, josta alkaa 2. tuuli osuus
+								    // jos sitä ei löydy, voidaan olettaa että ollaan menty jo sen ohi ja lopetetaan.
+				    }
+				    else
+					    _41414_groupMissing = false; // pitää 'nollata' tämä lippu jos se oli päällä
+			    }while(ssin.good());
+            }
 			return true;
 		}
 	}
