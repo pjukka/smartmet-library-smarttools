@@ -26,11 +26,11 @@ NFmiAviationStation* NFmiAviationStationInfoSystem::FindStation(const std::strin
 	return 0;
 }
 
-NFmiAviationStation* NFmiAviationStationInfoSystem::FindStation(unsigned long theWmoId)
+NFmiAviationStation* NFmiAviationStationInfoSystem::FindStation(long theWmoId)
 {
 	if(fWmoStationsWanted)
 	{
-		std::map<unsigned long, NFmiAviationStation>::iterator it = itsWmoStations.find(theWmoId);
+		std::map<long, NFmiAviationStation>::iterator it = itsWmoStations.find(theWmoId);
 		if(it != itsWmoStations.end())
 		{
 			return &(it->second);
@@ -43,7 +43,7 @@ NFmiAviationStation* NFmiAviationStationInfoSystem::FindStation(unsigned long th
 // FIN,FI,Finland,-,,Helsinki,Vantaa,,FIaaEFHK,EFHK,,2974,,HEL,m,EFHK,A,ICA09,,,,2974,A,WMO11,29740,,,,,60.31666667,24.96666667,G,WMO11 WMO10,51,C,WMO11 WMO10,56,C,WMO11 WMO10,Europe/Helsinki,FI-01560,,,,,,60,24
 static bool GetAviationStationFromCsvString(const std::string &theStationStr, NFmiAviationStation &theStationOut, bool fIcaoNeeded, bool fWmoNeeded)
 {
-	static unsigned long currentWmoIdCounter = 128000;
+	static long currentWmoIdCounter = 128000;
 	if(theStationStr.size() > 2)
 	{
 		if(theStationStr[0] == '#')
@@ -59,15 +59,15 @@ static bool GetAviationStationFromCsvString(const std::string &theStationStr, NF
 			bool wmoOk = false;
 			std::string nameStr = stationParts[5];
 			std::string icaoStr = stationParts[15];
-			const unsigned long missingWmoId = 9999999;
-			unsigned long wmoId = missingWmoId;
+			const long missingWmoId = 9999999;
+			long wmoId = missingWmoId;
 			double lat = -9999;
 			double lon = -9999;
 			if(icaoStr.size() == 4)
 				icaoOk = true;
 			try
 			{
-				wmoId = NFmiStringTools::Convert<unsigned long>(stationParts[21]);
+				wmoId = NFmiStringTools::Convert<long>(stationParts[21]);
 				wmoOk = true;
 			}
 			catch(...)
@@ -210,7 +210,7 @@ static double GetLatOrLon(const std::string &theLatOrLonStr, bool fDoLatitude)
 // 10. sarake (lon asteet ja minuutit)
 static bool GetAviationStationFromWmoFlatTableString(const std::string &theStationStr, NFmiAviationStation &theStationOut)
 {
-	static unsigned long currentWmoIdCounter = 128000;
+	static long currentWmoIdCounter = 128000;
 	if(theStationStr.size() > 2)
 	{
 		// HUOM! vaikka data formaatti ei tuekaan kommentteja, annetaan kommenttien tarkistus koodin olla tässä varmuuden vuoksi
@@ -225,13 +225,13 @@ static bool GetAviationStationFromWmoFlatTableString(const std::string &theStati
 			bool latlonOk = false;
 			bool wmoOk = false;
 			std::string nameStr = stationParts[7];
-			const unsigned long missingWmoId = 9999999;
-			unsigned long wmoId = missingWmoId;
+			const long missingWmoId = 9999999;
+			long wmoId = missingWmoId;
 			double lat = -9999;
 			double lon = -9999;
 			try
 			{
-				wmoId = NFmiStringTools::Convert<unsigned long>(stationParts[5]);
+				wmoId = NFmiStringTools::Convert<long>(stationParts[5]);
 				wmoOk = true;
 			}
 			catch(...)

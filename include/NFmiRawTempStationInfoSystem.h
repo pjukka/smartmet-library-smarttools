@@ -42,7 +42,7 @@ public:
 	,itsIcaoStr()
 	{}
 
-	AviationStation(unsigned long theIdent,
+	AviationStation(long theIdent,
 					const NFmiString & theName,
 					double theLongitude,
 					double theLatitude,
@@ -78,7 +78,7 @@ public:
 	void Init(const std::string &theInitFileName);
 
 	bool FindAviationStation(const std::string &theIcaoStr);
-	bool FindStation(unsigned long theStationId);
+	bool FindStation(long theStationId);
 	const NFmiLocation* CurrentLocation(const std::string &theIcaoStr);
 private:
 
@@ -139,7 +139,7 @@ public:
 		return itsName.empty() == false;
 	}
 
-	unsigned long itsWmoId; // wmo-id esim 2792 (= 02-974)
+	long itsWmoId; // wmo-id esim 2792 (= 02-974)
 	std::string itsName; // Helsinki-Vantaa
 	std::string itsIcaoStr; // icao tunnus EFHK
 	std::string itsState; // ainakin US asemilla on state, muilla ei kai ole
@@ -155,11 +155,11 @@ public:
 	NFmiWmoStationLookUpSystem(void);
 	void Init(const std::string &theInitFileName, int theStationCountHint = -1);
 	const std::string& InitLogMessage(void) const {return itsInitLogMessage;}
-	const NFmiWmoStation& GetStation(unsigned long theWmoId);
+	const NFmiWmoStation& GetStation(long theWmoId);
 private:
-	std::vector<NFmiWmoStation> itsStations; // t‰h‰n alustetaan aina haluttu m‰‰r‰ asemia, jotka t‰ytet‰‰n jos niille lˆytyy m‰‰rityksi‰.
-											// T‰m‰n avulla voidaan hakea wmo-id:n avulla suoraan taulukosta tietoja asemasta NOPEASTI!
-	std::string itsInitLogMessage; // onnistuneen tai ep‰onnistuneen initialisoinnin viesti, miss‰ voi olla varoituksia lokiin.
+
+  std::map<long,NFmiWmoStation> itsStations;	// Used to be a vector, but this should be fast enough
+  std::string itsInitLogMessage; // onnistuneen tai ep‰onnistuneen initialisoinnin viesti, miss‰ voi olla varoituksia lokiin.
 };
 
 #endif // NFMIRAWTEMPSTATIONINFOSYSTEM_H
