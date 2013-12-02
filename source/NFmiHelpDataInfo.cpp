@@ -304,7 +304,7 @@ NFmiDataIdent NFmiHelpDataInfoSystem::GetNextSatelChannel(const NFmiDataIdent &t
 	{
 		if(itsDynamicHelpDataInfos[i].DataType() == NFmiInfoData::kSatelData)
 		{
-			if(static_cast<unsigned long>(prodId) == itsDynamicHelpDataInfos[i].ImageDataIdent().GetProducer()->GetIdent())
+			if(prodId == itsDynamicHelpDataInfos[i].ImageDataIdent().GetProducer()->GetIdent())
 			{
 				dataIdentVec.push_back(itsDynamicHelpDataInfos[i].ImageDataIdent());
 				if(theDataIdent.GetParamIdent() == itsDynamicHelpDataInfos[i].ImageDataIdent().GetParamIdent())
@@ -343,7 +343,7 @@ boost::shared_ptr<NFmiArea> NFmiHelpDataInfoSystem::GetDataFilePatternAndArea(NF
 		{
 			if(itsDynamicHelpDataInfos[i].DataType() == theDataType)
 			{
-				if(static_cast<unsigned long>(theProdId) == itsDynamicHelpDataInfos[i].ImageDataIdent().GetProducer()->GetIdent() &&
+				if(theProdId == itsDynamicHelpDataInfos[i].ImageDataIdent().GetProducer()->GetIdent() &&
 				   static_cast<unsigned long>(theParamId) == itsDynamicHelpDataInfos[i].ImageDataIdent().GetParamIdent())
 				{
 					if(fDemandMatchingArea && IsSameTypeProjections(theZoomedArea, itsDynamicHelpDataInfos[i].ImageArea()))

@@ -389,7 +389,7 @@ bool NFmiAviationStationInfoSystem_Obsolite::FindAviationStation(const std::stri
 	return false;
 }
 
-bool NFmiAviationStationInfoSystem_Obsolite::FindStation(unsigned long theStationId)
+bool NFmiAviationStationInfoSystem_Obsolite::FindStation(long theStationId)
 {
 	return itsLocations.Location(theStationId);
 }
@@ -526,13 +526,14 @@ NFmiWmoStationLookUpSystem::NFmiWmoStationLookUpSystem(void)
 {
 }
 
-const NFmiWmoStation& NFmiWmoStationLookUpSystem::GetStation(unsigned long theWmoId)
+const NFmiWmoStation& NFmiWmoStationLookUpSystem::GetStation(long theWmoId)
 {
 	const static NFmiWmoStation dummy;
-	if(theWmoId < itsStations.size())
-		return itsStations[theWmoId];
+	std::map<long,NFmiWmoStation>::const_iterator it = itsStations.find(theWmoId);
+	if(it == itsStations.end())
+	  return dummy;
 	else
-		return dummy;
+	  return it->second;
 }
 
 // purkaa rivin
@@ -547,7 +548,7 @@ static bool GetWmoStationFromString(const std::string &theStationStr, const std:
 		return false; // ignoorataan vain tyhjä/yhden osion rivit
 
 	theStationOut.itsIcaoStr = strVector[2];
-	theStationOut.itsWmoId = NFmiStringTools::Convert<unsigned long>(strVector[0])*1000 + NFmiStringTools::Convert<unsigned long>(strVector[1]);
+	theStationOut.itsWmoId = NFmiStringTools::Convert<long>(strVector[0])*1000 + NFmiStringTools::Convert<long>(strVector[1]);
 	double lat = GetLatOrLonFromString(strVector[7], theStationStr, theInitFileName, 'N', 'S');
 	double lon = GetLatOrLonFromString(strVector[8], theStationStr, theInitFileName, 'E', 'W');
 	theStationOut.itsLatlon = NFmiPoint(lon, lat);
@@ -602,10 +603,7 @@ static bool GetWmoStationFromString(const std::string &theStationStr, const std:
 
 void NFmiWmoStationLookUpSystem::Init(const std::string &theInitFileName, int theStationCountHint)
 {
-	if(theStationCountHint == -1)
-		itsStations.resize(102000); // näin monta asemaa on suunnilleen NOAA:n nsd_bbsss.txt -tiedostossa (tekee n. 21 MB kokoisen 'tyhjän' taulukon)
-	else
-		itsStations.resize(theStationCountHint);
+  // We ignore theStationCountHint, the data structure is now a map
 
 	itsInitLogMessage = "";
 
@@ -650,26 +648,10 @@ void NFmiWmoStationLookUpSystem::Init(const std::string &theInitFileName, int th
 			if(getStationStatus)
 			{
 				counter++;
-				if(station.itsWmoId < itsStations.size())
-				{
-					itsStations[station.itsWmoId] = station;
-					foundStationCounter++;
-				}
-				else if(station.itsWmoId < 200000) // rajoitetaan asema listan koko 200000 asemaan varmuuden vuoksi
-				{
-					itsStations.resize(station.itsWmoId);
-					itsStations[station.itsWmoId] = station;
-					foundStationCounter++;
-				}
-				else
-				{
-					warningSectionStr += std::string("Found wmo id: ") + NFmiStringTools::Convert(station.itsWmoId);
-					warningSectionStr += std::string(" in station line: ") + buffer;
-					warningSectionStr += "\nwas too big and was ignored.\n";
-					warningCounter++;
-				}
+				itsStations[station.itsWmoId] = station;
 			}
-		}while(in.good());
+		}
+		while(in.good());
 
 		itsInitLogMessage = "Initializing NFmiWmoStationLookUpSystem data went OK, from file: ";
 		itsInitLogMessage += theInitFileName;

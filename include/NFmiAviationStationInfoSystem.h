@@ -17,13 +17,13 @@ class NFmiAviationStation : public NFmiStation
 {
 public:
 	NFmiAviationStation(void):NFmiStation(),itsIcaoStr(){}
-	NFmiAviationStation(unsigned long theIdent,
-					const NFmiString & theName,
-					double theLongitude,
-					double theLatitude,
-					const std::string &theIcaoStr)
-					:NFmiStation(theIdent, theName, theLongitude, theLatitude, kFloatMissing, kWMO)
-					,itsIcaoStr(theIcaoStr)
+	NFmiAviationStation(long theIdent,
+						const NFmiString & theName,
+						double theLongitude,
+						double theLatitude,
+						const std::string &theIcaoStr)
+	  :NFmiStation(theIdent, theName, theLongitude, theLatitude, kFloatMissing, kWMO)
+	  ,itsIcaoStr(theIcaoStr)
 	{}
 	~NFmiAviationStation(void){}
 
@@ -54,13 +54,13 @@ public:
 	void InitFromMasterTableCsv(const std::string &theInitFileName);
 	void InitFromWmoFlatTable(const std::string &theInitFileName);
 	NFmiAviationStation* FindStation(const std::string &theIcaoId);
-	NFmiAviationStation* FindStation(unsigned long theWmoId);
+	NFmiAviationStation* FindStation(long theWmoId);
 	bool WmoStationsWanted(void) const {return fWmoStationsWanted;}
 private:
 
 	std::string itsInitLogMessage; // onnistuneen initialisoinnin viesti, miss‰ voi olla varoituksia lokiin.
 	std::map<std::string, NFmiAviationStation> itsIcaoStations;
-	std::map<unsigned long, NFmiAviationStation> itsWmoStations;
+	std::map<long, NFmiAviationStation> itsWmoStations;
 	bool fWmoStationsWanted; // t‰m‰ p‰‰tt‰‰, k‰ytet‰‰nkˆ luokassa WMO vai ICAO asemia
 	bool fVerboseMode;
 };
