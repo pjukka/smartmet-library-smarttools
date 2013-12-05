@@ -1660,7 +1660,9 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 
 void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit, bool *fCheckLimits)
 {
-	if(theAreaMaskInfo.GetDataIdent().GetParamIdent() == kFmiTotalWindMS || theAreaMaskInfo.GetDataIdent().GetParamIdent() == kFmiWeatherAndCloudiness)
+    FmiParameterName parName = static_cast<FmiParameterName>(theAreaMaskInfo.GetDataIdent().GetParamIdent());
+    // yhdistelmä parametreille ei ole rajoja, samoin par-id kFmiBadParameter, koska silloin on kyse erikoisfunktioista kuten grad tms.
+    if(parName == kFmiTotalWindMS || parName == kFmiWeatherAndCloudiness || parName == kFmiBadParameter)
 		*fCheckLimits = false;
 	else
 	{
