@@ -21,12 +21,12 @@ using namespace NFmiSoundingFunctions;
 // jos se ei ole nousevassa järjestyksessä, käännetään annettu data vektori.
 void ReverseSoundingData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &theDataVector)
 {
-	if(theInfo->HeightValueAvailable())
+	if(theInfo->HeightDataAvailable())
 	{   // jos on korkeus dataa 
 		if(theInfo->HeightParamIsRising() == false) // ja korkeus parametri ei ole nousevassa järjestyksessä, käännetään vektorissa olevat arvot
 			std::reverse(theDataVector.begin(), theDataVector.end());
 	}
-	else if(theInfo->PressureValueAvailable())
+	else if(theInfo->PressureDataAvailable())
 	{   // jos on paine dataa 
 		if(theInfo->PressureParamIsRising()) // ja paine on nousevassa järjestyksessä, käännetään vektorissa olevat arvot
 			std::reverse(theDataVector.begin(), theDataVector.end());
@@ -1138,24 +1138,36 @@ void NFmiSoundingData::UpdateUandVParams(void)
 // tarkistaa onko kyseisellä ajanhetkellä ja asemalla ei puuttuvaa luotaus-dataa
 bool NFmiSoundingData::HasRealSoundingData(NFmiFastQueryInfo &theSoundingLevelInfo)
 {
-	if(theSoundingLevelInfo.Param(kFmiPressure) || theSoundingLevelInfo.Param(kFmiGeomHeight) || theSoundingLevelInfo.Param(kFmiGeopHeight))
+	if(theSoundingLevelInfo.PressureDataAvailable() || theSoundingLevelInfo.HeightDataAvailable())
 	{
-		int cc = 0;
-		for(theSoundingLevelInfo.ResetLevel(); theSoundingLevelInfo.NextLevel(); cc++)
-		{
-			if(theSoundingLevelInfo.FloatValue() != kFloatMissing)
-				return true; // jos miltään alku leveliltä löytyy yhtään korkeusdataa, on käyrä 'piirrettävissä'
-			if(cc > 10) // pitää löytyä dataa 10 ensimmäisen kerroksen aikana
-				break;
-		}
-		cc = 0; // käydään dataa läpi myös toisesta päästä, jos ei löytynyt
-		for(theSoundingLevelInfo.LastLevel(); theSoundingLevelInfo.PreviousLevel(); cc++)
-		{
-			if(theSoundingLevelInfo.FloatValue() != kFloatMissing)
-				return true; // jos miltään alku leveliltä löytyy yhtään korkeusdataa, on käyrä 'piirrettävissä'
-			if(cc > 10) // pitää löytyä dataa 10 ensimmäisen kerroksen aikana
-				break;
-		}
+        std::vector<FmiParameterName> checkedParams;
+        checkedParams.push_back(kFmiTemperature);
+        checkedParams.push_back(kFmiDewPoint);
+        checkedParams.push_back(kFmiWindDirection);
+        checkedParams.push_back(kFmiWindSpeedMS);
+        checkedParams.push_back(kFmiPressure);
+        for(size_t i=0; i < checkedParams.size(); i++)
+        {
+            if(theSoundingLevelInfo.Param(checkedParams[i]))
+            {
+		        int cc = 0;
+		        for(theSoundingLevelInfo.ResetLevel(); theSoundingLevelInfo.NextLevel(); cc++)
+		        {
+			        if(theSoundingLevelInfo.FloatValue() != kFloatMissing)
+				        return true; // jos miltään alku leveliltä löytyy yhtään korkeusdataa, on käyrä 'piirrettävissä'
+			        if(cc > 10) // pitää löytyä dataa 10 ensimmäisen kerroksen aikana
+				        break;
+		        }
+		        cc = 0; // käydään dataa läpi myös toisesta päästä, jos ei löytynyt
+		        for(theSoundingLevelInfo.LastLevel(); theSoundingLevelInfo.PreviousLevel(); cc++)
+		        {
+			        if(theSoundingLevelInfo.FloatValue() != kFloatMissing)
+				        return true; // jos miltään alku leveliltä löytyy yhtään korkeusdataa, on käyrä 'piirrettävissä'
+			        if(cc > 10) // pitää löytyä dataa 10 ensimmäisen kerroksen aikana
+				        break;
+		        }
+            }
+        }
 	}
 	return false;
 }
