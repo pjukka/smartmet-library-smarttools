@@ -527,6 +527,26 @@ bool NFmiSoundingDataOpt1::FastFillParamData(const boost::shared_ptr<NFmiFastQue
 	return status;
 }
 
+// Katsotaan saadaanko täytettyä korkeus data heith-levleiden avulla
+bool NFmiSoundingDataOpt1::FillHeightDataFromLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+	bool status = false;
+	std::deque<float>&data = GetParamData(kFmiGeopHeight);
+	data.resize(theInfo->SizeLevels(), kFloatMissing); // alustetaan vektori puuttuvalla
+	if(theInfo->FirstLevel())
+	{
+        if(theInfo->Level()->LevelType() == kFmiHeight)
+		{
+			int i = 0;
+			for(theInfo->ResetLevel(); theInfo->NextLevel(); i++)
+				data[i] = static_cast<float>(theInfo->Level()->LevelValue());
+			status = true;
+        	::ReverseSoundingData(theInfo, data);
+		}
+	}
+    return status;
+}
+
 bool NFmiSoundingDataOpt1::FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId, const NFmiMetTime& theTime, const NFmiPoint& theLatlon)
 {
 	bool status = false;
@@ -777,7 +797,8 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
 				FillParamData(theInfo, kFmiPressure);
 				if(!FillParamData(theInfo, kFmiGeomHeight))
 					if(!FillParamData(theInfo, kFmiGeopHeight))
-					FillParamData(theInfo, kFmiFlAltitude); // eri datoissa on geom ja geop heightia, kokeillaan molempia tarvittaessa
+					    if(!FillParamData(theInfo, kFmiFlAltitude)) // eri datoissa on geom ja geop heightia, kokeillaan molempia tarvittaessa
+                            FillHeightDataFromLevels(theInfo);
 				FillParamData(theInfo, kFmiWindSpeedMS);
 				FillParamData(theInfo, kFmiWindDirection);
 				FillParamData(theInfo, kFmiWindUMS);
@@ -785,6 +806,7 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
 				FillParamData(theInfo, kFmiWindVectorMS);
 				CalculateHumidityData();
 				InitZeroHeight();
+                SetVerticalParamStatus();
 				return true;
 			}
 		}
@@ -810,7 +832,8 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
 			FastFillParamData(theInfo, kFmiDewPoint);
 			FastFillParamData(theInfo, kFmiPressure);
 			if(!FastFillParamData(theInfo, kFmiGeomHeight))
-				FastFillParamData(theInfo, kFmiGeopHeight); // eri datoissa on geom ja geop heightia, kokeillaan molempia tarvittaessa
+				if(!FastFillParamData(theInfo, kFmiGeopHeight)) // eri datoissa on geom ja geop heightia, kokeillaan molempia tarvittaessa
+                    FillHeightDataFromLevels(theInfo);
 			FastFillParamData(theInfo, kFmiWindSpeedMS);
 			FastFillParamData(theInfo, kFmiWindDirection);
 			FastFillParamData(theInfo, kFmiWindUMS);
@@ -823,7 +846,8 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
 			FillParamData(theInfo, kFmiDewPoint, theTime, theLatlon);
 			FillParamData(theInfo, kFmiPressure, theTime, theLatlon);
 			if(!FillParamData(theInfo, kFmiGeomHeight, theTime, theLatlon))
-				FillParamData(theInfo, kFmiGeopHeight, theTime, theLatlon); // eri datoissa on geom ja geop heightia, kokeillaan molempia tarvittaessa
+				if(!FillParamData(theInfo, kFmiGeopHeight, theTime, theLatlon)) // eri datoissa on geom ja geop heightia, kokeillaan molempia tarvittaessa
+                    FillHeightDataFromLevels(theInfo);
 			FillParamData(theInfo, kFmiWindSpeedMS, theTime, theLatlon);
 			FillParamData(theInfo, kFmiWindDirection, theTime, theLatlon);
 			FillParamData(theInfo, kFmiWindUMS, theTime, theLatlon);
@@ -834,9 +858,32 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
 		CalculateHumidityData();
 		InitZeroHeight();
 		FixPressureDataSoundingWithGroundData(theGroundDataInfo);
+        SetVerticalParamStatus();
 		return true;
 	}
 	return false;
+}
+
+static bool AnyGoodValues(const std::deque<float> &values)
+{
+    for(size_t i = 0; i < values.size(); i++)
+    {
+        if(values[i] != kFloatMissing)
+            return true;
+    }
+    return false;
+}
+
+// Tarkistaa onko pressure taulussa yhtaan ei puuttuvaa arvoa ja asettaa fPressureDataAvailable -lipun päälle.
+// Tarkistaa onko height taulussa yhtaan ei puuttuvaa arvoa ja asettaa fHeightDataAvailable -lipun päälle.
+void NFmiSoundingDataOpt1::SetVerticalParamStatus(void)
+{
+    std::deque<float>&data = GetParamData(kFmiPressure);
+    if(::AnyGoodValues(data))
+        fPressureDataAvailable = true;
+    data = GetParamData(kFmiGeomHeight);
+    if(::AnyGoodValues(data))
+        fHeightDataAvailable = true;
 }
 
 // theVec is vector that is to be erased from the start.

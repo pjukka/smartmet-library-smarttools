@@ -146,6 +146,8 @@ private:
 	void InitZeroHeight(void); // tätä kutsutaan FillParamData-metodeista
 	void CalculateHumidityData(void);
     std::string MakeCacheString(double T, double Td, double fromP, double toP);
+    bool FillHeightDataFromLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
+    void SetVerticalParamStatus(void);
 
 	NFmiLocation itsLocation;
 	NFmiMetTime	itsTime;
