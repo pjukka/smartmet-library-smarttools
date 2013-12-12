@@ -878,11 +878,11 @@ static bool AnyGoodValues(const std::deque<float> &values)
 // Tarkistaa onko height taulussa yhtaan ei puuttuvaa arvoa ja asettaa fHeightDataAvailable -lipun p‰‰lle.
 void NFmiSoundingDataOpt1::SetVerticalParamStatus(void)
 {
-    std::deque<float>&data = GetParamData(kFmiPressure);
-    if(::AnyGoodValues(data))
+    std::deque<float>&pVec = GetParamData(kFmiPressure);
+    if(::AnyGoodValues(pVec))
         fPressureDataAvailable = true;
-    data = GetParamData(kFmiGeomHeight);
-    if(::AnyGoodValues(data))
+    std::deque<float>&hVec = GetParamData(kFmiGeomHeight);
+    if(::AnyGoodValues(hVec))
         fHeightDataAvailable = true;
 }
 
