@@ -490,8 +490,8 @@ public:
 	void Alpha(float newValue)
 	{
 		itsAlpha = newValue;
-		if(itsAlpha < 0.f)
-			itsAlpha = 0.f;
+		if(itsAlpha < NFmiDrawParam::itsMinAlpha)
+			itsAlpha = NFmiDrawParam::itsMinAlpha;
 		if(itsAlpha > 100.f)
 			itsAlpha = 100.f;
 	}
@@ -509,6 +509,7 @@ public:
 	virtual std::ostream & Write (std::ostream &file) const;
 	virtual std::istream & Read (std::istream &file);
 
+    const static float itsMinAlpha;
 
 protected:
 
@@ -666,7 +667,7 @@ protected:
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
-	float itsAlpha; // läpinäkyvyys kerroin, 0 on täysin läpinäkyvä ja 100 täysin läpinäkymätön
+	float itsAlpha; // läpinäkyvyys kerroin, 0 on täysin läpinäkyvä ja 100 täysin läpinäkymätön (0 on estetty ja itsMinAlpha on säädetty minimi raja)
 
 private:
 

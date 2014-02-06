@@ -36,6 +36,7 @@
 #include <fstream>
 
 float NFmiDrawParam::itsFileVersionNumber=3.0;
+const float NFmiDrawParam::itsMinAlpha = 5.f; // 5:kaan ei oikein erota enää mitään, on niin läpinäkyvä
 
 //--------------------------------------------------------
 // NFmiDrawParam(void)
@@ -483,6 +484,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 , itsDataComparisonProdId(other.itsDataComparisonProdId)
 , itsDataComparisonType(other.itsDataComparisonType)
 {
+    Alpha(itsAlpha); // varmistus että pysytään rajoissa
 	itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
 	itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
 }
@@ -674,7 +676,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 	//***********************************************
 	//********** 'versio 3' parametreja *************
 	//***********************************************
-	itsAlpha = theDrawParam->itsAlpha;
+	Alpha(theDrawParam->itsAlpha);
 
 	}
 	return;
