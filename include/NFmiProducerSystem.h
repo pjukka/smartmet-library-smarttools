@@ -24,12 +24,14 @@ class NFmiMetTime;
 class NFmiProducerInfo
 {
 public:
-	NFmiProducerInfo(void):itsName(),itsShortName(),itsUltraShortName(),itsProducerId(kFmiNoProducer),itsDescription(),fHasRealVerticalData(false),fHasQ2ArchiveData(false){}
+	NFmiProducerInfo(void):itsName(),itsShortNameVector(),itsUltraShortName(),itsProducerId(kFmiNoProducer),itsDescription(),fHasRealVerticalData(false),fHasQ2ArchiveData(false){}
 
 	const std::string& Name(void) const {return itsName;}
 	void Name(const std::string &newValue) {itsName = newValue;}
-	const std::string& ShortName(void) const {return itsShortName;}
-	void ShortName(const std::string &newValue) {itsShortName = newValue;}
+	const std::string& ShortName(size_t index = 0) const;
+	void ShortName(const std::string &newValue, size_t index = 0);
+    size_t ShortNameCount(void) const {return itsShortNameVector.size();}
+	void SetShortNames(const std::string &newShortNames);
 
 	const std::string& UltraShortName(void) const {return itsUltraShortName;}
 	void UltraShortName(const std::string &newValue) {itsUltraShortName = newValue;}
@@ -45,8 +47,8 @@ public:
 	void HasQ2ArchiveData(bool newValue) {fHasQ2ArchiveData = newValue;}
 private:
 	std::string itsName; // Pitempi nimi esim. Hirlam tai Ecmwf (voidaan k‰ytt‰‰ esim. popup-valikoissa, miss‰ on tilaa)
-	std::string itsShortName; // Lyhyempi nimi esim. Hir tai Ec (k‰ytet‰‰n mm. jossain pikavalinnoissa nimen‰ ja smarttool-kielen tuottaja nimen‰ skripteiss‰)
-	std::string itsUltraShortName; // Lyhyempi nimi esim. Hir tai Ec (k‰ytet‰‰n mm. jossain pikavalinnoissa nimen‰ ja smarttool-kielen tuottaja nimen‰ skripteiss‰)
+	std::vector<std::string> itsShortNameVector; // Lista lyhyemmist‰ nimist‰ esim. Hir tai Ec (k‰ytet‰‰n nyt ainoastaan smarttool-kielen tuottaja nimen‰ skripteiss‰)
+	std::string itsUltraShortName; // Lyhyempi nimi esim. Hir tai Ec (k‰ytet‰‰n mm. jossain pikavalinnoissa nimen‰)
 	unsigned long itsProducerId;
 	std::string itsDescription;
 	bool fHasRealVerticalData; // esim. UK,DWDjaUSa datoissa ei ole nyt oikeasti vertikaalidataa, vaikka siin‰ on painepintoja, n‰ist‰ malleista ei haluta

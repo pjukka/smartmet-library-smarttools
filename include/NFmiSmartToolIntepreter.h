@@ -132,7 +132,6 @@ private:
 	bool InterpretMasks(std::string &theMaskSectionText, boost::shared_ptr<NFmiAreaMaskSectionInfo> &theAreaMaskSectionInfo);
 	bool InterpretCalculationSection(std::string &theCalculationSectionText, boost::shared_ptr<NFmiSmartToolCalculationSectionInfo> &theSectionInfo);
 	boost::shared_ptr<NFmiSmartToolCalculationInfo> InterpretCalculationLine(const std::string &theCalculationLineText);
-	bool InterpretNextMask(const std::string &theMaskSectionText);
 
   // 1310 eli k‰‰nt‰j‰n versio 13.1 eli MSVC++ 7.1  toteuttaa 1. kerran kunnolla standardia
 

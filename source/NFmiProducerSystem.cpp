@@ -12,6 +12,31 @@
 #include <NFmiMetTime.h>
 #include <NFmiLevel.h>
 
+const std::string& NFmiProducerInfo::ShortName(size_t index) const
+{
+    if(index < itsShortNameVector.size())
+        return itsShortNameVector[index];
+    else
+        throw std::runtime_error("Out of bounds error in NFmiProducerInfo::ShortName");
+}
+
+void NFmiProducerInfo::ShortName(const std::string &newValue, size_t index)
+{
+    if(index < itsShortNameVector.size())
+        itsShortNameVector[index] = newValue;
+    else
+        throw std::runtime_error("Out of bounds error in NFmiProducerInfo::ShortName");
+}
+
+// newShortNames pitää sisällään yhden tai useamman lyhyen nimen pilkuilla erotellussa listassa.
+void NFmiProducerInfo::SetShortNames(const std::string &newShortNames)
+{
+    itsShortNameVector.clear();
+    itsShortNameVector = NFmiStringTools::Split(newShortNames, ",");
+    // poistetaan mhdolliset tyhjät stringit listasta
+    itsShortNameVector.erase( std::remove(itsShortNameVector.begin(), itsShortNameVector.end(), ""), itsShortNameVector.end());
+}
+
 NFmiProducer NFmiProducerInfo::GetProducer(void)
 {
 	return NFmiProducer(itsProducerId, itsName);
@@ -21,7 +46,7 @@ NFmiProducerInfo NFmiProducerSystem::GetProducerInfoFromSettings(const std::stri
 {
 	NFmiProducerInfo prod;
 	prod.Name(NFmiSettings::Require<std::string>(theUsedNameSpaceBase + "::Name"));
-	prod.ShortName(NFmiSettings::Require<std::string>(theUsedNameSpaceBase + "::ShortName"));
+	prod.SetShortNames(NFmiSettings::Require<std::string>(theUsedNameSpaceBase + "::ShortName"));
 	prod.UltraShortName(NFmiSettings::Require<std::string>(theUsedNameSpaceBase + "::UltraShortName"));
 	prod.Description(NFmiSettings::Require<std::string>(theUsedNameSpaceBase + "::Description"));
 	prod.ProducerId(NFmiSettings::Require<unsigned long>(theUsedNameSpaceBase + "::ProducerIds"));

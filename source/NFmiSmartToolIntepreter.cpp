@@ -239,12 +239,11 @@ NFmiParamBag NFmiSmartToolIntepreter::ModifiedParams(void)
 
 bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlockVector(boost::shared_ptr<NFmiSmartToolCalculationBlockInfoVector> &theBlockVector)
 {
-	bool fBlockFound = false;
 	int safetyIndex = 0;
 	boost::shared_ptr<NFmiSmartToolCalculationBlockInfo> block(new NFmiSmartToolCalculationBlockInfo());
 	try
 	{
-		for( ; (fBlockFound = CheckoutPossibleNextCalculationBlock(*(block.get()), false, safetyIndex)); safetyIndex++)
+		for( ; CheckoutPossibleNextCalculationBlock(*(block.get()), false, safetyIndex); safetyIndex++)
 		{
 			theBlockVector->Add(block);
 			if(safetyIndex > 500)
@@ -438,7 +437,6 @@ bool NFmiSmartToolIntepreter::IsPossibleElseConditionLine(const std::string &the
 		return true;
 	else
 		throw runtime_error(::GetDictionaryString("SmartToolErrorIllegalElseLine") + ": \n" + theTextLine);
-	return false;
 }
 
 static bool IsWordContinuing(char ch)
@@ -1421,7 +1419,7 @@ bool NFmiSmartToolIntepreter::GetProducerFromVariableById(const std::string &the
 
 // tutkii alkaako annettu sana "lev"-osiolla ja sit‰ seuraavalla numerolla
 // esim. par100 tai LEV850 jne.
-bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVariableText, NFmiLevel &theLevel, NFmiInfoData::Type theDataType)
+bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVariableText, NFmiLevel &theLevel, NFmiInfoData::Type /* theDataType */ )
 {
   if(IsWantedStart(theVariableText, "lev"))
 	{
@@ -1935,14 +1933,6 @@ bool NFmiSmartToolIntepreter::IsVariableBinaryOperator(const std::string &theVar
 	return false;
 }
 
-//--------------------------------------------------------
-// InterpretNextMask
-//--------------------------------------------------------
-bool NFmiSmartToolIntepreter::InterpretNextMask(const std::string &theMaskSectionText)
-{
-	return false;
-}
-
 NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &theParamText)
 {
 	NFmiParam param;
@@ -2239,9 +2229,12 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 			for(i=0; i<modelCount; i++)
 			{
 				NFmiProducerInfo &prodInfo = theProducerSystem->Producer(i+1);
-				std::string prodName(prodInfo.ShortName());
-				NFmiStringTools::LowerCase(prodName); // pit‰‰ muuttaa lower case:en!!!
-				itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(prodName, static_cast<FmiProducerName>(prodInfo.ProducerId())));
+                for(size_t i = 0; i < prodInfo.ShortNameCount(); i++)
+                {
+				    std::string prodName(prodInfo.ShortName(i));
+				    NFmiStringTools::LowerCase(prodName); // pit‰‰ muuttaa lower case:en!!!
+				    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(prodName, static_cast<FmiProducerName>(prodInfo.ProducerId())));
+                }
 			}
 		}
 		else
