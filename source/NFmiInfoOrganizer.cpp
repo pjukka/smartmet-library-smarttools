@@ -504,6 +504,12 @@ static bool CheckForParams(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const 
     return false;
 }
 
+bool NFmiInfoOrganizer::IsAmdarData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+	theInfo->FirstLevel();
+	return (theInfo->Level()->LevelType() == kFmiAmdarLevel);
+}
+
 bool NFmiInfoOrganizer::HasGoodParamsForSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const ParamCheckFlags &paramCheckFlags)
 {
     if(paramCheckFlags.fSounding)
@@ -526,7 +532,8 @@ int NFmiInfoOrganizer::IsGoodSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &
 		{
 			if(theInfo->SizeLevels() > 3) // pitää olla väh 4 leveliä ennen kuin kelpuutetaan sounding dataksi
 			{
-                if(HasGoodParamsForSoundingData(theInfo, paramCheckFlags))
+                // Datassa pitää olla tiettyjä parametreja, että se kelpaa luotaukseen, ja amdarit on poikkeus, ne pitää päästää läpi myös, koska niilla ei ole muka 'vertikaali' dataa
+                if(HasGoodParamsForSoundingData(theInfo, paramCheckFlags) || NFmiInfoOrganizer::IsAmdarData(theInfo))
                 {
 				    if(theInfo->DataType() == NFmiInfoData::kHybridData)
 					    return 2;

@@ -78,6 +78,7 @@ public:
 					  ,bool &fDataWasDeletedOut);
 	int CleanUnusedDataFromMemory(void);
 	static boost::shared_ptr<NFmiFastQueryInfo> DoDynamicShallowCopy(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
+    static bool IsAmdarData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
 
 	// ***************************************************************************************************************
 	// Tässä perässä on pienin mahdollinen julkinen rajapinta, jonka sain siivottua originaali NFmiInfoOrganizr:ista. 
