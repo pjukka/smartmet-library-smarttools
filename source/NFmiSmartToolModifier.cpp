@@ -265,7 +265,6 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer* theInfoOrganizer
 }
 NFmiSmartToolModifier::~NFmiSmartToolModifier(void)
 {
-	delete itsSmartToolIntepreter;
 }
 //--------------------------------------------------------
 // InitSmartTool
