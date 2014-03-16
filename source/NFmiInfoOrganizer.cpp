@@ -173,8 +173,18 @@ static bool CheckDataType(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, N
 
 static bool CheckDataIdent(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiDataIdent& theDataIdent, bool fUseParIdOnly)
 {
-	if(theInfo && (fUseParIdOnly ? theInfo->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())): theInfo->Param(theDataIdent)))
-		return true;
+	if(theInfo)
+    {
+	    if(fUseParIdOnly ? theInfo->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())): theInfo->Param(theDataIdent))
+		    return true;
+        else if(theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpStreamline && theInfo->IsGrid())
+        { // streamline parametri on ns. meta-parametri ja se pitää käsitellä erikseen
+            NFmiDataIdent metaParamReplacer(theDataIdent);
+            metaParamReplacer.GetParam()->SetIdent(kFmiWindUMS);
+    	    if(fUseParIdOnly ? theInfo->Param(static_cast<FmiParameterName>(metaParamReplacer.GetParamIdent())): theInfo->Param(metaParamReplacer))
+                return true;
+        }
+    }
 	return false;
 }
 
