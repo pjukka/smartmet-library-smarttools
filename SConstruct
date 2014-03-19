@@ -1,4 +1,3 @@
-#
 # SConstruct for building smarttools
 #
 # Usage:
