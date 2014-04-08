@@ -147,7 +147,7 @@ unsigned int NFmiProducerSystem::FindProducerInfo(const NFmiProducer &theProduce
 	for(unsigned int index = 0; index < itsProducers.size(); index++)
 	{
 		NFmiProducerInfo &prodInfo = itsProducers[index];
-		if(prodInfo.ProducerId() == theProducer.GetIdent())
+		if(prodInfo.ProducerId() == static_cast<unsigned long>(theProducer.GetIdent()))
 			return index+1; // palautetaan siis 1-pohjainen indeksi
 	}
 	return 0; // ei löytynyt, palautetaan 0;

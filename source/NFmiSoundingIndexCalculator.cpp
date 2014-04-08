@@ -195,7 +195,6 @@ static void CalculatePartOfSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &th
 		std::cerr << "thread nro: " << index << " end here."<< std::endl;
 }
 
-#ifdef WIN32 // G++ complains about an unused function otherwise
 static void CalculateSoundingDataOneTimeStepAtTime(boost::shared_ptr<NFmiFastQueryInfo> &theSourceInfo, boost::shared_ptr<NFmiFastQueryInfo> &theResultInfo, NFmiTimeIndexCalculator &theTimeIndexCalculator, bool useFastFill, NFmiStopFunctor *theStopFunctor, int index, bool fDoCerrReporting)
 {
 	try
@@ -239,7 +238,6 @@ static void CalculateSoundingDataOneTimeStepAtTime(boost::shared_ptr<NFmiFastQue
 	if(fDoCerrReporting)
 		std::cerr << "thread nro: " << index << " end here."<< std::endl;
 }
-#endif
 
 // Jos useFastFill on true, on datoilla sama hila ja aika descriptor rakenne
 // theMaxThreadCount -parametrilla voidaan rajoittaa käytettävien threadien määrää. Jos sen arvo on <=0, 
@@ -249,10 +247,6 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 {
 	NFmiSoundingFunctions::CalcDP(1, 56); // tämä funktio pitää varmistaa että se on alustettu, koska siellä on pari staattista muuttujaa, jotka 
 											// alustetaan ensimmäisellä kerralla ja multi-threaddaavassa jutussa se voisi olla ongelma.
-
-#ifdef UNIX
-	fUseOnlyOneThread = true; // kolmeen osaan jaettu datan rakennus ei toimi jostain syystä linux puolella
-#endif
 
 	unsigned long timeSize = theResultData.Info()->SizeTimes();
 	unsigned int usedThreadCount = boost::thread::hardware_concurrency();
@@ -269,7 +263,6 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 		boost::shared_ptr<NFmiFastQueryInfo> resultInfo(new NFmiFastQueryInfo(&theResultData));
 		::CalculatePartOfSoundingData(sourceInfo, resultInfo, 0, timeSize-1, useFastFill, theStopFunctor, 1, fDoCerrReporting);
 	}
-#ifndef UNIX
 	else
 	{
 		if(fDoCerrReporting)
@@ -296,7 +289,6 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 		if(fDoCerrReporting)
 			std::cerr << "all threads ended" << std::endl;
 	}
-#endif
 }
 
 float NFmiSoundingIndexCalculator::CalcOpt1(NFmiSoundingDataOpt1 &theSoundingDataOpt1, FmiSoundingParameters theParam)
@@ -744,14 +736,22 @@ boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingI
 			std::cerr << "read qd-file: " << theSourceFileFilter << std::endl;
 	}
 
-	// 2. luo sen avulla uusi qinfo pohjaksi
-	NFmiQueryInfo soundingIndexInfo = ::MakeSoundingIndexInfo(*sourceData.get(), theProducerName);
-	// 3. luo uusi qdata
+	return NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(sourceData, theProducerName, fDoCerrReporting, theStopFunctor, fUseOnlyOneThread, theMaxThreadCount);
+
+}
+
+boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(boost::shared_ptr<NFmiQueryData> sourceData, const std::string &theProducerName, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread, int theMaxThreadCount)
+{
+
+	// 1. luo sen avulla uusi qinfo pohjaksi
+	NFmiQueryInfo soundingIndexInfo = ::MakeSoundingIndexInfo(*sourceData, theProducerName);
+	// 2. luo uusi qdata
 	boost::shared_ptr<NFmiQueryData> data(NFmiQueryDataUtil::CreateEmptyData(soundingIndexInfo));
 	if(data == 0)
 		throw std::runtime_error("Error in CreateNewSoundingIndexData, could not create result data.");
 	// 4. täytä qdata
-    NFmiSoundingIndexCalculator::CalculateWholeSoundingData(*sourceData.get(), *data.get(), true, fDoCerrReporting, theStopFunctor, fUseOnlyOneThread, theMaxThreadCount);
+	NFmiSoundingIndexCalculator::CalculateWholeSoundingData(*sourceData.get(), *data.get(), true, fDoCerrReporting, theStopFunctor, fUseOnlyOneThread, theMaxThreadCount);
 
 	return data;
 }
+
