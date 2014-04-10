@@ -1,7 +1,7 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 14.4.7
+Version: 14.4.10
 Release: 1%{?dist}.fmi
 License: FMI
 Group: Development/Libraries
@@ -35,6 +35,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Thu Apr 10 2014 Mika Heiskanen <mika.heiskanen@fmi.fi> - 14.4.10-1.fmi
+- Recompiled to gain access to pollen parameters
 * Mon Apr  7 2014 Mika Heiskanen <mika.heiskanen@fmi.fi> - 14.4.7-1.fmi
 - Sounding index calculations are now multi threaded
 - API change to sounding index functions to enable using Himan
