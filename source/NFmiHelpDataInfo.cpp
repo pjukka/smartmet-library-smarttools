@@ -405,7 +405,12 @@ void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey, checked
 		hdi.InitFromSettings(theBaseKey, *iter, *this);
 		if(fStaticData)
 			hdi.ForceFileFilterName(true); // varmistetaan ett‰ staattisia datoja ei yritet‰ lukea lokaali cachesta
-		theHelpDataInfos.push_back(hdi);
+
+        // HelpDataInfolla pit‰‰ olla tyyppi, muuten sit‰ ei lis‰t‰ listaan. Kun vuoden 2013 lopussa tehtiin erillinen lista 
+        // eri datojen enable-ominaisuudesta yhteen konffitiedostoon (mm. helpdatainfo_enable_data_fmi_heavy.conf), 
+        // tuli mahdolliseksi, ett‰ t‰ss‰ tuli ns. haamu dataInfoja, jotka nyt pit‰‰ karsia.
+        if(hdi.DataType() != NFmiInfoData::kNoDataType) 
+    		theHelpDataInfos.push_back(hdi);
 	}
 }
 
