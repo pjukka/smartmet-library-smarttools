@@ -28,7 +28,8 @@ typedef enum
 	kFmiFontTextView = 8,
 	kFmiBitmapView = 9,
 	kFmiParamsDefaultView = 10,
-	kFmiPrecipFormSymbolView = 11
+	kFmiPrecipFormSymbolView = 11,
+	kFmiSynopWeatherSymbolView = 12
 }View;
 
 typedef enum
