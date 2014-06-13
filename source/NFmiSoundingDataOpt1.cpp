@@ -1023,8 +1023,14 @@ void NFmiSoundingDataOpt1::CalculateHumidityData(void)
 // Se pinta, miltä kaikki löytyvät 1. kerran sekä paine, että korkeus arvot
 // ja lisäksi joko lämpötila tai tuulennopeus.
 // Tai jos sellaista ei löydy asetetaan arvoksi 0.
+// Poikkeus: jos löytyy paine ja korkeus tiedot alempaa ja heti sen jälkeen tarpeeksi
+// lähellä (<  4 Hpa) on leveli, jossa on muita tietoja, mutta ei korkeutta, hyväksytään
+// aiemman levelin korkeus.
 void NFmiSoundingDataOpt1::InitZeroHeight(void)
 {
+    float closeLevelHeight = kFloatMissing;
+    float closeLevelPressure = kFloatMissing;
+    int closeLevelHeightIndex = -1;
 	itsZeroHeight = 0;
 	itsZeroHeightIndex = -1;
 	// oletus, kaikki vektorit on alustettu saman kokoisiksi kuin paine vektori
@@ -1032,16 +1038,37 @@ void NFmiSoundingDataOpt1::InitZeroHeight(void)
 	{
 		for(int i=0; i<static_cast<int>(itsPressureData.size()); i++)
 		{
-			if(itsPressureData[i] != kFloatMissing &&
-				itsGeomHeightData[i] != kFloatMissing &&
-				(itsTemperatureData[i] != kFloatMissing || // lämpötilaa ei ehkä tarvitse olla etsittäessä ensimmäistä validia kerrosta
-				 itsWindSpeedData[i] != kFloatMissing) // tuulta ei tarvitse olla etsittäessä ensimmäistä validia kerrosta
-				)
-			{
-				itsZeroHeight = itsGeomHeightData[i];
-				itsZeroHeightIndex = i;
-				break; // lopetetaan kun 1. löytyi
-			}
+            float P = itsPressureData[i];
+            float z = itsGeomHeightData[i];
+            float T = itsTemperatureData[i];
+            float WS = itsWindSpeedData[i];
+			if(P != kFloatMissing)
+            {
+			    if(z != kFloatMissing &&
+				    (T != kFloatMissing || // lämpötilaa ei ehkä tarvitse olla etsittäessä ensimmäistä validia kerrosta
+				     WS != kFloatMissing) // tuulta ei tarvitse olla etsittäessä ensimmäistä validia kerrosta
+				    )
+			    {
+				    itsZeroHeight = z;
+				    itsZeroHeightIndex = i;
+				    break; // lopetetaan kun 1. löytyi
+			    }
+			    else if(z != kFloatMissing)
+                { // jos löytyi vain paine ja korkeustiedot, otetaan ne varmuuden vuoksi talteen
+                    closeLevelHeight = z;
+                    closeLevelPressure = P;
+                    closeLevelHeightIndex = i;
+                }
+                else if(::fabs(closeLevelPressure - P) <= 4 &&
+				    (T != kFloatMissing || // lämpötilaa ei ehkä tarvitse olla etsittäessä ensimmäistä validia kerrosta
+				     WS != kFloatMissing) // tuulta ei tarvitse olla etsittäessä ensimmäistä validia kerrosta
+				    )
+			    {
+                    itsZeroHeight = closeLevelHeight;
+                    itsZeroHeightIndex = closeLevelHeightIndex;
+				    break; // lopetetaan kun 1. löytyi
+			    }
+            }
 		}
 	}
 }
