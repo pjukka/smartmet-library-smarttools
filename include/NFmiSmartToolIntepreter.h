@@ -133,13 +133,7 @@ private:
 	bool InterpretCalculationSection(std::string &theCalculationSectionText, boost::shared_ptr<NFmiSmartToolCalculationSectionInfo> &theSectionInfo);
 	boost::shared_ptr<NFmiSmartToolCalculationInfo> InterpretCalculationLine(const std::string &theCalculationLineText);
 
-  // 1310 eli k‰‰nt‰j‰n versio 13.1 eli MSVC++ 7.1  toteuttaa 1. kerran kunnolla standardia
-
-#ifdef OLD_MSC
-	std::string::iterator ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition);
-#else
 	std::string::const_iterator ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition);
-#endif
 
 	void InitCheckOut(void);
 	bool IsCaseInsensitiveEqual(const std::string &theStr1, const std::string &theStr2);

@@ -1961,18 +1961,9 @@ NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &thePara
 // ExtractNextElseIfMaskSection
 // ExtractElseCalculationSection
 
- // 1310 eli k‰‰nt‰j‰n versio 13.1 eli MSVC++ 7.1  toteuttaa 1. kerran kunnolla standardia
-#ifdef OLD_MSC
-std::string::iterator NFmiSmartToolIntepreter::ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition)
-#else
 std::string::const_iterator NFmiSmartToolIntepreter::ExtractFirstCalculationSection(const std::string &theMacroText, std::string::iterator theStartPosition)
-#endif
 {
-#ifdef OLD_MSC
-  return const_cast<std::string::iterator>(theMacroText.end());
-#else
   return theMacroText.end();
-#endif
 }
 
 void NFmiSmartToolIntepreter::Clear(void)
