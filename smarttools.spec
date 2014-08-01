@@ -1,7 +1,7 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 14.5.28
+Version: 14.8.1
 Release: 1%{?dist}.fmi
 License: FMI
 Group: Development/Libraries
@@ -35,6 +35,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libsmartmet_%{LIBNAME}.a
 
 %changelog
+* Fri Aug  1 2014 Mika Heiskanen <mika.heiskanen@fmi.fi> - 14.8.1-1.fmi
+- Fixes to sounding height calculations
+- New code for rendering weather observations
 * Wed May 28 2014 Santeri Oksman <santeri.oksman@fmi.fi> - 14.5.28-1.fmi
 - Recompiled to get WeatherSymbol parameter
 * Thu Apr 10 2014 Mika Heiskanen <mika.heiskanen@fmi.fi> - 14.4.10-1.fmi
