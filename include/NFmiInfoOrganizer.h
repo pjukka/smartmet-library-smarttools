@@ -134,6 +134,7 @@ public:
 	double CountDataSize(void);
 	void UpdateCrossSectionMacroParamDataSize(int x, int y);
 	void UpdateMacroParamDataSize(int x, int y);
+    static bool HasGoodParamsForSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const ParamCheckFlags &paramCheckFlags);
 	// ***************************************************************************************************************
 
 private:
@@ -155,7 +156,6 @@ private:
 	boost::shared_ptr<NFmiDrawParam> CreateSynopPlotDrawParam(const NFmiDataIdent& theDataIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType);
 	bool IsInfosTwoOfTheKind(NFmiQueryInfo* theInfo1, NFmiInfoData::Type theType1, const std::string &theFileNamePattern, const boost::shared_ptr<NFmiFastQueryInfo> &theInfo2);
     int IsGoodSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiProducer &theProducer, bool ignoreProducer, const ParamCheckFlags &paramCheckFlags);
-    bool HasGoodParamsForSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const ParamCheckFlags &paramCheckFlags);
 
 	boost::shared_ptr<NFmiQueryDataKeeper> itsEditedDataKeeper; // pit‰‰ sis‰ll‰‰n oikeasti NFmiSmartInfo-olion
 	boost::shared_ptr<NFmiQueryDataKeeper> itsCopyOfEditedDataKeeper;
@@ -171,6 +171,8 @@ private:
 	boost::shared_ptr<NFmiFastQueryInfo> itsCrossSectionMacroParamData; // poikkileikkaus makro-parametrien laskuja varten pit‰‰ pit‰‰ yll‰ yhden hilan kokoista dataa (yksi aika,param ja level, editoitavan datan hplaceDesc)
 	NFmiDataMatrix<float> itsCrossSectionMacroParamMissingValueMatrix; // t‰h‰n talletetaan editoitavan datan hilan suuruinen kFloatMissing:eilla alustettu matriisi ett‰ sill‰ voi alustaa makroParam dataa ennen laskuja
 	bool fCreateEditedDataCopy; // luodaanko vai eikˆ luoda kopiota editoidusta datasta
-    std::vector<FmiParameterName> itsWantedSoundingParams;
-    std::vector<FmiParameterName> itsWantedTrajectoryParams;
+    static std::vector<FmiParameterName> itsWantedSoundingParams;
+    static std::vector<FmiParameterName> itsWantedTrajectoryParams;
+    static bool fCheckParamsInitialized;
+    static void InitializeCheckParams(void);
 };

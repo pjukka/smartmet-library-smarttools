@@ -13,6 +13,28 @@
 #pragma warning(disable : 4239) // poistaa VC++ 2010 varoituksen: warning C4239: nonstandard extension used : 'argument' : conversion from 'boost::shared_ptr<T>' to 'boost::shared_ptr<T> &'
 #endif
 
+std::vector<FmiParameterName> NFmiInfoOrganizer::itsWantedSoundingParams;
+std::vector<FmiParameterName> NFmiInfoOrganizer::itsWantedTrajectoryParams;
+bool NFmiInfoOrganizer::fCheckParamsInitialized = false;
+
+void NFmiInfoOrganizer::InitializeCheckParams(void)
+{
+    if(!fCheckParamsInitialized)
+    {
+        fCheckParamsInitialized = true;
+        itsWantedSoundingParams.push_back(kFmiTemperature);
+        itsWantedSoundingParams.push_back(kFmiDewPoint);
+        itsWantedSoundingParams.push_back(kFmiHumidity);
+        itsWantedSoundingParams.push_back(kFmiWindSpeedMS);
+        itsWantedSoundingParams.push_back(kFmiWindDirection);
+
+        itsWantedTrajectoryParams.push_back(kFmiWindSpeedMS);
+        itsWantedTrajectoryParams.push_back(kFmiWindDirection);
+        itsWantedTrajectoryParams.push_back(kFmiVelocityPotential);
+        itsWantedTrajectoryParams.push_back(kFmiVerticalVelocityMMS);
+    }
+}
+
 NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 :itsEditedDataKeeper()
 ,itsCopyOfEditedDataKeeper()
@@ -27,19 +49,8 @@ NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 ,itsCrossSectionMacroParamData()
 ,itsCrossSectionMacroParamMissingValueMatrix()
 ,fCreateEditedDataCopy(false)
-,itsWantedSoundingParams()
-,itsWantedTrajectoryParams()
 {
-    itsWantedSoundingParams.push_back(kFmiTemperature);
-    itsWantedSoundingParams.push_back(kFmiDewPoint);
-    itsWantedSoundingParams.push_back(kFmiHumidity);
-    itsWantedSoundingParams.push_back(kFmiWindSpeedMS);
-    itsWantedSoundingParams.push_back(kFmiWindDirection);
-
-    itsWantedTrajectoryParams.push_back(kFmiWindSpeedMS);
-    itsWantedTrajectoryParams.push_back(kFmiWindDirection);
-    itsWantedTrajectoryParams.push_back(kFmiVelocityPotential);
-    itsWantedTrajectoryParams.push_back(kFmiVerticalVelocityMMS);
+    InitializeCheckParams();
 }
 
 NFmiInfoOrganizer::~NFmiInfoOrganizer(void)
@@ -497,17 +508,23 @@ static bool CheckForVerticalData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
     return theInfo->PressureDataAvailable() || theInfo->HeightDataAvailable();
 }
 
-static bool CheckForParams(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const std::vector<FmiParameterName> &wantedParams)
+static bool CheckForParams(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const std::vector<FmiParameterName> &wantedParams, bool trajectorySpecial = false)
 {
     if(::CheckForVerticalData(theInfo))
     {
-        int paramsFound = 0;
+        size_t paramsFound = 0;
         for (size_t i = 0; i < wantedParams.size(); i++)
         {
             if(theInfo->Param(wantedParams[i]))
                 paramsFound++;
         }
-        if(paramsFound)
+
+        if(trajectorySpecial) // trajektori parametreista pit‰‰ olla kolme nelj‰st‰, muuten laskuja ei tehd‰ ollenkaan (t‰m‰ ei ole t‰ydellinen tarkistus, koska pit‰‰ olla WS, WD ja toinen w -parametreista)
+        {
+            if(paramsFound >= wantedParams.size() - 1)
+                return true;
+        }
+        else if(paramsFound)
             return true;
     }
 
@@ -522,10 +539,12 @@ bool NFmiInfoOrganizer::IsAmdarData(boost::shared_ptr<NFmiFastQueryInfo> &theInf
 
 bool NFmiInfoOrganizer::HasGoodParamsForSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const ParamCheckFlags &paramCheckFlags)
 {
+    InitializeCheckParams(); // varmistetaan ett‰ on alustettu lista tarkistettavista parametreista
+
     if(paramCheckFlags.fSounding)
         return ::CheckForParams(theInfo, itsWantedSoundingParams);
     else if(paramCheckFlags.fTrajectory)
-        return ::CheckForParams(theInfo, itsWantedTrajectoryParams);
+        return ::CheckForParams(theInfo, itsWantedTrajectoryParams, true); // trajektori datassa pit‰‰ olla kaikki vaaditut parametrit, muuten laskuista ei tule mit‰‰n
 
     return true;
 }
