@@ -237,7 +237,7 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey, const std
 			}
 			NFmiParam param(NFmiSettings::Require<int>(itsBaseNameSpace + "::ParameterId")
 						   ,NFmiSettings::Require<std::string>(itsBaseNameSpace + "::ParameterName"));
-			itsImageDataIdent = NFmiDataIdent(param, itsFakeProducerId);
+			itsImageDataIdent = NFmiDataIdent(param, NFmiProducer(itsFakeProducerId));
 		}
 	}
 }
