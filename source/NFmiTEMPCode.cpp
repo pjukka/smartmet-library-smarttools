@@ -386,8 +386,8 @@ static bool DecodeHeader(std::stringstream &ssin, NFmiStation &theStation, NFmiM
 {
 	std::string first_Str; // esim. "USFI99"
 	ssin >> first_Str;
-    if(first_Str.size() > 6 && std::isdigit(first_Str[0]))
-    	ssin >> first_Str; // joskus 1. stringin‰ on pitk‰ luku kutem esim. 0000034101, t‰m‰ pit‰‰ ohittaa
+    if(first_Str.size() != 6 && std::isdigit(first_Str[0]))
+    	ssin >> first_Str; // joskus 1. stringin‰ on pitk‰ luku kutem esim. 0000034101 tai lyhyt luku kuten 999, t‰m‰ pit‰‰ ohittaa
 	bool wyoming_raw_data = false;
 	if(::toupper(first_Str[0]) == 'T' && ::toupper(first_Str[1]) == 'T') // wyoming raw data alkaa TTAA, TTBB jne. osioilla
 		wyoming_raw_data = true;
