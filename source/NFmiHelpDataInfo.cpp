@@ -275,6 +275,67 @@ const std::string NFmiHelpDataInfo::UsedFileNameFilter(const NFmiHelpDataInfoSys
 	}
 }
 
+bool NFmiHelpDataInfo::operator==(const NFmiHelpDataInfo &other) const
+{
+	if(itsName != other.itsName)
+        return false;
+	if(itsFileNameFilter != other.itsFileNameFilter)
+        return false;
+	if(itsPartialDataCacheFileNameFilter != other.itsPartialDataCacheFileNameFilter)
+        return false;
+	if(fForceFileFilterName != other.fForceFileFilterName)
+        return false;
+	// itsLatestFileName; // HUOM! Tätä muuttujaa ei tarkastella, tarkoitus on varsinaisesti tarkastella onko asetukset muuttuneet
+	// itsLatestErroneousFileName; // HUOM! Tätä muuttujaa ei tarkastella, tarkoitus on varsinaisesti tarkastella onko asetukset muuttuneet
+	if(itsDataType != other.itsDataType)
+        return false;
+	// itsLatestFileTimeStamp; // HUOM! Tätä muuttujaa ei tarkastella, tarkoitus on varsinaisesti tarkastella onko asetukset muuttuneet
+	if(itsFakeProducerId != other.itsFakeProducerId)
+        return false;
+	if(itsImageProjectionString != other.itsImageProjectionString)
+        return false;
+	if(!(itsImageDataIdent == other.itsImageDataIdent))
+        return false;
+    // itsImageArea; // HUOM! Tätä muuttujaa ei tarkastella, SmartMetilla ei voi muuttaa tätä (sitä tässä oikeasti halutaan tarkastella), ja NFmiArea -olioita ei voi verrata oikeni ilman jotain suurempaa viritystä, koska kyse on polymorphisesta luokka rakenteesta.
+	if(fNotifyOnLoad != other.fNotifyOnLoad)
+        return false;
+	if(itsNotificationLabel != other.itsNotificationLabel)
+        return false;
+	if(itsCustomMenuFolder != other.itsCustomMenuFolder)
+        return false;
+	if(itsReportNewDataTimeStepInMinutes != other.itsReportNewDataTimeStepInMinutes)
+        return false;
+	if(itsReportNewDataLabel != other.itsReportNewDataLabel)
+        return false;
+	if(itsCombineDataPathAndFileName != other.itsCombineDataPathAndFileName)
+        return false;
+	if(itsCombineDataMaxTimeSteps != other.itsCombineDataMaxTimeSteps)
+        return false;
+	if(fMakeSoundingIndexData != other.fMakeSoundingIndexData)
+        return false;
+	if(itsBaseNameSpace != other.itsBaseNameSpace)
+        return false;
+	if(itsAdditionalArchiveFileCount != other.itsAdditionalArchiveFileCount)
+        return false;
+	if(fEnable != other.fEnable)
+        return false;
+	if(fNonFixedTimeGab != other.fNonFixedTimeGab)
+        return false;
+	if(itsModelRunTimeGapInHours != other.itsModelRunTimeGapInHours)
+        return false;
+
+    return true;
+}
+
+bool NFmiHelpDataInfo::operator!=(const NFmiHelpDataInfo &other) const
+{
+    return !(*this == other);
+}
+
+// ***********************************************
+// ** Tästä alkaa NFmiHelpDataInfoSystem osio ****
+// ***********************************************
+
 NFmiHelpDataInfo& NFmiHelpDataInfoSystem::DynamicHelpDataInfo(int theIndex)
 {
 	static NFmiHelpDataInfo dummy;
@@ -472,6 +533,34 @@ void NFmiHelpDataInfoSystem::StoreToSettings(void)
 		throw std::runtime_error("Error in NFmiHelpDataInfoSystem::StoreToSettings, unable to store setting.");
 }
 
+bool NFmiHelpDataInfoSystem::AreStoredSettingsChanged(const NFmiHelpDataInfoSystem &other)
+{
+	if(itsCacheDirectory != other.itsCacheDirectory)
+        return true;
+	if(itsCacheTmpDirectory != other.itsCacheTmpDirectory)
+        return true;
+	if(itsCachePartialDataDirectory != other.itsCachePartialDataDirectory)
+        return true;
+	if(itsCacheTmpFileNameFix != other.itsCacheTmpFileNameFix)
+        return true;
+	if(fUseQueryDataCache != other.fUseQueryDataCache)
+        return true;
+	if(fDoCleanCache != other.fDoCleanCache)
+        return true;
+	if(itsCacheFileKeepMaxDays != other.itsCacheFileKeepMaxDays)
+        return true;
+	if(itsCacheMaxFilesPerPattern != other.itsCacheMaxFilesPerPattern)
+        return true;
+	if(itsCacheMediumFileSizeMB != other.itsCacheMediumFileSizeMB)
+        return true;
+	if(itsCacheLargeFileSizeMB != other.itsCacheLargeFileSizeMB)
+        return true;
+	if(itsCacheMaximumFileSizeMB != other.itsCacheMaximumFileSizeMB)
+        return true;
+
+    return false;
+}
+
 void NFmiHelpDataInfoSystem::InitSettings(const NFmiHelpDataInfoSystem &theOther, bool fDoHelpDataInfo)
 {
 	this->itsCacheDirectory = theOther.itsCacheDirectory;
@@ -569,3 +658,83 @@ std::vector<NFmiHelpDataInfo> NFmiHelpDataInfoSystem::GetCustomMenuHelpDataList(
 	}
 	return helpDataList;
 }
+
+NFmiHelpDataInfoSystem::NFmiHelpDataInfoSystem(const NFmiHelpDataInfoSystem &other)
+:itsDynamicHelpDataInfos(other.itsDynamicHelpDataInfos)
+,itsStaticHelpDataInfos(other.itsStaticHelpDataInfos)
+,itsCacheDirectory(other.itsCacheDirectory)
+,itsCacheTmpDirectory(other.itsCacheTmpDirectory)
+,itsCachePartialDataDirectory(other.itsCachePartialDataDirectory)
+,itsCacheTmpFileNameFix(other.itsCacheTmpFileNameFix)
+,fUseQueryDataCache(other.fUseQueryDataCache)
+,fDoCleanCache(other.fDoCleanCache)
+,itsCacheFileKeepMaxDays(other.itsCacheFileKeepMaxDays)
+,itsCacheMaxFilesPerPattern(other.itsCacheMaxFilesPerPattern)
+,itsCacheMediumFileSizeMB(other.itsCacheMediumFileSizeMB)
+,itsCacheLargeFileSizeMB(other.itsCacheLargeFileSizeMB)
+,itsCacheMaximumFileSizeMB(other.itsCacheMaximumFileSizeMB)
+,itsBaseNameSpace(other.itsBaseNameSpace)
+{
+}
+
+NFmiHelpDataInfoSystem& NFmiHelpDataInfoSystem::operator=(const NFmiHelpDataInfoSystem &other)
+{
+	if(this != &other)
+	{
+	    itsDynamicHelpDataInfos = other.itsDynamicHelpDataInfos;
+	    itsStaticHelpDataInfos = other.itsStaticHelpDataInfos;
+	    itsCacheDirectory = other.itsCacheDirectory;
+	    itsCacheTmpDirectory = other.itsCacheTmpDirectory;
+	    itsCachePartialDataDirectory = other.itsCachePartialDataDirectory;
+	    itsCacheTmpFileNameFix = other.itsCacheTmpFileNameFix;
+	    fUseQueryDataCache = other.fUseQueryDataCache;
+	    fDoCleanCache = other.fDoCleanCache;
+	    itsCacheFileKeepMaxDays = other.itsCacheFileKeepMaxDays;
+	    itsCacheMaxFilesPerPattern = other.itsCacheMaxFilesPerPattern;
+	    itsCacheMediumFileSizeMB = other.itsCacheMediumFileSizeMB;
+	    itsCacheLargeFileSizeMB = other.itsCacheLargeFileSizeMB;
+	    itsCacheMaximumFileSizeMB = other.itsCacheMaximumFileSizeMB;
+	    itsBaseNameSpace = other.itsBaseNameSpace;
+    }
+	return *this;
+}
+
+bool NFmiHelpDataInfoSystem::operator==(const NFmiHelpDataInfoSystem &other) const
+{
+	if(itsDynamicHelpDataInfos != other.itsDynamicHelpDataInfos)
+        return false;
+	if(itsStaticHelpDataInfos != other.itsStaticHelpDataInfos)
+        return false;
+	if(itsCacheDirectory != other.itsCacheDirectory)
+        return false;
+	if(itsCacheTmpDirectory != other.itsCacheTmpDirectory)
+        return false;
+	if(itsCachePartialDataDirectory != other.itsCachePartialDataDirectory)
+        return false;
+	if(itsCacheTmpFileNameFix != other.itsCacheTmpFileNameFix)
+        return false;
+	if(fUseQueryDataCache != other.fUseQueryDataCache)
+        return false;
+	if(fDoCleanCache != other.fDoCleanCache)
+        return false;
+	if(itsCacheFileKeepMaxDays != other.itsCacheFileKeepMaxDays)
+        return false;
+	if(itsCacheMaxFilesPerPattern != other.itsCacheMaxFilesPerPattern)
+        return false;
+	if(itsCacheMediumFileSizeMB != other.itsCacheMediumFileSizeMB)
+        return false;
+	if(itsCacheLargeFileSizeMB != other.itsCacheLargeFileSizeMB)
+        return false;
+	if(itsCacheMaximumFileSizeMB != other.itsCacheMaximumFileSizeMB)
+        return false;
+	if(itsBaseNameSpace != other.itsBaseNameSpace)
+        return false;
+
+    return true;
+}
+
+bool NFmiHelpDataInfoSystem::operator!=(const NFmiHelpDataInfoSystem &other) const
+{
+    return !(*this == other);
+}
+

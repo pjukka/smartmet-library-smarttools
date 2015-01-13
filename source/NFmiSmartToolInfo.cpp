@@ -31,6 +31,24 @@ NFmiSmartToolInfo::~NFmiSmartToolInfo(void)
 {
 }
 
+NFmiSmartToolInfo& NFmiSmartToolInfo::operator=(const NFmiSmartToolInfo &other)
+{
+	if(this != &other)
+	{
+	    itsCurrentScript = other.itsCurrentScript;
+	    itsScriptFileExtension = other.itsScriptFileExtension;
+	    itsCurrentScriptName = other.itsCurrentScriptName;
+	    itsLoadDirectory = other.itsLoadDirectory;
+	    itsRootLoadDirectory = other.itsRootLoadDirectory;
+	    itsDBCheckerFileName = other.itsDBCheckerFileName;
+	    itsDBCheckerText = other.itsDBCheckerText;
+	    fMakeDBCheckAtSend = other.fMakeDBCheckAtSend;
+	    fIsThereDBCheckScript = other.fIsThereDBCheckScript;
+    }
+	return *this;
+}
+
+
 // luetaan  asetukset nyky‰‰n NFmiSetting-luokasta
 bool NFmiSmartToolInfo::Init(const std::string &theLoadDirectory)
 {
@@ -49,7 +67,7 @@ bool NFmiSmartToolInfo::LoadScript(const std::string &theScriptName)
 	if(NFmiFileSystem::ReadFile2String(fullFileName, itsCurrentScript))
 	{
 		itsCurrentScriptName = theScriptName;
-		return SaveSettings();
+		return true;
 	}
 	return false;
 }
@@ -60,7 +78,7 @@ bool NFmiSmartToolInfo::SaveScript(const std::string &theScriptName)
 	if(WriteScript2File(fullFileName, itsCurrentScript))
 	{
 		itsCurrentScriptName = theScriptName;
-		return SaveSettings();
+		return true;
 	}
 	return false;
 }
@@ -125,6 +143,18 @@ bool NFmiSmartToolInfo::SaveSettings(void)
 	}
 }
 
+bool NFmiSmartToolInfo::AreStoredSettingsChanged(const NFmiSmartToolInfo &other)
+{
+	if(itsScriptFileExtension != other.itsScriptFileExtension)
+        return true;
+	if(itsCurrentScriptName != other.itsCurrentScriptName)
+        return true;
+	if(fMakeDBCheckAtSend != other.fMakeDBCheckAtSend)
+        return true;
+
+    return false;
+}
+
 bool NFmiSmartToolInfo::ScriptExist(const std::string &theScriptName)
 {
 	checkedVector<string> names = GetScriptNames();
@@ -186,13 +216,14 @@ bool NFmiSmartToolInfo::RemoveScript(const std::string &theScriptName)
 
 void NFmiSmartToolInfo::LoadDirectory(const std::string& newValue, bool fSaveSettings)
 {
+    bool directoryChanged = itsLoadDirectory != newValue;
 	itsLoadDirectory = newValue;
 	if(itsLoadDirectory[itsLoadDirectory.size()-1] == '/')
 		itsLoadDirectory[itsLoadDirectory.size()-1] = '\\';
 	else if(itsLoadDirectory[itsLoadDirectory.size()-1] != '\\')
 		itsLoadDirectory += "\\";
 	itsRootLoadDirectory = itsLoadDirectory;
-	if(fSaveSettings)
+	if(fSaveSettings && directoryChanged)
 		SaveSettings();
 }
 

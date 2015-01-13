@@ -34,7 +34,6 @@ public:
 	void InitFromSettings(const std::string &theBaseKey, const std::string &theName, const NFmiHelpDataInfoSystem &theHelpDataSystem);
 	// void StoreToSettings(void);  // HUOM! ei toteuteta ainakaan vielä talletusta
 
-	NFmiHelpDataInfo& operator=(const NFmiHelpDataInfo &theOther);
 	void Clear(void);
 
 	bool IsCombineData(void) const {return itsCombineDataPathAndFileName.empty() == false;}
@@ -88,6 +87,10 @@ public:
 
 	const std::string& PartialDataCacheFileNameFilter(void) const {return itsPartialDataCacheFileNameFilter;}
 	void PartialDataCacheFileNameFilter(const std::string &newValue) {itsPartialDataCacheFileNameFilter = newValue;}
+
+	NFmiHelpDataInfo& operator=(const NFmiHelpDataInfo &theOther);
+    bool operator==(const NFmiHelpDataInfo &other) const;
+    bool operator!=(const NFmiHelpDataInfo &other) const;
 private:
 
 	std::string itsName; // tällä nimellä erotetaan konffi-tiedostoissa eri datat
@@ -150,10 +153,13 @@ public:
 	,itsBaseNameSpace()
 	{}
 
+	NFmiHelpDataInfoSystem(const NFmiHelpDataInfoSystem &other);
+
 	void Clear(void)
 	{}
 	void InitFromSettings(const std::string &theInitNameSpace, std::string theHelpEditorFileNameFilter = "", std::string theHelpDataName = "");
 	void StoreToSettings(void);
+	bool AreStoredSettingsChanged(const NFmiHelpDataInfoSystem &other);
 	void InitSettings(const NFmiHelpDataInfoSystem &theOther, bool fDoHelpDataInfo);
 
 	NFmiHelpDataInfo& DynamicHelpDataInfo(int theIndex);
@@ -193,6 +199,10 @@ public:
 	void CacheMaximumFileSizeMB(double newValue) {itsCacheMaximumFileSizeMB = newValue;}
 	const std::string& CachePartialDataDirectory(void) const {return itsCachePartialDataDirectory;}
 	void CachePartialDataDirectory(const std::string &newValue) {itsCachePartialDataDirectory = newValue;}
+
+	NFmiHelpDataInfoSystem& operator=(const NFmiHelpDataInfoSystem &other);
+    bool operator==(const NFmiHelpDataInfoSystem &other) const;
+    bool operator!=(const NFmiHelpDataInfoSystem &other) const;
 private:
 	void InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos, bool fStaticData);
 	bool IsSameTypeProjections(const boost::shared_ptr<NFmiArea> &theFirst, const boost::shared_ptr<NFmiArea> &theSecond);

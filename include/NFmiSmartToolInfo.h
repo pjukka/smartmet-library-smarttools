@@ -24,6 +24,9 @@ public:
 	bool RemoveScript(const std::string &theScriptName);
 	bool LoadDBChecker(void);
 	bool SaveDBChecker(void);
+	bool LoadSettings(void);
+	bool SaveSettings(void);
+	bool AreStoredSettingsChanged(const NFmiSmartToolInfo &other);
 
 	const std::string& CurrentScript(void) const{return itsCurrentScript;}
 	const std::string& CurrentScriptName(void) const{return itsCurrentScriptName;}
@@ -33,13 +36,13 @@ public:
 	bool MakeDBCheckAtSend(void) const {return fMakeDBCheckAtSend;}
 	bool IsThereDBCheckScript(void) const {return fIsThereDBCheckScript;}
 
-	void CurrentScript(const std::string& newValue) {itsCurrentScript = newValue; SaveSettings();}
-	void CurrentScriptName(const std::string &newValue) {itsCurrentScriptName = newValue; SaveSettings();}
+	void CurrentScript(const std::string& newValue) {itsCurrentScript = newValue;}
+	void CurrentScriptName(const std::string &newValue) {itsCurrentScriptName = newValue;}
 	void LoadDirectory(const std::string& newValue, bool fSaveSettings);
 	void SetCurrentLoadDirectory(const std::string& newValue); // tässä ei aseteta root-directoria
 	void DBCheckerFileName(const std::string& newValue) {itsDBCheckerFileName = newValue;}
 	void DBCheckerText(const std::string& newValue) {itsDBCheckerText = newValue;}
-	void MakeDBCheckAtSend(bool newValue) {fMakeDBCheckAtSend = newValue; SaveSettings();}
+	void MakeDBCheckAtSend(bool newValue) {fMakeDBCheckAtSend = newValue;}
 	void IsThereDBCheckScript(bool newValue) {fIsThereDBCheckScript = newValue;}
 
 	bool ScriptExist(const std::string &theScriptName); // löytyykö tämän nimistä skriptiä
@@ -48,10 +51,9 @@ public:
 	void ScriptFileExtension(const std::string& newValue) {itsScriptFileExtension = newValue;}
 	std::string GetFullScriptFileName(const std::string &theScriptName);
 
+	NFmiSmartToolInfo& operator=(const NFmiSmartToolInfo &other);
 private:
 	bool WriteScript2File(const std::string &theFileName, const std::string &theScript);
-	bool LoadSettings(void);
-	bool SaveSettings(void);
 
 	std::string itsCurrentScript; //! Dialogissa oleva scripti.
 	std::string itsScriptFileExtension; //! smarttool-macrot talletetaan tiedostoihin tällä extensiolla (.st).
