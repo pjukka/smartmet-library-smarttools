@@ -456,17 +456,17 @@ void NFmiHelpDataInfoSystem::StoreToSettings(void)
 	if(itsBaseNameSpace.empty() == false)
 	{
 		// HUOM! tässä on toistaiseksi vain cacheen liittyvien muutosten talletukset
-		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheDirectory"), itsCacheDirectory);
-		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheTmpDirectory"), itsCacheTmpDirectory);
-		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CachePartialDataDirectory"), itsCachePartialDataDirectory);
-		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheTmpFileNameFix"), itsCacheTmpFileNameFix);
-		NFmiSettings::Set(std::string(itsBaseNameSpace + "::UseQueryDataCache"), NFmiStringTools::Convert(fUseQueryDataCache));
-		NFmiSettings::Set(std::string(itsBaseNameSpace + "::DoCleanCache"), NFmiStringTools::Convert(fDoCleanCache));
-		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheFileKeepMaxDays"), NFmiStringTools::Convert(itsCacheFileKeepMaxDays));
-		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheMaxFilesPerPattern"), NFmiStringTools::Convert(itsCacheMaxFilesPerPattern));
-		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheMediumFileSizeMB"), NFmiStringTools::Convert(itsCacheMediumFileSizeMB));
-		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheLargeFileSizeMB"), NFmiStringTools::Convert(itsCacheLargeFileSizeMB));
-		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheMaximumFileSizeMB"), NFmiStringTools::Convert(itsCacheMaximumFileSizeMB));
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheDirectory"), itsCacheDirectory, true);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheTmpDirectory"), itsCacheTmpDirectory, true);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CachePartialDataDirectory"), itsCachePartialDataDirectory, true);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheTmpFileNameFix"), itsCacheTmpFileNameFix, true);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::UseQueryDataCache"), NFmiStringTools::Convert(fUseQueryDataCache), true);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::DoCleanCache"), NFmiStringTools::Convert(fDoCleanCache), true);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheFileKeepMaxDays"), NFmiStringTools::Convert(itsCacheFileKeepMaxDays), true);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheMaxFilesPerPattern"), NFmiStringTools::Convert(itsCacheMaxFilesPerPattern), true);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheMediumFileSizeMB"), NFmiStringTools::Convert(itsCacheMediumFileSizeMB), true);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheLargeFileSizeMB"), NFmiStringTools::Convert(itsCacheLargeFileSizeMB), true);
+		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheMaximumFileSizeMB"), NFmiStringTools::Convert(itsCacheMaximumFileSizeMB), true);
 	}
 	else
 		throw std::runtime_error("Error in NFmiHelpDataInfoSystem::StoreToSettings, unable to store setting.");
