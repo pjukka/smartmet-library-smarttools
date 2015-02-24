@@ -668,7 +668,7 @@ checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos
 		boost::shared_ptr<NFmiFastQueryInfo> editedDataIter = itsEditedDataKeeper->GetIter();
 		if(editedDataIter && editedDataIter->IsGrid() == false) // laitetaan myˆs mahdollisesti editoitava data, jos kyseess‰ on asema dataa eli havainto
 		{
-			currentProdId = editedDataIter->Producer()->GetIdent();
+            currentProdId = editedDataIter->FirstParamProducer().GetIdent();  // haetaan aina 1. parametrin tuottaja => ei satunnaisuutta, jos datassa on v‰‰rin rakennettu parambagi jossa eri tuottajia
 			if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
 				infoVector.push_back(editedDataIter);
 		}
@@ -677,7 +677,7 @@ checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos
 	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
 	{
 		boost::shared_ptr<NFmiFastQueryInfo> aInfo = iter->second->GetDataKeeper()->GetIter();
-	    currentProdId = static_cast<int>(aInfo->Producer()->GetIdent());
+        currentProdId = static_cast<int>(aInfo->FirstParamProducer().GetIdent());  // haetaan aina 1. parametrin tuottaja => ei satunnaisuutta, jos datassa on v‰‰rin rakennettu parambagi jossa eri tuottajia
 		if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
 			infoVector.push_back(aInfo);
 	}
