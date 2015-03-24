@@ -284,9 +284,9 @@ int NFmiMultiLevelMask::MaskedCount(unsigned long theMaskType, unsigned long the
 	{
 		for(unsigned long j=startColumn; j<=endColumn; j++)
 		{
-			if(i < 0 || i >= theYGridSize)
+			if(i >= theYGridSize)
 				count++;
-			else if(j < 0 || j >= theXGridSize)
+			else if(j >= theXGridSize)
 				count++;
 			else
 			{
