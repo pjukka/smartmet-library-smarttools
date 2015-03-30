@@ -1,6 +1,4 @@
-SUBNAME = smarttools
-LIB = smartmet-$(SUBNAME)
-INCDIR = smartmet/$(SUBNAME)
+LIB = smarttools
 
 # Installation directories
 
@@ -39,7 +37,8 @@ ifeq ($(CXX), clang++)
 
  INCLUDES = \
 	-isystem $(includedir) \
-	-isystem $(includedir)/smartmet
+	-isystem $(includedir)/smartmet \
+	-isystem $(includedir)/smartmet/newbase
 
 else
 
@@ -82,11 +81,11 @@ LIBS = -L$(libdir) \
 
 rpmsourcedir = /tmp/$(shell whoami)/rpmbuild
 
-rpmerr = "There's no spec file ($(SUBNAME).spec). RPM wasn't created. Please make a spec file or copy and rename it into $(SUBNAME).spec"
+rpmerr = "There's no spec file ($(LIB).spec). RPM wasn't created. Please make a spec file or copy and rename it into $(LIB).spec"
 
 # What to install
 
-LIBFILE = libsmartmet_$(SUBNAME).so
+LIBFILE = libsmartmet_$(LIB).so
 
 # How to install
 
@@ -133,12 +132,12 @@ clean:
 	rm -rf $(objdir)
 
 install:
-	@mkdir -p $(includedir)/$(INCDIR)
+	@mkdir -p $(includedir)/smartmet/$(LIB)
 	@list='$(HDRS)'; \
 	for hdr in $$list; do \
 	  HDR=$$(basename $$hdr); \
-	  echo $(INSTALL_DATA) $$hdr $(includedir)/$(INCDIR)/$$HDR; \
-	  $(INSTALL_DATA) $$hdr $(includedir)/$(INCDIR)/$$HDR; \
+	  echo $(INSTALL_DATA) $$hdr $(includedir)/smartmet/$(LIB)/$$HDR; \
+	  $(INSTALL_DATA) $$hdr $(includedir)/smartmet/$(LIB)/$$HDR; \
 	done
 	@mkdir -p $(libdir)
 	$(INSTALL_PROG) $(LIBFILE) $(libdir)/$(LIBFILE)
@@ -150,14 +149,14 @@ objdir:
 	@mkdir -p $(objdir)
 
 rpm: clean
-	if [ -e $(SUBNAME).spec ]; \
+	if [ -e $(LIB).spec ]; \
 	then \
-	  smartspecupdate $(SUBNAME).spec ; \
+	  smartspecupdate $(LIB).spec ; \
 	  mkdir -p $(rpmsourcedir) ; \
-	  tar -C ../ -cf $(rpmsourcedir)/lib$(LIB).tar $(SUBNAME) ; \
-	  gzip -f $(rpmsourcedir)/lib$(LIB).tar ; \
-	  TAR_OPTIONS=--wildcards rpmbuild -v -ta $(rpmsourcedir)/lib$(LIB).tar.gz ; \
-	  rm -f $(rpmsourcedir)/$(LIB).tar.gz ; \
+	  tar -C ../ -cf $(rpmsourcedir)/libsmartmet-$(LIB).tar $(LIB) ; \
+	  gzip -f $(rpmsourcedir)/libsmartmet-$(LIB).tar ; \
+	  TAR_OPTIONS=--wildcards rpmbuild -v -ta $(rpmsourcedir)/libsmartmet-$(LIB).tar.gz ; \
+	  rm -f $(rpmsourcedir)/libsmartmet-$(LIB).tar.gz ; \
 	else \
 	  echo $(rpmerr); \
 	fi;
