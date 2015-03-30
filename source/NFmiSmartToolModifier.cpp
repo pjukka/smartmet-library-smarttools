@@ -41,19 +41,6 @@
 #endif
 #include <boost/thread.hpp>
 
-#ifdef USE_THREAD_POOL
-// threadpool on haettu http://threadpool.sourceforge.net/ -osoitteesta. Se ei kuulu vielä boost-kirjastoon (on ehdolla?).
-// Käytössäni on versio 0.2.5. Hain em. sivulta threadpool-0_2_5-src.zip -tiedoston, purin sen ja kopsasin threadpool\boost-hakemiston 
-// sisällön oikean boost:in boost-hakemistoon.
-#include <boost/threadpool.hpp>
-
-#include <boost/version.hpp>
-#if BOOST_VERSION < 105000
-#define TIME_UTC_ TIME_UTC
-#endif
-
-#endif // USE_THREAD_POOL
-
 #ifdef _MSC_VER
 #pragma warning (default : 4244 4267 4512) // laitetaan 4244 takaisin päälle, koska se on tärkeä (esim. double -> int auto castaus varoitus)
 #endif
@@ -723,37 +710,6 @@ static void DoPartialGridCalculationBlockInThread(NFmiLocationIndexRangeCalculat
 	}
 }
 
-#ifdef USE_THREAD_POOL
-
-// tämä on vain muutamien dataosien sijoitus yhteen rakenteeseen, koska threadpool:in schedule-metodi toimii max yhdelle parametrille
-class CalculationBlockParamsHolder
-{
-public:
-	CalculationBlockParamsHolder(NFmiLocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, boost::shared_ptr<NFmiSmartToolCalculation> &theCalculation, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
-	:itsLocationIndexRangeCalculator(&theLocationIndexRangeCalculator)
-	,itsInfo(&theInfo)
-	,itsCalculationBlock(&theCalculationBlock)
-	,itsCalculation(&theCalculation)
-	,itsCalculationParams(&theCalculationParams)
-	,itsUsedBitmask(theUsedBitmask)
-	{
-	}
-
-	NFmiLocationIndexRangeCalculator *itsLocationIndexRangeCalculator;
-	boost::shared_ptr<NFmiFastQueryInfo> *itsInfo; 
-	boost::shared_ptr<NFmiSmartToolCalculationBlock> *itsCalculationBlock; // HUOM! ottaa sekä CalculationBlock:in että Calculation:in, mutta niistä käytetään vain toista kutsutun threaddaus funktion mukaan
-	boost::shared_ptr<NFmiSmartToolCalculation> *itsCalculation;
-	NFmiCalculationParams *itsCalculationParams;
-	const NFmiBitMask *itsUsedBitmask;
-};
-
-static void DoPartialGridCalculationBlockInThreadWith1Parameter(CalculationBlockParamsHolder theCalculationBlockParamsHolder) // tarkoituksella kopio CalculationBlockParamsHolder-rakenteesta!!
-{
-	::DoPartialGridCalculationBlockInThread(*theCalculationBlockParamsHolder.itsLocationIndexRangeCalculator, *theCalculationBlockParamsHolder.itsInfo, *theCalculationBlockParamsHolder.itsCalculationBlock, *theCalculationBlockParamsHolder.itsCalculationParams, theCalculationBlockParamsHolder.itsUsedBitmask);
-}
-
-#endif // USE_THREAD_POOL
-
 static void DoPartialGridCalculationInThread(NFmiLocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<NFmiSmartToolCalculation> &theCalculation, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
 {
 	try
@@ -782,19 +738,6 @@ static void DoPartialGridCalculationInThread(NFmiLocationIndexRangeCalculator &t
 		// pakko ottaa vain vastaan poikkeukset, ei tehdä mitään
 	}
 }
-
-#ifdef USE_THREAD_POOL
-
-static void DoPartialGridCalculationInThreadWith1Parameter(CalculationBlockParamsHolder theCalculationBlockParamsHolder) // tarkoituksella kopio CalculationBlockParamsHolder-rakenteesta!!
-{
-	::DoPartialGridCalculationInThread(*theCalculationBlockParamsHolder.itsLocationIndexRangeCalculator, *theCalculationBlockParamsHolder.itsInfo, *theCalculationBlockParamsHolder.itsCalculation, *theCalculationBlockParamsHolder.itsCalculationParams, theCalculationBlockParamsHolder.itsUsedBitmask);
-}
-
-// HUOM! Lopetin threadpool:in käytön koska se vuoti vähän muistia (n. 7 kB). Tämä luokka ei ole ikinä päässyt boostin viralliseen kirjastoon.
-// Eikä luokasta ole varsinaisesti mitään extra hyötyä (verrattuna esim. boost::thread_group -luokan käyttöön verrattuna), halusin vain joskus testata sitä.
-boost::threadpool::pool gThreadPool(boost::thread::hardware_concurrency()); // tehdään thread-poolin kooksi koneen core-count
-
-#endif // USE_THREAD_POOL
 
 void NFmiSmartToolModifier::ModifyConditionalData_ver2(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiThreadCallBacks *theThreadCallBacks)
 {
@@ -838,29 +781,10 @@ void NFmiSmartToolModifier::ModifyConditionalData_ver2(const boost::shared_ptr<N
 						calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, missä on jo aika oikein
 					NFmiLocationIndexRangeCalculator locationIndexRangeCalculator(info->SizeLocations(), 100);
 
-#ifdef USE_THREAD_POOL
-					for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
-					{
-						boost::shared_ptr<NFmiSmartToolCalculation> dummyParam; // calculationBlock-laskuissa pitää tehdä tyhjä calculation-muuttuja
-						CalculationBlockParamsHolder paramHolder(locationIndexRangeCalculator, infoVector[threadIndex], calculationBlockVector[threadIndex], dummyParam, calculationParamsVector[threadIndex], usedBitmask);
-						gThreadPool.schedule(boost::bind(::DoPartialGridCalculationBlockInThreadWith1Parameter, paramHolder));
-					}
-					gThreadPool.wait();
-#else
 					boost::thread_group calcParts;
 					for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
 						calcParts.add_thread(new boost::thread(::DoPartialGridCalculationBlockInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationBlockVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
 					calcParts.join_all(); // odotetaan että threadit lopettavat
-#endif // USE_THREAD_POOL
-
-	/*
-					for(info->ResetLocation(); info->NextLocation(); )
-					{
-						calculationParams.itsLatlon = info->LatLon();
-						calculationParams.itsLocationIndex = info->LocationIndex(); // tämä locationindex juttu liittyy kai optimointiin, jota ei tehdä enää, pitäisikö poistaa
-						theCalculationBlock->Calculate_ver2(calculationParams);
-					}
-	*/
 				}
 			}
 		}
@@ -1009,20 +933,10 @@ void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalc
 							calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, missä on jo aika oikein
 						NFmiLocationIndexRangeCalculator locationIndexRangeCalculator(info->SizeLocations(), 100);
 
-#ifdef USE_THREAD_POOL
-						for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
-						{
-							boost::shared_ptr<NFmiSmartToolCalculationBlock> dummyParam; // calculation-laskuissa pitää tehdä tyhjä calculationBlock -muuttuja
-							CalculationBlockParamsHolder paramHolder(locationIndexRangeCalculator, infoVector[threadIndex], dummyParam, calculationVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask);
-							gThreadPool.schedule(boost::bind(::DoPartialGridCalculationInThreadWith1Parameter, paramHolder));
-						}
-						gThreadPool.wait();
-#else
 						boost::thread_group calcParts;
 						for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
 							calcParts.add_thread(new boost::thread(::DoPartialGridCalculationInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
 						calcParts.join_all(); // odotetaan että threadit lopettavat
-#endif
 					}
 				}
 
