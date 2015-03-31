@@ -1209,14 +1209,22 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 			}
 			break;
 			}
-		case NFmiAreaMask::VertFunctionStart:
-			{
-			fUseLevelData = true;
-			boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskVertFunc(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
-			fUseLevelData = false; // en tiedä pitääkö tämä laittaa takaisin falseksi, mutta laitan varmuuden vuoksi
-			break;
-			}
+        case NFmiAreaMask::VertFunctionStart:
+            {
+                if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ProbRect || theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ProbCircle)
+                {
+                    boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+                    areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskProbFunc(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
+                }
+                else
+                {
+                    fUseLevelData = true;
+                    boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+                    areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskVertFunc(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
+                    fUseLevelData = false; // en tiedä pitääkö tämä laittaa takaisin falseksi, mutta laitan varmuuden vuoksi
+                }
+                break;
+            }
 		case NFmiAreaMask::DeltaZFunction:
 			{
 			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiCalculationDeltaZValue());
