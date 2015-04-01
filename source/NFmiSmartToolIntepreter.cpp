@@ -2093,6 +2093,9 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso5"), kFmiProbabilityOfWindLimit5));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso6"), kFmiProbabilityOfWindLimit6));
 
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("icing"), kFmiIcing));
+		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("qnh"), static_cast<FmiParameterName>(1207)));
+        
 
 		// ****** sounding index funktiot  HUOM! ne k‰sitell‰‰n case insensitivein‰!! *************************
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclsur"), static_cast<FmiParameterName>(kSoundingParLCLSur)));

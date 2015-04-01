@@ -526,6 +526,7 @@ protected:
 								// ne ovat alihakemistossa. Eli Kun viewMacro talletetaan tiedostoon, lisätään tämä
 								// tieto itsParameterAbbreviation-tiedosn yhteyteen ja se myös puretaan luettaessa tähän.
 								// Tämä avulla voidaan rakentaa oikea suhteellinen polku haluttuun macroParamiin
+                                // Suhteellinen polku on ilman kenoviivoja alussa ja lopussa (esim. "euroMakrot" tai "euroMakrot\analyysi")
 
 //  Parametrin oletus näyttötyyppi (symboli,
 //  isoviiva, teksti...)

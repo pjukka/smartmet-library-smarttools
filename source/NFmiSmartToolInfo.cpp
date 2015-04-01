@@ -114,9 +114,9 @@ bool NFmiSmartToolInfo::SaveSettings(void)
 {
 	try
 	{
-		NFmiSettings::Set("MetEditor::SmartToolInfo::ScriptFileExtension", itsScriptFileExtension);
-		NFmiSettings::Set("MetEditor::SmartToolInfo::CurrentScriptName", itsCurrentScriptName);
-		NFmiSettings::Set("MetEditor::SmartToolInfo::MakeDBCheckAtSend", fMakeDBCheckAtSend ? "true" : "false");
+		NFmiSettings::Set("MetEditor::SmartToolInfo::ScriptFileExtension", itsScriptFileExtension, true);
+		NFmiSettings::Set("MetEditor::SmartToolInfo::CurrentScriptName", itsCurrentScriptName, true);
+		NFmiSettings::Set("MetEditor::SmartToolInfo::MakeDBCheckAtSend", fMakeDBCheckAtSend ? "true" : "false", true);
 		return true;
 	}
 	catch(exception & /* e */)

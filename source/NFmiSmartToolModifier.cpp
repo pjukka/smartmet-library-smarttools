@@ -790,7 +790,9 @@ static void DoPartialGridCalculationInThreadWith1Parameter(CalculationBlockParam
 	::DoPartialGridCalculationInThread(*theCalculationBlockParamsHolder.itsLocationIndexRangeCalculator, *theCalculationBlockParamsHolder.itsInfo, *theCalculationBlockParamsHolder.itsCalculation, *theCalculationBlockParamsHolder.itsCalculationParams, theCalculationBlockParamsHolder.itsUsedBitmask);
 }
 
-static boost::threadpool::pool gThreadPool(boost::thread::hardware_concurrency()); // tehdään thread-poolin kooksi koneen core-count
+// HUOM! Lopetin threadpool:in käytön koska se vuoti vähän muistia (n. 7 kB). Tämä luokka ei ole ikinä päässyt boostin viralliseen kirjastoon.
+// Eikä luokasta ole varsinaisesti mitään extra hyötyä (verrattuna esim. boost::thread_group -luokan käyttöön verrattuna), halusin vain joskus testata sitä.
+boost::threadpool::pool gThreadPool(boost::thread::hardware_concurrency()); // tehdään thread-poolin kooksi koneen core-count
 
 #endif // USE_THREAD_POOL
 

@@ -52,6 +52,13 @@ FMI smarttools development files
 %changelog
 * Mon Mar 30 2015 Mika Heiskanen <mika.heiskanen@fmi.fi> - 15.3.30-1.fmi
 - Switched to dynamic linkage
+* Mon Mar 16 2015 Mika Heiskanen <mika.heiskanen@fmi.fi> - 15.3.16-1.fmi
+- Recompiled due to newbase API changes
+* Mon Feb 16 2015 Mika Heiskanen <mika.heiskanen@fmi.fi> - 15.2.16-1.fmi
+- Fixes to data validation
+- Memory leak fixes
+- Added capability to detect changes to configuration file settings
+- Added smarttool parameter names qnh and icing
 * Fri Feb  6 2015 Mika Heiskanen <mika.heiskanen@fmi.fi> - 15.2.6-1.fmi
 - Recompiled with the latest newbase
 * Thu Oct 30 2014 Mika Heiskanen <mika.heiskanen@fmi.fi> - 14.10.30-1.fmi

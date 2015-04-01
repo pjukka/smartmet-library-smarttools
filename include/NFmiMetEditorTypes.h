@@ -39,6 +39,17 @@ typedef enum
    kFmiDisplayedMask = 16
 } Mask;
 
+enum FmiUsedSmartMetTool
+{
+    kFmiNoToolSelected = 0, // default tyhjä arvo
+    kFmiDataModificationTool = 1, // muokkausdialogi
+    kFmiBrush = 2, // pensseli
+    kFmiTimeSerialModification = 3, // aikasarja editointi
+    kFmiSmarttool = 4, // smarttool kieli
+	kFmiHarmonization = 5, // harmonisaattorit
+	kFmiDataLoading = 6 // harmonisaattorit
+};
+
 } // end of namespace NFmiMetEditorTypes
 
 #endif // NFMIMETEDITORTYPES_H
