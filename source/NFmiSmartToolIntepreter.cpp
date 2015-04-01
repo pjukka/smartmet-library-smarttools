@@ -154,14 +154,14 @@ NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctio
 //--------------------------------------------------------
 // Constructor/Destructor
 //--------------------------------------------------------
-NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiProducerSystem *theProducerSystem)
+NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiProducerSystem *theProducerSystem, NFmiProducerSystem *theObservationProducerSystem)
 :itsProducerSystem(theProducerSystem)
 ,itsSmartToolCalculationBlocks()
 ,fNormalAssigmentFound(false)
 ,fMacroParamFound(false)
 ,fMacroParamSkriptInProgress(false)
 {
-	NFmiSmartToolIntepreter::InitTokens(itsProducerSystem);
+    NFmiSmartToolIntepreter::InitTokens(itsProducerSystem, theObservationProducerSystem);
 }
 NFmiSmartToolIntepreter::~NFmiSmartToolIntepreter(void)
 {
@@ -1973,7 +1973,27 @@ void NFmiSmartToolIntepreter::Clear(void)
 		itsSmartToolCalculationBlocks[i].Clear();
 }
 
-void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
+void NFmiSmartToolIntepreter::InitProducerTokens(NFmiProducerSystem *theProducerSystem)
+{
+	if(theProducerSystem)
+	{
+		// Tuottaja listaa t‰ydennet‰‰n ProducerSystemin tuottajilla
+		int modelCount = static_cast<int>(theProducerSystem->Producers().size());
+		int i=0;
+		for(i=0; i<modelCount; i++)
+		{
+			NFmiProducerInfo &prodInfo = theProducerSystem->Producer(i+1);
+            for(size_t i = 0; i < prodInfo.ShortNameCount(); i++)
+            {
+				std::string prodName(prodInfo.ShortName(i));
+				NFmiStringTools::LowerCase(prodName); // pit‰‰ muuttaa lower case:en!!!
+				itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(prodName, static_cast<FmiProducerName>(prodInfo.ProducerId())));
+            }
+		}
+	}
+}
+
+void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, NFmiProducerSystem *theObservationProducerSystem)
 {
 	if(!NFmiSmartToolIntepreter::fTokensInitialized)
 	{
@@ -2217,19 +2237,8 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem)
 
 		if(theProducerSystem)
 		{
-			// lopuksi tuottaja listaa t‰ydennet‰‰n ProducerSystemin tuottajilla
-			int modelCount = static_cast<int>(theProducerSystem->Producers().size());
-			int i=0;
-			for(i=0; i<modelCount; i++)
-			{
-				NFmiProducerInfo &prodInfo = theProducerSystem->Producer(i+1);
-                for(size_t i = 0; i < prodInfo.ShortNameCount(); i++)
-                {
-				    std::string prodName(prodInfo.ShortName(i));
-				    NFmiStringTools::LowerCase(prodName); // pit‰‰ muuttaa lower case:en!!!
-				    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(prodName, static_cast<FmiProducerName>(prodInfo.ProducerId())));
-                }
-			}
+            NFmiSmartToolIntepreter::InitProducerTokens(theProducerSystem);
+            NFmiSmartToolIntepreter::InitProducerTokens(theObservationProducerSystem);
 		}
 		else
 		{
