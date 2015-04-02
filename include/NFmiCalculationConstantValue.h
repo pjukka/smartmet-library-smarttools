@@ -194,4 +194,50 @@ private:
 	boost::shared_ptr<MutexType> itsCacheMutex; // TÄMÄ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua työtä
 };
 
+// NFmiNearestObsValue2GridMask -luokka laskee havainto datasta sellaisen
+// hilan, mihin sijoitetaan kuhunkin hilapisteeseen vain sitä lähimmän aseman 
+// arvon (oli se puuttuvaa tai ei). Eli kaikkiin hilapisteisiin ei tule arvoa.
+// Tämän avulla on tarkoitus voida tehdä 'asemapiste' -laskuja ja visualisoida
+// niitä kartalla vain teksti muodossa. Tällöin teksti tulee näkyviin kartalla 
+// lähellä kunkin aseman omaa pistettä ja muut hilapisteet ovat puuttuvaa joten 
+// siihen ei tule näkyviin mitään.
+class NFmiNearestObsValue2GridMask : public NFmiInfoAreaMask
+{
+	typedef std::map<NFmiMetTime, NFmiDataMatrix<float> > DataCache;
+
+public:
+   NFmiNearestObsValue2GridMask(Type theMaskType, NFmiInfoData::Type theDataType, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, 
+       NFmiAreaMask::FunctionType thePrimaryFunc, NFmiAreaMask::FunctionType theSecondaryFunc, int theArgumentCount);
+   ~NFmiNearestObsValue2GridMask(void);
+   NFmiNearestObsValue2GridMask(const NFmiNearestObsValue2GridMask &theOther);
+   NFmiAreaMask* Clone(void) const;
+
+   double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
+   void SetGriddingHelpers(NFmiArea *theArea, NFmiEditMapGeneralDataDoc *theDoc, const NFmiPoint &theResultGridSize);
+   void SetArguments(std::vector<float> & theArgumentVector);
+
+private:
+  void DoNearestValueGriddingCheck(const NFmiCalculationParams &theCalculationParams);
+
+  boost::shared_ptr<DataCache> itsNearestObsValuesData; // Tämä jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua työtä
+  NFmiDataMatrix<float> *itsCurrentNearestObsValuesData; // tähän on laitettu se matriisi, joka sisältää halutun ajan asemadatasta lasketut hilatut arvot
+  NFmiMetTime itsLastCalculatedTime; // tälle ajanhetkelle on station data laskettu (tai puuttuva aika), mutta onko se sama kuin itsTime, jos ei ole, pitää laskea juuri tälle ajalle
+
+  NFmiAreaMask::FunctionType itsPrimaryFunc; // esim. ClosestObsTimeOffset
+  NFmiAreaMask::FunctionType itsSecondaryFunc; // esim. ClosestObsValue
+
+  // Näille muuttujille pitää asettaa arvot erillisellä SetGridHelpers-funktiolla
+  boost::shared_ptr<NFmiArea> itsAreaPtr; // omistaa ja tuhoaa!!
+  NFmiEditMapGeneralDataDoc *itsDoc;
+  NFmiPoint itsResultGridSize; // tämän kokoiseen hilaan asema data lasketaan (itsNearestObsValuesData -hilakoko)
+
+  std::vector<float> itsArgumentVector; // tähän lasketaan lennossa laskuissa tarvittavat argumentit (1. aikahyppy)
+
+  // Kun itsCurrentNearestObsValuesData -muuttujaa lasketaan tai asetetaan, sen saa tehdä kullekin ajalle vain kerran. Tämä lukko systeemi takaa sen.
+  typedef boost::shared_mutex MutexType;
+  typedef boost::shared_lock<MutexType> ReadLock; // Read-lockia ei oikeasti tarvita, mutta laitan sen tähän, jos joskus tarvitaankin
+  typedef boost::unique_lock<MutexType> WriteLock;
+  boost::shared_ptr<MutexType> itsCacheMutex; // TÄMÄ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua työtä
+};
+
 #endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL

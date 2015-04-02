@@ -1045,6 +1045,20 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMetFunctionAreaMask
 	return areaMask;
 }
 
+// Jos areaMaskin info on havaittua luotausdataa, pit‰‰ tehd‰ leveliin liittyv‰ fiksaus.
+void NFmiSmartToolModifier::MakeSoundingLevelFix(boost::shared_ptr<NFmiAreaMask> &theAreaMask, const NFmiAreaMaskInfo &theAreaMaskInfo)
+{
+    if(theAreaMask)
+    {
+	    if(theAreaMask->Info()->LevelType() == kFmiSoundingLevel) 
+	    { // Luotaus data on poikkeus, jonka haluttu painepinta level pit‰‰ asettaa t‰ss‰ erikseen.
+		    // Lis‰ksi levelType pit‰‰ vaihtaa pressuresta kFmiSoundingLevel!
+		    NFmiLevel soundingLevel(kFmiSoundingLevel, theAreaMaskInfo.GetLevel()->GetName(), theAreaMaskInfo.GetLevel()->LevelValue());
+		    theAreaMask->Level(soundingLevel);
+	    }
+    }
+}
+
 //--------------------------------------------------------
 // CreateAreaMask
 //--------------------------------------------------------
@@ -1216,6 +1230,19 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
                     boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
                     areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskProbFunc(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
                 }
+#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
+                else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue)
+			    {
+                    boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+            		if(info->IsGrid())
+                        throw std::runtime_error("With closestvalue -function you must choose observation (station) data producer, not data with grid.");
+                    NFmiNearestObsValue2GridMask *nearestObsValue2GridMask = new NFmiNearestObsValue2GridMask(NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount());
+				    nearestObsValue2GridMask->SetGriddingHelpers(itsWorkingGrid->itsArea, itsDoc, NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
+				    areaMask = boost::shared_ptr<NFmiAreaMask>(nearestObsValue2GridMask);
+                    MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
+			    }
+#endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
+
                 else
                 {
                     fUseLevelData = true;
@@ -1244,18 +1271,16 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 		if(areaMask->Info() && areaMask->Info()->Grid() == 0)
 		{ // jos oli info dataa ja viel‰ asemadatasta, tarkistetaan ett‰ kyse oli viel‰ infoData-tyypist‰, muuten oli virheellinen lauseke
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
-			if(maskType == NFmiAreaMask::InfoVariable)
+            if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue)
+            { // t‰m‰ on ok, ei tarvitse tehd‰ mit‰‰n
+            }
+			else if(maskType == NFmiAreaMask::InfoVariable)
 			{
 				boost::shared_ptr<NFmiFastQueryInfo> info = areaMask->Info();
 				NFmiStation2GridMask *station2GridMask = new NFmiStation2GridMask(areaMask->MaskType(), areaMask->GetDataType(), info);
 				station2GridMask->SetGriddingHelpers(itsWorkingGrid->itsArea, itsDoc, NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
 				areaMask = boost::shared_ptr<NFmiAreaMask>(station2GridMask);
-				if(areaMask->Info()->LevelType() == kFmiSoundingLevel) 
-				{ // Luotaus data on poikkeus, jonka haluttu painepinta level pit‰‰ asettaa t‰ss‰ erikseen.
-					// Lis‰ksi levelType pit‰‰ vaihtaa pressuresta kFmiSoundingLevel!
-					NFmiLevel soundingLevel(kFmiSoundingLevel, theAreaMaskInfo.GetLevel()->GetName(), theAreaMaskInfo.GetLevel()->LevelValue());
-					areaMask->Level(soundingLevel);
-				}
+                MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
 			}
 			else
 #endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
