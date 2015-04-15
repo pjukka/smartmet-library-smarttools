@@ -1,16 +1,16 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 15.4.9
+Version: 15.4.15
 Release: 1%{?dist}.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase-devel >= 15.4.9
+BuildRequires: libsmartmet-newbase-devel >= 15.4.15
 BuildRequires: boost-devel
-Requires: libsmartmet-newbase >= 15.4.9
+Requires: libsmartmet-newbase >= 15.4.15
 Provides: %{LIBNAME}
 
 %description
@@ -50,6 +50,8 @@ FMI smarttools development files
 
 
 %changelog
+* Wed Apr 15 2015 Mika Heiskanen <mika.heiskanen@fmi.fi> - 15.4.15-1.fmi
+- newbase API changed for LatLonCache queries
 * Thu Apr  9 2015 Mika Heiskanen <mika.heiskanen@fmi.fi> - 15.4.9-1.fmi
 - newbase API changed
 * Mon Mar 30 2015 Mika Heiskanen <mika.heiskanen@fmi.fi> - 15.3.30-1.fmi
