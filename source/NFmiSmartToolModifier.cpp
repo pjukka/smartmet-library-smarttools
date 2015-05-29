@@ -488,7 +488,7 @@ static void CalcTotalProgressStepCount(checkedVector<NFmiSmartToolCalculationBlo
 			NFmiSmartToolCalculationBlockInfo &blockInfo = theCalcInfoVector[i];
 			if(blockInfo.itsFirstCalculationSectionInfo)
 				totalStepCount += static_cast<int>(blockInfo.itsFirstCalculationSectionInfo->GetCalculationInfos().size() * sizeTimes);
-			if(blockInfo.itsIfAreaMaskSectionInfo)
+            if(blockInfo.itsIfAreaMaskSectionInfo && blockInfo.itsIfAreaMaskSectionInfo->GetAreaMaskInfoVector().size())
 				totalStepCount += sizeTimes;
 			if(blockInfo.itsLastCalculationSectionInfo)
 				totalStepCount += static_cast<int>(blockInfo.itsLastCalculationSectionInfo->GetCalculationInfos().size() * sizeTimes);
