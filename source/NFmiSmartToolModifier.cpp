@@ -898,7 +898,7 @@ void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalc
 			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
 			const NFmiBitMask *usedBitmask = ::GetUsedBitmask(info, fModifySelectedLocationsOnly);
 
-			unsigned int usedThreadCount = boost::thread::hardware_concurrency();
+            unsigned int usedThreadCount = boost::thread::hardware_concurrency();
 			std::vector<boost::shared_ptr<NFmiFastQueryInfo> > infoVector;
 			for(size_t i=0; i < usedThreadCount; i++)
 				infoVector.push_back(NFmiAreaMask::DoShallowCopy(info));
@@ -1225,7 +1225,12 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 			}
         case NFmiAreaMask::VertFunctionStart:
             {
-                if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ProbRect || theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ProbCircle)
+                if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::TimeRange)
+                {
+                    boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+                    areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskTimeRange(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
+                }
+                else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ProbRect || theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ProbCircle)
                 {
                     boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
                     areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskProbFunc(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
