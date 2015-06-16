@@ -693,11 +693,14 @@ bool NFmiDrawParam::Init (const std::string& theFilename)
 		if(in)
 		{
 			in >> *this;
-			in.close();
-			itsInitFileName = theFilename;
-			fViewMacroDrawParam = false;
-			fBorrowedParam = false;
-			return true;
+            if(in)
+            {
+                in.close();
+                itsInitFileName = theFilename;
+                fViewMacroDrawParam = false;
+                fBorrowedParam = false;
+                return true;
+            }
 		}
 	}
 	return false;

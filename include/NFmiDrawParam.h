@@ -87,8 +87,8 @@ public:
 	// HUOM! tämä asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppiä!!!!!!
 	void DataType(NFmiInfoData::Type newValue){itsDataType = newValue;};
 
-	bool              Init (const std::string& theFilename = std::string());
-	bool              StoreData (const std::string& theFilename = std::string());
+	bool              Init (const std::string& theFilename);
+	bool              StoreData (const std::string& theFilename);
 
 // --------------- "set" ja "get" metodit -----------------
 	const std::string&	 ParameterAbbreviation (void) const;
