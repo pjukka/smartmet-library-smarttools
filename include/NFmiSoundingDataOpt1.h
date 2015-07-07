@@ -164,7 +164,8 @@ private:
 	std::deque<float> itsWindDirectionData;
 	std::deque<float> itsWindComponentUData;
 	std::deque<float> itsWindComponentVData;
-	std::deque<float> itsWindVectorData;
+    std::deque<float> itsWindVectorData;
+    std::deque<float> itsTotalCloudinessData;
 
 	float itsZeroHeight; // tältä korkeudelta alkaa luotauksen 0-korkeus, eli vuoristossa luotaus alkaa oikeasti korkeammalta ja se korkeus pitää käsitellä pintakorkeutena
 	int itsZeroHeightIndex; // edellisen indeksi (paikka vektorissa). Arvo on -1 jos ei löytynyt kunnollista 0-korkeutta

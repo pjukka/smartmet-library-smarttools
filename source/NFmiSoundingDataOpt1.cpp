@@ -679,7 +679,7 @@ void NFmiSoundingDataOpt1::CutEmptyData(void)
 	itsWindComponentUData.resize(greatestNonMissingLevelIndex);
 	itsWindComponentVData.resize(greatestNonMissingLevelIndex);
 	itsWindVectorData.resize(greatestNonMissingLevelIndex);
-
+    itsTotalCloudinessData.resize(greatestNonMissingLevelIndex);
 }
 
 static bool FindTimeIndexies(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiMetTime &theStartTime, long minuteRange, unsigned long &timeIndex1, unsigned long &timeIndex2)
@@ -838,7 +838,8 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
 			FastFillParamData(theInfo, kFmiWindDirection);
 			FastFillParamData(theInfo, kFmiWindUMS);
 			FastFillParamData(theInfo, kFmiWindVMS);
-			FastFillParamData(theInfo, kFmiWindVectorMS);
+            FastFillParamData(theInfo, kFmiWindVectorMS);
+            FastFillParamData(theInfo, kFmiTotalCloudCover);
 		}
 		else
 		{
@@ -852,7 +853,8 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
 			FillParamData(theInfo, kFmiWindDirection, theTime, theLatlon);
 			FillParamData(theInfo, kFmiWindUMS, theTime, theLatlon);
 			FillParamData(theInfo, kFmiWindVMS, theTime, theLatlon);
-			FillParamData(theInfo, kFmiWindVectorMS, theTime, theLatlon);
+            FillParamData(theInfo, kFmiWindVectorMS, theTime, theLatlon);
+            FillParamData(theInfo, kFmiTotalCloudCover, theTime, theLatlon);
 		}
 
 		CalculateHumidityData();
@@ -924,6 +926,8 @@ void NFmiSoundingDataOpt1::FixPressureDataSoundingWithGroundData(const boost::sh
 		float groundStationPressure = theGroundDataInfo->InterpolatedValue(wantedLatlon, itsTime);
 		theGroundDataInfo->Param(kFmiHumidity);
 		float groundRH = theGroundDataInfo->InterpolatedValue(wantedLatlon, itsTime);
+        theGroundDataInfo->Param(kFmiTotalCloudCover);
+        float groundN = theGroundDataInfo->InterpolatedValue(wantedLatlon, itsTime);
 
 		if(groundStationPressure != kFloatMissing)
 		{
@@ -954,7 +958,8 @@ void NFmiSoundingDataOpt1::FixPressureDataSoundingWithGroundData(const boost::sh
 							itsWindVectorData[i] = groundWv;
 							itsWindComponentUData[i] = groundU;
 							itsWindComponentVData[i] = groundV;
-							itsHumidityData[i] = groundRH;
+                            itsHumidityData[i] = groundRH;
+                            itsTotalCloudinessData[i] = groundN;
 
 							// pit‰‰ ottaa vektoreista alkuosa pois, kun tuota itsZeroHeightIndex -dataosaa
 							// ei n‰emm‰ k‰ytet‰k‰‰n miss‰‰n
@@ -969,7 +974,8 @@ void NFmiSoundingDataOpt1::FixPressureDataSoundingWithGroundData(const boost::sh
 								::CutStartOfVector(itsWindVectorData, itsZeroHeightIndex);
 								::CutStartOfVector(itsWindComponentUData, itsZeroHeightIndex);
 								::CutStartOfVector(itsWindComponentVData, itsZeroHeightIndex);
-								::CutStartOfVector(itsHumidityData, itsZeroHeightIndex);
+                                ::CutStartOfVector(itsHumidityData, itsZeroHeightIndex);
+                                ::CutStartOfVector(itsTotalCloudinessData, itsZeroHeightIndex);
 								itsZeroHeightIndex = 0;
 							}
 
@@ -990,7 +996,8 @@ void NFmiSoundingDataOpt1::FixPressureDataSoundingWithGroundData(const boost::sh
 							itsWindVectorData.push_front(groundWv);
 							itsWindComponentUData.push_front(groundU);
 							itsWindComponentVData.push_front(groundV);
-							itsHumidityData.push_front(groundRH);
+                            itsHumidityData.push_front(groundRH);
+                            itsTotalCloudinessData.push_front(groundN);
 
 							break;
 						}
@@ -1100,7 +1107,9 @@ std::deque<float>& NFmiSoundingDataOpt1::GetParamData(FmiParameterName theId)
 		return itsWindComponentVData;
 	case kFmiWindVectorMS:
 		return itsWindVectorData;
-	default:
+    case kFmiTotalCloudCover:
+        return itsTotalCloudinessData;
+    default:
 	  throw std::runtime_error(std::string("NFmiSoundingDataOpt1::GetParamData - wrong paramId given (Error in Program?): ") + NFmiStringTools::Convert<int>(theId));
 	}
 }
@@ -1116,7 +1125,8 @@ void NFmiSoundingDataOpt1::ClearDatas(void)
 	std::deque<float>().swap(itsWindDirectionData);
 	std::deque<float>().swap(itsWindComponentUData);
 	std::deque<float>().swap(itsWindComponentVData);
-	std::deque<float>().swap(itsWindVectorData);
+    std::deque<float>().swap(itsWindVectorData);
+    std::deque<float>().swap(itsTotalCloudinessData);
 
 	fPressureDataAvailable = false;
 	fHeightDataAvailable = false;
