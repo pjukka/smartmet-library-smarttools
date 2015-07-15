@@ -119,7 +119,9 @@ void NFmiDataStoringHelpers::NFmiExtraDataStorage::Write(std::ostream& os) const
 	size_t i = 0;
 	for(i=0; i<ssize; i++)
 	{
-		os << itsDoubleValues[i] << " ";
+        if(i > 0) // tämän avulla viimeisen arvon jälkeen ei tule spacea
+            os << " ";
+        os << itsDoubleValues[i];
 	}
 	if(ssize > 0)
 		os << std::endl;
