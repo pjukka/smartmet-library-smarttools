@@ -1621,7 +1621,9 @@ void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaM
     // yhdistelmä parametreille ei ole rajoja, samoin par-id kFmiBadParameter, koska silloin on kyse erikoisfunktioista kuten grad tms.
     if(parName == kFmiTotalWindMS || parName == kFmiWeatherAndCloudiness || parName == kFmiBadParameter)
 		*fCheckLimits = false;
-	else
+    else if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kScriptVariableData)
+        *fCheckLimits = false;
+    else
 	{
 		boost::shared_ptr<NFmiDrawParam> drawParam = itsInfoOrganizer->CreateDrawParam(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
 		if(drawParam)
