@@ -1015,7 +1015,7 @@ void NFmiSoundingDataOpt1::CalculateHumidityData(void)
 	size_t tVectorSize = itsTemperatureData.size();
 	if(tVectorSize > 0 && itsDewPointData.size() == tVectorSize)
 	{
-		itsHumidityData.resize(tVectorSize);
+		itsHumidityData.resize(tVectorSize, kFloatMissing);
 		for(size_t i = 0; i < tVectorSize; i++)
 		{
 			if(itsTemperatureData[i] != kFloatMissing && itsDewPointData[i] != kFloatMissing)
