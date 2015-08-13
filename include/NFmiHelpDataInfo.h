@@ -160,7 +160,6 @@ public:
 	NFmiHelpDataInfo& StaticHelpDataInfo(int theIndex);
 	int DynamicCount(void) const{return static_cast<int>(itsDynamicHelpDataInfos.size());}
 	int StaticCount(void) const{return static_cast<int>(itsStaticHelpDataInfos.size());}
-	boost::shared_ptr<NFmiArea> GetDataFilePatternAndArea(NFmiInfoData::Type theDataType, FmiProducerName theProdId, FmiParameterName theParamId, const boost::shared_ptr<NFmiArea> &theZoomedArea, std::string &theFilePattern, bool fDemandMatchingArea);
 	NFmiDataIdent GetNextSatelChannel(const NFmiDataIdent &theDataIdent, FmiDirection theDir);
 	void AddDynamic(const NFmiHelpDataInfo &theInfo);
 	void AddStatic(const NFmiHelpDataInfo &theInfo);

@@ -328,41 +328,6 @@ NFmiDataIdent NFmiHelpDataInfoSystem::GetNextSatelChannel(const NFmiDataIdent &t
 	return returnDataIdent;
 }
 
-
-// etsii sateldata-tyypit (oikeasti imagedatatype) l‰pi ja etsii haluttua parametria
-// jolle lˆytyy ns. piirrett‰v‰ projektio. Palauttaa kyseisen datan projektion
-// ja filepatternin.
-// Jos fDemandMatchingArea on true, pit‰‰ areoiden sopia niin ett‰ piirto onnistuu blittaamalla.
-// jos false, palautetaan area ja filepattern jos datatyyppi ja parametri ovat halutut.
-boost::shared_ptr<NFmiArea> NFmiHelpDataInfoSystem::GetDataFilePatternAndArea(NFmiInfoData::Type theDataType, FmiProducerName theProdId, FmiParameterName theParamId, const boost::shared_ptr<NFmiArea> &theZoomedArea, std::string &theFilePattern, bool fDemandMatchingArea)
-{
-	if(theDataType == NFmiInfoData::kSatelData)
-	{
-		size_t count = itsDynamicHelpDataInfos.size();
-		for(size_t i=0; i<count; i++)
-		{
-			if(itsDynamicHelpDataInfos[i].DataType() == theDataType)
-			{
-				if(theProdId == itsDynamicHelpDataInfos[i].ImageDataIdent().GetProducer()->GetIdent() &&
-				   static_cast<unsigned long>(theParamId) == itsDynamicHelpDataInfos[i].ImageDataIdent().GetParamIdent())
-				{
-					if(fDemandMatchingArea && IsSameTypeProjections(theZoomedArea, itsDynamicHelpDataInfos[i].ImageArea()))
-					{
-						theFilePattern = itsDynamicHelpDataInfos[i].FileNameFilter();
-						return itsDynamicHelpDataInfos[i].ImageArea();
-					}
-					else if(fDemandMatchingArea == false)
-					{
-						theFilePattern = itsDynamicHelpDataInfos[i].FileNameFilter();
-						return itsDynamicHelpDataInfos[i].ImageArea();
-					}
-			}
-			}
-		}
-	}
-	return boost::shared_ptr<NFmiArea>();
-}
-
 // Ovatko kaksi annettua projektiota siin‰ mieless‰ samanlaisia, ett‰ 
 // voidaan sijoittaa rasterikuva oikein toisen rasterikuvan p‰‰lle.
 // Eli palauta false = ei voi piirt‰‰ ja true = voi, 
