@@ -1477,7 +1477,7 @@ bool NFmiSoundingDataOpt1::GetValuesNeededInLCLCalculations(FmiLCLCalcType theLC
 	else if(theLCLCalcType == kLCLCalcMostUnstable)
 	{
 		double maxThetaE = 0;
-		status = FindHighestThetaE(T, Td, P, maxThetaE, 500); // rajoitetaan max thetan etsintä 500 mb:en asti
+		status = FindHighestThetaE(T, Td, P, maxThetaE, 600); // rajoitetaan max thetan etsintä 600 mb:en asti (oli aiemmin 500, mutta niin korkealta voi löytyä suuria arvoja, jotka sotkevat todellisen MU-Capen etsinnän)
 	}
 
 	if(status == false) // jos muu ei auta, laske pinta suureiden avulla
