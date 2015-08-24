@@ -278,7 +278,14 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetSynopPlotParamInfo(NF
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetSoundingPlotParamInfo(NFmiInfoData::Type theType)
 {
-	return GetWantedProducerInfo(theType, kFmiTEMP);
+    // En uskalla rikkoa käytettyä logiikkaa ja käyttää suotaan NFmiInfoOrganizer::GetPrioritizedSoundingInfo -metodia, koska 
+    // siinä ei oteta huomioon parametrina annettua theType: ollenkaan, siksi teen tähän uuden priorisointi listan.
+    // Prioriteetti haku järjestys: 1. Bufr-luotaus, 2. Temp-luotaus
+
+    boost::shared_ptr<NFmiFastQueryInfo> soundingInfo = GetWantedProducerInfo(theType, kFmiBufrTEMP);
+    if(!soundingInfo)
+        soundingInfo = GetWantedProducerInfo(theType, kFmiTEMP);
+	return soundingInfo;
 }
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetMetarPlotParamInfo(NFmiInfoData::Type theType)
@@ -537,6 +544,24 @@ bool NFmiInfoOrganizer::IsAmdarData(boost::shared_ptr<NFmiFastQueryInfo> &theInf
 	return (theInfo->Level()->LevelType() == kFmiAmdarLevel);
 }
 
+bool NFmiInfoOrganizer::IsTempData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+    theInfo->FirstLevel();
+    return (theInfo->Level()->LevelType() == kFmiSoundingLevel);
+}
+
+// Normaali tarkistus: onko id normaali TEMP tai Bufr-TEMP.
+// Halutessa voidaan ottaa tarkasteluun myös ns. RAW-TEMP, joka on suotetty erikseen SmartMetin Luotaus-dialogin TEMP-syöttö dialogista.
+bool NFmiInfoOrganizer::IsTempData(unsigned long theProducerId, bool includeRawTemp)
+{
+    if(includeRawTemp && theProducerId == kFmiRAWTEMP)
+        return true;
+    if(theProducerId == kFmiTEMP || theProducerId == kFmiBufrTEMP)
+        return true;
+    else
+        return false;
+}
+
 bool NFmiInfoOrganizer::HasGoodParamsForSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const ParamCheckFlags &paramCheckFlags)
 {
     InitializeCheckParams(); // varmistetaan että on alustettu lista tarkistettavista parametreista
@@ -616,6 +641,19 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindSoundingInfo(const N
 	}
 
 	return exceptableInfo;
+}
+
+// Prioriteetti haku järjestys: 1. editoitu data, 2. Bufr-luotaus, 3. Temp-luotaus
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetPrioritizedSoundingInfo(ParamCheckFlags paramCheckFlags)
+{
+    boost::shared_ptr<NFmiFastQueryInfo> info = FindSoundingInfo(NFmiProducer(kFmiMETEOR), 0, paramCheckFlags);
+    if(info == 0)
+    {
+        info = FindSoundingInfo(NFmiProducer(kFmiBufrTEMP), 0, paramCheckFlags);
+        if(info == 0)
+            info = FindSoundingInfo(NFmiProducer(kFmiTEMP), 0, paramCheckFlags);
+    }
+    return info;
 }
 
 // Haetaan infoOrganizerista kaikki ne SmartInfot, joihin annettu fileNameFilter sopii.
