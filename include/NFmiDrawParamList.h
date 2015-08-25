@@ -88,7 +88,8 @@ public:
 	unsigned long NumberOfItems(void){return static_cast<unsigned long>(itsList.size());};
 	bool RemoveMacroParam(const std::string &theName);
 	bool MoveActiveParam(int theMovement);
-	int FindActive(void);
+    bool MoveParam(int theMovedParamIndex, int theMoveToPosition);
+    int FindActive(void);
 	int FindEdited(void);
 	bool HasBorrowedParams(void) const {return fHasBorrowedParams;}
 	void HasBorrowedParams(bool newValue) {fHasBorrowedParams = newValue;}

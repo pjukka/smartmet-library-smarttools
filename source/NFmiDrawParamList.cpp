@@ -440,6 +440,22 @@ bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 	return false;
 }
 
+// Siirretään osoitettua parametria osoitettuun paikkaan listassa,
+// jos listassa on kaksi tai enemmän parametreja
+// jos indeksit ovat kunnollisia ja eri suuruisia
+bool NFmiDrawParamList::MoveParam(int theMovedParamIndex, int theMoveToPosition)
+{
+    if(NumberOfItems() >= 2)
+    {
+        if(theMovedParamIndex != theMoveToPosition)
+        {
+            Swap(theMovedParamIndex, theMoveToPosition);
+            return fDirtyList;
+        }
+    }
+    return false;
+}
+
 // Tämä tekee tarkistamattoman kahden itemin swapin listassa.
 // indeksit alkoivat 1:stä, eli listan 1. itemi on indeksi 1:ssä.
 void NFmiDrawParamList::Swap(int index1, int index2)
