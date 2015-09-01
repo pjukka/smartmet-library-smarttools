@@ -1313,7 +1313,9 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 			areaMask->UsedPressureLevelValue(theAreaMaskInfo.GetLevel()->LevelValue());
 			if(theAreaMaskInfo.GetLevel()->LevelType() == kFmiFlightLevel)
 				const_cast<NFmiLevel*>(areaMask->Level())->SetIdent(static_cast<unsigned long>(kFmiFlightLevel));
-		}
+            else if(theAreaMaskInfo.GetLevel()->LevelType() == kFmiHeight)
+                const_cast<NFmiLevel*>(areaMask->Level())->SetIdent(static_cast<unsigned long>(kFmiHeight));
+        }
 	}
 	return areaMask;
 }
