@@ -2005,7 +2005,8 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("tpot"), kFmiPotentialTemperature));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("thetaw"), kFmiPseudoAdiabaticPotentialTemperature));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("kind"), kFmiKIndex));
-		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("dp"), kFmiDewPoint));
+        itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("td"), kFmiDewPoint));
+        itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("dp"), kFmiDewPoint));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lrad"), kFmiRadiationLW));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("srad"), kFmiRadiationGlobal));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("ws"), kFmiWindSpeedMS));
