@@ -449,8 +449,13 @@ bool NFmiDrawParamList::MoveParam(int theMovedParamIndex, int theMoveToPosition)
     {
         if(theMovedParamIndex != theMoveToPosition)
         {
-            Swap(theMovedParamIndex, theMoveToPosition);
-            return fDirtyList;
+            if(Index(theMovedParamIndex))
+            {
+                boost::shared_ptr<NFmiDrawParam> movedDrawPAram = Current(); // Otetaan osoitetulta kohdalta drawParam talteen
+                Remove(); // poistetaan siirrett‰v‰ drawParam
+                Add(movedDrawPAram, theMoveToPosition); // lis‰t‰‰n se haluttuun kohtaan ennen jo poistettua drawParamiajolloin voidaan k‰ytt‰‰ annettua indeksi‰
+                return fDirtyList;
+            }
         }
     }
     return false;
