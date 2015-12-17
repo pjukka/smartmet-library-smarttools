@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iterator>
 #include <algorithm>
+#include "boost/filesystem.hpp"
 
 using namespace std;
 
@@ -52,6 +53,23 @@ bool NFmiSmartToolInfo::LoadScript(const std::string &theScriptName)
 		return SaveSettings();
 	}
 	return false;
+}
+
+// theScriptName -parametrissa on mukana itsRootLoadDirectory:n suhteen polku esim. xxx\yyy\macro.st
+bool NFmiSmartToolInfo::SpeedLoadScript(const std::string &theScriptName)
+{
+    // fullFileName saadaan yhdistämällä root ja annettu suhteellinen polku
+    string fullFileName = itsRootLoadDirectory + theScriptName;
+    // Lisäksi halutaan asettaa itsLoadDirectory osoittamaan annettuun suhteelliseen polkuun
+    boost::filesystem::path loadPath = theScriptName;
+    itsLoadDirectory = itsRootLoadDirectory + loadPath.parent_path().string() + "\\";
+
+    if(NFmiFileSystem::ReadFile2String(fullFileName, itsCurrentScript))
+    {
+        itsCurrentScriptName = loadPath.stem().string();
+        return SaveSettings();
+    }
+    return false;
 }
 
 bool NFmiSmartToolInfo::SaveScript(const std::string &theScriptName)
@@ -240,4 +258,14 @@ void NFmiSmartToolInfo::SetCurrentLoadDirectory(const std::string& newValue)
 		itsLoadDirectory += usedDirectoryName;
 		itsLoadDirectory += "\\";
 	}
+}
+
+// Jos itsLoadDirectory     on C:\xxx\yyy\zzz
+// ja itsRootLoadDirectory  on C:\xxx\
+// tällöin tämä funktio palauttaa arvon: yyy\zzz
+std::string NFmiSmartToolInfo::GetRelativeLoadPath() const
+{
+    std::string relativePath = itsLoadDirectory;
+    NFmiStringTools::ReplaceAll(relativePath, itsRootLoadDirectory, "");
+    return relativePath;
 }
