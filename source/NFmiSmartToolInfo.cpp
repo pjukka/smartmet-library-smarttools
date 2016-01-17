@@ -261,7 +261,7 @@ void NFmiSmartToolInfo::SetCurrentLoadDirectory(const std::string& newValue)
 }
 
 // Jos itsLoadDirectory     on C:\xxx\yyy\zzz
-// ja itsRootLoadDirectory  on C:\xxx\
+// ja itsRootLoadDirectory  on C:\xxx
 // tällöin tämä funktio palauttaa arvon: yyy\zzz
 std::string NFmiSmartToolInfo::GetRelativeLoadPath() const
 {
