@@ -79,6 +79,8 @@ public:
 	int CleanUnusedDataFromMemory(void);
 	static boost::shared_ptr<NFmiFastQueryInfo> DoDynamicShallowCopy(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
     static bool IsAmdarData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
+    static bool IsTempData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
+    static bool IsTempData(unsigned long theProducerId, bool includeRawTemp = false);
 
 	// ***************************************************************************************************************
 	// T‰ss‰ per‰ss‰ on pienin mahdollinen julkinen rajapinta, jonka sain siivottua originaali NFmiInfoOrganizr:ista. 
@@ -97,7 +99,8 @@ public:
 	checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > GetInfos(NFmiInfoData::Type theType, bool fGroundData, int theProducerId, int theProducerId2 = -1); // palauttaa vectorin halutun tuottajan infoja
 	boost::shared_ptr<NFmiFastQueryInfo> FindInfo(NFmiInfoData::Type theDataType, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
 	boost::shared_ptr<NFmiFastQueryInfo> FindInfo(NFmiInfoData::Type theDataType, const NFmiProducer &theProducer, bool fGroundData, int theIndex = 0); // Hakee indeksin mukaisen tietyn datatyypin infon
-	boost::shared_ptr<NFmiFastQueryInfo> FindSoundingInfo(const NFmiProducer &theProducer, int theIndex = 0, ParamCheckFlags paramCheckFlags = ParamCheckFlags()); // Hakee parhaan luotaus infon tuottajalle
+    boost::shared_ptr<NFmiFastQueryInfo> FindSoundingInfo(const NFmiProducer &theProducer, int theIndex = 0, ParamCheckFlags paramCheckFlags = ParamCheckFlags()); // Hakee parhaan luotaus infon tuottajalle
+    boost::shared_ptr<NFmiFastQueryInfo> GetPrioritizedSoundingInfo(ParamCheckFlags paramCheckFlags = ParamCheckFlags()); // Hakee tietyn prioriteetin mukaisesti parhaan luotaus-infon
 
 	// HUOM! N‰m‰ makroParamData jutut pit‰‰ mietti‰ uusiksi, jos niit‰ aletaan k‰sittelem‰‰n eri s‰ikeiss‰. T‰llˆin
 	// Niist‰ pit‰‰ luoda aina ilmeisesti paikalliset kopiot?!?!

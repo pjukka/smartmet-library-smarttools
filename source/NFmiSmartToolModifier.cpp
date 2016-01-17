@@ -41,19 +41,6 @@
 #endif
 #include <boost/thread.hpp>
 
-#ifdef USE_THREAD_POOL
-// threadpool on haettu http://threadpool.sourceforge.net/ -osoitteesta. Se ei kuulu vielä boost-kirjastoon (on ehdolla?).
-// Käytössäni on versio 0.2.5. Hain em. sivulta threadpool-0_2_5-src.zip -tiedoston, purin sen ja kopsasin threadpool\boost-hakemiston 
-// sisällön oikean boost:in boost-hakemistoon.
-#include <boost/threadpool.hpp>
-
-#include <boost/version.hpp>
-#if BOOST_VERSION < 105000
-#define TIME_UTC_ TIME_UTC
-#endif
-
-#endif // USE_THREAD_POOL
-
 #ifdef _MSC_VER
 #pragma warning (default : 4244 4267 4512) // laitetaan 4244 takaisin päälle, koska se on tärkeä (esim. double -> int auto castaus varoitus)
 #endif
@@ -501,7 +488,7 @@ static void CalcTotalProgressStepCount(checkedVector<NFmiSmartToolCalculationBlo
 			NFmiSmartToolCalculationBlockInfo &blockInfo = theCalcInfoVector[i];
 			if(blockInfo.itsFirstCalculationSectionInfo)
 				totalStepCount += static_cast<int>(blockInfo.itsFirstCalculationSectionInfo->GetCalculationInfos().size() * sizeTimes);
-			if(blockInfo.itsIfAreaMaskSectionInfo)
+            if(blockInfo.itsIfAreaMaskSectionInfo && blockInfo.itsIfAreaMaskSectionInfo->GetAreaMaskInfoVector().size())
 				totalStepCount += sizeTimes;
 			if(blockInfo.itsLastCalculationSectionInfo)
 				totalStepCount += static_cast<int>(blockInfo.itsLastCalculationSectionInfo->GetCalculationInfos().size() * sizeTimes);
@@ -723,37 +710,6 @@ static void DoPartialGridCalculationBlockInThread(NFmiLocationIndexRangeCalculat
 	}
 }
 
-#ifdef USE_THREAD_POOL
-
-// tämä on vain muutamien dataosien sijoitus yhteen rakenteeseen, koska threadpool:in schedule-metodi toimii max yhdelle parametrille
-class CalculationBlockParamsHolder
-{
-public:
-	CalculationBlockParamsHolder(NFmiLocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, boost::shared_ptr<NFmiSmartToolCalculation> &theCalculation, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
-	:itsLocationIndexRangeCalculator(&theLocationIndexRangeCalculator)
-	,itsInfo(&theInfo)
-	,itsCalculationBlock(&theCalculationBlock)
-	,itsCalculation(&theCalculation)
-	,itsCalculationParams(&theCalculationParams)
-	,itsUsedBitmask(theUsedBitmask)
-	{
-	}
-
-	NFmiLocationIndexRangeCalculator *itsLocationIndexRangeCalculator;
-	boost::shared_ptr<NFmiFastQueryInfo> *itsInfo; 
-	boost::shared_ptr<NFmiSmartToolCalculationBlock> *itsCalculationBlock; // HUOM! ottaa sekä CalculationBlock:in että Calculation:in, mutta niistä käytetään vain toista kutsutun threaddaus funktion mukaan
-	boost::shared_ptr<NFmiSmartToolCalculation> *itsCalculation;
-	NFmiCalculationParams *itsCalculationParams;
-	const NFmiBitMask *itsUsedBitmask;
-};
-
-static void DoPartialGridCalculationBlockInThreadWith1Parameter(CalculationBlockParamsHolder theCalculationBlockParamsHolder) // tarkoituksella kopio CalculationBlockParamsHolder-rakenteesta!!
-{
-	::DoPartialGridCalculationBlockInThread(*theCalculationBlockParamsHolder.itsLocationIndexRangeCalculator, *theCalculationBlockParamsHolder.itsInfo, *theCalculationBlockParamsHolder.itsCalculationBlock, *theCalculationBlockParamsHolder.itsCalculationParams, theCalculationBlockParamsHolder.itsUsedBitmask);
-}
-
-#endif // USE_THREAD_POOL
-
 static void DoPartialGridCalculationInThread(NFmiLocationIndexRangeCalculator &theLocationIndexRangeCalculator, boost::shared_ptr<NFmiFastQueryInfo> &theInfo, boost::shared_ptr<NFmiSmartToolCalculation> &theCalculation, NFmiCalculationParams &theCalculationParams, const NFmiBitMask *theUsedBitmask)
 {
 	try
@@ -782,19 +738,6 @@ static void DoPartialGridCalculationInThread(NFmiLocationIndexRangeCalculator &t
 		// pakko ottaa vain vastaan poikkeukset, ei tehdä mitään
 	}
 }
-
-#ifdef USE_THREAD_POOL
-
-static void DoPartialGridCalculationInThreadWith1Parameter(CalculationBlockParamsHolder theCalculationBlockParamsHolder) // tarkoituksella kopio CalculationBlockParamsHolder-rakenteesta!!
-{
-	::DoPartialGridCalculationInThread(*theCalculationBlockParamsHolder.itsLocationIndexRangeCalculator, *theCalculationBlockParamsHolder.itsInfo, *theCalculationBlockParamsHolder.itsCalculation, *theCalculationBlockParamsHolder.itsCalculationParams, theCalculationBlockParamsHolder.itsUsedBitmask);
-}
-
-// HUOM! Lopetin threadpool:in käytön koska se vuoti vähän muistia (n. 7 kB). Tämä luokka ei ole ikinä päässyt boostin viralliseen kirjastoon.
-// Eikä luokasta ole varsinaisesti mitään extra hyötyä (verrattuna esim. boost::thread_group -luokan käyttöön verrattuna), halusin vain joskus testata sitä.
-boost::threadpool::pool gThreadPool(boost::thread::hardware_concurrency()); // tehdään thread-poolin kooksi koneen core-count
-
-#endif // USE_THREAD_POOL
 
 void NFmiSmartToolModifier::ModifyConditionalData_ver2(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiThreadCallBacks *theThreadCallBacks)
 {
@@ -838,29 +781,10 @@ void NFmiSmartToolModifier::ModifyConditionalData_ver2(const boost::shared_ptr<N
 						calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, missä on jo aika oikein
 					NFmiLocationIndexRangeCalculator locationIndexRangeCalculator(info->SizeLocations(), 100);
 
-#ifdef USE_THREAD_POOL
-					for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
-					{
-						boost::shared_ptr<NFmiSmartToolCalculation> dummyParam; // calculationBlock-laskuissa pitää tehdä tyhjä calculation-muuttuja
-						CalculationBlockParamsHolder paramHolder(locationIndexRangeCalculator, infoVector[threadIndex], calculationBlockVector[threadIndex], dummyParam, calculationParamsVector[threadIndex], usedBitmask);
-						gThreadPool.schedule(boost::bind(::DoPartialGridCalculationBlockInThreadWith1Parameter, paramHolder));
-					}
-					gThreadPool.wait();
-#else
 					boost::thread_group calcParts;
 					for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
 						calcParts.add_thread(new boost::thread(::DoPartialGridCalculationBlockInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationBlockVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
 					calcParts.join_all(); // odotetaan että threadit lopettavat
-#endif // USE_THREAD_POOL
-
-	/*
-					for(info->ResetLocation(); info->NextLocation(); )
-					{
-						calculationParams.itsLatlon = info->LatLon();
-						calculationParams.itsLocationIndex = info->LocationIndex(); // tämä locationindex juttu liittyy kai optimointiin, jota ei tehdä enää, pitäisikö poistaa
-						theCalculationBlock->Calculate_ver2(calculationParams);
-					}
-	*/
 				}
 			}
 		}
@@ -974,7 +898,7 @@ void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalc
 			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
 			const NFmiBitMask *usedBitmask = ::GetUsedBitmask(info, fModifySelectedLocationsOnly);
 
-			unsigned int usedThreadCount = boost::thread::hardware_concurrency();
+            unsigned int usedThreadCount = boost::thread::hardware_concurrency();
 			std::vector<boost::shared_ptr<NFmiFastQueryInfo> > infoVector;
 			for(size_t i=0; i < usedThreadCount; i++)
 				infoVector.push_back(NFmiAreaMask::DoShallowCopy(info));
@@ -1009,20 +933,10 @@ void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalc
 							calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, missä on jo aika oikein
 						NFmiLocationIndexRangeCalculator locationIndexRangeCalculator(info->SizeLocations(), 100);
 
-#ifdef USE_THREAD_POOL
-						for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
-						{
-							boost::shared_ptr<NFmiSmartToolCalculationBlock> dummyParam; // calculation-laskuissa pitää tehdä tyhjä calculationBlock -muuttuja
-							CalculationBlockParamsHolder paramHolder(locationIndexRangeCalculator, infoVector[threadIndex], dummyParam, calculationVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask);
-							gThreadPool.schedule(boost::bind(::DoPartialGridCalculationInThreadWith1Parameter, paramHolder));
-						}
-						gThreadPool.wait();
-#else
 						boost::thread_group calcParts;
 						for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
 							calcParts.add_thread(new boost::thread(::DoPartialGridCalculationInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
 						calcParts.join_all(); // odotetaan että threadit lopettavat
-#endif
 					}
 				}
 
@@ -1129,6 +1043,20 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMetFunctionAreaMask
 		DoErrorExceptionForMetFunction(theAreaMaskInfo, ::GetDictionaryString("SmartMet program error with Met-function"), ::GetDictionaryString("error with line"));
 
 	return areaMask;
+}
+
+// Jos areaMaskin info on havaittua luotausdataa, pitää tehdä leveliin liittyvä fiksaus.
+void NFmiSmartToolModifier::MakeSoundingLevelFix(boost::shared_ptr<NFmiAreaMask> &theAreaMask, const NFmiAreaMaskInfo &theAreaMaskInfo)
+{
+    if(theAreaMask)
+    {
+	    if(theAreaMask->Info()->LevelType() == kFmiSoundingLevel) 
+	    { // Luotaus data on poikkeus, jonka haluttu painepinta level pitää asettaa tässä erikseen.
+		    // Lisäksi levelType pitää vaihtaa pressuresta kFmiSoundingLevel!
+		    NFmiLevel soundingLevel(kFmiSoundingLevel, theAreaMaskInfo.GetLevel()->GetName(), theAreaMaskInfo.GetLevel()->LevelValue());
+		    theAreaMask->Level(soundingLevel);
+	    }
+    }
 }
 
 //--------------------------------------------------------
@@ -1295,14 +1223,44 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 			}
 			break;
 			}
-		case NFmiAreaMask::VertFunctionStart:
-			{
-			fUseLevelData = true;
-			boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskVertFunc(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
-			fUseLevelData = false; // en tiedä pitääkö tämä laittaa takaisin falseksi, mutta laitan varmuuden vuoksi
-			break;
-			}
+        case NFmiAreaMask::VertFunctionStart:
+            {
+                if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::TimeRange)
+                {
+                    boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+                    areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskTimeRange(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
+                }
+                else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ProbRect || theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ProbCircle)
+                {
+                    boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+                    areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskProbFunc(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
+                }
+#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
+                else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue)
+			    {
+                    boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+            		if(info->IsGrid())
+                        throw std::runtime_error("With closestvalue -function you must choose observation (station) data producer, not data with grid.");
+                    NFmiNearestObsValue2GridMask *nearestObsValue2GridMask = new NFmiNearestObsValue2GridMask(NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount());
+				    nearestObsValue2GridMask->SetGriddingHelpers(itsWorkingGrid->itsArea, itsDoc, NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
+				    areaMask = boost::shared_ptr<NFmiAreaMask>(nearestObsValue2GridMask);
+                    MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
+			    }
+#endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
+
+                else
+                {
+                    NFmiAreaMask::FunctionType secondaryFunc = theAreaMaskInfo.GetSecondaryFunctionType();
+                    fUseLevelData = true;
+                    boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+                    if(secondaryFunc == NFmiAreaMask::TimeVertP || secondaryFunc == NFmiAreaMask::TimeVertFL || secondaryFunc == NFmiAreaMask::TimeVertZ || secondaryFunc == NFmiAreaMask::TimeVertHyb)
+                        areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskTimeVertFunc(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
+                    else
+                        areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskVertFunc(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
+                    fUseLevelData = false; // en tiedä pitääkö tämä laittaa takaisin falseksi, mutta laitan varmuuden vuoksi
+                }
+                break;
+            }
 		case NFmiAreaMask::DeltaZFunction:
 			{
 			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiCalculationDeltaZValue());
@@ -1322,18 +1280,16 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 		if(areaMask->Info() && areaMask->Info()->Grid() == 0)
 		{ // jos oli info dataa ja vielä asemadatasta, tarkistetaan että kyse oli vielä infoData-tyypistä, muuten oli virheellinen lauseke
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
-			if(maskType == NFmiAreaMask::InfoVariable)
+            if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue)
+            { // tämä on ok, ei tarvitse tehdä mitään
+            }
+			else if(maskType == NFmiAreaMask::InfoVariable)
 			{
 				boost::shared_ptr<NFmiFastQueryInfo> info = areaMask->Info();
 				NFmiStation2GridMask *station2GridMask = new NFmiStation2GridMask(areaMask->MaskType(), areaMask->GetDataType(), info);
 				station2GridMask->SetGriddingHelpers(itsWorkingGrid->itsArea, itsDoc, NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
 				areaMask = boost::shared_ptr<NFmiAreaMask>(station2GridMask);
-				if(areaMask->Info()->LevelType() == kFmiSoundingLevel) 
-				{ // Luotaus data on poikkeus, jonka haluttu painepinta level pitää asettaa tässä erikseen.
-					// Lisäksi levelType pitää vaihtaa pressuresta kFmiSoundingLevel!
-					NFmiLevel soundingLevel(kFmiSoundingLevel, theAreaMaskInfo.GetLevel()->GetName(), theAreaMaskInfo.GetLevel()->LevelValue());
-					areaMask->Level(soundingLevel);
-				}
+                MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
 			}
 			else
 #endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
@@ -1357,7 +1313,9 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 			areaMask->UsedPressureLevelValue(theAreaMaskInfo.GetLevel()->LevelValue());
 			if(theAreaMaskInfo.GetLevel()->LevelType() == kFmiFlightLevel)
 				const_cast<NFmiLevel*>(areaMask->Level())->SetIdent(static_cast<unsigned long>(kFmiFlightLevel));
-		}
+            else if(theAreaMaskInfo.GetLevel()->LevelType() == kFmiHeight)
+                const_cast<NFmiLevel*>(areaMask->Level())->SetIdent(static_cast<unsigned long>(kFmiHeight));
+        }
 	}
 	return areaMask;
 }
@@ -1665,7 +1623,9 @@ void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaM
     // yhdistelmä parametreille ei ole rajoja, samoin par-id kFmiBadParameter, koska silloin on kyse erikoisfunktioista kuten grad tms.
     if(parName == kFmiTotalWindMS || parName == kFmiWeatherAndCloudiness || parName == kFmiBadParameter)
 		*fCheckLimits = false;
-	else
+    else if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kScriptVariableData)
+        *fCheckLimits = false;
+    else
 	{
 		boost::shared_ptr<NFmiDrawParam> drawParam = itsInfoOrganizer->CreateDrawParam(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), theAreaMaskInfo.GetDataType());
 		if(drawParam)

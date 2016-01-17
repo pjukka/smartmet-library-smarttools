@@ -278,7 +278,14 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetSynopPlotParamInfo(NF
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetSoundingPlotParamInfo(NFmiInfoData::Type theType)
 {
-	return GetWantedProducerInfo(theType, kFmiTEMP);
+    // En uskalla rikkoa käytettyä logiikkaa ja käyttää suotaan NFmiInfoOrganizer::GetPrioritizedSoundingInfo -metodia, koska 
+    // siinä ei oteta huomioon parametrina annettua theType: ollenkaan, siksi teen tähän uuden priorisointi listan.
+    // Prioriteetti haku järjestys: 1. Bufr-luotaus, 2. Temp-luotaus
+
+    boost::shared_ptr<NFmiFastQueryInfo> soundingInfo = GetWantedProducerInfo(theType, kFmiBufrTEMP);
+    if(!soundingInfo)
+        soundingInfo = GetWantedProducerInfo(theType, kFmiTEMP);
+	return soundingInfo;
 }
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetMetarPlotParamInfo(NFmiInfoData::Type theType)
@@ -537,6 +544,24 @@ bool NFmiInfoOrganizer::IsAmdarData(boost::shared_ptr<NFmiFastQueryInfo> &theInf
 	return (theInfo->Level()->LevelType() == kFmiAmdarLevel);
 }
 
+bool NFmiInfoOrganizer::IsTempData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+    theInfo->FirstLevel();
+    return (theInfo->Level()->LevelType() == kFmiSoundingLevel);
+}
+
+// Normaali tarkistus: onko id normaali TEMP tai Bufr-TEMP.
+// Halutessa voidaan ottaa tarkasteluun myös ns. RAW-TEMP, joka on suotetty erikseen SmartMetin Luotaus-dialogin TEMP-syöttö dialogista.
+bool NFmiInfoOrganizer::IsTempData(unsigned long theProducerId, bool includeRawTemp)
+{
+    if(includeRawTemp && theProducerId == kFmiRAWTEMP)
+        return true;
+    if(theProducerId == kFmiTEMP || theProducerId == kFmiBufrTEMP)
+        return true;
+    else
+        return false;
+}
+
 bool NFmiInfoOrganizer::HasGoodParamsForSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const ParamCheckFlags &paramCheckFlags)
 {
     InitializeCheckParams(); // varmistetaan että on alustettu lista tarkistettavista parametreista
@@ -618,6 +643,19 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindSoundingInfo(const N
 	return exceptableInfo;
 }
 
+// Prioriteetti haku järjestys: 1. editoitu data, 2. Bufr-luotaus, 3. Temp-luotaus
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetPrioritizedSoundingInfo(ParamCheckFlags paramCheckFlags)
+{
+    boost::shared_ptr<NFmiFastQueryInfo> info = FindSoundingInfo(NFmiProducer(kFmiMETEOR), 0, paramCheckFlags);
+    if(info == 0)
+    {
+        info = FindSoundingInfo(NFmiProducer(kFmiBufrTEMP), 0, paramCheckFlags);
+        if(info == 0)
+            info = FindSoundingInfo(NFmiProducer(kFmiTEMP), 0, paramCheckFlags);
+    }
+    return info;
+}
+
 // Haetaan infoOrganizerista kaikki ne SmartInfot, joihin annettu fileNameFilter sopii.
 // Mielestäni vastauksia pitäisi tulla korkeintaan yksi, mutta ehkä tulevaisuudessa voisi tulla lista.
 // HUOM! Palauttaa vectorin halutunlaisia infoja, vectori ei omista pointtereita, joten infoja ei saa tuhota delete:llä.
@@ -668,7 +706,7 @@ checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos
 		boost::shared_ptr<NFmiFastQueryInfo> editedDataIter = itsEditedDataKeeper->GetIter();
 		if(editedDataIter && editedDataIter->IsGrid() == false) // laitetaan myös mahdollisesti editoitava data, jos kyseessä on asema dataa eli havainto
 		{
-			currentProdId = editedDataIter->Producer()->GetIdent();
+            currentProdId = editedDataIter->FirstParamProducer().GetIdent();  // haetaan aina 1. parametrin tuottaja => ei satunnaisuutta, jos datassa on väärin rakennettu parambagi jossa eri tuottajia
 			if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
 				infoVector.push_back(editedDataIter);
 		}
@@ -677,7 +715,7 @@ checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > NFmiInfoOrganizer::GetInfos
 	for(MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
 	{
 		boost::shared_ptr<NFmiFastQueryInfo> aInfo = iter->second->GetDataKeeper()->GetIter();
-	    currentProdId = static_cast<int>(aInfo->Producer()->GetIdent());
+        currentProdId = static_cast<int>(aInfo->FirstParamProducer().GetIdent());  // haetaan aina 1. parametrin tuottaja => ei satunnaisuutta, jos datassa on väärin rakennettu parambagi jossa eri tuottajia
 		if(::IsProducerWanted(currentProdId, theProducerId, theProducerId2, theProducerId3, theProducerId4))
 			infoVector.push_back(aInfo);
 	}

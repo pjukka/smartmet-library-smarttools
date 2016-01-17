@@ -94,7 +94,7 @@ public:
 	typedef std::map<std::string, double> ConstantMap; // esim. MISS 32700 tai PI 3.14159
 	void Interpret(const std::string &theMacroText, bool fThisIsMacroParamSkript = false);
 
-	NFmiSmartToolIntepreter(NFmiProducerSystem *theProducerSystem);
+	NFmiSmartToolIntepreter(NFmiProducerSystem *theProducerSystem, NFmiProducerSystem *theObservationProducerSystem = 0);
 	~NFmiSmartToolIntepreter(void);
 
 	void Clear(void);
@@ -196,7 +196,8 @@ private:
 
 	int itsMaxCalculationSectionCount;
 
-	static void InitTokens(NFmiProducerSystem *theProducerSystem);
+	static void InitTokens(NFmiProducerSystem *theProducerSystem, NFmiProducerSystem *theObservationProducerSystem);
+    static void InitProducerTokens(NFmiProducerSystem *theProducerSystem);
 	static bool fTokensInitialized;
 	static ParamMap itsTokenParameterNamesAndIds;
 	static ProducerMap itsTokenProducerNamesAndIds;

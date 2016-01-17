@@ -440,6 +440,27 @@ bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 	return false;
 }
 
+// Siirret‰‰n osoitettua parametria osoitettuun paikkaan listassa,
+// jos listassa on kaksi tai enemm‰n parametreja
+// jos indeksit ovat kunnollisia ja eri suuruisia
+bool NFmiDrawParamList::MoveParam(int theMovedParamIndex, int theMoveToPosition)
+{
+    if(NumberOfItems() >= 2)
+    {
+        if(theMovedParamIndex != theMoveToPosition)
+        {
+            if(Index(theMovedParamIndex))
+            {
+                boost::shared_ptr<NFmiDrawParam> movedDrawPAram = Current(); // Otetaan osoitetulta kohdalta drawParam talteen
+                Remove(); // poistetaan siirrett‰v‰ drawParam
+                Add(movedDrawPAram, theMoveToPosition); // lis‰t‰‰n se haluttuun kohtaan ennen jo poistettua drawParamiajolloin voidaan k‰ytt‰‰ annettua indeksi‰
+                return fDirtyList;
+            }
+        }
+    }
+    return false;
+}
+
 // T‰m‰ tekee tarkistamattoman kahden itemin swapin listassa.
 // indeksit alkoivat 1:st‰, eli listan 1. itemi on indeksi 1:ss‰.
 void NFmiDrawParamList::Swap(int index1, int index2)

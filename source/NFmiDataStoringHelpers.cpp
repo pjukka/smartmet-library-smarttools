@@ -19,8 +19,10 @@ void NFmiDataStoringHelpers::WriteTimeWithOffsets(const NFmiMetTime &theUsedCurr
 	short utcHour = theTime.GetHour();
 	short utcMinute = theTime.GetMin();
 	NFmiMetTime aTime(theUsedCurrentTime);
-	aTime.SetHour(0);
-	long hourShift = aTime.DifferenceInHours(theTime);
+    aTime.SetHour(0);
+    aTime.SetMin(0);
+    aTime.SetSec(0);
+    long hourShift = aTime.DifferenceInHours(theTime);
 	long usedDayShift = hourShift/24;
 	if(hourShift > 0)
 		usedDayShift++;
@@ -36,10 +38,19 @@ void NFmiDataStoringHelpers::ReadTimeWithOffsets(const NFmiMetTime &theUsedCurre
 
 	NFmiMetTime aTime(theUsedCurrentTime);
 	aTime.SetHour(0);
-	aTime.ChangeByDays(-dayShift);
+    aTime.SetMin(0);
+    aTime.SetSec(0);
+    aTime.ChangeByDays(-dayShift);
 	aTime.SetHour(utcHour);
 	aTime.SetMin(utcMinute);
-	theTime = aTime;
+    // alkuperäisessä tallennuskoodissa on ollut bugi, kun ei olla nollattu minuutteja eikä 
+    // sekunteja ennen dayshift-laskuja. 
+    // En voi täysin korjata tätä, koska se saattaa sekoittaa pakkaa enemmän kuin tarpeen.
+    // Siksi jos utc-tunti oli 0 ja dayShift oli positiivinen, pitää lopullista aikaa siirtää päivällä eteenpäin
+    bool uglyAfterFix = ((utcHour == 0) && (dayShift > 0));
+    if(uglyAfterFix)
+        aTime.ChangeByDays(1); 
+    theTime = aTime;
 }
 
 void NFmiDataStoringHelpers::WriteTimeBagWithOffSets(const NFmiMetTime &theUsedCurrentTime, const NFmiTimeBag &theTimeBag, std::ostream& os)
@@ -119,7 +130,9 @@ void NFmiDataStoringHelpers::NFmiExtraDataStorage::Write(std::ostream& os) const
 	size_t i = 0;
 	for(i=0; i<ssize; i++)
 	{
-		os << itsDoubleValues[i] << " ";
+        if(i > 0) // tämän avulla viimeisen arvon jälkeen ei tule spacea
+            os << " ";
+        os << itsDoubleValues[i];
 	}
 	if(ssize > 0)
 		os << std::endl;
