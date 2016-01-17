@@ -1,16 +1,16 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 15.4.15
+Version: 16.1.17
 Release: 1%{?dist}.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase-devel >= 15.4.15
+BuildRequires: libsmartmet-newbase-devel >= 16.1.17
 BuildRequires: boost-devel
-Requires: libsmartmet-newbase >= 15.4.15
+Requires: libsmartmet-newbase >= 16.1.17
 Provides: %{LIBNAME}
 
 %description
@@ -46,10 +46,19 @@ FMI smarttools development files
 
 %files -n libsmartmet-%{LIBNAME}-devel
 %defattr(0664,root,root,-)
-%{_includedir}/smartmet/%{LIBNAME}
+%{_includedir}/smartmet/%{LIBNAME}/*.h
 
 
 %changelog
+* Sun Jan 17 2016 Mika Heiskanen <mika.heiskanen@fmi.fi> - 16.1.17-1.fmi
+- "td" is now an alias for dew point, meteorologists prefer it over dp
+- Handle sounding querydata
+- Bug fix to ThetaE calculations
+- Bug fix to parameter min/max limit handling
+- Bug fix to progress bar updates
+- Bug fix to moving parameters in lists
+- Bug fix to level handling with respect to height as in T_EC_z500
+- Bug fix to time indexing of SmartMet editor displays
 * Wed Apr 15 2015 Mika Heiskanen <mika.heiskanen@fmi.fi> - 15.4.15-1.fmi
 - newbase API changed for LatLonCache queries
 * Thu Apr  9 2015 Mika Heiskanen <mika.heiskanen@fmi.fi> - 15.4.9-1.fmi
