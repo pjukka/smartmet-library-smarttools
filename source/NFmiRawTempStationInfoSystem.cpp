@@ -9,50 +9,55 @@
 
 using namespace std;
 
-static void ThrowLatLonProblemException(const std::string &theFunctionNameStr, const std::string &theProblemStr, const std::string &theLatLonStr, const std::string &theLineStr, const std::string &theInitFileName)
+static void ThrowLatLonProblemException(const std::string &theFunctionNameStr,
+                                        const std::string &theProblemStr,
+                                        const std::string &theLatLonStr,
+                                        const std::string &theLineStr,
+                                        const std::string &theInitFileName)
 {
-	std::string errStr;
-	errStr += theFunctionNameStr;
-	errStr += " - ";
-	errStr += theProblemStr;
-	errStr += ": ";
-	errStr += theLatLonStr;
-	errStr += "\non line:\n";
-	errStr += theLineStr;
-	errStr += "\nin file: ";
-	errStr += theInitFileName;
-	throw std::runtime_error(errStr);
+  std::string errStr;
+  errStr += theFunctionNameStr;
+  errStr += " - ";
+  errStr += theProblemStr;
+  errStr += ": ";
+  errStr += theLatLonStr;
+  errStr += "\non line:\n";
+  errStr += theLineStr;
+  errStr += "\nin file: ";
+  errStr += theInitFileName;
+  throw std::runtime_error(errStr);
 }
 
 // purkaa rivin
 // 2963 23.5 60.8167 JOKIOINEN OBSERVATORIO
 // osiin, ja rakentaan NFmiStation-otuksen, niin ett‰ 3. spacen j‰lkeen kaikki on nime‰.
-static bool GetStationFromString(const std::string &theStationStr, const std::string &theInitFileName, NFmiStation &theStationOut)
+static bool GetStationFromString(const std::string &theStationStr,
+                                 const std::string &theInitFileName,
+                                 NFmiStation &theStationOut)
 {
-	std::vector<std::string> strVector = NFmiStringTools::Split(theStationStr, " ");
-	if(strVector.size() > 1 && strVector.size() < 4)
-	{
-		std::string errStr("GetStationFromString - station info had too few parts on line\n");
-		errStr += theStationStr;
-		errStr += "\n in file: ";
-		errStr += theInitFileName;
-		throw std::runtime_error(errStr);
-	}
-	else if(strVector.size() <= 1)
-		return false; // en ole varma splitterist‰, mutta ignoorataan vain tyhj‰/yhden osion rivit
+  std::vector<std::string> strVector = NFmiStringTools::Split(theStationStr, " ");
+  if (strVector.size() > 1 && strVector.size() < 4)
+  {
+    std::string errStr("GetStationFromString - station info had too few parts on line\n");
+    errStr += theStationStr;
+    errStr += "\n in file: ";
+    errStr += theInitFileName;
+    throw std::runtime_error(errStr);
+  }
+  else if (strVector.size() <= 1)
+    return false;  // en ole varma splitterist‰, mutta ignoorataan vain tyhj‰/yhden osion rivit
 
-	theStationOut.SetIdent(NFmiStringTools::Convert<unsigned long>(strVector[0]));
-	theStationOut.SetLongitude(NFmiStringTools::Convert<double>(strVector[1]));
-	theStationOut.SetLatitude(NFmiStringTools::Convert<double>(strVector[2]));
-	std::string name;
-	for(unsigned int i = 3; i<strVector.size(); i++)
-	{
-		if(i != 3)
-			name += " ";
-		name += strVector[i];
-	}
-	theStationOut.SetName(NFmiString(name));
-	return true;
+  theStationOut.SetIdent(NFmiStringTools::Convert<unsigned long>(strVector[0]));
+  theStationOut.SetLongitude(NFmiStringTools::Convert<double>(strVector[1]));
+  theStationOut.SetLatitude(NFmiStringTools::Convert<double>(strVector[2]));
+  std::string name;
+  for (unsigned int i = 3; i < strVector.size(); i++)
+  {
+    if (i != 3) name += " ";
+    name += strVector[i];
+  }
+  theStationOut.SetName(NFmiString(name));
+  return true;
 }
 
 // poistaa alku+loppu spacet ja tabulaattorit
@@ -61,97 +66,103 @@ static bool GetStationFromString(const std::string &theStationStr, const std::st
 // <cr> ja <lf> ei poisteta eik‰ huomioida (paitsi alusta ja lopusta)!!
 static std::string RemoveExtraSpaces(const std::string &theStr)
 {
-	std::string tmp(theStr);
+  std::string tmp(theStr);
 
-	// trimmataan stringin alusta ja lopusta whitespacet pois
-	NFmiStringTools::Trim(tmp, ' ');
-	NFmiStringTools::Trim(tmp, '\t');
-	NFmiStringTools::Trim(tmp, '\t');
-	NFmiStringTools::Trim(tmp, '\n');
-	std::string result;
-	bool wordBreak = false;
-	for(unsigned int i=0; i<tmp.size(); i++)
-	{
-		if(tmp[i] == ' ' || tmp[i] == '\t')
-		{
-			if(wordBreak == false)
-			{
-				wordBreak = true;
-				result.push_back(' '); // laitetaan aina sanan per‰‰n yksi space
-			}
-		}
-		else
-		{
-			wordBreak = false;
-			result.push_back(tmp[i]);
-		}
-	}
+  // trimmataan stringin alusta ja lopusta whitespacet pois
+  NFmiStringTools::Trim(tmp, ' ');
+  NFmiStringTools::Trim(tmp, '\t');
+  NFmiStringTools::Trim(tmp, '\t');
+  NFmiStringTools::Trim(tmp, '\n');
+  std::string result;
+  bool wordBreak = false;
+  for (unsigned int i = 0; i < tmp.size(); i++)
+  {
+    if (tmp[i] == ' ' || tmp[i] == '\t')
+    {
+      if (wordBreak == false)
+      {
+        wordBreak = true;
+        result.push_back(' ');  // laitetaan aina sanan per‰‰n yksi space
+      }
+    }
+    else
+    {
+      wordBreak = false;
+      result.push_back(tmp[i]);
+    }
+  }
 
-	return result;
+  return result;
 }
 
 // Lukee initialisointi tiedostosta asema tiedot, heitt‰‰ poikkeuksen jos ongelmia.
-// Asema tiedoston formaatti on seuraava (kommentit sallittuja, mutta asema rivit 
+// Asema tiedoston formaatti on seuraava (kommentit sallittuja, mutta asema rivit
 // ilman kommentti merkkej‰):
-// 
+//
 // // id  lon  lat      name (with spaces to the end of line)
 // 2963 23.5 60.8167 JOKIOINEN OBSERVATORIO
 // 3005 -1.18333 60.1333 LERWICK
 void NFmiRawTempStationInfoSystem::Init(const std::string &theInitFileName)
 {
-	itsInitLogMessage = "";
-	itsLocations = NFmiHPlaceDescriptor(); // tyhjennet‰‰n ensin asemalista
-	NFmiLocationBag locBag;
+  itsInitLogMessage = "";
+  itsLocations = NFmiHPlaceDescriptor();  // tyhjennet‰‰n ensin asemalista
+  NFmiLocationBag locBag;
 
-	if(theInitFileName.empty())
-		throw std::runtime_error("NFmiRawTempStationInfoSystem::Init - empty settings filename given.");
+  if (theInitFileName.empty())
+    throw std::runtime_error("NFmiRawTempStationInfoSystem::Init - empty settings filename given.");
 
-	NFmiCommentStripper stripComments;
-	if(stripComments.ReadAndStripFile(theInitFileName))
-	{
+  NFmiCommentStripper stripComments;
+  if (stripComments.ReadAndStripFile(theInitFileName))
+  {
 #ifdef OLDGCC
-		std::istrstream in(stripComments.GetString().c_str());
+    std::istrstream in(stripComments.GetString().c_str());
 #else
-		std::stringstream in(stripComments.GetString());
+    std::stringstream in(stripComments.GetString());
 #endif
 
-		const int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
-		std::string buffer;
-		NFmiStation station;
-		int i = 0;
-		int counter = 0;
-		do
-		{
-			buffer.resize(maxBufferSize);
-			in.getline(&buffer[0], maxBufferSize);
+    const int maxBufferSize = 1024 + 1;  // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+    std::string buffer;
+    NFmiStation station;
+    int i = 0;
+    int counter = 0;
+    do
+    {
+      buffer.resize(maxBufferSize);
+      in.getline(&buffer[0], maxBufferSize);
 
-			int realSize = static_cast<int>(strlen(buffer.c_str()));
-			buffer.resize(realSize);
-			buffer = ::RemoveExtraSpaces(buffer);
-			if(::GetStationFromString(buffer, theInitFileName, station))
-			{
-				counter++;
-				locBag.AddLocation(station, true);
-			}
-			i++;
-		}while(in.good());
-		itsLocations = NFmiHPlaceDescriptor(locBag); // tyhjennet‰‰n ensin asemalista
-		itsInitLogMessage = "Initializing sounding station data went OK, from file: ";
-		itsInitLogMessage += theInitFileName;
-		if(itsLocations.Size() == 0)
-			itsInitLogMessage += "\nWarning: 0 sounding stations found.";
-		else
-			itsInitLogMessage += std::string("\nInfo: ") + NFmiStringTools::Convert<int>(itsLocations.Size()) + " sounding stations found.";
-		int diff = counter - itsLocations.Size();
-		if(diff > 0)
-		{
-			itsInitLogMessage += "\nWarning: there were probably ";
-			itsInitLogMessage += NFmiStringTools::Convert<int>(diff);
-			itsInitLogMessage += " 'extra' stations in file, meaning that there were more station lines than different station were found, use unique stations.";
-		}
-	}
-	else
-		throw std::runtime_error(std::string("NFmiRawTempStationInfoSystem::Init - trouble reading file: ") + theInitFileName);
+      int realSize = static_cast<int>(strlen(buffer.c_str()));
+      buffer.resize(realSize);
+      buffer = ::RemoveExtraSpaces(buffer);
+      if (::GetStationFromString(buffer, theInitFileName, station))
+      {
+        counter++;
+        locBag.AddLocation(station, true);
+      }
+      i++;
+    } while (in.good());
+    itsLocations = NFmiHPlaceDescriptor(locBag);  // tyhjennet‰‰n ensin asemalista
+    itsInitLogMessage = "Initializing sounding station data went OK, from file: ";
+    itsInitLogMessage += theInitFileName;
+    if (itsLocations.Size() == 0)
+      itsInitLogMessage += "\nWarning: 0 sounding stations found.";
+    else
+      itsInitLogMessage += std::string("\nInfo: ") +
+                           NFmiStringTools::Convert<int>(itsLocations.Size()) +
+                           " sounding stations found.";
+    int diff = counter - itsLocations.Size();
+    if (diff > 0)
+    {
+      itsInitLogMessage += "\nWarning: there were probably ";
+      itsInitLogMessage += NFmiStringTools::Convert<int>(diff);
+      itsInitLogMessage +=
+          " 'extra' stations in file, meaning that there were more station lines than different "
+          "station were found, use unique stations.";
+    }
+  }
+  else
+    throw std::runtime_error(
+        std::string("NFmiRawTempStationInfoSystem::Init - trouble reading file: ") +
+        theInitFileName);
 }
 
 // ***********************************************************************
@@ -160,29 +171,49 @@ void NFmiRawTempStationInfoSystem::Init(const std::string &theInitFileName)
 
 // Lukee initialisointi tiedostosta asema tiedot, heitt‰‰ poikkeuksen jos ongelmia.
 // Lukee asema tiedot jotka saadaan webist‰ paikasta http://weather.noaa.gov/data/nsd_bbsss.txt
-// Asema tiedoston formaatti on seuraava (kommentit sallittuja, mutta asema rivit 
+// Asema tiedoston formaatti on seuraava (kommentit sallittuja, mutta asema rivit
 // ilman kommentti merkkej‰):
-// 
+//
 // Keyed by Index (Block and Station) Number
 // This index table from http://weather.noaa.gov/tg/site.shtml
 // and the station table from http://weather.noaa.gov/data/nsd_bbsss.txt
 // Last Updated
-// All stations that have an index number assigned by the WMO are available in this file. The ASCII file contains the following fields in the order specified, delimited by semi-colons. Fields that are empty will be coded as no characters (adjacent delimiters) except where otherwise noted.
+// All stations that have an index number assigned by the WMO are available in this file. The ASCII
+// file contains the following fields in the order specified, delimited by semi-colons. Fields that
+// are empty will be coded as no characters (adjacent delimiters) except where otherwise noted.
 //
 // Block Number 		2 digits representing the WMO-assigned block.
 // Station Number  		3 digits representing the WMO-assigned station.
-// ICAO Location Indicator 	4 alphanumeric characters, not all stations in this file have an assigned location indicator. The value "----" is used for stations that do not have an assigned location indicator.
+// ICAO Location Indicator 	4 alphanumeric characters, not all stations in this file have an
+// assigned location indicator. The value "----" is used for stations that do not have an assigned
+// location indicator.
 // Place Name 			Common name of station location.
-// State 			2 character abbreviation (included for stations located in the United States only).
+// State 			2 character abbreviation (included for stations located in the
+// United
+// States
+// only).
 // Country Name 		Country name is ISO short English form.
-// WMO Region 			digits 1 through 6 representing the corresponding WMO region, 7 stands for the WMO Antarctic region.
-// Station Latitude 		DD-MM-SSH where DD is degrees, MM is minutes, SS is seconds and H is N for northern hemisphere or S for southern hemisphere. The seconds value is omitted for those stations where the seconds value is unknown.
-// Station Longitude 		DDD-MM-SSH where DDD is degrees, MM is minutes, SS is seconds and H is E for eastern hemisphere or W for western hemisphere. The seconds value is omitted for those stations where the seconds value is unknown.
-// Upper Air Latitude 		DD-MM-SSH where DD is degrees, MM is minutes, SS is seconds and H is N for northern hemisphere or S for southern hemisphere. The seconds value is omitted for those stations where the seconds value is unknown.
-// Upper Air Longitude 		DDD-MM-SSH where DDD is degrees, MM is minutes, SS is seconds and H is E for eastern hemisphere or W for western hemisphere. The seconds value is omitted for those stations where the seconds value is unknown.
+// WMO Region 			digits 1 through 6 representing the corresponding WMO region, 7
+// stands
+// for the WMO Antarctic region.
+// Station Latitude 		DD-MM-SSH where DD is degrees, MM is minutes, SS is seconds and H is
+// N
+// for northern hemisphere or S for southern hemisphere. The seconds value is omitted for those
+// stations where the seconds value is unknown.
+// Station Longitude 		DDD-MM-SSH where DDD is degrees, MM is minutes, SS is seconds and H
+// is E for eastern hemisphere or W for western hemisphere. The seconds value is omitted for those
+// stations where the seconds value is unknown.
+// Upper Air Latitude 		DD-MM-SSH where DD is degrees, MM is minutes, SS is seconds and H is
+// N for northern hemisphere or S for southern hemisphere. The seconds value is omitted for those
+// stations where the seconds value is unknown.
+// Upper Air Longitude 		DDD-MM-SSH where DDD is degrees, MM is minutes, SS is seconds and H
+// is E for eastern hemisphere or W for western hemisphere. The seconds value is omitted for those
+// stations where the seconds value is unknown.
 // Station Elevation (Ha) 	The station elevation in meters. Value is omitted if unknown.
 // Upper Air Elevation (Hp) 	The upper air elevation in meters. Value is omitted if unknown.
-// RBSN indicator 		P if station is defined by the WMO as belonging to the Regional Basic Synoptic Network, omitted otherwise.
+// RBSN indicator 		P if station is defined by the WMO as belonging to the Regional
+// Basic
+// Synoptic Network, omitted otherwise.
 
 // 00;000;PABL;Buckland, Buckland Airport;AK;United States;4;65-58-56N;161-09-07W;;;7;;
 // 01;001;ENJA;Jan Mayen;;Norway;6;70-56N;008-40W;70-56N;008-40W;10;9;P
@@ -201,203 +232,243 @@ void NFmiRawTempStationInfoSystem::Init(const std::string &theInitFileName)
 // jne....
 void NFmiAviationStationInfoSystem_Obsolite::Init(const std::string &theInitFileName)
 {
-	itsInitLogMessage = "";
-	itsLocations = NFmiHPlaceDescriptor(); // tyhjennet‰‰n ensin asemalista
-	NFmiLocationBag locBag;
+  itsInitLogMessage = "";
+  itsLocations = NFmiHPlaceDescriptor();  // tyhjennet‰‰n ensin asemalista
+  NFmiLocationBag locBag;
 
-	if(theInitFileName.empty())
-		throw std::runtime_error("NFmiAviationStationInfoSystem_Obsolite::Init - empty settings filename given.");
+  if (theInitFileName.empty())
+    throw std::runtime_error(
+        "NFmiAviationStationInfoSystem_Obsolite::Init - empty settings filename given.");
 
-	NFmiCommentStripper stripComments(false); // ei stripata # eli pound kommentteja, koska stripperiss‰ on bugi
-	if(stripComments.ReadAndStripFile(theInitFileName))
-	{
+  NFmiCommentStripper stripComments(
+      false);  // ei stripata # eli pound kommentteja, koska stripperiss‰ on bugi
+  if (stripComments.ReadAndStripFile(theInitFileName))
+  {
 #ifdef OLDGCC
-		std::istrstream in(stripComments.GetString().c_str());
+    std::istrstream in(stripComments.GetString().c_str());
 #else
-		std::stringstream in(stripComments.GetString());
+    std::stringstream in(stripComments.GetString());
 #endif
 
-		const int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
-		std::string buffer;
-		AviationStation station;
-		int i = 0;
-		int counter = 0;
-		do
-		{
-			buffer.resize(maxBufferSize);
-			in.getline(&buffer[0], maxBufferSize);
-			size_t realSize = strlen(buffer.c_str());
-			buffer.resize(realSize);
-			buffer = ::RemoveExtraSpaces(buffer);
-			if(GetAviationStationFromString(buffer, theInitFileName, station))
-			{
-				counter++;
-				unsigned long oldSize = locBag.GetSize();
-				locBag.AddLocation(station, false); // AddLocation ongelma, k‰ytt‰‰ NFmiLocation::operator< -metodia, joka ei vertaa station-id:t‰ vaan nimi ja lat+lon. T‰llˆin jotkut noaa listan asemista menev‰t p‰‰llekk‰in.
-				unsigned long newSize = locBag.GetSize();
-				if(fVerboseMode && oldSize == newSize)
-						cerr << "Duplicate station info:" << endl << buffer.c_str() << endl;
-			}
-			i++;
-		}while(in.good());
-		itsLocations = NFmiHPlaceDescriptor(locBag); // tyhjennet‰‰n ensin asemalista
-		if(fVerboseMode)
-		{
-			itsInitLogMessage = "Initializing NFmiAviationStationInfoSystem_Obsolite data went OK, from file: ";
-			itsInitLogMessage += theInitFileName;
-			if(itsLocations.Size() == 0)
-				itsInitLogMessage += "\nWarning: 0 sounding stations found.";
-			else
-				itsInitLogMessage += std::string("\nInfo: ") + NFmiStringTools::Convert<int>(itsLocations.Size()) + " sounding stations found.";
-			int diff = counter - itsLocations.Size();
-			if(diff > 0)
-			{
-				itsInitLogMessage += "\nWarning: there were probably ";
-				itsInitLogMessage += NFmiStringTools::Convert<int>(diff);
-				itsInitLogMessage += " 'extra' stations in file, meaning that there were more station lines than different station were found, use unique stations.";
-			}
-		}
-	}
-	else
-		throw std::runtime_error(std::string("NFmiAviationStationInfoSystem_Obsolite::Init - trouble reading file: ") + theInitFileName);
+    const int maxBufferSize = 1024 + 1;  // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+    std::string buffer;
+    AviationStation station;
+    int i = 0;
+    int counter = 0;
+    do
+    {
+      buffer.resize(maxBufferSize);
+      in.getline(&buffer[0], maxBufferSize);
+      size_t realSize = strlen(buffer.c_str());
+      buffer.resize(realSize);
+      buffer = ::RemoveExtraSpaces(buffer);
+      if (GetAviationStationFromString(buffer, theInitFileName, station))
+      {
+        counter++;
+        unsigned long oldSize = locBag.GetSize();
+        locBag.AddLocation(station, false);  // AddLocation ongelma, k‰ytt‰‰ NFmiLocation::operator<
+                                             // -metodia, joka ei vertaa station-id:t‰ vaan nimi ja
+                                             // lat+lon. T‰llˆin jotkut noaa listan asemista menev‰t
+                                             // p‰‰llekk‰in.
+        unsigned long newSize = locBag.GetSize();
+        if (fVerboseMode && oldSize == newSize)
+          cerr << "Duplicate station info:" << endl << buffer.c_str() << endl;
+      }
+      i++;
+    } while (in.good());
+    itsLocations = NFmiHPlaceDescriptor(locBag);  // tyhjennet‰‰n ensin asemalista
+    if (fVerboseMode)
+    {
+      itsInitLogMessage =
+          "Initializing NFmiAviationStationInfoSystem_Obsolite data went OK, from file: ";
+      itsInitLogMessage += theInitFileName;
+      if (itsLocations.Size() == 0)
+        itsInitLogMessage += "\nWarning: 0 sounding stations found.";
+      else
+        itsInitLogMessage += std::string("\nInfo: ") +
+                             NFmiStringTools::Convert<int>(itsLocations.Size()) +
+                             " sounding stations found.";
+      int diff = counter - itsLocations.Size();
+      if (diff > 0)
+      {
+        itsInitLogMessage += "\nWarning: there were probably ";
+        itsInitLogMessage += NFmiStringTools::Convert<int>(diff);
+        itsInitLogMessage +=
+            " 'extra' stations in file, meaning that there were more station lines than different "
+            "station were found, use unique stations.";
+      }
+    }
+  }
+  else
+    throw std::runtime_error(
+        std::string("NFmiAviationStationInfoSystem_Obsolite::Init - trouble reading file: ") +
+        theInitFileName);
 }
 
 // esim. 70-56N (ilmeisesti myˆs sekunnit voi olla mukana, jolloin olisi 70-56-24N)
-// Station Latitude 		DD-MM-SSH where DD is degrees, MM is minutes, SS is seconds and H is N for northern hemisphere or S for southern hemisphere. The seconds value is omitted for those stations where the seconds value is unknown.
+// Station Latitude 		DD-MM-SSH where DD is degrees, MM is minutes, SS is seconds and H is
+// N
+// for northern hemisphere or S for southern hemisphere. The seconds value is omitted for those
+// stations where the seconds value is unknown.
 // tai
 // esim. 008-40W (ilmeisesti myˆs sekunnit voi olla mukana, jolloin olisi esim. 008-40-15W)
-// Station Longitude 		DDD-MM-SSH where DDD is degrees, MM is minutes, SS is seconds and H is E for eastern hemisphere or W for western hemisphere. The seconds value is omitted for those stations where the seconds value is unknown.
-static double GetLatOrLonFromString(const std::string &theLatOrLonStr, const std::string &theLineStr, const std::string &theInitFileName, char posMark, char negMark)
+// Station Longitude 		DDD-MM-SSH where DDD is degrees, MM is minutes, SS is seconds and H
+// is E for eastern hemisphere or W for western hemisphere. The seconds value is omitted for those
+// stations where the seconds value is unknown.
+static double GetLatOrLonFromString(const std::string &theLatOrLonStr,
+                                    const std::string &theLineStr,
+                                    const std::string &theInitFileName,
+                                    char posMark,
+                                    char negMark)
 {
-	std::vector<std::string> strVector = NFmiStringTools::Split(theLatOrLonStr, "-");
-	if(strVector.size() < 2 || strVector.size() > 3)
-		ThrowLatLonProblemException("GetLatOrLonFromString", "Station lat/lon had illegal form", theLatOrLonStr, theLineStr, theInitFileName);
+  std::vector<std::string> strVector = NFmiStringTools::Split(theLatOrLonStr, "-");
+  if (strVector.size() < 2 || strVector.size() > 3)
+    ThrowLatLonProblemException("GetLatOrLonFromString",
+                                "Station lat/lon had illegal form",
+                                theLatOrLonStr,
+                                theLineStr,
+                                theInitFileName);
 
-	int degrees = NFmiStringTools::Convert<int>(strVector[0]);
-	int minutes = 0;
-	int seconds = 0;
-	bool posSign = true;
-	if(strVector.size() == 2)
-	{
-		char ch = static_cast<char>(::toupper(strVector[1].operator[](strVector[1].size()-1))); // t‰h‰n N, S, W tai E
-		if(ch == posMark)
-			posSign = true;
-		else if(ch == negMark)
-			posSign = false;
-		else
-			ThrowLatLonProblemException("GetLatOrLonFromString", "The station's lat/lon string didn't have N, S, W or E at end", theLatOrLonStr, theLineStr, theInitFileName);
-		strVector[1].resize(strVector[1].size()-1); // lyhennet‰‰n t‰t‰ stringi‰, niin ett‰ viimeinen merkki j‰‰ pois
-	}
-	else if(strVector.size() == 3)
-	{
-		char ch = static_cast<char>(::toupper(strVector[2].operator[](strVector[2].size()-1))); // t‰h‰n N, S, W tai E
-		if(ch == posMark)
-			posSign = true;
-		else if(ch == negMark)
-			posSign = false;
-		else
-			ThrowLatLonProblemException("GetLatOrLonFromString", "The station's lat/lon string didn't have N, S, W or E at end", theLatOrLonStr, theLineStr, theInitFileName);
-		strVector[2].resize(strVector[2].size()-1); // lyhennet‰‰n t‰t‰ stringi‰, niin ett‰ viimeinen merkki j‰‰ pois
-		seconds = NFmiStringTools::Convert<int>(strVector[2]);
-	}
-	minutes = NFmiStringTools::Convert<int>(strVector[1]);
-	double value = degrees;
-	value += minutes/60.;
-	value += seconds/3600.;
-	if(posSign == false)
-		value = -value;
-	return value;
+  int degrees = NFmiStringTools::Convert<int>(strVector[0]);
+  int minutes = 0;
+  int seconds = 0;
+  bool posSign = true;
+  if (strVector.size() == 2)
+  {
+    char ch = static_cast<char>(
+        ::toupper(strVector[1].operator[](strVector[1].size() - 1)));  // t‰h‰n N, S, W tai E
+    if (ch == posMark)
+      posSign = true;
+    else if (ch == negMark)
+      posSign = false;
+    else
+      ThrowLatLonProblemException("GetLatOrLonFromString",
+                                  "The station's lat/lon string didn't have N, S, W or E at end",
+                                  theLatOrLonStr,
+                                  theLineStr,
+                                  theInitFileName);
+    strVector[1].resize(strVector[1].size() -
+                        1);  // lyhennet‰‰n t‰t‰ stringi‰, niin ett‰ viimeinen merkki j‰‰ pois
+  }
+  else if (strVector.size() == 3)
+  {
+    char ch = static_cast<char>(
+        ::toupper(strVector[2].operator[](strVector[2].size() - 1)));  // t‰h‰n N, S, W tai E
+    if (ch == posMark)
+      posSign = true;
+    else if (ch == negMark)
+      posSign = false;
+    else
+      ThrowLatLonProblemException("GetLatOrLonFromString",
+                                  "The station's lat/lon string didn't have N, S, W or E at end",
+                                  theLatOrLonStr,
+                                  theLineStr,
+                                  theInitFileName);
+    strVector[2].resize(strVector[2].size() -
+                        1);  // lyhennet‰‰n t‰t‰ stringi‰, niin ett‰ viimeinen merkki j‰‰ pois
+    seconds = NFmiStringTools::Convert<int>(strVector[2]);
+  }
+  minutes = NFmiStringTools::Convert<int>(strVector[1]);
+  double value = degrees;
+  value += minutes / 60.;
+  value += seconds / 3600.;
+  if (posSign == false) value = -value;
+  return value;
 }
 
 // purkaa rivin
 // 01;001;ENJA;Jan Mayen;;Norway;6;70-56N;008-40W;70-56N;008-40W;10;9;P
 // osiin, ja rakentaan AviationStation-otuksen.
-bool NFmiAviationStationInfoSystem_Obsolite::GetAviationStationFromString(const std::string &theStationStr, const std::string &theInitFileName, AviationStation &theStationOut)
+bool NFmiAviationStationInfoSystem_Obsolite::GetAviationStationFromString(
+    const std::string &theStationStr,
+    const std::string &theInitFileName,
+    AviationStation &theStationOut)
 {
-	std::vector<std::string> strVector = NFmiStringTools::Split(theStationStr, ";");
-	if(strVector.size() > 1 && strVector.size() < 13)
-	{
-		std::string errStr("GetAviationStationFromString - station info had too few parts (");
-		errStr +=  NFmiStringTools::Convert<int>(static_cast<int>(strVector.size()-1));
-		errStr +=  " ';' separators, 13 is right amount)";
-		errStr +=  " on line\n";
-		errStr += theStationStr;
-		errStr += "\nin file: ";
-		errStr += theInitFileName;
-		throw std::runtime_error(errStr);
-	}
-	else if(strVector.size() == 13)
-	{
-		static int counter = 1;
-		if(fVerboseMode)
-		{
-			if(counter == 1)
-			{
-				std::string errStr("Warning: GetAviationStationFromString - station info had too few parts (");
-				errStr +=  NFmiStringTools::Convert<int>(static_cast<int>(strVector.size()-1));
-				errStr +=  " ';' separators, 13 is right amount, but 12 is accepted)";
-				errStr +=  " on line\n";
-				errStr += theStationStr;
-				errStr += "\nin file: ";
-				errStr += theInitFileName;
-				cerr << errStr << endl;
-			}
-			else if(counter == 2)
-			{
-				cerr << "Also these station lines had only 12 separators:" << endl;
-				cerr << theStationStr << endl;
-			}
-			else
-				cerr << theStationStr << endl;
-		}
-		counter++;
-		return false;
-	}
-	else if(strVector.size() <= 1)
-		return false; // en ole varma splitterist‰, mutta ignoorataan vain tyhj‰/yhden osion rivit
+  std::vector<std::string> strVector = NFmiStringTools::Split(theStationStr, ";");
+  if (strVector.size() > 1 && strVector.size() < 13)
+  {
+    std::string errStr("GetAviationStationFromString - station info had too few parts (");
+    errStr += NFmiStringTools::Convert<int>(static_cast<int>(strVector.size() - 1));
+    errStr += " ';' separators, 13 is right amount)";
+    errStr += " on line\n";
+    errStr += theStationStr;
+    errStr += "\nin file: ";
+    errStr += theInitFileName;
+    throw std::runtime_error(errStr);
+  }
+  else if (strVector.size() == 13)
+  {
+    static int counter = 1;
+    if (fVerboseMode)
+    {
+      if (counter == 1)
+      {
+        std::string errStr(
+            "Warning: GetAviationStationFromString - station info had too few parts (");
+        errStr += NFmiStringTools::Convert<int>(static_cast<int>(strVector.size() - 1));
+        errStr += " ';' separators, 13 is right amount, but 12 is accepted)";
+        errStr += " on line\n";
+        errStr += theStationStr;
+        errStr += "\nin file: ";
+        errStr += theInitFileName;
+        cerr << errStr << endl;
+      }
+      else if (counter == 2)
+      {
+        cerr << "Also these station lines had only 12 separators:" << endl;
+        cerr << theStationStr << endl;
+      }
+      else
+        cerr << theStationStr << endl;
+    }
+    counter++;
+    return false;
+  }
+  else if (strVector.size() <= 1)
+    return false;  // en ole varma splitterist‰, mutta ignoorataan vain tyhj‰/yhden osion rivit
 
-	std::string icaoId = strVector[2];
-	if(icaoId.empty())
-		return false; // otetaan vain asemat miss‰ icao id
+  std::string icaoId = strVector[2];
+  if (icaoId.empty()) return false;  // otetaan vain asemat miss‰ icao id
 
-	theStationOut.IcaoStr(icaoId);
-	unsigned long stationId = NFmiStringTools::Convert<unsigned long>(strVector[0])*1000 + NFmiStringTools::Convert<unsigned long>(strVector[1]);
-	theStationOut.SetIdent(stationId);
-	double lat = ::GetLatOrLonFromString(strVector[7], theStationStr, theInitFileName, 'N', 'S');
-	double lon = ::GetLatOrLonFromString(strVector[8], theStationStr, theInitFileName, 'E', 'W');
-	theStationOut.SetLongitude(lon);
-	theStationOut.SetLatitude(lat);
-	std::string name = strVector[3];
-	theStationOut.SetName(NFmiString(name));
-	return true;
+  theStationOut.IcaoStr(icaoId);
+  unsigned long stationId = NFmiStringTools::Convert<unsigned long>(strVector[0]) * 1000 +
+                            NFmiStringTools::Convert<unsigned long>(strVector[1]);
+  theStationOut.SetIdent(stationId);
+  double lat = ::GetLatOrLonFromString(strVector[7], theStationStr, theInitFileName, 'N', 'S');
+  double lon = ::GetLatOrLonFromString(strVector[8], theStationStr, theInitFileName, 'E', 'W');
+  theStationOut.SetLongitude(lon);
+  theStationOut.SetLatitude(lat);
+  std::string name = strVector[3];
+  theStationOut.SetName(NFmiString(name));
+  return true;
 }
 
-const NFmiLocation* NFmiAviationStationInfoSystem_Obsolite::CurrentLocation(const std::string &theIcaoStr)
+const NFmiLocation *NFmiAviationStationInfoSystem_Obsolite::CurrentLocation(
+    const std::string &theIcaoStr)
 {
-	return itsLocations.Location();
+  return itsLocations.Location();
 }
 
 // HUOM!!! Oletus hplaceDesc sis‰lt‰‰ AviationStation:eita.
 bool NFmiAviationStationInfoSystem_Obsolite::FindAviationStation(const std::string &theIcaoStr)
 {
-	for(itsLocations.Reset(); itsLocations.Next(); )
-	{
-		const AviationStation &aviStation = *static_cast<const AviationStation*>(itsLocations.Location());
-		if(aviStation.IcaoStr() == theIcaoStr)
-			return true;
-	}
-	return false;
+  for (itsLocations.Reset(); itsLocations.Next();)
+  {
+    const AviationStation &aviStation =
+        *static_cast<const AviationStation *>(itsLocations.Location());
+    if (aviStation.IcaoStr() == theIcaoStr) return true;
+  }
+  return false;
 }
 
 bool NFmiAviationStationInfoSystem_Obsolite::FindStation(long theStationId)
 {
-	return itsLocations.Location(theStationId);
+  return itsLocations.Location(theStationId);
 }
 
 // ***********************************************************************
 // *****************  NFmiAviationStationInfoSystem_Obsolite  ************
 // ***********************************************************************
-
 
 // ***********************************************************************
 // *****************  NFmiSilamStationList  *************************
@@ -406,184 +477,219 @@ bool NFmiAviationStationInfoSystem_Obsolite::FindStation(long theStationId)
 // t‰‰lt‰ heitet‰‰n aina poikkeus kun on virhe tai halutaan skipata rivi
 static NFmiSilamStationList::Station GetSilamStationFromString(const std::string &lineStr)
 {
-	if(lineStr.empty())
-		throw std::runtime_error("GetSilamStationFromString - empty line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+  if (lineStr.empty())
+    throw std::runtime_error("GetSilamStationFromString - empty line string.");  // viestill‰ ei ole
+                                                                                 // oikeastaan
+                                                                                 // v‰li‰, l‰hinn‰
+                                                                                 // kommentti
 
-	if(lineStr[0] == '!')
-		throw std::runtime_error("GetSilamStationFromString - comment line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+  if (lineStr[0] == '!')
+    throw std::runtime_error("GetSilamStationFromString - comment line string.");  // viestill‰ ei
+                                                                                   // ole oikeastaan
+                                                                                   // v‰li‰, l‰hinn‰
+                                                                                   // kommentti
 
-	std::stringstream in(lineStr);
-	NFmiSilamStationList::Station station;
+  std::stringstream in(lineStr);
+  NFmiSilamStationList::Station station;
 
-	double value = 0;
-	in >> value; // latitude
-	if(in.fail())
-		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
-	std::string str;
-	in >> str; // latitude sign
-	if(in.fail())
-		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+  double value = 0;
+  in >> value;  // latitude
+  if (in.fail())
+    throw std::runtime_error(
+        "GetSilamStationFromString - error in line string.");  // viestill‰ ei ole oikeastaan v‰li‰,
+                                                               // l‰hinn‰ kommentti
+  std::string str;
+  in >> str;  // latitude sign
+  if (in.fail())
+    throw std::runtime_error(
+        "GetSilamStationFromString - error in line string.");  // viestill‰ ei ole oikeastaan v‰li‰,
+                                                               // l‰hinn‰ kommentti
 
-	station.itsLatlon.Y(value); // latitude signilla ei ilmeisesti merkityst‰, ainakin longitude sign on merkityksetˆn
+  station.itsLatlon.Y(value);  // latitude signilla ei ilmeisesti merkityst‰, ainakin longitude sign
+                               // on merkityksetˆn
 
+  in >> value;  // longtitude
+  if (in.fail())
+    throw std::runtime_error(
+        "GetSilamStationFromString - error in line string.");  // viestill‰ ei ole oikeastaan v‰li‰,
+                                                               // l‰hinn‰ kommentti
+  in >> str;                                                   // longtitude sign
+  if (in.fail())
+    throw std::runtime_error(
+        "GetSilamStationFromString - error in line string.");  // viestill‰ ei ole oikeastaan v‰li‰,
+                                                               // l‰hinn‰ kommentti
 
-	in >> value; // longtitude
-	if(in.fail())
-		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
-	in >> str; // longtitude sign
-	if(in.fail())
-		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+  station.itsLatlon.X(value);  // longtitude signilla ei ilmeisesti merkityst‰, ainakin longitude
+                               // sign on merkityksetˆn
 
-	station.itsLatlon.X(value); // longtitude signilla ei ilmeisesti merkityst‰, ainakin longitude sign on merkityksetˆn
+  // sitten luetaan maa (joka voi olla useassa osassa)
+  do
+  {
+    in >> str;
+    if (in.fail())
+      throw std::runtime_error(
+          "GetSilamStationFromString - error in line string.");  // viestill‰ ei ole oikeastaan
+                                                                 // v‰li‰, l‰hinn‰ kommentti
+    if (str.size() >= 2 &&
+        ((str[0] == 'O' && str[1] == 'T') ||
+         (str[0] == 'P' && str[1] == 'L')))  // tyyppi ilmeisesti alkaa OT tai PL alulla
+      break;
+    station.itsCountry += str;
+  } while (true);
 
-	// sitten luetaan maa (joka voi olla useassa osassa)
-	do
-	{
-		in >> str;
-		if(in.fail())
-			throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
-		if(str.size() >= 2 && ((str[0] == 'O' && str[1] == 'T') || (str[0] == 'P' && str[1] == 'L'))) // tyyppi ilmeisesti alkaa OT tai PL alulla
-			break;
-		station.itsCountry += str;
-	}while(true);
+  if (in.fail())
+    throw std::runtime_error(
+        "GetSilamStationFromString - error in line string.");  // viestill‰ ei ole oikeastaan v‰li‰,
+                                                               // l‰hinn‰ kommentti
 
-	if(in.fail())
-		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+  station.itsType = str;
 
-	station.itsType = str;
+  int maxBufferSize = 1024 + 1;  // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+  std::string buffer;
+  buffer.resize(maxBufferSize);
+  in.getline(&buffer[0], maxBufferSize);
+  size_t length2 = ::strlen(&buffer[0]);
+  buffer.resize(length2);
+  station.itsInfo = buffer;
 
-	int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
-	std::string buffer;
-	buffer.resize(maxBufferSize);
-	in.getline(&buffer[0], maxBufferSize);
-	size_t length2 = ::strlen(&buffer[0]);
-	buffer.resize(length2);
-	station.itsInfo = buffer;
-
-	return station;
+  return station;
 }
-
 
 // Lukee Silam tyyppisest‰ asemalista tiedostosta asema tiedot, heitt‰‰ poikkeuksen jos ongelmia.
 // Asema tiedoston formaatti on seuraava (!-merkki aloittaa kommentti rivin):
-// 
+//
 // !    latitude        longitude        valtio                    tyyppi               info
 // !--------------------------------------------------------------------------------------------------------------------
 //
-// 40.600   N   44.350   E   ARMENIA   PL_PWR   Ararat, Armenia teho 2x376 MW, Shut down 1989 
+// 40.600   N   44.350   E   ARMENIA   PL_PWR   Ararat, Armenia teho 2x376 MW, Shut down 1989
 // 48.300   N   15.800   E   AUSTRIA   PL   Zwentendorf, Tullnerfeld 1
 void NFmiSilamStationList::Init(const std::string &theInitFileName)
 {
-	itsInitLogMessage = "";
-	itsLocations.clear(); // tyhjennet‰‰n ensin asemalista
+  itsInitLogMessage = "";
+  itsLocations.clear();  // tyhjennet‰‰n ensin asemalista
 
-	if(theInitFileName.empty())
-		throw std::runtime_error("NFmiSilamStationList::Init - empty settings filename given.");
+  if (theInitFileName.empty())
+    throw std::runtime_error("NFmiSilamStationList::Init - empty settings filename given.");
 
-	ifstream in(theInitFileName.c_str());
-	if(in)
-	{
-		const int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
-		std::string buffer;
-		Station station;
-		do
-		{
-			buffer.resize(maxBufferSize);
-			in.getline(&buffer[0], maxBufferSize);
+  ifstream in(theInitFileName.c_str());
+  if (in)
+  {
+    const int maxBufferSize = 1024 + 1;  // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+    std::string buffer;
+    Station station;
+    do
+    {
+      buffer.resize(maxBufferSize);
+      in.getline(&buffer[0], maxBufferSize);
 
-			int realSize = static_cast<int>(strlen(buffer.c_str()));
-			buffer.resize(realSize);
-			buffer = ::RemoveExtraSpaces(buffer);
+      int realSize = static_cast<int>(strlen(buffer.c_str()));
+      buffer.resize(realSize);
+      buffer = ::RemoveExtraSpaces(buffer);
 
-			try
-			{
-				station = ::GetSilamStationFromString(buffer);
-				itsLocations.push_back(station);
-			}
-			catch(...)
-			{
-				// ei tehd‰ mit‰‰n, jatketaan seuraavalla rivill‰ niin kauan kuin rivej‰ riitt‰‰
-			}
+      try
+      {
+        station = ::GetSilamStationFromString(buffer);
+        itsLocations.push_back(station);
+      }
+      catch (...)
+      {
+        // ei tehd‰ mit‰‰n, jatketaan seuraavalla rivill‰ niin kauan kuin rivej‰ riitt‰‰
+      }
 
-		}while(in.good());
-		itsInitLogMessage = "Initializing silam station data went OK, from file: ";
-		itsInitLogMessage += theInitFileName;
-	}
-	else
-		throw std::runtime_error(std::string("NFmiSilamStationList::Init - trouble reading file: ") + theInitFileName);
+    } while (in.good());
+    itsInitLogMessage = "Initializing silam station data went OK, from file: ";
+    itsInitLogMessage += theInitFileName;
+  }
+  else
+    throw std::runtime_error(std::string("NFmiSilamStationList::Init - trouble reading file: ") +
+                             theInitFileName);
 }
 
-void NFmiSilamStationList::Clear(void)
-{
-	itsLocations.clear();
-}
-
+void NFmiSilamStationList::Clear(void) { itsLocations.clear(); }
 // ****************   NFmiWmoStationLookUpSystem  *************************************
 
-NFmiWmoStationLookUpSystem::NFmiWmoStationLookUpSystem(void)
-:itsStations()
-,itsInitLogMessage()
+NFmiWmoStationLookUpSystem::NFmiWmoStationLookUpSystem(void) : itsStations(), itsInitLogMessage() {}
+const NFmiWmoStation &NFmiWmoStationLookUpSystem::GetStation(long theWmoId)
 {
-}
-
-const NFmiWmoStation& NFmiWmoStationLookUpSystem::GetStation(long theWmoId)
-{
-	const static NFmiWmoStation dummy;
-	std::map<long,NFmiWmoStation>::const_iterator it = itsStations.find(theWmoId);
-	if(it == itsStations.end())
-	  return dummy;
-	else
-	  return it->second;
+  const static NFmiWmoStation dummy;
+  std::map<long, NFmiWmoStation>::const_iterator it = itsStations.find(theWmoId);
+  if (it == itsStations.end())
+    return dummy;
+  else
+    return it->second;
 }
 
 // purkaa rivin
 // 01;001;ENJA;Jan Mayen;;Norway;6;70-56N;008-40W;70-56N;008-40W;10;9;P
 // osiin, ja rakentaan NFmiWmoStation-otuksen.
-static bool GetWmoStationFromString(const std::string &theStationStr, const std::string &theInitFileName, NFmiWmoStation &theStationOut)
+static bool GetWmoStationFromString(const std::string &theStationStr,
+                                    const std::string &theInitFileName,
+                                    NFmiWmoStation &theStationOut)
 {
-	std::vector<std::string> strVector = NFmiStringTools::Split(theStationStr, ";");
-	if(strVector.size() > 1 && strVector.size() < 13)
-		throw std::runtime_error(std::string("Wmo-station error with line: ") + theStationStr);
-	else if(strVector.size() <= 1)
-		return false; // ignoorataan vain tyhj‰/yhden osion rivit
+  std::vector<std::string> strVector = NFmiStringTools::Split(theStationStr, ";");
+  if (strVector.size() > 1 && strVector.size() < 13)
+    throw std::runtime_error(std::string("Wmo-station error with line: ") + theStationStr);
+  else if (strVector.size() <= 1)
+    return false;  // ignoorataan vain tyhj‰/yhden osion rivit
 
-	theStationOut.itsIcaoStr = strVector[2];
-	theStationOut.itsWmoId = NFmiStringTools::Convert<long>(strVector[0])*1000 + NFmiStringTools::Convert<long>(strVector[1]);
-	double lat = GetLatOrLonFromString(strVector[7], theStationStr, theInitFileName, 'N', 'S');
-	double lon = GetLatOrLonFromString(strVector[8], theStationStr, theInitFileName, 'E', 'W');
-	theStationOut.itsLatlon = NFmiPoint(lon, lat);
-	theStationOut.itsName = strVector[3];
-	theStationOut.itsState = strVector[4];
-	theStationOut.itsCountry = strVector[5];
-	return true;
+  theStationOut.itsIcaoStr = strVector[2];
+  theStationOut.itsWmoId = NFmiStringTools::Convert<long>(strVector[0]) * 1000 +
+                           NFmiStringTools::Convert<long>(strVector[1]);
+  double lat = GetLatOrLonFromString(strVector[7], theStationStr, theInitFileName, 'N', 'S');
+  double lon = GetLatOrLonFromString(strVector[8], theStationStr, theInitFileName, 'E', 'W');
+  theStationOut.itsLatlon = NFmiPoint(lon, lat);
+  theStationOut.itsName = strVector[3];
+  theStationOut.itsState = strVector[4];
+  theStationOut.itsCountry = strVector[5];
+  return true;
 }
 
-
-// Lukee initialisointi tiedostosta asema tiedot, jos ongelmia, ja on annettu lokitus systeemi, lokittaa virheit‰.
+// Lukee initialisointi tiedostosta asema tiedot, jos ongelmia, ja on annettu lokitus systeemi,
+// lokittaa virheit‰.
 // Lukee asema tiedot jotka saadaan webist‰ paikasta http://weather.noaa.gov/data/nsd_bbsss.txt
-// Asema tiedoston formaatti on seuraava (kommentit sallittuja, mutta asema rivit 
+// Asema tiedoston formaatti on seuraava (kommentit sallittuja, mutta asema rivit
 // ilman kommentti merkkej‰):
-// 
+//
 // Keyed by Index (Block and Station) Number
 // This index table from http://weather.noaa.gov/tg/site.shtml
 // and the station table from http://weather.noaa.gov/data/nsd_bbsss.txt
 // Last Updated
-// All stations that have an index number assigned by the WMO are available in this file. The ASCII file contains the following fields in the order specified, delimited by semi-colons. Fields that are empty will be coded as no characters (adjacent delimiters) except where otherwise noted.
+// All stations that have an index number assigned by the WMO are available in this file. The ASCII
+// file contains the following fields in the order specified, delimited by semi-colons. Fields that
+// are empty will be coded as no characters (adjacent delimiters) except where otherwise noted.
 //
 // Block Number 		2 digits representing the WMO-assigned block.
 // Station Number  		3 digits representing the WMO-assigned station.
-// ICAO Location Indicator 	4 alphanumeric characters, not all stations in this file have an assigned location indicator. The value "----" is used for stations that do not have an assigned location indicator.
+// ICAO Location Indicator 	4 alphanumeric characters, not all stations in this file have an
+// assigned location indicator. The value "----" is used for stations that do not have an assigned
+// location indicator.
 // Place Name 			Common name of station location.
-// State 			2 character abbreviation (included for stations located in the United States only).
+// State 			2 character abbreviation (included for stations located in the
+// United
+// States
+// only).
 // Country Name 		Country name is ISO short English form.
-// WMO Region 			digits 1 through 6 representing the corresponding WMO region, 7 stands for the WMO Antarctic region.
-// Station Latitude 		DD-MM-SSH where DD is degrees, MM is minutes, SS is seconds and H is N for northern hemisphere or S for southern hemisphere. The seconds value is omitted for those stations where the seconds value is unknown.
-// Station Longitude 		DDD-MM-SSH where DDD is degrees, MM is minutes, SS is seconds and H is E for eastern hemisphere or W for western hemisphere. The seconds value is omitted for those stations where the seconds value is unknown.
-// Upper Air Latitude 		DD-MM-SSH where DD is degrees, MM is minutes, SS is seconds and H is N for northern hemisphere or S for southern hemisphere. The seconds value is omitted for those stations where the seconds value is unknown.
-// Upper Air Longitude 		DDD-MM-SSH where DDD is degrees, MM is minutes, SS is seconds and H is E for eastern hemisphere or W for western hemisphere. The seconds value is omitted for those stations where the seconds value is unknown.
+// WMO Region 			digits 1 through 6 representing the corresponding WMO region, 7
+// stands
+// for the WMO Antarctic region.
+// Station Latitude 		DD-MM-SSH where DD is degrees, MM is minutes, SS is seconds and H is
+// N
+// for northern hemisphere or S for southern hemisphere. The seconds value is omitted for those
+// stations where the seconds value is unknown.
+// Station Longitude 		DDD-MM-SSH where DDD is degrees, MM is minutes, SS is seconds and H
+// is E for eastern hemisphere or W for western hemisphere. The seconds value is omitted for those
+// stations where the seconds value is unknown.
+// Upper Air Latitude 		DD-MM-SSH where DD is degrees, MM is minutes, SS is seconds and H is
+// N for northern hemisphere or S for southern hemisphere. The seconds value is omitted for those
+// stations where the seconds value is unknown.
+// Upper Air Longitude 		DDD-MM-SSH where DDD is degrees, MM is minutes, SS is seconds and H
+// is E for eastern hemisphere or W for western hemisphere. The seconds value is omitted for those
+// stations where the seconds value is unknown.
 // Station Elevation (Ha) 	The station elevation in meters. Value is omitted if unknown.
 // Upper Air Elevation (Hp) 	The upper air elevation in meters. Value is omitted if unknown.
-// RBSN indicator 		P if station is defined by the WMO as belonging to the Regional Basic Synoptic Network, omitted otherwise.
+// RBSN indicator 		P if station is defined by the WMO as belonging to the Regional
+// Basic
+// Synoptic Network, omitted otherwise.
 
 // 00;000;PABL;Buckland, Buckland Airport;AK;United States;4;65-58-56N;161-09-07W;;;7;;
 // 01;001;ENJA;Jan Mayen;;Norway;6;70-56N;008-40W;70-56N;008-40W;10;9;P
@@ -605,68 +711,71 @@ void NFmiWmoStationLookUpSystem::Init(const std::string &theInitFileName, int th
 {
   // We ignore theStationCountHint, the data structure is now a map
 
-	itsInitLogMessage = "";
+  itsInitLogMessage = "";
 
-	if(theInitFileName.empty())
-		throw std::runtime_error("NFmiWmoStationLookUpSystem::Init - empty settings filename given.");
+  if (theInitFileName.empty())
+    throw std::runtime_error("NFmiWmoStationLookUpSystem::Init - empty settings filename given.");
 
-	NFmiCommentStripper stripComments(false); // ei stripata # eli pound kommentteja, koska stripperiss‰ on bugi
-	if(stripComments.ReadAndStripFile(theInitFileName))
-	{
+  NFmiCommentStripper stripComments(
+      false);  // ei stripata # eli pound kommentteja, koska stripperiss‰ on bugi
+  if (stripComments.ReadAndStripFile(theInitFileName))
+  {
 #ifdef OLDGCC
-		std::istrstream in(stripComments.GetString().c_str());
+    std::istrstream in(stripComments.GetString().c_str());
 #else
-		std::stringstream in(stripComments.GetString());
+    std::stringstream in(stripComments.GetString());
 #endif
 
-		std::string warningSectionStr;
-		const int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
-		std::string buffer;
-		NFmiWmoStation station;
-		int counter = 0;
-		int warningCounter = 0;
-		int foundStationCounter = 0;
-		do
-		{
-			buffer.resize(maxBufferSize);
-			in.getline(&buffer[0], maxBufferSize);
-			size_t realSize = strlen(buffer.c_str());
-			buffer.resize(realSize);
-			buffer = ::RemoveExtraSpaces(buffer);
-			bool getStationStatus = true;
-			try
-			{
-				getStationStatus = ::GetWmoStationFromString(buffer, theInitFileName, station);
-			}
-			catch(std::exception &e)
-			{
-				warningSectionStr += e.what();
-				warningSectionStr += "\n";
-				warningCounter++;
-			}
+    std::string warningSectionStr;
+    const int maxBufferSize = 1024 + 1;  // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+    std::string buffer;
+    NFmiWmoStation station;
+    int counter = 0;
+    int warningCounter = 0;
+    int foundStationCounter = 0;
+    do
+    {
+      buffer.resize(maxBufferSize);
+      in.getline(&buffer[0], maxBufferSize);
+      size_t realSize = strlen(buffer.c_str());
+      buffer.resize(realSize);
+      buffer = ::RemoveExtraSpaces(buffer);
+      bool getStationStatus = true;
+      try
+      {
+        getStationStatus = ::GetWmoStationFromString(buffer, theInitFileName, station);
+      }
+      catch (std::exception &e)
+      {
+        warningSectionStr += e.what();
+        warningSectionStr += "\n";
+        warningCounter++;
+      }
 
-			if(getStationStatus)
-			{
-				counter++;
-				itsStations[station.itsWmoId] = station;
-			}
-		}
-		while(in.good());
+      if (getStationStatus)
+      {
+        counter++;
+        itsStations[station.itsWmoId] = station;
+      }
+    } while (in.good());
 
-		itsInitLogMessage = "Initializing NFmiWmoStationLookUpSystem data went OK, from file: ";
-		itsInitLogMessage += theInitFileName;
-		if(foundStationCounter == 0)
-			itsInitLogMessage += "\nWarning: 0 sounding stations found.";
-		else
-			itsInitLogMessage += std::string("\nInfo: ") + NFmiStringTools::Convert<int>(foundStationCounter) + " wmo stations found.";
-		if(warningCounter > 0)
-		{
-			itsInitLogMessage += "\nFollowing warning were issued:\n";
-			itsInitLogMessage += warningSectionStr;
-		}
-	}
-	else
-		throw std::runtime_error(std::string("NFmiWmoStationLookUpSystem::Init - trouble reading file: ") + theInitFileName);
+    itsInitLogMessage = "Initializing NFmiWmoStationLookUpSystem data went OK, from file: ";
+    itsInitLogMessage += theInitFileName;
+    if (foundStationCounter == 0)
+      itsInitLogMessage += "\nWarning: 0 sounding stations found.";
+    else
+      itsInitLogMessage += std::string("\nInfo: ") +
+                           NFmiStringTools::Convert<int>(foundStationCounter) +
+                           " wmo stations found.";
+    if (warningCounter > 0)
+    {
+      itsInitLogMessage += "\nFollowing warning were issued:\n";
+      itsInitLogMessage += warningSectionStr;
+    }
+  }
+  else
+    throw std::runtime_error(
+        std::string("NFmiWmoStationLookUpSystem::Init - trouble reading file: ") + theInitFileName);
 }
 
 // ****************   NFmiWmoStationLookUpSystem  *************************************

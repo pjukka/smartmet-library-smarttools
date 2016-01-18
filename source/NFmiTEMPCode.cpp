@@ -12,1094 +12,1155 @@
 #include <sstream>
 
 NFmiTEMPCode::NFmiTEMPCode(void)
-:itsOriginalCodeAStr()
-,itsOriginalCodeBStr()
-,itsOriginalCodeCStr()
-,itsOriginalCodeDStr()
-,itsTime()
-,itsStation()
-,fTempMobil(false)
-,itsTempStations(0)
-,itsUnknownStationLocation()
-,itsLevels()
+    : itsOriginalCodeAStr(),
+      itsOriginalCodeBStr(),
+      itsOriginalCodeCStr(),
+      itsOriginalCodeDStr(),
+      itsTime(),
+      itsStation(),
+      fTempMobil(false),
+      itsTempStations(0),
+      itsUnknownStationLocation(),
+      itsLevels()
 {
 }
 
-NFmiTEMPCode::NFmiTEMPCode(NFmiAviationStationInfoSystem *theTempStations, const NFmiPoint &theUnknownStationLocation)
-:itsOriginalCodeAStr()
-,itsOriginalCodeBStr()
-,itsOriginalCodeCStr()
-,itsOriginalCodeDStr()
-,itsTime()
-,itsStation()
-,fTempMobil(false)
-,itsTempStations(theTempStations)
-,itsUnknownStationLocation(theUnknownStationLocation)
-,itsLevels()
+NFmiTEMPCode::NFmiTEMPCode(NFmiAviationStationInfoSystem *theTempStations,
+                           const NFmiPoint &theUnknownStationLocation)
+    : itsOriginalCodeAStr(),
+      itsOriginalCodeBStr(),
+      itsOriginalCodeCStr(),
+      itsOriginalCodeDStr(),
+      itsTime(),
+      itsStation(),
+      fTempMobil(false),
+      itsTempStations(theTempStations),
+      itsUnknownStationLocation(theUnknownStationLocation),
+      itsLevels()
 {
 }
 
-NFmiTEMPCode::~NFmiTEMPCode(void)
-{
-}
-
+NFmiTEMPCode::~NFmiTEMPCode(void) {}
 void NFmiTEMPCode::Clear(void)
 {
-	itsOriginalCodeAStr.clear();
-	itsOriginalCodeBStr.clear();
-	itsOriginalCodeCStr.clear();
-	itsOriginalCodeDStr.clear();
-	itsStation = NFmiStation(); // joku dummy asema vain
-	fTempMobil = false;
-	itsLevels.clear();
+  itsOriginalCodeAStr.clear();
+  itsOriginalCodeBStr.clear();
+  itsOriginalCodeCStr.clear();
+  itsOriginalCodeDStr.clear();
+  itsStation = NFmiStation();  // joku dummy asema vain
+  fTempMobil = false;
+  itsLevels.clear();
 }
 
-static void InsertLevelData(std::map<double, TEMPLevelData> &theLevelMap, const TEMPLevelData &theLevelData)
+static void InsertLevelData(std::map<double, TEMPLevelData> &theLevelMap,
+                            const TEMPLevelData &theLevelData)
 {
-	theLevelMap.insert(std::make_pair(theLevelData.itsPressure, theLevelData));
+  theLevelMap.insert(std::make_pair(theLevelData.itsPressure, theLevelData));
 }
 
 // oletus painelevelit (theLevels) ovat 'nousevassa' j‰rjestyksess‰ eli pienenev‰t
 // toisin kuin itse level-data, joiden oletetaan alkavan ylh‰‰lt‰
 void NFmiTEMPCode::ForceWantedPressureLevels(NFmiVPlaceDescriptor &theLevels)
 {
-	size_t levelSize = itsLevels.size();
-	if(levelSize <= 2)
-		return;
-	theLevels.Reset();
-	theLevels.Next();
-	double currentMainLevel = static_cast<double>(theLevels.Level()->LevelValue());
-	std::map<double, TEMPLevelData>::reverse_iterator it = itsLevels.rbegin();
-	std::map<double, TEMPLevelData>::reverse_iterator last = it; // t‰h‰n sijoitetaan edellisen levelin data
-	std::map<double, TEMPLevelData>::reverse_iterator endIt = itsLevels.rend();
-	std::map<double, TEMPLevelData> resultLevels;
-	InsertLevelData(resultLevels, (*last).second); // 1. leveli laitetaan aina
-	int lastTemperatureDir = 0; // jos T laskee, t‰h‰n -1, jos nousee, 1, jos ei alustettu, 0
-	int currentTemperatureDir = 0; // jos T laskee, t‰h‰n -1, jos nousee, 1, jos ei alustettu, 0
-	int minDirCounter = 6;
-	int T_Dircounter = 0;
-	int lastDewPointDir = 0; // jos T laskee, t‰h‰n -1, jos nousee, 1, jos ei alustettu, 0
-	int currentDewPointDir = 0; // jos T laskee, t‰h‰n -1, jos nousee, 1, jos ei alustettu, 0
-	int Td_Dircounter = 0;
-	double lastTZRatio = 0;
-	double currentTZRatio = 0;
-	double lastTdZRatio = 0;
-	double currentTdZRatio = 0;
-	int counter = 0;
-	do
-	{
-		counter++;
-		lastTemperatureDir = currentTemperatureDir;
-		lastDewPointDir = currentDewPointDir;
-		last = it;
-		++it;
-		double p1 = (*last).second.itsPressure;
-		double p2 = (*it).second.itsPressure;
-		if(p1 < currentMainLevel && p2 < currentMainLevel)
-		{ // molemmat kerrokset ovat jo ylemp‰n‰ kuin etsitty main level, etsit‰‰n sellainen main level, mik‰ ei ole molempien yl‰puolella
-			do
-			{
-				if(theLevels.Next() == false)
-					break;
-				currentMainLevel = static_cast<double>(theLevels.Level()->LevelValue());
-			}while(p1 < currentMainLevel && p2 < currentMainLevel);
-		}
+  size_t levelSize = itsLevels.size();
+  if (levelSize <= 2) return;
+  theLevels.Reset();
+  theLevels.Next();
+  double currentMainLevel = static_cast<double>(theLevels.Level()->LevelValue());
+  std::map<double, TEMPLevelData>::reverse_iterator it = itsLevels.rbegin();
+  std::map<double, TEMPLevelData>::reverse_iterator last =
+      it;  // t‰h‰n sijoitetaan edellisen levelin data
+  std::map<double, TEMPLevelData>::reverse_iterator endIt = itsLevels.rend();
+  std::map<double, TEMPLevelData> resultLevels;
+  InsertLevelData(resultLevels, (*last).second);  // 1. leveli laitetaan aina
+  int lastTemperatureDir = 0;     // jos T laskee, t‰h‰n -1, jos nousee, 1, jos ei alustettu, 0
+  int currentTemperatureDir = 0;  // jos T laskee, t‰h‰n -1, jos nousee, 1, jos ei alustettu, 0
+  int minDirCounter = 6;
+  int T_Dircounter = 0;
+  int lastDewPointDir = 0;     // jos T laskee, t‰h‰n -1, jos nousee, 1, jos ei alustettu, 0
+  int currentDewPointDir = 0;  // jos T laskee, t‰h‰n -1, jos nousee, 1, jos ei alustettu, 0
+  int Td_Dircounter = 0;
+  double lastTZRatio = 0;
+  double currentTZRatio = 0;
+  double lastTdZRatio = 0;
+  double currentTdZRatio = 0;
+  int counter = 0;
+  do
+  {
+    counter++;
+    lastTemperatureDir = currentTemperatureDir;
+    lastDewPointDir = currentDewPointDir;
+    last = it;
+    ++it;
+    double p1 = (*last).second.itsPressure;
+    double p2 = (*it).second.itsPressure;
+    if (p1 < currentMainLevel && p2 < currentMainLevel)
+    {  // molemmat kerrokset ovat jo ylemp‰n‰ kuin etsitty main level, etsit‰‰n sellainen main
+       // level, mik‰ ei ole molempien yl‰puolella
+      do
+      {
+        if (theLevels.Next() == false) break;
+        currentMainLevel = static_cast<double>(theLevels.Level()->LevelValue());
+      } while (p1 < currentMainLevel && p2 < currentMainLevel);
+    }
 
-		if(p1 >= currentMainLevel && p2 <= currentMainLevel)
-		{ // nyt etsitty main level on leveleiden v‰liss‰. katsotaan kumpi on l‰hemp‰n‰ ja muutetaan se tarvittaessa halutuksi leveliksi
-			if(p1 == currentMainLevel || p1 == currentMainLevel)
-			{ // ei tarvitse muuta kuin alkaa etsim‰‰n seuraavaa leveli‰
-			}
-			else
-			{
-				double diff1 = ::fabs(currentMainLevel-p1);
-				double diff2 = ::fabs(currentMainLevel-p2);
-				if(diff1 < diff2)
-				{
-					(*last).second.itsPressure = currentMainLevel;
-					InsertLevelData(resultLevels, (*last).second);
-				}
-				else
-				{
-					(*it).second.itsPressure = currentMainLevel;
-					InsertLevelData(resultLevels, (*it).second);
-				}
-			}
-			theLevels.Next();
-			currentMainLevel = static_cast<double>(theLevels.Level()->LevelValue());
-		}
-		double z1 = (*last).second.itsHeight;
-		int zFix = static_cast<int>(z1/1000.);
-		double z2 = (*it).second.itsHeight;
-		double T1 = (*last).second.itsTemperature;
-		double T2 = (*it).second.itsTemperature;
-		T_Dircounter++;
-		if(T1 >= T2)
-			currentTemperatureDir = -1;
-		else
-			currentTemperatureDir = 1;
-		if(lastTemperatureDir != currentTemperatureDir && T_Dircounter > minDirCounter+zFix)
-		{
-			T_Dircounter = 0;
-			InsertLevelData(resultLevels, (*last).second); // jos l‰mpˆtilan suunta vaihtuu, laitetaan leveli talteen
-		}
+    if (p1 >= currentMainLevel && p2 <= currentMainLevel)
+    {  // nyt etsitty main level on leveleiden v‰liss‰. katsotaan kumpi on l‰hemp‰n‰ ja muutetaan se
+       // tarvittaessa halutuksi leveliksi
+      if (p1 == currentMainLevel || p1 == currentMainLevel)
+      {  // ei tarvitse muuta kuin alkaa etsim‰‰n seuraavaa leveli‰
+      }
+      else
+      {
+        double diff1 = ::fabs(currentMainLevel - p1);
+        double diff2 = ::fabs(currentMainLevel - p2);
+        if (diff1 < diff2)
+        {
+          (*last).second.itsPressure = currentMainLevel;
+          InsertLevelData(resultLevels, (*last).second);
+        }
+        else
+        {
+          (*it).second.itsPressure = currentMainLevel;
+          InsertLevelData(resultLevels, (*it).second);
+        }
+      }
+      theLevels.Next();
+      currentMainLevel = static_cast<double>(theLevels.Level()->LevelValue());
+    }
+    double z1 = (*last).second.itsHeight;
+    int zFix = static_cast<int>(z1 / 1000.);
+    double z2 = (*it).second.itsHeight;
+    double T1 = (*last).second.itsTemperature;
+    double T2 = (*it).second.itsTemperature;
+    T_Dircounter++;
+    if (T1 >= T2)
+      currentTemperatureDir = -1;
+    else
+      currentTemperatureDir = 1;
+    if (lastTemperatureDir != currentTemperatureDir && T_Dircounter > minDirCounter + zFix)
+    {
+      T_Dircounter = 0;
+      InsertLevelData(resultLevels,
+                      (*last).second);  // jos l‰mpˆtilan suunta vaihtuu, laitetaan leveli talteen
+    }
 
-		double Td1 = (*last).second.itsDewPoint;
-		double Td2 = (*it).second.itsDewPoint;
-		Td_Dircounter++;
-		if(Td1 >= Td2)
-			currentDewPointDir = -1;
-		else
-			currentDewPointDir = 1;
-		if(lastDewPointDir != currentDewPointDir && Td_Dircounter > (minDirCounter+zFix)*3)
-		{
-			Td_Dircounter = 0;
-			InsertLevelData(resultLevels, (*last).second); // jos kastepisteen suunta vaihtuu, laitetaan leveli talteen
-		}
-		if(z1 != z2)
-		{
-			currentTZRatio = (T2-T1)/(z2-z1);
-			if(::fabs(currentTZRatio - lastTZRatio) > 0.22)
-			{
-				InsertLevelData(resultLevels, (*last).second); // jos l‰mpˆtilan 'kulmakerroin' muuttuu tarpeeksi, laitetaan leveli talteen
-				lastTZRatio = currentTZRatio;
-			}
-			currentTdZRatio = (Td2-Td1)/(z2-z1);
-			if(::fabs(currentTdZRatio - lastTdZRatio) > 0.22)
-			{
-				InsertLevelData(resultLevels, (*last).second); // jos l‰mpˆtilan 'kulmakerroin' muuttuu tarpeeksi, laitetaan leveli talteen
-				lastTdZRatio = currentTdZRatio;
-			}
-		}
+    double Td1 = (*last).second.itsDewPoint;
+    double Td2 = (*it).second.itsDewPoint;
+    Td_Dircounter++;
+    if (Td1 >= Td2)
+      currentDewPointDir = -1;
+    else
+      currentDewPointDir = 1;
+    if (lastDewPointDir != currentDewPointDir && Td_Dircounter > (minDirCounter + zFix) * 3)
+    {
+      Td_Dircounter = 0;
+      InsertLevelData(resultLevels,
+                      (*last).second);  // jos kastepisteen suunta vaihtuu, laitetaan leveli talteen
+    }
+    if (z1 != z2)
+    {
+      currentTZRatio = (T2 - T1) / (z2 - z1);
+      if (::fabs(currentTZRatio - lastTZRatio) > 0.22)
+      {
+        InsertLevelData(resultLevels, (*last).second);  // jos l‰mpˆtilan 'kulmakerroin' muuttuu
+                                                        // tarpeeksi, laitetaan leveli talteen
+        lastTZRatio = currentTZRatio;
+      }
+      currentTdZRatio = (Td2 - Td1) / (z2 - z1);
+      if (::fabs(currentTdZRatio - lastTdZRatio) > 0.22)
+      {
+        InsertLevelData(resultLevels, (*last).second);  // jos l‰mpˆtilan 'kulmakerroin' muuttuu
+                                                        // tarpeeksi, laitetaan leveli talteen
+        lastTdZRatio = currentTdZRatio;
+      }
+    }
 
-	}while(it != endIt);
-	InsertLevelData(resultLevels, (*it).second); // viimeinen leveli laitetaan aina
-	itsLevels = resultLevels;
+  } while (it != endIt);
+  InsertLevelData(resultLevels, (*it).second);  // viimeinen leveli laitetaan aina
+  itsLevels = resultLevels;
 }
 
 // Saa A,B,C ja D koodit. Tarkistaa ne ja purkaa. Palauttaa luvun, joka kertoo kuinka monta
 // osaa kelpasi (eli oli samalta asemalta, samaan aikaan jne. )
-int NFmiTEMPCode::InsertCodeStrings(const std::string &theCodeAStr, const std::string &theCodeBStr, const std::string &theCodeCStr, const std::string &theCodeDStr, bool fNoEqualSignInCode)
+int NFmiTEMPCode::InsertCodeStrings(const std::string &theCodeAStr,
+                                    const std::string &theCodeBStr,
+                                    const std::string &theCodeCStr,
+                                    const std::string &theCodeDStr,
+                                    bool fNoEqualSignInCode)
 {
-	std::string ttStr;
-	if(fNoEqualSignInCode)
-		ttStr = "TT";
-	itsOriginalCodeAStr = ttStr + theCodeAStr;
-	itsOriginalCodeBStr = ttStr + theCodeBStr;
-	itsOriginalCodeCStr = ttStr + theCodeCStr;
-	itsOriginalCodeDStr = ttStr + theCodeDStr;
-	fTempMobil = false;
-	itsLevels.clear();
+  std::string ttStr;
+  if (fNoEqualSignInCode) ttStr = "TT";
+  itsOriginalCodeAStr = ttStr + theCodeAStr;
+  itsOriginalCodeBStr = ttStr + theCodeBStr;
+  itsOriginalCodeCStr = ttStr + theCodeCStr;
+  itsOriginalCodeDStr = ttStr + theCodeDStr;
+  fTempMobil = false;
+  itsLevels.clear();
 
-	return Decode();
+  return Decode();
 }
 
 int NFmiTEMPCode::Decode(void)
 {
-	int tempCount = 0;
-	if(DecodeA())
-	{
-		tempCount++;
-		if(DecodeB())
-		{
-			tempCount++;
-			if(DecodeC())
-			{
-				tempCount++;
-				if(DecodeD())
-				{
-					tempCount++;
-				}
-			}
-		}
-	}
-//	SortLevels();
-	return tempCount;
+  int tempCount = 0;
+  if (DecodeA())
+  {
+    tempCount++;
+    if (DecodeB())
+    {
+      tempCount++;
+      if (DecodeC())
+      {
+        tempCount++;
+        if (DecodeD())
+        {
+          tempCount++;
+        }
+      }
+    }
+  }
+  //	SortLevels();
+  return tempCount;
 }
 
-template<typename T>
+template <typename T>
 static T GetValue(const std::string &theValueStr)
 {
-	std::string tmpStr(theValueStr);
-	NFmiStringTools::LowerCase(tmpStr);
+  std::string tmpStr(theValueStr);
+  NFmiStringTools::LowerCase(tmpStr);
 
-	if(tmpStr != "//" && tmpStr != "xx")
-		return NFmiStringTools::Convert<T>(tmpStr);
-	else
-		return static_cast<T>(kFloatMissing);
+  if (tmpStr != "//" && tmpStr != "xx")
+    return NFmiStringTools::Convert<T>(tmpStr);
+  else
+    return static_cast<T>(kFloatMissing);
 }
 
 // laskee TnTnTanDnDn ryhm‰st‰ T:n ja Td:n. Palauttaa false jos jokin pieless‰
 static bool GetTandTd(const std::string &theTnTnTanDnDn_str, double &T, double &Td)
 {
-	T = kFloatMissing;
-	Td = kFloatMissing;
-	if(theTnTnTanDnDn_str == "/////")
-		return true; // ok, palautetaan puuttuvat arvot
+  T = kFloatMissing;
+  Td = kFloatMissing;
+  if (theTnTnTanDnDn_str == "/////") return true;  // ok, palautetaan puuttuvat arvot
 
-	std::string TnTn_str(theTnTnTanDnDn_str.begin(), theTnTnTanDnDn_str.begin()+2);
-	double TintPart = ::GetValue<double>(TnTn_str);
-	std::string Tan_str(theTnTnTanDnDn_str.begin()+2, theTnTnTanDnDn_str.begin()+3);
-	int TdecimalPart = ::GetValue<int>(Tan_str);
-	std::string DD_str(theTnTnTanDnDn_str.begin()+3, theTnTnTanDnDn_str.begin()+5);
-	double TdDiff = ::GetValue<double>(DD_str);
+  std::string TnTn_str(theTnTnTanDnDn_str.begin(), theTnTnTanDnDn_str.begin() + 2);
+  double TintPart = ::GetValue<double>(TnTn_str);
+  std::string Tan_str(theTnTnTanDnDn_str.begin() + 2, theTnTnTanDnDn_str.begin() + 3);
+  int TdecimalPart = ::GetValue<int>(Tan_str);
+  std::string DD_str(theTnTnTanDnDn_str.begin() + 3, theTnTnTanDnDn_str.begin() + 5);
+  double TdDiff = ::GetValue<double>(DD_str);
 
-	if(TintPart != kFloatMissing && TdecimalPart != kFloatMissing)
-	{
-		if(TdecimalPart % 2 == 0) // jos parillinen
-			T = TintPart + TdecimalPart/10.;
-		else
-			T = -(TintPart + TdecimalPart/10.);
-	}
+  if (TintPart != kFloatMissing && TdecimalPart != kFloatMissing)
+  {
+    if (TdecimalPart % 2 == 0)  // jos parillinen
+      T = TintPart + TdecimalPart / 10.;
+    else
+      T = -(TintPart + TdecimalPart / 10.);
+  }
 
-	if(T != kFloatMissing && TdDiff != kFloatMissing)
-	{
-		if(TdDiff <= 50)
-			Td = T - TdDiff/10.;
-		else if(TdDiff >= 56)
-			Td = T - (TdDiff-50.);
-		else
-			return false;
-	}
+  if (T != kFloatMissing && TdDiff != kFloatMissing)
+  {
+    if (TdDiff <= 50)
+      Td = T - TdDiff / 10.;
+    else if (TdDiff >= 56)
+      Td = T - (TdDiff - 50.);
+    else
+      return false;
+  }
 
-	return true;
+  return true;
 }
 
 static bool GetWDandWS(const std::string &thedddff_Str, double &WD, double &WS, bool fConvertKt2Ms)
 {
-	WD = kFloatMissing;
-	WS = kFloatMissing;
-	if(thedddff_Str == "/////")
-		return true; // ok, palautetaan puuttuvat arvot
+  WD = kFloatMissing;
+  WS = kFloatMissing;
+  if (thedddff_Str == "/////") return true;  // ok, palautetaan puuttuvat arvot
 
-	// HUOM! jos tuulen suunta tai nopeus puuttuu, niit‰ voisi hanskata paremmin ja laskea toisen vaikka
-	// toinen puuttuisi, nyt molemmat puuttuviksi jos toinen puuttuu (tuuliviiri‰ ei saa kuitenkaan piirretyksi)
-	std::string ddd_str(thedddff_Str.begin(), thedddff_Str.begin()+3);
-	int WDtmp = static_cast<int>(kFloatMissing);
-	if(ddd_str.find('/') == std::string::npos)
-		WDtmp = ::GetValue<int>(ddd_str);
-	std::string ff_str(thedddff_Str.begin()+3, thedddff_Str.begin()+5);
-	double WStmp = kFloatMissing;
-	if(ff_str.find('/') == std::string::npos)
-		WStmp = ::GetValue<double>(ff_str);
+  // HUOM! jos tuulen suunta tai nopeus puuttuu, niit‰ voisi hanskata paremmin ja laskea toisen
+  // vaikka
+  // toinen puuttuisi, nyt molemmat puuttuviksi jos toinen puuttuu (tuuliviiri‰ ei saa kuitenkaan
+  // piirretyksi)
+  std::string ddd_str(thedddff_Str.begin(), thedddff_Str.begin() + 3);
+  int WDtmp = static_cast<int>(kFloatMissing);
+  if (ddd_str.find('/') == std::string::npos) WDtmp = ::GetValue<int>(ddd_str);
+  std::string ff_str(thedddff_Str.begin() + 3, thedddff_Str.begin() + 5);
+  double WStmp = kFloatMissing;
+  if (ff_str.find('/') == std::string::npos) WStmp = ::GetValue<double>(ff_str);
 
-	if(WDtmp != kFloatMissing && WStmp != kFloatMissing)
-	{
-		if(WDtmp % 10 == 0 || WDtmp % 5 == 0) // jos loppuu 0:aan tai 5:een
-		{
-			WD = WDtmp;
-			WS = WStmp;
-		}
-		else
-		{
-			WD = WDtmp-1;
-			WS = (WStmp+100)/2; // kt -> m/s konversio nyt jaetaan 2:lla!!!!!
-		}
-		if(fConvertKt2Ms)
-			WS = WS / 2.0; // 1.94384; // muunnetaan solmut -> m/s
-	}
+  if (WDtmp != kFloatMissing && WStmp != kFloatMissing)
+  {
+    if (WDtmp % 10 == 0 || WDtmp % 5 == 0)  // jos loppuu 0:aan tai 5:een
+    {
+      WD = WDtmp;
+      WS = WStmp;
+    }
+    else
+    {
+      WD = WDtmp - 1;
+      WS = (WStmp + 100) / 2;  // kt -> m/s konversio nyt jaetaan 2:lla!!!!!
+    }
+    if (fConvertKt2Ms) WS = WS / 2.0;  // 1.94384; // muunnetaan solmut -> m/s
+  }
 
-	return true;
+  return true;
 }
 
 static double GetMainPressureLevel(int thePident)
 {
-	switch(thePident)
-	{
-	case 0:
-		return 1000;
-	case 92:
-		return 925;
-	case 85:
-		return 850;
-	case 70:
-		return 700;
-	case 50:
-		return 500;
-	case 40:
-		return 400;
-	case 30:
-		return 300;
-	case 25:
-		return 250;
-	case 20:
-		return 200;
-	case 15:
-		return 150;
-	case 10:
-		return 100;
-	default:
-		return kFloatMissing;
-	}
+  switch (thePident)
+  {
+    case 0:
+      return 1000;
+    case 92:
+      return 925;
+    case 85:
+      return 850;
+    case 70:
+      return 700;
+    case 50:
+      return 500;
+    case 40:
+      return 400;
+    case 30:
+      return 300;
+    case 25:
+      return 250;
+    case 20:
+      return 200;
+    case 15:
+      return 150;
+    case 10:
+      return 100;
+    default:
+      return kFloatMissing;
+  }
 }
 
 static double GetMainPressureHeight(int thePident, int theH)
 {
-	switch(thePident)
-	{
-	case 0:
-		return theH;
-	case 92:
-		return theH < 300 ? theH+1000 : theH;
-	case 85:
-		return theH+1000;
-	case 70:
-		return theH > 500 ? theH+2000 : theH+3000;
-	case 50:
-		return theH*10;
-	case 40:
-		return theH*10;
-	case 30:
-		return theH > 300 ? theH*10 : (theH+1000)*10;
-	case 25:
-		return theH > 300 ? theH*10 : (theH+1000)*10;
-	case 20:
-		return theH > 300 ? theH*10 : (theH+1000)*10;
-	case 15:
-		return (theH+1000)*10;
-	case 10:
-		return (theH+1000)*10;
-	default:
-		return kFloatMissing;
-	}
+  switch (thePident)
+  {
+    case 0:
+      return theH;
+    case 92:
+      return theH < 300 ? theH + 1000 : theH;
+    case 85:
+      return theH + 1000;
+    case 70:
+      return theH > 500 ? theH + 2000 : theH + 3000;
+    case 50:
+      return theH * 10;
+    case 40:
+      return theH * 10;
+    case 30:
+      return theH > 300 ? theH * 10 : (theH + 1000) * 10;
+    case 25:
+      return theH > 300 ? theH * 10 : (theH + 1000) * 10;
+    case 20:
+      return theH > 300 ? theH * 10 : (theH + 1000) * 10;
+    case 15:
+      return (theH + 1000) * 10;
+    case 10:
+      return (theH + 1000) * 10;
+    default:
+      return kFloatMissing;
+  }
 }
 
 static bool GetPandH(const std::string &thePPhhh_Str, double &P, double &h)
 {
-	P = kFloatMissing;
-	h = kFloatMissing;
+  P = kFloatMissing;
+  h = kFloatMissing;
 
-	std::string PP_str(thePPhhh_Str.begin(), thePPhhh_Str.begin()+2);
-	double PPtmp = ::GetValue<double>(PP_str);
-	std::string hhh_str(thePPhhh_Str.begin()+2, thePPhhh_Str.begin()+5);
-	double hhhtmp = ::GetValue<double>(hhh_str);
+  std::string PP_str(thePPhhh_Str.begin(), thePPhhh_Str.begin() + 2);
+  double PPtmp = ::GetValue<double>(PP_str);
+  std::string hhh_str(thePPhhh_Str.begin() + 2, thePPhhh_Str.begin() + 5);
+  double hhhtmp = ::GetValue<double>(hhh_str);
 
-	if(PPtmp != kFloatMissing)
-		P = ::GetMainPressureLevel(static_cast<int>(PPtmp));
-	if(P != kFloatMissing && hhhtmp != kFloatMissing)
-		h = ::GetMainPressureHeight(static_cast<int>(PPtmp), static_cast<int>(hhhtmp));
+  if (PPtmp != kFloatMissing) P = ::GetMainPressureLevel(static_cast<int>(PPtmp));
+  if (P != kFloatMissing && hhhtmp != kFloatMissing)
+    h = ::GetMainPressureHeight(static_cast<int>(PPtmp), static_cast<int>(hhhtmp));
 
-	return true;
+  return true;
 }
 
-static bool DecodeHeader(std::stringstream &ssin, NFmiStation &theStation, NFmiMetTime &theTime, bool &fTempMobil, char theWantedSectionChar, bool fInitializeValues, NFmiAviationStationInfoSystem *theTempStations, const NFmiPoint &theUnknownStationLocation, bool &fConvertKt2Ms)
+static bool DecodeHeader(std::stringstream &ssin,
+                         NFmiStation &theStation,
+                         NFmiMetTime &theTime,
+                         bool &fTempMobil,
+                         char theWantedSectionChar,
+                         bool fInitializeValues,
+                         NFmiAviationStationInfoSystem *theTempStations,
+                         const NFmiPoint &theUnknownStationLocation,
+                         bool &fConvertKt2Ms)
 {
-	std::string first_Str; // esim. "USFI99"
-	ssin >> first_Str;
-    if(first_Str.size() != 6 && std::isdigit(first_Str[0]))
-    	ssin >> first_Str; // joskus 1. stringin‰ on pitk‰ luku kutem esim. 0000034101 tai lyhyt luku kuten 999, t‰m‰ pit‰‰ ohittaa
-	bool wyoming_raw_data = false;
-	if(::toupper(first_Str[0]) == 'T' && ::toupper(first_Str[1]) == 'T') // wyoming raw data alkaa TTAA, TTBB jne. osioilla
-		wyoming_raw_data = true;
-	NFmiStation station;
-	if(wyoming_raw_data == false)
-	{
-		std::string icao_Str; // esim. "EFKL"
-		ssin >> icao_Str;
-		station.SetName(icao_Str);
-		std::string third_Str; // esim. "140200"
-		ssin >> third_Str;
-	}
+  std::string first_Str;  // esim. "USFI99"
+  ssin >> first_Str;
+  if (first_Str.size() != 6 && std::isdigit(first_Str[0]))
+    ssin >> first_Str;  // joskus 1. stringin‰ on pitk‰ luku kutem esim. 0000034101 tai lyhyt luku
+                        // kuten 999, t‰m‰ pit‰‰ ohittaa
+  bool wyoming_raw_data = false;
+  if (::toupper(first_Str[0]) == 'T' &&
+      ::toupper(first_Str[1]) == 'T')  // wyoming raw data alkaa TTAA, TTBB jne. osioilla
+    wyoming_raw_data = true;
+  NFmiStation station;
+  if (wyoming_raw_data == false)
+  {
+    std::string icao_Str;  // esim. "EFKL"
+    ssin >> icao_Str;
+    station.SetName(icao_Str);
+    std::string third_Str;  // esim. "140200"
+    ssin >> third_Str;
+  }
 
-	std::string MiMiMjMj_Str;
-	if(wyoming_raw_data)
-		MiMiMjMj_Str = first_Str;
-	else
+  std::string MiMiMjMj_Str;
+  if (wyoming_raw_data)
+    MiMiMjMj_Str = first_Str;
+  else
+  {
+    ssin >> MiMiMjMj_Str;
+    if (MiMiMjMj_Str.size() != 4 && MiMiMjMj_Str.size() > 0 && std::isalpha(MiMiMjMj_Str[0]) &&
+        MiMiMjMj_Str[0] != 'T')
+      ssin >> MiMiMjMj_Str;  // joskus voi olla esim. RRB sana ennen TTxx -stringi‰, t‰llˆin vain
+                             // luetaan seuraava sana
+  }
+  if (MiMiMjMj_Str.size() != 4) return false;
+  bool doTempMobil = false;  // jos false, normaali TEMP, muuten TEMP MOBIL
+  bool doShip = false;  // jos false, normaali TEMP, muuten TEMP MOBIL, joka on aseman korkeus info
+                        // muuten sama kuin MOBIL
+  if (::toupper(MiMiMjMj_Str[0]) == 'I' &&
+      ::toupper(MiMiMjMj_Str[1]) == 'I')  // jos stringi muotoa II?? on kyseess‰ TEMP MOBIL
+    doTempMobil = true;
+  else if (::toupper(MiMiMjMj_Str[0]) == 'U' &&
+           ::toupper(MiMiMjMj_Str[1]) == 'U')  // jos stringi muotoa UU?? on kyseess‰ SHIP, joka on
+                                               // samanlainen kuin TEMP MOBIL
+  {
+    doTempMobil = true;
+    doShip = true;
+  }
+  if (fInitializeValues)
+    fTempMobil = doTempMobil;  // A-osiossa vain talletetaan onko mobiili temp kyseess‰
+  else
+  {  // tarkistetaan ett‰ sama temp tyyppi, kuin A-osiossa ollut
+    if (fTempMobil != doTempMobil) return false;  // pit‰isi heitt‰‰ poikkeus!!
+  }
+
+  if (::toupper(MiMiMjMj_Str[2]) == theWantedSectionChar &&
+      ::toupper(MiMiMjMj_Str[3]) ==
+          theWantedSectionChar)  // stringin pit‰‰ olla muotoa ??AA, ??BB, ??CC tai ??DD
+  {
+    if (doTempMobil)
     {
-		ssin >> MiMiMjMj_Str;
-        if(MiMiMjMj_Str.size() != 4 && MiMiMjMj_Str.size() > 0 && std::isalpha(MiMiMjMj_Str[0]) && MiMiMjMj_Str[0] != 'T')
-    		ssin >> MiMiMjMj_Str; // joskus voi olla esim. RRB sana ennen TTxx -stringi‰, t‰llˆin vain luetaan seuraava sana
+      std::string D___D_Str;  // esim. "SA_INT"
+      ssin >> D___D_Str;
     }
-	if(MiMiMjMj_Str.size() != 4)
-		return false;
-	bool doTempMobil = false; // jos false, normaali TEMP, muuten TEMP MOBIL
-	bool doShip = false; // jos false, normaali TEMP, muuten TEMP MOBIL, joka on aseman korkeus info muuten sama kuin MOBIL
-	if(::toupper(MiMiMjMj_Str[0]) == 'I' && ::toupper(MiMiMjMj_Str[1]) == 'I') // jos stringi muotoa II?? on kyseess‰ TEMP MOBIL
-		doTempMobil = true;
-	else if(::toupper(MiMiMjMj_Str[0]) == 'U' && ::toupper(MiMiMjMj_Str[1]) == 'U') // jos stringi muotoa UU?? on kyseess‰ SHIP, joka on samanlainen kuin TEMP MOBIL
-	{
-		doTempMobil = true;
-		doShip = true;
-	}
-	if(fInitializeValues)
-		fTempMobil = doTempMobil; // A-osiossa vain talletetaan onko mobiili temp kyseess‰
-	else
-	{ // tarkistetaan ett‰ sama temp tyyppi, kuin A-osiossa ollut
-		if(fTempMobil != doTempMobil)
-			return false; // pit‰isi heitt‰‰ poikkeus!!
-	}
+    std::string YYGGId_Str;  // esim. "64022"
+    ssin >> YYGGId_Str;
+    if (YYGGId_Str.size() != 5) return false;
+    std::string dayStr(YYGGId_Str.begin(), YYGGId_Str.begin() + 2);
+    short day = NFmiStringTools::Convert<short>(dayStr);
+    if (day > 50)
+    {
+      fConvertKt2Ms = true;
+      day -= 50;  // jos havaintop‰iv‰ > 50, on tuulen nopeus solmuissa (v‰henn‰ myˆs se 50 ett‰
+                  // saat p‰iv‰n)
+    }
+    NFmiMetTime tempTime;
+    if (day > tempTime.GetDay())  // pit‰‰ p‰‰tell‰ ollaanko sittenkin edellisess‰ kuukaudessa (jos
+                                  // saatu p‰iv‰ suurempi kuin nyky p‰iv‰)
+    {
+      NFmiTimePerioid moveByMonth(0, 1, 0, 0, 0, 0);
+      tempTime.PreviousMetTime(moveByMonth);
+    }
+    tempTime.SetDay(day);  // t‰m‰ on virhe altis, jos kuukaudessa ei ole n‰in monta p‰iv‰‰
+    short daysInMonth = tempTime.DaysInMonth(tempTime.GetMonth(), tempTime.GetYear());
+    if (tempTime.GetDay() > daysInMonth)  // jos ongelmia p‰ivien kanssa siirryttt‰ess‰ kuukausissa
+                                          // (esim. 31 ja kuussa ei ole kuin 30 p‰iv‰‰), laitetaan
+                                          // paiv‰ksi suurin sallittu p‰iv‰ siin‰ kuussa
+      tempTime.SetDay(daysInMonth);
 
-	if(::toupper(MiMiMjMj_Str[2]) == theWantedSectionChar && ::toupper(MiMiMjMj_Str[3]) == theWantedSectionChar) // stringin pit‰‰ olla muotoa ??AA, ??BB, ??CC tai ??DD
-	{
+    std::string hourStr(YYGGId_Str.begin() + 2, YYGGId_Str.begin() + 4);
+    short hour = NFmiStringTools::Convert<short>(hourStr);  // UTC aikaa t‰m‰ havainto tunti
+    tempTime.SetHour(hour);
+    if (fInitializeValues)
+      theTime = tempTime;  // A-osiossa vain talletetaan aika
+    else
+    {                                         // tarkistetaan ett‰ sama aika, kuin A-osiossa ollut
+      if (theTime != tempTime) return false;  // pit‰isi heitt‰‰ poikkeus!!
+    }
 
-		if(doTempMobil)
-		{
-			std::string D___D_Str; // esim. "SA_INT"
-			ssin >> D___D_Str;
-		}
-		std::string YYGGId_Str; // esim. "64022"
-		ssin >> YYGGId_Str;
-		if(YYGGId_Str.size() != 5)
-			return false;
-		std::string dayStr(YYGGId_Str.begin(), YYGGId_Str.begin()+2);
-		short day = NFmiStringTools::Convert<short>(dayStr);
-		if(day > 50)
-		{
-			fConvertKt2Ms = true;
-			day -= 50; // jos havaintop‰iv‰ > 50, on tuulen nopeus solmuissa (v‰henn‰ myˆs se 50 ett‰ saat p‰iv‰n)
-		}
-		NFmiMetTime tempTime;
-		if(day > tempTime.GetDay()) // pit‰‰ p‰‰tell‰ ollaanko sittenkin edellisess‰ kuukaudessa (jos saatu p‰iv‰ suurempi kuin nyky p‰iv‰)
-		{
-			NFmiTimePerioid moveByMonth(0, 1, 0, 0, 0, 0);
-			tempTime.PreviousMetTime(moveByMonth);
-		}
-		tempTime.SetDay(day); // t‰m‰ on virhe altis, jos kuukaudessa ei ole n‰in monta p‰iv‰‰
-		short daysInMonth = tempTime.DaysInMonth(tempTime.GetMonth(), tempTime.GetYear());
-		if(tempTime.GetDay() > daysInMonth) // jos ongelmia p‰ivien kanssa siirryttt‰ess‰ kuukausissa (esim. 31 ja kuussa ei ole kuin 30 p‰iv‰‰), laitetaan paiv‰ksi suurin sallittu p‰iv‰ siin‰ kuussa
-			tempTime.SetDay(daysInMonth);
+    if (doTempMobil)
+    {
+      std::string _99LaLaLa_Str;  // esim. "99613" // muuttujassa alaviiva alku, koska numero ei voi
+                                  // aloittaa muuttujaa
+      ssin >> _99LaLaLa_Str;
+      if (_99LaLaLa_Str.size() != 5) return false;
+      double lat = NFmiStringTools::Convert<double>(
+          std::string(_99LaLaLa_Str.begin() + 2, _99LaLaLa_Str.begin() + 4));
+      double latTenth = NFmiStringTools::Convert<double>(
+                            std::string(_99LaLaLa_Str.begin() + 4, _99LaLaLa_Str.begin() + 5)) /
+                        6.;
+      lat += latTenth;
+      std::string QcLoLoLoLo_Str;  // esim. "10280"
+      ssin >> QcLoLoLoLo_Str;
+      if (QcLoLoLoLo_Str.size() != 5) return false;
+      double lon = NFmiStringTools::Convert<double>(
+          std::string(QcLoLoLoLo_Str.begin() + 1, QcLoLoLoLo_Str.begin() + 4));
+      double lonTenth = NFmiStringTools::Convert<double>(
+                            std::string(QcLoLoLoLo_Str.begin() + 4, QcLoLoLoLo_Str.begin() + 5)) /
+                        6.;
+      lon += lonTenth;
+      std::string MMMUlaUlo_Str;  // esim. "25018"
+      ssin >> MMMUlaUlo_Str;
+      if (doShip == false)
+      {                              // luetaan aseman korkeus vain MOBIL sanomille, ei SHIP:eille
+        std::string h0h0h0h0im_Str;  // esim. "01152"
+        ssin >> h0h0h0h0im_Str;
+      }
+      station.SetLatitude(lat);
+      station.SetLongitude(lon);
+    }
+    else  // luetaan aseman id-stringi
+    {
+      std::string IIiii_Str;  // IIiii asematunnuskoodi esim. "02963" II on alue koodi ja 963 on
+                              // asema tunnus
+      ssin >> IIiii_Str;
+      if (IIiii_Str.size() != 5) return false;
 
-		std::string hourStr(YYGGId_Str.begin()+2, YYGGId_Str.begin()+4);
-		short hour = NFmiStringTools::Convert<short>(hourStr); // UTC aikaa t‰m‰ havainto tunti
-		tempTime.SetHour(hour);
-		if(fInitializeValues)
-			theTime = tempTime; // A-osiossa vain talletetaan aika
-		else
-		{ // tarkistetaan ett‰ sama aika, kuin A-osiossa ollut
-			if(theTime != tempTime)
-				return false; // pit‰isi heitt‰‰ poikkeus!!
-		}
+      // HUOM! t‰ss‰ pit‰isi olla joku asema tietokanta k‰ytˆss‰, mist‰ saisi aseman sijainnin
+      unsigned long stationId = NFmiStringTools::Convert<unsigned long>(IIiii_Str);
+      NFmiAviationStation *tempStation =
+          theTempStations ? theTempStations->FindStation(stationId) : 0;
+      if (tempStation)
+      {
+        station = NFmiStation(*tempStation);
+      }
+      else if (theUnknownStationLocation != NFmiPoint::gMissingLatlon)
+      {
+        station.SetLatitude(theUnknownStationLocation.Y());
+        station.SetLongitude(theUnknownStationLocation.X());
+        station.SetName(IIiii_Str);
+      }
+      else
+        return false;  // ei lˆytynyt asemaa asemalistasta, ja unknown-asema oli
+                       // "missing"-lokaatiossa, hyl‰t‰‰n sanoma kokonaan
+    }
 
-		if(doTempMobil)
-		{
-			std::string _99LaLaLa_Str; // esim. "99613" // muuttujassa alaviiva alku, koska numero ei voi aloittaa muuttujaa
-			ssin >> _99LaLaLa_Str;
-			if(_99LaLaLa_Str.size() != 5)
-				return false;
-			double lat = NFmiStringTools::Convert<double>(std::string(_99LaLaLa_Str.begin()+2, _99LaLaLa_Str.begin()+4));
-			double latTenth = NFmiStringTools::Convert<double>(std::string(_99LaLaLa_Str.begin()+4, _99LaLaLa_Str.begin()+5))/6.;
-			lat += latTenth;
-			std::string QcLoLoLoLo_Str; // esim. "10280"
-			ssin >> QcLoLoLoLo_Str;
-			if(QcLoLoLoLo_Str.size() != 5)
-				return false;
-			double lon = NFmiStringTools::Convert<double>(std::string(QcLoLoLoLo_Str.begin()+1, QcLoLoLoLo_Str.begin()+4));
-			double lonTenth = NFmiStringTools::Convert<double>(std::string(QcLoLoLoLo_Str.begin()+4, QcLoLoLoLo_Str.begin()+5))/6.;
-			lon += lonTenth;
-			std::string MMMUlaUlo_Str; // esim. "25018"
-			ssin >> MMMUlaUlo_Str;
-			if(doShip == false)
-			{ // luetaan aseman korkeus vain MOBIL sanomille, ei SHIP:eille
-				std::string h0h0h0h0im_Str; // esim. "01152"
-				ssin >> h0h0h0h0im_Str;
-			}
-			station.SetLatitude(lat);
-			station.SetLongitude(lon);
-		}
-		else // luetaan aseman id-stringi
-		{
-			std::string IIiii_Str; // IIiii asematunnuskoodi esim. "02963" II on alue koodi ja 963 on asema tunnus
-			ssin >> IIiii_Str;
-			if(IIiii_Str.size() != 5)
-				return false;
-
-			// HUOM! t‰ss‰ pit‰isi olla joku asema tietokanta k‰ytˆss‰, mist‰ saisi aseman sijainnin
-			unsigned long stationId = NFmiStringTools::Convert<unsigned long>(IIiii_Str);
-			NFmiAviationStation *tempStation = theTempStations ? theTempStations->FindStation(stationId) : 0;
-			if(tempStation)
-			{
-				station = NFmiStation(*tempStation);
-			}
-			else if(theUnknownStationLocation != NFmiPoint::gMissingLatlon)
-			{
-				station.SetLatitude(theUnknownStationLocation.Y());
-				station.SetLongitude(theUnknownStationLocation.X());
-				station.SetName(IIiii_Str);
-			}
-			else 
-				return false; // ei lˆytynyt asemaa asemalistasta, ja unknown-asema oli "missing"-lokaatiossa, hyl‰t‰‰n sanoma kokonaan
-		}
-
-		if(fInitializeValues)
-			theStation = station; // A-osiossa vain talletetaan aika
-		else
-		{ // tarkistetaan ett‰ sama asema, kuin A-osiossa ollut
-			if(theStation != station)
-				return false; // pit‰isi heitt‰‰ poikkeus!!
-		}
-		return true;
-	}
-	return false;
+    if (fInitializeValues)
+      theStation = station;  // A-osiossa vain talletetaan aika
+    else
+    {  // tarkistetaan ett‰ sama asema, kuin A-osiossa ollut
+      if (theStation != station) return false;  // pit‰isi heitt‰‰ poikkeus!!
+    }
+    return true;
+  }
+  return false;
 }
 
 bool NFmiTEMPCode::DecodeA(void)
 {
-	bool fConvertKt2Ms = false;
-	std::stringstream ssin(itsOriginalCodeAStr);
-	if(::DecodeHeader(ssin, itsStation, itsTime, fTempMobil, 'A', true, itsTempStations, itsUnknownStationLocation, fConvertKt2Ms))
-	{
-		if(ssin.good())
-		{
-			std::string _99PPP_Str;
-			std::string PnPnhnhnhn_Str;
-			std::string TTTaDD_Str;
-			std::string dddff_Str;
-			ssin >> _99PPP_Str;
-			if(_99PPP_Str.size() != 5)
-				return false;
-			ssin >> TTTaDD_Str;
-			if(TTTaDD_Str.size() != 5)
-				return false;
-			ssin >> dddff_Str;
-			if(dddff_Str.size() != 5)
-				return false;
-			if(std::string(_99PPP_Str.begin(), _99PPP_Str.begin()+2) == "99") // tarkistetaan ett‰ 99-taikasana lˆytyy
-			{
-				double surfPressure = NFmiStringTools::Convert<double>(std::string(_99PPP_Str.begin()+2, _99PPP_Str.begin()+5));
-				if(surfPressure < 100.)
-					surfPressure += 1000.;
-				double T = kFloatMissing;
-				double Td = kFloatMissing;
-				bool status = ::GetTandTd(TTTaDD_Str, T, Td);
-				double WD = kFloatMissing;
-				double WS = kFloatMissing;
-				status &= ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
-				TEMPLevelData levelData;
-				levelData.Clear();
-				levelData.itsTemperature = T;
-				levelData.itsDewPoint = Td;
-				levelData.itsWD = WD;
-				levelData.itsWS = WS;
-				levelData.itsPressure = surfPressure;
-				levelData.itsHeight = kFloatMissing; // pit‰isikˆ t‰h‰n laittaa asema korkeus?!?!?
-				AddData(levelData); // laitetaan saatu leveli talteen
+  bool fConvertKt2Ms = false;
+  std::stringstream ssin(itsOriginalCodeAStr);
+  if (::DecodeHeader(ssin,
+                     itsStation,
+                     itsTime,
+                     fTempMobil,
+                     'A',
+                     true,
+                     itsTempStations,
+                     itsUnknownStationLocation,
+                     fConvertKt2Ms))
+  {
+    if (ssin.good())
+    {
+      std::string _99PPP_Str;
+      std::string PnPnhnhnhn_Str;
+      std::string TTTaDD_Str;
+      std::string dddff_Str;
+      ssin >> _99PPP_Str;
+      if (_99PPP_Str.size() != 5) return false;
+      ssin >> TTTaDD_Str;
+      if (TTTaDD_Str.size() != 5) return false;
+      ssin >> dddff_Str;
+      if (dddff_Str.size() != 5) return false;
+      if (std::string(_99PPP_Str.begin(), _99PPP_Str.begin() + 2) ==
+          "99")  // tarkistetaan ett‰ 99-taikasana lˆytyy
+      {
+        double surfPressure = NFmiStringTools::Convert<double>(
+            std::string(_99PPP_Str.begin() + 2, _99PPP_Str.begin() + 5));
+        if (surfPressure < 100.) surfPressure += 1000.;
+        double T = kFloatMissing;
+        double Td = kFloatMissing;
+        bool status = ::GetTandTd(TTTaDD_Str, T, Td);
+        double WD = kFloatMissing;
+        double WS = kFloatMissing;
+        status &= ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
+        TEMPLevelData levelData;
+        levelData.Clear();
+        levelData.itsTemperature = T;
+        levelData.itsDewPoint = Td;
+        levelData.itsWD = WD;
+        levelData.itsWS = WS;
+        levelData.itsPressure = surfPressure;
+        levelData.itsHeight = kFloatMissing;  // pit‰isikˆ t‰h‰n laittaa asema korkeus?!?!?
+        AddData(levelData);                   // laitetaan saatu leveli talteen
 
-				double P = kFloatMissing;
-				double h = kFloatMissing;
-				// ok 1. level on hoidettu, sitten aletaan k‰ym‰‰n dataa l‰pi loopissa
-				ssin >> PnPnhnhnhn_Str;
-				std::string PnPn_Str(PnPnhnhnhn_Str.begin(), PnPnhnhnhn_Str.begin()+2);
-				bool stopAfterThis = false;
-				while(ssin.good() && stopAfterThis == false)
-				{
-					P = kFloatMissing;
-					h = kFloatMissing;
-					T = kFloatMissing;
-					Td = kFloatMissing;
-					WD = kFloatMissing;
-					WS = kFloatMissing;
+        double P = kFloatMissing;
+        double h = kFloatMissing;
+        // ok 1. level on hoidettu, sitten aletaan k‰ym‰‰n dataa l‰pi loopissa
+        ssin >> PnPnhnhnhn_Str;
+        std::string PnPn_Str(PnPnhnhnhn_Str.begin(), PnPnhnhnhn_Str.begin() + 2);
+        bool stopAfterThis = false;
+        while (ssin.good() && stopAfterThis == false)
+        {
+          P = kFloatMissing;
+          h = kFloatMissing;
+          T = kFloatMissing;
+          Td = kFloatMissing;
+          WD = kFloatMissing;
+          WS = kFloatMissing;
 
-					if(PnPnhnhnhn_Str.size() != 5)
-						return false;
-					if(PnPnhnhnhn_Str == "77999")
-						break; // nyt tultiin loppuun, ei ole tietoa max tuuli jutuista
-					else if(PnPnhnhnhn_Str == "88999")
-					{
-						// ei tropopaussia, ei tehd‰ mit‰‰n, jatketaan seuraavan rivin tulkkausta
-						ssin >> PnPnhnhnhn_Str; // t‰m‰ pit‰‰ lukea lopuksi, koska loopin lopetus riippuu t‰st‰
-						PnPn_Str = std::string(PnPnhnhnhn_Str.begin(), PnPnhnhnhn_Str.begin()+2);
-						continue;
-					}
-					else if(PnPn_Str == "88") // trropopaussi merkki
-					{
-						// tropo pause Pressure
-						P = NFmiStringTools::Convert<double>(std::string(PnPnhnhnhn_Str.begin()+2, PnPnhnhnhn_Str.begin()+5));
-						h = kFloatMissing;
-						ssin >> TTTaDD_Str;
-						ssin >> dddff_Str;
-					}
-					else if(PnPn_Str == "77" || PnPn_Str == "66") // max tuuli ilmoitetaan nyt ja siihen osio loppuu
-					{
-						// tropo pause Pressure
-						P = NFmiStringTools::Convert<double>(std::string(PnPnhnhnhn_Str.begin()+2, PnPnhnhnhn_Str.begin()+5));
-						h = kFloatMissing;
-						T = kFloatMissing; // t/Td kentt‰‰ ei anneta t‰ss‰ tapauksessa
-						Td = kFloatMissing;
-						TTTaDD_Str = "/////";
-						ssin >> dddff_Str;
-						stopAfterThis = true;
-					}
-					else
-					{
-						ssin >> TTTaDD_Str;
-						ssin >> dddff_Str;
-					}
+          if (PnPnhnhnhn_Str.size() != 5) return false;
+          if (PnPnhnhnhn_Str == "77999")
+            break;  // nyt tultiin loppuun, ei ole tietoa max tuuli jutuista
+          else if (PnPnhnhnhn_Str == "88999")
+          {
+            // ei tropopaussia, ei tehd‰ mit‰‰n, jatketaan seuraavan rivin tulkkausta
+            ssin >> PnPnhnhnhn_Str;  // t‰m‰ pit‰‰ lukea lopuksi, koska loopin lopetus riippuu t‰st‰
+            PnPn_Str = std::string(PnPnhnhnhn_Str.begin(), PnPnhnhnhn_Str.begin() + 2);
+            continue;
+          }
+          else if (PnPn_Str == "88")  // trropopaussi merkki
+          {
+            // tropo pause Pressure
+            P = NFmiStringTools::Convert<double>(
+                std::string(PnPnhnhnhn_Str.begin() + 2, PnPnhnhnhn_Str.begin() + 5));
+            h = kFloatMissing;
+            ssin >> TTTaDD_Str;
+            ssin >> dddff_Str;
+          }
+          else if (PnPn_Str == "77" ||
+                   PnPn_Str == "66")  // max tuuli ilmoitetaan nyt ja siihen osio loppuu
+          {
+            // tropo pause Pressure
+            P = NFmiStringTools::Convert<double>(
+                std::string(PnPnhnhnhn_Str.begin() + 2, PnPnhnhnhn_Str.begin() + 5));
+            h = kFloatMissing;
+            T = kFloatMissing;  // t/Td kentt‰‰ ei anneta t‰ss‰ tapauksessa
+            Td = kFloatMissing;
+            TTTaDD_Str = "/////";
+            ssin >> dddff_Str;
+            stopAfterThis = true;
+          }
+          else
+          {
+            ssin >> TTTaDD_Str;
+            ssin >> dddff_Str;
+          }
 
-					if(TTTaDD_Str.size() != 5)
-						return false;
-//					ssin >> dddff_Str;
-					if(dddff_Str.size() != 5)
-						return false;
+          if (TTTaDD_Str.size() != 5) return false;
+          //					ssin >> dddff_Str;
+          if (dddff_Str.size() != 5) return false;
 
-// TƒMƒ erikois kerroksien tarkastelu menee ihan pieleen
-					status &= ::GetPandH(PnPnhnhnhn_Str, P, h);
-					status &= ::GetTandTd(TTTaDD_Str, T, Td);
-					status &= ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
+          // TƒMƒ erikois kerroksien tarkastelu menee ihan pieleen
+          status &= ::GetPandH(PnPnhnhnhn_Str, P, h);
+          status &= ::GetTandTd(TTTaDD_Str, T, Td);
+          status &= ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
 
-					levelData.Clear();
-					levelData.itsPressure = P;
-					levelData.itsHeight = h;
-					levelData.itsTemperature = T;
-					levelData.itsDewPoint = Td;
-					levelData.itsWD = WD;
-					levelData.itsWS = WS;
-					AddData(levelData); // laitetaan saatu leveli talteen
+          levelData.Clear();
+          levelData.itsPressure = P;
+          levelData.itsHeight = h;
+          levelData.itsTemperature = T;
+          levelData.itsDewPoint = Td;
+          levelData.itsWD = WD;
+          levelData.itsWS = WS;
+          AddData(levelData);  // laitetaan saatu leveli talteen
 
-					ssin >> PnPnhnhnhn_Str; // t‰m‰ pit‰‰ lukea lopuksi, koska loopin lopetus riippuu t‰st‰
-					if(ssin.good() == false)
-						break;
-						//throw std::runtime_error("Data tiedostossa loppui kesken.");
-					PnPn_Str = std::string(PnPnhnhnhn_Str.begin(), PnPnhnhnhn_Str.begin()+2);
-				}
-				return true;
-			}
-		}
-	}
+          ssin >> PnPnhnhnhn_Str;  // t‰m‰ pit‰‰ lukea lopuksi, koska loopin lopetus riippuu t‰st‰
+          if (ssin.good() == false) break;
+          // throw std::runtime_error("Data tiedostossa loppui kesken.");
+          PnPn_Str = std::string(PnPnhnhnhn_Str.begin(), PnPnhnhnhn_Str.begin() + 2);
+        }
+        return true;
+      }
+    }
+  }
 
-	return false;
+  return false;
 }
 
 void NFmiTEMPCode::AddData(const TEMPLevelData &theLevelData)
 {
-	if(theLevelData.itsPressure != kFloatMissing)
-		itsLevels.insert(std::make_pair(theLevelData.itsPressure, theLevelData)); // laitetaan saatu leveli talteen
+  if (theLevelData.itsPressure != kFloatMissing)
+    itsLevels.insert(
+        std::make_pair(theLevelData.itsPressure, theLevelData));  // laitetaan saatu leveli talteen
 }
 
 bool NFmiTEMPCode::DecodeB(void)
 {
-	bool status = true;
-	bool fConvertKt2Ms = false;
-	std::stringstream ssin(itsOriginalCodeBStr);
-	if(::DecodeHeader(ssin, itsStation, itsTime, fTempMobil, 'B', false, itsTempStations, itsUnknownStationLocation, fConvertKt2Ms))
-	{
-		if(ssin.good())
-		{
-			bool _41414_groupMissing = false;
-			TEMPLevelData levelData;
-			std::string XXPPP_Str; // esim. 11PPP juttu
-			std::string TTTaDD_Str;
-			std::string dddff_Str;
-			do // K‰yd‰‰n ensin osio, miss‰ on on l‰mpˆtilojen k‰‰nnepisteet
-			{
-				double P = kFloatMissing;
-				double T = kFloatMissing;
-				double Td = kFloatMissing;
+  bool status = true;
+  bool fConvertKt2Ms = false;
+  std::stringstream ssin(itsOriginalCodeBStr);
+  if (::DecodeHeader(ssin,
+                     itsStation,
+                     itsTime,
+                     fTempMobil,
+                     'B',
+                     false,
+                     itsTempStations,
+                     itsUnknownStationLocation,
+                     fConvertKt2Ms))
+  {
+    if (ssin.good())
+    {
+      bool _41414_groupMissing = false;
+      TEMPLevelData levelData;
+      std::string XXPPP_Str;  // esim. 11PPP juttu
+      std::string TTTaDD_Str;
+      std::string dddff_Str;
+      do  // K‰yd‰‰n ensin osio, miss‰ on on l‰mpˆtilojen k‰‰nnepisteet
+      {
+        double P = kFloatMissing;
+        double T = kFloatMissing;
+        double Td = kFloatMissing;
 
-				ssin >> XXPPP_Str;
-				if(XXPPP_Str.size() != 5)
-					return false;
-				if(XXPPP_Str == "21212")
-					break; // nyt tultiin t‰m‰n osion loppuun
-				if(XXPPP_Str == "31313")
-					break; // nyt tultiin t‰m‰n osion loppuun
-				if(XXPPP_Str == "41414")
-				{
-					_41414_groupMissing = true; // en ole varma miten t‰m‰ pit‰‰ handlata kun 21212-ryhm‰ puuttuu
-					break; // nyt tultiin t‰m‰n osion loppuun
-				}
+        ssin >> XXPPP_Str;
+        if (XXPPP_Str.size() != 5) return false;
+        if (XXPPP_Str == "21212") break;  // nyt tultiin t‰m‰n osion loppuun
+        if (XXPPP_Str == "31313") break;  // nyt tultiin t‰m‰n osion loppuun
+        if (XXPPP_Str == "41414")
+        {
+          _41414_groupMissing =
+              true;  // en ole varma miten t‰m‰ pit‰‰ handlata kun 21212-ryhm‰ puuttuu
+          break;     // nyt tultiin t‰m‰n osion loppuun
+        }
 
-				std::string PPP_partStr(XXPPP_Str.begin()+2, XXPPP_Str.begin()+5);
-				if(PPP_partStr != "///") // joskus t‰m‰ voi olla puuttuvaa, skipataan vain conversio, paine j‰‰ puuttuvaksi ja kaikki t‰m‰n levelin arvot j‰‰v‰t taltioimatta
-					P = NFmiStringTools::Convert<double>(PPP_partStr);
-				if(P < 50.)
-					P += 1000.;
-				ssin >> TTTaDD_Str;
-				if(TTTaDD_Str.size() != 5)
-					return false;
-				status &= ::GetTandTd(TTTaDD_Str, T, Td);
+        std::string PPP_partStr(XXPPP_Str.begin() + 2, XXPPP_Str.begin() + 5);
+        if (PPP_partStr != "///")  // joskus t‰m‰ voi olla puuttuvaa, skipataan vain conversio,
+                                   // paine j‰‰ puuttuvaksi ja kaikki t‰m‰n levelin arvot j‰‰v‰t
+                                   // taltioimatta
+          P = NFmiStringTools::Convert<double>(PPP_partStr);
+        if (P < 50.) P += 1000.;
+        ssin >> TTTaDD_Str;
+        if (TTTaDD_Str.size() != 5) return false;
+        status &= ::GetTandTd(TTTaDD_Str, T, Td);
 
-				levelData.Clear();
-				levelData.itsPressure = P;
-				levelData.itsTemperature = T;
-				levelData.itsDewPoint = Td;
-				AddData(levelData); // laitetaan saatu leveli talteen
+        levelData.Clear();
+        levelData.itsPressure = P;
+        levelData.itsTemperature = T;
+        levelData.itsDewPoint = Td;
+        AddData(levelData);  // laitetaan saatu leveli talteen
 
-			}while(ssin.good());
+      } while (ssin.good());
 
-			if(XXPPP_Str == "21212") // etsit‰‰n vain merkitt‰vi‰ tuulia, jotka tulevat 21212-ryhm‰n j‰lkeen
+      if (XXPPP_Str ==
+          "21212")  // etsit‰‰n vain merkitt‰vi‰ tuulia, jotka tulevat 21212-ryhm‰n j‰lkeen
+      {
+        do  // on kaksi tuuli osiota, jotka molemmat k‰yd‰‰n l‰pi
+        {
+          do  // K‰yd‰‰n sitten osio, miss‰ on tuulien k‰‰nnepisteet
+          {
+            double P = kFloatMissing;
+            double WD = kFloatMissing;
+            double WS = kFloatMissing;
+
+            ssin >> XXPPP_Str;
+            if (XXPPP_Str.size() != 5) return false;
+            if (XXPPP_Str == "41414") break;  // nyt tultiin t‰m‰n osion loppuun
+            if (XXPPP_Str == "51515")         // joskus 51515 tulee ilman 41414:‰‰
             {
-			    do // on kaksi tuuli osiota, jotka molemmat k‰yd‰‰n l‰pi
-			    {
-				    do // K‰yd‰‰n sitten osio, miss‰ on tuulien k‰‰nnepisteet
-				    {
-					    double P = kFloatMissing;
-					    double WD = kFloatMissing;
-					    double WS = kFloatMissing;
-
-					    ssin >> XXPPP_Str;
-					    if(XXPPP_Str.size() != 5)
-						    return false;
-					    if(XXPPP_Str == "41414")
-						    break; // nyt tultiin t‰m‰n osion loppuun
-					    if(XXPPP_Str == "51515") // joskus 51515 tulee ilman 41414:‰‰
-					    {
-						    _41414_groupMissing = true;
-						    break; // nyt tultiin t‰m‰n osion loppuun
-					    }
-					    if(XXPPP_Str == "31313")
-					    {
-						    // en tied‰ mik‰ t‰m‰ on, mutta luetaan pois
-						    std::string tmp1, tmp2;
-						    ssin >> tmp1;
-						    ssin >> tmp2;
-						    continue; // jatketaan looppia, seuraavaksi pit‰isi tulla 41414
-					    }
-
-					    P = NFmiStringTools::Convert<double>(std::string(XXPPP_Str.begin()+2, XXPPP_Str.begin()+5));
-					    if(P < 50.)
-						    P += 1000.;
-					    ssin >> dddff_Str;
-					    if(dddff_Str.size() != 5)
-						    return false;
-					    status &= ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
-
-					    levelData.Clear();
-					    levelData.itsPressure = P;
-					    levelData.itsWD = WD;
-					    levelData.itsWS = WS;
-					    AddData(levelData); // laitetaan saatu leveli talteen
-
-				    }while(ssin.good());
-				    if(_41414_groupMissing == false)
-				    {
-					    std::string NhClCmCh_Str;
-					    ssin >> NhClCmCh_Str;
-					    std::string check_Str;
-					    ssin >> check_Str;
-					    if(check_Str != "51515")
-						    break; // 1. tuuli osion j‰lkeen kun on tultu "41414" merkkiin, on kaksi juttu jotka luetaan
-								    // toinen on synop pilvi osuus ja toinen on 51515 merkki, josta alkaa 2. tuuli osuus
-								    // jos sit‰ ei lˆydy, voidaan olettaa ett‰ ollaan menty jo sen ohi ja lopetetaan.
-				    }
-				    else
-					    _41414_groupMissing = false; // pit‰‰ 'nollata' t‰m‰ lippu jos se oli p‰‰ll‰
-			    }while(ssin.good());
+              _41414_groupMissing = true;
+              break;  // nyt tultiin t‰m‰n osion loppuun
             }
-			return true;
-		}
-	}
+            if (XXPPP_Str == "31313")
+            {
+              // en tied‰ mik‰ t‰m‰ on, mutta luetaan pois
+              std::string tmp1, tmp2;
+              ssin >> tmp1;
+              ssin >> tmp2;
+              continue;  // jatketaan looppia, seuraavaksi pit‰isi tulla 41414
+            }
 
-	return false;
+            P = NFmiStringTools::Convert<double>(
+                std::string(XXPPP_Str.begin() + 2, XXPPP_Str.begin() + 5));
+            if (P < 50.) P += 1000.;
+            ssin >> dddff_Str;
+            if (dddff_Str.size() != 5) return false;
+            status &= ::GetWDandWS(dddff_Str, WD, WS, fConvertKt2Ms);
+
+            levelData.Clear();
+            levelData.itsPressure = P;
+            levelData.itsWD = WD;
+            levelData.itsWS = WS;
+            AddData(levelData);  // laitetaan saatu leveli talteen
+
+          } while (ssin.good());
+          if (_41414_groupMissing == false)
+          {
+            std::string NhClCmCh_Str;
+            ssin >> NhClCmCh_Str;
+            std::string check_Str;
+            ssin >> check_Str;
+            if (check_Str != "51515")
+              break;  // 1. tuuli osion j‰lkeen kun on tultu "41414" merkkiin, on kaksi juttu jotka
+                      // luetaan
+            // toinen on synop pilvi osuus ja toinen on 51515 merkki, josta alkaa 2. tuuli osuus
+            // jos sit‰ ei lˆydy, voidaan olettaa ett‰ ollaan menty jo sen ohi ja lopetetaan.
+          }
+          else
+            _41414_groupMissing = false;  // pit‰‰ 'nollata' t‰m‰ lippu jos se oli p‰‰ll‰
+        } while (ssin.good());
+      }
+      return true;
+    }
+  }
+
+  return false;
 }
 
 bool NFmiTEMPCode::DecodeC(void)
 {
-	bool fConvertKt2Ms = false;
-	std::stringstream ssin(itsOriginalCodeCStr);
-	if(::DecodeHeader(ssin, itsStation, itsTime, fTempMobil, 'C', false, itsTempStations, itsUnknownStationLocation, fConvertKt2Ms))
-	{
-		if(ssin.good())
-			return true; // tarkistetaan vain ett‰ on C-osio ja sama luotaus kuin aiemmin, ei pureta viel‰ enemp‰‰
+  bool fConvertKt2Ms = false;
+  std::stringstream ssin(itsOriginalCodeCStr);
+  if (::DecodeHeader(ssin,
+                     itsStation,
+                     itsTime,
+                     fTempMobil,
+                     'C',
+                     false,
+                     itsTempStations,
+                     itsUnknownStationLocation,
+                     fConvertKt2Ms))
+  {
+    if (ssin.good())
+      return true;  // tarkistetaan vain ett‰ on C-osio ja sama luotaus kuin aiemmin, ei pureta
+                    // viel‰ enemp‰‰
 
-		// t‰h‰n loppu C-osion koodin purku
-	}
-	return false;
+    // t‰h‰n loppu C-osion koodin purku
+  }
+  return false;
 }
 
 bool NFmiTEMPCode::DecodeD(void)
 {
-	bool fConvertKt2Ms = false;
-	std::stringstream ssin(itsOriginalCodeDStr);
-	if(::DecodeHeader(ssin, itsStation, itsTime, fTempMobil, 'D', false, itsTempStations, itsUnknownStationLocation, fConvertKt2Ms))
-	{
-		if(ssin.good())
-			return true; // tarkistetaan vain ett‰ on D-osio ja sama luotaus kuin aiemmin, ei pureta viel‰ enemp‰‰
+  bool fConvertKt2Ms = false;
+  std::stringstream ssin(itsOriginalCodeDStr);
+  if (::DecodeHeader(ssin,
+                     itsStation,
+                     itsTime,
+                     fTempMobil,
+                     'D',
+                     false,
+                     itsTempStations,
+                     itsUnknownStationLocation,
+                     fConvertKt2Ms))
+  {
+    if (ssin.good())
+      return true;  // tarkistetaan vain ett‰ on D-osio ja sama luotaus kuin aiemmin, ei pureta
+                    // viel‰ enemp‰‰
 
-		// t‰h‰n loppu D-osion koodin purku
-	}
-	return false;
+    // t‰h‰n loppu D-osion koodin purku
+  }
+  return false;
 }
 
 struct LevelSorter
 {
-	bool operator()(const TEMPLevelData &theLevel1, const TEMPLevelData &theLevel2)
-	{
-		if(theLevel1.itsPressure != kFloatMissing && theLevel2.itsPressure != kFloatMissing)
-			if(theLevel1.itsPressure < theLevel2.itsPressure)
-				return true;
-		return false;
-	}
+  bool operator()(const TEMPLevelData &theLevel1, const TEMPLevelData &theLevel2)
+  {
+    if (theLevel1.itsPressure != kFloatMissing && theLevel2.itsPressure != kFloatMissing)
+      if (theLevel1.itsPressure < theLevel2.itsPressure) return true;
+    return false;
+  }
 };
 
 static NFmiTimeList MakeTimeList(std::set<NFmiMetTime> &theTimes)
 {
-	NFmiTimeList times;
-	std::set<NFmiMetTime>::iterator it = theTimes.begin();
-	for( ; it != theTimes.end(); ++it)
-		times.Add(new NFmiMetTime(*it));
-	return times;
+  NFmiTimeList times;
+  std::set<NFmiMetTime>::iterator it = theTimes.begin();
+  for (; it != theTimes.end(); ++it)
+    times.Add(new NFmiMetTime(*it));
+  return times;
 }
 
 struct TimeCollector
 {
-	void operator()(const NFmiTEMPCode &theTEMPCode)
-	{
-		itsTimes.insert(theTEMPCode.Time());
-	}
-
-	std::set<NFmiMetTime> itsTimes;
+  void operator()(const NFmiTEMPCode &theTEMPCode) { itsTimes.insert(theTEMPCode.Time()); }
+  std::set<NFmiMetTime> itsTimes;
 };
 
 struct LocationCollector
 {
-	void operator()(const NFmiTEMPCode &theTEMPCode)
-	{
-		itsLocations.insert(theTEMPCode.Station());
-	}
-
-	std::set<NFmiStation> itsLocations;
+  void operator()(const NFmiTEMPCode &theTEMPCode) { itsLocations.insert(theTEMPCode.Station()); }
+  std::set<NFmiStation> itsLocations;
 };
 
 static NFmiTimeList MakeTimeListForTEMP(std::vector<NFmiTEMPCode> &theSoundings)
 {
-	TimeCollector collector;
-	collector = std::for_each(theSoundings.begin(), theSoundings.end(), TimeCollector());
+  TimeCollector collector;
+  collector = std::for_each(theSoundings.begin(), theSoundings.end(), TimeCollector());
 
-	return MakeTimeList(collector.itsTimes);
+  return MakeTimeList(collector.itsTimes);
 }
 
 static NFmiLocationBag MakeLocationBag(std::set<NFmiStation> &theStations)
 {
-	NFmiLocationBag locations;
-	std::set<NFmiStation>::iterator it = theStations.begin();
-	unsigned long ind = 0;
-	std::set<NFmiPoint> points;
-	std::vector<unsigned long> equalLocationIndexies;
-	for( ; it != theStations.end(); ++it)
-	{
-		size_t s1 = points.size();
-		points.insert((*it).GetLocation());
-		size_t s2 = points.size();
-		if(s1 == s2)
-		{
-			// t‰m‰ on pikaviritys. Jos arvottu luotaus-asemat, niill‰ on samat
-			// sijainnit, t‰ss‰ pit‰‰ tehd‰ sijainteihin pienet erot
-			ind++;
-			const_cast<NFmiStation&>((*it)).SetLongitude((*it).GetLongitude() + ind);
-		}
+  NFmiLocationBag locations;
+  std::set<NFmiStation>::iterator it = theStations.begin();
+  unsigned long ind = 0;
+  std::set<NFmiPoint> points;
+  std::vector<unsigned long> equalLocationIndexies;
+  for (; it != theStations.end(); ++it)
+  {
+    size_t s1 = points.size();
+    points.insert((*it).GetLocation());
+    size_t s2 = points.size();
+    if (s1 == s2)
+    {
+      // t‰m‰ on pikaviritys. Jos arvottu luotaus-asemat, niill‰ on samat
+      // sijainnit, t‰ss‰ pit‰‰ tehd‰ sijainteihin pienet erot
+      ind++;
+      const_cast<NFmiStation &>((*it)).SetLongitude((*it).GetLongitude() + ind);
+    }
 
-		locations.AddLocation(*it);
-	}
+    locations.AddLocation(*it);
+  }
 
-	return locations;
+  return locations;
 }
 
 static NFmiLocationBag MakeLocationBagForTEMP(std::vector<NFmiTEMPCode> &theSoundings)
 {
-	LocationCollector collector;
-	collector = std::for_each(theSoundings.begin(), theSoundings.end(), LocationCollector());
+  LocationCollector collector;
+  collector = std::for_each(theSoundings.begin(), theSoundings.end(), LocationCollector());
 
-	return MakeLocationBag(collector.itsLocations);
+  return MakeLocationBag(collector.itsLocations);
 }
 
 static NFmiParamBag MakeParamBag(const NFmiProducer &theWantedProducer)
 {
-	NFmiParamBag params;
-	params.Add(NFmiDataIdent(NFmiParam(kFmiPressure, "P"), theWantedProducer));
-	params.Add(NFmiDataIdent(NFmiParam(kFmiTemperature, "T"), theWantedProducer));
-	params.Add(NFmiDataIdent(NFmiParam(kFmiDewPoint, "Td"), theWantedProducer));
-	NFmiTotalWind totWind;
-	NFmiDataIdent *newDataIdent = totWind.CreateParam(theWantedProducer);
-	boost::shared_ptr<NFmiDataIdent> newDataIdentPtr(newDataIdent);
-	params.Add(*newDataIdent);
-	params.Add(NFmiDataIdent(NFmiParam(kFmiGeomHeight, "h"), theWantedProducer));
-	return params;
+  NFmiParamBag params;
+  params.Add(NFmiDataIdent(NFmiParam(kFmiPressure, "P"), theWantedProducer));
+  params.Add(NFmiDataIdent(NFmiParam(kFmiTemperature, "T"), theWantedProducer));
+  params.Add(NFmiDataIdent(NFmiParam(kFmiDewPoint, "Td"), theWantedProducer));
+  NFmiTotalWind totWind;
+  NFmiDataIdent *newDataIdent = totWind.CreateParam(theWantedProducer);
+  boost::shared_ptr<NFmiDataIdent> newDataIdentPtr(newDataIdent);
+  params.Add(*newDataIdent);
+  params.Add(NFmiDataIdent(NFmiParam(kFmiGeomHeight, "h"), theWantedProducer));
+  return params;
 }
 
 static NFmiLevelBag MakeLevelBag(std::vector<NFmiTEMPCode> &theSoundings)
 {
-	size_t ssize = theSoundings.size();
-	float maxLevelSize = 0;
-	for(size_t i=0; i<ssize; i++)
-	{ // etsit‰‰ luotaus miss‰ eniten levelej‰, ja otetaan se 'pohjaksi' level bagiin
-		if(theSoundings[i].LevelData().size() > maxLevelSize)
-			maxLevelSize = static_cast<float>(theSoundings[i].LevelData().size());
-	}
-	NFmiLevelBag levels(kFmiSoundingLevel, 1, maxLevelSize, 1);
-	return levels;
+  size_t ssize = theSoundings.size();
+  float maxLevelSize = 0;
+  for (size_t i = 0; i < ssize; i++)
+  {  // etsit‰‰ luotaus miss‰ eniten levelej‰, ja otetaan se 'pohjaksi' level bagiin
+    if (theSoundings[i].LevelData().size() > maxLevelSize)
+      maxLevelSize = static_cast<float>(theSoundings[i].LevelData().size());
+  }
+  NFmiLevelBag levels(kFmiSoundingLevel, 1, maxLevelSize, 1);
+  return levels;
 }
 
-static NFmiQueryInfo* MakeNewInnerInfoForTEMP(std::vector<NFmiTEMPCode> &theSoundings, const NFmiProducer &theWantedProducer)
+static NFmiQueryInfo *MakeNewInnerInfoForTEMP(std::vector<NFmiTEMPCode> &theSoundings,
+                                              const NFmiProducer &theWantedProducer)
 {
-	NFmiQueryInfo *info = 0;
-	if(theSoundings.size() > 0)
-	{
-		NFmiTimeList times(MakeTimeListForTEMP(theSoundings));
-		NFmiMetTime origTime;
-		NFmiTimeDescriptor timeDesc(origTime, times);
+  NFmiQueryInfo *info = 0;
+  if (theSoundings.size() > 0)
+  {
+    NFmiTimeList times(MakeTimeListForTEMP(theSoundings));
+    NFmiMetTime origTime;
+    NFmiTimeDescriptor timeDesc(origTime, times);
 
-		NFmiLocationBag locations(MakeLocationBagForTEMP(theSoundings));
-		NFmiHPlaceDescriptor hPlaceDesc(locations);
+    NFmiLocationBag locations(MakeLocationBagForTEMP(theSoundings));
+    NFmiHPlaceDescriptor hPlaceDesc(locations);
 
-		NFmiParamBag params(MakeParamBag(theWantedProducer));
-		NFmiParamDescriptor paramDesc(params);
+    NFmiParamBag params(MakeParamBag(theWantedProducer));
+    NFmiParamDescriptor paramDesc(params);
 
-		NFmiLevelBag levels(MakeLevelBag(theSoundings));
-		NFmiVPlaceDescriptor vPlaceDesc(levels);
+    NFmiLevelBag levels(MakeLevelBag(theSoundings));
+    NFmiVPlaceDescriptor vPlaceDesc(levels);
 
-		info = new NFmiQueryInfo(paramDesc, timeDesc, hPlaceDesc, vPlaceDesc);
-	}
-	return info;
+    info = new NFmiQueryInfo(paramDesc, timeDesc, hPlaceDesc, vPlaceDesc);
+  }
+  return info;
 }
 
 static std::string MakeCheckReport(NFmiQueryData *theData, int theErrorCount, int theSoundingCount)
 {
-	if(theData && theSoundingCount)
-	{
-		NFmiFastQueryInfo info(theData);
-		if(info.SizeLevels() && info.SizeLocations() && info.SizeParams() && info.SizeTimes())
-		{ // dataan oli saatu varmasti jotain, kun kaikki size:t ovat > 0
-			std::string str;
-			str += ::GetDictionaryString("TempCodeInsertDlgSoundingStr");
-			str += ":";
-			str += NFmiStringTools::Convert<int>(theSoundingCount);
-			str += " ";
-			str += ::GetDictionaryString("TempCodeInsertDlgPiecesStr");
-			str += ", ";
-			if(theErrorCount)
-			{
-				str += ::GetDictionaryString("TempCodeInsertDlgErrorStr");
-				str += ":";
-				str += NFmiStringTools::Convert<int>(theErrorCount);
-				str += " ";
-				str += ::GetDictionaryString("TempCodeInsertDlgPiecesStr");
-				str += ", ";
-			}
-			str += ::GetDictionaryString("TempCodeInsertDlgStationStr");
-			str += ":";
-			str += NFmiStringTools::Convert<int>(info.SizeLocations());
-			str += " ";
-			str += ::GetDictionaryString("TempCodeInsertDlgPiecesStr");
-			str += ", ";
-			str += ::GetDictionaryString("TempCodeInsertDlgTimeStr");
-			str += ":";
-			str += NFmiStringTools::Convert<int>(info.SizeTimes());
-			str += " ";
-			str += ::GetDictionaryString("TempCodeInsertDlgPiecesStr");
-			str += ".";
-			return str;
-		}
-	}
-	std::string str;
-	str += ::GetDictionaryString("TempCodeInsertDlgNoSoundingErrorStr");
-	str += " ";
-	str += NFmiStringTools::Convert<int>(theErrorCount);
-	str += " ";
-	str += ::GetDictionaryString("TempCodeInsertDlgPiecesStr");
-	str += ".";
-	return str;
+  if (theData && theSoundingCount)
+  {
+    NFmiFastQueryInfo info(theData);
+    if (info.SizeLevels() && info.SizeLocations() && info.SizeParams() && info.SizeTimes())
+    {  // dataan oli saatu varmasti jotain, kun kaikki size:t ovat > 0
+      std::string str;
+      str += ::GetDictionaryString("TempCodeInsertDlgSoundingStr");
+      str += ":";
+      str += NFmiStringTools::Convert<int>(theSoundingCount);
+      str += " ";
+      str += ::GetDictionaryString("TempCodeInsertDlgPiecesStr");
+      str += ", ";
+      if (theErrorCount)
+      {
+        str += ::GetDictionaryString("TempCodeInsertDlgErrorStr");
+        str += ":";
+        str += NFmiStringTools::Convert<int>(theErrorCount);
+        str += " ";
+        str += ::GetDictionaryString("TempCodeInsertDlgPiecesStr");
+        str += ", ";
+      }
+      str += ::GetDictionaryString("TempCodeInsertDlgStationStr");
+      str += ":";
+      str += NFmiStringTools::Convert<int>(info.SizeLocations());
+      str += " ";
+      str += ::GetDictionaryString("TempCodeInsertDlgPiecesStr");
+      str += ", ";
+      str += ::GetDictionaryString("TempCodeInsertDlgTimeStr");
+      str += ":";
+      str += NFmiStringTools::Convert<int>(info.SizeTimes());
+      str += " ";
+      str += ::GetDictionaryString("TempCodeInsertDlgPiecesStr");
+      str += ".";
+      return str;
+    }
+  }
+  std::string str;
+  str += ::GetDictionaryString("TempCodeInsertDlgNoSoundingErrorStr");
+  str += " ";
+  str += NFmiStringTools::Convert<int>(theErrorCount);
+  str += " ";
+  str += ::GetDictionaryString("TempCodeInsertDlgPiecesStr");
+  str += ".";
+  return str;
 }
 
-NFmiQueryData* DecodeTEMP::MakeNewDataFromTEMPStr(const std::string &theTEMPStr, std::string &theCheckReportStr, NFmiAviationStationInfoSystem &theTempStations, const NFmiPoint &theUnknownStationLocation, const NFmiProducer &theWantedProducer, bool fRoundTimesToNearestSynopticTimes)
+NFmiQueryData *DecodeTEMP::MakeNewDataFromTEMPStr(const std::string &theTEMPStr,
+                                                  std::string &theCheckReportStr,
+                                                  NFmiAviationStationInfoSystem &theTempStations,
+                                                  const NFmiPoint &theUnknownStationLocation,
+                                                  const NFmiProducer &theWantedProducer,
+                                                  bool fRoundTimesToNearestSynopticTimes)
 {
-	theCheckReportStr = ::GetDictionaryString("TempCodeInsertDlgStartCheckingStr");
-	std::vector<std::string> codeParcels = NFmiStringTools::Split(theTEMPStr, "=");
-	bool noEqualSignInCode = false;
-	if(codeParcels.size() <= 1)
-	{ // kokeillaan sitten jakaa TT -stringin avulla koodia osiin. =-merkki‰ ei ole wyomingista saatavista raaka luotaus koodeissa
-		codeParcels = NFmiStringTools::Split(theTEMPStr, "TT");
-		noEqualSignInCode = true;
-	}
+  theCheckReportStr = ::GetDictionaryString("TempCodeInsertDlgStartCheckingStr");
+  std::vector<std::string> codeParcels = NFmiStringTools::Split(theTEMPStr, "=");
+  bool noEqualSignInCode = false;
+  if (codeParcels.size() <= 1)
+  {  // kokeillaan sitten jakaa TT -stringin avulla koodia osiin. =-merkki‰ ei ole wyomingista
+     // saatavista raaka luotaus koodeissa
+    codeParcels = NFmiStringTools::Split(theTEMPStr, "TT");
+    noEqualSignInCode = true;
+  }
 
-	if(codeParcels.size() < 2)
-	{
-		theCheckReportStr = ::GetDictionaryString("TempCodeInsertDlgTooFewSectionsErrorStr");
-		return 0;
-	}
+  if (codeParcels.size() < 2)
+  {
+    theCheckReportStr = ::GetDictionaryString("TempCodeInsertDlgTooFewSectionsErrorStr");
+    return 0;
+  }
 
-	std::vector<NFmiTEMPCode> tempCodeVec;
-	NFmiTEMPCode tempCode(&theTempStations, theUnknownStationLocation);
-	int errorCount = 0;
-	for(int i=0; i<static_cast<int>(codeParcels.size()); )
-	{
-		// aina pit‰isi olla nelj‰ koodi osiota annettavissa, ett‰ yritet‰‰n purkaa luotaus teksti‰
-		int decodeCount = 0;
-		try
-		{
-			decodeCount = 0;
-			if(codeParcels.size() - i >= 4)
-				decodeCount = tempCode.InsertCodeStrings(codeParcels[i], codeParcels[i+1], codeParcels[i+2], codeParcels[i+3], noEqualSignInCode);
-			else if(codeParcels.size() - i == 3)
-				decodeCount = tempCode.InsertCodeStrings(codeParcels[i], codeParcels[i+1], codeParcels[i+2], "", noEqualSignInCode);
-			else if(codeParcels.size() - i == 2)
-				decodeCount = tempCode.InsertCodeStrings(codeParcels[i], codeParcels[i+1], "", "", noEqualSignInCode);
-			else if(codeParcels.size() - i == 1)
-				decodeCount = tempCode.InsertCodeStrings(codeParcels[i], "", "", "", noEqualSignInCode);
-			if(decodeCount != 4)
-				errorCount++;
-		}
-		catch(std::exception & /* e */ )
-		{
-			errorCount++;
-		}
-		if(decodeCount > 0) // jos edes yksi osa on onnistuttu purkamaan (4:st‰ mahdollisesta), laitetaan luotaus listaan
-		{
-			if(fRoundTimesToNearestSynopticTimes)
-			{
-				NFmiMetTime aTime(tempCode.Time());
-				aTime.SetTimeStep(180);
-				tempCode.Time(aTime);
-			}
-			tempCodeVec.push_back(tempCode);
-		}
-		if(decodeCount <= 0)
-			decodeCount = 1; // jos ei onnistunut purkamaan mit‰‰n, menn‰‰n ainakin yksi blokki eteenp‰in ja kokeillaan
-		i += decodeCount; // edet‰‰n purettujen blokkien m‰‰r‰n verran eteenp‰in
-	}
+  std::vector<NFmiTEMPCode> tempCodeVec;
+  NFmiTEMPCode tempCode(&theTempStations, theUnknownStationLocation);
+  int errorCount = 0;
+  for (int i = 0; i < static_cast<int>(codeParcels.size());)
+  {
+    // aina pit‰isi olla nelj‰ koodi osiota annettavissa, ett‰ yritet‰‰n purkaa luotaus teksti‰
+    int decodeCount = 0;
+    try
+    {
+      decodeCount = 0;
+      if (codeParcels.size() - i >= 4)
+        decodeCount = tempCode.InsertCodeStrings(codeParcels[i],
+                                                 codeParcels[i + 1],
+                                                 codeParcels[i + 2],
+                                                 codeParcels[i + 3],
+                                                 noEqualSignInCode);
+      else if (codeParcels.size() - i == 3)
+        decodeCount = tempCode.InsertCodeStrings(
+            codeParcels[i], codeParcels[i + 1], codeParcels[i + 2], "", noEqualSignInCode);
+      else if (codeParcels.size() - i == 2)
+        decodeCount = tempCode.InsertCodeStrings(
+            codeParcels[i], codeParcels[i + 1], "", "", noEqualSignInCode);
+      else if (codeParcels.size() - i == 1)
+        decodeCount = tempCode.InsertCodeStrings(codeParcels[i], "", "", "", noEqualSignInCode);
+      if (decodeCount != 4) errorCount++;
+    }
+    catch (std::exception & /* e */)
+    {
+      errorCount++;
+    }
+    if (decodeCount > 0)  // jos edes yksi osa on onnistuttu purkamaan (4:st‰ mahdollisesta),
+                          // laitetaan luotaus listaan
+    {
+      if (fRoundTimesToNearestSynopticTimes)
+      {
+        NFmiMetTime aTime(tempCode.Time());
+        aTime.SetTimeStep(180);
+        tempCode.Time(aTime);
+      }
+      tempCodeVec.push_back(tempCode);
+    }
+    if (decodeCount <= 0)
+      decodeCount = 1;  // jos ei onnistunut purkamaan mit‰‰n, menn‰‰n ainakin yksi blokki eteenp‰in
+                        // ja kokeillaan
+    i += decodeCount;   // edet‰‰n purettujen blokkien m‰‰r‰n verran eteenp‰in
+  }
 
-	NFmiQueryData *newData = DecodeTEMP::CreateNewQData(tempCodeVec, theWantedProducer);
-	theCheckReportStr = MakeCheckReport(newData, errorCount, static_cast<int>(tempCodeVec.size()));
-	return newData;
+  NFmiQueryData *newData = DecodeTEMP::CreateNewQData(tempCodeVec, theWantedProducer);
+  theCheckReportStr = MakeCheckReport(newData, errorCount, static_cast<int>(tempCodeVec.size()));
+  return newData;
 }
 
-NFmiQueryData* DecodeTEMP::CreateNewQData(std::vector<NFmiTEMPCode> &theTempCodeVec, const NFmiProducer &theWantedProducer)
+NFmiQueryData *DecodeTEMP::CreateNewQData(std::vector<NFmiTEMPCode> &theTempCodeVec,
+                                          const NFmiProducer &theWantedProducer)
 {
-	NFmiQueryData *newData = 0;
-	NFmiQueryInfo* innerInfo = MakeNewInnerInfoForTEMP(theTempCodeVec, theWantedProducer);
-	boost::shared_ptr<NFmiQueryInfo> innerInfoPtr(innerInfo);
-	if(innerInfo)
-	{
-		newData = NFmiQueryDataUtil::CreateEmptyData(*innerInfo);
-		if(newData)
-		{ // sitten t‰ytet‰‰n uusi data
-			NFmiFastQueryInfo infoIter(newData);
+  NFmiQueryData *newData = 0;
+  NFmiQueryInfo *innerInfo = MakeNewInnerInfoForTEMP(theTempCodeVec, theWantedProducer);
+  boost::shared_ptr<NFmiQueryInfo> innerInfoPtr(innerInfo);
+  if (innerInfo)
+  {
+    newData = NFmiQueryDataUtil::CreateEmptyData(*innerInfo);
+    if (newData)
+    {  // sitten t‰ytet‰‰n uusi data
+      NFmiFastQueryInfo infoIter(newData);
 
-			std::vector<NFmiTEMPCode>::iterator it = theTempCodeVec.begin();
-			std::vector<NFmiTEMPCode>::iterator endIt = theTempCodeVec.end();
-			for(; it != endIt; ++it)
-			{
-				const NFmiTEMPCode &tempCode = *it;
-				if(infoIter.Time(tempCode.Time()))
-				{
-					if(infoIter.Location(tempCode.Station().GetLocation()))
-					{
-						const std::map<double, TEMPLevelData> &levelData = tempCode.LevelData();
-						std::map<double, TEMPLevelData>::const_iterator levelIt = levelData.begin();
-						std::map<double, TEMPLevelData>::const_iterator endLevelIt = levelData.end();
-						infoIter.FirstLevel();
-						for(; levelIt != endLevelIt; ++levelIt)
-						{
-							infoIter.Param(kFmiTemperature);
-							infoIter.FloatValue(static_cast<float>((*levelIt).second.itsTemperature));
-							infoIter.Param(kFmiDewPoint);
-							infoIter.FloatValue(static_cast<float>((*levelIt).second.itsDewPoint));
-							infoIter.Param(kFmiPressure);
-							infoIter.FloatValue(static_cast<float>((*levelIt).second.itsPressure));
-							infoIter.Param(kFmiGeomHeight);
-							infoIter.FloatValue(static_cast<float>((*levelIt).second.itsHeight));
-							infoIter.Param(kFmiWindDirection);
-							infoIter.FloatValue(static_cast<float>((*levelIt).second.itsWD));
-							infoIter.Param(kFmiWindSpeedMS);
-							infoIter.FloatValue(static_cast<float>((*levelIt).second.itsWS));
+      std::vector<NFmiTEMPCode>::iterator it = theTempCodeVec.begin();
+      std::vector<NFmiTEMPCode>::iterator endIt = theTempCodeVec.end();
+      for (; it != endIt; ++it)
+      {
+        const NFmiTEMPCode &tempCode = *it;
+        if (infoIter.Time(tempCode.Time()))
+        {
+          if (infoIter.Location(tempCode.Station().GetLocation()))
+          {
+            const std::map<double, TEMPLevelData> &levelData = tempCode.LevelData();
+            std::map<double, TEMPLevelData>::const_iterator levelIt = levelData.begin();
+            std::map<double, TEMPLevelData>::const_iterator endLevelIt = levelData.end();
+            infoIter.FirstLevel();
+            for (; levelIt != endLevelIt; ++levelIt)
+            {
+              infoIter.Param(kFmiTemperature);
+              infoIter.FloatValue(static_cast<float>((*levelIt).second.itsTemperature));
+              infoIter.Param(kFmiDewPoint);
+              infoIter.FloatValue(static_cast<float>((*levelIt).second.itsDewPoint));
+              infoIter.Param(kFmiPressure);
+              infoIter.FloatValue(static_cast<float>((*levelIt).second.itsPressure));
+              infoIter.Param(kFmiGeomHeight);
+              infoIter.FloatValue(static_cast<float>((*levelIt).second.itsHeight));
+              infoIter.Param(kFmiWindDirection);
+              infoIter.FloatValue(static_cast<float>((*levelIt).second.itsWD));
+              infoIter.Param(kFmiWindSpeedMS);
+              infoIter.FloatValue(static_cast<float>((*levelIt).second.itsWS));
 
-							infoIter.NextLevel();
-						}
-					}
-				}
-			}
-		}
-	}
-	return newData;
+              infoIter.NextLevel();
+            }
+          }
+        }
+      }
+    }
+  }
+  return newData;
 }
 
 /*
