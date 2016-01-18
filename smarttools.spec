@@ -31,7 +31,7 @@ make %{_smp_mflags}
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%defattr(0775,root,root,-)
+%defattr(0775,root,root,0775)
 %{_libdir}/libsmartmet_%{LIBNAME}.so
 
 %post -p /sbin/ldconfig
@@ -45,8 +45,8 @@ Provides: %{LIBNAME}-devel
 FMI smarttools development files
 
 %files -n libsmartmet-%{LIBNAME}-devel
-%defattr(0664,root,root,-)
-%{_includedir}/smartmet/%{LIBNAME}/*.h
+%defattr(0664,root,root,0775)
+%{_includedir}/smartmet/%{LIBNAME}
 
 
 %changelog
