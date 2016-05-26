@@ -465,15 +465,17 @@ bool NFmiSoundingDataOpt1::FindHighestThetaE(double &T, double &Td, double &P, d
 			float tmpTd = tdV[i];
 			if(tmpP != kFloatMissing && tmpT != kFloatMissing && tmpTd != kFloatMissing)
 			{
-				if(tmpP >= theMinP) // eli ollaanko lähempana maanpintaa kuin raja paine pinta on
-				{
-					double thetaE = NFmiSoundingFunctions::CalcThetaE(tmpT, tmpTd, tmpP);
-					if(thetaE != kFloatMissing && thetaE > theMaxThetaE)
-					{
-						theMaxThetaE = thetaE;
-						T = tmpT;
-						Td = tmpTd;
-						P = tmpP;
+                if(tmpP >= theMinP) // eli ollaanko lähempana maanpintaa kuin raja paine pinta on
+                {
+                    double thetaE = NFmiSoundingFunctions::CalcThetaE(tmpT, tmpTd, tmpP);
+                    if(thetaE != kFloatMissing && thetaE > theMaxThetaE)
+                    {
+                        theMaxThetaE = thetaE;
+                        T = tmpT;
+                        Td = tmpTd;
+                        P = tmpP;
+                    }
+                }
 			}
 		}
 	}
