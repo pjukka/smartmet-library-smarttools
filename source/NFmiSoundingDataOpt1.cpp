@@ -308,6 +308,140 @@ float NFmiSoundingDataOpt1::FindPressureWhereHighestValue(FmiParameterName theId
 	return maxValuePressure;
 }
 
+// Stabiilisuus indeksien Most Unstable tapausta etsittäessä etsitään maksimi ThetaE:tä.
+// Hakua rajoitetaan pinnan ja jonkin max korkeuden väliin.
+// Joskus käy niin että maanpinnan lähellä on lokaali maksimi ja juuri ennen maksimi korkeutta tulee globaali maksimi.
+// Tämä globaali maksimi ei kuitenkaan ole se maksimi mitä halutaan vaan jos pintaa lähempänä olevassa kerroksessa olevan 
+// lokaalin maksimin arvo on tarpeeksi lähellä globaalia maksimia, otetaan sen kerroksen arvot käyttöön.
+struct ThetaEValues
+{
+    ThetaEValues()
+        :P(kFloatMissing)
+        , ThetaE(kFloatMissing)
+        , T(kFloatMissing)
+        , Td(kFloatMissing)
+    {}
+
+    ThetaEValues(float P, float T, float Td, double ThetaE)
+        :P(P)
+        , ThetaE(ThetaE)
+        , T(T)
+        , Td(Td)
+    {}
+
+    float P;
+    double ThetaE;
+    float T;
+    float Td;
+};
+
+// Tällä operaattorilla sortataan lasketut theta kerrokset
+static bool operator<(const ThetaEValues &theta1, const ThetaEValues &theta2)
+{
+    if(theta1.P != kFloatMissing && theta2.P != kFloatMissing && theta1.ThetaE != kFloatMissing && theta2.ThetaE != kFloatMissing)
+    { // Jos ei puuttuvia arvoja, alkaa kiinnnostavat vertailut
+        if(theta1.ThetaE > theta2.ThetaE) // Kumpi theta arvo on suurempi
+            return false;
+        else if(theta1.ThetaE == theta2.ThetaE && theta1.P < theta2.P) // Jos Thetat on samoja, kiinnostaa se kummpi niistä on lähempänä maanpintaa
+            return false;
+    }
+    return true;
+}
+
+// Tällä operaattorilla sortataan lasketut theta kerrokset
+static bool operator>(const ThetaEValues &theta1, const ThetaEValues &theta2)
+{
+    if(theta1.P != kFloatMissing && theta2.P != kFloatMissing)
+    {
+        if(theta1.P > theta2.P)
+            return true;
+    }
+    return false;
+}
+
+static bool isCloseToUpperLevelLimit(const ThetaEValues &theta, double topPressureLevel)
+{
+    if(std::fabs((theta.P - topPressureLevel) / topPressureLevel) < 0.3)
+        return true;
+    else
+        return false;
+}
+
+static bool isGlobalAndLocalThetasCloseEnough(double globalMaxTheta, double localThetaE)
+{
+    if(std::fabs((globalMaxTheta - localThetaE) / globalMaxTheta) < 0.15)
+        return true;
+    else
+        return false;
+}
+
+// Jos globaali maksimi on lähempänä maanpintaa eli kauempana annetusta yläkerroksen rajasta,
+// annetaan se. 
+// Jos globaali maksimi lähellä yläkerroksen rajaa, katsotaan löytyykö alemmista kerroksista lokaali maksimi,
+// joka on tarpeeksi lähellä globaalin maksimin arvoa ja palautetaan se.
+static ThetaEValues getBestMUThetaValues(std::set<ThetaEValues> &thetas, double topPressureLevel)
+{
+    if(thetas.size() == 0)
+        return ThetaEValues();
+    else if(thetas.size() == 1)
+        return *thetas.begin();
+    else
+    {
+        // Käydään containeria läpi lopusta alkuun, koska datat ovat siinä nousevassa järjestyksessä
+        std::set<ThetaEValues>::reverse_iterator iter = thetas.rbegin(); 
+        if(!::isCloseToUpperLevelLimit(*iter, topPressureLevel))
+            return *iter; // maksimi theta oli etäällä ylärajasta, voidaan palauttaa se
+        double globalMaxTheta = iter->ThetaE;
+        for(; ++iter != thetas.rend();)
+        {
+            if(!::isCloseToUpperLevelLimit(*iter, topPressureLevel))
+            {
+                if(::isGlobalAndLocalThetasCloseEnough(globalMaxTheta, iter->ThetaE))
+                    return *iter; // Palautetaan lokaali maksimi
+                else
+                    return *thetas.rbegin(); // Koska 1. lokaali maanpintaa lähempänä ollut theta maksimi ei ollut tarpeeksi lähellä globaalia maksimia, palautetaan globaali maksimi
+            }
+        }
+        return *thetas.rbegin(); // Koska ei löytynyt hyviä lokaaleja maksimeja alemmalta tasolta, palautetaan globaali maksimi
+    }
+}
+
+// Etsitään maanpinnasta ylöspäin lokaali maksimeja. Jos lokaali maksimi on tarpeeksi lähellä totaali maksimia, palautetaan sen arvo.
+// Muuten palautetaan globaali maksimi.
+static ThetaEValues getBestMUThetaValues2(std::vector<ThetaEValues> &thetas, double topPressureLevel)
+{
+    if(thetas.size() == 0)
+        return ThetaEValues();
+    else if(thetas.size() == 1)
+        return *thetas.begin();
+    else
+    {
+        // Etsitään globaali maksimi
+        ThetaEValues globalMaxTheta = *std::max_element(thetas.begin(), thetas.end());
+
+        // Onko vector:in 0. elementti lokaali maksimi on erikoistapaus
+        if(thetas[0].ThetaE > thetas[1].ThetaE && ::isGlobalAndLocalThetasCloseEnough(globalMaxTheta.ThetaE, thetas[0].ThetaE))
+            return thetas[0]; // Maanpintaa lähin arvo oli lokaali maksimi ja se oli tarpeeksi lähellä globaalia maksimi thetaa
+        else
+        {
+            for(size_t i = 1; i < thetas.size() - 1; i++)
+            {
+                if(thetas[i - 1].ThetaE < thetas[i].ThetaE && thetas[i].ThetaE > thetas[i + 1].ThetaE && ::isGlobalAndLocalThetasCloseEnough(globalMaxTheta.ThetaE, thetas[i].ThetaE))
+                    return thetas[i]; // Jos i:s theta oli suurempi kuin viereiset arvot (lokaali maksimi) ja se oli tarpeeksi lähellä globaalia maksimi thetaa
+            }
+        }
+        return globalMaxTheta; // Jos tullaan tänne, palautetaan sitten globaali maksimi eli tämän pitää olla sama kuin vectorin viimeisen elementin
+    }
+}
+
+static void setThetaValues(const ThetaEValues &theta, double &T, double &Td, double &P, double &theMaxThetaE)
+{
+    theMaxThetaE = theta.ThetaE;
+    T = theta.T;
+    Td = theta.Td;
+    P = theta.P;
+}
+
 // Käy läpi luotausta ja etsi sen kerroksen arvot, jolta löytyy suurin theta-E ja
 // palauta sen kerroksen T, Td ja P ja laskettu max Theta-e.
 // Etsitään arvoja jos pinta on alle theMinP-tason (siis alle tuon tason fyysisesti).
@@ -340,15 +474,49 @@ bool NFmiSoundingDataOpt1::FindHighestThetaE(double &T, double &Td, double &P, d
 						T = tmpT;
 						Td = tmpTd;
 						P = tmpP;
-					}
-				}
-				else // jos oltiin korkeammalla, voidaan lopettaa
-					break;
 			}
 		}
 	}
 	return theMaxThetaE != kFloatMissing;
 }
+/*
+bool NFmiSoundingDataOpt1::FindHighestThetaE2(double &T, double &Td, double &P, double &theMaxThetaE, double theMinP)
+{
+	T = kFloatMissing;
+	Td = kFloatMissing;
+	P = kFloatMissing;
+	theMaxThetaE = kFloatMissing;
+	std::deque<float>&pV = GetParamData(kFmiPressure);
+	std::deque<float>&tV = GetParamData(kFmiTemperature);
+	std::deque<float>&tdV = GetParamData(kFmiDewPoint);
+	if(pV.size() > 0)
+	{
+        std::set<ThetaEValues> thetas;
+        std::vector<ThetaEValues> thetas2;
+		theMaxThetaE = -99999999;
+		for(unsigned int i=0; i<pV.size(); i++)
+		{
+			float tmpP = pV[i];
+			float tmpT = tV[i];
+			float tmpTd = tdV[i];
+			if(tmpP != kFloatMissing && tmpT != kFloatMissing && tmpTd != kFloatMissing)
+			{
+				if(tmpP >= theMinP) // eli ollaanko lähempana maanpintaa kuin raja paine pinta on
+				{
+					double thetaE = NFmiSoundingFunctions::CalcThetaE(tmpT, tmpTd, tmpP);
+                    thetas.insert(ThetaEValues(tmpP, tmpT, tmpTd, thetaE));
+                    thetas2.push_back(ThetaEValues(tmpP, tmpT, tmpTd, thetaE));
+				}
+				else // jos oltiin korkeammalla, voidaan lopettaa
+					break;
+			}
+		}
+//        ::setThetaValues(::getBestMUThetaValues(thetas, theMinP), T, Td, P, theMaxThetaE);
+        ::setThetaValues(::getBestMUThetaValues2(thetas2, theMinP), T, Td, P, theMaxThetaE);
+	}
+	return theMaxThetaE != kFloatMissing;
+}
+*/
 
 // Tämä on Pieter Groenemeijerin ehdottama tapa laskea LCL-laskuihin tarvittavia T, Td ja P arvoja yli halutun layerin.
 // Laskee keskiarvot T:lle, Td:lle ja P:lle haluttujen korkeuksien välille.
