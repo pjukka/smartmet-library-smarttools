@@ -914,9 +914,9 @@ void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalc
 			for(size_t i=0; i < calculationVector.size(); i++)
 			{
 				boost::shared_ptr<NFmiSmartToolCalculation> smartToolCalculation = calculationVector[i];
-				std::vector<boost::shared_ptr<NFmiSmartToolCalculation> > calculationVector; // tehdään joka coren säikeelle oma calculaatio kopio
-				for(size_t i=0; i < usedThreadCount; i++)
-					calculationVector.push_back(boost::shared_ptr<NFmiSmartToolCalculation>(new NFmiSmartToolCalculation(*smartToolCalculation)));
+				std::vector<boost::shared_ptr<NFmiSmartToolCalculation> > calculationVectorForThread; // tehdään joka coren säikeelle oma calculaatio kopio
+				for(size_t j=0; j < usedThreadCount; j++)
+					calculationVectorForThread.push_back(boost::shared_ptr<NFmiSmartToolCalculation>(new NFmiSmartToolCalculation(*smartToolCalculation)));
 
 				for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 				{
@@ -926,16 +926,16 @@ void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalc
 						NFmiQueryDataUtil::CheckIfStopped(theThreadCallBacks);
 						NFmiQueryDataUtil::DoStepIt(theThreadCallBacks); // stepataan vasta 0-tarkastuksen jälkeen!
 						smartToolCalculation->Time(calculationParams.itsTime); // yritetään optimoida laskuja hieman kun mahdollista
-						std::for_each(calculationVector.begin(), calculationVector.end(), TimeSetter<NFmiSmartToolCalculation>(calculationParams.itsTime)); // calculaatioiden kopioiden ajat pitää myös asettaa
+						std::for_each(calculationVectorForThread.begin(), calculationVectorForThread.end(), TimeSetter<NFmiSmartToolCalculation>(calculationParams.itsTime)); // calculaatioiden kopioiden ajat pitää myös asettaa
 						std::for_each(infoVector.begin(), infoVector.end(), TimeSetter<NFmiFastQueryInfo>(calculationParams.itsTime)); // info kopioiden ajat pitää myös asettaa
 						std::vector<NFmiCalculationParams> calculationParamsVector;
-						for(size_t i=0; i < usedThreadCount; i++)
+						for(size_t k=0; k < usedThreadCount; k++)
 							calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, missä on jo aika oikein
 						NFmiLocationIndexRangeCalculator locationIndexRangeCalculator(info->SizeLocations(), 100);
 
 						boost::thread_group calcParts;
 						for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
-							calcParts.add_thread(new boost::thread(::DoPartialGridCalculationInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
+							calcParts.add_thread(new boost::thread(::DoPartialGridCalculationInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationVectorForThread[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
 						calcParts.join_all(); // odotetaan että threadit lopettavat
 					}
 				}

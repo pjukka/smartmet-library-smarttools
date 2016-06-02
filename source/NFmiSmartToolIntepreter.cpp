@@ -1979,13 +1979,12 @@ void NFmiSmartToolIntepreter::InitProducerTokens(NFmiProducerSystem *theProducer
 	{
 		// Tuottaja listaa t‰ydennet‰‰n ProducerSystemin tuottajilla
 		int modelCount = static_cast<int>(theProducerSystem->Producers().size());
-		int i=0;
-		for(i=0; i<modelCount; i++)
+		for(int i=0; i<modelCount; i++)
 		{
 			NFmiProducerInfo &prodInfo = theProducerSystem->Producer(i+1);
-            for(size_t i = 0; i < prodInfo.ShortNameCount(); i++)
+            for(size_t j = 0; j < prodInfo.ShortNameCount(); j++)
             {
-				std::string prodName(prodInfo.ShortName(i));
+				std::string prodName(prodInfo.ShortName(j));
 				NFmiStringTools::LowerCase(prodName); // pit‰‰ muuttaa lower case:en!!!
 				itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(prodName, static_cast<FmiProducerName>(prodInfo.ProducerId())));
             }
