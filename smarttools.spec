@@ -1,16 +1,16 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 16.1.17
+Version: 16.6.14
 Release: 1%{?dist}.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase-devel >= 16.1.17
+BuildRequires: libsmartmet-newbase-devel >= 16.6.13
 BuildRequires: boost-devel
-Requires: libsmartmet-newbase >= 16.1.17
+Requires: libsmartmet-newbase >= 16.6.13
 Provides: %{LIBNAME}
 
 %description
@@ -50,6 +50,8 @@ FMI smarttools development files
 
 
 %changelog
+* Tue Jun 14 2016 Mika Heiskanen <mika.heiskanen@fmi.fi> - 16.6.14-1.fmi
+- Recompiled due to newbase API changes
 * Sun Jan 17 2016 Mika Heiskanen <mika.heiskanen@fmi.fi> - 16.1.17-1.fmi
 - "td" is now an alias for dew point, meteorologists prefer it over dp
 - Handle sounding querydata
