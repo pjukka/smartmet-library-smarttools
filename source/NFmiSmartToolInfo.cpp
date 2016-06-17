@@ -103,7 +103,7 @@ bool NFmiSmartToolInfo::WriteScript2File(const std::string &theFileName, const s
 {
 	if(!theFileName.empty())
 	{
-		ofstream out(theFileName.c_str());
+		ofstream out(theFileName.c_str(), std::ios::binary);
 		if(out)
 		{
 			out << theScript;
