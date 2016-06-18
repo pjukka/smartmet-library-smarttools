@@ -2433,9 +2433,9 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
 
         // time_*-funktiot laskevat halutun operaation l‰pi halutun aikahaarukan. Laskut k‰yd‰‰n l‰pi datan omassa aikaresoluutiossa, eli t‰ss‰ ei ole aikainterpolaatioita kuten esim. maxt vastaavissa funktioissa.
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::TimeRange, 3, string("time_max(par, time_offset1, time_offset2)"))));
-        itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::TimeRange, 3, string("time_max(par, time_offset1, time_offset2)"))));
-        itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::TimeRange, 3, string("time_max(par, time_offset1, time_offset2)"))));
-        itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::TimeRange, 3, string("time_max(par, time_offset1, time_offset2)"))));
+        itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::TimeRange, 3, string("time_min(par, time_offset1, time_offset2)"))));
+        itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::TimeRange, 3, string("time_avg(par, time_offset1, time_offset2)"))));
+        itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::TimeRange, 3, string("time_sum(par, time_offset1, time_offset2)"))));
 
         // T‰ss‰ on time-range vertikaaliset-funktiot, jotka operoivat datan omassa aika ja level resoluutiossa. 
         // Esim. hae maksimi arvo 2h aikav‰lill‰ 1000 ja 500 hPa v‰lilt‰.
