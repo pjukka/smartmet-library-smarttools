@@ -689,7 +689,7 @@ bool NFmiDrawParam::Init (const std::string& theFilename)
 {
 	if(theFilename != std::string(""))
 	{
-		std::ifstream in(theFilename.c_str(), std::ios::in);
+		std::ifstream in(theFilename.c_str(), std::ios::binary);
 		if(in)
 		{
 			in >> *this;
@@ -713,7 +713,7 @@ bool NFmiDrawParam::StoreData (const std::string& theFilename)
 {
 	if(theFilename != std::string(""))
 	{
-		std::ofstream out(theFilename.c_str());
+		std::ofstream out(theFilename.c_str(), std::ios::binary);
 		if(out)
 		{
 			out << *this;

@@ -318,7 +318,7 @@ bool NFmiQueryDataSetKeeper::DoOnDemandOldDataLoad(int theIndex)
 				{
 					std::string usedFileName = ::GetFullFileName(itsFilePattern, *it);
 					NFmiQueryInfo info;
-					std::ifstream in(usedFileName.c_str());
+					std::ifstream in(usedFileName.c_str(), std::ios::binary);
 					if(in)
 					{
 						in >> info;
