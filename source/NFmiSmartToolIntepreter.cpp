@@ -2428,6 +2428,9 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::ProbCircle, 6, string("probcircle_between(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::ProbCircle, 6, string("probcircle_betweeneq(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
 
+        // Esiintym‰ funktio eli kuinka monta kertaa joku ehto halutulle parametrille pit‰‰ paikkaansa.
+        itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::Occurrence, 5, string("occurrence(par, radius_km, time_offset1, time_offset2, end-of-condition)"))));
+
         // Hae asemadatasta l‰hin arvo funktionaalisuus
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("closestvalue"), VertFunctionMapValue(NFmiAreaMask::ClosestObsTimeOffset, NFmiAreaMask::ClosestObsValue, 2, string("closestvalue(par, timeoffset)"))));
 
