@@ -1225,7 +1225,12 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 			}
         case NFmiAreaMask::VertFunctionStart:
             {
-                if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::TimeRange)
+                if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::Occurrence)
+                {
+                    boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+                    areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskOccurrance(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
+                }
+                else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::TimeRange)
                 {
                     boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
                     areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskTimeRange(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
@@ -1280,7 +1285,7 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 		if(areaMask->Info() && areaMask->Info()->Grid() == 0)
 		{ // jos oli info dataa ja viel‰ asemadatasta, tarkistetaan ett‰ kyse oli viel‰ infoData-tyypist‰, muuten oli virheellinen lauseke
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
-            if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue)
+            if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue || theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::Occurrence)
             { // t‰m‰ on ok, ei tarvitse tehd‰ mit‰‰n
             }
 			else if(maskType == NFmiAreaMask::InfoVariable)
@@ -1606,9 +1611,10 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kSingleStationRadarData, kFmiPressureLevel);
 		if(info == 0) // kokeillaan viel‰ yksitt‰isten tutkien dataa ilman level moodia (esim. vertikaali-funktioiden yhteydess‰)
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kSingleStationRadarData);
+        if(info == 0) // kokeillaan viel‰ salama dataa
+            info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kFlashData);
 
 #endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
-
 
 	}
 	if(!info)
