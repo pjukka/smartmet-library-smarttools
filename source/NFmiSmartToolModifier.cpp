@@ -29,6 +29,7 @@
 #include <NFmiDataModifierClasses.h>
 #include <NFmiFastQueryInfo.h>
 #include <NFmiInfoAreaMask.h>
+#include "NFmiInfoAreaMaskOccurrance.h"
 #include <NFmiQueryData.h>
 #include <NFmiQueryDataUtil.h>
 #include <NFmiRelativeDataIterator.h>
