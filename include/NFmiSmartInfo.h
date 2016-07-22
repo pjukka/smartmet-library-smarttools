@@ -31,8 +31,9 @@ public:
 	NFmiSmartInfo* Clone(void) const; // syvä kopio, eli kloonille luodaan oma queryData sen omistukseen
 										// TODO: katso pitääkö metodin nimi muuttaa, koska emoissa Clone on 
 										// virtuaali funktio, jossa eri paluu-luokka.
-
-	bool NextLocation (void);
+    // Apu funktio tekemään kevyitä kopoioita, koska Clone tekee raskaan kopion (= data kopioidaan myös)
+    static boost::shared_ptr<NFmiFastQueryInfo> CreateShallowCopyOfHighestInfo(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
+    bool NextLocation (void);
 
 	bool SnapShotData(const std::string& theAction, const NFmiHarmonizerBookKeepingData &theCurrentHarmonizerBookKeepingData);
 	bool Undo(void);

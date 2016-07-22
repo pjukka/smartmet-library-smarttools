@@ -55,6 +55,26 @@ NFmiSmartInfo* NFmiSmartInfo::Clone(void) const
 	return copy;
 }
 
+boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartInfo::CreateShallowCopyOfHighestInfo(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+    if(theInfo)
+    {
+        NFmiSmartInfo *smartInfo = dynamic_cast<NFmiSmartInfo*>(theInfo.get());
+        if(smartInfo)
+            return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(*smartInfo));
+
+        NFmiOwnerInfo *ownerInfo = dynamic_cast<NFmiOwnerInfo*>(theInfo.get());
+        if(ownerInfo)
+            return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiOwnerInfo(*ownerInfo));
+
+        NFmiFastQueryInfo *fastInfo = dynamic_cast<NFmiFastQueryInfo*>(theInfo.get());
+        if(fastInfo)
+            return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*fastInfo));
+    }
+
+    return boost::shared_ptr<NFmiFastQueryInfo>();
+}
+
 void NFmiSmartInfo::CopyClonedDatas(const NFmiSmartInfo &theOther)
 {
 	if(this != &theOther)

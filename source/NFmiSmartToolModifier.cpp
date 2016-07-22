@@ -48,26 +48,6 @@
 
 using namespace std;
 
-static boost::shared_ptr<NFmiFastQueryInfo> CreateShallowCopyOfHighestInfo(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
-{
-	if(theInfo)
-	{
-		NFmiSmartInfo *smartInfo = dynamic_cast<NFmiSmartInfo*>(theInfo.get());
-		if(smartInfo)
-			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(*smartInfo));
-
-		NFmiOwnerInfo *ownerInfo = dynamic_cast<NFmiOwnerInfo*>(theInfo.get());
-		if(ownerInfo)
-			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiOwnerInfo(*ownerInfo));
-
-		NFmiFastQueryInfo *fastInfo = dynamic_cast<NFmiFastQueryInfo*>(theInfo.get());
-		if(fastInfo)
-			return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*fastInfo));
-	}
-
-	return boost::shared_ptr<NFmiFastQueryInfo>();
-}
-
 static checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlock> > DoShallowCopy(const checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlock> > &theCalculationBlockVector)
 {
 	checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlock> > returnVector(theCalculationBlockVector.size());
@@ -1229,7 +1209,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
                 if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::Occurrence)
                 {
                     boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-                    areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskOccurrance(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
+                    boost::shared_ptr<NFmiArea> calculationArea(UsedMacroParamData()->Area()->Clone());
+                    areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskOccurrance(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount(), calculationArea));
                 }
                 else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::TimeRange)
                 {
@@ -1495,7 +1476,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
 				info = infos[0];
 		}
 
-		info = ::CreateShallowCopyOfHighestInfo(info);
+		info = NFmiSmartInfo::CreateShallowCopyOfHighestInfo(info);
 		mustUsePressureInterpolation = true;
 	}
 	return info;
@@ -1526,7 +1507,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateCopyOfAnalyzeI
 	if(info)
 	{
 		if(info->Param(static_cast<FmiParameterName>(theDataIdent.GetParamIdent())) && (theLevel == 0 || info->Level(*theLevel)))
-			return ::CreateShallowCopyOfHighestInfo(info);
+			return NFmiSmartInfo::CreateShallowCopyOfHighestInfo(info);
 	}
 	return info;
 }
@@ -1549,7 +1530,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetWantedAreaMaskDat
 			info = GetInfoFromOrganizer(theAreaMaskInfo.GetDataIdent(), &aLevel, usedDataType, fUseParIdOnly, fUseLevelData, theAreaMaskInfo.ModelRunIndex());
 		}
 	}
-	return ::CreateShallowCopyOfHighestInfo(info); // tehd‰‰n viel‰ 'kevyt' kopio lˆytyneest‰ datasta
+	return NFmiSmartInfo::CreateShallowCopyOfHighestInfo(info); // tehd‰‰n viel‰ 'kevyt' kopio lˆytyneest‰ datasta
 }
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
@@ -1564,7 +1545,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 		{ // t‰m‰ macroParam data viritys on multi threaddaavaa serveri‰ varten, eli macroparam data pit‰‰ olla thread-kohtainen
 			// ja se on aina annettu luodulle NFmiSmartToolModifier-luokan instansille erikseen.
 			if(UsedMacroParamData())
-				info = ::CreateShallowCopyOfHighestInfo(UsedMacroParamData());
+				info = NFmiSmartInfo::CreateShallowCopyOfHighestInfo(UsedMacroParamData());
 			else
 				throw runtime_error("NFmiSmartToolModifier::CreateInfo - error in program, no macroParam data available.");
 		}
@@ -1657,7 +1638,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateScriptVariable
 {
 	boost::shared_ptr<NFmiFastQueryInfo> tmp = GetScriptVariableInfo(theDataIdent);
 	if(tmp)
-		return ::CreateShallowCopyOfHighestInfo(tmp);
+		return NFmiSmartInfo::CreateShallowCopyOfHighestInfo(tmp);
 	else // pit‰‰ viel‰ luoda kyseinen skripti-muuttuja, koska sit‰ k‰ytet‰‰n nyt 1. kertaa
 	{
 		boost::shared_ptr<NFmiFastQueryInfo> tmp2 = CreateRealScriptVariableInfo(theDataIdent);
@@ -1666,7 +1647,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateScriptVariable
 			itsScriptVariableInfos.push_back(tmp2);
 			tmp = GetScriptVariableInfo(theDataIdent);
 			if(tmp)
-				return ::CreateShallowCopyOfHighestInfo(tmp);
+				return NFmiSmartInfo::CreateShallowCopyOfHighestInfo(tmp);
 		}
 	}
 
