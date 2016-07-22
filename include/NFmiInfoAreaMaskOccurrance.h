@@ -28,11 +28,20 @@ public:
 protected:
     bool IsGridData() const;
     bool IsKnownMultiSourceData(); // nyt synop ja salama datat ovat tälläisiä
-    void DoCalculations(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiCalculationParams &theCalculationParams, const NFmiLocation &theLocation, int &theOccurranceCountInOut);
+    void DoCalculations(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiCalculationParams &theCalculationParams, const NFmiLocation &theLocation, const std::vector<unsigned long> &theLocationIndexCache, int &theOccurranceCountInOut);
+    void DoCalculateCurrentLocation(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiLocation &theLocation, bool theIsStationLocationsStoredInData, int &theOccurranceCountInOut);
+    void InitializeLocationIndexCaches();
+    std::vector<unsigned long> CalcLocationIndexCache(boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
 
     bool fUseMultiSourceData;
     boost::shared_ptr<NFmiArea> itsCalculationArea; // Joitain laskuja optimoidaan ja niillä lähdedatasta laskut rajataan laskettavan kartta-alueen sisälle
     checkedVector<boost::shared_ptr<NFmiFastQueryInfo>> itsInfoVector; // Tähän laitetaan laskuissa käytettävät datat, joko se joko on jo emoluokassa oleva itsInfo, tai multisource tapauksissa joukko datoja
+
+    // Jokaiselle käytössä olevalle datalle lasketaan locationIndex cache, eli kaikki ne pisteet kustakin datasta, 
+    // joita käytetään laskuissa. Jos jollekin datalle on tyhjä vektori, lasketaan siitä kaikki. Jos jostain datasta 
+    // ei käytetä yhtään pistettä, on siihen kuuluvassa vektorissa vain yksi luku (gMissingIndex).
+    // Tämä alustetaan Initialize -metodissa.
+    std::vector<std::vector<unsigned long>> itsCalculatedLocationIndexies;
 
     static std::function<void(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &, boost::shared_ptr<NFmiDrawParam> &, const boost::shared_ptr<NFmiArea> &)> itsMultiSourceDataGetter;
 
