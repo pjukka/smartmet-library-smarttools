@@ -15,7 +15,8 @@ public:
         NFmiAreaMask::FunctionType thePrimaryFunc,
         NFmiAreaMask::FunctionType theSecondaryFunc,
         int theArgumentCount,
-        const boost::shared_ptr<NFmiArea> &theCalculationArea);
+        const boost::shared_ptr<NFmiArea> &theCalculationArea,
+        bool synopXCase);
     NFmiInfoAreaMaskOccurrance(const NFmiInfoAreaMaskOccurrance &theOther);
     void Initialize(void); // Tätä kutsutaan konstruktorin jälkeen, tässä alustetaan tietyille datoille mm. käytetyt aikaindeksit ja käytetyt locaaion indeksit
     NFmiAreaMask* Clone(void) const;
@@ -33,6 +34,7 @@ protected:
     void InitializeLocationIndexCaches();
     std::vector<unsigned long> CalcLocationIndexCache(boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
 
+    bool fSynopXCase; // halutaanko vain normaali asemat (true), ei liikkuvia asemia (laivat, poijut)
     bool fUseMultiSourceData;
     boost::shared_ptr<NFmiArea> itsCalculationArea; // Joitain laskuja optimoidaan ja niillä lähdedatasta laskut rajataan laskettavan kartta-alueen sisälle
     checkedVector<boost::shared_ptr<NFmiFastQueryInfo>> itsInfoVector; // Tähän laitetaan laskuissa käytettävät datat, joko se joko on jo emoluokassa oleva itsInfo, tai multisource tapauksissa joukko datoja

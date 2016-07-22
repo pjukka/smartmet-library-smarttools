@@ -1208,9 +1208,12 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
             {
                 if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::Occurrence)
                 {
+                    bool synopXCase = theAreaMaskInfo.GetDataIdent().GetProducer()->GetIdent() == NFmiInfoData::kFmiSpSynoXProducer;
+                    if(synopXCase)
+                        theAreaMaskInfo.GetDataIdent().GetProducer()->SetIdent(kFmiSYNOP);
                     boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
                     boost::shared_ptr<NFmiArea> calculationArea(UsedMacroParamData()->Area()->Clone());
-                    areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskOccurrance(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount(), calculationArea));
+                    areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskOccurrance(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount(), calculationArea, synopXCase));
                 }
                 else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::TimeRange)
                 {

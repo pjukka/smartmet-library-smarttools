@@ -21,8 +21,10 @@ NFmiInfoAreaMaskOccurrance::NFmiInfoAreaMaskOccurrance(const NFmiCalculationCond
     NFmiAreaMask::FunctionType thePrimaryFunc,
     NFmiAreaMask::FunctionType theSecondaryFunc,
     int theArgumentCount,
-    const boost::shared_ptr<NFmiArea> &theCalculationArea)
+    const boost::shared_ptr<NFmiArea> &theCalculationArea,
+    bool synopXCase)
     :NFmiInfoAreaMaskProbFunc(theOperation, theMaskType, theDataType, theInfo, thePrimaryFunc, theSecondaryFunc, theArgumentCount)
+    , fSynopXCase(synopXCase)
     , fUseMultiSourceData(false)
     , itsCalculationArea(theCalculationArea)
     , itsInfoVector()
@@ -33,6 +35,7 @@ NFmiInfoAreaMaskOccurrance::NFmiInfoAreaMaskOccurrance(const NFmiCalculationCond
 
 NFmiInfoAreaMaskOccurrance::NFmiInfoAreaMaskOccurrance(const NFmiInfoAreaMaskOccurrance &theOther)
     : NFmiInfoAreaMaskProbFunc(theOther)
+    , fSynopXCase(theOther.fSynopXCase)
     , fUseMultiSourceData(theOther.fUseMultiSourceData)
     , itsCalculationArea(theOther.itsCalculationArea)
     , itsInfoVector()
@@ -61,6 +64,8 @@ void NFmiInfoAreaMaskOccurrance::Initialize(void)
     else
     {
         boost::shared_ptr<NFmiDrawParam> drawParam(new NFmiDrawParam(itsInfo->Param(), *itsInfo->Level(), 0, itsInfo->DataType()));
+        if(fSynopXCase)
+            drawParam->Param().GetProducer()->SetIdent(NFmiInfoData::kFmiSpSynoXProducer);
         itsMultiSourceDataGetter(itsInfoVector, drawParam, itsCalculationArea);
     }
     InitializeLocationIndexCaches();

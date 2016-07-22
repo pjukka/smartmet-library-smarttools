@@ -2229,7 +2229,8 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
 
 		// havainto datoja
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("synop"), kFmiSYNOP));
-		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("metar"), kFmiMETAR));
+        itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("synopx"), static_cast<FmiProducerName>(NFmiInfoData::kFmiSpSynoXProducer)));
+        itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("metar"), kFmiMETAR));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("wxt"), kFmiTestBed));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("road"), kFmiRoadObs));
         itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("temp"), kFmiTEMP));
