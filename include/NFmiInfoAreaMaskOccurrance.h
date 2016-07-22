@@ -14,8 +14,10 @@ public:
         const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
         NFmiAreaMask::FunctionType thePrimaryFunc,
         NFmiAreaMask::FunctionType theSecondaryFunc,
-        int theArgumentCount);
+        int theArgumentCount,
+        const boost::shared_ptr<NFmiArea> &theCalculationArea);
     NFmiInfoAreaMaskOccurrance(const NFmiInfoAreaMaskOccurrance &theOther);
+    void Initialize(void); // Tätä kutsutaan konstruktorin jälkeen, tässä alustetaan tietyille datoille mm. käytetyt aikaindeksit ja käytetyt locaaion indeksit
     NFmiAreaMask* Clone(void) const;
 
     static void SetMultiSourceDataGetterCallback(const std::function<void(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &, boost::shared_ptr<NFmiDrawParam> &, const boost::shared_ptr<NFmiArea> &)> &theCallbackFunction);
@@ -28,8 +30,9 @@ protected:
     bool IsKnownMultiSourceData(); // nyt synop ja salama datat ovat tälläisiä
     void DoCalculations(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiCalculationParams &theCalculationParams, const NFmiLocation &theLocation, int &theOccurranceCountInOut);
 
-    bool fStationLocationsStoredInData; // Esim. salama ja SHIP datoissa kunkin ajan ja paikan latlon sijainti on tallessa Longitude ja Latitude parametreissa
     bool fUseMultiSourceData;
+    boost::shared_ptr<NFmiArea> itsCalculationArea; // Joitain laskuja optimoidaan ja niillä lähdedatasta laskut rajataan laskettavan kartta-alueen sisälle
+    checkedVector<boost::shared_ptr<NFmiFastQueryInfo>> itsInfoVector; // Tähän laitetaan laskuissa käytettävät datat, joko se joko on jo emoluokassa oleva itsInfo, tai multisource tapauksissa joukko datoja
 
     static std::function<void(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &, boost::shared_ptr<NFmiDrawParam> &, const boost::shared_ptr<NFmiArea> &)> itsMultiSourceDataGetter;
 

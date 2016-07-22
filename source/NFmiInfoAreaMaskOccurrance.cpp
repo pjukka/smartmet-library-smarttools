@@ -3,6 +3,7 @@
 #include "NFmiFastQueryInfo.h"
 #include "NFmiDrawParam.h"
 #include "NFmiProducerName.h"
+#include "NFmiSmartInfo.h"
 
 // **********************************************************
 // *****    NFmiInfoAreaMaskOccurrance  *********************
@@ -19,20 +20,25 @@ NFmiInfoAreaMaskOccurrance::NFmiInfoAreaMaskOccurrance(const NFmiCalculationCond
     const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
     NFmiAreaMask::FunctionType thePrimaryFunc,
     NFmiAreaMask::FunctionType theSecondaryFunc,
-    int theArgumentCount)
+    int theArgumentCount,
+    const boost::shared_ptr<NFmiArea> &theCalculationArea)
     :NFmiInfoAreaMaskProbFunc(theOperation, theMaskType, theDataType, theInfo, thePrimaryFunc, theSecondaryFunc, theArgumentCount)
-    , fStationLocationsStoredInData(false)
     , fUseMultiSourceData(false)
+    , itsCalculationArea(theCalculationArea)
+    , itsInfoVector()
 {
-    fStationLocationsStoredInData = theInfo->HasLatlonInfoInData();
     fUseMultiSourceData = IsKnownMultiSourceData();
 }
 
 NFmiInfoAreaMaskOccurrance::NFmiInfoAreaMaskOccurrance(const NFmiInfoAreaMaskOccurrance &theOther)
     : NFmiInfoAreaMaskProbFunc(theOther)
-    , fStationLocationsStoredInData(theOther.fStationLocationsStoredInData)
     , fUseMultiSourceData(theOther.fUseMultiSourceData)
+    , itsCalculationArea(theOther.itsCalculationArea)
+    , itsInfoVector()
 {
+    // tehd‰‰n matala kopio info-vektorista
+    for(size_t i = 0; i < theOther.itsInfoVector.size(); i++)
+        itsInfoVector.push_back(NFmiSmartInfo::CreateShallowCopyOfHighestInfo(theOther.itsInfoVector[i]));
 }
 
 NFmiAreaMask* NFmiInfoAreaMaskOccurrance::Clone(void) const
@@ -43,6 +49,18 @@ NFmiAreaMask* NFmiInfoAreaMaskOccurrance::Clone(void) const
 void NFmiInfoAreaMaskOccurrance::SetMultiSourceDataGetterCallback(const std::function<void(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &, boost::shared_ptr<NFmiDrawParam> &, const boost::shared_ptr<NFmiArea> &)> &theCallbackFunction)
 {
     NFmiInfoAreaMaskOccurrance::itsMultiSourceDataGetter = theCallbackFunction;
+}
+
+void NFmiInfoAreaMaskOccurrance::Initialize(void)
+{
+    // cachejen alustuksia tehd‰‰n vain asemadatoille. Hila datat hanskataan emoluokassa ja sit‰ en l‰hde t‰ss‰ viel‰ optinmoimaan.
+    if(!fUseMultiSourceData)
+        itsInfoVector.push_back(itsInfo);
+    else
+    {
+        boost::shared_ptr<NFmiDrawParam> drawParam(new NFmiDrawParam(itsInfo->Param(), *itsInfo->Level(), 0, itsInfo->DataType()));
+        itsMultiSourceDataGetter(itsInfoVector, drawParam, itsCalculationArea);
+    }
 }
 
 // Nyt synop ja salama datat ovat t‰ll‰isi‰. T‰m‰ on yritys tehd‰ v‰h‰n optimointia muutenkin jo pirun raskaaseen koodiin.
@@ -80,12 +98,8 @@ double NFmiInfoAreaMaskOccurrance::Value(const NFmiCalculationParams &theCalcula
 
         if(fUseMultiSourceData && itsMultiSourceDataGetter)
         {
-            boost::shared_ptr<NFmiArea> dummyAreaPtr; // t‰ll‰ ei tehd‰ mit‰‰n haussa
-            boost::shared_ptr<NFmiDrawParam> drawParam(new NFmiDrawParam(itsInfo->Param(), *itsInfo->Level(), 0, itsInfo->DataType()));
-            checkedVector<boost::shared_ptr<NFmiFastQueryInfo>> infos;
-            itsMultiSourceDataGetter(infos, drawParam, dummyAreaPtr);
-            for(size_t i = 0; i < infos.size(); i++)
-                DoCalculations(infos[i], theCalculationParams, location, occurranceCount);
+            for(size_t i = 0; i < itsInfoVector.size(); i++)
+                DoCalculations(itsInfoVector[i], theCalculationParams, location, occurranceCount);
         }
         else
         {
@@ -98,7 +112,7 @@ double NFmiInfoAreaMaskOccurrance::Value(const NFmiCalculationParams &theCalcula
 
 void NFmiInfoAreaMaskOccurrance::DoCalculations(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiCalculationParams &theCalculationParams, const NFmiLocation &theLocation, int &theOccurranceCountInOut)
 {
-    fStationLocationsStoredInData = theInfo->HasLatlonInfoInData(); // Eri multi source datoille voi olla erilaiset lokaatio jutut (tosessa synop datassa vakio maaasema, toisessa liikkuva laiva)
+    bool stationLocationsStoredInData = theInfo->HasLatlonInfoInData(); // Eri multi source datoille voi olla erilaiset lokaatio jutut (tosessa synop datassa vakio maaasema, toisessa liikkuva laiva)
     // Lasketaan aikaloopitus rajat
     unsigned long origTimeIndex = theInfo->TimeIndex(); // Otetaan aikaindeksi talteen, jotta se voidaan lopuksi palauttaa takaisin
     unsigned long startTimeIndex = origTimeIndex;
@@ -114,7 +128,7 @@ void NFmiInfoAreaMaskOccurrance::DoCalculations(boost::shared_ptr<NFmiFastQueryI
         for(theInfo->ResetLocation(); theInfo->NextLocation(); ) // K‰yd‰‰n l‰pi kaikki asemat (miten k‰yd‰‰n l‰pi eri synop datat????)
         {
             // Tarkastetaan jokainen piste erikseen, onko se halutun s‰teisen ympyr‰n sis‰ll‰
-            double distanceInKM = theLocation.Distance(fStationLocationsStoredInData ? theInfo->GetLatlonFromData() : theInfo->LatLon()) * 0.001;
+            double distanceInKM = theLocation.Distance(stationLocationsStoredInData ? theInfo->GetLatlonFromData() : theInfo->LatLon()) * 0.001;
             if(distanceInKM > itsSearchRangeInKM)
                 continue; // kyseinen piste oli ympyr‰n ulkopuolella
 
