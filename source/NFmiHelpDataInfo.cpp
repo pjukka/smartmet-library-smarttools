@@ -328,28 +328,6 @@ NFmiDataIdent NFmiHelpDataInfoSystem::GetNextSatelChannel(const NFmiDataIdent &t
 	return returnDataIdent;
 }
 
-// Ovatko kaksi annettua projektiota siin‰ mieless‰ samanlaisia, ett‰ 
-// voidaan sijoittaa rasterikuva oikein toisen rasterikuvan p‰‰lle.
-// Eli palauta false = ei voi piirt‰‰ ja true = voi, 
-// jos projektio luokat ovat samoja ja jos kyseess‰ oli stereographic areat, niiden
-// orientaatiot pit‰‰ olla samat.
-bool NFmiHelpDataInfoSystem::IsSameTypeProjections(const boost::shared_ptr<NFmiArea> &theFirst, const boost::shared_ptr<NFmiArea> &theSecond)
-{
-	if(theFirst && theSecond)
-	{
-		if(theFirst->ClassId() == theSecond->ClassId() && theFirst->ClassId() == kNFmiStereographicArea)
-		{
-            if(static_cast<const NFmiStereographicArea*>(theFirst.get())->Orientation() == static_cast<const NFmiStereographicArea*>(theSecond.get())->Orientation())
-				return true;
-			else
-				return false;
-		}
-		else if(theFirst->ClassId() == theSecond->ClassId())
-			return true;
-	}
-	return false;
-}
-
 void NFmiHelpDataInfoSystem::AddDynamic(const NFmiHelpDataInfo &theInfo)
 {
 	itsDynamicHelpDataInfos.push_back(theInfo);

@@ -194,7 +194,6 @@ public:
 	void CachePartialDataDirectory(const std::string &newValue) {itsCachePartialDataDirectory = newValue;}
 private:
 	void InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos, bool fStaticData);
-	bool IsSameTypeProjections(const boost::shared_ptr<NFmiArea> &theFirst, const boost::shared_ptr<NFmiArea> &theSecond);
 
 	checkedVector<NFmiHelpDataInfo> itsDynamicHelpDataInfos; // tähän tulee jatkuvasti päivitettävät datat kuten havainnot, tutka ja analyysi datat
 	checkedVector<NFmiHelpDataInfo> itsStaticHelpDataInfos; // tähän tulee kerran ladattavat jutut kuten maa/meri maskit ja klimatologiset jutut
