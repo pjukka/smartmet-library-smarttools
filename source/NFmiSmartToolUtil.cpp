@@ -170,7 +170,7 @@ bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase,
         std::string(""), createDrawParamFileIfNotExist, false, false);  // tähän annetaan
                                                                         // drawparametrien lataus
                                                                         // polku, mutta niitä ei
-                                                                        // käytetä tässä tapauksessa
+    // käytetä tässä tapauksessa
     // false tarkoittaa että ei tehdä kopiota editoidusta datasta, tässä se on turhaa
     bool dataWasDeleted = false;
     theModifiedData->LatLonCache();  // lasketaan latlon-cache valmiiksi, koska muuten multi-thread
@@ -209,9 +209,10 @@ bool NFmiSmartToolUtil::InitDataBaseHelperData(
       sQData.QueryData()->LatLonCache();  // lasketaan latlon-cache valmiiksi, koska muuten
                                           // multi-thread ympäristössä tulee sen kanssa ongelmia
       bool dataWasDeleted = false;
+
       theDataBase.AddData(sQData.QueryData(true),
                           theHelperDataFileNames[i],
-                          "",
+                          theHelperDataFileNames[i],
                           dataType,
                           0,
                           0,

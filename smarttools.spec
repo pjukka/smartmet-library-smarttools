@@ -1,16 +1,16 @@
 %define LIBNAME smarttools
 Summary: smarttools library
 Name: libsmartmet-%{LIBNAME}
-Version: 16.6.14
+Version: 16.10.29
 Release: 1%{?dist}.fmi
 License: FMI
 Group: Development/Libraries
 URL: http://www.weatherproof.fi
 Source: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: libsmartmet-newbase-devel >= 16.6.13
+BuildRequires: libsmartmet-newbase-devel >= 16.9.20
 BuildRequires: boost-devel
-Requires: libsmartmet-newbase >= 16.6.13
+Requires: libsmartmet-newbase >= 16.9.20
 Provides: %{LIBNAME}
 
 %description
@@ -50,6 +50,8 @@ FMI smarttools development files
 
 
 %changelog
+* Thu Oct 27 2016 Mika Heiskanen <mika.heiskanen@fmi.fi> - 16.10.29-1.fmi
+- Enable scripting with multiple files with the same producer but different parameters
 * Tue Jun 14 2016 Mika Heiskanen <mika.heiskanen@fmi.fi> - 16.6.14-1.fmi
 - Recompiled due to newbase API changes
 * Sun Jan 17 2016 Mika Heiskanen <mika.heiskanen@fmi.fi> - 16.1.17-1.fmi
