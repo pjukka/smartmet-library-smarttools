@@ -45,6 +45,7 @@ NFmiQueryDataKeeper::NFmiQueryDataKeeper(boost::shared_ptr<NFmiOwnerInfo> &theOr
 NFmiQueryDataKeeper::~NFmiQueryDataKeeper(void)
 {
 }
+
 boost::shared_ptr<NFmiOwnerInfo> NFmiQueryDataKeeper::OriginalData(void)
 {
   itsLastTimeUsedTimer.StartTimer();
@@ -121,6 +122,7 @@ NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> 
 NFmiQueryDataSetKeeper::~NFmiQueryDataSetKeeper(void)
 {
 }
+
 /*
 static void QDataListDestroyer(NFmiQueryDataSetKeeper::ListType *theQDataListToBeDestroyed)
 {
@@ -356,7 +358,7 @@ bool NFmiQueryDataSetKeeper::DoOnDemandOldDataLoad(int theIndex)
         {
           std::string usedFileName = ::GetFullFileName(itsFilePattern, *it);
           NFmiQueryInfo info;
-          std::ifstream in(usedFileName.c_str());
+          std::ifstream in(usedFileName.c_str(), std::ios::binary);
           if (in)
           {
             in >> info;
@@ -427,6 +429,7 @@ size_t NFmiQueryDataSetKeeper::DataCount(void)
 {
   return itsQueryDatas.size();
 }
+
 size_t NFmiQueryDataSetKeeper::DataByteCount(void)
 {
   size_t sizeInBytes = 0;

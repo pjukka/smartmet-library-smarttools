@@ -81,6 +81,7 @@ NFmiAreaMaskInfo::~NFmiAreaMaskInfo(void)
 {
   delete itsLevel;
 }
+
 void NFmiAreaMaskInfo::SetLevel(NFmiLevel *theLevel)
 {
   delete itsLevel;

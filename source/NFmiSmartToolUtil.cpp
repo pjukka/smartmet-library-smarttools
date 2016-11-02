@@ -211,7 +211,6 @@ bool NFmiSmartToolUtil::InitDataBaseHelperData(
       sQData.QueryData()->LatLonCache();  // lasketaan latlon-cache valmiiksi, koska muuten
                                           // multi-thread ympäristössä tulee sen kanssa ongelmia
       bool dataWasDeleted = false;
-
       theDataBase.AddData(sQData.QueryData(true),
                           theHelperDataFileNames[i],
                           theHelperDataFileNames[i],

@@ -52,6 +52,7 @@ NFmiDrawParamList::~NFmiDrawParamList(void)
 {
   Clear();
 }
+
 //--------------------------------------------------------
 // Add
 //--------------------------------------------------------
@@ -231,6 +232,7 @@ bool NFmiDrawParamList::Find(NFmiDrawParam* item)
 void NFmiDrawParamList::Update(void)
 {
 }
+
 void NFmiDrawParamList::HideAllParams(bool newState)
 {
   for (Reset(); Next();)

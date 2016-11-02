@@ -21,6 +21,7 @@ NFmiSmartToolCalculationSectionInfo::NFmiSmartToolCalculationSectionInfo(void)
 NFmiSmartToolCalculationSectionInfo::~NFmiSmartToolCalculationSectionInfo(void)
 {
 }
+
 void NFmiSmartToolCalculationSectionInfo::AddCalculationInfo(
     boost::shared_ptr<NFmiSmartToolCalculationInfo> &value)
 {

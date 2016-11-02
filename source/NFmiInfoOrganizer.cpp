@@ -58,6 +58,7 @@ NFmiInfoOrganizer::NFmiInfoOrganizer(void)
 NFmiInfoOrganizer::~NFmiInfoOrganizer(void)
 {
 }
+
 bool NFmiInfoOrganizer::Init(const std::string &theDrawParamPath,
                              bool createDrawParamFileIfNotExist,
                              bool createEditedDataCopy,
@@ -445,7 +446,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
 {
   boost::shared_ptr<NFmiFastQueryInfo>
       backupData;  // etsitää tähän 1. data joka muuten sopii kriteereihin, mutta
-  // jonka tuottaja nimi on eri kuin haluttu. Jos oikealla nimellä ei löydy dataa, käytetään tätä.
+                   // jonka tuottaja nimi on eri kuin haluttu. Jos oikealla nimellä ei löydy dataa, käytetään tätä.
   if (theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpSynoPlot ||
       theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpMinMaxPlot)  // synop plot paramille pitää
                                                                        // tehdä kikka (ja min/max
@@ -532,7 +533,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CrossSectionInfo(
     return CrossSectionMacroParamData();
   boost::shared_ptr<NFmiFastQueryInfo>
       backupData;  // etsitää tähän 1. data joka muuten sopii kriteereihin, mutta
-  // jonka tuottaja nimi on eri kuin haluttu. Jos oikealla nimellä ei löydy dataa, käytetään tätä.
+                   // jonka tuottaja nimi on eri kuin haluttu. Jos oikealla nimellä ei löydy dataa, käytetään tätä.
   boost::shared_ptr<NFmiFastQueryInfo> foundData;
   if (itsEditedDataKeeper &&
       ::MatchCrossSectionData(itsEditedDataKeeper->GetIter(), theType, theDataIdent, true))

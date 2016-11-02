@@ -575,7 +575,7 @@ void NFmiSilamStationList::Init(const std::string &theInitFileName)
   if (theInitFileName.empty())
     throw std::runtime_error("NFmiSilamStationList::Init - empty settings filename given.");
 
-  ifstream in(theInitFileName.c_str());
+  ifstream in(theInitFileName.c_str(), std::ios::binary);
   if (in)
   {
     const int maxBufferSize = 1024 + 1;  // kuinka pitkä yhden rivin maksimissaan oletetaan olevan
@@ -613,11 +613,13 @@ void NFmiSilamStationList::Clear(void)
 {
   itsLocations.clear();
 }
+
 // ****************   NFmiWmoStationLookUpSystem  *************************************
 
 NFmiWmoStationLookUpSystem::NFmiWmoStationLookUpSystem(void) : itsStations(), itsInitLogMessage()
 {
 }
+
 const NFmiWmoStation &NFmiWmoStationLookUpSystem::GetStation(long theWmoId)
 {
   const static NFmiWmoStation dummy;

@@ -42,6 +42,7 @@ NFmiProducer NFmiProducerInfo::GetProducer(void)
 {
   return NFmiProducer(itsProducerId, itsName);
 }
+
 NFmiProducerInfo NFmiProducerSystem::GetProducerInfoFromSettings(
     const std::string &theUsedNameSpaceBase)
 {

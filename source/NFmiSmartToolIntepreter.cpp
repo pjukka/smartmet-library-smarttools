@@ -55,10 +55,12 @@ NFmiSmartToolCalculationBlockInfoVector::NFmiSmartToolCalculationBlockInfoVector
 NFmiSmartToolCalculationBlockInfoVector::~NFmiSmartToolCalculationBlockInfoVector(void)
 {
 }
+
 void NFmiSmartToolCalculationBlockInfoVector::Clear(void)
 {
   itsCalculationBlockInfos.clear();
 }
+
 // Ottaa pointterin 'omistukseensa' eli pitää luoda ulkona new:llä ja antaa tänne
 void NFmiSmartToolCalculationBlockInfoVector::Add(
     boost::shared_ptr<NFmiSmartToolCalculationBlockInfo> &theBlockInfo)
@@ -91,6 +93,7 @@ NFmiSmartToolCalculationBlockInfo::NFmiSmartToolCalculationBlockInfo(void)
 NFmiSmartToolCalculationBlockInfo::~NFmiSmartToolCalculationBlockInfo(void)
 {
 }
+
 void NFmiSmartToolCalculationBlockInfo::Clear(void)
 {
   if (itsIfCalculationBlockInfos)
@@ -2333,13 +2336,12 @@ void NFmiSmartToolIntepreter::InitProducerTokens(NFmiProducerSystem *theProducer
   {
     // Tuottaja listaa täydennetään ProducerSystemin tuottajilla
     int modelCount = static_cast<int>(theProducerSystem->Producers().size());
-    int i = 0;
-    for (i = 0; i < modelCount; i++)
+    for (int i = 0; i < modelCount; i++)
     {
       NFmiProducerInfo &prodInfo = theProducerSystem->Producer(i + 1);
-      for (size_t i = 0; i < prodInfo.ShortNameCount(); i++)
+      for (size_t j = 0; j < prodInfo.ShortNameCount(); j++)
       {
-        std::string prodName(prodInfo.ShortName(i));
+        std::string prodName(prodInfo.ShortName(j));
         NFmiStringTools::LowerCase(prodName);  // pitää muuttaa lower case:en!!!
         itsTokenProducerNamesAndIds.insert(
             ProducerMap::value_type(prodName, static_cast<FmiProducerName>(prodInfo.ProducerId())));
@@ -2510,6 +2512,9 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("icing"), kFmiIcing));
     itsTokenParameterNamesAndIds.insert(
         ParamMap::value_type(string("qnh"), static_cast<FmiParameterName>(1207)));
+
+    itsTokenParameterNamesAndIds.insert(
+        ParamMap::value_type(string("messagetype"), kFmiHakeMessageType));
 
     // ****** sounding index funktiot  HUOM! ne käsitellään case insensitiveinä!!
     // *************************
@@ -2704,12 +2709,15 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
 
     // havainto datoja
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("synop"), kFmiSYNOP));
+    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(
+        string("synopx"), static_cast<FmiProducerName>(NFmiInfoData::kFmiSpSynoXProducer)));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("metar"), kFmiMETAR));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("wxt"), kFmiTestBed));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("road"), kFmiRoadObs));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("temp"), kFmiTEMP));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("temp"), kFmiBufrTEMP));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("nrd"), kFmiRADARNRD));
+    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("hake"), kFmiHakeMessages));
 
     if (theProducerSystem)
     {
@@ -3181,7 +3189,14 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
             NFmiAreaMask::ProbEqual,
             NFmiAreaMask::ProbRect,
             5,
-            string("probrect_equal(par, radius_km, time_offset1, time_offset2, limit)"))));
+            string("probrect_equal(par, radius_km, time_offset1, time_offset2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
+        string("probrect_notequal"),
+        VertFunctionMapValue(
+            NFmiAreaMask::ProbNotEqual,
+            NFmiAreaMask::ProbRect,
+            5,
+            string("probrect_notequal(par, radius_km, time_offset1, time_offset2, value)"))));
     itsTokenVertFunctions.insert(VertFunctionMap::value_type(
         string("probrect_between"),
         VertFunctionMapValue(
@@ -3234,7 +3249,14 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
             NFmiAreaMask::ProbEqual,
             NFmiAreaMask::ProbCircle,
             5,
-            string("probcircle_equal(par, radius_km, time_offset1, time_offset2, limit)"))));
+            string("probcircle_equal(par, radius_km, time_offset1, time_offset2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
+        string("probcircle_notequal"),
+        VertFunctionMapValue(
+            NFmiAreaMask::ProbNotEqual,
+            NFmiAreaMask::ProbCircle,
+            5,
+            string("probcircle_equal(par, radius_km, time_offset1, time_offset2, value)"))));
     itsTokenVertFunctions.insert(VertFunctionMap::value_type(
         string("probcircle_between"),
         VertFunctionMapValue(NFmiAreaMask::ProbBetween,
@@ -3248,6 +3270,65 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
                              NFmiAreaMask::ProbCircle,
                              6,
                              string("probcircle_betweeneq(par, radius_km, time_offset1, "
+                                    "time_offset2, limit1, limit2)"))));
+
+    // Esiintymä funktio eli kuinka monta kertaa joku ehto halutulle parametrille pitää paikkaansa
+    // (halutulla aikavälillä ja halutun säteisellä alueella).
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
+        string("occurrence_over"),
+        VertFunctionMapValue(
+            NFmiAreaMask::ProbOver,
+            NFmiAreaMask::Occurrence,
+            5,
+            string("occurrence_over(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
+        string("occurrence_overeq"),
+        VertFunctionMapValue(
+            NFmiAreaMask::ProbOverEq,
+            NFmiAreaMask::Occurrence,
+            5,
+            string("occurrence_overeq(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
+        string("occurrence_under"),
+        VertFunctionMapValue(
+            NFmiAreaMask::ProbUnder,
+            NFmiAreaMask::Occurrence,
+            5,
+            string("occurrence_under(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
+        string("occurrence_undereq"),
+        VertFunctionMapValue(
+            NFmiAreaMask::ProbUnderEq,
+            NFmiAreaMask::Occurrence,
+            5,
+            string("occurrence_undereq(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
+        string("occurrence_equal"),
+        VertFunctionMapValue(
+            NFmiAreaMask::ProbEqual,
+            NFmiAreaMask::Occurrence,
+            5,
+            string("occurrence_equal(par, radius_km, time_offset1, time_offset2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
+        string("occurrence_notequal"),
+        VertFunctionMapValue(
+            NFmiAreaMask::ProbNotEqual,
+            NFmiAreaMask::Occurrence,
+            5,
+            string("occurrence_notequal(par, radius_km, time_offset1, time_offset2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
+        string("occurrence_between"),
+        VertFunctionMapValue(NFmiAreaMask::ProbBetween,
+                             NFmiAreaMask::Occurrence,
+                             6,
+                             string("occurrence_between(par, radius_km, time_offset1, "
+                                    "time_offset2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
+        string("occurrence_betweeneq"),
+        VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq,
+                             NFmiAreaMask::Occurrence,
+                             6,
+                             string("occurrence_betweeneq(par, radius_km, time_offset1, "
                                     "time_offset2, limit1, limit2)"))));
 
     // Hae asemadatasta lähin arvo funktionaalisuus
@@ -3272,19 +3353,19 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
         VertFunctionMapValue(NFmiAreaMask::Min,
                              NFmiAreaMask::TimeRange,
                              3,
-                             string("time_max(par, time_offset1, time_offset2)"))));
+                             string("time_min(par, time_offset1, time_offset2)"))));
     itsTokenVertFunctions.insert(VertFunctionMap::value_type(
         string("time_avg"),
         VertFunctionMapValue(NFmiAreaMask::Avg,
                              NFmiAreaMask::TimeRange,
                              3,
-                             string("time_max(par, time_offset1, time_offset2)"))));
+                             string("time_avg(par, time_offset1, time_offset2)"))));
     itsTokenVertFunctions.insert(VertFunctionMap::value_type(
         string("time_sum"),
         VertFunctionMapValue(NFmiAreaMask::Sum,
                              NFmiAreaMask::TimeRange,
                              3,
-                             string("time_max(par, time_offset1, time_offset2)"))));
+                             string("time_sum(par, time_offset1, time_offset2)"))));
 
     // Tässä on time-range vertikaaliset-funktiot, jotka operoivat datan omassa aika ja level
     // resoluutiossa.

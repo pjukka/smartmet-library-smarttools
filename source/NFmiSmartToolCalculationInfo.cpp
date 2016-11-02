@@ -22,6 +22,7 @@ NFmiSmartToolCalculationInfo::NFmiSmartToolCalculationInfo(void)
 NFmiSmartToolCalculationInfo::~NFmiSmartToolCalculationInfo(void)
 {
 }
+
 void NFmiSmartToolCalculationInfo::AddCalculationInfo(
     boost::shared_ptr<NFmiAreaMaskInfo> &theAreaMaskInfo)
 {

@@ -88,6 +88,7 @@ NFmiSmartToolCalculation::NFmiSmartToolCalculation(const NFmiSmartToolCalculatio
 NFmiSmartToolCalculation::~NFmiSmartToolCalculation(void)
 {
 }
+
 //--------------------------------------------------------
 // Calculate
 //--------------------------------------------------------

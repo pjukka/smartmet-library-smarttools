@@ -31,6 +31,7 @@ NFmiSmartToolInfo::NFmiSmartToolInfo(void)
 NFmiSmartToolInfo::~NFmiSmartToolInfo(void)
 {
 }
+
 // luetaan  asetukset nykyään NFmiSetting-luokasta
 bool NFmiSmartToolInfo::Init(const std::string &theLoadDirectory)
 {
@@ -104,7 +105,7 @@ bool NFmiSmartToolInfo::WriteScript2File(const std::string &theFileName,
 {
   if (!theFileName.empty())
   {
-    ofstream out(theFileName.c_str());
+    ofstream out(theFileName.c_str(), std::ios::binary);
     if (out)
     {
       out << theScript;

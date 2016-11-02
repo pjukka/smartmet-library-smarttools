@@ -81,6 +81,7 @@ NFmiDrawParamFactory::NFmiDrawParamFactory(bool createDrawParamFileIfNotExist,
 NFmiDrawParamFactory::~NFmiDrawParamFactory(void)
 {
 }
+
 //--------------------------------------------------------
 // DrawParam
 //--------------------------------------------------------
@@ -160,6 +161,7 @@ bool NFmiDrawParamFactory::Init()
 {
   return true;
 }
+
 //--------------------------------------------------------
 // CreateFileName, private
 //--------------------------------------------------------

@@ -198,6 +198,10 @@ static void CalcAllSoundingIndexParamFields(boost::shared_ptr<NFmiFastQueryInfo>
         theResultInfo->FloatValue(valueOpt1);
       }
     }
+    catch (NFmiStopThreadException &)
+    {
+      break;
+    }
     catch (...)
     {
       // jouduin laittamaan try-catch blokin tänne, koska aina silloin tällöin jossain vaiheessa
@@ -1197,5 +1201,11 @@ boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingI
                                                           fUseOnlyOneThread,
                                                           theMaxThreadCount);
 
-  return data;
+  if (theStopFunctor && theStopFunctor->Stop())
+    return boost::shared_ptr<NFmiQueryData>();  // Jos Esim. SmartMetia ollaan sulkemassa ja laskut
+                                                // on lopetettu kesken, ei haluta tallettaa kesken
+                                                // jääneitä laskuja tiedostoon, eli palautetaan
+                                                // tässä tyhjä smart-pointer
+  else
+    return data;
 }

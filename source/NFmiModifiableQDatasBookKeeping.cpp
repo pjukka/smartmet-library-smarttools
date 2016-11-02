@@ -97,6 +97,7 @@ unsigned long NFmiModifiableQDatasBookKeeping::MaskType(void)
 {
   return (*itsAreaMask)->MaskType();
 }
+
 bool NFmiModifiableQDatasBookKeeping::IsMasked(unsigned long theIndex) const
 {
   return (*itsAreaMask)->IsMasked(theIndex);
@@ -191,10 +192,12 @@ bool NFmiModifiableQDatasBookKeeping::LocationSelectionUndo(void)
 {
   return itsAreaMask->Undo();
 }
+
 bool NFmiModifiableQDatasBookKeeping::LocationSelectionRedo(void)
 {
   return itsAreaMask->Redo();
 }
+
 bool NFmiModifiableQDatasBookKeeping::LocationSelectionUndoData(void)
 {
   return itsAreaMask->UndoData();

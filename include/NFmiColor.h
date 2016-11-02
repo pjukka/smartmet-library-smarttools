@@ -147,18 +147,22 @@ inline void NFmiColor::SetRGBA(const FmiRGBColor &aColor)
 inline NFmiColor::NFmiColor(const NFmiColor &aColor) : itsColor(aColor.itsColor)
 {
 }
+
 inline NFmiColor::NFmiColor(const FmiRGBColor &aColor) : itsColor()
 {
   SetRGBA(aColor);
 }
+
 inline std::ostream &operator<<(std::ostream &os, const NFmiColor &ob)
 {
   return ob.Write(os);
 }
+
 inline std::istream &operator>>(std::istream &os, NFmiColor &ob)
 {
   return ob.Read(os);
 }
+
 inline void NFmiColor::SetRGBA(float aRedValue,
                                float aGreenValue,
                                float aBlueValue,

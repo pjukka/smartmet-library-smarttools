@@ -43,6 +43,7 @@ NFmiTEMPCode::NFmiTEMPCode(NFmiAviationStationInfoSystem *theTempStations,
 NFmiTEMPCode::~NFmiTEMPCode(void)
 {
 }
+
 void NFmiTEMPCode::Clear(void)
 {
   itsOriginalCodeAStr.clear();

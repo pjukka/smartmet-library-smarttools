@@ -523,6 +523,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 NFmiDrawParam::~NFmiDrawParam(void)
 {
 }
+
 //-------------------------------------------------------
 // Init
 //-------------------------------------------------------
@@ -726,7 +727,7 @@ bool NFmiDrawParam::Init(const std::string& theFilename)
 {
   if (theFilename != std::string(""))
   {
-    std::ifstream in(theFilename.c_str(), std::ios::in);
+    std::ifstream in(theFilename.c_str(), std::ios::binary);
     if (in)
     {
       in >> *this;
@@ -750,7 +751,7 @@ bool NFmiDrawParam::StoreData(const std::string& theFilename)
 {
   if (theFilename != std::string(""))
   {
-    std::ofstream out(theFilename.c_str());
+    std::ofstream out(theFilename.c_str(), std::ios::binary);
     if (out)
     {
       out << *this;
@@ -1072,6 +1073,22 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
   return file;
 }
 
+// Kun muutin drawParamien luku/kirjoitukset binäärisiksi, tuli SmartMetiin seuraava bugi:
+// Harmaassa param-boxissa tuli joillekin parametreille nimeksi pelkkä ?.
+// Tämä johtui siitä että binääri luvussa luetaan teksti sellaisenään tiedostosta, eikä siinä
+// skipata \r ja \n merkkejä.
+// Nämä merkit ? -tekstin perässä aiheutti sen että parametri-näytössä ollut "?" tekstin tarkastu
+// meni pieleen.
+// Siksi luetusta parametrin nimi tekstistä pitää siivota lopusta poi mahdolliset rivinvaihto
+// merkit.
+static void FixBinaryReadParameterAbbreviation(std::string& paramNameInOut)
+{
+  // Trimmaa oikealta muutamia mahdollisia rivinvaihto merkkejä pois
+  NFmiStringTools::TrimR(paramNameInOut, '\n');
+  NFmiStringTools::TrimR(paramNameInOut, '\r');
+  NFmiStringTools::TrimR(paramNameInOut, '\n');
+}
+
 //--------------------------------------------------------
 // Read
 //--------------------------------------------------------
@@ -1112,6 +1129,9 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       else
       {
         itsMacroParamRelativePath = "";
+        ::FixBinaryReadParameterAbbreviation(tmpStr);  // Binääri lukuun siirron takia pitää
+                                                       // trimmata mahdollisia rivinvaihto merkkejä
+                                                       // pois
         itsParameterAbbreviation = tmpStr;
       }
       file >> temp;  // luetaan nimike pois

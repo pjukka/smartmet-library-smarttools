@@ -70,6 +70,7 @@ NFmiMultiLevelMask& NFmiMultiLevelMask::operator=(const NFmiMultiLevelMask& theM
 NFmiMultiLevelMask::~NFmiMultiLevelMask(void)
 {
 }
+
 //--------------------------------------------------------
 // MaskSize
 //--------------------------------------------------------
@@ -77,6 +78,7 @@ const unsigned long& NFmiMultiLevelMask::MaskSize(void) const
 {
   return itsMaskSize;
 }
+
 //--------------------------------------------------------
 // Mask
 //--------------------------------------------------------

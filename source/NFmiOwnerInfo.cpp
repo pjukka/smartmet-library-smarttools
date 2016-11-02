@@ -33,6 +33,7 @@ NFmiOwnerInfo::NFmiOwnerInfo(const NFmiOwnerInfo &theInfo)
 NFmiOwnerInfo::~NFmiOwnerInfo(void)
 {
 }
+
 NFmiOwnerInfo &NFmiOwnerInfo::operator=(const NFmiOwnerInfo &theInfo)
 {
   NFmiFastQueryInfo::operator=(theInfo);
