@@ -16,26 +16,27 @@ class NFmiFastQueryInfo;
 //! Tämä luokka toimii kuten NFmiInfoAreaMask mutta kurkkaa halutun x-y hila pisteen yli arvoa
 class NFmiInfoAreaMaskSoundingIndex : public NFmiInfoAreaMask
 {
+ public:
+  virtual ~NFmiInfoAreaMaskSoundingIndex(void);
+  NFmiInfoAreaMaskSoundingIndex(boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+                                FmiSoundingParameters theSoundingParam);
+  NFmiInfoAreaMaskSoundingIndex(const NFmiInfoAreaMaskSoundingIndex &theOther);
+  NFmiAreaMask *Clone(void) const;
 
-public:
+  FmiSoundingParameters SoundingParam(void) const { return itsSoundingParam; }
+  void SoundingParam(FmiSoundingParameters newValue) { itsSoundingParam = newValue; }
+  // tätä kaytetaan smarttool-modifierin yhteydessä
+  using NFmiInfoAreaMask::Value;
+  double Value(const NFmiPoint &theLatlon,
+               const NFmiMetTime &theTime,
+               int theTimeIndex,
+               bool fUseTimeInterpolationAlways);
 
-	virtual ~NFmiInfoAreaMaskSoundingIndex(void);
-	NFmiInfoAreaMaskSoundingIndex(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiSoundingParameters theSoundingParam);
-	NFmiInfoAreaMaskSoundingIndex(const NFmiInfoAreaMaskSoundingIndex &theOther);
-	NFmiAreaMask* Clone(void) const;
+ private:
+  FmiSoundingParameters itsSoundingParam;
 
-	FmiSoundingParameters SoundingParam(void) const {return itsSoundingParam;}
-	void SoundingParam(FmiSoundingParameters newValue) {itsSoundingParam = newValue;}
+  NFmiInfoAreaMaskSoundingIndex &operator=(const NFmiInfoAreaMaskPeekXY &theMask);
 
-	// tätä kaytetaan smarttool-modifierin yhteydessä
-    using NFmiInfoAreaMask::Value;
-	double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
+};  // class NFmiInfoAreaMaskSoundingIndex
 
-private:
-	FmiSoundingParameters itsSoundingParam;
-
-	NFmiInfoAreaMaskSoundingIndex & operator=(const NFmiInfoAreaMaskPeekXY & theMask);
-
-}; // class NFmiInfoAreaMaskSoundingIndex
-
-#endif // NFMIINFOAREAMASKSOUNDINGINDEX_H
+#endif  // NFMIINFOAREAMASKSOUNDINGINDEX_H

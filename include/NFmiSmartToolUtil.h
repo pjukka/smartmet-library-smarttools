@@ -8,13 +8,13 @@
  * \class NFmiSmartToolUtil
  *
  * Tämä luokka tekee halutut smarttool-operaatiot halutuille datoille.
- * Toiminta samanlainen kuin NFmiQueryDataUtil-luokalla, mutta muutokset 
+ * Toiminta samanlainen kuin NFmiQueryDataUtil-luokalla, mutta muutokset
  * tehdään erilaisilla scripteillä. Muokkaus datoihin tapahtuu luokan static
  * funktioilla.
  */
 // ======================================================================
-#ifndef  NFMISMARTTOOLUTIL_H
-#define  NFMISMARTTOOLUTIL_H
+#ifndef NFMISMARTTOOLUTIL_H
+#define NFMISMARTTOOLUTIL_H
 
 #include <NFmiDataMatrix.h>
 #include <string>
@@ -23,18 +23,41 @@ class NFmiQueryData;
 class NFmiTimeDescriptor;
 class NFmiInfoOrganizer;
 
-class NFmiSmartToolUtil 
+class NFmiSmartToolUtil
 {
-public:
+ public:
+  static NFmiQueryData *ModifyData(const std::string &theMacroText,
+                                   NFmiQueryData *theModifiedData,
+                                   bool createDrawParamFileIfNotExist,
+                                   bool fMakeStaticIfOneTimeStepData);
+  static NFmiQueryData *ModifyData(const std::string &theMacroText,
+                                   NFmiQueryData *theModifiedData,
+                                   NFmiTimeDescriptor *theTimes,
+                                   bool createDrawParamFileIfNotExist,
+                                   bool fMakeStaticIfOneTimeStepData);
+  static NFmiQueryData *ModifyData(const std::string &theMacroText,
+                                   NFmiQueryData *theModifiedData,
+                                   const checkedVector<std::string> *theHelperDataFileNames,
+                                   bool createDrawParamFileIfNotExist,
+                                   bool goThroughLevels,
+                                   bool fMakeStaticIfOneTimeStepData);
+  static NFmiQueryData *ModifyData(const std::string &theMacroText,
+                                   NFmiQueryData *theModifiedData,
+                                   NFmiTimeDescriptor *theTimes,
+                                   const checkedVector<std::string> *theHelperDataFileNames,
+                                   bool createDrawParamFileIfNotExist,
+                                   bool goThroughLevels,
+                                   bool fMakeStaticIfOneTimeStepData);
 
-	static NFmiQueryData* ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, bool createDrawParamFileIfNotExist, bool fMakeStaticIfOneTimeStepData);
-	static NFmiQueryData* ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, bool createDrawParamFileIfNotExist, bool fMakeStaticIfOneTimeStepData);
-	static NFmiQueryData* ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool goThroughLevels, bool fMakeStaticIfOneTimeStepData);
-	static NFmiQueryData* ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool goThroughLevels, bool fMakeStaticIfOneTimeStepData);
-
-private:
-	static bool InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryData* theModifiedData, const checkedVector<std::string> *theHelperDataFileNames, bool createDrawParamFileIfNotExist, bool fMakeStaticIfOneTimeStepData);
-	static bool InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, const checkedVector<std::string> &theHelperDataFileNames, bool fMakeStaticIfOneTimeStepData);
-	static std::string GetWorkingDirectory(void);
+ private:
+  static bool InitDataBase(NFmiInfoOrganizer *theDataBase,
+                           NFmiQueryData *theModifiedData,
+                           const checkedVector<std::string> *theHelperDataFileNames,
+                           bool createDrawParamFileIfNotExist,
+                           bool fMakeStaticIfOneTimeStepData);
+  static bool InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase,
+                                     const checkedVector<std::string> &theHelperDataFileNames,
+                                     bool fMakeStaticIfOneTimeStepData);
+  static std::string GetWorkingDirectory(void);
 };
-#endif // NFMISMARTTOOLUTIL_H
+#endif  // NFMISMARTTOOLUTIL_H
