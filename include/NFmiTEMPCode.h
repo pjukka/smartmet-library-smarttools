@@ -37,8 +37,8 @@ struct TEMPLevelData
 
 namespace DecodeTEMP
 {
-// T‰lle funktiolle annetaan haluttu l‰j‰ TEMP koodia
-// (stringiss‰ voi olla vaikka kuinka monta eri TEMP sanomaa per‰kk‰in).
+// T√§lle funktiolle annetaan haluttu l√§j√§ TEMP koodia
+// (stringiss√§ voi olla vaikka kuinka monta eri TEMP sanomaa per√§kk√§in).
 // Funktio purkaa ne ja laittaa datan new:lla luotuun QueryData-olioon.
 NFmiQueryData *MakeNewDataFromTEMPStr(const std::string &theTEMPStr,
                                       std::string &theCheckReportStr,
@@ -47,13 +47,13 @@ NFmiQueryData *MakeNewDataFromTEMPStr(const std::string &theTEMPStr,
                                       const NFmiProducer &theWantedProducer,
                                       bool fRoundTimesToNearestSynopticTimes);
 
-// T‰m‰ funktio tekee annetusta Tempcode-vectorista querydatan.
+// T√§m√§ funktio tekee annetusta Tempcode-vectorista querydatan.
 // TempCode-vektorissa on siis luotauksia tempcode-olioihin talletettuna.
 NFmiQueryData *CreateNewQData(std::vector<NFmiTEMPCode> &theTempCodeVec,
                               const NFmiProducer &theWantedProducer);
 }
 
-// Luokka joka saa 4 stringi‰, miss‰ on koko temp-koodi.
+// Luokka joka saa 4 stringi√§, miss√§ on koko temp-koodi.
 // Purkaa koodin ja laskee leveleiksi ja muuksi dataksi.
 class NFmiTEMPCode
 {
@@ -86,16 +86,16 @@ class NFmiTEMPCode
   bool DecodeC(void);
   bool DecodeD(void);
 
-  std::string itsOriginalCodeAStr;  // t‰h‰n talletetaan koko koodi osa A
-  std::string itsOriginalCodeBStr;  // t‰h‰n talletetaan koko koodi osa B
-  std::string itsOriginalCodeCStr;  // t‰h‰n talletetaan koko koodi osa C
-  std::string itsOriginalCodeDStr;  // t‰h‰n talletetaan koko koodi osa D
+  std::string itsOriginalCodeAStr;  // t√§h√§n talletetaan koko koodi osa A
+  std::string itsOriginalCodeBStr;  // t√§h√§n talletetaan koko koodi osa B
+  std::string itsOriginalCodeCStr;  // t√§h√§n talletetaan koko koodi osa C
+  std::string itsOriginalCodeDStr;  // t√§h√§n talletetaan koko koodi osa D
 
   NFmiMetTime itsTime;
   NFmiStation itsStation;
-  bool fTempMobil;  // onko kyseess‰ temp mobil koodia, joka pit‰‰ purkaa hieman erilailla
-  NFmiAviationStationInfoSystem *itsTempStations;  // Ei omista.  Jos t‰ss‰ on luotausinfo, sit‰
-                                                   // voidaan pit‰‰ luotaus asemien "tietokantana"
+  bool fTempMobil;  // onko kyseess√§ temp mobil koodia, joka pit√§√§ purkaa hieman erilailla
+  NFmiAviationStationInfoSystem *itsTempStations;  // Ei omista.  Jos t√§ss√§ on luotausinfo, sit√§
+                                                   // voidaan pit√§√§ luotaus asemien "tietokantana"
   NFmiPoint itsUnknownStationLocation;
 
   std::map<double, TEMPLevelData> itsLevels;

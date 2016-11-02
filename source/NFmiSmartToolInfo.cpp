@@ -1,6 +1,6 @@
 /*!
  *  \file NFmiSmartToolInfo.cpp \par
- *  Luokka pit‰‰ sis‰ll‰‰n SmartTool:ia ja SmartToolDialogia
+ *  Luokka pit√§√§ sis√§ll√§√§n SmartTool:ia ja SmartToolDialogia
  *  koskevia tietoja.
  */
 
@@ -29,14 +29,14 @@ NFmiSmartToolInfo::NFmiSmartToolInfo(void)
 }
 
 NFmiSmartToolInfo::~NFmiSmartToolInfo(void) {}
-// luetaan  asetukset nyky‰‰n NFmiSetting-luokasta
+// luetaan  asetukset nyky√§√§n NFmiSetting-luokasta
 bool NFmiSmartToolInfo::Init(const std::string &theLoadDirectory)
 {
   LoadDirectory(theLoadDirectory, false);
   if (LoadSettings())
   {
     LoadScript(itsCurrentScriptName);
-    return true;  // sill‰ ei ole v‰li‰, vaikka viimeist‰ skripti‰ ei saisikaan luettua kunhan
+    return true;  // sill√§ ei ole v√§li√§, vaikka viimeist√§ skripti√§ ei saisikaan luettua kunhan
                   // asetukset on saatu
   }
   return false;
@@ -56,9 +56,9 @@ bool NFmiSmartToolInfo::LoadScript(const std::string &theScriptName)
 // theScriptName -parametrissa on mukana itsRootLoadDirectory:n suhteen polku esim. xxx\yyy\macro.st
 bool NFmiSmartToolInfo::SpeedLoadScript(const std::string &theScriptName)
 {
-  // fullFileName saadaan yhdist‰m‰ll‰ root ja annettu suhteellinen polku
+  // fullFileName saadaan yhdist√§m√§ll√§ root ja annettu suhteellinen polku
   string fullFileName = itsRootLoadDirectory + theScriptName;
-  // Lis‰ksi halutaan asettaa itsLoadDirectory osoittamaan annettuun suhteelliseen polkuun
+  // Lis√§ksi halutaan asettaa itsLoadDirectory osoittamaan annettuun suhteelliseen polkuun
   boost::filesystem::path loadPath = theScriptName;
   itsLoadDirectory = itsRootLoadDirectory + loadPath.parent_path().string() + "\\";
 
@@ -157,7 +157,7 @@ checkedVector<std::string> NFmiSmartToolInfo::GetScriptNames(void)
 {
   checkedVector<string> names;
 
-  // listataan alkuun hakemistot ja jos ei olla rootissa, laitetaan viel‰ ..-hakemsito mukaan
+  // listataan alkuun hakemistot ja jos ei olla rootissa, laitetaan viel√§ ..-hakemsito mukaan
   std::list<std::string> directories = NFmiFileSystem::Directories(itsLoadDirectory);
   std::list<std::string>::iterator itDir = directories.begin();
   std::list<std::string>::iterator itEndDir = directories.end();
@@ -215,7 +215,7 @@ void NFmiSmartToolInfo::LoadDirectory(const std::string &newValue, bool fSaveSet
 
 /*
  * poistaa viimeisen osan polusta c:\data\src\inc\ -> c:\data\src\
- * eli inc pois esimerkist‰
+ * eli inc pois esimerkist√§
  */
 
 static void RemoveLastPartOfDirectory(string &thePath)
@@ -241,8 +241,8 @@ static void RemoveLastPartOfDirectory(string &thePath)
 }
 
 void NFmiSmartToolInfo::SetCurrentLoadDirectory(const std::string &newValue)
-{  // t‰ss‰ ei aseteta root-directoria
-   // nimi tulee <> sulkujen sis‰ll‰ joten ne on poistettava ensin
+{  // t√§ss√§ ei aseteta root-directoria
+   // nimi tulee <> sulkujen sis√§ll√§ joten ne on poistettava ensin
   std::string usedDirectoryName(newValue);
   NFmiStringTools::TrimL(usedDirectoryName, '<');
   NFmiStringTools::TrimR(usedDirectoryName, '>');
@@ -260,7 +260,7 @@ void NFmiSmartToolInfo::SetCurrentLoadDirectory(const std::string &newValue)
 
 // Jos itsLoadDirectory     on C:\xxx\yyy\zzz
 // ja itsRootLoadDirectory  on C:\xxx
-// t‰llˆin t‰m‰ funktio palauttaa arvon: yyy\zzz
+// t√§ll√∂in t√§m√§ funktio palauttaa arvon: yyy\zzz
 std::string NFmiSmartToolInfo::GetRelativeLoadPath() const
 {
   std::string relativePath = itsLoadDirectory;

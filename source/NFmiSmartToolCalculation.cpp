@@ -24,7 +24,7 @@
 // ======================================================================
 
 #ifdef _MSC_VER
-#pragma warning(disable : 4786)  // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
+#pragma warning(disable : 4786)  // poistaa n kpl VC++ k√§√§nt√§j√§n varoitusta
 #endif
 
 #include "NFmiSmartToolCalculation.h"
@@ -68,9 +68,9 @@ NFmiSmartToolCalculation::NFmiSmartToolCalculation(const NFmiSmartToolCalculatio
       itsLowerLimit(theOther.itsLowerLimit),
       itsUpperLimit(theOther.itsUpperLimit),
       fDoLimitCheck(theOther.fDoLimitCheck),
-      token()  // t‰t‰ ei mielest‰ni pid‰ kopioida
+      token()  // t√§t√§ ei mielest√§ni pid√§ kopioida
       ,
-      itsCalcIterator()  // t‰t‰ ei mielest‰ni pid‰ kopioida
+      itsCalcIterator()  // t√§t√§ ei mielest√§ni pid√§ kopioida
       ,
       itsResultInfo(NFmiAreaMask::DoShallowCopy(theOther.itsResultInfo)),
       itsCalculations(NFmiAreaMask::DoShallowCopy(theOther.itsCalculations)),
@@ -100,17 +100,17 @@ void NFmiSmartToolCalculation::Calculate(const NFmiCalculationParams &theCalcula
   double value = eval_exp(theCalculationParams);
 
   //	value = FmiMakeValidNumber(value); // NFmiQueryInfo::FloatValue(value) -metodi tarkastaa
-  // nyky‰‰n onko kyseess‰ sallittu luku, inf ja nan -arvojen asetus on nyky‰‰n estetty
-  if (value != kFloatMissing)  // tuli ongelmia missing asetuksissa, pit‰‰ mietti vaikka jokin
-                               // funktio, jolla asetetaan puuttuva arvo // pit‰‰ pysty‰ sittenkin
+  // nyky√§√§n onko kyseess√§ sallittu luku, inf ja nan -arvojen asetus on nyky√§√§n estetty
+  if (value != kFloatMissing)  // tuli ongelmia missing asetuksissa, pit√§√§ mietti vaikka jokin
+                               // funktio, jolla asetetaan puuttuva arvo // pit√§√§ pysty√§ sittenkin
                                // asettamaan arvoksi kFloatMissing:in!!!
   {
     itsResultInfo->LocationIndex(theCalculationParams.itsLocationIndex);  // kohde dataa
                                                                           // juoksutetaan, joten
                                                                           // lokaatio indeksien
-                                                                          // pit‰‰ olla synkassa!!!
-    value = FixCircularValues(value);  // ensin tehd‰‰n circular tarkistus ja sitten vasta min/max
-    value = GetInsideLimitsValue(static_cast<float>(value));  // asetetaan value viel‰ drawparamista
+                                                                          // pit√§√§ olla synkassa!!!
+    value = FixCircularValues(value);  // ensin tehd√§√§n circular tarkistus ja sitten vasta min/max
+    value = GetInsideLimitsValue(static_cast<float>(value));  // asetetaan value viel√§ drawparamista
                                                               // satuihin rajoihin, ettei esim. RH
                                                               // voi olla alle 0 tai yli 100 %
 
@@ -124,13 +124,13 @@ void NFmiSmartToolCalculation::Calculate(const NFmiCalculationParams &theCalcula
       itsResultInfo->LocationIndex(theCalculationParams.itsLocationIndex);  // kohde dataa
                                                                             // juoksutetaan, joten
                                                                             // lokaatio indeksien
-                                                                            // pit‰‰ olla
+                                                                            // pit√§√§ olla
                                                                             // synkassa!!!
       itsResultInfo->FloatValue(
           static_cast<float>(value));  // nyt voidaan asettaa puuttuva arvo dataan
     }
   }
-  // lopuksi asetetaan macroParamValue, jos niin on haluttu ja resultInfo on macroParam-tyyppi‰
+  // lopuksi asetetaan macroParamValue, jos niin on haluttu ja resultInfo on macroParam-tyyppi√§
   NFmiInfoData::Type dataType = itsResultInfo->DataType();
   if (theMacroParamValue.fSetValue &&
       (dataType == NFmiInfoData::kMacroParam || dataType == NFmiInfoData::kCrossSectionMacroParam ||
@@ -143,17 +143,17 @@ void NFmiSmartToolCalculation::Calculate_ver2(const NFmiCalculationParams &theCa
   double value = eval_exp(theCalculationParams);
 
   //	value = FmiMakeValidNumber(value); // NFmiQueryInfo::FloatValue(value) -metodi tarkastaa
-  // nyky‰‰n onko kyseess‰ sallittu luku, inf ja nan -arvojen asetus on nyky‰‰n estetty
-  if (value != kFloatMissing)  // tuli ongelmia missing asetuksissa, pit‰‰ mietti vaikka jokin
-                               // funktio, jolla asetetaan puuttuva arvo // pit‰‰ pysty‰ sittenkin
+  // nyky√§√§n onko kyseess√§ sallittu luku, inf ja nan -arvojen asetus on nyky√§√§n estetty
+  if (value != kFloatMissing)  // tuli ongelmia missing asetuksissa, pit√§√§ mietti vaikka jokin
+                               // funktio, jolla asetetaan puuttuva arvo // pit√§√§ pysty√§ sittenkin
                                // asettamaan arvoksi kFloatMissing:in!!!
   {
     itsResultInfo->LocationIndex(theCalculationParams.itsLocationIndex);  // kohde dataa
                                                                           // juoksutetaan, joten
                                                                           // lokaatio indeksien
-                                                                          // pit‰‰ olla synkassa!!!
-    value = FixCircularValues(value);  // ensin tehd‰‰n circular tarkistus ja sitten vasta min/max
-    value = GetInsideLimitsValue(static_cast<float>(value));  // asetetaan value viel‰ drawparamista
+                                                                          // pit√§√§ olla synkassa!!!
+    value = FixCircularValues(value);  // ensin tehd√§√§n circular tarkistus ja sitten vasta min/max
+    value = GetInsideLimitsValue(static_cast<float>(value));  // asetetaan value viel√§ drawparamista
                                                               // satuihin rajoihin, ettei esim. RH
                                                               // voi olla alle 0 tai yli 100 %
 
@@ -167,7 +167,7 @@ void NFmiSmartToolCalculation::Calculate_ver2(const NFmiCalculationParams &theCa
       itsResultInfo->LocationIndex(theCalculationParams.itsLocationIndex);  // kohde dataa
                                                                             // juoksutetaan, joten
                                                                             // lokaatio indeksien
-                                                                            // pit‰‰ olla
+                                                                            // pit√§√§ olla
                                                                             // synkassa!!!
       itsResultInfo->FloatValue(
           static_cast<float>(value));  // nyt voidaan asettaa puuttuva arvo dataan
@@ -175,7 +175,7 @@ void NFmiSmartToolCalculation::Calculate_ver2(const NFmiCalculationParams &theCa
   }
 }
 
-// ei ota huomioon missing arvoa, koska se pit‰‰ ottaa huomioon jo ennen t‰m‰n kutsua.
+// ei ota huomioon missing arvoa, koska se pit√§√§ ottaa huomioon jo ennen t√§m√§n kutsua.
 float NFmiSmartToolCalculation::GetInsideLimitsValue(float theValue)
 {
   if (theValue == kFloatMissing) return theValue;
@@ -231,15 +231,15 @@ struct TimeSetter
 
 void NFmiSmartToolCalculation::Time(const NFmiMetTime &theTime)
 {
-  if (itsResultInfo)  // maskin tapauksessa t‰m‰ on 0-pointteri (ja tulevaisuudessa t‰m‰ sijoitus
+  if (itsResultInfo)  // maskin tapauksessa t√§m√§ on 0-pointteri (ja tulevaisuudessa t√§m√§ sijoitus
                       // info poistuu kokonaisuudessaan)
-    itsResultInfo->Time(theTime);  // t‰m‰n ajan asetuksen pit‰‰ onnistua editoitavalle datalle
+    itsResultInfo->Time(theTime);  // t√§m√§n ajan asetuksen pit√§√§ onnistua editoitavalle datalle
 
   std::for_each(itsCalculations.begin(), itsCalculations.end(), TimeSetter(theTime));
 }
 
 // eval_exp-metodit otettu H. Schilbertin  C++: the Complete Refeference third ed.
-// jouduin muuttamaan niit‰ v‰h‰n sopimaan t‰h‰n ymp‰ristˆˆn.
+// jouduin muuttamaan niit√§ v√§h√§n sopimaan t√§h√§n ymp√§rist√∂√∂n.
 double NFmiSmartToolCalculation::eval_exp(const NFmiCalculationParams &theCalculationParams)
 {
   double result = kFloatMissing;
@@ -261,8 +261,8 @@ double NFmiSmartToolCalculation::eval_exp(const NFmiCalculationParams &theCalcul
 }
 
 // Process an assignment.
-// T‰m‰ on jo hoidettu toisella tavalla omassa koodissa, joten ohitan t‰m‰n,
-// mutta j‰t‰n kommentteihin, jos tarvitsen tulevaisuudessa.
+// T√§m√§ on jo hoidettu toisella tavalla omassa koodissa, joten ohitan t√§m√§n,
+// mutta j√§t√§n kommentteihin, jos tarvitsen tulevaisuudessa.
 void NFmiSmartToolCalculation::eval_exp1(double &result,
                                          const NFmiCalculationParams &theCalculationParams)
 {
@@ -386,7 +386,7 @@ void NFmiSmartToolCalculation::eval_exp6(double &result,
     get_token();
     eval_exp2(result, theCalculationParams);
     if (token->GetCalculationOperationType() !=
-        NFmiAreaMask::EndParenthesis)  // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
+        NFmiAreaMask::EndParenthesis)  // MathFunctionStart:in p√§√§tt√§√§ normaali lopetus sulku!
       throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") +
                           ":\n" + GetCalculationText());
     eval_math_function(result, function);
@@ -417,18 +417,18 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(
     if (argument1 != kFloatMissing && argument2 != kFloatMissing)
     {
       double value = kFloatMissing;
-      // 1. ota talteen token tai se iteraattori, ett‰ samoja laskuja voidaan k‰yd‰ l‰pi uudestaan
+      // 1. ota talteen token tai se iteraattori, ett√§ samoja laskuja voidaan k√§yd√§ l√§pi uudestaan
       // ja uudestaan
       CalcIter startCalcIterator =
-          itsCalcIterator;  // pit‰‰kˆ olla edellinen??, pit‰‰ olla ep‰selv‰‰, mutta pakko
-      // 2. katso onko kyseess‰ aika- vai korkeus lasku ja haaraudu
+          itsCalcIterator;  // pit√§√§k√∂ olla edellinen??, pit√§√§ olla ep√§selv√§√§, mutta pakko
+      // 2. katso onko kyseess√§ aika- vai korkeus lasku ja haaraudu
       // 3. jos aikalasku, laske alkuaika ja loppu aika
       NFmiMetTime startTime(theCalculationParams.itsTime);
       startTime.ChangeByHours(static_cast<long>(argument1));
       NFmiMetTime endTime(theCalculationParams.itsTime);
       endTime.ChangeByHours(static_cast<long>(argument2));
       NFmiMetTime currentTime(startTime);
-      // 4. mieti mik‰ on aikahyppy (oletus 1h) jos pelkk‰‰ EC-dataa, voisi aikahyppy olla 3h tai 6h
+      // 4. mieti mik√§ on aikahyppy (oletus 1h) jos pelkk√§√§ EC-dataa, voisi aikahyppy olla 3h tai 6h
       int usedTimeResolutionInMinutes = 60;
       if (startTime <= endTime)
       {
@@ -436,7 +436,7 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(
           throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorTimeCalcOverRun"));
         // 5. funktiosta riippuva datamodifier min, max jne.
         boost::shared_ptr<NFmiDataModifier> modifier =
-            CreateIntegrationFuction(func);  // t‰m‰ palauttaa aina jotain, tai heitt‰‰ poikkeuksen
+            CreateIntegrationFuction(func);  // t√§m√§ palauttaa aina jotain, tai heitt√§√§ poikkeuksen
         try
         {
           NFmiCalculationParams modifiedCalculationParams(theCalculationParams);
@@ -446,15 +446,15 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(
             modifiedCalculationParams.itsTime = currentTime;
             // 6. muista aina asettaa token/laskuiteraattori 'alkuun'
             itsCalcIterator = startCalcIterator;
-            get_token();  // pit‰‰ tehd‰ viel‰ t‰m‰, muuten osoittaa edelliseen pilkku-operaattoriin
-            // 7. k‰y aika-loopissa l‰pi eval_exp2-laskut
+            get_token();  // pit√§√§ tehd√§ viel√§ t√§m√§, muuten osoittaa edelliseen pilkku-operaattoriin
+            // 7. k√§y aika-loopissa l√§pi eval_exp2-laskut
             eval_exp2(value, modifiedCalculationParams);  // theTimeIndex on nyt puppua
             // 8. sijoita tulos datamodifier:iin
             modifier->Calculate(static_cast<float>(value));
             // 9. 'next'
             currentTime.ChangeByMinutes(usedTimeResolutionInMinutes);
           } while (currentTime <= endTime);
-          // 10. loopin lopuksi pyyd‰ result datamodifier:ilta
+          // 10. loopin lopuksi pyyd√§ result datamodifier:ilta
           result = modifier->CalculationResult();
           fUseTimeInterpolationAlways = false;
         }
@@ -464,7 +464,7 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunction(
           throw;
         }
       }
-      // Jos kyse level laskuista, juoksuta korkeuksia/leveleit‰ jotenkin ja tee samaa
+      // Jos kyse level laskuista, juoksuta korkeuksia/leveleit√§ jotenkin ja tee samaa
     }
   }
 }
@@ -509,15 +509,15 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(
   {
     double value = kFloatMissing;
     double heightValue =
-        kFloatMissing;  // t‰h‰n talletetaan h-funktion tapauksessa minimin/maksimin korkeus
-    // 1. ota talteen token tai se iteraattori, ett‰ samoja laskuja voidaan k‰yd‰ l‰pi uudestaan ja
+        kFloatMissing;  // t√§h√§n talletetaan h-funktion tapauksessa minimin/maksimin korkeus
+    // 1. ota talteen token tai se iteraattori, ett√§ samoja laskuja voidaan k√§yd√§ l√§pi uudestaan ja
     // uudestaan
     CalcIter startCalcIterator =
-        itsCalcIterator;  // pit‰‰kˆ olla edellinen??, pit‰‰ olla ep‰selv‰‰, mutta pakko
+        itsCalcIterator;  // pit√§√§k√∂ olla edellinen??, pit√§√§ olla ep√§selv√§√§, mutta pakko
     // 3. jos korkeus lasku
     itsHeightValue = static_cast<float>(argument1);
-    // 4. mieti mik‰ on aikahyppy (oletus 1h) jos pelkk‰‰ EC-dataa, voisi aikahyppy olla 3h tai 6h
-    // HUOM!! Muuta resoluutio siten, ett‰ 50, kun korkeus alle 500 m, 100, kun korkeus alle 3000 m,
+    // 4. mieti mik√§ on aikahyppy (oletus 1h) jos pelkk√§√§ EC-dataa, voisi aikahyppy olla 3h tai 6h
+    // HUOM!! Muuta resoluutio siten, ett√§ 50, kun korkeus alle 500 m, 100, kun korkeus alle 3000 m,
     // 200 kun korkeus alle 10000 m ja 500 kun korkeus yli sen
     float usedHeightResolution = 100;
     if (argument1 >= 0 && argument1 <= argument2)
@@ -526,7 +526,7 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(
         throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorHeightCalcOverRun"));
       // 5. funktiosta riippuva datamodifier min, max jne.
       boost::shared_ptr<NFmiDataModifier> modifier =
-          CreateIntegrationFuction(func);  // t‰m‰ palauttaa aina jotain, tai heitt‰‰ poikkeuksen
+          CreateIntegrationFuction(func);  // t√§m√§ palauttaa aina jotain, tai heitt√§√§ poikkeuksen
       try
       {
         fUseHeightCalculation = true;
@@ -536,8 +536,8 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(
           NFmiCalculationDeltaZValue::SetDeltaZValue(usedHeightResolution);
           // 6. muista aina asettaa token/laskuiteraattori 'alkuun'
           itsCalcIterator = startCalcIterator;
-          get_token();  // pit‰‰ tehd‰ viel‰ t‰m‰, muuten osoittaa edelliseen pilkku-operaattoriin
-          // 7. k‰y aika-loopissa l‰pi eval_exp2-laskut
+          get_token();  // pit√§√§ tehd√§ viel√§ t√§m√§, muuten osoittaa edelliseen pilkku-operaattoriin
+          // 7. k√§y aika-loopissa l√§pi eval_exp2-laskut
           eval_exp2(value, theCalculationParams);  // theTimeIndex on nyt puppua
           // 8. sijoita tulos datamodifier:iin
           modifier->Calculate(static_cast<float>(value));
@@ -545,13 +545,13 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(
           {
             double calculationResult = modifier->CalculationResult();
 
-            // HUOM!! T‰ss‰ value vs. calculationResult vertailu pit‰‰ tehd‰ virherajan sis‰ll‰,
-            // koska modifier k‰sittelee arvoja floateilla ja muu ysteemi doubleina ja
-            // siit‰ seuraa ongelmia tarkkuuden kanssa.
+            // HUOM!! T√§ss√§ value vs. calculationResult vertailu pit√§√§ tehd√§ virherajan sis√§ll√§,
+            // koska modifier k√§sittelee arvoja floateilla ja muu ysteemi doubleina ja
+            // siit√§ seuraa ongelmia tarkkuuden kanssa.
             // MSVC++ 7.1 debug toimi == operaatorin kanssa, MUTTA release versio EI!!!
-            // Bugin mets‰stykseen on mennyt arviolta eri aikoina yhteens‰ 10 tuntia!!!!
-            // Ja ainakin nelj‰ kertaa kun olen esitellyt SmartTool-kielen maxh-funktiota
-            // olen ihmetellyt ett‰ demossa ei toimi, mutta omassa koneessa toimi (debug versiona!)
+            // Bugin mets√§stykseen on mennyt arviolta eri aikoina yhteens√§ 10 tuntia!!!!
+            // Ja ainakin nelj√§ kertaa kun olen esitellyt SmartTool-kielen maxh-funktiota
+            // olen ihmetellyt ett√§ demossa ei toimi, mutta omassa koneessa toimi (debug versiona!)
             if (value != kFloatMissing && ::IsEqualEnough(value, calculationResult, 0.000001))
             {
               heightValue = itsHeightValue;
@@ -560,9 +560,9 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(
           // 9. 'next'
           itsHeightValue += usedHeightResolution;
         } while (itsHeightValue <= argument2);
-        // 10. loopin lopuksi pyyd‰ result datamodifier:ilta
+        // 10. loopin lopuksi pyyd√§ result datamodifier:ilta
         if (theIntegrationFunctionType == 3)
-          result = heightValue;  // eli sijoitetaan min/max arvon korkeus tulokseen jos kyseess‰ oli
+          result = heightValue;  // eli sijoitetaan min/max arvon korkeus tulokseen jos kyseess√§ oli
                                  // minh/maxh -funktio
         else
           result = modifier->CalculationResult();
@@ -574,11 +574,11 @@ void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(
         throw;
       }
     }
-    // Jos kyse level laskuista, juoksuta korkeuksia/leveleit‰ jotenkin ja tee samaa
+    // Jos kyse level laskuista, juoksuta korkeuksia/leveleit√§ jotenkin ja tee samaa
   }
 }
 
-// Muista jos tulee p‰ivityksi‰, smanlainen funktio lˆytyy myˆs NFmiSmartToolModifier-luokasta
+// Muista jos tulee p√§ivityksi√§, smanlainen funktio l√∂ytyy my√∂s NFmiSmartToolModifier-luokasta
 boost::shared_ptr<NFmiDataModifier> NFmiSmartToolCalculation::CreateIntegrationFuction(
     NFmiAreaMask::FunctionType func)
 {
@@ -597,7 +597,7 @@ boost::shared_ptr<NFmiDataModifier> NFmiSmartToolCalculation::CreateIntegrationF
     case NFmiAreaMask::Sum:
       modifier = boost::shared_ptr<NFmiDataModifier>(new NFmiDataModifierSum());
       break;
-    // HUOM!!!! Tee WAvg-modifier myˆs, joka on peritty Avg-modifierist‰ ja tee joku kerroin juttu
+    // HUOM!!!! Tee WAvg-modifier my√∂s, joka on peritty Avg-modifierist√§ ja tee joku kerroin juttu
     // painotukseen.
     default:
       throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorIntegrationFunction"));
@@ -605,7 +605,7 @@ boost::shared_ptr<NFmiDataModifier> NFmiSmartToolCalculation::CreateIntegrationF
   return modifier;
 }
 
-// HUOM! trigonometriset funktiot tehd‰‰n asteille, joten annettu luku pit‰‰ konvertoida
+// HUOM! trigonometriset funktiot tehd√§√§n asteille, joten annettu luku pit√§√§ konvertoida
 // c++ funktioille jotka odottavat kulmaa radiaaneille.
 void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunction)
 {
@@ -619,31 +619,31 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
         result = exp(result);
         break;
       case NFmiAreaMask::Sqrt:
-        if (result >= 0)  // neliˆjuurta ei saa ottaa negatiivisesta luvusta
+        if (result >= 0)  // neli√∂juurta ei saa ottaa negatiivisesta luvusta
           result = sqrt(result);
         else
           result = kFloatMissing;
         break;
       case NFmiAreaMask::Log:
-        if (result > 0)  // logaritmi pit‰‰ ottaa positiivisesta luvusta
+        if (result > 0)  // logaritmi pit√§√§ ottaa positiivisesta luvusta
           result = log(result);
         else
           result = kFloatMissing;
         break;
       case NFmiAreaMask::Log10:
-        if (result > 0)  // logaritmi pit‰‰ ottaa positiivisesta luvusta
+        if (result > 0)  // logaritmi pit√§√§ ottaa positiivisesta luvusta
           result = log10(result);
         else
           result = kFloatMissing;
         break;
       case NFmiAreaMask::Sin:
-        result = sin(result * trigFactor);  // konversio asteista radiaaneiksi teht‰v‰
+        result = sin(result * trigFactor);  // konversio asteista radiaaneiksi teht√§v√§
         break;
       case NFmiAreaMask::Cos:
-        result = cos(result * trigFactor);  // konversio asteista radiaaneiksi teht‰v‰
+        result = cos(result * trigFactor);  // konversio asteista radiaaneiksi teht√§v√§
         break;
       case NFmiAreaMask::Tan:
-        result = tan(result * trigFactor);  // konversio asteista radiaaneiksi teht‰v‰
+        result = tan(result * trigFactor);  // konversio asteista radiaaneiksi teht√§v√§
         break;
       case NFmiAreaMask::Sinh:
         result = sinh(result);
@@ -656,18 +656,18 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
         break;
       case NFmiAreaMask::Asin:
         if (result >= -1 && result <= 1)
-          result = asin(result) / trigFactor;  // konversio radiaaneista asteiksi teht‰v‰
+          result = asin(result) / trigFactor;  // konversio radiaaneista asteiksi teht√§v√§
         else
           result = kFloatMissing;
         break;
       case NFmiAreaMask::Acos:
         if (result >= -1 && result <= 1)
-          result = acos(result) / trigFactor;  // konversio radiaaneista asteiksi teht‰v‰
+          result = acos(result) / trigFactor;  // konversio radiaaneista asteiksi teht√§v√§
         else
           result = kFloatMissing;
         break;
       case NFmiAreaMask::Atan:
-        result = atan(result) / trigFactor;  // konversio radiaaneista asteiksi teht‰v‰
+        result = atan(result) / trigFactor;  // konversio radiaaneista asteiksi teht√§v√§
         break;
       case NFmiAreaMask::Ceil:
         result = ceil(result);
@@ -683,7 +683,7 @@ void NFmiSmartToolCalculation::eval_math_function(double &result, int theFunctio
         break;
       case NFmiAreaMask::Rand:
         result = (static_cast<double>(rand()) / RAND_MAX) *
-                 result;  // palauttaa luvun 0 ja result:in v‰lilt‰
+                 result;  // palauttaa luvun 0 ja result:in v√§lilt√§
         break;
       default:
         throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorMathFunction") + ":\n" +
@@ -705,9 +705,9 @@ void NFmiSmartToolCalculation::atom(double &result,
 }
 
 // ottaa seuraavan 'tokenin' kohdalle, mutta koska aluksi
-// itsCalcIterator osoittaa jo 1. tokeniin, tehd‰‰n ensin
-// sijoitus tokeniin ja sitten siirret‰‰n iteraattoria eteenp‰in.
-// T‰ll‰ lailla C++: Compl. Ref. kirjasta kopioitu koodi toimii 'sellaisenaan'.
+// itsCalcIterator osoittaa jo 1. tokeniin, tehd√§√§n ensin
+// sijoitus tokeniin ja sitten siirret√§√§n iteraattoria eteenp√§in.
+// T√§ll√§ lailla C++: Compl. Ref. kirjasta kopioitu koodi toimii 'sellaisenaan'.
 void NFmiSmartToolCalculation::get_token(void)
 {
   if (itsCalcIterator != itsCalculations.end())
@@ -745,8 +745,8 @@ bool NFmiSmartToolCalculation::bin_eval_exp(const NFmiCalculationParams &theCalc
 }
 
 // Process an assignment.
-// T‰m‰ on jo hoidettu toisella tavalla omassa koodissa, joten ohitan t‰m‰n,
-// mutta j‰t‰n kommentteihin, jos tarvitsen tulevaisuudessa.
+// T√§m√§ on jo hoidettu toisella tavalla omassa koodissa, joten ohitan t√§m√§n,
+// mutta j√§t√§n kommentteihin, jos tarvitsen tulevaisuudessa.
 void NFmiSmartToolCalculation::bin_eval_exp1(bool &maskresult,
                                              double &result,
                                              const NFmiCalculationParams &theCalculationParams)
@@ -754,7 +754,7 @@ void NFmiSmartToolCalculation::bin_eval_exp1(bool &maskresult,
   bin_eval_exp1_1(maskresult, result, theCalculationParams);
 }
 
-// T‰m‰ pit‰‰ siirt‰‰ prioriteetissa alle yhteen laskun
+// T√§m√§ pit√§√§ siirt√§√§ prioriteetissa alle yhteen laskun
 // Process a binary expression. && ja || eli AND ja OR
 void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult,
                                                double &result,
@@ -784,7 +784,7 @@ void NFmiSmartToolCalculation::bin_eval_exp1_1(bool &maskresult,
   }
 }
 
-// T‰m‰ pit‰‰ siirt‰‰ prioriteetissa alle yhteen laskun
+// T√§m√§ pit√§√§ siirt√§√§ prioriteetissa alle yhteen laskun
 // Process a comparison expression <, >, ==, <=, >=
 void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult,
                                                double &result,
@@ -802,7 +802,7 @@ void NFmiSmartToolCalculation::bin_eval_exp1_2(bool &maskresult,
     NFmiAreaMask::CalculationOperationType opType2 = token->GetCalculationOperationType();
     bin_eval_exp2(tempmask, temp, theCalculationParams);
 
-    // resultit eiv‰t saa olla missin-arvoja, paitsi jos ne ovat Constant-maskista, eli halutaan
+    // resultit eiv√§t saa olla missin-arvoja, paitsi jos ne ovat Constant-maskista, eli halutaan
     // nimenomaan verrata jotain missing-arvoon
     bool allowMissingComparison = (result == kFloatMissing && opType1 == NFmiAreaMask::Constant) ||
                                   (temp == kFloatMissing && opType2 == NFmiAreaMask::Constant);
@@ -925,32 +925,32 @@ void NFmiSmartToolCalculation::bin_eval_exp5(bool &maskresult,
 void NFmiSmartToolCalculation::CalcThreeArgumentFunction(
     double &result, const NFmiCalculationParams &theCalculationParams)
 {
-  // huom! t‰ss‰ ei k‰ytet‰ bin_eval-kutsuja, koska t‰ss‰ lasketaan vain yksi luku, mik‰ palautetaan
+  // huom! t√§ss√§ ei k√§ytet√§ bin_eval-kutsuja, koska t√§ss√§ lasketaan vain yksi luku, mik√§ palautetaan
   // bin_eval-systeemiin
   NFmiAreaMask::FunctionType func =
-      token->GetFunctionType();  // eli onko kyse min, max vai mist‰ funktiosta
-  int integrationFunctionType = token->IntegrationFunctionType();  // t‰m‰ kertoo onko kyse
+      token->GetFunctionType();  // eli onko kyse min, max vai mist√§ funktiosta
+  int integrationFunctionType = token->IntegrationFunctionType();  // t√§m√§ kertoo onko kyse
                                                                    // vertikaali vai ajallisesta
                                                                    // integroinnista kyse
   get_token();
   double argument1 = kFloatMissing;
   eval_exp2(argument1, theCalculationParams);
   if (token->GetCalculationOperationType() !=
-      NFmiAreaMask::CommaOperator)  // n‰iden funktioiden argumentit erotetaan pilkuilla
+      NFmiAreaMask::CommaOperator)  // n√§iden funktioiden argumentit erotetaan pilkuilla
     throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParamSeparation") +
                         ":\n" + GetCalculationText());
   get_token();
   double argument2 = kFloatMissing;
   eval_exp2(argument2, theCalculationParams);
   if (token->GetCalculationOperationType() !=
-      NFmiAreaMask::CommaOperator)  // n‰iden funktioiden argumentit erotetaan pilkuilla
+      NFmiAreaMask::CommaOperator)  // n√§iden funktioiden argumentit erotetaan pilkuilla
     throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParamSeparation") +
                         ":\n" + GetCalculationText());
   eval_ThreeArgumentFunction(
       result, argument1, argument2, func, integrationFunctionType, theCalculationParams);
 
   if (token->GetCalculationOperationType() !=
-      NFmiAreaMask::EndParenthesis)  // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
+      NFmiAreaMask::EndParenthesis)  // MathFunctionStart:in p√§√§tt√§√§ normaali lopetus sulku!
     throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") +
                         ":\n" + GetCalculationText());
   get_token();
@@ -960,9 +960,9 @@ void NFmiSmartToolCalculation::CalcVertFunction(double &result,
                                                 const NFmiCalculationParams &theCalculationParams)
 {
   boost::shared_ptr<NFmiAreaMask> verticalFunctionToken =
-      token;  // t‰h‰n otetaan talteen vertikaalilasku olio
+      token;  // t√§h√§n otetaan talteen vertikaalilasku olio
   int trueArgumentCount = verticalFunctionToken->FunctionArgumentCount() - 1;
-  std::vector<float> argumentVector;  // t‰ss‰ vektorissa annetaan vertikaali laskuissa tarvittavat
+  std::vector<float> argumentVector;  // t√§ss√§ vektorissa annetaan vertikaali laskuissa tarvittavat
                                       // argumentti arvot (Paitsi 1. joka tulee AreaMask-olion
                                       // omasta itsInfo-datasta)
   for (int argumentCounter = 0; argumentCounter < trueArgumentCount; argumentCounter++)
@@ -974,7 +974,7 @@ void NFmiSmartToolCalculation::CalcVertFunction(double &result,
     bool endParethesisOperator =
         (argumentCounter >= trueArgumentCount - 1) &&
         (token->GetCalculationOperationType() == NFmiAreaMask::EndParenthesis);
-    if (!(commaOperator || endParethesisOperator))  // n‰iden funktioiden argumentit erotetaan
+    if (!(commaOperator || endParethesisOperator))  // n√§iden funktioiden argumentit erotetaan
                                                     // pilkuilla tai ne loppuu sulkuun
       throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidParamSeparation") +
                           ":\n" + GetCalculationText());
@@ -985,7 +985,7 @@ void NFmiSmartToolCalculation::CalcVertFunction(double &result,
   result = verticalFunctionToken->Value(theCalculationParams, false);
 
   if (token->GetCalculationOperationType() !=
-      NFmiAreaMask::EndParenthesis)  // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
+      NFmiAreaMask::EndParenthesis)  // MathFunctionStart:in p√§√§tt√§√§ normaali lopetus sulku!
     throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") +
                         ":\n" + GetCalculationText());
   get_token();
@@ -1011,7 +1011,7 @@ void NFmiSmartToolCalculation::bin_eval_exp6(bool &maskresult,
     get_token();
     bin_eval_exp1_1(maskresult, result, theCalculationParams);
     if (token->GetCalculationOperationType() !=
-        NFmiAreaMask::EndParenthesis)  // MathFunctionStart:in p‰‰tt‰‰ normaali lopetus sulku!
+        NFmiAreaMask::EndParenthesis)  // MathFunctionStart:in p√§√§tt√§√§ normaali lopetus sulku!
       throw runtime_error(::GetDictionaryString("SmartToolCalculationErrorInvalidMathParenthesis") +
                           ":\n" + GetCalculationText());
     eval_math_function(result, function);

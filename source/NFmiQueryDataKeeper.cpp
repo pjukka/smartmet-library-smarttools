@@ -8,7 +8,7 @@
 
 #ifdef _MSC_VER
 #pragma warning( \
-    disable : 4244 4267 4512)  // boost:in thread kirjastosta tulee ik‰v‰sti 4244 varoituksia
+    disable : 4244 4267 4512)  // boost:in thread kirjastosta tulee ik√§v√§sti 4244 varoituksia
 #endif
 
 #ifndef BOOST_DISABLE_THREADS
@@ -16,7 +16,7 @@
 #endif
 
 #ifdef _MSC_VER
-#pragma warning(default : 4244 4267 4512)  // laitetaan 4244 takaisin p‰‰lle, koska se on t‰rke‰
+#pragma warning(default : 4244 4267 4512)  // laitetaan 4244 takaisin p√§√§lle, koska se on t√§rke√§
                                            // (esim. double -> int auto castaus varoitus)
 #endif
 
@@ -49,31 +49,31 @@ boost::shared_ptr<NFmiOwnerInfo> NFmiQueryDataKeeper::OriginalData(void)
   return itsData;
 }
 
-// T‰m‰ palauttaa vapaana olevan Info-iteraattori kopion dataan.
+// T√§m√§ palauttaa vapaana olevan Info-iteraattori kopion dataan.
 boost::shared_ptr<NFmiFastQueryInfo> NFmiQueryDataKeeper::GetIter(void)
 {
-  WriteLock lock(itsMutex);  // t‰m‰ funktio pit‰‰ suorittaa aina max yhdest‰ s‰ikeest‰ (ainakin kun
-                             // tehd‰‰n moni-s‰ie laskuja smarttool-kielell‰, miss‰ on mukana
+  WriteLock lock(itsMutex);  // t√§m√§ funktio pit√§√§ suorittaa aina max yhdest√§ s√§ikeest√§ (ainakin kun
+                             // tehd√§√§n moni-s√§ie laskuja smarttool-kielell√§, miss√§ on mukana
                              // asemadataa!!)
 
   itsLastTimeUsedTimer.StartTimer();
-  // Katsotaan onko listassa yht‰‰n Info-iteraattoria, joka ei ole k‰ytˆss‰ (ref-count = 1)
+  // Katsotaan onko listassa yht√§√§n Info-iteraattoria, joka ei ole k√§yt√∂ss√§ (ref-count = 1)
   for (size_t i = 0; i < itsIteratorList.size(); i++)
   {
     if (itsIteratorList[i].use_count() <= 1) return itsIteratorList[i];
   }
 
-  // Ei lˆytynyt vapaata (tai ollenkaan) Info-iteraattoria, pit‰‰ luoda sellainen ja lis‰t‰ listaan
+  // Ei l√∂ytynyt vapaata (tai ollenkaan) Info-iteraattoria, pit√§√§ luoda sellainen ja lis√§t√§ listaan
   // ja paluttaa se
   boost::shared_ptr<NFmiFastQueryInfo> infoIter;
   if (OriginalData()->DataType() == NFmiInfoData::kEditable)
     infoIter = boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(
         *(dynamic_cast<NFmiSmartInfo *>(OriginalData().get()))));  // HUOM! Vain editoitu data on
-                                                                   // smartInfo2 -tyyppi‰, ja clone
-                                                                   // ei sovi t‰ss‰ koska nyt
-                                                                   // tehd‰‰n 'matala' kopio. Ett‰
+                                                                   // smartInfo2 -tyyppi√§, ja clone
+                                                                   // ei sovi t√§ss√§ koska nyt
+                                                                   // tehd√§√§n 'matala' kopio. Ett√§
                                                                    // saataisiin kaunis ratkaisu,
-                                                                   // pit‰isi tehd‰ joku
+                                                                   // pit√§isi tehd√§ joku
                                                                    // shallowClone virtuaali metodi
   else
     infoIter = boost::shared_ptr<NFmiFastQueryInfo>(new NFmiOwnerInfo(*(OriginalData().get())));
@@ -112,7 +112,7 @@ NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> 
       itsKeepInMemoryTime(theKeepInMemoryTime)
 {
   bool dataWasDeleted = false;
-  AddData(theData, true, dataWasDeleted);  // true tarkoittaa ett‰ kyse on 1. lis‰tt‰v‰st‰ datasta
+  AddData(theData, true, dataWasDeleted);  // true tarkoittaa ett√§ kyse on 1. lis√§tt√§v√§st√§ datasta
 }
 
 NFmiQueryDataSetKeeper::~NFmiQueryDataSetKeeper(void) {}
@@ -130,18 +130,18 @@ static void DestroyQDatasInSeparateThread(NFmiQueryDataSetKeeper::ListType
 &theQDataListToBeDestroyed)
 {
         NFmiQueryDataSetKeeper::ListType *swapList = new NFmiQueryDataSetKeeper::ListType;
-        theQDataListToBeDestroyed.swap(*swapList); // siirret‰‰n tuhottava lista toiseen
+        theQDataListToBeDestroyed.swap(*swapList); // siirret√§√§n tuhottava lista toiseen
 lista-olioon
-        // K‰ynnistet‰‰n uusi threadi, joka hoitaa lopullisen tuhoamisen
+        // K√§ynnistet√§√§n uusi threadi, joka hoitaa lopullisen tuhoamisen
         boost::thread wrk_thread(::QDataListDestroyer, swapList);
 
-        // ei j‰‰d‰ odottamaan lopetusta
+        // ei j√§√§d√§ odottamaan lopetusta
 }
 */
 
-// Lis‰t‰t‰‰n annettu data keeper-settiin.
-// Jos	itsMaxLatestDataCount on 0, tyhjennnet‰‰n olemassa olevat listat ja datat ja laitetaan
-// annettu data k‰yttˆˆn.
+// Lis√§t√§t√§√§n annettu data keeper-settiin.
+// Jos	itsMaxLatestDataCount on 0, tyhjennnet√§√§n olemassa olevat listat ja datat ja laitetaan
+// annettu data k√§ytt√∂√∂n.
 // Jos	itsMaxLatestDataCount on > 0, katsotaan mihin kohtaan (mille indeksille) data sijoittuu,
 // mahdollisesti vanhimman datan joutuu siivoamaan pois.
 void NFmiQueryDataSetKeeper::AddData(boost::shared_ptr<NFmiOwnerInfo> &theData,
@@ -153,13 +153,13 @@ void NFmiQueryDataSetKeeper::AddData(boost::shared_ptr<NFmiOwnerInfo> &theData,
     itsDataType = theData->DataType();
     if (fFirstData || itsMaxLatestDataCount == 0)
     {
-      // Halusin siirt‰‰ t‰m‰n datojen tuhoamisen omaan threadiin, koska ainakin debugatessa
-      // salama-kaudella, salama datan tuhomaminen kest‰‰, koska siin‰ on kymmeni‰ tuhansia
+      // Halusin siirt√§√§ t√§m√§n datojen tuhoamisen omaan threadiin, koska ainakin debugatessa
+      // salama-kaudella, salama datan tuhomaminen kest√§√§, koska siin√§ on kymmeni√§ tuhansia
       // dynaamisesti luotuja NFmiMetTime-olioita tuhottavana
       itsQueryDatas.clear();
 
-      //::DestroyQDatasInSeparateThread(itsQueryDatas); // ei riit‰ ett‰ tuhoaminen siirret‰‰n omaan
-      // threadiin, OwnerInfon rakennuskin kest‰‰!
+      //::DestroyQDatasInSeparateThread(itsQueryDatas); // ei riit√§ ett√§ tuhoaminen siirret√§√§n omaan
+      // threadiin, OwnerInfon rakennuskin kest√§√§!
 
       itsQueryDatas.push_back(
           boost::shared_ptr<NFmiQueryDataKeeper>(new NFmiQueryDataKeeper(theData)));
@@ -171,15 +171,15 @@ void NFmiQueryDataSetKeeper::AddData(boost::shared_ptr<NFmiOwnerInfo> &theData,
   }
 }
 
-// Oletus: annettu data lis‰t‰‰n t‰h‰n data settiin niin ett‰ etsit‰‰n sen paikka (indeksi).
-// Siirret‰‰n kaikkia datoja tarpeen mukaan indekseiss‰.
-// Jos datoja on liikaa setiss‰, poistetaan ylim‰‰r‰iset (yli max indeksiset).
-// Jos sama data lˆytyy jo setist‰ (= sama origin-aika), korvaa listassa oleva t‰ll‰ (esim. on tehty
+// Oletus: annettu data lis√§t√§√§n t√§h√§n data settiin niin ett√§ etsit√§√§n sen paikka (indeksi).
+// Siirret√§√§n kaikkia datoja tarpeen mukaan indekseiss√§.
+// Jos datoja on liikaa setiss√§, poistetaan ylim√§√§r√§iset (yli max indeksiset).
+// Jos sama data l√∂ytyy jo setist√§ (= sama origin-aika), korvaa listassa oleva t√§ll√§ (esim. on tehty
 // uusi korjattu malliajo datahaku).
 void NFmiQueryDataSetKeeper::AddDataToSet(boost::shared_ptr<NFmiOwnerInfo> &theData,
                                           bool &fDataWasDeletedOut)
 {
-  // etsi ja korvaa, jos setist‰ lˆytyy jo saman origin-timen data
+  // etsi ja korvaa, jos setist√§ l√∂ytyy jo saman origin-timen data
   NFmiMetTime origTime = theData->OriginTime();
   NFmiMetTime latestOrigTime = origTime;
   bool wasReplace = false;
@@ -187,34 +187,34 @@ void NFmiQueryDataSetKeeper::AddDataToSet(boost::shared_ptr<NFmiOwnerInfo> &theD
   {
     const NFmiMetTime &currentOrigTime = (*it)->OriginalData()->OriginTime();
     if (latestOrigTime < currentOrigTime)
-      latestOrigTime = currentOrigTime;  // etsit‰‰n samalla viimeisint‰ origin aikaa listasta
+      latestOrigTime = currentOrigTime;  // etsit√§√§n samalla viimeisint√§ origin aikaa listasta
 
     if (currentOrigTime == origTime)
     {
       *it = boost::shared_ptr<NFmiQueryDataKeeper>(
-          new NFmiQueryDataKeeper(theData));  // korvataan lˆydetty dataKeeper uudella
+          new NFmiQueryDataKeeper(theData));  // korvataan l√∂ydetty dataKeeper uudella
       wasReplace = true;
     }
   }
 
-  // T‰m‰ on data uudella origin ajalla.
-  // 1. Lis‰‰ se listaan.
+  // T√§m√§ on data uudella origin ajalla.
+  // 1. Lis√§√§ se listaan.
   itsLatestOriginTime = latestOrigTime;
   if (wasReplace == false)
     itsQueryDatas.push_back(
         boost::shared_ptr<NFmiQueryDataKeeper>(new NFmiQueryDataKeeper(theData)));
   // 2. Laske kaikille setin datoille indeksit uudestaan.
   RecalculateIndexies(itsLatestOriginTime);
-  // 3. Ota talteen lis‰tyn datan origTime
+  // 3. Ota talteen lis√§tyn datan origTime
   NFmiMetTime addedDataOrigTime = theData->OriginTime();
   // 4. Poista listasta kaikki datat joiden indeksi on suurempi kuin itsMaxLatestDataCount:in arvo
   // sallii.
   DeleteTooOldDatas();
-  // 5. Tutki lˆytyykˆ lis‰tty data viel‰ listalta
+  // 5. Tutki l√∂ytyyk√∂ lis√§tty data viel√§ listalta
   fDataWasDeletedOut = OrigTimeDataExist(addedDataOrigTime) == false;
 }
 
-// Etsi annettua origin-aikaa vastaava dataa listalta, jos ei lˆydy, palauta false, muuten true.
+// Etsi annettua origin-aikaa vastaava dataa listalta, jos ei l√∂ydy, palauta false, muuten true.
 bool NFmiQueryDataSetKeeper::OrigTimeDataExist(const NFmiMetTime &theOrigTime)
 {
   for (ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); ++it)
@@ -242,8 +242,8 @@ static bool IsNewer(const boost::shared_ptr<NFmiQueryDataKeeper> &theDataKeeper1
 void NFmiQueryDataSetKeeper::RecalculateIndexies(const NFmiMetTime &theLatestOrigTime)
 {
   if (itsModelRunTimeGap < 0)
-  {  // kyse on editoidusta datasta, jolla ei ole vakio malliajo v‰li‰. Laitetaan lista vain
-     // aikaj‰rjestykseen ja indeksoidaan numeroj‰rjestyksess‰
+  {  // kyse on editoidusta datasta, jolla ei ole vakio malliajo v√§li√§. Laitetaan lista vain
+     // aikaj√§rjestykseen ja indeksoidaan numeroj√§rjestyksess√§
     itsQueryDatas.sort(::IsNewer);
     int index = 0;
     for (ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); ++it)
@@ -289,12 +289,12 @@ static boost::shared_ptr<NFmiQueryDataKeeper> FindQDataKeeper(
   return boost::shared_ptr<NFmiQueryDataKeeper>();
 }
 
-// TODO: Tulevaisuudessa pit‰‰ viel‰ hanskata tilanne ett‰ halutaan uusimman ajon dataa,
-// jota ei v‰ltt‰m‰tt‰ ole kyseiselle datatyypille kyseisest‰ mallista. Voisi olla siis arvo 0, joka
+// TODO: Tulevaisuudessa pit√§√§ viel√§ hanskata tilanne ett√§ halutaan uusimman ajon dataa,
+// jota ei v√§ltt√§m√§tt√§ ole kyseiselle datatyypille kyseisest√§ mallista. Voisi olla siis arvo 0, joka
 // tarkoittaa
-// ett‰ hae viimeisimman malliajon data, siis Hirlam RCR:sta pintadata on jo 06, mutta jos
+// ett√§ hae viimeisimman malliajon data, siis Hirlam RCR:sta pintadata on jo 06, mutta jos
 // mallipinta olisi 00 ajosta,
-// pit‰isi t‰llˆin palauttaa 0-data. Jos indeksi olisi 1 (tai suurempi), palautettaisiin viimeisin
+// pit√§isi t√§ll√∂in palauttaa 0-data. Jos indeksi olisi 1 (tai suurempi), palautettaisiin viimeisin
 // data, ed. mainitun
 // esimerkin mukaisesti 00 mallipinta data.
 boost::shared_ptr<NFmiQueryDataKeeper> NFmiQueryDataSetKeeper::GetDataKeeper(int theIndex)
@@ -307,9 +307,9 @@ boost::shared_ptr<NFmiQueryDataKeeper> NFmiQueryDataSetKeeper::GetDataKeeper(int
 
   if (DoOnDemandOldDataLoad(theIndex))
     return ::FindQDataKeeper(
-        itsQueryDatas, theIndex);  // kokeillaan, lˆytyykˆ on-demand pyynnˆn j‰lkeen haluttua dataa
+        itsQueryDatas, theIndex);  // kokeillaan, l√∂ytyyk√∂ on-demand pyynn√∂n j√§lkeen haluttua dataa
 
-  // jos ei lˆytynyt, palautetaan tyhj‰
+  // jos ei l√∂ytynyt, palautetaan tyhj√§
   return boost::shared_ptr<NFmiQueryDataKeeper>();
 }
 
@@ -332,7 +332,7 @@ static std::string GetFullFileName(const std::string &theFileFilter, const std::
 
 bool NFmiQueryDataSetKeeper::DoOnDemandOldDataLoad(int theIndex)
 {
-  if (::abs(theIndex) < itsMaxLatestDataCount)  // ei yritet‰ hakea liian vanhoja datoja
+  if (::abs(theIndex) < itsMaxLatestDataCount)  // ei yritet√§ hakea liian vanhoja datoja
   {
     if (itsModelRunTimeGap > 0)
     {
@@ -360,14 +360,14 @@ bool NFmiQueryDataSetKeeper::DoOnDemandOldDataLoad(int theIndex)
           }
         }
         catch (...)
-        {  // pit‰‰ vain varmistaa ett‰ jos tiedosto on viallinen, poikkeukset napataan kiinni t‰ss‰
+        {  // pit√§√§ vain varmistaa ett√§ jos tiedosto on viallinen, poikkeukset napataan kiinni t√§ss√§
         }
       }
     }
     else if (itsModelRunTimeGap < 0)
-      ReadAllOldDatasInMemory();  // editoidut datat (tai vastaavat, joilla ei ole siis s‰‰nnˆllisi‰
-                                  // tekoaikoja) pit‰‰ lukea kaikki muistiin, muuten ei voida laskea
-                                  // niiden indeksej‰
+      ReadAllOldDatasInMemory();  // editoidut datat (tai vastaavat, joilla ei ole siis s√§√§nn√∂llisi√§
+                                  // tekoaikoja) pit√§√§ lukea kaikki muistiin, muuten ei voida laskea
+                                  // niiden indeksej√§
   }
   return false;
 }
@@ -384,7 +384,7 @@ bool NFmiQueryDataSetKeeper::ReadDataFileInUse(const std::string &theFileName)
     return (dataWasDeleted == false);
   }
   catch (...)
-  {  // pit‰‰ vain varmistaa ett‰ jos tiedosto on viallinen, poikkeukset napataan kiinni t‰ss‰
+  {  // pit√§√§ vain varmistaa ett√§ jos tiedosto on viallinen, poikkeukset napataan kiinni t√§ss√§
   }
   return false;
 }
@@ -405,7 +405,7 @@ void NFmiQueryDataSetKeeper::ReadAllOldDatasInMemory(void)
   {
     std::set<std::string>::iterator it2 = filesInMemory.find(*it);
     if (it2 == filesInMemory.end())
-    {  // kyseist‰ tiedostoa ei lˆytynyt muistista, koitetaan lukea se nyt
+    {  // kyseist√§ tiedostoa ei l√∂ytynyt muistista, koitetaan lukea se nyt
       std::string usedFileName = ::GetFullFileName(itsFilePattern, *it);
       ReadDataFileInUse(usedFileName);
     }
@@ -426,19 +426,19 @@ size_t NFmiQueryDataSetKeeper::DataByteCount(void)
 bool NFmiQueryDataSetKeeper::CheckKeepTime(ListType::iterator &it)
 {
   if ((*it)->Index() != 0)
-  {  // vain viimeisin data j‰‰ tutkimatta, koska sit‰ ei ole tarkoitus poistaa muistista koskaan
+  {  // vain viimeisin data j√§√§ tutkimatta, koska sit√§ ei ole tarkoitus poistaa muistista koskaan
     if ((*it)->LastUsedInMS() > itsKeepInMemoryTime * 60 * 1000) return true;
   }
   return false;
 }
 
-// 1. Jos jotain arkisto-dataa ei ole k‰ytetty tarpeeksi pitk‰‰n aikaan, poistetaan ne muistista.
-// 2. Viimeisint‰ dataa ei poisteta koskaan muistista.
-// 3. Jos kyse editoidusta datasta (esim. kepa-data, ei s‰‰nnˆllist‰ ilmestymis tiheytt‰, vaan niit‰
+// 1. Jos jotain arkisto-dataa ei ole k√§ytetty tarpeeksi pitk√§√§n aikaan, poistetaan ne muistista.
+// 2. Viimeisint√§ dataa ei poisteta koskaan muistista.
+// 3. Jos kyse editoidusta datasta (esim. kepa-data, ei s√§√§nn√∂llist√§ ilmestymis tiheytt√§, vaan niit√§
 // syntyy satunnaisina aikoina),
-// pit‰‰ tutkia kaikki arkisto ajat ennen niiden siivoamista. Jos yht‰k‰‰n arkisto datoista on
-// k‰ytetty aikarajan sis‰ll‰,
-// ei mit‰‰n heitet‰ pois muistista.
+// pit√§√§ tutkia kaikki arkisto ajat ennen niiden siivoamista. Jos yht√§k√§√§n arkisto datoista on
+// k√§ytetty aikarajan sis√§ll√§,
+// ei mit√§√§n heitet√§ pois muistista.
 // 4. Palauttaa kuinka monta dataa poistettiin muistista operaation aikana
 int NFmiQueryDataSetKeeper::CleanUnusedDataFromMemory(void)
 {
@@ -493,8 +493,8 @@ int NFmiQueryDataSetKeeper::GetNearestUnRegularTimeIndex(const NFmiMetTime &theT
     std::map<long, int> timeDiffsWithIndexies;
     for (ListType::iterator it = itsQueryDatas.begin(); it != itsQueryDatas.end(); ++it)
     {
-      // HUOM! etsit‰‰n pienint‰ negatiivista lukua, sitten nollaa, jos kumpaakaan ei lˆydy,
-      // palautetaan pienimm‰n positiivisen luvun indeksi
+      // HUOM! etsit√§√§n pienint√§ negatiivista lukua, sitten nollaa, jos kumpaakaan ei l√∂ydy,
+      // palautetaan pienimm√§n positiivisen luvun indeksi
       long diffInMinutes = (*it)->OriginTime().DifferenceInMinutes(theTime);
       int index = (*it)->Index();
       timeDiffsWithIndexies.insert(std::make_pair(diffInMinutes, index));
@@ -510,7 +510,7 @@ int NFmiQueryDataSetKeeper::GetNearestUnRegularTimeIndex(const NFmiMetTime &theT
       long diffValue2 = diffValue1;
       for (; it2 != timeDiffsWithIndexies.end();)
       {
-        if (indexValue1 >= 0)  // jos ollaan viimeisess‰ malliajo ajassa, se on otettava k‰yttˆˆn
+        if (indexValue1 >= 0)  // jos ollaan viimeisess√§ malliajo ajassa, se on otettava k√§ytt√∂√∂n
           return indexValue1;
         ++it2;
         diffValue2 = it2->first;

@@ -27,7 +27,7 @@ class NFmiColor
 
   NFmiColor(const NFmiColor &aColor);
 
-  // HUOM! t‰m‰ tekee rajojen tarkistuksen, siksi en tehnyt suoraa kopiota
+  // HUOM! t√§m√§ tekee rajojen tarkistuksen, siksi en tehnyt suoraa kopiota
   NFmiColor(const FmiRGBColor &aColor);
 
   // Color handling methods
@@ -49,8 +49,8 @@ class NFmiColor
   float Green(void) const { return itsColor.green; }
   float Blue(void) const { return itsColor.blue; }
   float Alpha(void) const { return itsColor.alpha; }
-  // Taaksep‰in yhteensopivuuden takia TFmiColor:in GetV‰ri-metodeja
-  // toteutetaan t‰ss‰ samallalailla kuten poistetussa TFmiColor-luokassa.
+  // Taaksep√§in yhteensopivuuden takia TFmiColor:in GetV√§ri-metodeja
+  // toteutetaan t√§ss√§ samallalailla kuten poistetussa TFmiColor-luokassa.
 
   float GetRed(void) const { return Red(); }
   float GetGreen(void) const { return Green(); }
@@ -131,8 +131,8 @@ class NFmiColor
   FmiRGBColor itsColor;
 };
 
-// Taaksep‰in yhteensopivuuden takia TFmiColor (poistettu luokka)
-// m‰‰ritell‰‰n t‰ss‰ samaksi kuin NFmiColor.
+// Taaksep√§in yhteensopivuuden takia TFmiColor (poistettu luokka)
+// m√§√§ritell√§√§n t√§ss√§ samaksi kuin NFmiColor.
 
 typedef NFmiColor TFmiColor;
 

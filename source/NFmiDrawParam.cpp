@@ -18,16 +18,16 @@
 //
 //
 //  Description:
-//   En ole viel‰ varma t‰m‰n luokan tarkoituksesta/toiminnasta,
-//   t‰m‰ on
+//   En ole viel√§ varma t√§m√§n luokan tarkoituksesta/toiminnasta,
+//   t√§m√§ on
 //   Persan idea.
 //
 //  Change Log:
-// Changed 1999.08.31/Marko	Muutin kontruktoreita niin, ett‰ mahdollisia
-//							n‰yttˆtyyppej‰ on 2 (teksti ja isoviiva).
-// Changed 1999.09.28/Marko	Lis‰sin SecondaryIsoLineColor:in k‰ytˆn (k‰ytet‰‰n
-//							vertailtaessa samantyyppist‰ dataa
-// p‰‰llekk‰in)
+// Changed 1999.08.31/Marko	Muutin kontruktoreita niin, ett√§ mahdollisia
+//							n√§ytt√∂tyyppej√§ on 2 (teksti ja isoviiva).
+// Changed 1999.09.28/Marko	Lis√§sin SecondaryIsoLineColor:in k√§yt√∂n (k√§ytet√§√§n
+//							vertailtaessa samantyyppist√§ dataa
+// p√§√§llekk√§in)
 //
 //**********************************************************
 #include "NFmiDrawParam.h"
@@ -38,7 +38,7 @@
 
 float NFmiDrawParam::itsFileVersionNumber = 3.0;
 const float NFmiDrawParam::itsMinAlpha =
-    5.f;  // 5:kaan ei oikein erota en‰‰ mit‰‰n, on niin l‰pin‰kyv‰
+    5.f;  // 5:kaan ei oikein erota en√§√§ mit√§√§n, on niin l√§pin√§kyv√§
 
 //--------------------------------------------------------
 // NFmiDrawParam(void)
@@ -75,9 +75,9 @@ NFmiDrawParam::NFmiDrawParam()
       itsContourColor(NFmiColor(0., 0., 0.)),
       itsIsolineTextColor(NFmiColor(0., 0., 0.)),
       itsContourTextColor(NFmiColor(0., 0., 0.)),
-      itsSecondaryIsolineColor(0.6f, 0.6f, 0.6f)  // tehd‰‰n secondary v‰reist‰ aina harmaita
+      itsSecondaryIsolineColor(0.6f, 0.6f, 0.6f)  // tehd√§√§n secondary v√§reist√§ aina harmaita
       ,
-      itsSecondaryIsolineTextColor(0.6f, 0.6f, 0.6f)  // tehd‰‰n secondary v‰reist‰ aina harmaita
+      itsSecondaryIsolineTextColor(0.6f, 0.6f, 0.6f)  // tehd√§√§n secondary v√§reist√§ aina harmaita
       ,
       fUseSecondaryColors(false),
       itsAbsoluteMinValue(-1000000000),
@@ -86,7 +86,7 @@ NFmiDrawParam::NFmiDrawParam()
       itsTimeSeriesScaleMax(100),
       itsPossibleViewTypeCount(2),
       fShowNumbers(true),
-      fShowMasks(false)  // t‰m‰ on turha
+      fShowMasks(false)  // t√§m√§ on turha
       ,
       fShowColors(false),
       fShowColoredNumbers(false),
@@ -172,7 +172,7 @@ NFmiDrawParam::NFmiDrawParam()
       ,
       itsIsoLineLabelDigitCount(0),
       itsContourLabelDigitCount(0),
-      itsAlpha(100.f)  // dafault on 100 eli t‰ysin l‰pin‰kym‰tˆn
+      itsAlpha(100.f)  // dafault on 100 eli t√§ysin l√§pin√§kym√§t√∂n
       ,
       itsInitFileVersionNumber(itsFileVersionNumber),
       fHidden(false),
@@ -233,9 +233,9 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       itsContourColor(NFmiColor(0., 0., 0.)),
       itsIsolineTextColor(NFmiColor(0., 0., 0.)),
       itsContourTextColor(NFmiColor(0., 0., 0.)),
-      itsSecondaryIsolineColor(0.6f, 0.6f, 0.6f)  // tehd‰‰n secondary v‰reist‰ aina harmaita
+      itsSecondaryIsolineColor(0.6f, 0.6f, 0.6f)  // tehd√§√§n secondary v√§reist√§ aina harmaita
       ,
-      itsSecondaryIsolineTextColor(0.6f, 0.6f, 0.6f)  // tehd‰‰n secondary v‰reist‰ aina harmaita
+      itsSecondaryIsolineTextColor(0.6f, 0.6f, 0.6f)  // tehd√§√§n secondary v√§reist√§ aina harmaita
       ,
       fUseSecondaryColors(false),
       itsAbsoluteMinValue(-1000000000),
@@ -244,7 +244,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       itsTimeSeriesScaleMax(100),
       itsPossibleViewTypeCount(2),
       fShowNumbers(true),
-      fShowMasks(false)  // t‰m‰ on turha
+      fShowMasks(false)  // t√§m√§ on turha
       ,
       fShowColors(false),
       fShowColoredNumbers(false),
@@ -328,7 +328,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       itsIsoLineHatchColor2(0.5f, 0.5f, 0.5f),
       itsIsoLineLabelDigitCount(0),
       itsContourLabelDigitCount(0),
-      itsAlpha(100.f)  // dafault on 100 eli t‰ysin l‰pin‰kym‰tˆn
+      itsAlpha(100.f)  // dafault on 100 eli t√§ysin l√§pin√§kym√§t√∂n
       ,
       itsInitFileVersionNumber(itsFileVersionNumber),
       fHidden(false),
@@ -512,7 +512,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       itsDataComparisonProdId(other.itsDataComparisonProdId),
       itsDataComparisonType(other.itsDataComparisonType)
 {
-  Alpha(itsAlpha);  // varmistus ett‰ pysyt‰‰n rajoissa
+  Alpha(itsAlpha);  // varmistus ett√§ pysyt√§√§n rajoissa
   itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
   itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
 }
@@ -537,8 +537,8 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     if (fInitOnlyDrawingOptions == false)
     {
       itsInitFileName = theDrawParam->InitFileName();
-      // HUOM! itsMacroParamRelativePath-dataosaa ei saa initialisoida, koska sit‰ k‰ytet‰‰n vain
-      // viewmakrojen yhteydess‰
+      // HUOM! itsMacroParamRelativePath-dataosaa ei saa initialisoida, koska sit√§ k√§ytet√§√§n vain
+      // viewmakrojen yhteydess√§
       itsParameterAbbreviation = theDrawParam->ParameterAbbreviation();
       fViewMacroDrawParam = theDrawParam->ViewMacroDrawParam();
       itsParameter = theDrawParam->itsParameter;
@@ -576,10 +576,10 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     itsIsolineColor = theDrawParam->IsolineColor();
     itsIsolineTextColor = theDrawParam->IsolineTextColor();
 
-    // ei tarvitse toistaiseksi alustaa sekundaarisia v‰rej‰
+    // ei tarvitse toistaiseksi alustaa sekundaarisia v√§rej√§
     //	itsSecondaryIsolineColor = theDrawParam->IsolineSecondaryColor();
     //	itsSecondaryIsolineTextColor = theDrawParam->IsolineSecondaryTextColor();
-    // ei tarvitse toistaiseksi alustaa sekundaarisia v‰rej‰
+    // ei tarvitse toistaiseksi alustaa sekundaarisia v√§rej√§
 
     itsAbsoluteMinValue = theDrawParam->AbsoluteMinValue();
     itsAbsoluteMaxValue = theDrawParam->AbsoluteMaxValue();
@@ -775,7 +775,7 @@ bool NFmiDrawParam::operator<(const NFmiDrawParam& theDrawParam) const
   return (itsPriority < theDrawParam.itsPriority);
 }
 
-// NFmiMetTime stringiksi ja stringist‰ metTimeksi funktiot, ett‰ voidaan tallentaa fiksatut origin
+// NFmiMetTime stringiksi ja stringist√§ metTimeksi funktiot, ett√§ voidaan tallentaa fiksatut origin
 // timet
 // viewMakroihin.
 static const unsigned long gMetTime2ViewMacroStringFormat = kYYYYMMDDHHMMSS;
@@ -799,11 +799,11 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
 
   file << "Version ";
   file << itsFileVersionNumber << endl;
-  file << "'ParameterAbbreviation'" << endl;  // selitt‰v‰ teksti
+  file << "'ParameterAbbreviation'" << endl;  // selitt√§v√§ teksti
   if (fViewMacroDrawParam)
-  {  // jos viewmacro tapaus ja siin‰ oleva macroParam, sen drawParamin nimen lyhenteeseen
+  {  // jos viewmacro tapaus ja siin√§ oleva macroParam, sen drawParamin nimen lyhenteeseen
      // talletetaan suhteellinen polku
-     // ('optimointia', n‰in minun ei viel‰ tarvitse muuttaa mink‰‰n macrosysteemien data tiedoston
+     // ('optimointia', n√§in minun ei viel√§ tarvitse muuttaa mink√§√§n macrosysteemien data tiedoston
      // rakennetta)
     std::string tmpStr(itsMacroParamRelativePath);
     tmpStr += tmpStr.empty() ? "" : "\\";
@@ -812,89 +812,89 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
   }
   else
     file << itsParameterAbbreviation << endl;
-  file << "'Priority'" << endl;  // selitt‰v‰ teksti
+  file << "'Priority'" << endl;  // selitt√§v√§ teksti
   file << itsPriority << endl;
-  file << "'ViewType'" << endl;  // selitt‰v‰ teksti
+  file << "'ViewType'" << endl;  // selitt√§v√§ teksti
   file << static_cast<int>(itsViewType) << endl;
-  file << "'UseIsoLineGabWithCustomContours'" << endl;  // selitt‰v‰ teksti
+  file << "'UseIsoLineGabWithCustomContours'" << endl;  // selitt√§v√§ teksti
   file << static_cast<int>(fUseIsoLineGabWithCustomContours) << endl;
-  file << "'IsoLineGab'" << endl;  // selitt‰v‰ teksti
+  file << "'IsoLineGab'" << endl;  // selitt√§v√§ teksti
   file << itsIsoLineGab << endl;
-  file << "'IsolineColor'" << endl;  // selitt‰v‰ teksti
+  file << "'IsolineColor'" << endl;  // selitt√§v√§ teksti
   file << itsIsolineColor << endl;
-  file << "'IsolineTextColor'" << endl;  // selitt‰v‰ teksti
+  file << "'IsolineTextColor'" << endl;  // selitt√§v√§ teksti
   file << itsIsolineTextColor << endl;
-  file << "'ModifyingStep'" << endl;  // selitt‰v‰ teksti
+  file << "'ModifyingStep'" << endl;  // selitt√§v√§ teksti
   file << itsModifyingStep << endl;
-  file << "'ModifyingUnit'" << endl;  // selitt‰v‰ teksti
+  file << "'ModifyingUnit'" << endl;  // selitt√§v√§ teksti
                                       //	file << fModifyingUnit << endl;
-  file << true << endl;  // t‰ss‰ on otettu pois modifyingUnit, mutta arvo pit‰‰ tallettaa ett‰
-                         // luku/kirjoitus operaatiot eiv‰t mene rikki
+  file << true << endl;  // t√§ss√§ on otettu pois modifyingUnit, mutta arvo pit√§√§ tallettaa ett√§
+                         // luku/kirjoitus operaatiot eiv√§t mene rikki
 
-  file << "'FrameColor'" << endl;  // selitt‰v‰ teksti
+  file << "'FrameColor'" << endl;  // selitt√§v√§ teksti
   file << itsFrameColor << endl;
-  file << "'FillColor'" << endl;  // selitt‰v‰ teksti
+  file << "'FillColor'" << endl;  // selitt√§v√§ teksti
   file << itsFillColor << endl;
-  file << "'IsolineLabelBoxFillColor'" << endl;  // selitt‰v‰ teksti
+  file << "'IsolineLabelBoxFillColor'" << endl;  // selitt√§v√§ teksti
   file << itsIsolineLabelBoxFillColor << endl;
 
-  file << "'itsAbsoluteMinValue'" << endl;  // selitt‰v‰ testi
+  file << "'itsAbsoluteMinValue'" << endl;  // selitt√§v√§ testi
   file << itsAbsoluteMinValue << endl;
-  file << "'itsAbsoluteMaxValue'" << endl;  // selitt‰v‰ teksti
+  file << "'itsAbsoluteMaxValue'" << endl;  // selitt√§v√§ teksti
   file << itsAbsoluteMaxValue << endl;
 
-  file << "'TimeSeriesScaleMin'" << endl;  // selitt‰v‰ teksti
+  file << "'TimeSeriesScaleMin'" << endl;  // selitt√§v√§ teksti
   file << itsTimeSeriesScaleMin << endl;
-  file << "'TimeSeriesScaleMax'" << endl;  // selitt‰v‰ teksti
+  file << "'TimeSeriesScaleMax'" << endl;  // selitt√§v√§ teksti
   file << itsTimeSeriesScaleMax << endl;
 
-  file << "'RelativeSize'" << endl;  // selitt‰v‰ teksti
+  file << "'RelativeSize'" << endl;  // selitt√§v√§ teksti
   file << itsRelativeSize;
-  file << "'RelativePositionOffset'" << endl;  // selitt‰v‰ teksti
+  file << "'RelativePositionOffset'" << endl;  // selitt√§v√§ teksti
   file << itsRelativePositionOffset;
-  file << "'OnlyOneSymbolRelativeSize'" << endl;  // selitt‰v‰ teksti
+  file << "'OnlyOneSymbolRelativeSize'" << endl;  // selitt√§v√§ teksti
   file << itsOnlyOneSymbolRelativeSize;
-  file << "'OnlyOneSymbolRelativePositionOffset'" << endl;  // selitt‰v‰ teksti
+  file << "'OnlyOneSymbolRelativePositionOffset'" << endl;  // selitt√§v√§ teksti
   file << itsOnlyOneSymbolRelativePositionOffset;
 
-  file << "'PossibleViewTypeCount'" << endl;  // selitt‰v‰ teksti
+  file << "'PossibleViewTypeCount'" << endl;  // selitt√§v√§ teksti
   file << itsPossibleViewTypeCount << endl;
-  file << "'PossibleViewTypeList'" << endl;  // selitt‰v‰ teksti
+  file << "'PossibleViewTypeList'" << endl;  // selitt√§v√§ teksti
   for (int ind = 0; ind < itsPossibleViewTypeCount; ind++)
     file << static_cast<int>(itsPossibleViewTypeList[ind]) << endl;
 
-  file << "'TimeSerialModifyingLimit'" << endl;  // selitt‰v‰ teksti
+  file << "'TimeSerialModifyingLimit'" << endl;  // selitt√§v√§ teksti
   file << itsTimeSerialModifyingLimit << endl;
 
   // ******************************************************************
-  // StationDataViewType otetttiin k‰yttˆˆn vasta v. 2007, kun halusin
-  // ett‰ voidaan katsoa asemadataa myˆs gridattuna. Ongelma oli ett‰
+  // StationDataViewType otetttiin k√§ytt√∂√∂n vasta v. 2007, kun halusin
+  // ett√§ voidaan katsoa asemadataa my√∂s gridattuna. Ongelma oli ett√§
   // kyseiseen dataosaan on joihinkin drawparameihin tallettunut tiedostoon
-  // jo 1:st‰ suurempia lukuja. T‰m‰ on kikka viitonen ett‰ ei tarvitsisi
-  // konvertoida nykyisi‰ drawparam (dpa) tiedostoja siten ett‰ niiss‰
-  // olisi defaulttin‰ 1 (=teksti tyyppi). Eli talletettaessa lis‰t‰‰n
-  // lukuun 100. Luettaessa v‰hennet‰‰n tuo 100. Jos luku t‰llˆin
+  // jo 1:st√§ suurempia lukuja. T√§m√§ on kikka viitonen ett√§ ei tarvitsisi
+  // konvertoida nykyisi√§ drawparam (dpa) tiedostoja siten ett√§ niiss√§
+  // olisi defaulttin√§ 1 (=teksti tyyppi). Eli talletettaessa lis√§t√§√§n
+  // lukuun 100. Luettaessa v√§hennet√§√§n tuo 100. Jos luku t√§ll√∂in
   // on pienempi kuin 1, annetaan arvoksi 1.
-  file << "'StationDataViewType'" << endl;  // selitt‰v‰ teksti
+  file << "'StationDataViewType'" << endl;  // selitt√§v√§ teksti
   file << static_cast<int>(itsStationDataViewType + 100) << endl;
-  file << "'EditableParam'" << endl;  // selitt‰v‰ teksti
-  file << false << endl;              // t‰m‰ muuttuja poistettu, mutt‰ jokin arvo laitettava t‰h‰n
-  file << "'Unit'" << endl;           // selitt‰v‰ teksti
+  file << "'EditableParam'" << endl;  // selitt√§v√§ teksti
+  file << false << endl;              // t√§m√§ muuttuja poistettu, mutt√§ jokin arvo laitettava t√§h√§n
+  file << "'Unit'" << endl;           // selitt√§v√§ teksti
   file << itsUnit << endl;
 
-  file << "'ShowNumbers'" << endl;  // selitt‰v‰ teksti
+  file << "'ShowNumbers'" << endl;  // selitt√§v√§ teksti
   file << fShowNumbers << endl;
 
-  file << "'ShowMasks'" << endl;  // selitt‰v‰ teksti
+  file << "'ShowMasks'" << endl;  // selitt√§v√§ teksti
   file << fShowMasks << endl;
-  file << "'ShowColors'" << endl;  // selitt‰v‰ teksti
+  file << "'ShowColors'" << endl;  // selitt√§v√§ teksti
   file << fShowColors << endl;
-  file << "'ShowColoredNumbers'" << endl;  // selitt‰v‰ teksti
+  file << "'ShowColoredNumbers'" << endl;  // selitt√§v√§ teksti
   file << fShowColoredNumbers << endl;
-  file << "'ZeroColorMean'" << endl;  // selitt‰v‰ teksti
+  file << "'ZeroColorMean'" << endl;  // selitt√§v√§ teksti
   file << fZeroColorMean << endl;
 
-  if (itsFileVersionNumber >= 2.)  // t‰m‰ on vain esimerkki siit‰ mit‰ joskus tulee olemaan
+  if (itsFileVersionNumber >= 2.)  // t√§m√§ on vain esimerkki siit√§ mit√§ joskus tulee olemaan
   {
     //***********************************************
     //********** 'versio 2' parametreja *************
@@ -1039,10 +1039,10 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
 
     file << fUseCustomIsoLineing << " " << itsContourLabelDigitCount << endl;
 
-    NFmiDataStoringHelpers::NFmiExtraDataStorage extraData;  // lopuksi viel‰ mahdollinen extra data
-    // Kun tulee uusia muuttujia, tee t‰h‰n extradatan t‰yttˆ‰, jotta se saadaan talteen tiedopstoon
-    // siten ett‰
-    // edelliset versiot eiv‰t mene solmuun vaikka on tullut uutta dataa.
+    NFmiDataStoringHelpers::NFmiExtraDataStorage extraData;  // lopuksi viel√§ mahdollinen extra data
+    // Kun tulee uusia muuttujia, tee t√§h√§n extradatan t√§ytt√∂√§, jotta se saadaan talteen tiedopstoon
+    // siten ett√§
+    // edelliset versiot eiv√§t mene solmuun vaikka on tullut uutta dataa.
     extraData.Add(itsAlpha);          // alpha on siis 1. uusista double-extra-parametreista
     extraData.Add(itsModelRunIndex);  // modelRunIndex on 2. uusista double-extra-parametreista
     extraData.Add(
@@ -1087,18 +1087,18 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
           "NFmiDrawParam::Read failed because version number in DrawParam was higher than program "
           "expects.");
 
-    if (itsInitFileVersionNumber >= 1.)  // t‰m‰ on vain esimerkki siit‰ mit‰ joskus tulee olemaan
+    if (itsInitFileVersionNumber >= 1.)  // t√§m√§ on vain esimerkki siit√§ mit√§ joskus tulee olemaan
     {
       if (!file) return file;
       file >> temp;                // luetaan nimike pois
       std::getline(file, tmpStr);  // luetaan ed. rivinvaihto pois jaloista
-      std::getline(file, tmpStr);  // luetaan rivin loppuun, jos lyhenteess‰ spaceja mahdollisesti
+      std::getline(file, tmpStr);  // luetaan rivin loppuun, jos lyhenteess√§ spaceja mahdollisesti
       std::string::size_type pos = tmpStr.find_last_of('/');
       if (pos == std::string::npos)
-        pos = tmpStr.find_last_of('\\');  // kokeillaan varmuuden vuoksi slasy‰ molempiin suuntiin
+        pos = tmpStr.find_last_of('\\');  // kokeillaan varmuuden vuoksi slasy√§ molempiin suuntiin
 
       if (pos != std::string::npos)
-      {  // jos lˆytyi kenoviiva lyhenteest‰, laitetaan viemacrossa olevan macroparamin suhteellinen
+      {  // jos l√∂ytyi kenoviiva lyhenteest√§, laitetaan viemacrossa olevan macroparamin suhteellinen
          // polku talteen
         itsMacroParamRelativePath =
             std::string(tmpStr.begin(), tmpStr.begin() + pos);  // huom! kenoa ei oteta talteen
@@ -1175,13 +1175,13 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       file >> temp;  // luetaan nimike pois
 
       // ******************************************************************
-      // StationDataViewType otetttiin k‰yttˆˆn vasta v. 2007, kun halusin
-      // ett‰ voidaan katsoa asemadataa myˆs gridattuna. Ongelma oli ett‰
+      // StationDataViewType otetttiin k√§ytt√∂√∂n vasta v. 2007, kun halusin
+      // ett√§ voidaan katsoa asemadataa my√∂s gridattuna. Ongelma oli ett√§
       // kyseiseen dataosaan on joihinkin drawparameihin tallettunut tiedostoon
-      // jo 1:st‰ suurempia lukuja. T‰m‰ on kikka viitonen ett‰ ei tarvitsisi
-      // konvertoida nykyisi‰ drawparam (dpa) tiedostoja siten ett‰ niiss‰
-      // olisi defaulttin‰ 1 (=teksti tyyppi). Eli talletettaessa lis‰t‰‰n
-      // lukuun 100. Luettaessa v‰hennet‰‰n tuo 100. Jos luku t‰llˆin
+      // jo 1:st√§ suurempia lukuja. T√§m√§ on kikka viitonen ett√§ ei tarvitsisi
+      // konvertoida nykyisi√§ drawparam (dpa) tiedostoja siten ett√§ niiss√§
+      // olisi defaulttin√§ 1 (=teksti tyyppi). Eli talletettaessa lis√§t√§√§n
+      // lukuun 100. Luettaessa v√§hennet√§√§n tuo 100. Jos luku t√§ll√∂in
       // on pienempi kuin 1, annetaan arvoksi 1.
       file >> number;
       number -= 100;
@@ -1189,7 +1189,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       itsStationDataViewType = NFmiMetEditorTypes::View(number);
       file >> temp;  // luetaan nimike pois
       bool tmpBool = false;
-      file >> tmpBool;  // t‰m‰ on legacy koodia, pit‰‰ lukea bool arvo t‰ss‰
+      file >> tmpBool;  // t√§m√§ on legacy koodia, pit√§√§ lukea bool arvo t√§ss√§
 
       file >> temp;  // luetaan nimike pois
       file >> temp;
@@ -1210,7 +1210,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       //***********************************************
       //********** 'versio 2' parametreja *************
       //***********************************************
-      if (itsInitFileVersionNumber >= 2.)  // t‰m‰ on vain esimerkki siit‰ mit‰ joskus tulee olemaan
+      if (itsInitFileVersionNumber >= 2.)  // t√§m√§ on vain esimerkki siit√§ mit√§ joskus tulee olemaan
       {
         if (!file) return file;
         file >> itsStationSymbolColorShadeLowValue;
@@ -1355,46 +1355,46 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
 
         file >> temp;  // luetaan 'possible_extra_data' pois
         NFmiDataStoringHelpers::NFmiExtraDataStorage
-            extraData;  // lopuksi viel‰ mahdollinen extra data
+            extraData;  // lopuksi viel√§ mahdollinen extra data
         file >> extraData;
-        // T‰ss‰ sitten otetaaan extradatasta talteen uudet muuttujat, mit‰ on mahdollisesti tullut
-        // eli jos uusia muutujia tai arvoja, k‰sittele t‰ss‰.
-        itsAlpha = 100.f;  // t‰m‰ on siis default arvo alphalle (t‰ysin l‰pin‰kyv‰)
+        // T√§ss√§ sitten otetaaan extradatasta talteen uudet muuttujat, mit√§ on mahdollisesti tullut
+        // eli jos uusia muutujia tai arvoja, k√§sittele t√§ss√§.
+        itsAlpha = 100.f;  // t√§m√§ on siis default arvo alphalle (t√§ysin l√§pin√§kyv√§)
         if (extraData.itsDoubleValues.size() >= 1)
           Alpha(static_cast<float>(
               extraData
-                  .itsDoubleValues[0]));  // laitetaan asetus-funktion l‰pi, jossa raja tarkistukset
-        itsModelRunIndex = 0;             // 0 on default, eli ei ole k‰ytˆss‰
+                  .itsDoubleValues[0]));  // laitetaan asetus-funktion l√§pi, jossa raja tarkistukset
+        itsModelRunIndex = 0;             // 0 on default, eli ei ole k√§yt√∂ss√§
         if (extraData.itsDoubleValues.size() >= 2)
           ModelRunIndex(static_cast<int>(
               extraData
-                  .itsDoubleValues[1]));  // laitetaan asetus-funktion l‰pi, jossa raja tarkistukset
+                  .itsDoubleValues[1]));  // laitetaan asetus-funktion l√§pi, jossa raja tarkistukset
         itsTimeSerialModelRunCount = 0;
         if (extraData.itsDoubleValues.size() >= 3)
           TimeSerialModelRunCount(static_cast<int>(
               extraData
-                  .itsDoubleValues[2]));  // laitetaan asetus-funktion l‰pi, jossa raja tarkistukset
-        itsModelRunDifferenceIndex = 0;   // 0 on default, eli ei ole k‰ytˆss‰
+                  .itsDoubleValues[2]));  // laitetaan asetus-funktion l√§pi, jossa raja tarkistukset
+        itsModelRunDifferenceIndex = 0;   // 0 on default, eli ei ole k√§yt√∂ss√§
         if (extraData.itsDoubleValues.size() >= 4)
           ModelRunDifferenceIndex(static_cast<int>(
               extraData
-                  .itsDoubleValues[3]));  // laitetaan asetus-funktion l‰pi, jossa raja tarkistukset
+                  .itsDoubleValues[3]));  // laitetaan asetus-funktion l√§pi, jossa raja tarkistukset
         itsDataComparisonProdId = 0;
         if (extraData.itsDoubleValues.size() >= 5)
           DataComparisonProdId(static_cast<unsigned long>(
               extraData
-                  .itsDoubleValues[4]));  // laitetaan asetus-funktion l‰pi, jossa raja tarkistukset
+                  .itsDoubleValues[4]));  // laitetaan asetus-funktion l√§pi, jossa raja tarkistukset
         itsDataComparisonType = NFmiInfoData::kNoDataType;
         if (extraData.itsDoubleValues.size() >= 6)
           DataComparisonType(static_cast<NFmiInfoData::Type>(
-              static_cast<int>(extraData.itsDoubleValues[5])));  // laitetaan asetus-funktion l‰pi,
+              static_cast<int>(extraData.itsDoubleValues[5])));  // laitetaan asetus-funktion l√§pi,
                                                                  // jossa raja tarkistukset
 
-        itsModelOriginTime = NFmiMetTime::gMissingTime;  // t‰m‰ on oletus arvo eli ei ole k‰ytˆss‰
+        itsModelOriginTime = NFmiMetTime::gMissingTime;  // t√§m√§ on oletus arvo eli ei ole k√§yt√∂ss√§
         if (extraData.itsStringValues.size() >= 1)
           ModelOriginTime(::String2MetTime(
               extraData
-                  .itsStringValues[0]));  // laitetaan asetus-funktion l‰pi, jossa raja tarkistukset
+                  .itsStringValues[0]));  // laitetaan asetus-funktion l√§pi, jossa raja tarkistukset
 
         if (file.fail()) throw std::runtime_error("NFmiDrawParam::Write failed");
         //***********************************************
@@ -1402,7 +1402,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         //***********************************************
       }
       else
-      {  // tietyt muuttujat pit‰‰ alustaa jos versio 2.
+      {  // tietyt muuttujat pit√§√§ alustaa jos versio 2.
         itsColorContouringColorShadeHigh2Value = itsColorContouringColorShadeHighValue;
         itsColorContouringColorShadeHigh2ValueColor = itsColorContouringColorShadeHighValueColor;
 
@@ -1429,11 +1429,11 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
 
         fUseCustomIsoLineing = fUseCustomColorContouring;
         itsContourLabelDigitCount = itsIsoLineLabelDigitCount;
-        itsAlpha = 100.f;  // t‰m‰ on siis default arvo alphalle (t‰ysin l‰pin‰kyv‰)
+        itsAlpha = 100.f;  // t√§m√§ on siis default arvo alphalle (t√§ysin l√§pin√§kyv√§)
       }
     }
     itsInitFileVersionNumber = itsFileVersionNumber;  // lopuksi asetetaan versio numero
-                                                      // viimeisimm‰ksi, ett‰ tulevaisuudessa
+                                                      // viimeisimm√§ksi, ett√§ tulevaisuudessa
                                                       // talletus menee uudella versiolla
   }
   return file;

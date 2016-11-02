@@ -18,15 +18,15 @@
 //
 //
 //  Description:
-//   Luokka joka pit‰‰ sis‰ll‰‰n usean tason maskeja.
+//   Luokka joka pit√§√§ sis√§ll√§√§n usean tason maskeja.
 //   Kaikki toiminnat
-//   riippuvat aina itsMaskState:n arvosta. T‰ss‰
+//   riippuvat aina itsMaskState:n arvosta. T√§ss√§
 //   vaiheessa luokka
-//   toteutetaan ei dynaamisesti, luomalla k‰yttˆˆn
+//   toteutetaan ei dynaamisesti, luomalla k√§ytt√∂√∂n
 //   kolme tasoinen
-//   maski, jota tarvitaan MetEditorissa. Myˆhemmin
-//   luokan voisi tehd‰
-//   siten, ett‰ eri bitmaskit laitetaan listaan.
+//   maski, jota tarvitaan MetEditorissa. My√∂hemmin
+//   luokan voisi tehd√§
+//   siten, ett√§ eri bitmaskit laitetaan listaan.
 //
 //
 //  Change Log:
@@ -77,7 +77,7 @@ const unsigned long& NFmiMultiLevelMask::MaskSize(void) const { return itsMaskSi
 //--------------------------------------------------------
 //   Asettaa indeksin osoittaman kohdan maskin
 //   newState:n mukaiseksi.
-//   Se mik‰/mitk‰ maskit asetetaan , riippuu
+//   Se mik√§/mitk√§ maskit asetetaan , riippuu
 //   itsMaskType:n arvosta.
 void NFmiMultiLevelMask::Mask(unsigned long theIndex, bool theNewState)
 {
@@ -96,7 +96,7 @@ void NFmiMultiLevelMask::Mask(unsigned long theIndex, bool theNewState)
 
 //   Palauttaa indeksin osoittaman kohdan, itsMaskType:n
 //   osoittamien
-//   maskien arvon. Jos kFmiNoMask 'p‰‰ll‰', palauttaa
+//   maskien arvon. Jos kFmiNoMask 'p√§√§ll√§', palauttaa
 //   aina true.
 //   Tarkista indeksin koko ja jos se ei sovi,
 //   palauta false.
@@ -110,8 +110,8 @@ bool NFmiMultiLevelMask::IsMasked(unsigned long theIndex) const
   if ((itsMaskType & NFmiMetEditorTypes::kFmiDisplayedMask) ==
       NFmiMetEditorTypes::kFmiDisplayedMask)
     if (!itsDisplayedMask.IsMasked(theIndex)) return false;
-  if ((itsMaskType & 0xffffffff) == 0)  // Jos mit‰‰n maaskityyppi‰ ei ole valittu.
-    return false;                       // T‰m‰ on k‰ytt‰j‰n aiheuttama virhetila.
+  if ((itsMaskType & 0xffffffff) == 0)  // Jos mit√§√§n maaskityyppi√§ ei ole valittu.
+    return false;                       // T√§m√§ on k√§ytt√§j√§n aiheuttama virhetila.
   return true;
 }
 //--------------------------------------------------------
@@ -142,7 +142,7 @@ bool NFmiMultiLevelMask::IsMasked(unsigned long theIndex, unsigned long theMaskT
   if ((theMaskType & NFmiMetEditorTypes::kFmiDisplayedMask) ==
       NFmiMetEditorTypes::kFmiDisplayedMask)
     if (!itsDisplayedMask.IsMasked(theIndex)) return false;
-  if ((theMaskType & 0xffffffff) == 0) return false;  // T‰m‰ on k‰ytt‰j‰n aiheuttama virhetila.
+  if ((theMaskType & 0xffffffff) == 0) return false;  // T√§m√§ on k√§ytt√§j√§n aiheuttama virhetila.
   return true;
 }
 //--------------------------------------------------------
@@ -198,7 +198,7 @@ void NFmiMultiLevelMask::InverseMask(unsigned long theMaskType)
 //   Kopioi annetun maskin suoraan itsMaskTypen
 //   osoittamiin maskeihin.
 //   Jos aneetun maskin ja itsMaskSize:n koot
-//   eiv‰t t‰sm‰‰, ep‰onnistuu
+//   eiv√§t t√§sm√§√§, ep√§onnistuu
 //   koko operaatio.
 bool NFmiMultiLevelMask::Mask(const NFmiBitMask& theMask)
 {
@@ -261,7 +261,7 @@ unsigned long NFmiMultiLevelMask::MaskedCount(unsigned long theMaskType)
   return 0;
 }
 
-// Laskee kuinka monta pistett‰ on maskattu annetun laatikon alueella, jonka vasen alakulma
+// Laskee kuinka monta pistett√§ on maskattu annetun laatikon alueella, jonka vasen alakulma
 // annetun indeksin kohdalla.
 int NFmiMultiLevelMask::MaskedCount(unsigned long theMaskType,
                                     unsigned long theIndex,

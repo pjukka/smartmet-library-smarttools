@@ -18,15 +18,15 @@
 //
 //
 //  Description:
-//   Voi olla ett‰ t‰ss‰ riitt‰‰ suoraan uuden
-//   template lista luokan ilmentym‰.
+//   Voi olla ett√§ t√§ss√§ riitt√§√§ suoraan uuden
+//   template lista luokan ilmentym√§.
 //
 //
 //  Change Log:
 //
-//  22.02.-99 lis‰ttiin bool fDirtyList, joka saa arvon
+//  22.02.-99 lis√§ttiin bool fDirtyList, joka saa arvon
 //  metodeissa Add, Remove ja Clear true. Oletusarvo on false.
-// Changed 26.08.1999/Marko		Lis‰sin uuden Find()-metodin.
+// Changed 26.08.1999/Marko		Lis√§sin uuden Find()-metodin.
 //
 //**********************************************************
 #ifndef NFMIDRAWPARAMLIST_H
@@ -40,7 +40,7 @@
 #include <list>
 
 #ifdef _MSC_VER
-#pragma warning(disable : 4512)  // poistaa VC++ k‰‰nt‰j‰n C4512 "assignment operator could not be
+#pragma warning(disable : 4512)  // poistaa VC++ k√§√§nt√§j√§n C4512 "assignment operator could not be
                                  // generated" varoituksen
 #endif
 
@@ -103,16 +103,16 @@ class NFmiDrawParamList
  private:
   void Swap(int index1, int index2);
 
-  bool fBeforeFirstItem;  // muutin luokan k‰ytt‰m‰‰n std:list:ia ja halusin kuitenkin ett‰ luokka
+  bool fBeforeFirstItem;  // muutin luokan k√§ytt√§m√§√§n std:list:ia ja halusin kuitenkin ett√§ luokka
                           // toimii kuten ennen,
-  // joten t‰ll‰ varmistan ett‰ Reset() -kutsun j‰lkeen ollaan tilassa, mista ei viel‰ saa ulos
-  // drawParamia, vaan vasta yhden Next-kutsun j‰lkeen saa 1. listan olion.
+  // joten t√§ll√§ varmistan ett√§ Reset() -kutsun j√§lkeen ollaan tilassa, mista ei viel√§ saa ulos
+  // drawParamia, vaan vasta yhden Next-kutsun j√§lkeen saa 1. listan olion.
   ListType itsList;
   IterType itsIter;
   //	NFmiSortedPtrList < NFmiDrawParam > itsList;
   //	NFmiPtrList < NFmiDrawParam > :: Iterator itsIter;
   bool fDirtyList;
-  bool fHasBorrowedParams;  // onko t‰ll‰ listalla 'lainattuja' parametreja
+  bool fHasBorrowedParams;  // onko t√§ll√§ listalla 'lainattuja' parametreja
 };
 
 #endif

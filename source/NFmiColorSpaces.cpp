@@ -1,6 +1,6 @@
 // NFmiColorSpaces.cpp
 //
-// NFmiColorSpaces-namespacen ja siin‰ olevien luokkien toteutus.
+// NFmiColorSpaces-namespacen ja siin√§ olevien luokkien toteutus.
 
 #include "NFmiColorSpaces.h"
 
@@ -133,9 +133,9 @@ NFmiColorSpaces::RGB_color NFmiColorSpaces::HSLtoRGB(double h, double s, double 
   }
 }
 
-// theBrightningFactor on prosentti luku, jolla annettua v‰ri‰ saadaan vaalennettua tai
+// theBrightningFactor on prosentti luku, jolla annettua v√§ri√§ saadaan vaalennettua tai
 // tummennettua.
-// jos prosentti luku on > 0, vaalenee v‰ri, jos se on < 0, tummenee v‰ri.
+// jos prosentti luku on > 0, vaalenee v√§ri, jos se on < 0, tummenee v√§ri.
 NFmiColor NFmiColorSpaces::GetBrighterColor(const NFmiColor &theColor, double theBrightningFactor)
 {
   RGB_color rgbCol(theColor);
@@ -143,7 +143,7 @@ NFmiColor NFmiColorSpaces::GetBrighterColor(const NFmiColor &theColor, double th
   double lightness = hslCol.l;
   if (lightness)
     lightness = lightness + lightness * (theBrightningFactor / 100.);
-  else  // jos lightness oli 0, pit‰‰ vain lis‰t‰ kirkastus kerroin
+  else  // jos lightness oli 0, pit√§√§ vain lis√§t√§ kirkastus kerroin
     lightness = theBrightningFactor;
 
   if (lightness > 100) lightness = 100;

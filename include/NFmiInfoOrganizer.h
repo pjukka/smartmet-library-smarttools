@@ -1,26 +1,26 @@
 #pragma once
 
-// Luokan teht‰v‰ on toimia eri queryDatojen ja niiden iteraattoreiden
-// s‰ilytyspaikkana SmartMet ja SmartToolFilter ohjelmille.
-// Alkuper‰inen NFmiInfoOrganizer-luokka on kauheaa syltty‰ ja se pit‰‰
-// tehd‰ t‰ss‰ uusiksi:
+// Luokan teht√§v√§ on toimia eri queryDatojen ja niiden iteraattoreiden
+// s√§ilytyspaikkana SmartMet ja SmartToolFilter ohjelmille.
+// Alkuper√§inen NFmiInfoOrganizer-luokka on kauheaa syltty√§ ja se pit√§√§
+// tehd√§ t√§ss√§ uusiksi:
 // --------------------
 // 1. Rajapinta on siivottava.
-// 2. Teht‰v‰ selke‰mm‰t data/info -pyynti funktiot.
+// 2. Teht√§v√§ selke√§mm√§t data/info -pyynti funktiot.
 //
-// Lis‰ksi tulee uusia ominaisuuksia:
+// Lis√§ksi tulee uusia ominaisuuksia:
 // ----------------------------------
 // 1. Tuettava multi-threddausta
 // 2. Osattava hanskata vanhoja malliajo datoja (esim. hirlam[-1])
 // 3. Muistin siivous ja datojen tuhoamisen automatisointi.
-// 4. Data voidaan tuhota infoOrganizerista vaikka sit‰ viel‰ joku k‰ytt‰‰
+// 4. Data voidaan tuhota infoOrganizerista vaikka sit√§ viel√§ joku k√§ytt√§√§
 // omassa threadissaa ja threadi sitten lopuksi itse tuhoaa automaattisesti datan.
 //
-// Toteutus: NFmiOwnerInfo on tavallisten queryDatojen s‰ilytys luokka.
-// NFmiSmartInfo on k‰ytˆss‰ vain editoitavalle datalle.
-// Huom! Myˆs SmartMetiin tiputetut datat pit‰‰ lis‰t‰ t‰nne fileFiltterin kanssa.
+// Toteutus: NFmiOwnerInfo on tavallisten queryDatojen s√§ilytys luokka.
+// NFmiSmartInfo on k√§yt√∂ss√§ vain editoitavalle datalle.
+// Huom! My√∂s SmartMetiin tiputetut datat pit√§√§ lis√§t√§ t√§nne fileFiltterin kanssa.
 // TODO: keksi parempi nimi tai muuta lopuksi NFmiInfoOrganizer-nimiseksi ja
-// tuhoa alkuper‰inen luokka.
+// tuhoa alkuper√§inen luokka.
 
 #include <NFmiPoint.h>
 #include <NFmiDataMatrix.h>
@@ -51,8 +51,8 @@ class NFmiInfoOrganizer
   typedef std::map<std::string, boost::shared_ptr<NFmiQueryDataSetKeeper> > MapType;
 
   struct ParamCheckFlags
-  {  // T‰m‰n rakenteen avulla voidaan halutessa varmistaa ainakin FindSoundingInfo -metodissa, ett‰
-     // palautettavassa datassa on tiettyj‰ parametreja, esim.:
+  {  // T√§m√§n rakenteen avulla voidaan halutessa varmistaa ainakin FindSoundingInfo -metodissa, ett√§
+     // palautettavassa datassa on tiettyj√§ parametreja, esim.:
     // fSounding -> P, T, Td, RH, WS, WD
     // fTrajectory -> P, WS, WD, w
     ParamCheckFlags(bool sounding = false, bool trajectory = false)
@@ -87,16 +87,16 @@ class NFmiInfoOrganizer
   static bool IsTempData(unsigned long theProducerId, bool includeRawTemp = false);
 
   // ***************************************************************************************************************
-  // T‰ss‰ per‰ss‰ on pienin mahdollinen julkinen rajapinta, jonka sain siivottua originaali
+  // T√§ss√§ per√§ss√§ on pienin mahdollinen julkinen rajapinta, jonka sain siivottua originaali
   // NFmiInfoOrganizr:ista.
-  // Ne pit‰‰ muuttaa viel‰ share_ptr ja uusien Info-luokkien mukaisiksi.
-  // HUOM! Ett‰ multi-threaddaus onnistuisi, pit‰‰ kaikki info-olioiden palautus funktioiden
+  // Ne pit√§√§ muuttaa viel√§ share_ptr ja uusien Info-luokkien mukaisiksi.
+  // HUOM! Ett√§ multi-threaddaus onnistuisi, pit√§√§ kaikki info-olioiden palautus funktioiden
   // palauttaa kopio
-  // iteraattori-infosta. Pit‰isikˆ jokaiselle datalle luoda on-demandina kopio-info-olio lista,
+  // iteraattori-infosta. Pit√§isik√∂ jokaiselle datalle luoda on-demandina kopio-info-olio lista,
   // josta palautus olisi nopea?
-  // Pit‰‰kˆ lis‰ksi laittaa extra-infoa eri datoista, ett‰ siivous rutiini tiet‰‰ milloin niit‰ on
-  // viimeksi k‰ytetty,
-  // mit‰ muuta infoa tarvitaan kirjanpitoon ja muuhin?
+  // Pit√§√§k√∂ lis√§ksi laittaa extra-infoa eri datoista, ett√§ siivous rutiini tiet√§√§ milloin niit√§ on
+  // viimeksi k√§ytetty,
+  // mit√§ muuta infoa tarvitaan kirjanpitoon ja muuhin?
   // ***************************************************************************************************************
   boost::shared_ptr<NFmiFastQueryInfo> Info(boost::shared_ptr<NFmiDrawParam> &theDrawParam,
                                             bool fCrossSectionInfoWanted,
@@ -142,9 +142,9 @@ class NFmiInfoOrganizer
       ParamCheckFlags paramCheckFlags =
           ParamCheckFlags());  // Hakee tietyn prioriteetin mukaisesti parhaan luotaus-infon
 
-  // HUOM! N‰m‰ makroParamData jutut pit‰‰ mietti‰ uusiksi, jos niit‰ aletaan k‰sittelem‰‰n eri
-  // s‰ikeiss‰. T‰llˆin
-  // Niist‰ pit‰‰ luoda aina ilmeisesti paikalliset kopiot?!?!
+  // HUOM! N√§m√§ makroParamData jutut pit√§√§ mietti√§ uusiksi, jos niit√§ aletaan k√§sittelem√§√§n eri
+  // s√§ikeiss√§. T√§ll√∂in
+  // Niist√§ pit√§√§ luoda aina ilmeisesti paikalliset kopiot?!?!
   boost::shared_ptr<NFmiFastQueryInfo> MacroParamData(void);
   boost::shared_ptr<NFmiFastQueryInfo> CrossSectionMacroParamData(void);
 
@@ -196,7 +196,7 @@ class NFmiInfoOrganizer
   // ***************************************************************************************************************
 
  private:
-  // estet‰‰n kopi konstruktorin ja sijoitus operaattoreiden luonti
+  // estet√§√§n kopi konstruktorin ja sijoitus operaattoreiden luonti
   NFmiInfoOrganizer &operator=(const NFmiInfoOrganizer &);
   NFmiInfoOrganizer(const NFmiInfoOrganizer &);
 
@@ -235,7 +235,7 @@ class NFmiInfoOrganizer
                          const ParamCheckFlags &paramCheckFlags);
 
   boost::shared_ptr<NFmiQueryDataKeeper>
-      itsEditedDataKeeper;  // pit‰‰ sis‰ll‰‰n oikeasti NFmiSmartInfo-olion
+      itsEditedDataKeeper;  // pit√§√§ sis√§ll√§√§n oikeasti NFmiSmartInfo-olion
   boost::shared_ptr<NFmiQueryDataKeeper> itsCopyOfEditedDataKeeper;
   MapType itsDataMap;  // sijoitus mappiin tapahtuu filepatternin avulla
 
@@ -244,30 +244,30 @@ class NFmiInfoOrganizer
   NFmiPoint itsMacroParamGridSize;
   NFmiPoint itsMacroParamMinGridSize;
   NFmiPoint itsMacroParamMaxGridSize;
-  boost::shared_ptr<NFmiFastQueryInfo> itsMacroParamData;  // makro-parametrien laskuja varten pit‰‰
-                                                           // pit‰‰ yll‰ yhden hilan kokoista dataa
+  boost::shared_ptr<NFmiFastQueryInfo> itsMacroParamData;  // makro-parametrien laskuja varten pit√§√§
+                                                           // pit√§√§ yll√§ yhden hilan kokoista dataa
                                                            // (yksi aika,param ja level, editoitavan
                                                            // datan hplaceDesc)
-  NFmiDataMatrix<float> itsMacroParamMissingValueMatrix;   // t‰h‰n talletetaan editoitavan datan
+  NFmiDataMatrix<float> itsMacroParamMissingValueMatrix;   // t√§h√§n talletetaan editoitavan datan
                                                            // hilan suuruinen kFloatMissing:eilla
-                                                           // alustettu matriisi ett‰ sill‰ voi
+                                                           // alustettu matriisi ett√§ sill√§ voi
                                                            // alustaa makroParam dataa ennen laskuja
   boost::shared_ptr<NFmiFastQueryInfo> itsCrossSectionMacroParamData;  // poikkileikkaus
                                                                        // makro-parametrien laskuja
-                                                                       // varten pit‰‰ pit‰‰ yll‰
+                                                                       // varten pit√§√§ pit√§√§ yll√§
                                                                        // yhden hilan kokoista dataa
                                                                        // (yksi aika,param ja level,
                                                                        // editoitavan datan
                                                                        // hplaceDesc)
-  NFmiDataMatrix<float> itsCrossSectionMacroParamMissingValueMatrix;   // t‰h‰n talletetaan
+  NFmiDataMatrix<float> itsCrossSectionMacroParamMissingValueMatrix;   // t√§h√§n talletetaan
                                                                        // editoitavan datan hilan
                                                                        // suuruinen
                                                                        // kFloatMissing:eilla
-                                                                       // alustettu matriisi ett‰
-                                                                       // sill‰ voi alustaa
+                                                                       // alustettu matriisi ett√§
+                                                                       // sill√§ voi alustaa
                                                                        // makroParam dataa ennen
                                                                        // laskuja
-  bool fCreateEditedDataCopy;  // luodaanko vai eikˆ luoda kopiota editoidusta datasta
+  bool fCreateEditedDataCopy;  // luodaanko vai eik√∂ luoda kopiota editoidusta datasta
   static std::vector<FmiParameterName> itsWantedSoundingParams;
   static std::vector<FmiParameterName> itsWantedTrajectoryParams;
   static bool fCheckParamsInitialized;

@@ -18,10 +18,10 @@
 //
 //
 //  Description:
-//   Halusin tehd‰ NFmiMultiLevelMask:iin undo/redo
+//   Halusin tehd√§ NFmiMultiLevelMask:iin undo/redo
 //   mahdollisuuden. Tein NFmiMultiLevelMask-
 //   smartpointerin, jolla on multilevelmask ja
-//   lis‰ksi undo/redo-lista, jossa on multilevelmask-pointereita.
+//   lis√§ksi undo/redo-lista, jossa on multilevelmask-pointereita.
 //
 //
 //  Change Log:
@@ -51,8 +51,8 @@ class NFmiUndoableMultiLevelMask
   bool RedoData(void);      // suorittaa todellisen redon
 
   // HUOM! ei toimi aivan oikein, jos undoleveliksi annetaan 5, on todellinen undo
-  // mahdollista vain 4 kertaa. En jaksa nyt ihmetell‰ sit‰ nyt (T:Marko).
-  void UndoLevel(int theNewUndoLevel);  // undolevel asetetaan t‰ll‰
+  // mahdollista vain 4 kertaa. En jaksa nyt ihmetell√§ sit√§ nyt (T:Marko).
+  void UndoLevel(int theNewUndoLevel);  // undolevel asetetaan t√§ll√§
   bool Mask(const NFmiBitMask& theMask, unsigned long theMaskType);
   const NFmiBitMask& Mask(unsigned long theMaskType) const;
 

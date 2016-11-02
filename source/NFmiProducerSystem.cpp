@@ -1,10 +1,10 @@
-//© Ilmatieteenlaitos/Marko.
+//¬© Ilmatieteenlaitos/Marko.
 // Original 20.6.2006
 //
-// Luokka pit‰‰ huolta Editoriin konffatuista malli tuottajista.
-// Voidaan konffata editorin kolme p‰‰tuottajat ja 10 sivu tuottajaa.
-// P‰‰ tuottajat n‰kyv‰t esim. luotaus valikoissa (toistaiseksi vain 3 radio buttonia k‰ytˆss‰).
-// P‰‰ ja Sivu tuottajat n‰kyv‰t esim. popup-valikoissa kun erilaisille n‰ytˆille valitaan dataa.
+// Luokka pit√§√§ huolta Editoriin konffatuista malli tuottajista.
+// Voidaan konffata editorin kolme p√§√§tuottajat ja 10 sivu tuottajaa.
+// P√§√§ tuottajat n√§kyv√§t esim. luotaus valikoissa (toistaiseksi vain 3 radio buttonia k√§yt√∂ss√§).
+// P√§√§ ja Sivu tuottajat n√§kyv√§t esim. popup-valikoissa kun erilaisille n√§yt√∂ille valitaan dataa.
 //---------------------------------------------------------- NFmiWarningCenterSystem.h
 
 #include "NFmiProducerSystem.h"
@@ -28,12 +28,12 @@ void NFmiProducerInfo::ShortName(const std::string &newValue, size_t index)
     throw std::runtime_error("Out of bounds error in NFmiProducerInfo::ShortName");
 }
 
-// newShortNames pit‰‰ sis‰ll‰‰n yhden tai useamman lyhyen nimen pilkuilla erotellussa listassa.
+// newShortNames pit√§√§ sis√§ll√§√§n yhden tai useamman lyhyen nimen pilkuilla erotellussa listassa.
 void NFmiProducerInfo::SetShortNames(const std::string &newShortNames)
 {
   itsShortNameVector.clear();
   itsShortNameVector = NFmiStringTools::Split(newShortNames, ",");
-  // poistetaan mhdolliset tyhj‰t stringit listasta
+  // poistetaan mhdolliset tyhj√§t stringit listasta
   itsShortNameVector.erase(std::remove(itsShortNameVector.begin(), itsShortNameVector.end(), ""),
                            itsShortNameVector.end());
 }
@@ -83,10 +83,10 @@ void NFmiProducerSystem::InitFromSettings(const std::string &theInitNameSpace)
 
   int maxDirectoryCount = 1000;  // lets try to read 20 diffrent models producer infos
   int prodCounter = 0;
-  int consecutiveMissingCount = 0;            // kuinka monta per‰kk‰in on ollut puuttuvaa asetusta
-  const int maxConsecutiveMissingCount = 20;  // ei kuitenkaan k‰yd‰ l‰pi kaikkia 1000
-                                              // mahdollisuutta, vaan jos on ollut n‰in monta
-                                              // puuttuvaa per‰kk‰in, niin lopetetaan
+  int consecutiveMissingCount = 0;            // kuinka monta per√§kk√§in on ollut puuttuvaa asetusta
+  const int maxConsecutiveMissingCount = 20;  // ei kuitenkaan k√§yd√§ l√§pi kaikkia 1000
+                                              // mahdollisuutta, vaan jos on ollut n√§in monta
+                                              // puuttuvaa per√§kk√§in, niin lopetetaan
   for (int i = 1; i <= maxDirectoryCount; i++)
   {
     try
@@ -106,7 +106,7 @@ void NFmiProducerSystem::InitFromSettings(const std::string &theInitNameSpace)
     {
     }
     if (consecutiveMissingCount > maxConsecutiveMissingCount)
-      break;  // tein t‰m‰n skippauksen, koska debug versiossa 1000 l‰pik‰ynti on aika hidasta,
+      break;  // tein t√§m√§n skippauksen, koska debug versiossa 1000 l√§pik√§ynti on aika hidasta,
               // release versiossa ei juuri huomaa
   }
   if (prodCounter > 0)
@@ -124,17 +124,17 @@ void NFmiProducerSystem::InitFromSettings(const std::string &theInitNameSpace)
   }
 }
 
-// kuten parametrin nimest‰kin voi p‰‰tell‰, on indeksi alkaa ykkˆsest‰ eteenp‰in
+// kuten parametrin nimest√§kin voi p√§√§tell√§, on indeksi alkaa ykk√∂sest√§ eteenp√§in
 bool NFmiProducerSystem::ExistProducer(unsigned int index1Based) const
 {
-  // jos annettu indeksi on 0, o-1 -> 4 miljardia unsigned maailmassa, joten riitt‰‰ yksi testi
+  // jos annettu indeksi on 0, o-1 -> 4 miljardia unsigned maailmassa, joten riitt√§√§ yksi testi
   if (index1Based - 1 < itsProducers.size()) return true;
   return false;
 }
 
 NFmiProducerInfo &NFmiProducerSystem::Producer(unsigned int index1Based)
 {
-  // jos annettu indeksi on 0, o-1 -> 4 miljardia unsigned maailmassa, joten riitt‰‰ yksi testi
+  // jos annettu indeksi on 0, o-1 -> 4 miljardia unsigned maailmassa, joten riitt√§√§ yksi testi
   if (index1Based - 1 < itsProducers.size())
     return itsProducers[index1Based - 1];
   else
@@ -144,10 +144,10 @@ NFmiProducerInfo &NFmiProducerSystem::Producer(unsigned int index1Based)
   }
 }
 
-// Etsi halutun tuottajan ProducerInfo indeksi, eli indeksi mill‰ NFmiProducerInfo-otuksen saa ulos
-// Producer-matodilla. Palautuva indeksi on siis 1:st‰ l‰htev‰ ja 0 tarkoittaa ett‰ kyseit‰
-// tuottajaa ei lˆytynyt.
-// Etsint‰ tehd‰‰n tuottaja id:t‰ vertailemalla.
+// Etsi halutun tuottajan ProducerInfo indeksi, eli indeksi mill√§ NFmiProducerInfo-otuksen saa ulos
+// Producer-matodilla. Palautuva indeksi on siis 1:st√§ l√§htev√§ ja 0 tarkoittaa ett√§ kyseit√§
+// tuottajaa ei l√∂ytynyt.
+// Etsint√§ tehd√§√§n tuottaja id:t√§ vertailemalla.
 unsigned int NFmiProducerSystem::FindProducerInfo(const NFmiProducer &theProducer)
 {
   for (unsigned int index = 0; index < itsProducers.size(); index++)
@@ -156,7 +156,7 @@ unsigned int NFmiProducerSystem::FindProducerInfo(const NFmiProducer &theProduce
     if (prodInfo.ProducerId() == static_cast<unsigned long>(theProducer.GetIdent()))
       return index + 1;  // palautetaan siis 1-pohjainen indeksi
   }
-  return 0;  // ei lˆytynyt, palautetaan 0;
+  return 0;  // ei l√∂ytynyt, palautetaan 0;
 }
 
 NFmiString NFmiProducerSystem::GetProducerAndLevelTypeString(const NFmiProducer &theProducer,

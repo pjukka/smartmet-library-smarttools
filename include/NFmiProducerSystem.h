@@ -1,10 +1,10 @@
-//© Ilmatieteenlaitos/Marko.
+//¬© Ilmatieteenlaitos/Marko.
 // Original 20.6.2006
 //
-// Luokka pit‰‰ huolta Editoriin konffatuista malli tuottajista.
+// Luokka pit√§√§ huolta Editoriin konffatuista malli tuottajista.
 // Voidaan konffata esim. 10 tuottajaa. Mutta editorin eri valikot ja systeemit
-// itse p‰‰tt‰v‰t kuinka montaa ensimm‰ist‰ voidaan k‰ytt‰‰. Eli Esim. Luotausn‰ytˆn
-// tuottaja valinta radio buttoneihin saa mukaan vain kolme mallia (pit‰‰ kai tehd‰
+// itse p√§√§tt√§v√§t kuinka montaa ensimm√§ist√§ voidaan k√§ytt√§√§. Eli Esim. Luotausn√§yt√∂n
+// tuottaja valinta radio buttoneihin saa mukaan vain kolme mallia (pit√§√§ kai tehd√§
 // joskus dropdown lista). Mutta esim. erilaisiin dynaamisiin parametrin valinta
 // popup-valikoihin voidaan laittaa useampia tuottajia.
 //---------------------------------------------------------- NFmiProducerSystem.h
@@ -54,29 +54,29 @@ class NFmiProducerInfo
   bool HasQ2ArchiveData(void) const { return fHasQ2ArchiveData; }
   void HasQ2ArchiveData(bool newValue) { fHasQ2ArchiveData = newValue; }
  private:
-  std::string itsName;  // Pitempi nimi esim. Hirlam tai Ecmwf (voidaan k‰ytt‰‰ esim.
-                        // popup-valikoissa, miss‰ on tilaa)
-  std::vector<std::string> itsShortNameVector;  // Lista lyhyemmist‰ nimist‰ esim. Hir tai Ec
-                                                // (k‰ytet‰‰n nyt ainoastaan smarttool-kielen
-                                                // tuottaja nimen‰ skripteiss‰)
-  std::string itsUltraShortName;  // Lyhyempi nimi esim. Hir tai Ec (k‰ytet‰‰n mm. jossain
-                                  // pikavalinnoissa nimen‰)
+  std::string itsName;  // Pitempi nimi esim. Hirlam tai Ecmwf (voidaan k√§ytt√§√§ esim.
+                        // popup-valikoissa, miss√§ on tilaa)
+  std::vector<std::string> itsShortNameVector;  // Lista lyhyemmist√§ nimist√§ esim. Hir tai Ec
+                                                // (k√§ytet√§√§n nyt ainoastaan smarttool-kielen
+                                                // tuottaja nimen√§ skripteiss√§)
+  std::string itsUltraShortName;  // Lyhyempi nimi esim. Hir tai Ec (k√§ytet√§√§n mm. jossain
+                                  // pikavalinnoissa nimen√§)
   unsigned long itsProducerId;
   std::string itsDescription;
   bool fHasRealVerticalData;  // esim. UK,DWDjaUSa datoissa ei ole nyt oikeasti vertikaalidataa,
-                              // vaikka siin‰ on painepintoja, n‰ist‰ malleista ei haluta
-  // tehd‰ luotauksia, poikkileikkausia tai trajektori laskuja, joten n‰m‰ mallit saavat arvon
+                              // vaikka siin√§ on painepintoja, n√§ist√§ malleista ei haluta
+  // tehd√§ luotauksia, poikkileikkausia tai trajektori laskuja, joten n√§m√§ mallit saavat arvon
   // false.
-  bool fHasQ2ArchiveData;  // t‰m‰ m‰‰r‰‰, voidaanko katsoa arkisto dataa Q2-serverilt‰
+  bool fHasQ2ArchiveData;  // t√§m√§ m√§√§r√§√§, voidaanko katsoa arkisto dataa Q2-serverilt√§
 };
 
 class NFmiProducerSystem
 {
  public:
   static const unsigned int gHelpEditorDataProdId =
-      996;  // pistin t‰m‰n tuottaja id:n tanne, koska en viitsi laittaa t‰t‰
-            // metkun editorin sis‰ist‰ help-data tuottaja id juttua
-            // newbasen ProducerName listaan. T‰t‰ k‰ytet‰‰n ainakin
+      996;  // pistin t√§m√§n tuottaja id:n tanne, koska en viitsi laittaa t√§t√§
+            // metkun editorin sis√§ist√§ help-data tuottaja id juttua
+            // newbasen ProducerName listaan. T√§t√§ k√§ytet√§√§n ainakin
             // smarttool-kielen alustamisessa ja dokumentin HelpDataSystemin alustuksessa
 
   NFmiProducerSystem(void) : itsProducers() {}
@@ -97,12 +97,12 @@ class NFmiProducerSystem
   NFmiProducerInfo GetProducerInfoFromSettings(const std::string &theUsedNameSpaceBase);
 
   std::vector<NFmiProducerInfo>
-      itsProducers;  // T‰h‰n voi siis laittaa tuottajia kuinka paljon tahansa,
-                     // mutta kannattaa sijoittaa alkuun t‰rkeimm‰t, koska
-                     // Editori p‰‰tt‰‰ eri ikkunoissa/tyˆkaluissa, kuinka monta
-                     // tuottajaa (alkup‰‰st‰) se ottaa k‰yttˆˆn. Esim. Luotaus
-                     // n‰ytˆn malli valinta radio-buttoneita on esim. vain kolme (t‰ll‰ hetkell‰)
-  std::string itsInitializeLogStr;  // jos luokka initialisoidaan settingeist‰, t‰h‰n talletetaan
+      itsProducers;  // T√§h√§n voi siis laittaa tuottajia kuinka paljon tahansa,
+                     // mutta kannattaa sijoittaa alkuun t√§rkeimm√§t, koska
+                     // Editori p√§√§tt√§√§ eri ikkunoissa/ty√∂kaluissa, kuinka monta
+                     // tuottajaa (alkup√§√§st√§) se ottaa k√§ytt√∂√∂n. Esim. Luotaus
+                     // n√§yt√∂n malli valinta radio-buttoneita on esim. vain kolme (t√§ll√§ hetkell√§)
+  std::string itsInitializeLogStr;  // jos luokka initialisoidaan settingeist√§, t√§h√§n talletetaan
                                     // loki stringi
 };
 

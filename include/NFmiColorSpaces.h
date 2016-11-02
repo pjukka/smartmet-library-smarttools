@@ -1,8 +1,8 @@
 // NFmiColorSpaces.h
 //
-// NFmiColorSpaces-namespace hanskaa RGB ja HSL v‰ri avaruudet ja niiden
-// v‰liset konversiot. Lis‰ksi voidaan vaalentaa ja tummentaa NFmiColor-v‰rej‰.
-// Koodit on pˆˆlitty CodeProject:ista:
+// NFmiColorSpaces-namespace hanskaa RGB ja HSL v√§ri avaruudet ja niiden
+// v√§liset konversiot. Lis√§ksi voidaan vaalentaa ja tummentaa NFmiColor-v√§rej√§.
+// Koodit on p√∂√∂litty CodeProject:ista:
 // http://www.codeproject.com/KB/recipes/colorspace1.aspx
 
 #ifndef NFMICOLORSPACES_H
@@ -50,9 +50,9 @@ HSL_color RGBtoHSL(int red, int green, int blue);
 // <param name="l">Luminance, must be in [0, 1].</param>
 RGB_color HSLtoRGB(double h, double s, double l);
 
-// theBrightningFactor on prosentti luku, jolla annettua v‰ri‰ saadaan vaalennettua tai
+// theBrightningFactor on prosentti luku, jolla annettua v√§ri√§ saadaan vaalennettua tai
 // tummennettua.
-// jos prosentti luku on > 0, vaalenee v‰ri, jos se on < 0, tummenee v‰ri.
+// jos prosentti luku on > 0, vaalenee v√§ri, jos se on < 0, tummenee v√§ri.
 NFmiColor GetBrighterColor(const NFmiColor &theColor, double theBrightningFactor);
 }
 

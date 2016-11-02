@@ -5,7 +5,7 @@
 //  Author         : pietarin
 //  Creation Date  : Thur - Jun 20, 2002
 //
-// T‰m‰ luokka hoitaa yhden laskurivin esim. T = T + 1
+// T√§m√§ luokka hoitaa yhden laskurivin esim. T = T + 1
 //**********************************************************
 
 #include <NFmiAreaMask.h>
@@ -33,9 +33,9 @@ class NFmiMacroParamValue
 
   NFmiPoint itsLatlon;
   NFmiMetTime itsTime;
-  float itsValue;           // t‰h‰n talletetaan value
-  float itsPressureHeight;  // poikkileikkaus laskuissa k‰ytet‰‰n t‰t‰
-  bool fSetValue;           // t‰t‰ luokkaa k‰ytet‰‰n vain jos t‰m‰ on true
+  float itsValue;           // t√§h√§n talletetaan value
+  float itsPressureHeight;  // poikkileikkaus laskuissa k√§ytet√§√§n t√§t√§
+  bool fSetValue;           // t√§t√§ luokkaa k√§ytet√§√§n vain jos t√§m√§ on true
   bool fDoCrossSectionCalculations;
 };
 
@@ -68,17 +68,17 @@ class NFmiSmartToolCalculation
   bool AllowMissingValueAssignment(void) { return fAllowMissingValueAssignment; };
   void AllowMissingValueAssignment(bool newState) { fAllowMissingValueAssignment = newState; };
  private:
-  std::string itsCalculationText;  // originaali teksti, mist‰ t‰m‰ lasku on tulkittu
+  std::string itsCalculationText;  // originaali teksti, mist√§ t√§m√§ lasku on tulkittu
   typedef checkedVector<boost::shared_ptr<NFmiAreaMask> >::iterator CalcIter;
 
   float GetInsideLimitsValue(float theValue);
-  float itsLowerLimit;  // n‰iden avulla kontrolloidaan mahdollisia min ja max arvoja
+  float itsLowerLimit;  // n√§iden avulla kontrolloidaan mahdollisia min ja max arvoja
   float itsUpperLimit;
   bool
-      fDoLimitCheck;  // kaikille parametreille ei tehd‰ rajojen tarkistusta, esim. TotalWind ja W&C
+      fDoLimitCheck;  // kaikille parametreille ei tehd√§ rajojen tarkistusta, esim. TotalWind ja W&C
 
   // eval_exp-metodit otettu H. Schilbertin  C++: the Complete Refeference third ed.
-  // jouduin muuttamaan niit‰ v‰h‰n sopimaan t‰h‰n ymp‰ristˆˆn.
+  // jouduin muuttamaan niit√§ v√§h√§n sopimaan t√§h√§n ymp√§rist√∂√∂n.
   double eval_exp(const NFmiCalculationParams &theCalculationParams);
   void eval_exp1(double &result, const NFmiCalculationParams &theCalculationParams);
   void eval_exp2(double &result, const NFmiCalculationParams &theCalculationParams);
@@ -102,9 +102,9 @@ class NFmiSmartToolCalculation
   boost::shared_ptr<NFmiDataModifier> CreateIntegrationFuction(NFmiAreaMask::FunctionType func);
   void atom(double &result, const NFmiCalculationParams &theCalculationParams);
   void get_token(void);
-  boost::shared_ptr<NFmiAreaMask> token;  // t‰ss‰ on kulloinenkin laskun osa tarkastelussa
-  CalcIter itsCalcIterator;               // get_token siirt‰‰ t‰t‰
-  // Lis‰ksi piti maskia varten bin‰‰ri versio evaluaatio systeemist‰
+  boost::shared_ptr<NFmiAreaMask> token;  // t√§ss√§ on kulloinenkin laskun osa tarkastelussa
+  CalcIter itsCalcIterator;               // get_token siirt√§√§ t√§t√§
+  // Lis√§ksi piti maskia varten bin√§√§ri versio evaluaatio systeemist√§
   bool bin_eval_exp(const NFmiCalculationParams &theCalculationParams);
   void bin_eval_exp1(bool &maskresult,
                      double &result,
@@ -142,14 +142,14 @@ class NFmiSmartToolCalculation
   float itsPressureHeightValue;
 
   bool fUseTimeInterpolationAlways;  // uudet MINT, MAXT, jne vaativat aina aikainterpolointia, ja
-                                     // t‰m‰ flagi laitetaan silloin p‰‰lle
-  // (t‰m‰ on jo k‰ytˆss‰ olevan optimoinnin toimivuuden kannalta pakko tehd‰ n‰in)
-  bool fUseHeightCalculation;  // atom-metodi kutsuu HeightValue-metodia, jos t‰m‰ on p‰‰ll‰
+                                     // t√§m√§ flagi laitetaan silloin p√§√§lle
+  // (t√§m√§ on jo k√§yt√∂ss√§ olevan optimoinnin toimivuuden kannalta pakko tehd√§ n√§in)
+  bool fUseHeightCalculation;  // atom-metodi kutsuu HeightValue-metodia, jos t√§m√§ on p√§√§ll√§
   bool
-      fUsePressureLevelCalculation;  // atom-metodi kutsuu PressureValue-metodia, jos t‰m‰ on p‰‰ll‰
+      fUsePressureLevelCalculation;  // atom-metodi kutsuu PressureValue-metodia, jos t√§m√§ on p√§√§ll√§
   bool fAllowMissingValueAssignment;
 
-  // tuulen suuntaa varten pit‰‰ tehd‰ virityksi‰, ett‰ esim. 350 + 20 olisi 10 eik‰ 360 (eli
+  // tuulen suuntaa varten pit√§√§ tehd√§ virityksi√§, ett√§ esim. 350 + 20 olisi 10 eik√§ 360 (eli
   // maksimi) jne.
   bool fCircularValue;
   double itsCircularValueModulor;
