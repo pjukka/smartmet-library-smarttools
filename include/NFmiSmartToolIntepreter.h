@@ -111,8 +111,8 @@ class NFmiSmartToolIntepreter
   NFmiParam GetParamFromString(const std::string &theParamText);
   bool IsInterpretedSkriptMacroParam(void);  // kun intepreter on tulkinnut smarttool-tekstin,
                                              // voidaan kysyä, onko kyseinen makro ns.
-                                             // macroParam-skripti eli sisältääkö se RESULT = ???
-                                             // tapaista tekstiä
+  // macroParam-skripti eli sisältääkö se RESULT = ???
+  // tapaista tekstiä
 
  private:
   typedef std::map<std::string, FmiParameterName> ParamMap;
@@ -324,8 +324,8 @@ class NFmiSmartToolIntepreter
                        int,
                        std::string>
       MetFunctionMapValue;  // MetFunktioihin talletetaan 'taika'-sanan lisäksi Funktio tyyppi ja
-                            // funktion argumenttien lukumäärä ja funktion oikea 'muoto' stringinä,
-                            // joka pitää sisällään esim. grad-funktion tapauksessa "grad(param)"
+  // funktion argumenttien lukumäärä ja funktion oikea 'muoto' stringinä,
+  // joka pitää sisällään esim. grad-funktion tapauksessa "grad(param)"
   typedef std::map<std::string, MetFunctionMapValue> MetFunctionMap;  // 'Meteorologiset' funktiot.
                                                                       // Näillä funktioilla
                                                                       // käsitellään
@@ -368,8 +368,8 @@ class NFmiSmartToolIntepreter
   bool fNormalAssigmentFound;  // loytyykö skriptistä normaaleja sijoituksia esim. T = ???
   bool fMacroParamFound;  // loytyykö skriptistä ns. macroParameri sijoituksia eli RESULT = ?????
   bool fMacroParamSkriptInProgress;  // Tieto siitä tulkitaanko macroParam-skriptiä vai tavallista
-                                     // skriptiä. Poikkeus heitetään jos macrpParam-skripti päällä,
-                                     // mutta tehdään tavallinen sijoitus
+  // skriptiä. Poikkeus heitetään jos macrpParam-skripti päällä,
+  // mutta tehdään tavallinen sijoitus
 
   // GetToken ja IsDelim otettu H. Schilbertin  C++: the Complete Refeference third ed.
   // jouduin muuttamaan niitä vähän sopimaan tähän ympäristöön.

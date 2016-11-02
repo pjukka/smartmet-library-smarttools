@@ -39,6 +39,6 @@ class NFmiOwnerInfo : public NFmiFastQueryInfo
   boost::shared_ptr<NFmiQueryData> itsDataPtr;
   std::string itsDataFileName;
   std::string itsDataFilePattern;  // tätä käytetään tunnistamaan mm. info-organizerissa, että onko
-                                   // data samanlaista, eli pyyhitäänkö vanha tälläinen data pois
-                                   // alta
+  // data samanlaista, eli pyyhitäänkö vanha tälläinen data pois
+  // alta
 };

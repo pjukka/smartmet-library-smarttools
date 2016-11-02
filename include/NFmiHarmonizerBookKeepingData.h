@@ -27,7 +27,7 @@ class NFmiHarmonizerBookKeepingData
       itsHarmonizerTimesSet;  // tänne laitetaan kaikki muokatut ajat jotta voidaan
                               // harmonisoinnin yhteydessä tehdä timedesc, jonka avulla ajetaan
                               // harmonisaattori skripti
-  bool fHarmonizeAllTimes;    // apuna edellisen set:in lisäksi, että jos käydään läpi koko data
+  bool fHarmonizeAllTimes;  // apuna edellisen set:in lisäksi, että jos käydään läpi koko data
   NFmiParamBag
       itsHarmonizerParams;  // tähän merkitään parametrit, joita on muokattu eri työkaluilla.
 };

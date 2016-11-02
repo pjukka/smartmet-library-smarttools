@@ -14,9 +14,9 @@ std::string GetDictionaryString(const char *theMagicWord)
 
   std::string usedMagicWord(theMagicWord);
   NFmiStringTools::ReplaceAll(usedMagicWord, "\t", "\\t");  // pitää muuttaa mahdollinen
-                                                            // tabulaattori merkkisarjaksi, missä on
-                                                            // kenoviiva ja t peräkkäin, koska
-                                                            // tabulaattori on siten sanakirjassa
+  // tabulaattori merkkisarjaksi, missä on
+  // kenoviiva ja t peräkkäin, koska
+  // tabulaattori on siten sanakirjassa
   std::string finalMagicWord(baseWords);
   finalMagicWord += usedMagicWord;
   std::string dictionarySentense =

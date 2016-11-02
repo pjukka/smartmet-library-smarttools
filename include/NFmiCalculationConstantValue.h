@@ -240,9 +240,9 @@ class NFmiNearestObsValue2GridMask : public NFmiInfoAreaMask
  private:
   void DoNearestValueGriddingCheck(const NFmiCalculationParams &theCalculationParams);
 
-  boost::shared_ptr<DataCache> itsNearestObsValuesData;   // Tämä jaetaan kaikkien kopioiden kesken,
-                                                          // jotta multi-thread -koodi saa jaettua
-                                                          // työtä
+  boost::shared_ptr<DataCache> itsNearestObsValuesData;  // Tämä jaetaan kaikkien kopioiden kesken,
+                                                         // jotta multi-thread -koodi saa jaettua
+                                                         // työtä
   NFmiDataMatrix<float> *itsCurrentNearestObsValuesData;  // tähän on laitettu se matriisi, joka
                                                           // sisältää halutun ajan asemadatasta
                                                           // lasketut hilatut arvot

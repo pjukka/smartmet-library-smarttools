@@ -81,7 +81,8 @@ class NFmiDrawParam
   void TimeSerialModelRunCount(int newValue)
   {
     itsTimeSerialModelRunCount = newValue;
-    if (itsTimeSerialModelRunCount < 0) itsTimeSerialModelRunCount = 0;
+    if (itsTimeSerialModelRunCount < 0)
+      itsTimeSerialModelRunCount = 0;
   }
   int ModelRunDifferenceIndex(void) const { return itsModelRunDifferenceIndex; }
   void ModelRunDifferenceIndex(int newValue) { itsModelRunDifferenceIndex = newValue; }
@@ -162,13 +163,15 @@ class NFmiDrawParam
   void IsoLineGab(const double theIsoLineGab)
   {
     itsIsoLineGab = theIsoLineGab;
-    if (itsIsoLineGab == 0) itsIsoLineGab = 1;  // gappi ei voi olla 0
+    if (itsIsoLineGab == 0)
+      itsIsoLineGab = 1;  // gappi ei voi olla 0
   }
   double IsoLineGab(void) const { return itsIsoLineGab; };
   void ContourGab(const double theContourGab)
   {
     itsContourGab = theContourGab;
-    if (itsContourGab == 0) itsContourGab = 1;
+    if (itsContourGab == 0)
+      itsContourGab = 1;
   }
   double ContourGab(void) const { return itsContourGab; };
   void ModifyingStep(const double theModifyingStep) { itsModifyingStep = theModifyingStep; };
@@ -666,16 +669,19 @@ class NFmiDrawParam
   void IsoLineLabelDigitCount(int newValue)
   {
     itsIsoLineLabelDigitCount = newValue;
-    if (itsIsoLineLabelDigitCount > 10) itsIsoLineLabelDigitCount = 10;
+    if (itsIsoLineLabelDigitCount > 10)
+      itsIsoLineLabelDigitCount = 10;
     itsContourLabelDigitCount = newValue;
-    if (itsContourLabelDigitCount > 10) itsContourLabelDigitCount = 10;
+    if (itsContourLabelDigitCount > 10)
+      itsContourLabelDigitCount = 10;
   }
 
   int ContourLabelDigitCount(void) const { return itsContourLabelDigitCount; }
   void ContourLabelDigitCount(int newValue)
   {
     itsContourLabelDigitCount = newValue;
-    if (itsContourLabelDigitCount > 10) itsContourLabelDigitCount = 10;
+    if (itsContourLabelDigitCount > 10)
+      itsContourLabelDigitCount = 10;
   }
 
   //**************************************************************
@@ -685,8 +691,10 @@ class NFmiDrawParam
   void Alpha(float newValue)
   {
     itsAlpha = newValue;
-    if (itsAlpha < NFmiDrawParam::itsMinAlpha) itsAlpha = NFmiDrawParam::itsMinAlpha;
-    if (itsAlpha > 100.f) itsAlpha = 100.f;
+    if (itsAlpha < NFmiDrawParam::itsMinAlpha)
+      itsAlpha = NFmiDrawParam::itsMinAlpha;
+    if (itsAlpha > 100.f)
+      itsAlpha = 100.f;
   }
 
   bool ViewMacroDrawParam(void) const { return fViewMacroDrawParam; }
@@ -725,15 +733,15 @@ class NFmiDrawParam
   //  isoviiva, teksti...)
   NFmiMetEditorTypes::View itsViewType;
   NFmiMetEditorTypes::View itsStationDataViewType;  // jos viewtype on isoviiva, mutta data on asema
-                                                    // dataa, pitää olla varalla joku näyttötyyppi
-                                                    // että voidaan piirtää tällöin
+  // dataa, pitää olla varalla joku näyttötyyppi
+  // että voidaan piirtää tällöin
   NFmiColor itsFrameColor;
   NFmiColor itsFillColor;
 
   NFmiColor itsIsolineLabelBoxFillColor;
   NFmiColor itsContourLabelBoxFillColor;  // **** Versio 3 parametri ****
-                                          //   Minkä kokoinen näyttöön piirrettävä 'symbolidata'
-                                          //   on suhteessa
+  //   Minkä kokoinen näyttöön piirrettävä 'symbolidata'
+  //   on suhteessa
   //   annettuun asemalle/hilalle varattuun 'datalaatikkoon'.
   //   (oletusarvo)
   NFmiPoint itsRelativeSize;  // nämä ovat asemadata symboli kokoja
@@ -785,7 +793,7 @@ class NFmiDrawParam
   int itsStationSymbolColorShadeClassCount;  // kuinka monta väri luokkaa tehdään skaalaukseen
   bool fUseSymbolsInTextMode;  // käytetäänkö tekstiä vai mapataanko arvoja kohden jokin symboli
                                // ruudulle?
-  int itsUsedSymbolListIndex;  // 0=ei mitään, 1=synopfont, 2=hessaa, ...
+  int itsUsedSymbolListIndex;         // 0=ei mitään, 1=synopfont, 2=hessaa, ...
   int itsSymbolIndexingMapListIndex;  // indeksi johonkin symbolilistaan, jossa on mapattu arvot
                                       // haluttuihin symboleihin
 
@@ -801,17 +809,17 @@ class NFmiDrawParam
   bool fUseSimpleContourDefinitions;  // **** Versio 3 parametri ****
   bool fUseSeparatorLinesBetweenColorContourClasses;  // piirrä viivat arvo/väri luokkien välille
   float itsSimpleIsoLineGap;
-  float itsSimpleIsoLineZeroValue;          // tämän arvon kautta isoviivat joutuvat menemään
-  float itsSimpleContourZeroValue;          // **** Versio 3 parametri ****
-  float itsSimpleIsoLineLabelHeight;        // relatiivinen vai mm? (0=ei näytetä ollenkaan)
-  float itsSimpleContourLabelHeight;        // **** Versio 3 parametri ****
-  bool fShowSimpleIsoLineLabelBox;          // ei vielä muita attribuutteja isoviiva labelille (tämä
-                                            // tarkoittaa lukua ympäroivää laatikkoa)
-  bool fShowSimpleContourLabelBox;          // **** Versio 3 parametri ****
-  float itsSimpleIsoLineWidth;              // relatiivinen vai mm?
-  float itsSimpleContourWidth;              // **** Versio 3 parametri ****
-  int itsSimpleIsoLineLineStyle;            // 1=yht. viiva, 2=pisteviiva jne.
-  int itsSimpleContourLineStyle;            // **** Versio 3 parametri ****
+  float itsSimpleIsoLineZeroValue;    // tämän arvon kautta isoviivat joutuvat menemään
+  float itsSimpleContourZeroValue;    // **** Versio 3 parametri ****
+  float itsSimpleIsoLineLabelHeight;  // relatiivinen vai mm? (0=ei näytetä ollenkaan)
+  float itsSimpleContourLabelHeight;  // **** Versio 3 parametri ****
+  bool fShowSimpleIsoLineLabelBox;    // ei vielä muita attribuutteja isoviiva labelille (tämä
+                                      // tarkoittaa lukua ympäroivää laatikkoa)
+  bool fShowSimpleContourLabelBox;    // **** Versio 3 parametri ****
+  float itsSimpleIsoLineWidth;        // relatiivinen vai mm?
+  float itsSimpleContourWidth;        // **** Versio 3 parametri ****
+  int itsSimpleIsoLineLineStyle;      // 1=yht. viiva, 2=pisteviiva jne.
+  int itsSimpleContourLineStyle;      // **** Versio 3 parametri ****
   float itsIsoLineSplineSmoothingFactor;    // 0-10, 0=ei pehmennystä, 10=maksimi pyöritys
   bool fUseSingleColorsWithSimpleIsoLines;  // true=sama väri kaikille isoviivoille, false=tehdään
                                             // väriskaala
@@ -847,9 +855,9 @@ class NFmiDrawParam
   checkedVector<float> itsSpecialColorContouringValues;  // tähän laitetaan kaikki arvot, johon
                                                          // halutaan color contour luokka rajoiksi
   checkedVector<int> itsSpecialColorContouringColorIndexies;  // eri viivojen väri indeksit (pitää
-                                                              // tehdä näyttö taulukko käyttäjälle)
-  float itsColorContouringColorShadeLowValue;                 // väri skaalaus alkaa tästä arvosta
-  float itsColorContouringColorShadeMidValue;                 // väri skaalauksen keskiarvo
+  // tehdä näyttö taulukko käyttäjälle)
+  float itsColorContouringColorShadeLowValue;  // väri skaalaus alkaa tästä arvosta
+  float itsColorContouringColorShadeMidValue;  // väri skaalauksen keskiarvo
   float itsColorContouringColorShadeHighValue;
   float itsColorContouringColorShadeHigh2Value;  // väri skaalaus loppuu tähän arvoon
   NFmiColor itsColorContouringColorShadeLowValueColor;
@@ -921,8 +929,8 @@ class NFmiDrawParam
   // mallipintadatasta vasta 00, silloin viimeisin ajo on 06 ja -1 viittaa tällöin 00-ajoon.
   // Jos tämä on 0 tai positiivinen, tämä ei ole käytössä.
   NFmiMetTime itsModelOriginTimeCalculated;  // tähän lasketaan relatiivisen malliajon mukainen
-                                             // origin aika, jotä käytetään sitten mm. tooltipeissä
-                                             // ja muualla
+  // origin aika, jotä käytetään sitten mm. tooltipeissä
+  // ja muualla
   int itsTimeSerialModelRunCount;  // tähän määrätään kuinka monta viimeista ajoa näytetään mallille
   // kerrallaa aikasarjassa. Jos arvo on 0 (default), ei näytetä kuin viimeinen ajo normaalisti.
   int itsModelRunDifferenceIndex;  // tämän avulla on tarkoitus verrata eri malliajoja. Jos tämä on
@@ -942,7 +950,10 @@ inline std::ostream& operator<<(std::ostream& os, const NFmiDrawParam& item)
 {
   return item.Write(os);
 }
-inline std::istream& operator>>(std::istream& is, NFmiDrawParam& item) { return item.Read(is); }
+inline std::istream& operator>>(std::istream& is, NFmiDrawParam& item)
+{
+  return item.Read(is);
+}
 //@}
 
 #endif

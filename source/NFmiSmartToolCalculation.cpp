@@ -85,7 +85,9 @@ NFmiSmartToolCalculation::NFmiSmartToolCalculation(const NFmiSmartToolCalculatio
 {
 }
 
-NFmiSmartToolCalculation::~NFmiSmartToolCalculation(void) {}
+NFmiSmartToolCalculation::~NFmiSmartToolCalculation(void)
+{
+}
 //--------------------------------------------------------
 // Calculate
 //--------------------------------------------------------
@@ -102,13 +104,13 @@ void NFmiSmartToolCalculation::Calculate(const NFmiCalculationParams &theCalcula
   //	value = FmiMakeValidNumber(value); // NFmiQueryInfo::FloatValue(value) -metodi tarkastaa
   // nykyään onko kyseessä sallittu luku, inf ja nan -arvojen asetus on nykyään estetty
   if (value != kFloatMissing)  // tuli ongelmia missing asetuksissa, pitää mietti vaikka jokin
-                               // funktio, jolla asetetaan puuttuva arvo // pitää pystyä sittenkin
-                               // asettamaan arvoksi kFloatMissing:in!!!
+  // funktio, jolla asetetaan puuttuva arvo // pitää pystyä sittenkin
+  // asettamaan arvoksi kFloatMissing:in!!!
   {
     itsResultInfo->LocationIndex(theCalculationParams.itsLocationIndex);  // kohde dataa
                                                                           // juoksutetaan, joten
                                                                           // lokaatio indeksien
-                                                                          // pitää olla synkassa!!!
+    // pitää olla synkassa!!!
     value = FixCircularValues(value);  // ensin tehdään circular tarkistus ja sitten vasta min/max
     value = GetInsideLimitsValue(static_cast<float>(value));  // asetetaan value vielä drawparamista
                                                               // satuihin rajoihin, ettei esim. RH
@@ -145,13 +147,13 @@ void NFmiSmartToolCalculation::Calculate_ver2(const NFmiCalculationParams &theCa
   //	value = FmiMakeValidNumber(value); // NFmiQueryInfo::FloatValue(value) -metodi tarkastaa
   // nykyään onko kyseessä sallittu luku, inf ja nan -arvojen asetus on nykyään estetty
   if (value != kFloatMissing)  // tuli ongelmia missing asetuksissa, pitää mietti vaikka jokin
-                               // funktio, jolla asetetaan puuttuva arvo // pitää pystyä sittenkin
-                               // asettamaan arvoksi kFloatMissing:in!!!
+  // funktio, jolla asetetaan puuttuva arvo // pitää pystyä sittenkin
+  // asettamaan arvoksi kFloatMissing:in!!!
   {
     itsResultInfo->LocationIndex(theCalculationParams.itsLocationIndex);  // kohde dataa
                                                                           // juoksutetaan, joten
                                                                           // lokaatio indeksien
-                                                                          // pitää olla synkassa!!!
+    // pitää olla synkassa!!!
     value = FixCircularValues(value);  // ensin tehdään circular tarkistus ja sitten vasta min/max
     value = GetInsideLimitsValue(static_cast<float>(value));  // asetetaan value vielä drawparamista
                                                               // satuihin rajoihin, ettei esim. RH
@@ -178,7 +180,8 @@ void NFmiSmartToolCalculation::Calculate_ver2(const NFmiCalculationParams &theCa
 // ei ota huomioon missing arvoa, koska se pitää ottaa huomioon jo ennen tämän kutsua.
 float NFmiSmartToolCalculation::GetInsideLimitsValue(float theValue)
 {
-  if (theValue == kFloatMissing) return theValue;
+  if (theValue == kFloatMissing)
+    return theValue;
 
   if (fDoLimitCheck)
   {
@@ -344,10 +347,12 @@ void NFmiSmartToolCalculation::eval_exp5(double &result,
                                          const NFmiCalculationParams &theCalculationParams)
 {
   NFmiAreaMask::CalculationOperator op = token->GetCalculationOperator();
-  if (op == NFmiAreaMask::Add || op == NFmiAreaMask::Sub) get_token();
+  if (op == NFmiAreaMask::Add || op == NFmiAreaMask::Sub)
+    get_token();
   eval_exp6(result, theCalculationParams);
 
-  if (op == NFmiAreaMask::Sub && result != kFloatMissing) result = -result;
+  if (op == NFmiAreaMask::Sub && result != kFloatMissing)
+    result = -result;
 }
 
 #if 0
@@ -493,7 +498,8 @@ static float GetCurrentHeightStep(float theHeight)
 template <typename T>
 static bool IsEqualEnough(T value1, T value2, T usedEpsilon)
 {
-  if (::fabs(static_cast<double>(value1 - value2)) < usedEpsilon) return true;
+  if (::fabs(static_cast<double>(value1 - value2)) < usedEpsilon)
+    return true;
   return false;
 }
 void NFmiSmartToolCalculation::eval_ThreeArgumentFunctionZ(
@@ -916,10 +922,12 @@ void NFmiSmartToolCalculation::bin_eval_exp5(bool &maskresult,
                                              const NFmiCalculationParams &theCalculationParams)
 {
   NFmiAreaMask::CalculationOperator op = token->GetCalculationOperator();
-  if (op == NFmiAreaMask::Add || op == NFmiAreaMask::Sub) get_token();
+  if (op == NFmiAreaMask::Add || op == NFmiAreaMask::Sub)
+    get_token();
   bin_eval_exp6(maskresult, result, theCalculationParams);
 
-  if (op == NFmiAreaMask::Sub && result != kFloatMissing) result = -result;
+  if (op == NFmiAreaMask::Sub && result != kFloatMissing)
+    result = -result;
 }
 
 void NFmiSmartToolCalculation::CalcThreeArgumentFunction(

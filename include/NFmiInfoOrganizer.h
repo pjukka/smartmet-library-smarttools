@@ -52,7 +52,7 @@ class NFmiInfoOrganizer
 
   struct ParamCheckFlags
   {  // Tämän rakenteen avulla voidaan halutessa varmistaa ainakin FindSoundingInfo -metodissa, että
-     // palautettavassa datassa on tiettyjä parametreja, esim.:
+    // palautettavassa datassa on tiettyjä parametreja, esim.:
     // fSounding -> P, T, Td, RH, WS, WD
     // fTrajectory -> P, WS, WD, w
     ParamCheckFlags(bool sounding = false, bool trajectory = false)
@@ -245,28 +245,28 @@ class NFmiInfoOrganizer
   NFmiPoint itsMacroParamMinGridSize;
   NFmiPoint itsMacroParamMaxGridSize;
   boost::shared_ptr<NFmiFastQueryInfo> itsMacroParamData;  // makro-parametrien laskuja varten pitää
-                                                           // pitää yllä yhden hilan kokoista dataa
-                                                           // (yksi aika,param ja level, editoitavan
-                                                           // datan hplaceDesc)
-  NFmiDataMatrix<float> itsMacroParamMissingValueMatrix;   // tähän talletetaan editoitavan datan
-                                                           // hilan suuruinen kFloatMissing:eilla
-                                                           // alustettu matriisi että sillä voi
-                                                           // alustaa makroParam dataa ennen laskuja
+  // pitää yllä yhden hilan kokoista dataa
+  // (yksi aika,param ja level, editoitavan
+  // datan hplaceDesc)
+  NFmiDataMatrix<float> itsMacroParamMissingValueMatrix;  // tähän talletetaan editoitavan datan
+                                                          // hilan suuruinen kFloatMissing:eilla
+                                                          // alustettu matriisi että sillä voi
+                                                          // alustaa makroParam dataa ennen laskuja
   boost::shared_ptr<NFmiFastQueryInfo> itsCrossSectionMacroParamData;  // poikkileikkaus
                                                                        // makro-parametrien laskuja
-                                                                       // varten pitää pitää yllä
-                                                                       // yhden hilan kokoista dataa
-                                                                       // (yksi aika,param ja level,
-                                                                       // editoitavan datan
-                                                                       // hplaceDesc)
-  NFmiDataMatrix<float> itsCrossSectionMacroParamMissingValueMatrix;   // tähän talletetaan
-                                                                       // editoitavan datan hilan
-                                                                       // suuruinen
-                                                                       // kFloatMissing:eilla
-                                                                       // alustettu matriisi että
-                                                                       // sillä voi alustaa
-                                                                       // makroParam dataa ennen
-                                                                       // laskuja
+  // varten pitää pitää yllä
+  // yhden hilan kokoista dataa
+  // (yksi aika,param ja level,
+  // editoitavan datan
+  // hplaceDesc)
+  NFmiDataMatrix<float> itsCrossSectionMacroParamMissingValueMatrix;  // tähän talletetaan
+                                                                      // editoitavan datan hilan
+                                                                      // suuruinen
+                                                                      // kFloatMissing:eilla
+                                                                      // alustettu matriisi että
+                                                                      // sillä voi alustaa
+                                                                      // makroParam dataa ennen
+                                                                      // laskuja
   bool fCreateEditedDataCopy;  // luodaanko vai eikö luoda kopiota editoidusta datasta
   static std::vector<FmiParameterName> itsWantedSoundingParams;
   static std::vector<FmiParameterName> itsWantedTrajectoryParams;

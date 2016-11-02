@@ -101,7 +101,7 @@ class NFmiProducerSystem
                      // mutta kannattaa sijoittaa alkuun tärkeimmät, koska
                      // Editori päättää eri ikkunoissa/työkaluissa, kuinka monta
                      // tuottajaa (alkupäästä) se ottaa käyttöön. Esim. Luotaus
-                     // näytön malli valinta radio-buttoneita on esim. vain kolme (tällä hetkellä)
+  // näytön malli valinta radio-buttoneita on esim. vain kolme (tällä hetkellä)
   std::string itsInitializeLogStr;  // jos luokka initialisoidaan settingeistä, tähän talletetaan
                                     // loki stringi
 };

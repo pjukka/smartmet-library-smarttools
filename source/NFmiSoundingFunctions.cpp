@@ -81,7 +81,8 @@ double WMR(double T, double P)
 double ESAT(double T)  // T kelvineinä tai celsiuksina
 {
   double T0 = 0.;
-  if (T < 105.) T0 = 273.15;
+  if (T < 105.)
+    T0 = 273.15;
 
   // Formula with T = temperature in K
   //   esat = exp( -6763.6/(T+T0) - 4.9283*alog((T+T0)) + 54.2190 )
@@ -223,7 +224,8 @@ double TSA(double OS, double P)
     D = D / 2.;
     double X = A * ::exp(-2.6518986 * MIXR_SAT(TQ, P) / TQ) - TQ * (::pow((1000. / P), .286));
     //;  IF THE TEMPERATURE DIFFERENCE, X, IS SMALL, EXIT THIS LOOP.
-    if (::fabs(X) < 0.01) break;
+    if (::fabs(X) < 0.01)
+      break;
     D = (X < 0) ? -fabs(D) : fabs(D);  // hämärää koodia alkuperäisessä kielessä
     TQ = TQ + D;
   }
@@ -384,7 +386,8 @@ double CalcLCLPressure(double T, double Td, double P)
     double Tw = TMR(w, currentP);
     double Tdry = Tpot2t(tpot, currentP);
 
-    if (Tdry < Tw) break;
+    if (Tdry < Tw)
+      break;
     lastP = currentP;  // viimeisinta painetta ennen kuin Tw ja Tdry ovat leikanneet, voidaan
                        // käyttää tarkemman LCL painepinnan interpolointiin
   }
@@ -428,10 +431,11 @@ double CalcLCLPressureFast(double T, double Td, double P)
   {
     iterationCount++;
     currentP = IterateMixMoistDiffWithNewtonMethod(w, tpot, currentP, diff);
-    if (::fabs(diff) < 0.01) break;
+    if (::fabs(diff) < 0.01)
+      break;
     if (currentP < 100)  // most unstable tapauksissa etsintä piste saattaa pompata tosi ylös
     {  // tässä on paineen arvoksi tullut niin pieni että nostetaan sitä takaisin ylös ja jatketaan
-       // etsintöjä
+      // etsintöjä
       currentP = 100;
     }
   } while (iterationCount < maxIterations);
@@ -470,7 +474,7 @@ double CalcMoistT(double T, double P)
   {
     double AOS1 = OS(moistT1, 1000.);  // tämä on hämärä, miksi tämä tehdään, mutta muutetaan
                                        // kostea-lämppäsi jotenkin pintaan
-    double ATSA1 = TSA(AOS1, P);       // lasketaan sen avulla lämpötila taas halutulle korkeudelle
+    double ATSA1 = TSA(AOS1, P);  // lasketaan sen avulla lämpötila taas halutulle korkeudelle
     double diff1 = ATSA1 - T;
     double AOS2 = OS(moistT2, 1000.);
     double ATSA2 = TSA(AOS2, P);

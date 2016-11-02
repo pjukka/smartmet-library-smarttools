@@ -126,8 +126,8 @@ class NFmiSmartToolModifier
   const std::string &GetStrippedMacroText(void) const;
   bool IsInterpretedSkriptMacroParam(void);  // kun intepreter on tulkinnut smarttool-tekstin,
                                              // voidaan kysyä, onko kyseinen makro ns.
-                                             // macroParam-skripti eli sisältääkö se RESULT = ???
-                                             // tapaista tekstiä
+  // macroParam-skripti eli sisältääkö se RESULT = ???
+  // tapaista tekstiä
 
   void ModifiedLevel(boost::shared_ptr<NFmiLevel> &theLevel);
 
@@ -226,7 +226,7 @@ class NFmiSmartToolModifier
   std::string itsIncludeDirectory;  // mistä ladataan mahd. include filet
 
   NFmiTimeDescriptor *itsModifiedTimes;  // ei omista/tuhoa
-  bool fMacroParamCalculation;           // tämä tieto tarvitaan scriptVariablejen kanssa, jos true,
+  bool fMacroParamCalculation;  // tämä tieto tarvitaan scriptVariablejen kanssa, jos true,
   // käytetään pohjana macroParam-infoa, muuten editoitua dataa
 
   // Nämä muuttujat ovat sitä varten että SumZ ja MinH tyyppisissä funktoissa
@@ -236,8 +236,8 @@ class NFmiSmartToolModifier
   bool fUseLevelData;  // kun tämä flagi on päällä, käytetään CreateInfo-metodissa hybridi-datoja
                        // jos mahd. ja sitten painepinta datoja.
   bool fDoCrossSectionCalculation;  // kun tämä flagi on päällä, ollaan laskemassa poikkileikkauksia
-                                    // ja silloin level-infot yritetään tehdä ensin hybrididatasta
-                                    // ja sitten painepintadatasta
+  // ja silloin level-infot yritetään tehdä ensin hybrididatasta
+  // ja sitten painepintadatasta
   int itsCommaCounter;  // tarvitaan laskemaan pilkkuja, kun lasketaan milloin level-dataa pitää
                         // käyttää.
   int itsParethesisCounter;  // kun käytetään esim. Sumz-funktion 2. pilkun jälkeen level-dataa,
@@ -245,8 +245,8 @@ class NFmiSmartToolModifier
   // HUOM! sulkujen lisäksi pitää laskea myös erilaisten funktioiden alut.
 
   boost::shared_ptr<MyGrid> itsWorkingGrid;  // Tähän talletetaan ns. työskentely gidi, eli missä on
-                                             // työskentely alueen area-määritys ja laskennallinen
-                                             // hila koko.
+  // työskentely alueen area-määritys ja laskennallinen
+  // hila koko.
   boost::shared_ptr<NFmiLevel> itsModifiedLevel;  // Jos ollaan editoimassa level-dataa, tähän on
                                                   // tarkoitus laittaa kulloinenkin muokattava level
                                                   // talteen.

@@ -108,8 +108,8 @@ class NFmiAreaMaskInfo
                                                // matemaattisia funktioita kuten sin, cos, pow,
                                                // jne.)
   NFmiAreaMask::FunctionType itsSecondaryFunctionType;  // Tähän laitetaan mm. vertikaali
-                                                        // funktioissa käytetty korkeus tyyppi esim.
-                                                        // VertP tai VertZ
+  // funktioissa käytetty korkeus tyyppi esim.
+  // VertP tai VertZ
   NFmiAreaMask::MetFunctionDirection itsMetFunctionDirection;  // grad, adv, div rot ja lap
                                                                // -funktioille (ja näiden
                                                                // 2-versioille) määrätään myös

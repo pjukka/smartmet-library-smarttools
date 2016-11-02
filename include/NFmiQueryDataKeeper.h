@@ -123,14 +123,14 @@ class NFmiQueryDataSetKeeper
                               // viimeisin data.
   int itsModelRunTimeGap;  // millä ajoväleillä kyseisen datan mallia ajetaan (yksikkö minuutteja),
                            // jos kyse havainnosta, eli ei ole kuin viimeinen data, arvo 0 ja jos
-                           // kyse esim. editoidusta datasta (epämääräinen ilmestymisväli) on arvo
-                           // -1.
+  // kyse esim. editoidusta datasta (epämääräinen ilmestymisväli) on arvo
+  // -1.
   std::string itsFilePattern;  // erilaiset datat erotellaan fileFilterin avulla (esim.
                                // "D:\smartmet\wrk\data\local\*_hirlam_skandinavia_mallipinta.sqd")
   NFmiMetTime itsLatestOriginTime;  // tähän talletetaan aina viimeisimmän datan origin-time
                                     // vertailuja helpottamaan
-  NFmiInfoData::Type itsDataType;   // tähän laitetaan 1. datan datattyyppi (pitäisi olla yhtenäinen
-                                    // kaikille setissä oleville datoille)
+  NFmiInfoData::Type itsDataType;  // tähän laitetaan 1. datan datattyyppi (pitäisi olla yhtenäinen
+                                   // kaikille setissä oleville datoille)
   int itsKeepInMemoryTime;  // kuinka kauan pidetään data muistissa, jos sitä ei ole käytetty.
                             // yksikkö on minuutteja
 };

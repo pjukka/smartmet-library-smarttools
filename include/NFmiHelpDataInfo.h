@@ -112,9 +112,9 @@ class NFmiHelpDataInfo
       itsFileNameFilter;  // tiedostonimi filtteri polun kera esim. d:\weto\wrk\data\in\data_1_*.sqd
   std::string itsPartialDataCacheFileNameFilter;  // cachen käyttö ja partial-datat ovat oma lukunsa
                                                   // ja niitä varten pitää tehdä filefiltteri
-  bool fForceFileFilterName;      // jos tämä on erikoistilanteissa asetettu true:ksi, ei välitetä
-                                  // mahdillisista cachen käytöistä, vaan UsedFilefilter-metodi
-                                  // palauttaa itsFileNameFilter:in arvon
+  bool fForceFileFilterName;  // jos tämä on erikoistilanteissa asetettu true:ksi, ei välitetä
+                              // mahdillisista cachen käytöistä, vaan UsedFilefilter-metodi
+                              // palauttaa itsFileNameFilter:in arvon
   std::string itsLatestFileName;  // kun filtterillä on haettu tiedostot ja uusin on löytynyt,
                                   // talletetaan se tähän
   std::string itsLatestErroneousFileName;  // Jos datatiedosto on jotenkin korruptoitunut,
@@ -130,8 +130,8 @@ class NFmiHelpDataInfo
   std::string
       itsImageProjectionString;  // jos data on image-tyyppistä (satel,radar, jne.), on tiedostossa
   // stringi, joka sisältää projektio tiedon jonka NFmiAreaFactory ymmärtää
-  NFmiDataIdent itsImageDataIdent;           // tieto image paramin id:stä, nimestä (vain id ja nimi
-                                             // talletetaan tiedostoon)
+  NFmiDataIdent itsImageDataIdent;  // tieto image paramin id:stä, nimestä (vain id ja nimi
+                                    // talletetaan tiedostoon)
   boost::shared_ptr<NFmiArea> itsImageArea;  // tähän luodaan ed. stringin avulla projektio, tämä ei
                                              // ole tallessa tiedostossa
   // Edelliset koskevat vain image-tyyppisiä juttuja
@@ -258,9 +258,9 @@ class NFmiHelpDataInfoSystem
   checkedVector<NFmiHelpDataInfo> itsDynamicHelpDataInfos;  // tähän tulee jatkuvasti päivitettävät
                                                             // datat kuten havainnot, tutka ja
                                                             // analyysi datat
-  checkedVector<NFmiHelpDataInfo> itsStaticHelpDataInfos;   // tähän tulee kerran ladattavat jutut
-                                                            // kuten maa/meri maskit ja
-                                                            // klimatologiset jutut
+  checkedVector<NFmiHelpDataInfo> itsStaticHelpDataInfos;  // tähän tulee kerran ladattavat jutut
+                                                           // kuten maa/meri maskit ja
+                                                           // klimatologiset jutut
 
   // SmartMet voidaan laittaa käyttämään queryData cachetusta, jolloin verkkopalvelimelta
   // luetaan data määrättyyn cache-hakemistoon omalle kovalevylle. Näin voidaan
@@ -274,11 +274,11 @@ class NFmiHelpDataInfoSystem
   std::string itsCachePartialDataDirectory;  // combineData-threadin käyttämät datat kopioidaan
                                              // tänne cacheen
   std::string
-      itsCacheTmpFileNameFix;      // tämä name fix lisätään tmp tiedosto nimen alkuun ja loppuun
-  bool fUseQueryDataCache;         // onko cachetus systeemi päällä vai ei?
-  bool fDoCleanCache;              // siivotaanko cachea vai ei
-  float itsCacheFileKeepMaxDays;   // kuinka vanhat tiedostot ainakin siivotaan pois (esim. 1.5 on
-                                   // 1.5 päivää eli 36 tuntia) jos luku on <= 0 ei tätä käytetä
+      itsCacheTmpFileNameFix;  // tämä name fix lisätään tmp tiedosto nimen alkuun ja loppuun
+  bool fUseQueryDataCache;     // onko cachetus systeemi päällä vai ei?
+  bool fDoCleanCache;          // siivotaanko cachea vai ei
+  float itsCacheFileKeepMaxDays;  // kuinka vanhat tiedostot ainakin siivotaan pois (esim. 1.5 on
+  // 1.5 päivää eli 36 tuntia) jos luku on <= 0 ei tätä käytetä
   int itsCacheMaxFilesPerPattern;  // kuinka monta tiedostoa maksimissaan pidetään kutakin tiedosto
                                    // patternia kohden, jos luku <= 0, ei tätä käytetä
 

@@ -149,7 +149,8 @@ static bool FillSurfaceValuesFromInfo(NFmiSmartInfo *theInfo, NFmiSoundingData &
 
 static void CheckIfStopped(NFmiStopFunctor *theStopFunctor)
 {
-  if (theStopFunctor && theStopFunctor->Stop()) throw NFmiStopThreadException();
+  if (theStopFunctor && theStopFunctor->Stop())
+    throw NFmiStopThreadException();
 }
 
 static void CalcAllSoundingIndexParamFields(boost::shared_ptr<NFmiFastQueryInfo> &theSourceInfo,
@@ -167,7 +168,8 @@ static void CalcAllSoundingIndexParamFields(boost::shared_ptr<NFmiFastQueryInfo>
     try
     {
       // bool surfaceBaseStatus = false;
-      if (useFastFill) theSourceInfo->LocationIndex(theResultInfo->LocationIndex());
+      if (useFastFill)
+        theSourceInfo->LocationIndex(theResultInfo->LocationIndex());
       ::FillSoundingDataOpt1(theSourceInfo,
                              soundingDataOpt1,
                              theResultInfo->Time(),
@@ -256,7 +258,8 @@ static void CalculatePartOfSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &th
     if (fDoCerrReporting)
       std::cerr << "thread nro: " << index << " stops because unknown error." << std::endl;
   }
-  if (fDoCerrReporting) std::cerr << "thread nro: " << index << " end here." << std::endl;
+  if (fDoCerrReporting)
+    std::cerr << "thread nro: " << index << " end here." << std::endl;
 }
 
 static void CalculateSoundingDataOneTimeStepAtTime(
@@ -312,7 +315,8 @@ static void CalculateSoundingDataOneTimeStepAtTime(
     if (fDoCerrReporting)
       std::cerr << "thread nro: " << index << " stops because unknown error." << std::endl;
   }
-  if (fDoCerrReporting) std::cerr << "thread nro: " << index << " end here." << std::endl;
+  if (fDoCerrReporting)
+    std::cerr << "thread nro: " << index << " end here." << std::endl;
 }
 
 // Jos useFastFill on true, on datoilla sama hila ja aika descriptor rakenne
@@ -337,15 +341,16 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
   unsigned int usedThreadCount = boost::thread::hardware_concurrency();
   if (theMaxThreadCount > 0 && usedThreadCount > static_cast<unsigned int>(theMaxThreadCount))
     usedThreadCount = static_cast<unsigned int>(theMaxThreadCount);  // jos on haluttu säätää maksim
-                                                                     // threadien määrää, säädetään
-                                                                     // maksimia jos usedThreadCount
-                                                                     // olisi muuten ylittänyt sen.
+  // threadien määrää, säädetään
+  // maksimia jos usedThreadCount
+  // olisi muuten ylittänyt sen.
 
   usedThreadCount = NFmiQueryDataUtil::CalcOptimalThreadCount(usedThreadCount, timeSize);
 
   if (fUseOnlyOneThread || usedThreadCount < 2)
   {  // jos aikoja oli alle kaksi, lasketaan data yhdessä funktiossa
-    if (fDoCerrReporting) std::cerr << "making data in single thread" << std::endl;
+    if (fDoCerrReporting)
+      std::cerr << "making data in single thread" << std::endl;
     boost::shared_ptr<NFmiFastQueryInfo> sourceInfo(new NFmiFastQueryInfo(&theSourceData));
     boost::shared_ptr<NFmiFastQueryInfo> resultInfo(new NFmiFastQueryInfo(&theResultData));
     ::CalculatePartOfSoundingData(
@@ -353,7 +358,8 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
   }
   else
   {
-    if (fDoCerrReporting) std::cerr << "making data in multiple threads" << std::endl;
+    if (fDoCerrReporting)
+      std::cerr << "making data in multiple threads" << std::endl;
 
     theSourceData.LatLonCache();  // Ennen multi-thread laskuja pitää varmistaa että kunkin datan
                                   // (source + result) latlon-cache on alustettu, muutern tulee
@@ -382,7 +388,8 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
                                              fDoCerrReporting));
     calcParts.join_all();  // odotetaan että threadit lopettavat
 
-    if (fDoCerrReporting) std::cerr << "all threads ended" << std::endl;
+    if (fDoCerrReporting)
+      std::cerr << "all threads ended" << std::endl;
   }
 }
 
@@ -1155,7 +1162,8 @@ boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingI
     throw std::runtime_error("Error in CreateNewSoundingIndexData, cannot read source data.");
   else
   {
-    if (fDoCerrReporting) std::cerr << "read qd-file: " << theSourceFileFilter << std::endl;
+    if (fDoCerrReporting)
+      std::cerr << "read qd-file: " << theSourceFileFilter << std::endl;
   }
 
   return NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(sourceData,

@@ -19,8 +19,12 @@
 //--------------------------------------------------------
 // Constructor/Destructor
 //--------------------------------------------------------
-NFmiCalculationConstantValue::NFmiCalculationConstantValue(double value) : itsValue(value) {}
-NFmiCalculationConstantValue::~NFmiCalculationConstantValue() {}
+NFmiCalculationConstantValue::NFmiCalculationConstantValue(double value) : itsValue(value)
+{
+}
+NFmiCalculationConstantValue::~NFmiCalculationConstantValue()
+{
+}
 NFmiCalculationConstantValue::NFmiCalculationConstantValue(
     const NFmiCalculationConstantValue &theOther)
     : NFmiAreaMaskImpl(theOther), itsValue(theOther.itsValue)
@@ -82,7 +86,9 @@ NFmiCalculationRampFuction::NFmiCalculationRampFuction(
 {
 }
 
-NFmiCalculationRampFuction::~NFmiCalculationRampFuction(void) {}
+NFmiCalculationRampFuction::~NFmiCalculationRampFuction(void)
+{
+}
 NFmiCalculationRampFuction::NFmiCalculationRampFuction(const NFmiCalculationRampFuction &theOther)
     : NFmiInfoAreaMask(theOther)
 {
@@ -120,7 +126,9 @@ NFmiCalculationIntegrationFuction::NFmiCalculationIntegrationFuction(
 {
 }
 
-NFmiCalculationIntegrationFuction::~NFmiCalculationIntegrationFuction(void) {}
+NFmiCalculationIntegrationFuction::~NFmiCalculationIntegrationFuction(void)
+{
+}
 double NFmiCalculationIntegrationFuction::Value(const NFmiCalculationParams &theCalculationParams,
                                                 bool /* fUseTimeInterpolationAlways */)
 {
@@ -163,7 +171,9 @@ NFmiCalculationRampFuctionWithAreaMask::NFmiCalculationRampFuctionWithAreaMask(
 {
 }
 
-NFmiCalculationRampFuctionWithAreaMask::~NFmiCalculationRampFuctionWithAreaMask(void) {}
+NFmiCalculationRampFuctionWithAreaMask::~NFmiCalculationRampFuctionWithAreaMask(void)
+{
+}
 NFmiCalculationRampFuctionWithAreaMask::NFmiCalculationRampFuctionWithAreaMask(
     const NFmiCalculationRampFuctionWithAreaMask &theOther)
     : NFmiAreaMaskImpl(theOther),
@@ -185,7 +195,9 @@ NFmiAreaMask *NFmiCalculationRampFuctionWithAreaMask::Clone(void) const
 // ****************************************************************************
 double NFmiCalculationDeltaZValue::itsHeightValue;
 
-NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(void) : NFmiAreaMaskImpl() {}
+NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(void) : NFmiAreaMaskImpl()
+{
+}
 NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(const NFmiCalculationDeltaZValue &theOther)
     : NFmiAreaMaskImpl(theOther)
 {
@@ -222,7 +234,9 @@ NFmiStation2GridMask::NFmiStation2GridMask(Type theMaskType,
 {
 }
 
-NFmiStation2GridMask::~NFmiStation2GridMask(void) {}
+NFmiStation2GridMask::~NFmiStation2GridMask(void)
+{
+}
 NFmiStation2GridMask::NFmiStation2GridMask(const NFmiStation2GridMask &theOther)
     : NFmiInfoAreaMask(theOther),
       itsGriddedStationData(theOther.itsGriddedStationData),
@@ -236,7 +250,10 @@ NFmiStation2GridMask::NFmiStation2GridMask(const NFmiStation2GridMask &theOther)
 {
 }
 
-NFmiAreaMask *NFmiStation2GridMask::Clone(void) const { return new NFmiStation2GridMask(*this); }
+NFmiAreaMask *NFmiStation2GridMask::Clone(void) const
+{
+  return new NFmiStation2GridMask(*this);
+}
 double NFmiStation2GridMask::Value(const NFmiCalculationParams &theCalculationParams,
                                    bool /* fUseTimeInterpolationAlways */)
 {
@@ -324,7 +341,9 @@ NFmiNearestObsValue2GridMask::NFmiNearestObsValue2GridMask(
   itsFunctionArgumentCount = theArgumentCount;
 }
 
-NFmiNearestObsValue2GridMask::~NFmiNearestObsValue2GridMask(void) {}
+NFmiNearestObsValue2GridMask::~NFmiNearestObsValue2GridMask(void)
+{
+}
 NFmiNearestObsValue2GridMask::NFmiNearestObsValue2GridMask(
     const NFmiNearestObsValue2GridMask &theOther)
     : NFmiInfoAreaMask(theOther),
@@ -431,8 +450,8 @@ static NFmiDataMatrix<float> CalcNearestValueMatrix(
                   NFmiStationView::SetSoundingDataLevel(
                       theLevel, *infoIter);  // Tämä tehdään vain luotaus datalle: tämä level pitää
                                              // asettaa joka pisteelle erikseen, koska vakio
-                                             // painepinnat eivät ole kaikille luotaus parametreille
-                                             // samoilla leveleillä
+                  // painepinnat eivät ole kaikille luotaus parametreille
+                  // samoilla leveleillä
                   nearestValueMatrix[grid.CurrentX()][grid.CurrentY()] =
                       infoIter->FloatValue();  // ei ole väliä onko lähimmän aseman arvo puuttuva
                                                // vai ei, se halutaan aina tulokseen!!!

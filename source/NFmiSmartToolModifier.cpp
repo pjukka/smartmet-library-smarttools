@@ -55,13 +55,16 @@ static boost::shared_ptr<NFmiFastQueryInfo> CreateShallowCopyOfHighestInfo(
   if (theInfo)
   {
     NFmiSmartInfo *smartInfo = dynamic_cast<NFmiSmartInfo *>(theInfo.get());
-    if (smartInfo) return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(*smartInfo));
+    if (smartInfo)
+      return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(*smartInfo));
 
     NFmiOwnerInfo *ownerInfo = dynamic_cast<NFmiOwnerInfo *>(theInfo.get());
-    if (ownerInfo) return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiOwnerInfo(*ownerInfo));
+    if (ownerInfo)
+      return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiOwnerInfo(*ownerInfo));
 
     NFmiFastQueryInfo *fastInfo = dynamic_cast<NFmiFastQueryInfo *>(theInfo.get());
-    if (fastInfo) return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*fastInfo));
+    if (fastInfo)
+      return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*fastInfo));
   }
 
   return boost::shared_ptr<NFmiFastQueryInfo>();
@@ -90,7 +93,9 @@ NFmiSmartToolCalculationBlockVector::NFmiSmartToolCalculationBlockVector(
 {
 }
 
-NFmiSmartToolCalculationBlockVector::~NFmiSmartToolCalculationBlockVector(void) {}
+NFmiSmartToolCalculationBlockVector::~NFmiSmartToolCalculationBlockVector(void)
+{
+}
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolCalculationBlockVector::FirstVariableInfo(void)
 {
   Iterator it = Begin();
@@ -176,30 +181,43 @@ NFmiSmartToolCalculationBlock::NFmiSmartToolCalculationBlock(
 {
 }
 
-NFmiSmartToolCalculationBlock::~NFmiSmartToolCalculationBlock(void) {}
+NFmiSmartToolCalculationBlock::~NFmiSmartToolCalculationBlock(void)
+{
+}
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolCalculationBlock::FirstVariableInfo(void)
 {
   boost::shared_ptr<NFmiFastQueryInfo> info;
-  if (itsFirstCalculationSection) info = itsFirstCalculationSection->FirstVariableInfo();
-  if (info == 0 && itsIfCalculationBlocks) info = itsIfCalculationBlocks->FirstVariableInfo();
+  if (itsFirstCalculationSection)
+    info = itsFirstCalculationSection->FirstVariableInfo();
+  if (info == 0 && itsIfCalculationBlocks)
+    info = itsIfCalculationBlocks->FirstVariableInfo();
   if (info == 0 && itsElseIfCalculationBlocks)
     info = itsElseIfCalculationBlocks->FirstVariableInfo();
-  if (info == 0 && itsElseCalculationBlocks) info = itsElseCalculationBlocks->FirstVariableInfo();
-  if (info == 0 && itsLastCalculationSection) info = itsLastCalculationSection->FirstVariableInfo();
+  if (info == 0 && itsElseCalculationBlocks)
+    info = itsElseCalculationBlocks->FirstVariableInfo();
+  if (info == 0 && itsLastCalculationSection)
+    info = itsLastCalculationSection->FirstVariableInfo();
   return info;
 }
 
 void NFmiSmartToolCalculationBlock::Time(const NFmiMetTime &theTime)
 {
-  if (itsFirstCalculationSection) itsFirstCalculationSection->SetTime(theTime);
+  if (itsFirstCalculationSection)
+    itsFirstCalculationSection->SetTime(theTime);
 
-  if (itsIfAreaMaskSection) itsIfAreaMaskSection->Time(theTime);
-  if (itsIfCalculationBlocks) itsIfCalculationBlocks->SetTime(theTime);
-  if (itsElseIfAreaMaskSection) itsElseIfAreaMaskSection->Time(theTime);
-  if (itsElseIfCalculationBlocks) itsElseIfCalculationBlocks->SetTime(theTime);
-  if (itsElseCalculationBlocks) itsElseCalculationBlocks->SetTime(theTime);
+  if (itsIfAreaMaskSection)
+    itsIfAreaMaskSection->Time(theTime);
+  if (itsIfCalculationBlocks)
+    itsIfCalculationBlocks->SetTime(theTime);
+  if (itsElseIfAreaMaskSection)
+    itsElseIfAreaMaskSection->Time(theTime);
+  if (itsElseIfCalculationBlocks)
+    itsElseIfCalculationBlocks->SetTime(theTime);
+  if (itsElseCalculationBlocks)
+    itsElseCalculationBlocks->SetTime(theTime);
 
-  if (itsLastCalculationSection) itsLastCalculationSection->SetTime(theTime);
+  if (itsLastCalculationSection)
+    itsLastCalculationSection->SetTime(theTime);
 }
 
 void NFmiSmartToolCalculationBlock::Calculate(const NFmiCalculationParams &theCalculationParams,
@@ -237,7 +255,8 @@ void NFmiSmartToolCalculationBlock::Calculate_ver2(
 
   if (fDoMiddlePartOnly == false)
   {
-    if (itsLastCalculationSection) itsLastCalculationSection->Calculate_ver2(theCalculationParams);
+    if (itsLastCalculationSection)
+      itsLastCalculationSection->Calculate_ver2(theCalculationParams);
   }
 }
 
@@ -264,7 +283,9 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer *theInfoOrganizer
 #endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
 {
 }
-NFmiSmartToolModifier::~NFmiSmartToolModifier(void) {}
+NFmiSmartToolModifier::~NFmiSmartToolModifier(void)
+{
+}
 //--------------------------------------------------------
 // InitSmartTool
 //--------------------------------------------------------
@@ -697,7 +718,8 @@ void NFmiSmartToolModifier::ModifyConditionalData(
           NFmiQueryDataUtil::DoStepIt(
               theThreadCallBacks);  // stepataan vasta 0-tarkastuksen jälkeen!
           calculationParams.itsTime = modifiedTimes.Time();
-          if (theMacroParamValue.fSetValue) calculationParams.itsTime = theMacroParamValue.itsTime;
+          if (theMacroParamValue.fSetValue)
+            calculationParams.itsTime = theMacroParamValue.itsTime;
           calculationParams.itsTimeIndex = info->TimeIndex();
           theCalculationBlock->itsIfAreaMaskSection->Time(
               calculationParams.itsTime);  // yritetään optimoida laskuja hieman kun mahdollista
@@ -719,8 +741,8 @@ void NFmiSmartToolModifier::ModifyConditionalData(
             {
               calculationParams.itsLatlon = theMacroParamValue.itsLatlon;
               info->Location(calculationParams.itsLatlon);  // pitää laittaa nearestlocation päälle,
-                                                            // että tuloksia voidaan myöhemmin hakea
-                                                            // interpolaation avulla
+              // että tuloksia voidaan myöhemmin hakea
+              // interpolaation avulla
             }
             calculationParams.itsLocationIndex =
                 info->LocationIndex();  // tämä locationindex juttu liittyy kai optimointiin, jota
@@ -870,7 +892,8 @@ void NFmiSmartToolModifier::ModifyConditionalData_ver2(
       throw runtime_error(::GetDictionaryString("SmartToolModifierErrorUnknownProblem"));
     boost::shared_ptr<NFmiFastQueryInfo> info(
         dynamic_cast<NFmiFastQueryInfo *>(theCalculationBlock->FirstVariableInfo()->Clone()));
-    if (info == 0) return;
+    if (info == 0)
+      return;
 
     try
     {
@@ -974,7 +997,8 @@ void NFmiSmartToolModifier::ModifyData2(
   {
     boost::shared_ptr<NFmiFastQueryInfo> info(
         dynamic_cast<NFmiFastQueryInfo *>(theCalculationSection->FirstVariableInfo()->Clone()));
-    if (info == 0) return;
+    if (info == 0)
+      return;
     try
     {
       NFmiCalculationParams calculationParams;
@@ -998,7 +1022,8 @@ void NFmiSmartToolModifier::ModifyData2(
         for (modifiedTimes.Reset(); modifiedTimes.Next();)
         {
           calculationParams.itsTime = modifiedTimes.Time();
-          if (theMacroParamValue.fSetValue) calculationParams.itsTime = theMacroParamValue.itsTime;
+          if (theMacroParamValue.fSetValue)
+            calculationParams.itsTime = theMacroParamValue.itsTime;
           if (info->Time(
                   calculationParams.itsTime))  // asetetaan myös tämä, että saadaan oikea timeindex
           {
@@ -1024,10 +1049,12 @@ void NFmiSmartToolModifier::ModifyData2(
               theCalculationSection->GetCalculations()[i]->Calculate(calculationParams,
                                                                      theMacroParamValue);
 
-              if (theMacroParamValue.fSetValue) break;
+              if (theMacroParamValue.fSetValue)
+                break;
             }
           }
-          if (theMacroParamValue.fSetValue) break;
+          if (theMacroParamValue.fSetValue)
+            break;
         }
       }
     }
@@ -1046,7 +1073,8 @@ void NFmiSmartToolModifier::ModifyData2_ver2(
   {
     boost::shared_ptr<NFmiFastQueryInfo> info(
         dynamic_cast<NFmiFastQueryInfo *>(theCalculationSection->FirstVariableInfo()->Clone()));
-    if (info == 0) return;
+    if (info == 0)
+      return;
     try
     {
       info->LatLon();  // tämä on pyydettävä kerran multi-thread jutuissa, koska tämä rakentaa
@@ -1177,7 +1205,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreatePeekFunctionAreaMas
         theAreaMaskInfo.GetOffsetPoint1().Y(),
         NFmiAreaMask::kNoValue));
 
-  if (fUseLevelData) itsParethesisCounter++;
+  if (fUseLevelData)
+    itsParethesisCounter++;
 
   return areaMask;
 }
@@ -1366,7 +1395,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(
                                                        theAreaMaskInfo.GetDataType(),
                                                        areaMask2));
       }
-      if (fUseLevelData) itsParethesisCounter++;
+      if (fUseLevelData)
+        itsParethesisCounter++;
       break;
     }
     case NFmiAreaMask::FunctionAreaIntergration:
@@ -1415,7 +1445,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(
                                        theAreaMaskInfo.GetFunctionType(),
                                        startX,
                                        startY));
-      if (fUseLevelData) itsParethesisCounter++;
+      if (fUseLevelData)
+        itsParethesisCounter++;
       break;
     }
     case NFmiAreaMask::FunctionPeekXY:
@@ -1451,7 +1482,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(
     {
       areaMask = boost::shared_ptr<NFmiAreaMask>(
           new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator()));
-      if (fUseLevelData) itsParethesisCounter++;
+      if (fUseLevelData)
+        itsParethesisCounter++;
       break;
     }
     case NFmiAreaMask::EndParenthesis:
@@ -1480,7 +1512,7 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(
         {                            // kun pilkku-laskuri tuli täyteen
           fUseLevelData = true;      // on aika ruveta käyttämään level-dataa infoissa
           itsParethesisCounter = 1;  // lisäksi ruvetaan metsästämään sulkuja,
-                                     // että tiedetään milloin funktio ja level datan käyttö loppuu
+          // että tiedetään milloin funktio ja level datan käyttö loppuu
         }
       }
       break;
@@ -1501,7 +1533,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(
     {
       areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiCalculationSpecialCase());
       areaMask->SetMathFunctionType(theAreaMaskInfo.GetMathFunctionType());
-      if (fUseLevelData) itsParethesisCounter++;
+      if (fUseLevelData)
+        itsParethesisCounter++;
       break;
     }
     case NFmiAreaMask::ThreeArgumentFunctionStart:
@@ -1732,7 +1765,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateCalculatedAreaMask(
         theAreaMaskInfo.GetMaskCondition(),
         false));
 
-  if (areaMask) return areaMask;
+  if (areaMask)
+    return areaMask;
 
   throw runtime_error(::GetDictionaryString("SmartToolModifierErrorStrangeVariable"));
 }
@@ -1807,8 +1841,10 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateEndingAreaMask(void
 
 static bool IsBetweenValues(double value, double value1, double value2)
 {
-  if (value >= value1 && value <= value2) return true;
-  if (value >= value2 && value <= value1) return true;
+  if (value >= value1 && value <= value2)
+    return true;
+  if (value >= value2 && value <= value1)
+    return true;
   return false;
 }
 
@@ -1834,7 +1870,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
           tmpInfo->FirstLevel();
           if (tmpInfo->Level()->GetIdent() == kFmiHybridLevel)
           {  // lähdetään tässä siitä että jos löytyy mallipinta-dataa, mikä sopii tarkoitukseen, se
-             // valitaan ensisijaisesti
+            // valitaan ensisijaisesti
             info = tmpInfo;
             break;
           }
@@ -1859,8 +1895,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
     }
   }
   if (info == 0 && possiblePressureLevelDataInfo != 0)  // jos ei löytynyt sopivaa mallipinta-dataa,
-                                                        // mutta painepinta-dataa löytyi, otetaan se
-                                                        // käyttöön
+    // mutta painepinta-dataa löytyi, otetaan se
+    // käyttöön
     info = possiblePressureLevelDataInfo;
   if (info)
   {
@@ -1869,7 +1905,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
     {
       checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infos =
           itsInfoOrganizer->GetInfos(info->DataFilePattern());
-      if (infos.size()) info = infos[0];
+      if (infos.size())
+        info = infos[0];
     }
 
     info = ::CreateShallowCopyOfHighestInfo(info);
@@ -1895,8 +1932,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetInfoFromOrganizer
     NFmiStringTools::LowerCase(parName);
     if (parName == "z")
     {  // z-parametri on poikkeus (siis smarttool-kielen tekstinä annettu "z" -parametri), eli tätä
-       // yritetään hakea sekä kFmiGeomHeight:ista (id=3), joka on default, ja kFmiGeopHeight:ista
-       // (id=2)
+      // yritetään hakea sekä kFmiGeomHeight:ista (id=3), joka on default, ja kFmiGeopHeight:ista
+      // (id=2)
       NFmiParam secondaryParam(*theIdent.GetParam());
       secondaryParam.SetIdent(kFmiGeopHeight);
       NFmiDataIdent secondaryDataIdent(secondaryParam, *theIdent.GetProducer());
@@ -1928,7 +1965,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetWantedAreaMaskDat
     FmiLevelType theOverRideLevelType)
 {
   NFmiInfoData::Type usedDataType = theAreaMaskInfo.GetDataType();
-  if (theOverRideDataType != NFmiInfoData::kNoDataType) usedDataType = theOverRideDataType;
+  if (theOverRideDataType != NFmiInfoData::kNoDataType)
+    usedDataType = theOverRideDataType;
 
   boost::shared_ptr<NFmiFastQueryInfo> info;
   if (theOverRideLevelType == kFmiNoLevelType)
@@ -1978,7 +2016,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(
     else
     {
       info = GetWantedAreaMaskData(theAreaMaskInfo, true);
-      if (info && itsModifiedLevel) info->Level(*itsModifiedLevel);
+      if (info && itsModifiedLevel)
+        info->Level(*itsModifiedLevel);
     }
     if (info == 0)
       info = GetPossibleLevelInterpolatedInfo(theAreaMaskInfo, mustUsePressureInterpolation);
@@ -1993,7 +2032,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(
     if (fUseLevelData || fDoCrossSectionCalculation)  // jos leveldata-flagi päällä, yritetään
                                                       // ensin, löytyykö hybridi dataa
       info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kHybridData);
-    if (info == 0) info = GetWantedAreaMaskData(theAreaMaskInfo, false);
+    if (info == 0)
+      info = GetWantedAreaMaskData(theAreaMaskInfo, false);
     if (info == 0 &&
         theAreaMaskInfo.GetDataType() ==
             NFmiInfoData::kAnalyzeData)  // analyysi datalle piti tehdä pika viritys tähän
@@ -2093,7 +2133,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateScriptVariable
     {
       itsScriptVariableInfos.push_back(tmp2);
       tmp = GetScriptVariableInfo(theDataIdent);
-      if (tmp) return ::CreateShallowCopyOfHighestInfo(tmp);
+      if (tmp)
+        return ::CreateShallowCopyOfHighestInfo(tmp);
     }
   }
 
@@ -2109,11 +2150,15 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetScriptVariableInf
       std::find_if(itsScriptVariableInfos.begin(),
                    itsScriptVariableInfos.end(),
                    FindScriptVariable(theDataIdent.GetParamIdent()));
-  if (it != itsScriptVariableInfos.end()) return *it;
+  if (it != itsScriptVariableInfos.end())
+    return *it;
   return boost::shared_ptr<NFmiFastQueryInfo>();
 }
 
-void NFmiSmartToolModifier::ClearScriptVariableInfos(void) { itsScriptVariableInfos.clear(); }
+void NFmiSmartToolModifier::ClearScriptVariableInfos(void)
+{
+  itsScriptVariableInfos.clear();
+}
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateRealScriptVariableInfo(
     const NFmiDataIdent &theDataIdent)
 {
@@ -2159,5 +2204,8 @@ void NFmiSmartToolModifier::ModifiedLevel(boost::shared_ptr<NFmiLevel> &theLevel
 
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
 
-void NFmiSmartToolModifier::SetGeneralDoc(NFmiEditMapGeneralDataDoc *theDoc) { itsDoc = theDoc; }
+void NFmiSmartToolModifier::SetGeneralDoc(NFmiEditMapGeneralDataDoc *theDoc)
+{
+  itsDoc = theDoc;
+}
 #endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
