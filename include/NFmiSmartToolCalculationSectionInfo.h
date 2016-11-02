@@ -5,12 +5,12 @@
 //  Author         : pietarin 
 //  Creation Date  : 8.11. 2010 
 // 
-// Sis‰lt‰‰ joukon smarttool laskuja, jotka kuuluvat yhteen blokkiin. Esim.
+// Sis√§lt√§√§ joukon smarttool laskuja, jotka kuuluvat yhteen blokkiin. Esim.
 // 
 // T = T +1
 // P = P * 0.99
 // 
-// Yksi rivi on aina yksi lasku ja laskussa pit‰‰ olla sijoitus johonkin parametriin (=).
+// Yksi rivi on aina yksi lasku ja laskussa pit√§√§ olla sijoitus johonkin parametriin (=).
 //**********************************************************
 
 #include <NFmiDataMatrix.h>

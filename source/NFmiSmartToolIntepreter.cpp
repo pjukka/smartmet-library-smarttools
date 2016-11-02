@@ -6,7 +6,7 @@
 //
 //**********************************************************
 #ifdef _MSC_VER
-#pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
+#pragma warning(disable : 4786) // poistaa n kpl VC++ k√§√§nt√§j√§n varoitusta
 #endif
 
 #include "NFmiSmartToolIntepreter.h"
@@ -35,18 +35,18 @@ static const unsigned int gMesanProdId = 160;
 
 using namespace std;
 
-// globaali tarkistus luokka etsim‰‰n rivin lopetusta
+// globaali tarkistus luokka etsim√§√§n rivin lopetusta
 struct EndOfLineSearcher
 {
 	template<typename T>
 	bool operator()(T theChar)
-	{ // tarkistetaan myˆs blokin loppu merkki '}' koska blokki-koodi voi olla seuraavanlaista "{T = T + 1}" eli blokin loppu merkki samalla rivill‰
+	{ // tarkistetaan my√∂s blokin loppu merkki '}' koska blokki-koodi voi olla seuraavanlaista "{T = T + 1}" eli blokin loppu merkki samalla rivill√§
 	  return(theChar == '\r' || theChar == '\n' || theChar == '}');
 	}
 
 };
 
-//HUOM!!! vaarallinen luokka, pit‰‰ muistaa kutsua Clearia, muuten vuotaa!!!
+//HUOM!!! vaarallinen luokka, pit√§√§ muistaa kutsua Clearia, muuten vuotaa!!!
 NFmiSmartToolCalculationBlockInfoVector::NFmiSmartToolCalculationBlockInfoVector(void)
 :itsCalculationBlockInfos()
 {
@@ -61,7 +61,7 @@ void NFmiSmartToolCalculationBlockInfoVector::Clear(void)
 	itsCalculationBlockInfos.clear();
 }
 
-// Ottaa pointterin 'omistukseensa' eli pit‰‰ luoda ulkona new:ll‰ ja antaa t‰nne
+// Ottaa pointterin 'omistukseensa' eli pit√§√§ luoda ulkona new:ll√§ ja antaa t√§nne
 void NFmiSmartToolCalculationBlockInfoVector::Add(boost::shared_ptr<NFmiSmartToolCalculationBlockInfo> &theBlockInfo)
 {
 	itsCalculationBlockInfos.push_back(theBlockInfo);
@@ -77,7 +77,7 @@ void NFmiSmartToolCalculationBlockInfoVector::AddModifiedParams(std::set<int> &t
 	}
 }
 
-//HUOM!!! vaarallinen luokka, pit‰‰ muistaa kutsua Clearia, muuten vuotaa!!!
+//HUOM!!! vaarallinen luokka, pit√§√§ muistaa kutsua Clearia, muuten vuotaa!!!
 NFmiSmartToolCalculationBlockInfo::NFmiSmartToolCalculationBlockInfo(void)
 :itsFirstCalculationSectionInfo(new NFmiSmartToolCalculationSectionInfo)
 ,itsIfAreaMaskSectionInfo(new NFmiAreaMaskSectionInfo)
@@ -104,7 +104,7 @@ void NFmiSmartToolCalculationBlockInfo::Clear(void)
 	fElseSectionExist = false;
 }
 
-// Lis‰t‰‰n set:iin kaikki parametrit, joita t‰ss‰ calculationblokissa
+// Lis√§t√§√§n set:iin kaikki parametrit, joita t√§ss√§ calculationblokissa
 // voidaan muokata. Talteen otetaan vain identti, koska muu ei
 // kiinnosta (ainakaan nyt).
 void NFmiSmartToolCalculationBlockInfo::AddModifiedParams(std::set<int> &theModifiedParams)
@@ -171,21 +171,21 @@ NFmiSmartToolIntepreter::~NFmiSmartToolIntepreter(void)
 // Interpret
 //--------------------------------------------------------
 // Tulkitsee annetun macro-tekstin. Erottelee eri calculationSectionit, mahdolliset ehto rakenteet ja niiden maskit ja rakentaa sen
-// mukaiset maski ja calculation infot, ett‰ SmartToolModifier osaa rakentaa oikeat systeemit (areamaskit ja lasku-oliot).
-// Jos macrossa virhe, heitt‰‰ poikkeuksen.
+// mukaiset maski ja calculation infot, ett√§ SmartToolModifier osaa rakentaa oikeat systeemit (areamaskit ja lasku-oliot).
+// Jos macrossa virhe, heitt√§√§ poikkeuksen.
 // fThisIsMacroParamSkript -parametrin avulla voidaan tarkistaa, ettei ajeta tavallista sijoitusta macroParamin
-// RESULT = ... sijoitusten sijaan. Tulkin pit‰‰ olla tietoinen 'moodista' ett‰ voi heitt‰‰ poikkeuksen
-// huomatessaan t‰ll‰isen tilanteen.
+// RESULT = ... sijoitusten sijaan. Tulkin pit√§√§ olla tietoinen 'moodista' ett√§ voi heitt√§√§ poikkeuksen
+// huomatessaan t√§ll√§isen tilanteen.
 void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText, bool fThisIsMacroParamSkript)
 {
 	fMacroParamSkriptInProgress = fThisIsMacroParamSkript;
 	Clear();
 	itsTokenScriptVariableNames.clear(); // tyhjennetaan aluksi kaikki skripti muuttujat
-	itsScriptVariableParamIdCounter = 1000000; // alustetaan isoksi, ettei mene p‰‰llekk‰in todellisten param id::::ien kanssa
+	itsScriptVariableParamIdCounter = 1000000; // alustetaan isoksi, ettei mene p√§√§llekk√§in todellisten param id::::ien kanssa
 	SetMacroTexts(theMacroText);
 	InitCheckOut();
 
-	// nollataan tulkinnan aluksi, mink‰ tyyppisi‰ parametri sijoituksia sijoituksia lˆytyy
+	// nollataan tulkinnan aluksi, mink√§ tyyppisi√§ parametri sijoituksia sijoituksia l√∂ytyy
 	fNormalAssigmentFound = false;
 	fMacroParamFound = false;
 
@@ -201,7 +201,7 @@ void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText, bool fT
 				throw runtime_error(::GetDictionaryString("SmartToolErrorTooManyBlocks"));
 			fGoOn = CheckoutPossibleNextCalculationBlock(block, true);
 			itsSmartToolCalculationBlocks.push_back(block);
-			if(itsCheckOutTextStartPosition != itsStrippedMacroText.end() && *itsCheckOutTextStartPosition == '}') // jos ollaan blokin loppu merkiss‰, siirryt‰‰n sen yli ja jatketaan seuraavalle kierrokselle
+			if(itsCheckOutTextStartPosition != itsStrippedMacroText.end() && *itsCheckOutTextStartPosition == '}') // jos ollaan blokin loppu merkiss√§, siirryt√§√§n sen yli ja jatketaan seuraavalle kierrokselle
 				++itsCheckOutTextStartPosition;
 		}
 		catch(...)
@@ -212,9 +212,9 @@ void NFmiSmartToolIntepreter::Interpret(const std::string &theMacroText, bool fT
 }
 
 // kun joku skripti on tulkittu Interpret-metodissa, on tuotettu
-// laskenta-lausekkeet itsSmartToolCalculationBlocks, joista t‰m‰
-// metodi k‰y katsomassa, mit‰ parametreja ollaan mahd. muokkaamassa
-// eli T = ? jne. tarkoittaa ett‰ l‰mpˆtilaa ollaan ainakin
+// laskenta-lausekkeet itsSmartToolCalculationBlocks, joista t√§m√§
+// metodi k√§y katsomassa, mit√§ parametreja ollaan mahd. muokkaamassa
+// eli T = ? jne. tarkoittaa ett√§ l√§mp√∂tilaa ollaan ainakin
 // mahdollisesti muokkaamassa.
 NFmiParamBag NFmiSmartToolIntepreter::ModifiedParams(void)
 {
@@ -249,10 +249,10 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlockVector(boost::
 			if(safetyIndex > 500)
 				throw runtime_error(::GetDictionaryString("SmartToolErrorTooManyBlocks"));
 
-			if(itsCheckOutTextStartPosition != itsStrippedMacroText.end() && *itsCheckOutTextStartPosition == '}') // jos ollaan loppu merkiss‰, siirryt‰‰n sen yli ja jatketaan seuraavalle kierrokselle
+			if(itsCheckOutTextStartPosition != itsStrippedMacroText.end() && *itsCheckOutTextStartPosition == '}') // jos ollaan loppu merkiss√§, siirryt√§√§n sen yli ja jatketaan seuraavalle kierrokselle
 			{
 				++itsCheckOutTextStartPosition;
-				break; // lopetetaan blokki vektorin luku t‰h‰n kun loppu merkki tuli vastaan
+				break; // lopetetaan blokki vektorin luku t√§h√§n kun loppu merkki tuli vastaan
 			}
 			block = boost::shared_ptr<NFmiSmartToolCalculationBlockInfo>(new NFmiSmartToolCalculationBlockInfo());
 		}
@@ -264,18 +264,18 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlockVector(boost::
 	return !theBlockVector->Empty();
 }
 
-// paluu arvo tarkoittaa, jatketaanko tekstin l‰pik‰ymist‰ viel‰, vai ollaanko tultu jo loppuun.
+// paluu arvo tarkoittaa, jatketaanko tekstin l√§pik√§ymist√§ viel√§, vai ollaanko tultu jo loppuun.
 bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlockInfo &theBlock, bool fFirstLevelCheckout, int theBlockIndex)
 {
 	bool fWasBlockMarksFound = false;
 	CheckoutPossibleNextCalculationSection(theBlock.itsFirstCalculationSectionInfo, fWasBlockMarksFound);
-	if(fFirstLevelCheckout || (fWasBlockMarksFound && theBlockIndex == 0) || theBlockIndex > 0) // vain 1. tason kyselyss‰ jatketaan tai jos blokki merkit lˆytyiv‰t {}
-		// eli IF()-lauseen j‰lkeen pit‰‰ olla {}-blokki muuten ei oteta kuin 1. calc-sektio kun ollaan extraktoimassa if, else if tai else -blokkia
-		// tai jos useita blokkeja if-lauseen sis‰ll‰, jatketaan myˆs
+	if(fFirstLevelCheckout || (fWasBlockMarksFound && theBlockIndex == 0) || theBlockIndex > 0) // vain 1. tason kyselyss√§ jatketaan tai jos blokki merkit l√∂ytyiv√§t {}
+		// eli IF()-lauseen j√§lkeen pit√§√§ olla {}-blokki muuten ei oteta kuin 1. calc-sektio kun ollaan extraktoimassa if, else if tai else -blokkia
+		// tai jos useita blokkeja if-lauseen sis√§ll√§, jatketaan my√∂s
 	{
 		if(CheckoutPossibleIfClauseSection(theBlock.itsIfAreaMaskSectionInfo))
 		{
-			// blokit voidaan luoda  vasta t‰‰ll‰ eik‰ konstruktorissa, koska muuten konstruktori joutuisi iki-looppiin
+			// blokit voidaan luoda  vasta t√§√§ll√§ eik√§ konstruktorissa, koska muuten konstruktori joutuisi iki-looppiin
 			theBlock.itsIfCalculationBlockInfos = boost::shared_ptr<NFmiSmartToolCalculationBlockInfoVector>(new NFmiSmartToolCalculationBlockInfoVector());
 			CheckoutPossibleNextCalculationBlockVector(theBlock.itsIfCalculationBlockInfos);
 			if(CheckoutPossibleElseIfClauseSection(theBlock.itsElseIfAreaMaskSectionInfo))
@@ -289,7 +289,7 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleNextCalculationBlock(NFmiSmartTool
 				CheckoutPossibleNextCalculationBlockVector(theBlock.itsElseCalculationBlockInfos);
 			}
 		}
-		if(!fWasBlockMarksFound) // jos 1. checkoutiss ei tˆrm‰tty blokin alkumerkkiin '{' voidaan kokeilla lˆytyykˆ t‰st‰ lasku-sektiota
+		if(!fWasBlockMarksFound) // jos 1. checkoutiss ei t√∂rm√§tty blokin alkumerkkiin '{' voidaan kokeilla l√∂ytyyk√∂ t√§st√§ lasku-sektiota
 		CheckoutPossibleNextCalculationSection(theBlock.itsLastCalculationSectionInfo, fWasBlockMarksFound);
 	}
 	if(itsCheckOutTextStartPosition == itsStrippedMacroText.end())
@@ -301,7 +301,7 @@ void NFmiSmartToolIntepreter::InitCheckOut(void)
 {
 	itsCheckOutSectionText = "";
 	itsCheckOutTextStartPosition = itsStrippedMacroText.begin();
-	itsCheckOutTextEndPosition = itsStrippedMacroText.begin(); // t‰ll‰ ei viel‰ v‰li‰
+	itsCheckOutTextEndPosition = itsStrippedMacroText.begin(); // t√§ll√§ ei viel√§ v√§li√§
 	fContinueCurrentSectionCheckOut = true;
 }
 
@@ -320,12 +320,12 @@ static std::string::iterator EatWhiteSpaces(std::string::iterator & it,
 	return it;
 }
 
-// Irroitetaan mahdollisia laskuoperaatio rivej‰ tulkkausta varten.
-// laskun pit‰‰ olla yhdell‰ rivill‰ ja ne ovat muotoa:
+// Irroitetaan mahdollisia laskuoperaatio rivej√§ tulkkausta varten.
+// laskun pit√§√§ olla yhdell√§ rivill√§ ja ne ovat muotoa:
 // T = T + 1
-// Eli pit‰‰ olla joku sijoitus johonkin parametriin.
-// Palauttaa true jos lˆytyi jotai lasku-operaatioita.
-// P‰ivitt‰‰ myˆs luokan sis‰isi‰ iteraattoreita macro-tekstiin.
+// Eli pit√§√§ olla joku sijoitus johonkin parametriin.
+// Palauttaa true jos l√∂ytyi jotai lasku-operaatioita.
+// P√§ivitt√§√§ my√∂s luokan sis√§isi√§ iteraattoreita macro-tekstiin.
 bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBlockMarksFound)
 {
 	fWasBlockMarksFound = false;
@@ -334,7 +334,7 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 	std::string::iterator eolPos = itsCheckOutTextStartPosition;
 	eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
 	itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
-	if(eolPos != itsStrippedMacroText.end() && *eolPos == '{') // jos blokin alkumerkki lˆytyi, haetaan sen loppua
+	if(eolPos != itsStrippedMacroText.end() && *eolPos == '{') // jos blokin alkumerkki l√∂ytyi, haetaan sen loppua
 	{
 		eolPos = std::find(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), '}');
 		if(eolPos == itsStrippedMacroText.end())
@@ -342,7 +342,7 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 		else
 		{
 			fWasBlockMarksFound = true;
-			++itsCheckOutTextStartPosition; // hyp‰t‰‰n alkumerkin ohi
+			++itsCheckOutTextStartPosition; // hyp√§t√§√§n alkumerkin ohi
 			eolPos = itsCheckOutTextStartPosition;
 		}
 	}
@@ -351,12 +351,12 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 		do
 		{
 			eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
-			// en ole varma viel‰ n‰ist‰ iteraattoreista, mitk‰ ovat tarpeellisisa ja mitk‰ turhia.
+			// en ole varma viel√§ n√§ist√§ iteraattoreista, mitk√§ ovat tarpeellisisa ja mitk√§ turhia.
 			itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
 			itsCheckOutSectionText += nextLine;
-			if(eolPos != itsStrippedMacroText.end() && (*eolPos == '{' || *eolPos == '}')) // jos seuraavan blokin alkumerkki tai loppumerkki lˆytyi, lopetetaan t‰m‰ blokki t‰h‰n
+			if(eolPos != itsStrippedMacroText.end() && (*eolPos == '{' || *eolPos == '}')) // jos seuraavan blokin alkumerkki tai loppumerkki l√∂ytyi, lopetetaan t√§m√§ blokki t√§h√§n
 			{
-				if(*eolPos == '{') // jos lˆytyy alkumerkki, ilmoitetaan siit‰ ulos t‰‰lt‰
+				if(*eolPos == '{') // jos l√∂ytyy alkumerkki, ilmoitetaan siit√§ ulos t√§√§lt√§
 					fWasBlockMarksFound = true;
 				if(itsCheckOutSectionText.empty())
 					return false;
@@ -379,7 +379,7 @@ bool NFmiSmartToolIntepreter::ExtractPossibleNextCalculationSection(bool &fWasBl
 
 // aluksi yksinkertainen laskurivi tarkistus:
 // 1. Ei saa olla ehto-lause sanoja (IF,ELSEIF jne.).
-// 2. Pit‰‰ olla sijoitus-operaatio eli '='
+// 2. Pit√§√§ olla sijoitus-operaatio eli '='
 bool NFmiSmartToolIntepreter::IsPossibleCalculationLine(const std::string &theTextLine)
 {
 	if(FindAnyFromText(theTextLine, itsTokenConditionalCommands))
@@ -393,9 +393,9 @@ bool NFmiSmartToolIntepreter::IsPossibleCalculationLine(const std::string &theTe
 }
 
 // Yksinkertainen IF(mask) -rivin tarkistus:
-// 1. aluksi pit‰‰ olla IF
+// 1. aluksi pit√§√§ olla IF
 // 2. ei saa olla ELSE/ELSEIF sanoja
-// 3. Pit‰‰ olla ensin '('- ja sitten ')' -merkit
+// 3. Pit√§√§ olla ensin '('- ja sitten ')' -merkit
 bool NFmiSmartToolIntepreter::IsPossibleIfConditionLine(const std::string &theTextLine)
 {
 	if(!FindAnyFromText(theTextLine, itsTokenIfCommands))
@@ -410,9 +410,9 @@ bool NFmiSmartToolIntepreter::IsPossibleIfConditionLine(const std::string &theTe
 }
 
 // Yksinkertainen ELSEIF(mask) -rivin tarkistus:
-// 1. aluksi pit‰‰ olla ELSEIF
+// 1. aluksi pit√§√§ olla ELSEIF
 // 2. ei saa olla IF/ELSE sanoja
-// 3. Pit‰‰ olla ensin '('- ja sitten ')' -merkit
+// 3. Pit√§√§ olla ensin '('- ja sitten ')' -merkit
 bool NFmiSmartToolIntepreter::IsPossibleElseIfConditionLine(const std::string &theTextLine)
 {
 	if(!FindAnyFromText(theTextLine, itsTokenElseIfCommands))
@@ -431,7 +431,7 @@ bool NFmiSmartToolIntepreter::IsPossibleElseConditionLine(const std::string &the
 	sstream >> tmp;
 	if(!FindAnyFromText(tmp, itsTokenElseCommands))
 			return false;
-	tmp = ""; // nollataan t‰m‰, koska MSVC++7.1 ei sijoita jostain syyst‰ mit‰‰n kun ollaan tultu loppuun (muilla k‰‰nt‰jill‰ on sijoitettu tyhj‰ tmp-stringiin)
+	tmp = ""; // nollataan t√§m√§, koska MSVC++7.1 ei sijoita jostain syyst√§ mit√§√§n kun ollaan tultu loppuun (muilla k√§√§nt√§jill√§ on sijoitettu tyhj√§ tmp-stringiin)
 	sstream >> tmp;
 	if(tmp.empty())
 		return true;
@@ -446,7 +446,7 @@ static bool IsWordContinuing(char ch)
 	return false;
 }
 
-// Pit‰‰ olla kokonainen sana eli juuri ennen sanaa ei saa olla kirjaimia,numeroita tai _-merkki‰, eik‰ heti sen j‰lkeenk‰‰n.
+// Pit√§√§ olla kokonainen sana eli juuri ennen sanaa ei saa olla kirjaimia,numeroita tai _-merkki√§, eik√§ heti sen j√§lkeenk√§√§n.
 bool NFmiSmartToolIntepreter::FindAnyFromText(const std::string &theText, const checkedVector<std::string>& theSearchedItems)
 {
 	int size = static_cast<int>(theSearchedItems.size());
@@ -473,7 +473,7 @@ bool NFmiSmartToolIntepreter::FindAnyFromText(const std::string &theText, const 
 	return false;
 }
 
-// palauttaa true, jos if-lause lˆytyi
+// palauttaa true, jos if-lause l√∂ytyi
 bool NFmiSmartToolIntepreter::CheckoutPossibleIfClauseSection(boost::shared_ptr<NFmiAreaMaskSectionInfo> &theAreaMaskSectionInfo)
 {
 	if(ExtractPossibleIfClauseSection())
@@ -482,8 +482,8 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleIfClauseSection(boost::shared_ptr<
 }
 
 
-// IF-lause koostuu sanasta IF ja suluista, jotka sulkevat v‰hint‰‰n yhden mahd. useita ehtoja
-// joita yhdistet‰‰n erilaisilla bin‰‰ri operaatioilla. Koko jutun pit‰‰ olla yhdell‰ rivill‰.
+// IF-lause koostuu sanasta IF ja suluista, jotka sulkevat v√§hint√§√§n yhden mahd. useita ehtoja
+// joita yhdistet√§√§n erilaisilla bin√§√§ri operaatioilla. Koko jutun pit√§√§ olla yhdell√§ rivill√§.
 // Esim:
 // IF(T<1)
 // IF(T<1 && P>1012)
@@ -493,13 +493,13 @@ bool NFmiSmartToolIntepreter::ExtractPossibleIfClauseSection(void)
 	itsCheckOutSectionText = "";
 	std::string::iterator eolPos = itsCheckOutTextStartPosition;
 	eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
-	// en ole varma viel‰ n‰ist‰ iteraattoreista, mitk‰ ovat tarpeellisisa ja mitk‰ turhia.
+	// en ole varma viel√§ n√§ist√§ iteraattoreista, mitk√§ ovat tarpeellisisa ja mitk√§ turhia.
 	itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
 
 	// HUOM!!! NT4 ja W2000 ero:
-	// Dialogista tulevasta stringiss‰ rivin vaihto on W2000:ssa 13 (=CR) ja NT4:ssa 10 (=LF)
-	// Pit‰‰ Testata molemmat tapaukset!!!!!!
-	eolPos = std::find_if(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), EndOfLineSearcher()); // W2000:ssa etsit‰‰n CR:‰‰
+	// Dialogista tulevasta stringiss√§ rivin vaihto on W2000:ssa 13 (=CR) ja NT4:ssa 10 (=LF)
+	// Pit√§√§ Testata molemmat tapaukset!!!!!!
+	eolPos = std::find_if(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), EndOfLineSearcher()); // W2000:ssa etsit√§√§n CR:√§√§
 	string nextLine = string(itsCheckOutTextStartPosition, eolPos);
 	if(IsPossibleIfConditionLine(nextLine))
 	{
@@ -510,8 +510,8 @@ bool NFmiSmartToolIntepreter::ExtractPossibleIfClauseSection(void)
 	return false;
 }
 
-// En ymm‰rr‰ miten t‰m‰n saa toimimaan, miten saa k‰ytetty‰ mem_fun-adapteria.
-// VC:ssa n‰ytt‰‰ olevan taas oma systeemi ja nyt mem_fun ei toimi
+// En ymm√§rr√§ miten t√§m√§n saa toimimaan, miten saa k√§ytetty√§ mem_fun-adapteria.
+// VC:ssa n√§ytt√§√§ olevan taas oma systeemi ja nyt mem_fun ei toimi
 // standardin mukaisesti. En saa kutsua toimiaan.
 template<typename memfunction>
 bool NFmiSmartToolIntepreter::ExtractPossibleConditionalClauseSection(memfunction conditionalChecker)
@@ -519,13 +519,13 @@ bool NFmiSmartToolIntepreter::ExtractPossibleConditionalClauseSection(memfunctio
 	itsCheckOutSectionText = "";
 	std::string::iterator eolPos = itsCheckOutTextStartPosition;
 	eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
-	// en ole varma viel‰ n‰ist‰ iteraattoreista, mitk‰ ovat tarpeellisisa ja mitk‰ turhia.
+	// en ole varma viel√§ n√§ist√§ iteraattoreista, mitk√§ ovat tarpeellisisa ja mitk√§ turhia.
 	itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
 
 	// HUOM!!! NT4 ja W2000 ero:
-	// Dialogista tulevasta stringiss‰ rivin vaihto on W2000:ssa 13 (=CR) ja NT4:ssa 10 (=LF)
-	// Pit‰‰ Testata molemmat tapaukset!!!!!!
-	eolPos = std::find_if(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), EndOfLineSearcher()); // W2000:ssa etsit‰‰n CR:‰‰
+	// Dialogista tulevasta stringiss√§ rivin vaihto on W2000:ssa 13 (=CR) ja NT4:ssa 10 (=LF)
+	// Pit√§√§ Testata molemmat tapaukset!!!!!!
+	eolPos = std::find_if(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), EndOfLineSearcher()); // W2000:ssa etsit√§√§n CR:√§√§
 	string nextLine = string(itsCheckOutTextStartPosition, eolPos);
 	if(conditionalChecker(nextLine))
 	{
@@ -536,10 +536,10 @@ bool NFmiSmartToolIntepreter::ExtractPossibleConditionalClauseSection(memfunctio
 	return false;
 }
 
-// En saanut toimimaan mem_fun adapteri-systeemi‰, joten joudun kopioimaan koodia
-// ExtractPossibleIfClauseSection-metodista. Olisin halunnut k‰ytt‰‰ yleist‰
+// En saanut toimimaan mem_fun adapteri-systeemi√§, joten joudun kopioimaan koodia
+// ExtractPossibleIfClauseSection-metodista. Olisin halunnut k√§ytt√§√§ yleist√§
 // funktiota, jolle annetaan parametrina yksi erottava metodi.
-// palauttaa true, jos ifelse-lause lˆytyi
+// palauttaa true, jos ifelse-lause l√∂ytyi
 bool NFmiSmartToolIntepreter::CheckoutPossibleElseIfClauseSection(boost::shared_ptr<NFmiAreaMaskSectionInfo> &theAreaMaskSectionInfo)
 {
 	if(ExtractPossibleElseIfClauseSection())
@@ -552,13 +552,13 @@ bool NFmiSmartToolIntepreter::ExtractPossibleElseIfClauseSection(void)
 	itsCheckOutSectionText = "";
 	std::string::iterator eolPos = itsCheckOutTextStartPosition;
 	eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
-	// en ole varma viel‰ n‰ist‰ iteraattoreista, mitk‰ ovat tarpeellisisa ja mitk‰ turhia.
+	// en ole varma viel√§ n√§ist√§ iteraattoreista, mitk√§ ovat tarpeellisisa ja mitk√§ turhia.
 	itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
 
 	// HUOM!!! NT4 ja W2000 ero:
-	// Dialogista tulevasta stringiss‰ rivin vaihto on W2000:ssa 13 (=CR) ja NT4:ssa 10 (=LF)
-	// Pit‰‰ Testata molemmat tapaukset!!!!!!
-	eolPos = std::find_if(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), EndOfLineSearcher()); // W2000:ssa etsit‰‰n CR:‰‰
+	// Dialogista tulevasta stringiss√§ rivin vaihto on W2000:ssa 13 (=CR) ja NT4:ssa 10 (=LF)
+	// Pit√§√§ Testata molemmat tapaukset!!!!!!
+	eolPos = std::find_if(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), EndOfLineSearcher()); // W2000:ssa etsit√§√§n CR:√§√§
 	string nextLine = string(itsCheckOutTextStartPosition, eolPos);
 	if(IsPossibleElseIfConditionLine(nextLine))
 	{
@@ -574,13 +574,13 @@ bool NFmiSmartToolIntepreter::CheckoutPossibleElseClauseSection(void)
 	itsCheckOutSectionText = "";
 	std::string::iterator eolPos = itsCheckOutTextStartPosition;
 	eolPos = EatWhiteSpaces(eolPos, itsStrippedMacroText.end());
-	// en ole varma viel‰ n‰ist‰ iteraattoreista, mitk‰ ovat tarpeellisisa ja mitk‰ turhia.
+	// en ole varma viel√§ n√§ist√§ iteraattoreista, mitk√§ ovat tarpeellisisa ja mitk√§ turhia.
 	itsCheckOutTextStartPosition = itsCheckOutTextEndPosition = eolPos;
 
 	// HUOM!!! NT4 ja W2000 ero:
-	// Dialogista tulevasta stringiss‰ rivin vaihto on W2000:ssa 13 (=CR) ja NT4:ssa 10 (=LF)
-	// Pit‰‰ Testata molemmat tapaukset!!!!!!
-	eolPos = std::find_if(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), EndOfLineSearcher()); // W2000:ssa etsit‰‰n CR:‰‰
+	// Dialogista tulevasta stringiss√§ rivin vaihto on W2000:ssa 13 (=CR) ja NT4:ssa 10 (=LF)
+	// Pit√§√§ Testata molemmat tapaukset!!!!!!
+	eolPos = std::find_if(itsCheckOutTextStartPosition, itsStrippedMacroText.end(), EndOfLineSearcher()); // W2000:ssa etsit√§√§n CR:√§√§
 	string nextLine = string(itsCheckOutTextStartPosition, eolPos);
 	if(IsPossibleElseConditionLine(nextLine))
 	{
@@ -616,7 +616,7 @@ void NFmiSmartToolIntepreter::SetMacroTexts(const std::string &theMacroText)
 //--------------------------------------------------------
 // InterpretMaskSection
 //--------------------------------------------------------
-// Koko Section on yhdell‰ rivill‰!!!
+// Koko Section on yhdell√§ rivill√§!!!
 // Esim:
 // IF(T<1)
 // IF(T<1 && P>1012)
@@ -629,21 +629,21 @@ bool NFmiSmartToolIntepreter::InterpretMaskSection(const std::string &theMaskSec
 	exp_end = maskText.end();
 
 	string tmp;
-	if(GetToken()) // luetaan komento t‰h‰n esim. if, else jne
+	if(GetToken()) // luetaan komento t√§h√§n esim. if, else jne
 	{
 		tmp = token;
 		if(FindAnyFromText(tmp, itsTokenConditionalCommands))
 		{
-			if(GetToken()) // luetaan komento t‰h‰n esim. if, else jne
+			if(GetToken()) // luetaan komento t√§h√§n esim. if, else jne
 			{
 				tmp = token;
-				if(tmp == "(") // pit‰‰ lˆyty‰ alku sulku
+				if(tmp == "(") // pit√§√§ l√∂yty√§ alku sulku
 				{
 					string::size_type startPos = exp_ptr - maskText.begin();
 					string::size_type endPos = maskText.rfind(string(")"));
 					string::iterator it1 = maskText.begin() + startPos;
 					string::iterator it2 = maskText.begin() + endPos;
-					if(endPos != string::npos) // pit‰‰ lˆyty‰ lopetus sulku
+					if(endPos != string::npos) // pit√§√§ l√∂yty√§ lopetus sulku
 					{
 						string finalText(it1, it2);
 						return InterpretMasks(finalText, theAreaMaskSectionInfo);
@@ -655,11 +655,11 @@ bool NFmiSmartToolIntepreter::InterpretMaskSection(const std::string &theMaskSec
 	throw runtime_error(::GetDictionaryString("SmartToolErrorIllegalConditional") + ":\n" + maskText);
 }
 
-// t‰ss‰ on en‰‰ ehtolauseen sulkujen sis‰lt‰v‰ oleva teksti esim.
+// t√§ss√§ on en√§√§ ehtolauseen sulkujen sis√§lt√§v√§ oleva teksti esim.
 // T<1
 // T<1 && P>1012
 // T<1 && P>1012 || RH>=95
-// HUOM!!!! T‰m‰ vuotaa exceptionin yhteydess‰, pino ei tuhoa AreaMaskInfoja!!!!! (korjaa)
+// HUOM!!!! T√§m√§ vuotaa exceptionin yhteydess√§, pino ei tuhoa AreaMaskInfoja!!!!! (korjaa)
 bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, boost::shared_ptr<NFmiAreaMaskSectionInfo> &theAreaMaskSectionInfo)
 {
 	string maskText(theMaskSectionText);
@@ -669,13 +669,13 @@ bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, bo
 	string tmp;
 	for(; GetToken(); )
 	{
-		tmp = token; // luetaan muuttuja/vakio/funktio tai mik‰ lie
+		tmp = token; // luetaan muuttuja/vakio/funktio tai mik√§ lie
 		boost::shared_ptr<NFmiAreaMaskInfo> maskInfo(new NFmiAreaMaskInfo(theMaskSectionText));
 		InterpretToken(tmp, maskInfo);
 		theAreaMaskSectionInfo->Add(maskInfo);
 	}
 
-	// minimiss‰‰n erilaisia lasku elementtej‰ pit‰‰ olla vahint‰in 3 (esim. T > 15)
+	// minimiss√§√§n erilaisia lasku elementtej√§ pit√§√§ olla vahint√§in 3 (esim. T > 15)
 	if(theAreaMaskSectionInfo->GetAreaMaskInfoVector().size() >= 3)
 		return true;
 	throw runtime_error(::GetDictionaryString("SmartToolErrorConditionalWasNotComplete") + ":\n" + theMaskSectionText);
@@ -684,10 +684,10 @@ bool NFmiSmartToolIntepreter::InterpretMasks(std::string &theMaskSectionText, bo
 //--------------------------------------------------------
 // InterpretCalculationSection
 //--------------------------------------------------------
-// Jokainen rivi tekstiss‰ on mahdollinen laskuoperaatio esim.
+// Jokainen rivi tekstiss√§ on mahdollinen laskuoperaatio esim.
 // T = T + 1
-// Jokaiselta rivilt‰ pit‰‰ siis lˆty‰ muuttuja johon sijoitetaan ja jotain laskuja
-// palauttaa true, jos lˆytyi laskuja ja false jos ei.
+// Jokaiselta rivilt√§ pit√§√§ siis l√∂ty√§ muuttuja johon sijoitetaan ja jotain laskuja
+// palauttaa true, jos l√∂ytyi laskuja ja false jos ei.
 bool NFmiSmartToolIntepreter::InterpretCalculationSection(std::string &theCalculationSectiontext, boost::shared_ptr<NFmiSmartToolCalculationSectionInfo> &theSectionInfo)
 {
 	std::string::iterator pos = theCalculationSectiontext.begin();
@@ -724,9 +724,9 @@ std::string NFmiSmartToolIntepreter::ExtractNextLine(std::string &theText, std::
 	return str;
 }
 
-// Riviss‰ on mahdollinen laskuoperaatio esim.
+// Riviss√§ on mahdollinen laskuoperaatio esim.
 // T = T + 1
-// Rivilt‰ pit‰‰ siis lˆty‰ muuttuja johon sijoitetaan ja jotain laskuja
+// Rivilt√§ pit√§√§ siis l√∂ty√§ muuttuja johon sijoitetaan ja jotain laskuja
 boost::shared_ptr<NFmiSmartToolCalculationInfo> NFmiSmartToolIntepreter::InterpretCalculationLine(const std::string &theCalculationLineText)
 {
 	string calculationLineText(theCalculationLineText);
@@ -748,7 +748,7 @@ boost::shared_ptr<NFmiSmartToolCalculationInfo> NFmiSmartToolIntepreter::Interpr
 			fNewScriptVariable = true;
 		}
 		boost::shared_ptr<NFmiAreaMaskInfo> assignedVariable(new NFmiAreaMaskInfo(calculationLineText));
-		InterpretVariable(tmp, assignedVariable, fNewScriptVariable);  // ei saa antaa auto_ptr-otust‰ t‰ss‰, muuten se menett‰‰ omistuksen!
+		InterpretVariable(tmp, assignedVariable, fNewScriptVariable);  // ei saa antaa auto_ptr-otust√§ t√§ss√§, muuten se menett√§√§ omistuksen!
 		NFmiInfoData::Type dType = assignedVariable->GetDataType();
 		if(!(dType == NFmiInfoData::kEditable || dType == NFmiInfoData::kScriptVariableData || dType == NFmiInfoData::kAnyData || dType == NFmiInfoData::kMacroParam))
 			throw runtime_error(::GetDictionaryString("SmartToolErrorAssignmentError") + ":\n" + calculationLineText);
@@ -759,7 +759,7 @@ boost::shared_ptr<NFmiSmartToolCalculationInfo> NFmiSmartToolIntepreter::Interpr
 			throw runtime_error(::GetDictionaryString("SmartToolErrorNoAssignmentOperator") + ":\n" + theCalculationLineText);
 		for(; GetToken(); )
 		{
-			tmp = token; // luetaan muuttuja/vakio/funktio tai mik‰ lie
+			tmp = token; // luetaan muuttuja/vakio/funktio tai mik√§ lie
 			boost::shared_ptr<NFmiAreaMaskInfo> variableInfo(new NFmiAreaMaskInfo(calculationLineText));
 			InterpretToken(tmp, variableInfo);
 			calculationInfo->AddCalculationInfo(variableInfo);
@@ -777,7 +777,7 @@ boost::shared_ptr<NFmiSmartToolCalculationInfo> NFmiSmartToolIntepreter::Interpr
 		if(fMacroParamSkriptInProgress)
 			throw runtime_error(::GetDictionaryString("SmartToolErrorMacroParamAssignmentError1") + "\n" + ::GetDictionaryString("SmartToolErrorMacroParamAssignmentError2") + "\n" + ::GetDictionaryString("SmartToolErrorThatWontWorkEnding"));
 	}
-	// tarkistetaan saman tien, onko sijoituksia tehty molempiin tyyppeihin ja heitet‰‰n poikkeus jos on
+	// tarkistetaan saman tien, onko sijoituksia tehty molempiin tyyppeihin ja heitet√§√§n poikkeus jos on
 	if(fMacroParamFound && fNormalAssigmentFound)
 		throw runtime_error(::GetDictionaryString("SmartToolErrorMacroParamAssignmentError3") + "\n" + ::GetDictionaryString("SmartToolErrorMacroParamAssignmentError4") + "\n" + ::GetDictionaryString("SmartToolErrorThatWontWorkEnding"));
 
@@ -785,7 +785,7 @@ boost::shared_ptr<NFmiSmartToolCalculationInfo> NFmiSmartToolIntepreter::Interpr
 }
 
 // GetToken ja IsDelim otettu H. Schilbertin  C++: the Complete Refeference third ed.
-// jouduin muuttamaan niit‰ t‰h‰n ymp‰ristˆˆn.
+// jouduin muuttamaan niit√§ t√§h√§n ymp√§rist√∂√∂n.
 // Obtain the next token. Palauttaa true, jos sellainen saatiin, jos ollaan lopussa, palauttaa false.
 bool NFmiSmartToolIntepreter::GetToken(void)
 {
@@ -803,7 +803,7 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 	if(exp_ptr >= exp_end)
 		return false; // at end of expression
 
-	// HUOM! t‰ss‰ delimiter rimpsussa ei ole spacea, joten ei voi tehd‰ yhteist‰ stringi‰, muista p‰ivitt‰‰ myˆs IsDelim-metodi
+	// HUOM! t√§ss√§ delimiter rimpsussa ei ole spacea, joten ei voi tehd√§ yhteist√§ stringi√§, muista p√§ivitt√§√§ my√∂s IsDelim-metodi
 	if(strchr("+-*/%^=(){}<>&|!,", *exp_ptr))
 	{
 		tok_type = DELIMITER;
@@ -811,15 +811,15 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 		*temp++ = *exp_ptr++;
 		if(exp_ptr < exp_end)
 		{
-			if(*exp_ptr == '>' || *exp_ptr == '=') // t‰ss‰ halutaan ottaa huomioon >=, <=, !=, <> ja == vertailu operaattorit
+			if(*exp_ptr == '>' || *exp_ptr == '=') // t√§ss√§ halutaan ottaa huomioon >=, <=, !=, <> ja == vertailu operaattorit
 			{
 				*temp++ = *exp_ptr++;
 			}
-			if(*exp_ptr == '&') // t‰ss‰ halutaan ottaa huomioon && vertailu operaattori
+			if(*exp_ptr == '&') // t√§ss√§ halutaan ottaa huomioon && vertailu operaattori
 			{
 				*temp++ = *exp_ptr++;
 			}
-			if(*exp_ptr == '|') // t‰ss‰ halutaan ottaa huomioon || vertailu operaattori
+			if(*exp_ptr == '|') // t√§ss√§ halutaan ottaa huomioon || vertailu operaattori
 			{
 				*temp++ = *exp_ptr++;
 			}
@@ -832,7 +832,7 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 			*temp++ = *exp_ptr++;
 			if(exp_ptr >= exp_end)
 				break; // at end of expression
-			if(*exp_ptr == '[') // Ollaan tultu kohtaan missa annetaan malliajo eli esim. T_HIR[-1], nyt jatketaan kunnes lˆytyy lopetus merkki eli ']'
+			if(*exp_ptr == '[') // Ollaan tultu kohtaan missa annetaan malliajo eli esim. T_HIR[-1], nyt jatketaan kunnes l√∂ytyy lopetus merkki eli ']'
 			{
 				SearchUntil(exp_ptr, temp, ']');
 				tok_type = VARIABLE;
@@ -856,13 +856,13 @@ bool NFmiSmartToolIntepreter::GetToken(void)
 	return true;
 }
 
-// T‰m‰ on tosi k‰m‰ist‰ pointteri virittely koodia, mik‰ on vanhaa perua. En uskalla nyt laittaa koko smarttool-kielen tulkintaa
-// uusiksi, joten joudun virittelem‰‰n aika pahasti t‰t‰ koodia t‰ss‰.
-// Nyky‰‰n en tekisi tulkki-koodia miss‰‰n tapauksess‰ n‰in.
-// theTempCharPtr -osoittaa oikeasti token-dataosan currenttiin char:iin. Se pit‰‰ sulkea t‰ss‰ (asettaa 0 viimeiseen kohtaan).
-// Lis‰ksi t‰m‰n kutsun j‰lkeen ei saa lopettaa NFmiSmartToolIntepreter::GetToken -metodia normaalisti, koska tuo pointteri
-// ei osoitakaan en‰‰ sinne minne oltiin edetty funktiossa, vaan sit‰ aiempaan tilaan. Kokeilin antaa pointterin pointterin, mutta 
-// sitten syntaksi meni jo niin kinkkiseksi ett‰ luovutin.
+// T√§m√§ on tosi k√§m√§ist√§ pointteri virittely koodia, mik√§ on vanhaa perua. En uskalla nyt laittaa koko smarttool-kielen tulkintaa
+// uusiksi, joten joudun virittelem√§√§n aika pahasti t√§t√§ koodia t√§ss√§.
+// Nyky√§√§n en tekisi tulkki-koodia miss√§√§n tapauksess√§ n√§in.
+// theTempCharPtr -osoittaa oikeasti token-dataosan currenttiin char:iin. Se pit√§√§ sulkea t√§ss√§ (asettaa 0 viimeiseen kohtaan).
+// Lis√§ksi t√§m√§n kutsun j√§lkeen ei saa lopettaa NFmiSmartToolIntepreter::GetToken -metodia normaalisti, koska tuo pointteri
+// ei osoitakaan en√§√§ sinne minne oltiin edetty funktiossa, vaan sit√§ aiempaan tilaan. Kokeilin antaa pointterin pointterin, mutta 
+// sitten syntaksi meni jo niin kinkkiseksi ett√§ luovutin.
 void NFmiSmartToolIntepreter::SearchUntil(std::string::iterator &theExp_ptr, char *theTempCharPtr, char theSearchedCh)
 {
 	while(*theExp_ptr != theSearchedCh)
@@ -883,8 +883,8 @@ void NFmiSmartToolIntepreter::SearchUntil(std::string::iterator &theExp_ptr, cha
 
 // Return true if c is a delimiter.
 bool NFmiSmartToolIntepreter::IsDelim(char c)
-{ // HUOM! t‰ss‰ delimiter rimpsussa on space muiden lis‰ksi, joten ei voi tehd‰ yhteist‰ stringi‰, muista p‰ivitt‰‰ myˆs GetToken-metodi
-	if(strchr(" +-*/%^=(){}<>&|!,", c) || c==9 || c=='\r' || c=='\t' || c==0) // lis‰sin muutaman delimiter merkin
+{ // HUOM! t√§ss√§ delimiter rimpsussa on space muiden lis√§ksi, joten ei voi tehd√§ yhteist√§ stringi√§, muista p√§ivitt√§√§ my√∂s GetToken-metodi
+	if(strchr(" +-*/%^=(){}<>&|!,", c) || c==9 || c=='\r' || c=='\t' || c==0) // lis√§sin muutaman delimiter merkin
 		return true;
 	return false;
 }
@@ -925,7 +925,7 @@ void NFmiSmartToolIntepreter::InterpretToken(const std::string &theTokenText, bo
 	}
 }
 
-// HUOM!!!! Muuta k‰ytt‰m‰‰n itsCalculationOperations-mappia!!!!!!!!!!
+// HUOM!!!! Muuta k√§ytt√§m√§√§n itsCalculationOperations-mappia!!!!!!!!!!
 void NFmiSmartToolIntepreter::InterpretDelimiter(const std::string &theDelimText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
 {
 	theMaskInfo->SetMaskText(theDelimText);
@@ -977,11 +977,11 @@ void NFmiSmartToolIntepreter::InterpretDelimiter(const std::string &theDelimText
 
 }
 
-// Tulkitsee annetun muuttujan. Hoitelee myˆs tuottajan, jos se on annettu, esim.
+// Tulkitsee annetun muuttujan. Hoitelee my√∂s tuottajan, jos se on annettu, esim.
 // T T_HIR jne.
-// Voi olla myˆs vakio tai funktio systeemi.
-// HUOM!!! Ei viel‰ tuottajan handlausta.
-// HUOM!!! Ei hoida viel‰ vakioita tai funktio systeemej‰.
+// Voi olla my√∂s vakio tai funktio systeemi.
+// HUOM!!! Ei viel√§ tuottajan handlausta.
+// HUOM!!! Ei hoida viel√§ vakioita tai funktio systeemej√§.
 void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, bool fNewScriptVariable)
 {
 	theMaskInfo->SetMaskText(theVariableText);
@@ -991,11 +991,11 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 	bool levelExist = false;
 	bool producerExist = false;
 	int modelRunIndex = 1; // 1 = viimeisin malliajo data
-							// 0 = viimeisin data, mutta niin ett‰ jos on tullut hir-pintadatasta 06 utc ajo ja painepinta datasta viimeisin on 00 utc, 
-							// t‰llˆin painepinta datan 0 viimeisin ajo on tyhj‰‰ (explisiittisesti on haluttu 06 viimeisint‰ malliajoa)
-							// -1 - -n on edellisi‰ malliajoja -1 on siis edellinen ja -2 on viimeksi edellinen jne.
+							// 0 = viimeisin data, mutta niin ett√§ jos on tullut hir-pintadatasta 06 utc ajo ja painepinta datasta viimeisin on 00 utc, 
+							// t√§ll√∂in painepinta datan 0 viimeisin ajo on tyhj√§√§ (explisiittisesti on haluttu 06 viimeisint√§ malliajoa)
+							// -1 - -n on edellisi√§ malliajoja -1 on siis edellinen ja -2 on viimeksi edellinen jne.
 
-	// tutkitaan ensin onko mahdollisesti variable-muuttuja, jolloin voimme sallia _-merkin k‰ytˆn muuttujissa
+	// tutkitaan ensin onko mahdollisesti variable-muuttuja, jolloin voimme sallia _-merkin k√§yt√∂n muuttujissa
 	if(InterpretPossibleScriptVariable(theVariableText, theMaskInfo, fNewScriptVariable))
 		return ;
 
@@ -1003,7 +1003,7 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 						  levelExist, levelNameOnly,
 						  producerExist, producerNameOnly, modelRunIndex);
 
-	bool origWanted = producerExist ? IsProducerOrig(producerNameOnly) : false; // lis‰sin ehdon, koska boundchecker valitti tyhj‰n stringin vertailua IsProducerOrig-metodissa.
+	bool origWanted = producerExist ? IsProducerOrig(producerNameOnly) : false; // lis√§sin ehdon, koska boundchecker valitti tyhj√§n stringin vertailua IsProducerOrig-metodissa.
 
 	if(InterpretVariableCheckTokens(theVariableText, theMaskInfo, origWanted, levelExist, producerExist, paramNameOnly, levelNameOnly, producerNameOnly, modelRunIndex))
 	{
@@ -1018,17 +1018,17 @@ void NFmiSmartToolIntepreter::InterpretVariable(const std::string &theVariableTe
 bool NFmiSmartToolIntepreter::InterpretPossibleScriptVariable(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, bool fNewScriptVariable)
 {
 	ScriptVariableMap::iterator it = itsTokenScriptVariableNames.find(theVariableText);
-	if(it != itsTokenScriptVariableNames.end() && fNewScriptVariable) // var x k‰ytetty uudestaan, esitell‰‰n muuttujat vain kerran
+	if(it != itsTokenScriptVariableNames.end() && fNewScriptVariable) // var x k√§ytetty uudestaan, esitell√§√§n muuttujat vain kerran
 		throw runtime_error(::GetDictionaryString("SmartToolErrorScriptVariableSecondTime") + ": " + theVariableText);
-	else if(it != itsTokenScriptVariableNames.end()) // muuttujaa x k‰ytetty uudestaan
+	else if(it != itsTokenScriptVariableNames.end()) // muuttujaa x k√§ytetty uudestaan
 	{
 		NFmiParam param((*it).second, (*it).first, kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly);
-		NFmiProducer producer; // t‰ll‰ ei ole v‰li‰
+		NFmiProducer producer; // t√§ll√§ ei ole v√§li√§
 		NFmiDataIdent dataIdent(param, producer);
 		theMaskInfo->SetOperationType(NFmiAreaMask::InfoVariable);
 		theMaskInfo->SetDataIdent(dataIdent);
 		theMaskInfo->SetDataType(NFmiInfoData::kScriptVariableData);
-		theMaskInfo->SetUseDefaultProducer(false); // t‰m‰ ei todellakaan ole default tuottajan dataa (t‰m‰ vaikuttaa siihen mm. ett‰ tehd‰‰nkˆ datasta kopioita tietyiss‰ tilanteissa)
+		theMaskInfo->SetUseDefaultProducer(false); // t√§m√§ ei todellakaan ole default tuottajan dataa (t√§m√§ vaikuttaa siihen mm. ett√§ tehd√§√§nk√∂ datasta kopioita tietyiss√§ tilanteissa)
 		return true;
 	}
 	else if(fNewScriptVariable) // var x, eli 1. alustus
@@ -1036,12 +1036,12 @@ bool NFmiSmartToolIntepreter::InterpretPossibleScriptVariable(const std::string 
 		NFmiParam param(itsScriptVariableParamIdCounter, theVariableText, kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly);
 		itsTokenScriptVariableNames.insert(ScriptVariableMap::value_type(theVariableText, itsScriptVariableParamIdCounter));
 		itsScriptVariableParamIdCounter++; // kasvatetaan seuraavaa uutta muutujaa varten
-		NFmiProducer producer; // t‰ll‰ ei ole v‰li‰
+		NFmiProducer producer; // t√§ll√§ ei ole v√§li√§
 		NFmiDataIdent dataIdent(param, producer);
 		theMaskInfo->SetOperationType(NFmiAreaMask::InfoVariable);
 		theMaskInfo->SetDataIdent(dataIdent);
 		theMaskInfo->SetDataType(NFmiInfoData::kScriptVariableData);
-		theMaskInfo->SetUseDefaultProducer(false); // t‰m‰ ei todellakaan ole default tuottajan dataa (t‰m‰ vaikuttaa siihen mm. ett‰ tehd‰‰nkˆ datasta kopioita tietyiss‰ tilanteissa)
+		theMaskInfo->SetUseDefaultProducer(false); // t√§m√§ ei todellakaan ole default tuottajan dataa (t√§m√§ vaikuttaa siihen mm. ett√§ tehd√§√§nk√∂ datasta kopioita tietyiss√§ tilanteissa)
 		return true;
 	}
 	return false;
@@ -1049,18 +1049,18 @@ bool NFmiSmartToolIntepreter::InterpretPossibleScriptVariable(const std::string 
 
 bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo, bool fOrigWanted, bool fLevelExist, bool fProducerExist, const std::string &theParamNameOnly, const std::string &theLevelNameOnly, const std::string &theProducerNameOnly, int theModelRunIndex)
 {
-	if(fLevelExist && fProducerExist) // kokeillaan ensin, lˆytyykˆ param+level+producer
+	if(fLevelExist && fProducerExist) // kokeillaan ensin, l√∂ytyyk√∂ param+level+producer
 	{
 		if(FindParamAndLevelAndProducerAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, theProducerNameOnly, NFmiAreaMask::InfoVariable, fOrigWanted ? NFmiInfoData::kCopyOfEdited : NFmiInfoData::kViewable, theMaskInfo, theModelRunIndex))
 			return true;
 	}
-	else if(fLevelExist) // kokeillaan sitten, lˆytyykˆ param+level
+	else if(fLevelExist) // kokeillaan sitten, l√∂ytyyk√∂ param+level
 	{
-		// Jos tuottajaa ei ole mainittu, oletetaan, ett‰ kyseess‰ on editoitava parametri.
+		// Jos tuottajaa ei ole mainittu, oletetaan, ett√§ kyseess√§ on editoitava parametri.
 		if(FindParamAndLevelAndSetMaskInfo(theParamNameOnly, theLevelNameOnly, NFmiAreaMask::InfoVariable, NFmiInfoData::kEditable, theMaskInfo, theModelRunIndex))
 			return true;
 	}
-	else if(fProducerExist) // kokeillaan sitten, lˆytyykˆ param+producer
+	else if(fProducerExist) // kokeillaan sitten, l√∂ytyyk√∂ param+producer
 	{
 		if(FindParamAndProducerAndSetMaskInfo(theParamNameOnly, theProducerNameOnly, NFmiAreaMask::InfoVariable, fOrigWanted ? NFmiInfoData::kCopyOfEdited : NFmiInfoData::kViewable, theMaskInfo, theModelRunIndex))
 			return true;
@@ -1096,7 +1096,7 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(const std::string &th
 	if(IsVariableDeltaZ(theVariableText, theMaskInfo))
 		return true;
 
-	if(IsVariableBinaryOperator(theVariableText, theMaskInfo)) // t‰m‰ on and ja or tapausten k‰sittelyyn
+	if(IsVariableBinaryOperator(theVariableText, theMaskInfo)) // t√§m√§ on and ja or tapausten k√§sittelyyn
 		return true;
 
 	return false;
@@ -1114,7 +1114,7 @@ bool NFmiSmartToolIntepreter::IsProducerOrig(std::string &theProducerText)
 bool NFmiSmartToolIntepreter::IsFunctionNameWithUnderScore(const std::string &theVariableText)
 {
 	std::string tmpVariableStr = theVariableText;
-	// HUOM! Mm. uusissa vertikaali-funktioissa on '_'-merkkej‰, jotka pit‰‰ ignoorata jossain paikoissa koodia
+	// HUOM! Mm. uusissa vertikaali-funktioissa on '_'-merkkej√§, jotka pit√§√§ ignoorata jossain paikoissa koodia
 	VertFunctionMap::iterator it = itsTokenVertFunctions.find(NFmiStringTools::LowerCase(tmpVariableStr)); 
 	if(it != itsTokenVertFunctions.end())
 		return true; // Kyse oli jostain uudesta vertikaali funktiosta
@@ -1122,12 +1122,12 @@ bool NFmiSmartToolIntepreter::IsFunctionNameWithUnderScore(const std::string &th
 	return false;
 }
 
-// t‰m‰ heitt‰‰ poikkeuksen virheilmoituksineen (auttavamman), jos t‰m‰ muuttuja muistuttaa uusia alaviiva -funktioita
+// t√§m√§ heitt√§√§ poikkeuksen virheilmoituksineen (auttavamman), jos t√§m√§ muuttuja muistuttaa uusia alaviiva -funktioita
 void NFmiSmartToolIntepreter::CheckIfVariableResemblesVerticalFunction(const std::string &theVariableText)
 {
 	std::string tmpVariableStr(theVariableText);
 	NFmiStringTools::LowerCase(tmpVariableStr);
-	// jos theVariableText:ist‰ lˆytyy vert-sana, tehd‰‰n vertikaali funktioihin liittyv‰ virheilmoitus
+	// jos theVariableText:ist√§ l√∂ytyy vert-sana, tehd√§√§n vertikaali funktioihin liittyv√§ virheilmoitus
 	string::size_type pos = tmpVariableStr.find(string("vert"));
 	if(pos != string::npos)
 	{
@@ -1145,24 +1145,24 @@ void NFmiSmartToolIntepreter::CheckIfVariableResemblesVerticalFunction(const std
 }
 
 
-// Saa parametrina kokonaisen parametri stringin, joka voi sis‰lt‰‰
-// parametrin lis‰ksi myˆs levelin ja producerin.
+// Saa parametrina kokonaisen parametri stringin, joka voi sis√§lt√§√§
+// parametrin lis√§ksi my√∂s levelin ja producerin.
 // Teksti voi siis olla vaikka: T, T_850, T_Ec, T_850_Ec
 // Eri osat asetetaan parametreina annetuille stringeille ja exist
-// parametrit asetetaan myˆs vastaavasti, paitsi itse paramStringille
+// parametrit asetetaan my√∂s vastaavasti, paitsi itse paramStringille
 // ei ole muutujaa, koska se on pakollinen.
 void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariableText, std::string &theParamText,
 												  bool &fLevelExist, std::string &theLevelText,
 												  bool &fProducerExist, std::string &theProducerText, int &theModelRunIndex)
 {
 	if(IsFunctionNameWithUnderScore(theVariableText))
-		return ; // Kyse oli jostain uudesta funktiosta, joissa on alaviiva, eik‰ tehd‰ nyt t‰ss‰ mit‰‰n
+		return ; // Kyse oli jostain uudesta funktiosta, joissa on alaviiva, eik√§ tehd√§ nyt t√§ss√§ mit√§√§n
 
 	theParamText = theLevelText = theProducerText = "";
 	fLevelExist = fProducerExist = false;
 
 	std::vector<std::string> variableParts = NFmiStringTools::Split(theVariableText, "_");
-	std::vector<std::string> lastParamParts  = NFmiStringTools::Split(variableParts[variableParts.size()-1], "["); // viimeisen parametri osion yhteydess‰ voi olla [-1] -osio, miss‰ on kerrottu haluttu malliajo
+	std::vector<std::string> lastParamParts  = NFmiStringTools::Split(variableParts[variableParts.size()-1], "["); // viimeisen parametri osion yhteydess√§ voi olla [-1] -osio, miss√§ on kerrottu haluttu malliajo
 	if(lastParamParts.size() > 2)
 	{
 		std::string errStr = ::GetDictionaryString("Error with variable text");
@@ -1174,7 +1174,7 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 	}
 	else if(lastParamParts.size() == 2)
 	{
-		variableParts[variableParts.size()-1] = lastParamParts[0]; // pit‰‰ laittaa viimeiseen osioon malliajo-tiedosta 'riisuttu' teksti osio
+		variableParts[variableParts.size()-1] = lastParamParts[0]; // pit√§√§ laittaa viimeiseen osioon malliajo-tiedosta 'riisuttu' teksti osio
 		std::string modelRunPart = lastParamParts[1];
 		modelRunPart = NFmiStringTools::TrimR(modelRunPart, ']');
 		theModelRunIndex = NFmiStringTools::Convert<int>(modelRunPart);
@@ -1197,7 +1197,7 @@ void NFmiSmartToolIntepreter::CheckVariableString(const std::string &theVariable
 		}
 		else
 		{
-			CheckIfVariableResemblesVerticalFunction(theVariableText); // t‰m‰ heitt‰‰ poikkeuksen virheilmoituksineen (auttavamman), jos t‰m‰ muuttuja muistuttaa uusia alaviiva -funktioita
+			CheckIfVariableResemblesVerticalFunction(theVariableText); // t√§m√§ heitt√§√§ poikkeuksen virheilmoituksineen (auttavamman), jos t√§m√§ muuttuja muistuttaa uusia alaviiva -funktioita
 			// muuten tee standardi virheilmoitus
 			throw runtime_error(::GetDictionaryString("SmartToolErrorVariableWithUndescore") + ":\n" + theVariableText);
 		}
@@ -1243,7 +1243,7 @@ bool NFmiSmartToolIntepreter::IsPossiblyLevelItem(const std::string &theText)
 {
 	try
 	{
-		// jos numeroksi muunto onnistuu, oletetaan ett‰ kyseess‰ on level
+		// jos numeroksi muunto onnistuu, oletetaan ett√§ kyseess√§ on level
 		NFmiStringTools::Convert<int>(theText);
 		return true;
 	}
@@ -1260,7 +1260,7 @@ bool NFmiSmartToolIntepreter::IsPossiblyLevelItem(const std::string &theText)
 	return false;
 }
 
-// HUOM! tekee lower case tarkasteluja, joten theMap pit‰‰ myˆs alustaa lower case stringeill‰
+// HUOM! tekee lower case tarkasteluja, joten theMap pit√§√§ my√∂s alustaa lower case stringeill√§
 template<typename mapType>
 bool NFmiSmartToolIntepreter::IsInMap(mapType& theMap, const std::string &theSearchedItem)
 {
@@ -1300,9 +1300,9 @@ bool NFmiSmartToolIntepreter::FindParamAndProducerAndSetMaskInfo(const std::stri
 {
 	NFmiProducer producer(GetPossibleProducerInfo(theProducerText));
 	if(producer.GetIdent() == gMesanProdId)
-		theDataType = NFmiInfoData::kAnalyzeData; // ik‰v‰‰ koodia, mutta analyysi data tyyppi pit‰‰ asettaa jos ANAL-tuottajaa k‰ytetty
+		theDataType = NFmiInfoData::kAnalyzeData; // ik√§v√§√§ koodia, mutta analyysi data tyyppi pit√§√§ asettaa jos ANAL-tuottajaa k√§ytetty
 	else if(producer.GetIdent() == NFmiProducerSystem::gHelpEditorDataProdId)
-		theDataType = NFmiInfoData::kEditingHelpData; // ik‰v‰‰ koodia, editor help datalle pit‰‰ saada oma tuottaja id
+		theDataType = NFmiInfoData::kEditingHelpData; // ik√§v√§√§ koodia, editor help datalle pit√§√§ saada oma tuottaja id
 	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer, theModelRunIndex))
 		return true;
 	return false;
@@ -1312,7 +1312,7 @@ bool NFmiSmartToolIntepreter::FindParamAndLevelAndProducerAndSetMaskInfo(const s
 {
 	NFmiProducer producer(GetPossibleProducerInfo(theProducerText));
 	if(producer.GetIdent() == gMesanProdId)
-		theDataType = NFmiInfoData::kAnalyzeData; // ik‰v‰‰ koodia, mutta analyysi data tyyppi pit‰‰ asettaa jos ANA-tuottajaa k‰ytetty
+		theDataType = NFmiInfoData::kAnalyzeData; // ik√§v√§√§ koodia, mutta analyysi data tyyppi pit√§√§ asettaa jos ANA-tuottajaa k√§ytetty
 	if(FindParamAndSetMaskInfo(theVariableText, itsTokenParameterNamesAndIds, theOperType, theDataType, theMaskInfo, producer, theModelRunIndex))
 	{
 		NFmiLevel level(GetPossibleLevelInfo(theLevelText, theDataType));
@@ -1333,7 +1333,7 @@ NFmiLevel NFmiSmartToolIntepreter::GetPossibleLevelInfo(const std::string &theLe
 
 	try
 	{
-		// jos numeroksi muunto onnistuu, oletetaan ett‰ kyseess‰ on level
+		// jos numeroksi muunto onnistuu, oletetaan ett√§ kyseess√§ on level
 		float value = NFmiStringTools::Convert<float>(theLevelText);
 		level = NFmiLevel(kFmiPressureLevel, theLevelText, value);
 		return level;
@@ -1376,7 +1376,7 @@ bool NFmiSmartToolIntepreter::GetParamFromVariable(const std::string &theVariabl
 	if(it == theParamMap.end())
 	{
 		if(GetParamFromVariableById(theVariableText, theParam))
-			fUseWildDataType = true; // paridta k‰ytett‰ess‰ pit‰‰ asettaa data tyyppi 'villiksi' toistaiseksi
+			fUseWildDataType = true; // paridta k√§ytett√§ess√§ pit√§√§ asettaa data tyyppi 'villiksi' toistaiseksi
 		else
 			return false;
 	}
@@ -1385,7 +1385,7 @@ bool NFmiSmartToolIntepreter::GetParamFromVariable(const std::string &theVariabl
 	return true;
 }
 
-// tutkii alkaako annettu sana "par"-osiolla ja sit‰ seuraavalla numerolla
+// tutkii alkaako annettu sana "par"-osiolla ja sit√§ seuraavalla numerolla
 // esim. par4 tai PAR114 jne.
 bool NFmiSmartToolIntepreter::GetParamFromVariableById(const std::string &theVariableText, NFmiParam &theParam)
 {
@@ -1401,7 +1401,7 @@ bool NFmiSmartToolIntepreter::GetParamFromVariableById(const std::string &theVar
 	return false;
 }
 
-// tutkii alkaako annettu sana "prod"-osiolla ja sit‰ seuraavalla numerolla
+// tutkii alkaako annettu sana "prod"-osiolla ja sit√§ seuraavalla numerolla
 // esim. prod230 tai PROD1 jne.
 bool NFmiSmartToolIntepreter::GetProducerFromVariableById(const std::string &theVariableText, NFmiProducer &theProducer)
 {
@@ -1417,7 +1417,7 @@ bool NFmiSmartToolIntepreter::GetProducerFromVariableById(const std::string &the
 	return false;
 }
 
-// tutkii alkaako annettu sana "lev"-osiolla ja sit‰ seuraavalla numerolla
+// tutkii alkaako annettu sana "lev"-osiolla ja sit√§ seuraavalla numerolla
 // esim. par100 tai LEV850 jne.
 bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVariableText, NFmiLevel &theLevel, NFmiInfoData::Type /* theDataType */ )
 {
@@ -1427,8 +1427,8 @@ bool NFmiSmartToolIntepreter::GetLevelFromVariableById(const std::string &theVar
 	  if(numericPart.IsNumeric())
 		{
 		  float levelValue = static_cast<float>(numericPart);
-		  // pitaisi tunnistaa level tyyppi arvosta kait, nyt oletus ett‰ painepinta
-		  FmiLevelType levelType = kFmiHybridLevel; // jos k‰ytt‰j‰ on antanut lev45, t‰llˆin halutaan hybrid level 45 ei painepinta 45. painepinnat saa automaattisesti pelk‰ll‰ numerolla
+		  // pitaisi tunnistaa level tyyppi arvosta kait, nyt oletus ett√§ painepinta
+		  FmiLevelType levelType = kFmiHybridLevel; // jos k√§ytt√§j√§ on antanut lev45, t√§ll√∂in halutaan hybrid level 45 ei painepinta 45. painepinnat saa automaattisesti pelk√§ll√§ numerolla
 		  theLevel = NFmiLevel(levelType, theVariableText, levelValue);
 		  return true;
 		}
@@ -1492,7 +1492,7 @@ bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVari
 		theMaskInfo->SetDataIdent(dataIdent);
 		theMaskInfo->SetUseDefaultProducer(true);
 		theMaskInfo->ModelRunIndex(theModelRunIndex);
-		if(fUseWildDataType && theDataType != NFmiInfoData::kEditable) // HUOM! anydata-tyyppi sallitaan vain kun tarkastellaan ei editoitavia parametreja, t‰m‰ siksi ett‰ ei haluta esim. par165 menev‰n l‰pi smarttool-kieless‰, koska se on ec:n meren aallon pituusparametri ja ilman tuottajaa haluataan vain tukea editoitua dataa ja topo-dataa
+		if(fUseWildDataType && theDataType != NFmiInfoData::kEditable) // HUOM! anydata-tyyppi sallitaan vain kun tarkastellaan ei editoitavia parametreja, t√§m√§ siksi ett√§ ei haluta esim. par165 menev√§n l√§pi smarttool-kieless√§, koska se on ec:n meren aallon pituusparametri ja ilman tuottajaa haluataan vain tukea editoitua dataa ja topo-dataa
 			theMaskInfo->SetDataType(NFmiInfoData::kAnyData);
 		else
 			theMaskInfo->SetDataType(theDataType);
@@ -1509,9 +1509,9 @@ bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVari
 	{
 		NFmiProducer usedProducer(theProducer);
 		if(usedProducer.GetIdent() == NFmiInfoData::kFmiSpEcmwf3Vrk)
-		{// ik‰v‰‰ koodia, mutta tein kikka vitosen ett‰ saan EC:n 3vrk datat mukaan smarttool-kieleen
-			// ja laitoin koodin t‰h‰n funktioon, ett‰ se hanskaa samalla sek‰ pinta ett‰ painepinta datat
-			theDataType = NFmiInfoData::kModelHelpData;  // EC:n 3 vrk datat tyyppi asetettava, ett‰ ohittaa normaali ec datan
+		{// ik√§v√§√§ koodia, mutta tein kikka vitosen ett√§ saan EC:n 3vrk datat mukaan smarttool-kieleen
+			// ja laitoin koodin t√§h√§n funktioon, ett√§ se hanskaa samalla sek√§ pinta ett√§ painepinta datat
+			theDataType = NFmiInfoData::kModelHelpData;  // EC:n 3 vrk datat tyyppi asetettava, ett√§ ohittaa normaali ec datan
 			usedProducer = NFmiProducer(kFmiMTAECMWF, "Ec3vrk");
 		}
 
@@ -1522,12 +1522,12 @@ bool NFmiSmartToolIntepreter::FindParamAndSetMaskInfo(const std::string &theVari
 		theMaskInfo->ModelRunIndex(theModelRunIndex);
 		if(fUseWildDataType)
 		{
-			if(usedProducer.GetIdent() == 0) // t‰m‰ on viritys, jos on annettu esim. "par180_ec" parametri, menee se any-data kategoriaan, ellei ei tarkisteta onko oikeasti annettu tuottajakin
+			if(usedProducer.GetIdent() == 0) // t√§m√§ on viritys, jos on annettu esim. "par180_ec" parametri, menee se any-data kategoriaan, ellei ei tarkisteta onko oikeasti annettu tuottajakin
 				theMaskInfo->SetDataType(NFmiInfoData::kAnyData);
 			else
 				theMaskInfo->SetDataType(theDataType);
 		}
-		else if(usedProducer.GetIdent() == 999) // t‰m‰ 999 on viritys, mutta se on m‰‰r‰tty helpdatainfo.dat tiedostossa kepa-datan feikki id numeroksi. Oikeaa id:t‰ ei voi k‰ytt‰‰, koska se on sama kuin editoitavalla datalla.
+		else if(usedProducer.GetIdent() == 999) // t√§m√§ 999 on viritys, mutta se on m√§√§r√§tty helpdatainfo.dat tiedostossa kepa-datan feikki id numeroksi. Oikeaa id:t√§ ei voi k√§ytt√§√§, koska se on sama kuin editoitavalla datalla.
 			theMaskInfo->SetDataType(NFmiInfoData::kKepaData);
 		else
 			theMaskInfo->SetDataType(theDataType);
@@ -1548,7 +1548,7 @@ bool NFmiSmartToolIntepreter::IsVariableConstantValue(const std::string &theVari
 		return true;
 	}
 
-	// sitten katsotaan onko se esim. MISS tai PI tms esi m‰‰ritelty vakio
+	// sitten katsotaan onko se esim. MISS tai PI tms esi m√§√§ritelty vakio
 	std::string tmp(theVariableText);
 	ConstantMap::iterator it = itsTokenConstants.find(NFmiStringTools::LowerCase(tmp));
 	if(it != itsTokenConstants.end())
@@ -1590,8 +1590,8 @@ bool NFmiSmartToolIntepreter::IsVariableMathFunction(const std::string &theVaria
 	{
 		if(GetToken())
 		{
-			tmp = token; // luetaan muuttuja/vakio/funktio tai mik‰ lie
-			if(tmp == string("(")) // etsit‰‰n fuktion aloitus sulkua (lopetus sulku tulee sitten aikanaan, v‰liss‰ voi olla mit‰ vain!)
+			tmp = token; // luetaan muuttuja/vakio/funktio tai mik√§ lie
+			if(tmp == string("(")) // etsit√§√§n fuktion aloitus sulkua (lopetus sulku tulee sitten aikanaan, v√§liss√§ voi olla mit√§ vain!)
 			{
 				theMaskInfo->SetOperationType(NFmiAreaMask::MathFunctionStart);
 				theMaskInfo->SetMathFunctionType((*it).second);
@@ -1619,8 +1619,8 @@ bool NFmiSmartToolIntepreter::IsVariableThreeArgumentFunction(const std::string 
 		theMaskInfo->IntegrationFunctionType(functionUsed);
 		if(GetToken())
 		{
-			tmp = token; // luetaan muuttuja/vakio/funktio tai mik‰ lie
-			if(tmp == string("(")) // etsit‰‰n fuktion aloitus sulkua (lopetus sulku tulee sitten aikanaan, v‰liss‰ voi olla mit‰ vain!)
+			tmp = token; // luetaan muuttuja/vakio/funktio tai mik√§ lie
+			if(tmp == string("(")) // etsit√§√§n fuktion aloitus sulkua (lopetus sulku tulee sitten aikanaan, v√§liss√§ voi olla mit√§ vain!)
 			{
 				theMaskInfo->SetOperationType(NFmiAreaMask::ThreeArgumentFunctionStart);
 				return true;
@@ -1631,10 +1631,10 @@ bool NFmiSmartToolIntepreter::IsVariableThreeArgumentFunction(const std::string 
 	return false;
 }
 
-// N‰m‰ ovat muotoa aika-'integroinnin' yhteydess‰:
+// N√§m√§ ovat muotoa aika-'integroinnin' yhteydess√§:
 // MIN(T -1 1)
 // eli 1. funktion nimi, sulku auki, parametri, aloitus aikaoffset, lopetus aikaoffset ja lopuksi suliku kiinni.
-// Tai alue-'integroinnin' yhteydess‰:
+// Tai alue-'integroinnin' yhteydess√§:
 // MIN(T -1 -1 1 1)
 // eli 1. funktion nimi, sulku auki, parametri, aloitus x ja y paikkaoffset, lopetus x ja y paikkaoffset ja lopuksi suliku kiinni.
 bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
@@ -1658,13 +1658,13 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 		int i;
 		for(i=0; i<7 && GetToken(); i++) // maksimissaan 7 kertaa
 		{
-			tmp = token; // luetaan muuttuja/vakio/funktio tai mik‰ lie
+			tmp = token; // luetaan muuttuja/vakio/funktio tai mik√§ lie
 			tmp = HandlePossibleUnaryMarkers(tmp);
 			tokens.push_back(std::make_pair(tmp, tok_type));
-			if(tmp == string(")")) // etsit‰‰n lopetus sulkua
+			if(tmp == string(")")) // etsit√§√§n lopetus sulkua
 				break;
 		}
-		// ensin tutkitaan, onko kyseess‰ aikaintegrointi eli 5 'tokenia'
+		// ensin tutkitaan, onko kyseess√§ aikaintegrointi eli 5 'tokenia'
 		if(i==4 && (tokens[0].first == string("(")) && (tokens[4].first == string(")")))
 		{
 			if(tokens[1].second == VARIABLE && tokens[2].second == NUMBER && tokens[3].second == NUMBER)
@@ -1682,7 +1682,7 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 				}
 			}
 		}
-		// sitten tutkitaan, onko kyseess‰ alueintegrointi eli 7 'tokenia'
+		// sitten tutkitaan, onko kyseess√§ alueintegrointi eli 7 'tokenia'
 		else if(i==6 && (tokens[0].first == string("(")) && (tokens[6].first == string(")")))
 		{
 			if(tokens[1].second == VARIABLE && tokens[2].second == NUMBER && tokens[3].second == NUMBER && tokens[4].second == NUMBER && tokens[5].second == NUMBER)
@@ -1713,7 +1713,7 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
 bool NFmiSmartToolIntepreter::IsVariablePeekFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
 {
 	std::string aVariableText(theVariableText);
-	PeekFunctionMap::iterator it = itsTokenPeekFunctions.find(NFmiStringTools::LowerCase(aVariableText)); // t‰ss‰ tarkastellaan case insensitiivisesti
+	PeekFunctionMap::iterator it = itsTokenPeekFunctions.find(NFmiStringTools::LowerCase(aVariableText)); // t√§ss√§ tarkastellaan case insensitiivisesti
 	if(it != itsTokenPeekFunctions.end())
 	{
 		string tmp;
@@ -1721,13 +1721,13 @@ bool NFmiSmartToolIntepreter::IsVariablePeekFunction(const std::string &theVaria
 		int i;
 		for(i=0; i<5 && GetToken(); i++) // maksimissaan 5 kertaa
 		{
-			tmp = token; // luetaan muuttuja/vakio/funktio tai mik‰ lie
+			tmp = token; // luetaan muuttuja/vakio/funktio tai mik√§ lie
 			tmp = HandlePossibleUnaryMarkers(tmp);
 			tokens.push_back(std::make_pair(tmp, tok_type));
-			if(tmp == string(")")) // etsit‰‰n lopetus sulkua
+			if(tmp == string(")")) // etsit√§√§n lopetus sulkua
 				break;
 		}
-		// ensin tutkitaan, onko kyseess‰ peekxy eli yhteens‰ 5 'tokenia' peekxy(T 1 1), huom! sulut on mukana tokeneissa
+		// ensin tutkitaan, onko kyseess√§ peekxy eli yhteens√§ 5 'tokenia' peekxy(T 1 1), huom! sulut on mukana tokeneissa
 		if(i==4 && (tokens[0].first == string("(")) && (tokens[4].first == string(")")))
 		{
 			if(tokens[1].second == VARIABLE && tokens[2].second == NUMBER && tokens[3].second == NUMBER)
@@ -1752,32 +1752,32 @@ bool NFmiSmartToolIntepreter::IsVariablePeekFunction(const std::string &theVaria
 bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
 {
 	std::string aVariableText(theVariableText);
-	MetFunctionMap::iterator it = itsTokenMetFunctions.find(NFmiStringTools::LowerCase(aVariableText)); // t‰ss‰ tarkastellaan case insensitiivisesti
+	MetFunctionMap::iterator it = itsTokenMetFunctions.find(NFmiStringTools::LowerCase(aVariableText)); // t√§ss√§ tarkastellaan case insensitiivisesti
 	if(it != itsTokenMetFunctions.end())
 	{
 		string tmp;
 		checkedVector<pair<string, types> > tokens;
-		int argumentCount = (*it).second.get<2>(); // n‰in monta argumenttia on odotettavissa t‰lle funktio tyypille 
-		int tokenCount = argumentCount + (argumentCount-1) + 2; // ja siin‰ on argumentCount-1 pilkkua v‰liss‰!  + 2 on alku ja loppu sulut
+		int argumentCount = (*it).second.get<2>(); // n√§in monta argumenttia on odotettavissa t√§lle funktio tyypille 
+		int tokenCount = argumentCount + (argumentCount-1) + 2; // ja siin√§ on argumentCount-1 pilkkua v√§liss√§!  + 2 on alku ja loppu sulut
 		for(int i=0; i < tokenCount && GetToken(); i++)
 		{
-			tmp = token; // luetaan muuttuja/vakio/funktio tai mik‰ lie
+			tmp = token; // luetaan muuttuja/vakio/funktio tai mik√§ lie
 			tmp = HandlePossibleUnaryMarkers(tmp);
-			// pit‰‰ tarkistaa ett‰ on oikeissa kohdissa pilkut, mutta ne on ohitettava vain sitten
+			// pit√§√§ tarkistaa ett√§ on oikeissa kohdissa pilkut, mutta ne on ohitettava vain sitten
 			if(tmp == string(",")) // tarkistetaan pilkut
 			{
 				bool isIndexPar = i % 2 == 0; // onko indeksi parillinen
-				bool overNonPossibleStartPos = i > 1; // onko indeksi edennyt ohi alun, miss‰ ei voi olla pilkkuja
-				bool underNonPossibleEndPos = i < tokenCount-2; // onko indeksi viel‰ alle lopun sen kohdan, mink‰ j‰lkeen ei voi olla en‰‰ pilkkuja
+				bool overNonPossibleStartPos = i > 1; // onko indeksi edennyt ohi alun, miss√§ ei voi olla pilkkuja
+				bool underNonPossibleEndPos = i < tokenCount-2; // onko indeksi viel√§ alle lopun sen kohdan, mink√§ j√§lkeen ei voi olla en√§√§ pilkkuja
 				if((isIndexPar && overNonPossibleStartPos && underNonPossibleEndPos) == false)
 					break; // jotain vikaa oli lausekkeessa
 			}
 			tokens.push_back(std::make_pair(tmp, tok_type));
 		}
-		// ensin tutkitaan, oliko funktiossa oikea m‰‰r‰ argumentteja esim. grad(T_Hir), miss‰ on tokeneita 1 + 2 (sulut)
+		// ensin tutkitaan, oliko funktiossa oikea m√§√§r√§ argumentteja esim. grad(T_Hir), miss√§ on tokeneita 1 + 2 (sulut)
 		if(static_cast<long>(tokens.size()) == argumentCount+2 && (tokens[0].first == string("(")) && (tokens[tokens.size()-1].first == string(")")))
 		{
-			if(tokens[1].second == VARIABLE) // tehd‰‰n t‰m‰ toimimaan ensin grad-tapaus  // && tokens[2].second == NUMBER && tokens[3].second == NUMBER)
+			if(tokens[1].second == VARIABLE) // tehd√§√§n t√§m√§ toimimaan ensin grad-tapaus  // && tokens[2].second == NUMBER && tokens[3].second == NUMBER)
 			{
 				InterpretVariable(tokens[1].first, theMaskInfo);
 				if(theMaskInfo->GetOperationType() == NFmiAreaMask::InfoVariable)
@@ -1811,12 +1811,12 @@ bool NFmiSmartToolIntepreter::IsVariableMetFunction(const std::string &theVariab
 bool NFmiSmartToolIntepreter::IsVariableVertFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
 {
 	std::string aVariableText(theVariableText);
-	VertFunctionMap::iterator it = itsTokenVertFunctions.find(NFmiStringTools::LowerCase(aVariableText)); // t‰ss‰ tarkastellaan case insensitiivisesti
+	VertFunctionMap::iterator it = itsTokenVertFunctions.find(NFmiStringTools::LowerCase(aVariableText)); // t√§ss√§ tarkastellaan case insensitiivisesti
 	if(it != itsTokenVertFunctions.end())
 	{
-		// 1. Vertikaali funktioiden tapauksessa tarkistetaan t‰ss‰, ett‰ on '('-merkki, sitten yksi muuttuja ja pilkku, muuten saa lausekkeita ja muita miten haluaa...
-		// 2. Ensimm‰inen parametri pit‰‰ olla pelkistetty yksi parametri (esim. WS_Hir), ei lauseketta esim. WS_Hir - WS_EC (ainakaan viel‰), jotta 
-		//	  voidaan k‰yd‰ dataa l‰pi level-by-level tyyliin eik‰ kuten vanhoilla vertikaali funktioilla, miss‰ oli keinotekoiset stepit, joita k‰ytiin l‰pi (juuri siksi ett‰ parametrin sijasta saattoi olla lauseke.)
+		// 1. Vertikaali funktioiden tapauksessa tarkistetaan t√§ss√§, ett√§ on '('-merkki, sitten yksi muuttuja ja pilkku, muuten saa lausekkeita ja muita miten haluaa...
+		// 2. Ensimm√§inen parametri pit√§√§ olla pelkistetty yksi parametri (esim. WS_Hir), ei lauseketta esim. WS_Hir - WS_EC (ainakaan viel√§), jotta 
+		//	  voidaan k√§yd√§ dataa l√§pi level-by-level tyyliin eik√§ kuten vanhoilla vertikaali funktioilla, miss√§ oli keinotekoiset stepit, joita k√§ytiin l√§pi (juuri siksi ett√§ parametrin sijasta saattoi olla lauseke.)
 		// 3. Lopuissa parametreissa voi olla laskuja, muuttujia tai lausekkeita.
 		GetToken();
 		string tmp = token;
@@ -1840,7 +1840,7 @@ bool NFmiSmartToolIntepreter::IsVariableVertFunction(const std::string &theVaria
 			}
 		}
 
-		// Jos lˆytyi Vertikaali-Funktio, mutta ehdot eiv‰t t‰yttyneet, tehd‰‰n virheilmoitus.
+		// Jos l√∂ytyi Vertikaali-Funktio, mutta ehdot eiv√§t t√§yttyneet, tehd√§√§n virheilmoitus.
 		std::string errorStr(::GetDictionaryString("Function"));
 		errorStr += " '";
 		errorStr += theVariableText;
@@ -1864,14 +1864,14 @@ std::string NFmiSmartToolIntepreter::HandlePossibleUnaryMarkers(const std::strin
 	if(returnStr == string("-"))
 	{
 		GetToken();
-		returnStr += token; // lis‰t‰‰n '-'-etumerkki ja seuraava token ja katsotaan mit‰ syntyy
+		returnStr += token; // lis√§t√§√§n '-'-etumerkki ja seuraava token ja katsotaan mit√§ syntyy
 	}
 	if(returnStr == string("+"))
-		GetToken(); // +-merkki ohitetaan merkityksettˆm‰n‰
+		GetToken(); // +-merkki ohitetaan merkityksett√∂m√§n√§
 	return returnStr;
 }
 
-// N‰m‰ ovat muotoa:
+// N√§m√§ ovat muotoa:
 // RU(T 1 3)
 // eli 1. maskin/funktion nimi, sulku auki, parametri, alkuarvo, loppuarvo ja lopuksi suliku kiinni.
 bool NFmiSmartToolIntepreter::IsVariableRampFunction(const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
@@ -1883,10 +1883,10 @@ bool NFmiSmartToolIntepreter::IsVariableRampFunction(const std::string &theVaria
 		int i;
 		for(i=0; i<5 && GetToken(); i++)
 		{
-			tmp = token; // luetaan muuttuja/vakio/funktio tai mik‰ lie
+			tmp = token; // luetaan muuttuja/vakio/funktio tai mik√§ lie
 			tmp = HandlePossibleUnaryMarkers(tmp);
 			tokens.push_back(std::make_pair(tmp, tok_type));
-			if(tmp == string(")")) // etsit‰‰n lopetus sulkua
+			if(tmp == string(")")) // etsit√§√§n lopetus sulkua
 				break;
 		}
 		if(i==4 && (tokens[0].first == string("(")) && (tokens[4].first == string(")")))
@@ -1952,10 +1952,10 @@ NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &thePara
 //--------------------------------------------------------
 // ExtractFirstCalculationSection
 //--------------------------------------------------------
-// Metodi saa parametrina stripatun macro-tekstin ja etsii siit‰ 1. calculation sectionin.
-// Jos lˆytyy, palauta sen positio, jos ei lˆydy, palauta string.end().
-// Parametrina tulee aloitus positio (merkitsee enemm‰n muissa vastaavissa metodeissa).
-// Tee myˆs seuraavat metodit:
+// Metodi saa parametrina stripatun macro-tekstin ja etsii siit√§ 1. calculation sectionin.
+// Jos l√∂ytyy, palauta sen positio, jos ei l√∂ydy, palauta string.end().
+// Parametrina tulee aloitus positio (merkitsee enemm√§n muissa vastaavissa metodeissa).
+// Tee my√∂s seuraavat metodit:
 // ExtractNextCalculationSection
 // ExtractIfMaskSection
 // ExtractNextElseIfMaskSection
@@ -1977,7 +1977,7 @@ void NFmiSmartToolIntepreter::InitProducerTokens(NFmiProducerSystem *theProducer
 {
 	if(theProducerSystem)
 	{
-		// Tuottaja listaa t‰ydennet‰‰n ProducerSystemin tuottajilla
+		// Tuottaja listaa t√§ydennet√§√§n ProducerSystemin tuottajilla
 		int modelCount = static_cast<int>(theProducerSystem->Producers().size());
 		for(int i=0; i<modelCount; i++)
 		{
@@ -1985,7 +1985,7 @@ void NFmiSmartToolIntepreter::InitProducerTokens(NFmiProducerSystem *theProducer
             for(size_t j = 0; j < prodInfo.ShortNameCount(); j++)
             {
 				std::string prodName(prodInfo.ShortName(j));
-				NFmiStringTools::LowerCase(prodName); // pit‰‰ muuttaa lower case:en!!!
+				NFmiStringTools::LowerCase(prodName); // pit√§√§ muuttaa lower case:en!!!
 				itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(prodName, static_cast<FmiProducerName>(prodInfo.ProducerId())));
             }
 		}
@@ -2030,7 +2030,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("geom"), kFmiGeomHeight));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("geop"), kFmiGeopHeight));
 
-		// laitetaan kokoelma parametritkin kieleen, ett‰ niit‰ voi sijoittaa kerralla yhdell‰ komennolla
+		// laitetaan kokoelma parametritkin kieleen, ett√§ niit√§ voi sijoittaa kerralla yhdell√§ komennolla
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wind"), kFmiTotalWindMS));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("weather"), kFmiWeatherAndCloudiness));
 
@@ -2118,7 +2118,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
         
         itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("messagetype"), kFmiHakeMessageType));
         
-		// ****** sounding index funktiot  HUOM! ne k‰sitell‰‰n case insensitivein‰!! *************************
+		// ****** sounding index funktiot  HUOM! ne k√§sitell√§√§n case insensitivein√§!! *************************
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclsur"), static_cast<FmiParameterName>(kSoundingParLCLSur)));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcsur"), static_cast<FmiParameterName>(kSoundingParLFCSur)));
 		itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elsur"), static_cast<FmiParameterName>(kSoundingParELSur)));
@@ -2212,15 +2212,15 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("eangle"), kFmiElevationAngle));
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("jday"), kFmiDay)); // julian day oikeasti
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("lhour"), kFmiHour)); // local hour oikeasti
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("utchour"), kFmiSecond)); // utc hour k‰ytt‰‰ secondia, koska ei ollut omaa parametria utc hourille enk‰ lis‰‰ sellaista
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("fhour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia k‰ytetty, koska ei ollut valmista parametria
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("utchour"), kFmiSecond)); // utc hour k√§ytt√§√§ secondia, koska ei ollut omaa parametria utc hourille enk√§ lis√§√§ sellaista
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("fhour"), kFmiForecastPeriod)); // forecast hour pikaviritys forperiodia k√§ytetty, koska ei ollut valmista parametria
 		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("timestep"), kFmiDeltaTime)); // TIMESTEP eli timestep palauttaa datan currentin ajan aika stepin tunneissa
 
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("gridsizex"), kFmiLastParameter)); // hilan x suuntainen koko metreiss‰ (muokattavan datan tai macroParam hilan koko)
-		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("gridsizey"), static_cast<FmiParameterName>(kFmiLastParameter+1))); // hilan y suuntainen koko metreiss‰ (muokattavan datan tai macroParam hilan koko)
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("gridsizex"), kFmiLastParameter)); // hilan x suuntainen koko metreiss√§ (muokattavan datan tai macroParam hilan koko)
+		itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("gridsizey"), static_cast<FmiParameterName>(kFmiLastParameter+1))); // hilan y suuntainen koko metreiss√§ (muokattavan datan tai macroParam hilan koko)
 
-		// Alustetaan ensin tuottaja listaan muut tarvittavat tuottajat, Huom! nimi pienell‰, koska
-		// tehd‰‰n case insensitiivej‰ tarkasteluja!!
+		// Alustetaan ensin tuottaja listaan muut tarvittavat tuottajat, Huom! nimi pienell√§, koska
+		// tehd√§√§n case insensitiivej√§ tarkasteluja!!
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("met"), static_cast<FmiProducerName>(999)));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("orig"), kFmiMETEOR));
 		itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
@@ -2246,10 +2246,10 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
 		}
 		else
 		{
-			// t‰st‰ pit‰isi varoittaa ja heitt‰‰ poikkeus, mutta aina ei voi alustaa smarttool-systeemi‰ producersystemill‰ (esim. SmarttoolFilter ei tied‰ moisesta mit‰‰n!!)
+			// t√§st√§ pit√§isi varoittaa ja heitt√§√§ poikkeus, mutta aina ei voi alustaa smarttool-systeemi√§ producersystemill√§ (esim. SmarttoolFilter ei tied√§ moisesta mit√§√§n!!)
 //			throw std::runtime_error("NFmiSmartToolIntepreter::InitTokens - Was not initialized correctly, ProducerSystem missing, error in program, report it!");
 
-			// joten pakko alustaa t‰m‰ t‰ss‰ tapauksessa sitten jollain hardcode tuottajilla
+			// joten pakko alustaa t√§m√§ t√§ss√§ tapauksessa sitten jollain hardcode tuottajilla
 			itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("hir"), kFmiMTAHIRLAM));
 			itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ec"), kFmiMTAECMWF));
 			itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("mbe"), kFmiMTAHIRMESO));
@@ -2332,40 +2332,40 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div"), MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionXandY, 1, "div(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionXandY, 1, "adv(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, NFmiAreaMask::DirectionXandY, 1, "lap(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, NFmiAreaMask::DirectionXandY, 1, "rot(wind)"))); // roottori ottaa totalwind:in parametrina, siit‰ saadaan tuulen u- ja v-komponentit
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, NFmiAreaMask::DirectionXandY, 1, "rot(wind)"))); // roottori ottaa totalwind:in parametrina, siit√§ saadaan tuulen u- ja v-komponentit
 
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("gradx"), MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionX, 1, "gradx(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("divx"), MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionX, 1, "divx(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("advx"), MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionX, 1, "advx(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lapx"), MetFunctionMapValue(NFmiAreaMask::Lap, NFmiAreaMask::DirectionX, 1, "lapx(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rotx"), MetFunctionMapValue(NFmiAreaMask::Rot, NFmiAreaMask::DirectionX, 1, "rotx(wind)"))); // roottori ottaa totalwind:in parametrina, siit‰ saadaan tuulen u- ja v-komponentit
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rotx"), MetFunctionMapValue(NFmiAreaMask::Rot, NFmiAreaMask::DirectionX, 1, "rotx(wind)"))); // roottori ottaa totalwind:in parametrina, siit√§ saadaan tuulen u- ja v-komponentit
 
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grady"), MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionY, 1, "grady(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("divy"), MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionY, 1, "divy(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("advy"), MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionY, 1, "advy(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lapy"), MetFunctionMapValue(NFmiAreaMask::Lap, NFmiAreaMask::DirectionY, 1, "lapy(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("roty"), MetFunctionMapValue(NFmiAreaMask::Rot, NFmiAreaMask::DirectionY, 1, "roty(wind)"))); // roottori ottaa totalwind:in parametrina, siit‰ saadaan tuulen u- ja v-komponentit
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("roty"), MetFunctionMapValue(NFmiAreaMask::Rot, NFmiAreaMask::DirectionY, 1, "roty(wind)"))); // roottori ottaa totalwind:in parametrina, siit√§ saadaan tuulen u- ja v-komponentit
 
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad2"), MetFunctionMapValue(NFmiAreaMask::Grad2, NFmiAreaMask::DirectionXandY, 1, "grad2(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div2"), MetFunctionMapValue(NFmiAreaMask::Divergence2, NFmiAreaMask::DirectionXandY, 1, "div2(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv2"), MetFunctionMapValue(NFmiAreaMask::Adv2, NFmiAreaMask::DirectionXandY, 1, "adv2(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap2"), MetFunctionMapValue(NFmiAreaMask::Lap2, NFmiAreaMask::DirectionXandY, 1, "lap2(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2"), MetFunctionMapValue(NFmiAreaMask::Rot2, NFmiAreaMask::DirectionXandY, 1, "rot2(wind)"))); // roottori ottaa totalwind:in parametrina, siit‰ saadaan tuulen u- ja v-komponentit
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2"), MetFunctionMapValue(NFmiAreaMask::Rot2, NFmiAreaMask::DirectionXandY, 1, "rot2(wind)"))); // roottori ottaa totalwind:in parametrina, siit√§ saadaan tuulen u- ja v-komponentit
 
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad2x"), MetFunctionMapValue(NFmiAreaMask::Grad2, NFmiAreaMask::DirectionX, 1, "grad2x(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div2x"), MetFunctionMapValue(NFmiAreaMask::Divergence2, NFmiAreaMask::DirectionX, 1, "div2x(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv2x"), MetFunctionMapValue(NFmiAreaMask::Adv2, NFmiAreaMask::DirectionX, 1, "adv2x(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap2x"), MetFunctionMapValue(NFmiAreaMask::Lap2, NFmiAreaMask::DirectionX, 1, "lap2x(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2x"), MetFunctionMapValue(NFmiAreaMask::Rot2, NFmiAreaMask::DirectionX, 1, "rot2x(wind)"))); // roottori ottaa totalwind:in parametrina, siit‰ saadaan tuulen u- ja v-komponentit
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2x"), MetFunctionMapValue(NFmiAreaMask::Rot2, NFmiAreaMask::DirectionX, 1, "rot2x(wind)"))); // roottori ottaa totalwind:in parametrina, siit√§ saadaan tuulen u- ja v-komponentit
 
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad2y"), MetFunctionMapValue(NFmiAreaMask::Grad2, NFmiAreaMask::DirectionY, 1, "grad2y(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div2y"), MetFunctionMapValue(NFmiAreaMask::Divergence2, NFmiAreaMask::DirectionY, 1, "div2y(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv2y"), MetFunctionMapValue(NFmiAreaMask::Adv2, NFmiAreaMask::DirectionY, 1, "adv2y(param)")));
 		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap2y"), MetFunctionMapValue(NFmiAreaMask::Lap2, NFmiAreaMask::DirectionY, 1, "lap2y(param)")));
-		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2y"), MetFunctionMapValue(NFmiAreaMask::Rot2, NFmiAreaMask::DirectionY, 1, "rot2y(wind)"))); // roottori ottaa totalwind:in parametrina, siit‰ saadaan tuulen u- ja v-komponentit
+		itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2y"), MetFunctionMapValue(NFmiAreaMask::Rot2, NFmiAreaMask::DirectionY, 1, "rot2y(wind)"))); // roottori ottaa totalwind:in parametrina, siit√§ saadaan tuulen u- ja v-komponentit
 
-		// t‰ss‰ on vertikaaliset-funktiot
-		// vertp-funktiot eli n‰it‰ operoidaan aina painepinnoilla [hPa]
+		// t√§ss√§ on vertikaaliset-funktiot
+		// vertp-funktiot eli n√§it√§ operoidaan aina painepinnoilla [hPa]
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertP, 3, string("vertp_max(par, p1, p2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertP, 3, string("vertp_min(par, p1, p2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertP, 3, string("vertp_avg(par, p1, p2)"))));
@@ -2377,7 +2377,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertP, 3, string("vertp_minh(par, p1, p2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_grad"), VertFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::VertP, 3, string("vertp_grad(par, p1, p2)"))));
 
-		// vertfl-funktiot eli n‰it‰ operoidaan aina lentopinnoilla flight-level [hft]
+		// vertfl-funktiot eli n√§it√§ operoidaan aina lentopinnoilla flight-level [hft]
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertFL, 3, string("vertfl_max(par, fl1, fl2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertFL, 3, string("vertfl_min(par, fl1, fl2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertFL, 3, string("vertfl_avg(par, fl1, fl2)"))));
@@ -2389,7 +2389,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertFL, 3, string("vertfl_minh(par, fl1, fl2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_grad"), VertFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::VertFL, 3, string("vertfl_grad(par, fl1, fl2)"))));
 
-		// vertz-funktiot eli n‰it‰ operoidaan aina metrisill‰ korkeuksilla [m]
+		// vertz-funktiot eli n√§it√§ operoidaan aina metrisill√§ korkeuksilla [m]
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertZ, 3, string("vertz_max(par, z1, z2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertZ, 3, string("vertz_min(par, z1, z2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertZ, 3, string("vertz_avg(par, z1, z2)"))));
@@ -2401,7 +2401,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertZ, 3, string("vertz_minh(par, z1, z2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_grad"), VertFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::VertZ, 3, string("vertz_grad(par, z1, z2)"))));
 
-		// vertlev-funktiot eli n‰it‰ operoidaan aina mallipintadatan hybrid-level arvoilla esim. hirlamissa arvot ovat 60 - 1
+		// vertlev-funktiot eli n√§it√§ operoidaan aina mallipintadatan hybrid-level arvoilla esim. hirlamissa arvot ovat 60 - 1
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertHyb, 3, string("vertlev_max(par, hyb1, hyb2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertHyb, 3, string("vertlev_min(par, hyb1, hyb2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertHyb, 3, string("vertlev_avg(par, hyb1, hyb2)"))));
@@ -2413,7 +2413,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertHyb, 3, string("vertlev_minh(par, hyb1, hyb2)"))));
 		itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_grad"), VertFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::VertHyb, 3, string("vertlev_grad(par, hyb1, hyb2)"))));
 
-		// Probability-laskenta (laatikko eli rect) vertlev-funktiot eli n‰m‰ on laitettu t‰h‰n, koska t‰m‰n funktion parametrien k‰sittely sopii tn-laskuille
+		// Probability-laskenta (laatikko eli rect) vertlev-funktiot eli n√§m√§ on laitettu t√§h√§n, koska t√§m√§n funktion parametrien k√§sittely sopii tn-laskuille
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::ProbRect, 5, string("probrect_over(par, radius_km, time_offset1, time_offset2, limit)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::ProbRect, 5, string("probrect_overeq(par, radius_km, time_offset1, time_offset2, limit)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::ProbRect, 5, string("probrect_under(par, radius_km, time_offset1, time_offset2, limit)"))));
@@ -2423,7 +2423,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::ProbRect, 6, string("probrect_between(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::ProbRect, 6, string("probrect_betweeneq(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
 
-		// Probability-laskenta (ympyr‰ eli circle) vertlev-funktiot eli n‰m‰ on laitettu t‰h‰n, koska t‰m‰n funktion parametrien k‰sittely sopii tn-laskuille
+		// Probability-laskenta (ympyr√§ eli circle) vertlev-funktiot eli n√§m√§ on laitettu t√§h√§n, koska t√§m√§n funktion parametrien k√§sittely sopii tn-laskuille
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::ProbCircle, 5, string("probcircle_over(par, radius_km, time_offset1, time_offset2, limit)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::ProbCircle, 5, string("probcircle_overeq(par, radius_km, time_offset1, time_offset2, limit)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::ProbCircle, 5, string("probcircle_under(par, radius_km, time_offset1, time_offset2, limit)"))));
@@ -2433,7 +2433,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::ProbCircle, 6, string("probcircle_between(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::ProbCircle, 6, string("probcircle_betweeneq(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
 
-        // Esiintym‰ funktio eli kuinka monta kertaa joku ehto halutulle parametrille pit‰‰ paikkaansa (halutulla aikav‰lill‰ ja halutun s‰teisell‰ alueella).
+        // Esiintym√§ funktio eli kuinka monta kertaa joku ehto halutulle parametrille pit√§√§ paikkaansa (halutulla aikav√§lill√§ ja halutun s√§teisell√§ alueella).
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::Occurrence, 5, string("occurrence_over(par, radius_km, time_offset1, time_offset2, limit)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::Occurrence, 5, string("occurrence_overeq(par, radius_km, time_offset1, time_offset2, limit)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::Occurrence, 5, string("occurrence_under(par, radius_km, time_offset1, time_offset2, limit)"))));
@@ -2443,37 +2443,37 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem, 
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::Occurrence, 6, string("occurrence_between(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::Occurrence, 6, string("occurrence_betweeneq(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
 
-        // Hae asemadatasta l‰hin arvo funktionaalisuus
+        // Hae asemadatasta l√§hin arvo funktionaalisuus
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("closestvalue"), VertFunctionMapValue(NFmiAreaMask::ClosestObsTimeOffset, NFmiAreaMask::ClosestObsValue, 2, string("closestvalue(par, timeoffset)"))));
 
-        // time_*-funktiot laskevat halutun operaation l‰pi halutun aikahaarukan. Laskut k‰yd‰‰n l‰pi datan omassa aikaresoluutiossa, eli t‰ss‰ ei ole aikainterpolaatioita kuten esim. maxt vastaavissa funktioissa.
+        // time_*-funktiot laskevat halutun operaation l√§pi halutun aikahaarukan. Laskut k√§yd√§√§n l√§pi datan omassa aikaresoluutiossa, eli t√§ss√§ ei ole aikainterpolaatioita kuten esim. maxt vastaavissa funktioissa.
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::TimeRange, 3, string("time_max(par, time_offset1, time_offset2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::TimeRange, 3, string("time_min(par, time_offset1, time_offset2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::TimeRange, 3, string("time_avg(par, time_offset1, time_offset2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::TimeRange, 3, string("time_sum(par, time_offset1, time_offset2)"))));
 
-        // T‰ss‰ on time-range vertikaaliset-funktiot, jotka operoivat datan omassa aika ja level resoluutiossa. 
-        // Esim. hae maksimi arvo 2h aikav‰lill‰ 1000 ja 500 hPa v‰lilt‰.
+        // T√§ss√§ on time-range vertikaaliset-funktiot, jotka operoivat datan omassa aika ja level resoluutiossa. 
+        // Esim. hae maksimi arvo 2h aikav√§lill√§ 1000 ja 500 hPa v√§lilt√§.
         // =================================================================
-        // timevertp-funktiot eli n‰it‰ operoidaan aina painepinnoilla [hPa]
+        // timevertp-funktiot eli n√§it√§ operoidaan aina painepinnoilla [hPa]
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertp_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::TimeVertP, 5, string("timevertp_max(par, timeoffset1, timeoffset2, p1, p2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertp_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::TimeVertP, 5, string("timevertp_min(par, timeoffset1, timeoffset2, p1, p2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertp_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::TimeVertP, 5, string("timevertp_avg(par, timeoffset1, timeoffset2, p1, p2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertp_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::TimeVertP, 5, string("timevertp_sum(par, timeoffset1, timeoffset2, p1, p2)"))));
 
-        // timevertfl-funktiot eli n‰it‰ operoidaan aina flight level pinnoilla [hft]
+        // timevertfl-funktiot eli n√§it√§ operoidaan aina flight level pinnoilla [hft]
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertfl_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::TimeVertFL, 5, string("timevertfl_max(par, timeoffset1, timeoffset2, fl1, fl2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertfl_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::TimeVertFL, 5, string("timevertfl_min(par, timeoffset1, timeoffset2, fl1, fl2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertfl_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::TimeVertFL, 5, string("timevertfl_avg(par, timeoffset1, timeoffset2, fl1, fl2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertfl_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::TimeVertFL, 5, string("timevertfl_sum(par, timeoffset1, timeoffset2, fl1, fl2)"))));
 
-        // timevertz-funktiot eli n‰it‰ operoidaan aina metrisill‰ korkeuksilla [m]
+        // timevertz-funktiot eli n√§it√§ operoidaan aina metrisill√§ korkeuksilla [m]
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertz_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::TimeVertZ, 5, string("timevertz_max(par, timeoffset1, timeoffset2, z1, z2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertz_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::TimeVertZ, 5, string("timevertz_min(par, timeoffset1, timeoffset2, z1, z2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertz_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::TimeVertZ, 5, string("timevertz_avg(par, timeoffset1, timeoffset2, z1, z2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertz_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::TimeVertZ, 5, string("timevertz_sum(par, timeoffset1, timeoffset2, z1, z2)"))));
 
-        // timevertlev-funktiot eli n‰it‰ operoidaan aina mallipintadatan hybrid-level arvoilla esim. hirlamissa arvot ovat 60 - 1
+        // timevertlev-funktiot eli n√§it√§ operoidaan aina mallipintadatan hybrid-level arvoilla esim. hirlamissa arvot ovat 60 - 1
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertlev_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::TimeVertHyb, 5, string("timevertlev_max(par, timeoffset1, timeoffset2, lev1, lev2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertlev_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::TimeVertHyb, 5, string("timevertlev_min(par, timeoffset1, timeoffset2, lev1, lev2)"))));
         itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertlev_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::TimeVertHyb, 5, string("timevertlev_avg(par, timeoffset1, timeoffset2, lev1, lev2)"))));

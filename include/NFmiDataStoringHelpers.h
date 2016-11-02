@@ -1,7 +1,7 @@
-//© Ilmatieteenlaitos/Marko.
+//¬© Ilmatieteenlaitos/Marko.
 //Original 5.10.2007
 //
-// namespacessa on muutamia helper funktioita ja 'ylim‰‰r‰isen' datan talletus luokka.
+// namespacessa on muutamia helper funktioita ja 'ylim√§√§r√§isen' datan talletus luokka.
 //---------------------------------------------------------- NFmiDataStoringHelpers.h
 
 #ifndef NFMIDATASTORINGHELPERS_H
@@ -18,17 +18,17 @@
 
 namespace NFmiDataStoringHelpers
 {
-	// yleisi‰ container-kirjoitus ja luku funktioita
-	// theReallyStoredSize on s‰‰stˆ‰ tarkoitettu parametri. Eli jos se on oletusarvossa -1, talletus tapahtuu normaalista
-	// eli kaikki talletetaan mit‰ annetussa containerissa on. Jos parametrin arvo on jotain muuta,
+	// yleisi√§ container-kirjoitus ja luku funktioita
+	// theReallyStoredSize on s√§√§st√∂√§ tarkoitettu parametri. Eli jos se on oletusarvossa -1, talletus tapahtuu normaalista
+	// eli kaikki talletetaan mit√§ annetussa containerissa on. Jos parametrin arvo on jotain muuta,
 	// talletetaan vain niin monta itemia, kuin parametrissa on annettu.
 	template<typename T>
 	inline void WriteContainer(const T & theContainer, std::ostream& os, const std::string &theSeparator, int theReallyStoredSize = -1)
 	{
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1500)
-// MSVC 2008 ei sitten osannut en‰‰ k‰‰nt‰‰ alempana olevaa koodia (KUN annetussa containerissa 
-// oli luokan sis‰isi‰ luokkia), joten tein for loopin, joka meni l‰pi.
+// MSVC 2008 ei sitten osannut en√§√§ k√§√§nt√§√§ alempana olevaa koodia (KUN annetussa containerissa 
+// oli luokan sis√§isi√§ luokkia), joten tein for loopin, joka meni l√§pi.
 		size_t storedCount = theReallyStoredSize;
 		if(storedCount > theContainer.size())
 			storedCount = theContainer.size();
@@ -37,7 +37,7 @@ namespace NFmiDataStoringHelpers
 		for(size_t i = 0; i < storedCount; i++)
 		{
 			os << theContainer[i];
-			if(i < storedCount-1) // ei laiteta separaattoria viimeisen j‰lkeen
+			if(i < storedCount-1) // ei laiteta separaattoria viimeisen j√§lkeen
 				os << theSeparator;
 		}
 #else
@@ -71,10 +71,10 @@ namespace NFmiDataStoringHelpers
 		}
 	}
 
-	// theUsedCurrentTime on ns. sein‰kello aika. Se pit‰‰ antaa kaikille n‰ille aikafunktioille. Siin‰ on normaalisti 
+	// theUsedCurrentTime on ns. sein√§kello aika. Se pit√§√§ antaa kaikille n√§ille aikafunktioille. Siin√§ on normaalisti 
 	// nykyhetken kellon aika minuutin tarkkuudella. Mutta jos ollaan SmartMetin CaseStudy-moodissa, laitetaankin siihen
-	// kyseiseen CaseStudyyn talletettu sein‰kelloaika. T‰m‰n avulla voidaan CaseStudy-moodissa k‰ytt‰‰ normaaleja 
-	// n‰yttˆmakroja niin ett‰ makron ajat kelautuvat tarvittaessa aina vuosien p‰‰h‰n.
+	// kyseiseen CaseStudyyn talletettu sein√§kelloaika. T√§m√§n avulla voidaan CaseStudy-moodissa k√§ytt√§√§ normaaleja 
+	// n√§ytt√∂makroja niin ett√§ makron ajat kelautuvat tarvittaessa aina vuosien p√§√§h√§n.
 
 	void WriteTimeWithOffsets(const NFmiMetTime &theUsedCurrentTime, const NFmiMetTime &theTime, std::ostream& os);
 	void ReadTimeWithOffsets(const NFmiMetTime &theUsedCurrentTime, NFmiMetTime &theTime, std::istream& is);
@@ -85,12 +85,12 @@ namespace NFmiDataStoringHelpers
 	void SetUsedViewMacroTime(const NFmiMetTime &theTime);
 	NFmiMetTime GetUsedViewMacroTime(void);
 
-	// Luokka jota k‰yttet‰‰n itsens‰ kirjoittavien luokkien
-	// tulevaisuudessa lis‰ttyjen datojen tallettamiseen.
-	// Eli luokka joka sis‰lt‰‰ n klp float lukuja ja m kpl
-	// string olioita. Vanha versio osaa lukea uudemman version sis‰‰ns‰
-	// vaikka ei ymm‰rr‰ sis‰ltˆ‰. Ja uusi versio yritt‰‰ lukea niin paljon
-	// kuin lˆyt‰‰ vanhasta versiosta.
+	// Luokka jota k√§yttet√§√§n itsens√§ kirjoittavien luokkien
+	// tulevaisuudessa lis√§ttyjen datojen tallettamiseen.
+	// Eli luokka joka sis√§lt√§√§ n klp float lukuja ja m kpl
+	// string olioita. Vanha versio osaa lukea uudemman version sis√§√§ns√§
+	// vaikka ei ymm√§rr√§ sis√§lt√∂√§. Ja uusi versio yritt√§√§ lukea niin paljon
+	// kuin l√∂yt√§√§ vanhasta versiosta.
 	struct NFmiExtraDataStorage
 	{
 		void Clear(void);

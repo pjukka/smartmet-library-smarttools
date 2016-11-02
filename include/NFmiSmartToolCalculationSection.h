@@ -5,7 +5,7 @@
 //  Author         : pietarin 
 //  Creation Date  : Thur - Jun 20, 2002 
 // 
-// T‰m‰ luokka hoitaa calculationsectionin yksi laskurivi kerrallaan.
+// T√§m√§ luokka hoitaa calculationsectionin yksi laskurivi kerrallaan.
 // esim. 
 // T = T + 1
 // P = P + 2

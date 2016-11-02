@@ -44,11 +44,11 @@ NFmiSmartInfo& NFmiSmartInfo::operator=(const NFmiSmartInfo &theInfo)
 
 NFmiSmartInfo* NFmiSmartInfo::Clone(void) const
 {
-	NFmiQueryData *cloneData = itsDataPtr.get()->Clone(); // datasta teht‰v‰ t‰ss‰ kopio!
-	NFmiSmartInfo *copy = new NFmiSmartInfo(cloneData, itsDataType, itsDataFileName, itsDataFilePattern); // t‰m‰ ei osaa tehd‰ kaikesta tarvittavasta datasta kopiota
-	copy->CopyClonedDatas(*this); // t‰ss‰ laitetaan kaikki loput tarvittavat NFmiSmartInfo-data osat kopioitavaksi clooniin.
-	// Pit‰‰ asettaa iteraattorit myˆs kohdalleen
-	copy->Param(Param()); // T‰m‰ pit‰‰ asettaa parametrilla, pelkk‰ indeksin asetus ei riit‰ (aliparametri juttu)!!!
+	NFmiQueryData *cloneData = itsDataPtr.get()->Clone(); // datasta teht√§v√§ t√§ss√§ kopio!
+	NFmiSmartInfo *copy = new NFmiSmartInfo(cloneData, itsDataType, itsDataFileName, itsDataFilePattern); // t√§m√§ ei osaa tehd√§ kaikesta tarvittavasta datasta kopiota
+	copy->CopyClonedDatas(*this); // t√§ss√§ laitetaan kaikki loput tarvittavat NFmiSmartInfo-data osat kopioitavaksi clooniin.
+	// Pit√§√§ asettaa iteraattorit my√∂s kohdalleen
+	copy->Param(Param()); // T√§m√§ pit√§√§ asettaa parametrilla, pelkk√§ indeksin asetus ei riit√§ (aliparametri juttu)!!!
 	copy->TimeIndex(TimeIndex());
 	copy->LevelIndex(LevelIndex());
 	copy->LocationIndex(LocationIndex());
@@ -83,7 +83,7 @@ void NFmiSmartInfo::CopyClonedDatas(const NFmiSmartInfo &theOther)
 	}
 }
 
-void NFmiSmartInfo::UndoLevel(long theDepth)	// theDepth kuvaa kuinka monta Undota voidaan tehd‰.
+void NFmiSmartInfo::UndoLevel(long theDepth)	// theDepth kuvaa kuinka monta Undota voidaan tehd√§.
 {
 	itsQDataBookKeepingPtr->UndoLevel(theDepth, *itsRefRawData);
 }
@@ -128,13 +128,13 @@ void NFmiSmartInfo::LoadedFromFile(bool loadedFromFile)
 	itsQDataBookKeepingPtr->LoadedFromFile(loadedFromFile);
 }
 
-//   Siirt‰‰ 'iteraattorin' osoittamaan seuraavaa
+//   Siirt√§√§ 'iteraattorin' osoittamaan seuraavaa
 //   maskattua paikkaa.
 //   Kutsutaan emon Next()-metodia ja katsotaan,
-//   mik‰ itsAreaMask-olio
+//   mik√§ itsAreaMask-olio
 //   palauttaa. Jos Maski on true, palautetaan
 //   true, muuten kutsutaan
-//   taas emon Next:i‰ ja jatketaan kunnes emon
+//   taas emon Next:i√§ ja jatketaan kunnes emon
 //   Next palauttaa falsen.
 bool NFmiSmartInfo::NextLocation()
 {

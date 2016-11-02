@@ -3,8 +3,8 @@
  * \file NFmiSoundingFunctions.h
  *
  * Namespace, jossa erilaisia irto funktioita, joiden avulla lasketaan
- * erilaisia mm. luotauksiin liittvi‰ juttuja.
- * Julkisia funktioita on vain osa, cpp-filessa on paljon lis‰‰ tavaraa.
+ * erilaisia mm. luotauksiin liittvi√§ juttuja.
+ * Julkisia funktioita on vain osa, cpp-filessa on paljon lis√§√§ tavaraa.
  */
 // ======================================================================
 

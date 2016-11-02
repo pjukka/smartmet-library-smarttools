@@ -26,7 +26,7 @@ static void ThrowLatLonProblemException(const std::string &theFunctionNameStr, c
 
 // purkaa rivin
 // 2963 23.5 60.8167 JOKIOINEN OBSERVATORIO
-// osiin, ja rakentaan NFmiStation-otuksen, niin ett‰ 3. spacen j‰lkeen kaikki on nime‰.
+// osiin, ja rakentaan NFmiStation-otuksen, niin ett√§ 3. spacen j√§lkeen kaikki on nime√§.
 static bool GetStationFromString(const std::string &theStationStr, const std::string &theInitFileName, NFmiStation &theStationOut)
 {
 	std::vector<std::string> strVector = NFmiStringTools::Split(theStationStr, " ");
@@ -39,7 +39,7 @@ static bool GetStationFromString(const std::string &theStationStr, const std::st
 		throw std::runtime_error(errStr);
 	}
 	else if(strVector.size() <= 1)
-		return false; // en ole varma splitterist‰, mutta ignoorataan vain tyhj‰/yhden osion rivit
+		return false; // en ole varma splitterist√§, mutta ignoorataan vain tyhj√§/yhden osion rivit
 
 	theStationOut.SetIdent(NFmiStringTools::Convert<unsigned long>(strVector[0]));
 	theStationOut.SetLongitude(NFmiStringTools::Convert<double>(strVector[1]));
@@ -56,9 +56,9 @@ static bool GetStationFromString(const std::string &theStationStr, const std::st
 }
 
 // poistaa alku+loppu spacet ja tabulaattorit
-// sek‰ sanojen v‰list‰ muut paitsi spacet ja tabit paitsi yhden spacen.
-// Jos sanojen v‰lill‰ on ainoastaan tabulaattoreita, korvaa ne yhdell‰ spacella.
-// <cr> ja <lf> ei poisteta eik‰ huomioida (paitsi alusta ja lopusta)!!
+// sek√§ sanojen v√§list√§ muut paitsi spacet ja tabit paitsi yhden spacen.
+// Jos sanojen v√§lill√§ on ainoastaan tabulaattoreita, korvaa ne yhdell√§ spacella.
+// <cr> ja <lf> ei poisteta eik√§ huomioida (paitsi alusta ja lopusta)!!
 static std::string RemoveExtraSpaces(const std::string &theStr)
 {
 	std::string tmp(theStr);
@@ -77,7 +77,7 @@ static std::string RemoveExtraSpaces(const std::string &theStr)
 			if(wordBreak == false)
 			{
 				wordBreak = true;
-				result.push_back(' '); // laitetaan aina sanan per‰‰n yksi space
+				result.push_back(' '); // laitetaan aina sanan per√§√§n yksi space
 			}
 		}
 		else
@@ -90,9 +90,9 @@ static std::string RemoveExtraSpaces(const std::string &theStr)
 	return result;
 }
 
-// Lukee initialisointi tiedostosta asema tiedot, heitt‰‰ poikkeuksen jos ongelmia.
+// Lukee initialisointi tiedostosta asema tiedot, heitt√§√§ poikkeuksen jos ongelmia.
 // Asema tiedoston formaatti on seuraava (kommentit sallittuja, mutta asema rivit 
-// ilman kommentti merkkej‰):
+// ilman kommentti merkkej√§):
 // 
 // // id  lon  lat      name (with spaces to the end of line)
 // 2963 23.5 60.8167 JOKIOINEN OBSERVATORIO
@@ -100,7 +100,7 @@ static std::string RemoveExtraSpaces(const std::string &theStr)
 void NFmiRawTempStationInfoSystem::Init(const std::string &theInitFileName)
 {
 	itsInitLogMessage = "";
-	itsLocations = NFmiHPlaceDescriptor(); // tyhjennet‰‰n ensin asemalista
+	itsLocations = NFmiHPlaceDescriptor(); // tyhjennet√§√§n ensin asemalista
 	NFmiLocationBag locBag;
 
 	if(theInitFileName.empty())
@@ -115,7 +115,7 @@ void NFmiRawTempStationInfoSystem::Init(const std::string &theInitFileName)
 		std::stringstream in(stripComments.GetString());
 #endif
 
-		const int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+		const int maxBufferSize = 1024+1; // kuinka pitk√§ yhden rivin maksimissaan oletetaan olevan
 		std::string buffer;
 		NFmiStation station;
 		int i = 0;
@@ -135,7 +135,7 @@ void NFmiRawTempStationInfoSystem::Init(const std::string &theInitFileName)
 			}
 			i++;
 		}while(in.good());
-		itsLocations = NFmiHPlaceDescriptor(locBag); // tyhjennet‰‰n ensin asemalista
+		itsLocations = NFmiHPlaceDescriptor(locBag); // tyhjennet√§√§n ensin asemalista
 		itsInitLogMessage = "Initializing sounding station data went OK, from file: ";
 		itsInitLogMessage += theInitFileName;
 		if(itsLocations.Size() == 0)
@@ -158,10 +158,10 @@ void NFmiRawTempStationInfoSystem::Init(const std::string &theInitFileName)
 // *****************  NFmiAviationStationInfoSystem_Obsolite  ************
 // ***********************************************************************
 
-// Lukee initialisointi tiedostosta asema tiedot, heitt‰‰ poikkeuksen jos ongelmia.
-// Lukee asema tiedot jotka saadaan webist‰ paikasta http://weather.noaa.gov/data/nsd_bbsss.txt
+// Lukee initialisointi tiedostosta asema tiedot, heitt√§√§ poikkeuksen jos ongelmia.
+// Lukee asema tiedot jotka saadaan webist√§ paikasta http://weather.noaa.gov/data/nsd_bbsss.txt
 // Asema tiedoston formaatti on seuraava (kommentit sallittuja, mutta asema rivit 
-// ilman kommentti merkkej‰):
+// ilman kommentti merkkej√§):
 // 
 // Keyed by Index (Block and Station) Number
 // This index table from http://weather.noaa.gov/tg/site.shtml
@@ -202,13 +202,13 @@ void NFmiRawTempStationInfoSystem::Init(const std::string &theInitFileName)
 void NFmiAviationStationInfoSystem_Obsolite::Init(const std::string &theInitFileName)
 {
 	itsInitLogMessage = "";
-	itsLocations = NFmiHPlaceDescriptor(); // tyhjennet‰‰n ensin asemalista
+	itsLocations = NFmiHPlaceDescriptor(); // tyhjennet√§√§n ensin asemalista
 	NFmiLocationBag locBag;
 
 	if(theInitFileName.empty())
 		throw std::runtime_error("NFmiAviationStationInfoSystem_Obsolite::Init - empty settings filename given.");
 
-	NFmiCommentStripper stripComments(false); // ei stripata # eli pound kommentteja, koska stripperiss‰ on bugi
+	NFmiCommentStripper stripComments(false); // ei stripata # eli pound kommentteja, koska stripperiss√§ on bugi
 	if(stripComments.ReadAndStripFile(theInitFileName))
 	{
 #ifdef OLDGCC
@@ -217,7 +217,7 @@ void NFmiAviationStationInfoSystem_Obsolite::Init(const std::string &theInitFile
 		std::stringstream in(stripComments.GetString());
 #endif
 
-		const int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+		const int maxBufferSize = 1024+1; // kuinka pitk√§ yhden rivin maksimissaan oletetaan olevan
 		std::string buffer;
 		AviationStation station;
 		int i = 0;
@@ -233,14 +233,14 @@ void NFmiAviationStationInfoSystem_Obsolite::Init(const std::string &theInitFile
 			{
 				counter++;
 				unsigned long oldSize = locBag.GetSize();
-				locBag.AddLocation(station, false); // AddLocation ongelma, k‰ytt‰‰ NFmiLocation::operator< -metodia, joka ei vertaa station-id:t‰ vaan nimi ja lat+lon. T‰llˆin jotkut noaa listan asemista menev‰t p‰‰llekk‰in.
+				locBag.AddLocation(station, false); // AddLocation ongelma, k√§ytt√§√§ NFmiLocation::operator< -metodia, joka ei vertaa station-id:t√§ vaan nimi ja lat+lon. T√§ll√∂in jotkut noaa listan asemista menev√§t p√§√§llekk√§in.
 				unsigned long newSize = locBag.GetSize();
 				if(fVerboseMode && oldSize == newSize)
 						cerr << "Duplicate station info:" << endl << buffer.c_str() << endl;
 			}
 			i++;
 		}while(in.good());
-		itsLocations = NFmiHPlaceDescriptor(locBag); // tyhjennet‰‰n ensin asemalista
+		itsLocations = NFmiHPlaceDescriptor(locBag); // tyhjennet√§√§n ensin asemalista
 		if(fVerboseMode)
 		{
 			itsInitLogMessage = "Initializing NFmiAviationStationInfoSystem_Obsolite data went OK, from file: ";
@@ -262,10 +262,10 @@ void NFmiAviationStationInfoSystem_Obsolite::Init(const std::string &theInitFile
 		throw std::runtime_error(std::string("NFmiAviationStationInfoSystem_Obsolite::Init - trouble reading file: ") + theInitFileName);
 }
 
-// esim. 70-56N (ilmeisesti myˆs sekunnit voi olla mukana, jolloin olisi 70-56-24N)
+// esim. 70-56N (ilmeisesti my√∂s sekunnit voi olla mukana, jolloin olisi 70-56-24N)
 // Station Latitude 		DD-MM-SSH where DD is degrees, MM is minutes, SS is seconds and H is N for northern hemisphere or S for southern hemisphere. The seconds value is omitted for those stations where the seconds value is unknown.
 // tai
-// esim. 008-40W (ilmeisesti myˆs sekunnit voi olla mukana, jolloin olisi esim. 008-40-15W)
+// esim. 008-40W (ilmeisesti my√∂s sekunnit voi olla mukana, jolloin olisi esim. 008-40-15W)
 // Station Longitude 		DDD-MM-SSH where DDD is degrees, MM is minutes, SS is seconds and H is E for eastern hemisphere or W for western hemisphere. The seconds value is omitted for those stations where the seconds value is unknown.
 static double GetLatOrLonFromString(const std::string &theLatOrLonStr, const std::string &theLineStr, const std::string &theInitFileName, char posMark, char negMark)
 {
@@ -279,25 +279,25 @@ static double GetLatOrLonFromString(const std::string &theLatOrLonStr, const std
 	bool posSign = true;
 	if(strVector.size() == 2)
 	{
-		char ch = static_cast<char>(::toupper(strVector[1].operator[](strVector[1].size()-1))); // t‰h‰n N, S, W tai E
+		char ch = static_cast<char>(::toupper(strVector[1].operator[](strVector[1].size()-1))); // t√§h√§n N, S, W tai E
 		if(ch == posMark)
 			posSign = true;
 		else if(ch == negMark)
 			posSign = false;
 		else
 			ThrowLatLonProblemException("GetLatOrLonFromString", "The station's lat/lon string didn't have N, S, W or E at end", theLatOrLonStr, theLineStr, theInitFileName);
-		strVector[1].resize(strVector[1].size()-1); // lyhennet‰‰n t‰t‰ stringi‰, niin ett‰ viimeinen merkki j‰‰ pois
+		strVector[1].resize(strVector[1].size()-1); // lyhennet√§√§n t√§t√§ stringi√§, niin ett√§ viimeinen merkki j√§√§ pois
 	}
 	else if(strVector.size() == 3)
 	{
-		char ch = static_cast<char>(::toupper(strVector[2].operator[](strVector[2].size()-1))); // t‰h‰n N, S, W tai E
+		char ch = static_cast<char>(::toupper(strVector[2].operator[](strVector[2].size()-1))); // t√§h√§n N, S, W tai E
 		if(ch == posMark)
 			posSign = true;
 		else if(ch == negMark)
 			posSign = false;
 		else
 			ThrowLatLonProblemException("GetLatOrLonFromString", "The station's lat/lon string didn't have N, S, W or E at end", theLatOrLonStr, theLineStr, theInitFileName);
-		strVector[2].resize(strVector[2].size()-1); // lyhennet‰‰n t‰t‰ stringi‰, niin ett‰ viimeinen merkki j‰‰ pois
+		strVector[2].resize(strVector[2].size()-1); // lyhennet√§√§n t√§t√§ stringi√§, niin ett√§ viimeinen merkki j√§√§ pois
 		seconds = NFmiStringTools::Convert<int>(strVector[2]);
 	}
 	minutes = NFmiStringTools::Convert<int>(strVector[1]);
@@ -354,11 +354,11 @@ bool NFmiAviationStationInfoSystem_Obsolite::GetAviationStationFromString(const 
 		return false;
 	}
 	else if(strVector.size() <= 1)
-		return false; // en ole varma splitterist‰, mutta ignoorataan vain tyhj‰/yhden osion rivit
+		return false; // en ole varma splitterist√§, mutta ignoorataan vain tyhj√§/yhden osion rivit
 
 	std::string icaoId = strVector[2];
 	if(icaoId.empty())
-		return false; // otetaan vain asemat miss‰ icao id
+		return false; // otetaan vain asemat miss√§ icao id
 
 	theStationOut.IcaoStr(icaoId);
 	unsigned long stationId = NFmiStringTools::Convert<unsigned long>(strVector[0])*1000 + NFmiStringTools::Convert<unsigned long>(strVector[1]);
@@ -377,7 +377,7 @@ const NFmiLocation* NFmiAviationStationInfoSystem_Obsolite::CurrentLocation(cons
 	return itsLocations.Location();
 }
 
-// HUOM!!! Oletus hplaceDesc sis‰lt‰‰ AviationStation:eita.
+// HUOM!!! Oletus hplaceDesc sis√§lt√§√§ AviationStation:eita.
 bool NFmiAviationStationInfoSystem_Obsolite::FindAviationStation(const std::string &theIcaoStr)
 {
 	for(itsLocations.Reset(); itsLocations.Next(); )
@@ -403,14 +403,14 @@ bool NFmiAviationStationInfoSystem_Obsolite::FindStation(long theStationId)
 // *****************  NFmiSilamStationList  *************************
 // ***********************************************************************
 
-// t‰‰lt‰ heitet‰‰n aina poikkeus kun on virhe tai halutaan skipata rivi
+// t√§√§lt√§ heitet√§√§n aina poikkeus kun on virhe tai halutaan skipata rivi
 static NFmiSilamStationList::Station GetSilamStationFromString(const std::string &lineStr)
 {
 	if(lineStr.empty())
-		throw std::runtime_error("GetSilamStationFromString - empty line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+		throw std::runtime_error("GetSilamStationFromString - empty line string."); // viestill√§ ei ole oikeastaan v√§li√§, l√§hinn√§ kommentti
 
 	if(lineStr[0] == '!')
-		throw std::runtime_error("GetSilamStationFromString - comment line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+		throw std::runtime_error("GetSilamStationFromString - comment line string."); // viestill√§ ei ole oikeastaan v√§li√§, l√§hinn√§ kommentti
 
 	std::stringstream in(lineStr);
 	NFmiSilamStationList::Station station;
@@ -418,41 +418,41 @@ static NFmiSilamStationList::Station GetSilamStationFromString(const std::string
 	double value = 0;
 	in >> value; // latitude
 	if(in.fail())
-		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill√§ ei ole oikeastaan v√§li√§, l√§hinn√§ kommentti
 	std::string str;
 	in >> str; // latitude sign
 	if(in.fail())
-		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill√§ ei ole oikeastaan v√§li√§, l√§hinn√§ kommentti
 
-	station.itsLatlon.Y(value); // latitude signilla ei ilmeisesti merkityst‰, ainakin longitude sign on merkityksetˆn
+	station.itsLatlon.Y(value); // latitude signilla ei ilmeisesti merkityst√§, ainakin longitude sign on merkitykset√∂n
 
 
 	in >> value; // longtitude
 	if(in.fail())
-		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill√§ ei ole oikeastaan v√§li√§, l√§hinn√§ kommentti
 	in >> str; // longtitude sign
 	if(in.fail())
-		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill√§ ei ole oikeastaan v√§li√§, l√§hinn√§ kommentti
 
-	station.itsLatlon.X(value); // longtitude signilla ei ilmeisesti merkityst‰, ainakin longitude sign on merkityksetˆn
+	station.itsLatlon.X(value); // longtitude signilla ei ilmeisesti merkityst√§, ainakin longitude sign on merkitykset√∂n
 
 	// sitten luetaan maa (joka voi olla useassa osassa)
 	do
 	{
 		in >> str;
 		if(in.fail())
-			throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+			throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill√§ ei ole oikeastaan v√§li√§, l√§hinn√§ kommentti
 		if(str.size() >= 2 && ((str[0] == 'O' && str[1] == 'T') || (str[0] == 'P' && str[1] == 'L'))) // tyyppi ilmeisesti alkaa OT tai PL alulla
 			break;
 		station.itsCountry += str;
 	}while(true);
 
 	if(in.fail())
-		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill‰ ei ole oikeastaan v‰li‰, l‰hinn‰ kommentti
+		throw std::runtime_error("GetSilamStationFromString - error in line string."); // viestill√§ ei ole oikeastaan v√§li√§, l√§hinn√§ kommentti
 
 	station.itsType = str;
 
-	int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+	int maxBufferSize = 1024+1; // kuinka pitk√§ yhden rivin maksimissaan oletetaan olevan
 	std::string buffer;
 	buffer.resize(maxBufferSize);
 	in.getline(&buffer[0], maxBufferSize);
@@ -464,7 +464,7 @@ static NFmiSilamStationList::Station GetSilamStationFromString(const std::string
 }
 
 
-// Lukee Silam tyyppisest‰ asemalista tiedostosta asema tiedot, heitt‰‰ poikkeuksen jos ongelmia.
+// Lukee Silam tyyppisest√§ asemalista tiedostosta asema tiedot, heitt√§√§ poikkeuksen jos ongelmia.
 // Asema tiedoston formaatti on seuraava (!-merkki aloittaa kommentti rivin):
 // 
 // !    latitude        longitude        valtio                    tyyppi               info
@@ -475,7 +475,7 @@ static NFmiSilamStationList::Station GetSilamStationFromString(const std::string
 void NFmiSilamStationList::Init(const std::string &theInitFileName)
 {
 	itsInitLogMessage = "";
-	itsLocations.clear(); // tyhjennet‰‰n ensin asemalista
+	itsLocations.clear(); // tyhjennet√§√§n ensin asemalista
 
 	if(theInitFileName.empty())
 		throw std::runtime_error("NFmiSilamStationList::Init - empty settings filename given.");
@@ -483,7 +483,7 @@ void NFmiSilamStationList::Init(const std::string &theInitFileName)
 	ifstream in(theInitFileName.c_str(), std::ios::binary);
 	if(in)
 	{
-		const int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+		const int maxBufferSize = 1024+1; // kuinka pitk√§ yhden rivin maksimissaan oletetaan olevan
 		std::string buffer;
 		Station station;
 		do
@@ -502,7 +502,7 @@ void NFmiSilamStationList::Init(const std::string &theInitFileName)
 			}
 			catch(...)
 			{
-				// ei tehd‰ mit‰‰n, jatketaan seuraavalla rivill‰ niin kauan kuin rivej‰ riitt‰‰
+				// ei tehd√§ mit√§√§n, jatketaan seuraavalla rivill√§ niin kauan kuin rivej√§ riitt√§√§
 			}
 
 		}while(in.good());
@@ -545,7 +545,7 @@ static bool GetWmoStationFromString(const std::string &theStationStr, const std:
 	if(strVector.size() > 1 && strVector.size() < 13)
 		throw std::runtime_error(std::string("Wmo-station error with line: ") + theStationStr);
 	else if(strVector.size() <= 1)
-		return false; // ignoorataan vain tyhj‰/yhden osion rivit
+		return false; // ignoorataan vain tyhj√§/yhden osion rivit
 
 	theStationOut.itsIcaoStr = strVector[2];
 	theStationOut.itsWmoId = NFmiStringTools::Convert<long>(strVector[0])*1000 + NFmiStringTools::Convert<long>(strVector[1]);
@@ -559,10 +559,10 @@ static bool GetWmoStationFromString(const std::string &theStationStr, const std:
 }
 
 
-// Lukee initialisointi tiedostosta asema tiedot, jos ongelmia, ja on annettu lokitus systeemi, lokittaa virheit‰.
-// Lukee asema tiedot jotka saadaan webist‰ paikasta http://weather.noaa.gov/data/nsd_bbsss.txt
+// Lukee initialisointi tiedostosta asema tiedot, jos ongelmia, ja on annettu lokitus systeemi, lokittaa virheit√§.
+// Lukee asema tiedot jotka saadaan webist√§ paikasta http://weather.noaa.gov/data/nsd_bbsss.txt
 // Asema tiedoston formaatti on seuraava (kommentit sallittuja, mutta asema rivit 
-// ilman kommentti merkkej‰):
+// ilman kommentti merkkej√§):
 // 
 // Keyed by Index (Block and Station) Number
 // This index table from http://weather.noaa.gov/tg/site.shtml
@@ -610,7 +610,7 @@ void NFmiWmoStationLookUpSystem::Init(const std::string &theInitFileName, int th
 	if(theInitFileName.empty())
 		throw std::runtime_error("NFmiWmoStationLookUpSystem::Init - empty settings filename given.");
 
-	NFmiCommentStripper stripComments(false); // ei stripata # eli pound kommentteja, koska stripperiss‰ on bugi
+	NFmiCommentStripper stripComments(false); // ei stripata # eli pound kommentteja, koska stripperiss√§ on bugi
 	if(stripComments.ReadAndStripFile(theInitFileName))
 	{
 #ifdef OLDGCC
@@ -620,7 +620,7 @@ void NFmiWmoStationLookUpSystem::Init(const std::string &theInitFileName, int th
 #endif
 
 		std::string warningSectionStr;
-		const int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+		const int maxBufferSize = 1024+1; // kuinka pitk√§ yhden rivin maksimissaan oletetaan olevan
 		std::string buffer;
 		NFmiWmoStation station;
 		int counter = 0;

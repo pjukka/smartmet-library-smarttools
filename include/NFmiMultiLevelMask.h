@@ -18,15 +18,15 @@
 // 
 // 
 //  Description: 
-//   Luokka joka pitää sisällään usean tason maskeja. 
+//   Luokka joka pitÃ¤Ã¤ sisÃ¤llÃ¤Ã¤n usean tason maskeja. 
 //   Kaikki toiminnat
-//   riippuvat aina itsMaskState:n arvosta. Tässä 
+//   riippuvat aina itsMaskState:n arvosta. TÃ¤ssÃ¤ 
 //   vaiheessa luokka
-//   toteutetaan ei dynaamisesti, luomalla käyttöön 
+//   toteutetaan ei dynaamisesti, luomalla kÃ¤yttÃ¶Ã¶n 
 //   kolme tasoinen
-//   maski, jota tarvitaan MetEditorissa. Myöhemmin 
-//   luokan voisi tehdä
-//   siten, että eri bitmaskit laitetaan listaan.
+//   maski, jota tarvitaan MetEditorissa. MyÃ¶hemmin 
+//   luokan voisi tehdÃ¤
+//   siten, ettÃ¤ eri bitmaskit laitetaan listaan.
 //   
 // 
 //  Change Log: 

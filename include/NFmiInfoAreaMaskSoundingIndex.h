@@ -13,7 +13,7 @@
 
 class NFmiFastQueryInfo;
 
-//! T‰m‰ luokka toimii kuten NFmiInfoAreaMask mutta kurkkaa halutun x-y hila pisteen yli arvoa
+//! T√§m√§ luokka toimii kuten NFmiInfoAreaMask mutta kurkkaa halutun x-y hila pisteen yli arvoa
 class NFmiInfoAreaMaskSoundingIndex : public NFmiInfoAreaMask
 {
 
@@ -27,7 +27,7 @@ public:
 	FmiSoundingParameters SoundingParam(void) const {return itsSoundingParam;}
 	void SoundingParam(FmiSoundingParameters newValue) {itsSoundingParam = newValue;}
 
-	// t‰t‰ kaytetaan smarttool-modifierin yhteydess‰
+	// t√§t√§ kaytetaan smarttool-modifierin yhteydess√§
     using NFmiInfoAreaMask::Value;
 	double Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int theTimeIndex, bool fUseTimeInterpolationAlways);
 

@@ -18,9 +18,9 @@
 // 
 // 
 //  Description: 
-//   Pointeri lista jossa itemit ovat j‰rjestetty 
-//   haluttuun j‰rjestykseen.
-//   T‰h‰n luokkaan laitettavilla olioiden luokilla 
+//   Pointeri lista jossa itemit ovat j√§rjestetty 
+//   haluttuun j√§rjestykseen.
+//   T√§h√§n luokkaan laitettavilla olioiden luokilla 
 //   on oltava operaattorit < ja ==
 // 
 //  Change Log: 
@@ -97,7 +97,7 @@ private:
 
 
 private: 
-	bool fAscending; //   M‰‰r‰‰ listan j‰rjestyksen (true = nouseva).
+	bool fAscending; //   M√§√§r√§√§ listan j√§rjestyksen (true = nouseva).
 };
 
 

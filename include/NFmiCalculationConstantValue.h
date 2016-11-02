@@ -14,11 +14,11 @@
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
 
 #ifdef _MSC_VER
-#pragma warning (disable : 4244 4267 4512) // boost:in thread kirjastosta tulee ik‰v‰sti 4244 varoituksia
+#pragma warning (disable : 4244 4267 4512) // boost:in thread kirjastosta tulee ik√§v√§sti 4244 varoituksia
 #endif
 #include <boost/thread.hpp>
 #ifdef _MSC_VER
-#pragma warning (default : 4244 4267 4512) // laitetaan 4244 takaisin p‰‰lle, koska se on t‰rke‰ (esim. double -> int auto castaus varoitus)
+#pragma warning (default : 4244 4267 4512) // laitetaan 4244 takaisin p√§√§lle, koska se on t√§rke√§ (esim. double -> int auto castaus varoitus)
 #endif
 
 #endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
@@ -27,7 +27,7 @@ class NFmiDataModifier;
 class NFmiDataIterator;
 class NFmiFastQueryInfo;
 
-// T‰m‰ luokka antaa laskuihin mukaan ajan mukana muuttuvat kertoimet. Aikasarja-editorista huom!
+// T√§m√§ luokka antaa laskuihin mukaan ajan mukana muuttuvat kertoimet. Aikasarja-editorista huom!
 class NFmiCalculationConstantValue : public NFmiAreaMaskImpl
 {
 
@@ -47,10 +47,10 @@ private:
 
 };
 
-// T‰m‰ luokka antaa laskuihin mukaan korkeus laskuissa (esim. SumZ tai MinH tyyliset funktiot)
-// k‰ytetyn kerroksen paksuuden. Korkeus laskut jakavat laskuissaan korkeus akselin vaihtuvan 
-// paksuisiin kerroksiin siten ett‰ alhaalla on tarkempi resoluutio kuin ylh‰‰ll‰. T‰t‰ voi k‰ytt‰‰
-// vain ed. mainittujen korkeus laskujen yhteydess‰.
+// T√§m√§ luokka antaa laskuihin mukaan korkeus laskuissa (esim. SumZ tai MinH tyyliset funktiot)
+// k√§ytetyn kerroksen paksuuden. Korkeus laskut jakavat laskuissaan korkeus akselin vaihtuvan 
+// paksuisiin kerroksiin siten ett√§ alhaalla on tarkempi resoluutio kuin ylh√§√§ll√§. T√§t√§ voi k√§ytt√§√§
+// vain ed. mainittujen korkeus laskujen yhteydess√§.
 class NFmiCalculationDeltaZValue : public NFmiAreaMaskImpl
 {
 
@@ -65,7 +65,7 @@ public:
    NFmiCalculationDeltaZValue(const NFmiCalculationDeltaZValue &theOther);
    NFmiAreaMask* Clone(void) const;
 
-   // t‰t‰ funktiota k‰ytt‰m‰ll‰ asetetaan korkeus 'siivun' paksuus. HUOM! se on staattinen kuten on
+   // t√§t√§ funktiota k√§ytt√§m√§ll√§ asetetaan korkeus 'siivun' paksuus. HUOM! se on staattinen kuten on
    // itsHeightValue-dataosakin, joten se tulee kaikille 'DeltaZ':oille yhteiseksi arvoksi.
    static void SetDeltaZValue(double value){itsHeightValue = value;}
 
@@ -75,10 +75,10 @@ private:
 };
 
 
-// T‰m‰ on taas pika suunnittelua/toteutusta, mutta laitoin t‰ll‰isen luokan
+// T√§m√§ on taas pika suunnittelua/toteutusta, mutta laitoin t√§ll√§isen luokan
 // jonka avulla hoidetaan smarttools laskuissa mm. sulut ja lasku- ja vertailu operaattorit.
 // Kun laitoin uuden smarttool systeemin laskemaan rekursiivisesti laskut ja
-// kaikki (muuttujat, operatorit, sulut jne.) pit‰‰ laittaa samaan putkeen.
+// kaikki (muuttujat, operatorit, sulut jne.) pit√§√§ laittaa samaan putkeen.
 class NFmiCalculationSpecialCase : public NFmiAreaMaskImpl
 {
 
@@ -127,7 +127,7 @@ public:
 
 private:
 	boost::shared_ptr<NFmiAreaMask> itsAreaMask;
-	bool fIsTimeIntepolationNeededInValue; // erikois optimointia Value-metodin ja Time-metodin k‰ytˆss‰
+	bool fIsTimeIntepolationNeededInValue; // erikois optimointia Value-metodin ja Time-metodin k√§yt√∂ss√§
 };
 
 // Avg, min ja max funktioiden laskut.
@@ -147,20 +147,20 @@ private:
 	boost::shared_ptr<NFmiDataIterator> itsDataIterator;
 };
 
-// t‰m‰ luokka on ik‰v‰sti riippuvainen 
+// t√§m√§ luokka on ik√§v√§sti riippuvainen 
 // 1. NFmiEditMapGeneralDataDoc -luokasta (smartmetbizcode\generaldoc -moduuli) 
 // 2. NFmiStationView -luokasta (smartmetbizcode\stationviews -moduuli)
 // 3. AVS ToolMaster-kirjastosta (joka tekee varsinaisen griddauksen)
-// Siksi se on mukana vain optionaalisesti, eli m‰‰rit‰ FMI_SUPPORT_STATION_DATA_SMARTTOOL
-// jos haluat t‰m‰n k‰yttˆˆn.
+// Siksi se on mukana vain optionaalisesti, eli m√§√§rit√§ FMI_SUPPORT_STATION_DATA_SMARTTOOL
+// jos haluat t√§m√§n k√§ytt√∂√∂n.
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
 
 class NFmiEditMapGeneralDataDoc;
 
-// t‰m‰ maski osaa laskea halutulle asemadatalle hilatut arvot halutulle alueelle
-// Jos maskin itsInfo on station-dataa, sen laskut tehd‰‰n toisella tavalla kuin 'normaalin' hila-datan kanssa
-// 1. Se pit‰‰ initilisoida kerran joka erillist‰ aikaa kohden eli lasketaan matriisiin valmiiksi kaikki arvot kerralla
-// 2. Kun maskin arvoja pyydet‰‰n Value-metodissa, ne saadaan valmiiksi lasketusta taulukosta (aika initialisointi voi tapahtua myˆs siell‰)
+// t√§m√§ maski osaa laskea halutulle asemadatalle hilatut arvot halutulle alueelle
+// Jos maskin itsInfo on station-dataa, sen laskut tehd√§√§n toisella tavalla kuin 'normaalin' hila-datan kanssa
+// 1. Se pit√§√§ initilisoida kerran joka erillist√§ aikaa kohden eli lasketaan matriisiin valmiiksi kaikki arvot kerralla
+// 2. Kun maskin arvoja pyydet√§√§n Value-metodissa, ne saadaan valmiiksi lasketusta taulukosta (aika initialisointi voi tapahtua my√∂s siell√§)
 class NFmiStation2GridMask : public NFmiInfoAreaMask
 {
 	typedef std::map<NFmiMetTime, NFmiDataMatrix<float> > DataCache;
@@ -177,30 +177,30 @@ public:
 private:
   void DoGriddingCheck(const NFmiCalculationParams &theCalculationParams);
 
-//  NFmiDataMatrix<float> itsGriddedStationData; // t‰ss‰ on asemadatasta lasketut hilatut arvot
-  boost::shared_ptr<DataCache> itsGriddedStationData; // T‰m‰ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua tyˆt‰
-  NFmiDataMatrix<float> *itsCurrentGriddedStationData; // t‰h‰n on laitettu se matriisi, joka sis‰lt‰‰ halutun ajan asemadatasta lasketut hilatut arvot
-  NFmiMetTime itsLastCalculatedTime; // t‰lle ajanhetkelle on station data laskettu (tai puuttuva aika), mutta onko se sama kuin itsTime, jos ei ole, pit‰‰ laskea juuri t‰lle ajalle
+//  NFmiDataMatrix<float> itsGriddedStationData; // t√§ss√§ on asemadatasta lasketut hilatut arvot
+  boost::shared_ptr<DataCache> itsGriddedStationData; // T√§m√§ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua ty√∂t√§
+  NFmiDataMatrix<float> *itsCurrentGriddedStationData; // t√§h√§n on laitettu se matriisi, joka sis√§lt√§√§ halutun ajan asemadatasta lasketut hilatut arvot
+  NFmiMetTime itsLastCalculatedTime; // t√§lle ajanhetkelle on station data laskettu (tai puuttuva aika), mutta onko se sama kuin itsTime, jos ei ole, pit√§√§ laskea juuri t√§lle ajalle
 
-  // N‰ille muuttujille pit‰‰ asettaa arvot erillisell‰ SetGridHelpers-funktiolla
+  // N√§ille muuttujille pit√§√§ asettaa arvot erillisell√§ SetGridHelpers-funktiolla
   boost::shared_ptr<NFmiArea> itsAreaPtr; // omistaa ja tuhoaa!!
   NFmiEditMapGeneralDataDoc *itsDoc;
-  NFmiPoint itsStation2GridSize; // t‰m‰n kokoiseen hilaan asema data lasketaan (itsGriddedStationData -koko)
+  NFmiPoint itsStation2GridSize; // t√§m√§n kokoiseen hilaan asema data lasketaan (itsGriddedStationData -koko)
 
-	// Kun itsCurrentGriddedStationData -muuttujaa lasketaan tai asetetaan, sen saa tehd‰ kullekin ajalle vain kerran. T‰m‰ lukko systeemi takaa sen.
+	// Kun itsCurrentGriddedStationData -muuttujaa lasketaan tai asetetaan, sen saa tehd√§ kullekin ajalle vain kerran. T√§m√§ lukko systeemi takaa sen.
 	typedef boost::shared_mutex MutexType;
-	typedef boost::shared_lock<MutexType> ReadLock; // Read-lockia ei oikeasti tarvita, mutta laitan sen t‰h‰n, jos joskus tarvitaankin
+	typedef boost::shared_lock<MutexType> ReadLock; // Read-lockia ei oikeasti tarvita, mutta laitan sen t√§h√§n, jos joskus tarvitaankin
 	typedef boost::unique_lock<MutexType> WriteLock;
-	boost::shared_ptr<MutexType> itsCacheMutex; // TƒMƒ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua tyˆt‰
+	boost::shared_ptr<MutexType> itsCacheMutex; // T√ÑM√Ñ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua ty√∂t√§
 };
 
 // NFmiNearestObsValue2GridMask -luokka laskee havainto datasta sellaisen
-// hilan, mihin sijoitetaan kuhunkin hilapisteeseen vain sit‰ l‰himm‰n aseman 
+// hilan, mihin sijoitetaan kuhunkin hilapisteeseen vain sit√§ l√§himm√§n aseman 
 // arvon (oli se puuttuvaa tai ei). Eli kaikkiin hilapisteisiin ei tule arvoa.
-// T‰m‰n avulla on tarkoitus voida tehd‰ 'asemapiste' -laskuja ja visualisoida
-// niit‰ kartalla vain teksti muodossa. T‰llˆin teksti tulee n‰kyviin kartalla 
-// l‰hell‰ kunkin aseman omaa pistett‰ ja muut hilapisteet ovat puuttuvaa joten 
-// siihen ei tule n‰kyviin mit‰‰n.
+// T√§m√§n avulla on tarkoitus voida tehd√§ 'asemapiste' -laskuja ja visualisoida
+// niit√§ kartalla vain teksti muodossa. T√§ll√∂in teksti tulee n√§kyviin kartalla 
+// l√§hell√§ kunkin aseman omaa pistett√§ ja muut hilapisteet ovat puuttuvaa joten 
+// siihen ei tule n√§kyviin mit√§√§n.
 class NFmiNearestObsValue2GridMask : public NFmiInfoAreaMask
 {
 	typedef std::map<NFmiMetTime, NFmiDataMatrix<float> > DataCache;
@@ -219,25 +219,25 @@ public:
 private:
   void DoNearestValueGriddingCheck(const NFmiCalculationParams &theCalculationParams);
 
-  boost::shared_ptr<DataCache> itsNearestObsValuesData; // T‰m‰ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua tyˆt‰
-  NFmiDataMatrix<float> *itsCurrentNearestObsValuesData; // t‰h‰n on laitettu se matriisi, joka sis‰lt‰‰ halutun ajan asemadatasta lasketut hilatut arvot
-  NFmiMetTime itsLastCalculatedTime; // t‰lle ajanhetkelle on station data laskettu (tai puuttuva aika), mutta onko se sama kuin itsTime, jos ei ole, pit‰‰ laskea juuri t‰lle ajalle
+  boost::shared_ptr<DataCache> itsNearestObsValuesData; // T√§m√§ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua ty√∂t√§
+  NFmiDataMatrix<float> *itsCurrentNearestObsValuesData; // t√§h√§n on laitettu se matriisi, joka sis√§lt√§√§ halutun ajan asemadatasta lasketut hilatut arvot
+  NFmiMetTime itsLastCalculatedTime; // t√§lle ajanhetkelle on station data laskettu (tai puuttuva aika), mutta onko se sama kuin itsTime, jos ei ole, pit√§√§ laskea juuri t√§lle ajalle
 
   NFmiAreaMask::FunctionType itsPrimaryFunc; // esim. ClosestObsTimeOffset
   NFmiAreaMask::FunctionType itsSecondaryFunc; // esim. ClosestObsValue
 
-  // N‰ille muuttujille pit‰‰ asettaa arvot erillisell‰ SetGridHelpers-funktiolla
+  // N√§ille muuttujille pit√§√§ asettaa arvot erillisell√§ SetGridHelpers-funktiolla
   boost::shared_ptr<NFmiArea> itsAreaPtr; // omistaa ja tuhoaa!!
   NFmiEditMapGeneralDataDoc *itsDoc;
-  NFmiPoint itsResultGridSize; // t‰m‰n kokoiseen hilaan asema data lasketaan (itsNearestObsValuesData -hilakoko)
+  NFmiPoint itsResultGridSize; // t√§m√§n kokoiseen hilaan asema data lasketaan (itsNearestObsValuesData -hilakoko)
 
-  std::vector<float> itsArgumentVector; // t‰h‰n lasketaan lennossa laskuissa tarvittavat argumentit (1. aikahyppy)
+  std::vector<float> itsArgumentVector; // t√§h√§n lasketaan lennossa laskuissa tarvittavat argumentit (1. aikahyppy)
 
-  // Kun itsCurrentNearestObsValuesData -muuttujaa lasketaan tai asetetaan, sen saa tehd‰ kullekin ajalle vain kerran. T‰m‰ lukko systeemi takaa sen.
+  // Kun itsCurrentNearestObsValuesData -muuttujaa lasketaan tai asetetaan, sen saa tehd√§ kullekin ajalle vain kerran. T√§m√§ lukko systeemi takaa sen.
   typedef boost::shared_mutex MutexType;
-  typedef boost::shared_lock<MutexType> ReadLock; // Read-lockia ei oikeasti tarvita, mutta laitan sen t‰h‰n, jos joskus tarvitaankin
+  typedef boost::shared_lock<MutexType> ReadLock; // Read-lockia ei oikeasti tarvita, mutta laitan sen t√§h√§n, jos joskus tarvitaankin
   typedef boost::unique_lock<MutexType> WriteLock;
-  boost::shared_ptr<MutexType> itsCacheMutex; // TƒMƒ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua tyˆt‰
+  boost::shared_ptr<MutexType> itsCacheMutex; // T√ÑM√Ñ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua ty√∂t√§
 };
 
 #endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL

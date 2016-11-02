@@ -1,7 +1,7 @@
 // NFmiHelpDataInfo.cpp
 
 #ifdef _MSC_VER
-#pragma warning(disable : 4996) // 4996 poistaa ep‰turvallisten string manipulaatio funktioiden k‰ytˆst‰ tulevat varoitukset. En aio k‰ytt‰‰ ehdotettuja turvallisia _s -funktioita (esim. sprintf_s), koska ne eiv‰t ole linux yhteensopivia.
+#pragma warning(disable : 4996) // 4996 poistaa ep√§turvallisten string manipulaatio funktioiden k√§yt√∂st√§ tulevat varoitukset. En aio k√§ytt√§√§ ehdotettuja turvallisia _s -funktioita (esim. sprintf_s), koska ne eiv√§t ole linux yhteensopivia.
 #endif
 
 #include "NFmiHelpDataInfo.h"
@@ -15,7 +15,7 @@ using namespace std;
 
 // ----------------------------------------------------------------------
 /*!
- *  syˆ spacet pois streamista ja palauttaa true:n jos ei olla lopussa
+ *  sy√∂ spacet pois streamista ja palauttaa true:n jos ei olla lopussa
  *
  * \param theInput The input stream
  * \return Undocumented
@@ -82,7 +82,7 @@ NFmiHelpDataInfo& NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
 {
 	if(this != &theOther)
 	{
-		Clear(); // l‰hinn‰ area-otuksen tuhoamista varten kutsutaan
+		Clear(); // l√§hinn√§ area-otuksen tuhoamista varten kutsutaan
 		itsName = theOther.itsName;
 		itsFileNameFilter = theOther.itsFileNameFilter;
 		itsPartialDataCacheFileNameFilter = theOther.itsPartialDataCacheFileNameFilter;
@@ -148,7 +148,7 @@ static void FixPathEndWithSeparator(std::string &theFixedPathStr)
 	if(theFixedPathStr.empty() == false)
 	{
         NFmiFileString tmpFileStr(theFixedPathStr);
-		tmpFileStr.NormalizeDelimiter(); // varmistetaan myˆs ett‰ polun merkit ovat oikein p‰in
+		tmpFileStr.NormalizeDelimiter(); // varmistetaan my√∂s ett√§ polun merkit ovat oikein p√§in
 		theFixedPathStr = static_cast<char*>(tmpFileStr);
 
 		std::string::value_type lastLetter = theFixedPathStr[theFixedPathStr.size()-1];
@@ -162,14 +162,14 @@ static void FixPatternSeparators(std::string &theFixedPatternStr)
 	if(theFixedPatternStr.empty() == false)
 	{
 	    NFmiFileString tmpFileStr(theFixedPatternStr);
-		tmpFileStr.NormalizeDelimiter(); // varmistetaan ett‰ polun merkit ovat oikein p‰in
+		tmpFileStr.NormalizeDelimiter(); // varmistetaan ett√§ polun merkit ovat oikein p√§in
 		theFixedPatternStr = static_cast<char*>(tmpFileStr);
 	}
 }
 
 static void MakeCombinedDataFilePattern(NFmiHelpDataInfo &theDataInfo, const NFmiHelpDataInfoSystem &theHelpDataSystem)
 {
-	// combineDataPattern += "FileNameFilter:ist‰ osa jossa on mukana ylin hakemistotaso"
+	// combineDataPattern += "FileNameFilter:ist√§ osa jossa on mukana ylin hakemistotaso"
 	// esim. "P:\data\partial_data\laps\*_LAPS_finland.sqd" -> "laps\*_LAPS_finland.sqd"
 	std::string lastDirFilePattern = theDataInfo.FileNameFilter();
 	if(lastDirFilePattern.empty() == false)
@@ -261,7 +261,7 @@ void NFmiHelpDataInfo::FileNameFilter(const std::string &newValue, bool forceFil
 	fForceFileFilterName = forceFileNameFilter;
 }
 
-// t‰m‰ on viritys, ett‰ olisi funktio, jolla voidaan pyyt‰‰ k‰ytetty fileFilter, riippuen siit‰ onko cache k‰ytˆss‰ vai ei
+// t√§m√§ on viritys, ett√§ olisi funktio, jolla voidaan pyyt√§√§ k√§ytetty fileFilter, riippuen siit√§ onko cache k√§yt√∂ss√§ vai ei
 const std::string NFmiHelpDataInfo::UsedFileNameFilter(const NFmiHelpDataInfoSystem &theHelpDataInfoSystem) const
 {
 	if(fForceFileFilterName || theHelpDataInfoSystem.UseQueryDataCache() == false || itsDataType == NFmiInfoData::kStationary)
@@ -290,8 +290,8 @@ NFmiHelpDataInfo& NFmiHelpDataInfoSystem::StaticHelpDataInfo(int theIndex)
 	return dummy;
 }
 
-// Etsii seuraavan satel-kuvan kanavan. Pit‰‰ olla sama tuottaja.
-// Palauttaa uuden dataidentin, miss‰ uusi parametri.
+// Etsii seuraavan satel-kuvan kanavan. Pit√§√§ olla sama tuottaja.
+// Palauttaa uuden dataidentin, miss√§ uusi parametri.
 NFmiDataIdent NFmiHelpDataInfoSystem::GetNextSatelChannel(const NFmiDataIdent &theDataIdent, FmiDirection theDir)
 {
 	NFmiDataIdent returnDataIdent(theDataIdent);
@@ -347,11 +347,11 @@ void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey, checked
 		NFmiHelpDataInfo hdi;
 		hdi.InitFromSettings(theBaseKey, *iter, *this);
 		if(fStaticData)
-			hdi.ForceFileFilterName(true); // varmistetaan ett‰ staattisia datoja ei yritet‰ lukea lokaali cachesta
+			hdi.ForceFileFilterName(true); // varmistetaan ett√§ staattisia datoja ei yritet√§ lukea lokaali cachesta
 
-        // HelpDataInfolla pit‰‰ olla tyyppi, muuten sit‰ ei lis‰t‰ listaan. Kun vuoden 2013 lopussa tehtiin erillinen lista 
+        // HelpDataInfolla pit√§√§ olla tyyppi, muuten sit√§ ei lis√§t√§ listaan. Kun vuoden 2013 lopussa tehtiin erillinen lista 
         // eri datojen enable-ominaisuudesta yhteen konffitiedostoon (mm. helpdatainfo_enable_data_fmi_heavy.conf), 
-        // tuli mahdolliseksi, ett‰ t‰ss‰ tuli ns. haamu dataInfoja, jotka nyt pit‰‰ karsia.
+        // tuli mahdolliseksi, ett√§ t√§ss√§ tuli ns. haamu dataInfoja, jotka nyt pit√§√§ karsia.
         if(hdi.DataType() != NFmiInfoData::kNoDataType) 
     		theHelpDataInfos.push_back(hdi);
 	}
@@ -383,7 +383,7 @@ void NFmiHelpDataInfoSystem::InitFromSettings(const std::string &theBaseNameSpac
 	// Read dynamic helpdata configurations
 	InitDataType(itsBaseNameSpace + "::Dynamic", itsDynamicHelpDataInfos, false);
 
-	// Lis‰t‰‰n help editor mode datan luku jos niin on haluttu
+	// Lis√§t√§√§n help editor mode datan luku jos niin on haluttu
 	if(theHelpEditorFileNameFilter.empty() == false)
 	{
 		NFmiHelpDataInfo helpDataInfo;
@@ -398,7 +398,7 @@ void NFmiHelpDataInfoSystem::StoreToSettings(void)
 {
 	if(itsBaseNameSpace.empty() == false)
 	{
-		// HUOM! t‰ss‰ on toistaiseksi vain cacheen liittyvien muutosten talletukset
+		// HUOM! t√§ss√§ on toistaiseksi vain cacheen liittyvien muutosten talletukset
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheDirectory"), itsCacheDirectory, true);
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CacheTmpDirectory"), itsCacheTmpDirectory, true);
 		NFmiSettings::Set(std::string(itsBaseNameSpace + "::CachePartialDataDirectory"), itsCachePartialDataDirectory, true);
@@ -446,17 +446,17 @@ static NFmiHelpDataInfo* FindHelpDataInfo(checkedVector<NFmiHelpDataInfo> &theHe
 	size_t ssize = theHelpInfos.size();
 	for(size_t i = 0; i<ssize; i++)
 	{
-		// Siis jos joko FileNameFilter tai CombineDataPathAndFileName (yhdistelm‰ datoissa t‰m‰ 
-		// on se data joka luetaan sis‰‰n SmartMetiin) on etsitty, palautetaan helpInfo.
+		// Siis jos joko FileNameFilter tai CombineDataPathAndFileName (yhdistelm√§ datoissa t√§m√§ 
+		// on se data joka luetaan sis√§√§n SmartMetiin) on etsitty, palautetaan helpInfo.
 		if(theHelpInfos[i].UsedFileNameFilter(theHelpDataInfoSystem) == theFileNameFilter || theHelpInfos[i].CombineDataPathAndFileName() == theFileNameFilter)
 			return &theHelpInfos[i];
 	}
 	return 0;
 }
 
-// Etsii annetun fileNameFilterin avulla HelpDataInfon ja palauttaa sen, jos lˆytyi.
-// Jos ei lˆytynyt vastaavaa filePatternia, palauttaa 0-pointterin.
-// K‰y ensin l‰pi dynaamiset helpDataInfot ja sitten staattiset.
+// Etsii annetun fileNameFilterin avulla HelpDataInfon ja palauttaa sen, jos l√∂ytyi.
+// Jos ei l√∂ytynyt vastaavaa filePatternia, palauttaa 0-pointterin.
+// K√§y ensin l√§pi dynaamiset helpDataInfot ja sitten staattiset.
 NFmiHelpDataInfo* NFmiHelpDataInfoSystem::FindHelpDataInfo(const std::string &theFileNameFilter)
 {
 	if(theFileNameFilter.empty())
@@ -479,7 +479,7 @@ static void CollectCustomMenuItems(const checkedVector<NFmiHelpDataInfo> &theHel
 	}
 }
 
-// ker‰‰ uniikki lista mahdollisista custom Menu folder asetuksista
+// ker√§√§ uniikki lista mahdollisista custom Menu folder asetuksista
 std::vector<std::string> NFmiHelpDataInfoSystem::GetUniqueCustomMenuList(void)
 {
 	std::set<std::string> menuSet;
@@ -501,7 +501,7 @@ static void CollectCustomMenuHelpDatas(const checkedVector<NFmiHelpDataInfo> &th
 	}
 }
 
-// ker‰t‰‰n list‰ niista helpDataInfoissta, joissa on asetettu kyseinen customFolder
+// ker√§t√§√§n list√§ niista helpDataInfoissta, joissa on asetettu kyseinen customFolder
 std::vector<NFmiHelpDataInfo> NFmiHelpDataInfoSystem::GetCustomMenuHelpDataList(const std::string &theCustomFolder)
 {
 	std::vector<NFmiHelpDataInfo> helpDataList;

@@ -18,13 +18,13 @@
 //
 //
 //  Description:
-//   En ole viel‰ varma t‰m‰n luokan tarkoituksesta/toiminnasta,
-//   t‰m‰ on
+//   En ole viel√§ varma t√§m√§n luokan tarkoituksesta/toiminnasta,
+//   t√§m√§ on
 //   Persan idea.
 //
 //  Change Log:
-// Changed 1999.09.28/Marko	Lis‰sin SecondaryIsoLineColor:in k‰ytˆn (k‰ytet‰‰n
-//							vertailtaessa samantyyppist‰ dataa p‰‰llekk‰in)
+// Changed 1999.09.28/Marko	Lis√§sin SecondaryIsoLineColor:in k√§yt√∂n (k√§ytet√§√§n
+//							vertailtaessa samantyyppist√§ dataa p√§√§llekk√§in)
 //
 //**********************************************************
 #ifndef  NFMIDRAWPARAM_H
@@ -38,7 +38,7 @@
 #include <NFmiPoint.h>
 #include <NFmiLevel.h>
 #include <NFmiInfoData.h>
-#include <NFmiDataMatrix.h> // t‰‰lt‰ tulee myˆs checkedVector
+#include <NFmiDataMatrix.h> // t√§√§lt√§ tulee my√∂s checkedVector
 #include <NFmiMetTime.h>
 #include <boost/shared_ptr.hpp>
 
@@ -84,7 +84,7 @@ public:
 	bool DoDataComparison(void);
 
 	NFmiInfoData::Type DataType(void) const {return itsDataType;}
-	// HUOM! t‰m‰ asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppi‰!!!!!!
+	// HUOM! t√§m√§ asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppi√§!!!!!!
 	void DataType(NFmiInfoData::Type newValue){itsDataType = newValue;};
 
 	bool              Init (const std::string& theFilename);
@@ -108,7 +108,7 @@ public:
 	void				 IsolineLabelBoxFillColor(const NFmiColor& theColor)
 	{
 		itsIsolineLabelBoxFillColor = theColor;
-		itsContourLabelBoxFillColor = theColor; // **** Versio 3 parametri asetetaan toistaiseksi myˆs n‰in ****
+		itsContourLabelBoxFillColor = theColor; // **** Versio 3 parametri asetetaan toistaiseksi my√∂s n√§in ****
 	};
 	const NFmiColor&	 IsolineLabelBoxFillColor(void) const { return itsIsolineLabelBoxFillColor; };
 
@@ -126,7 +126,7 @@ public:
 	void				 UseIsoLineGabWithCustomContours (const bool newState)
 	{
 		fUseIsoLineGabWithCustomContours = newState;
-		fUseContourGabWithCustomContours = newState;  // **** Versio 3 parametri asetetaan toistaiseksi myˆs n‰in ****
+		fUseContourGabWithCustomContours = newState;  // **** Versio 3 parametri asetetaan toistaiseksi my√∂s n√§in ****
 	};
 	bool				 UseIsoLineGabWithCustomContours (void) const { return fUseIsoLineGabWithCustomContours; };
 
@@ -172,7 +172,7 @@ public:
 	void IsolineColor(const NFmiColor& newColor)
 	{
 		itsIsolineColor = newColor;
-		itsContourColor = newColor; // **** Versio 3 parametri asetetaan toistaiseksi myˆs n‰in ****
+		itsContourColor = newColor; // **** Versio 3 parametri asetetaan toistaiseksi my√∂s n√§in ****
 	}
 
 	const NFmiColor& ContourColor(void) const {return itsContourColor;};
@@ -181,7 +181,7 @@ public:
 	void IsolineTextColor(const NFmiColor& newColor)
 	{
 		itsIsolineTextColor = newColor;
-		itsContourTextColor = newColor; // **** Versio 3 parametri asetetaan toistaiseksi myˆs n‰in ****
+		itsContourTextColor = newColor; // **** Versio 3 parametri asetetaan toistaiseksi my√∂s n√§in ****
 	}
 	const NFmiColor& IsolineTextColor(void) const {return fUseSecondaryColors ? itsSecondaryIsolineTextColor : itsIsolineTextColor;};
 
@@ -250,7 +250,7 @@ public:
 	void UseIsoLineFeathering(bool newValue)
 	{
 		fUseIsoLineFeathering = newValue;
-		fUseContourFeathering = newValue; // **** Versio 3 parametri asetetaan toistaiseksi myˆs n‰in ****
+		fUseContourFeathering = newValue; // **** Versio 3 parametri asetetaan toistaiseksi my√∂s n√§in ****
 	}
 
 	bool UseContourFeathering(void) const {return fUseContourFeathering;}
@@ -264,7 +264,7 @@ public:
 	void UseSimpleIsoLineDefinitions(bool newValue)
 	{
 		fUseSimpleIsoLineDefinitions = newValue;
-		fUseSimpleContourDefinitions = newValue; // **** Versio 3 parametri asetetaan toistaiseksi myˆs n‰in ****
+		fUseSimpleContourDefinitions = newValue; // **** Versio 3 parametri asetetaan toistaiseksi my√∂s n√§in ****
 	}
 
 	bool UseSimpleContourDefinitions(void) const {return fUseSimpleContourDefinitions;}
@@ -278,7 +278,7 @@ public:
 	void SimpleIsoLineZeroValue(float newValue)
 	{
 		itsSimpleIsoLineZeroValue = newValue;
-		itsSimpleContourZeroValue = newValue; // **** Versio 3 parametri asetetaan toistaiseksi myˆs n‰in ****
+		itsSimpleContourZeroValue = newValue; // **** Versio 3 parametri asetetaan toistaiseksi my√∂s n√§in ****
 	}
 
 	float SimpleContourZeroValue(void) const {return itsSimpleContourZeroValue;}
@@ -288,7 +288,7 @@ public:
 	void SimpleIsoLineLabelHeight(float newValue)
 	{
 		itsSimpleIsoLineLabelHeight = newValue;
-		itsSimpleContourLabelHeight = newValue; // **** Versio 3 parametri asetetaan toistaiseksi myˆs n‰in ****
+		itsSimpleContourLabelHeight = newValue; // **** Versio 3 parametri asetetaan toistaiseksi my√∂s n√§in ****
 	}
 
 	float SimpleContourLabelHeight(void) const {return itsSimpleContourLabelHeight;}
@@ -518,30 +518,30 @@ protected:
 	std::string itsParameterAbbreviation;
     int itsPriority;
 
-//   T‰h‰n talletetaan tiedoston nimi, mist‰ luetaan/mihin
+//   T√§h√§n talletetaan tiedoston nimi, mist√§ luetaan/mihin
 //   kirjoitetaan
 //   kyseisen luokan tiedot.
 	std::string itsInitFileName;
-	std::string itsMacroParamRelativePath; // t‰t‰ tarvitaan kun viewMacrojen yhteydess‰ on macroParametreja ja
-								// ne ovat alihakemistossa. Eli Kun viewMacro talletetaan tiedostoon, lis‰t‰‰n t‰m‰
-								// tieto itsParameterAbbreviation-tiedosn yhteyteen ja se myˆs puretaan luettaessa t‰h‰n.
-								// T‰m‰ avulla voidaan rakentaa oikea suhteellinen polku haluttuun macroParamiin
+	std::string itsMacroParamRelativePath; // t√§t√§ tarvitaan kun viewMacrojen yhteydess√§ on macroParametreja ja
+								// ne ovat alihakemistossa. Eli Kun viewMacro talletetaan tiedostoon, lis√§t√§√§n t√§m√§
+								// tieto itsParameterAbbreviation-tiedosn yhteyteen ja se my√∂s puretaan luettaessa t√§h√§n.
+								// T√§m√§ avulla voidaan rakentaa oikea suhteellinen polku haluttuun macroParamiin
                                 // Suhteellinen polku on ilman kenoviivoja alussa ja lopussa (esim. "euroMakrot" tai "euroMakrot\analyysi")
 
-//  Parametrin oletus n‰yttˆtyyppi (symboli,
+//  Parametrin oletus n√§ytt√∂tyyppi (symboli,
 //  isoviiva, teksti...)
 	NFmiMetEditorTypes::View itsViewType;
-	NFmiMetEditorTypes::View itsStationDataViewType; // jos viewtype on isoviiva, mutta data on asema dataa, pit‰‰ olla varalla joku n‰yttˆtyyppi ett‰ voidaan piirt‰‰ t‰llˆin
+	NFmiMetEditorTypes::View itsStationDataViewType; // jos viewtype on isoviiva, mutta data on asema dataa, pit√§√§ olla varalla joku n√§ytt√∂tyyppi ett√§ voidaan piirt√§√§ t√§ll√∂in
 	NFmiColor itsFrameColor;
 	NFmiColor itsFillColor;
 
 	NFmiColor itsIsolineLabelBoxFillColor;
 	NFmiColor itsContourLabelBoxFillColor; // **** Versio 3 parametri ****
-//   Mink‰ kokoinen n‰yttˆˆn piirrett‰v‰ 'symbolidata'
+//   Mink√§ kokoinen n√§ytt√∂√∂n piirrett√§v√§ 'symbolidata'
 //   on suhteessa
 //   annettuun asemalle/hilalle varattuun 'datalaatikkoon'.
 //   (oletusarvo)
-	NFmiPoint itsRelativeSize;	// n‰m‰ ovat asemadata symboli kokoja
+	NFmiPoint itsRelativeSize;	// n√§m√§ ovat asemadata symboli kokoja
 	NFmiPoint itsRelativePositionOffset;
 	NFmiPoint itsOnlyOneSymbolRelativeSize;
 	NFmiPoint itsOnlyOneSymbolRelativePositionOffset;
@@ -550,8 +550,8 @@ protected:
 	double itsIsoLineGab;
 	double itsContourGab; // **** Versio 3 parametri ****
 	double itsModifyingStep;
-//	bool fModifyingUnit;	//(= 0, jos yksikkˆ on %, = 1, jos yksikkˆ on sama kuin itsUnit)
-	double itsTimeSerialModifyingLimit; // aikasarjan‰ytˆn muutos akselin minimi ja maksimi arvo
+//	bool fModifyingUnit;	//(= 0, jos yksikk√∂ on %, = 1, jos yksikk√∂ on sama kuin itsUnit)
+	double itsTimeSerialModifyingLimit; // aikasarjan√§yt√∂n muutos akselin minimi ja maksimi arvo
 	NFmiColor itsIsolineColor;
 	NFmiColor itsContourColor; // **** Versio 3 parametri ****
 	NFmiColor itsIsolineTextColor;
@@ -563,68 +563,68 @@ protected:
 	double itsAbsoluteMinValue;
 	double itsAbsoluteMaxValue;
 
-	double itsTimeSeriesScaleMin; // k‰ytet‰‰n aikasarjaeditorissa
-	double itsTimeSeriesScaleMax; // k‰ytet‰‰n aikasarjaeditorissa
+	double itsTimeSeriesScaleMin; // k√§ytet√§√§n aikasarjaeditorissa
+	double itsTimeSeriesScaleMax; // k√§ytet√§√§n aikasarjaeditorissa
 
-//   Lista mahdollisista n‰yttˆtyypeist‰ kyseiselle
+//   Lista mahdollisista n√§ytt√∂tyypeist√§ kyseiselle
 //   parametrille.
 	NFmiMetEditorTypes::View itsPossibleViewTypeList[5];
 	int itsPossibleViewTypeCount;
 
-	// Tekstin‰yttˆ:
+	// Tekstin√§ytt√∂:
 	bool	fShowNumbers;
-	bool	fShowMasks; // t‰m‰ on turha!!!!!
-	bool	fShowColors; // asema teksti‰ varten
-	bool	fShowColoredNumbers; // asema teksti‰ varten
-	bool	fZeroColorMean; // asema teksti‰ varten
+	bool	fShowMasks; // t√§m√§ on turha!!!!!
+	bool	fShowColors; // asema teksti√§ varten
+	bool	fShowColoredNumbers; // asema teksti√§ varten
+	bool	fZeroColorMean; // asema teksti√§ varten
 
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
-	float itsStationSymbolColorShadeLowValue; //v‰ri skaalaus alkaa t‰st‰ arvosta
-	float itsStationSymbolColorShadeMidValue; //v‰ri skaalauksen keskiarvo
-	float itsStationSymbolColorShadeHighValue; //v‰ri skaalaus loppuu t‰h‰n arvoon
+	float itsStationSymbolColorShadeLowValue; //v√§ri skaalaus alkaa t√§st√§ arvosta
+	float itsStationSymbolColorShadeMidValue; //v√§ri skaalauksen keskiarvo
+	float itsStationSymbolColorShadeHighValue; //v√§ri skaalaus loppuu t√§h√§n arvoon
 	NFmiColor itsStationSymbolColorShadeLowValueColor;
 	NFmiColor itsStationSymbolColorShadeMidValueColor;
 	NFmiColor itsStationSymbolColorShadeHighValueColor;
-	int itsStationSymbolColorShadeClassCount; // kuinka monta v‰ri luokkaa tehd‰‰n skaalaukseen
-	bool fUseSymbolsInTextMode; // k‰ytet‰‰nkˆ teksti‰ vai mapataanko arvoja kohden jokin symboli ruudulle?
-	int itsUsedSymbolListIndex; // 0=ei mit‰‰n, 1=synopfont, 2=hessaa, ...
+	int itsStationSymbolColorShadeClassCount; // kuinka monta v√§ri luokkaa tehd√§√§n skaalaukseen
+	bool fUseSymbolsInTextMode; // k√§ytet√§√§nk√∂ teksti√§ vai mapataanko arvoja kohden jokin symboli ruudulle?
+	int itsUsedSymbolListIndex; // 0=ei mit√§√§n, 1=synopfont, 2=hessaa, ...
 	int itsSymbolIndexingMapListIndex; // indeksi johonkin symbolilistaan, jossa on mapattu arvot haluttuihin symboleihin
 
 	int itsGridDataPresentationStyle; // 1=asema muodossa, 2=isoviiva, 3=color contouring, 4= contour+isoviiva, 5=quick color contouring
 	bool fUseIsoLineFeathering; // isoviivojen harvennus optio
 	bool fUseContourFeathering; // **** Versio 3 parametri ****
-	bool fIsoLineLabelsOverLapping; // voivatko isoviiva labelit menn‰ p‰‰llekk‰in vai ei?
-	bool fShowColorLegend; // piirret‰‰nko rivin viimeiseen ruutuun color contouringin v‰ri selitys laatikko?
-	bool fUseSimpleIsoLineDefinitions; // otetaanko isoviivam‰‰ritykset simppelill‰ tavalla, vai kaikki arvot spesiaali tapauksina m‰‰ritettyin‰
+	bool fIsoLineLabelsOverLapping; // voivatko isoviiva labelit menn√§ p√§√§llekk√§in vai ei?
+	bool fShowColorLegend; // piirret√§√§nko rivin viimeiseen ruutuun color contouringin v√§ri selitys laatikko?
+	bool fUseSimpleIsoLineDefinitions; // otetaanko isoviivam√§√§ritykset simppelill√§ tavalla, vai kaikki arvot spesiaali tapauksina m√§√§ritettyin√§
 	bool fUseSimpleContourDefinitions; // **** Versio 3 parametri ****
-	bool fUseSeparatorLinesBetweenColorContourClasses; // piirr‰ viivat arvo/v‰ri luokkien v‰lille
+	bool fUseSeparatorLinesBetweenColorContourClasses; // piirr√§ viivat arvo/v√§ri luokkien v√§lille
 	float itsSimpleIsoLineGap;
-	float itsSimpleIsoLineZeroValue; // t‰m‰n arvon kautta isoviivat joutuvat menem‰‰n
+	float itsSimpleIsoLineZeroValue; // t√§m√§n arvon kautta isoviivat joutuvat menem√§√§n
 	float itsSimpleContourZeroValue; // **** Versio 3 parametri ****
-	float itsSimpleIsoLineLabelHeight; // relatiivinen vai mm? (0=ei n‰ytet‰ ollenkaan)
+	float itsSimpleIsoLineLabelHeight; // relatiivinen vai mm? (0=ei n√§ytet√§ ollenkaan)
 	float itsSimpleContourLabelHeight; // **** Versio 3 parametri ****
-	bool fShowSimpleIsoLineLabelBox; // ei viel‰ muita attribuutteja isoviiva labelille (t‰m‰ tarkoittaa lukua ymp‰roiv‰‰ laatikkoa)
+	bool fShowSimpleIsoLineLabelBox; // ei viel√§ muita attribuutteja isoviiva labelille (t√§m√§ tarkoittaa lukua ymp√§roiv√§√§ laatikkoa)
 	bool fShowSimpleContourLabelBox; // **** Versio 3 parametri ****
 	float itsSimpleIsoLineWidth; // relatiivinen vai mm?
 	float itsSimpleContourWidth; // **** Versio 3 parametri ****
 	int itsSimpleIsoLineLineStyle; // 1=yht. viiva, 2=pisteviiva jne.
 	int itsSimpleContourLineStyle; // **** Versio 3 parametri ****
-	float itsIsoLineSplineSmoothingFactor; // 0-10, 0=ei pehmennyst‰, 10=maksimi pyˆritys
-	bool fUseSingleColorsWithSimpleIsoLines; // true=sama v‰ri kaikille isoviivoille, false=tehd‰‰n v‰riskaala
-// isoviivan v‰riskaalaus asetukset
-	float itsSimpleIsoLineColorShadeLowValue; //v‰ri skaalaus alkaa t‰st‰ arvosta
-	float itsSimpleIsoLineColorShadeMidValue; //v‰ri skaalauksen keskiarvo
-	float itsSimpleIsoLineColorShadeHighValue; //v‰ri skaalaus loppuu t‰h‰n arvoon
+	float itsIsoLineSplineSmoothingFactor; // 0-10, 0=ei pehmennyst√§, 10=maksimi py√∂ritys
+	bool fUseSingleColorsWithSimpleIsoLines; // true=sama v√§ri kaikille isoviivoille, false=tehd√§√§n v√§riskaala
+// isoviivan v√§riskaalaus asetukset
+	float itsSimpleIsoLineColorShadeLowValue; //v√§ri skaalaus alkaa t√§st√§ arvosta
+	float itsSimpleIsoLineColorShadeMidValue; //v√§ri skaalauksen keskiarvo
+	float itsSimpleIsoLineColorShadeHighValue; //v√§ri skaalaus loppuu t√§h√§n arvoon
 	float itsSimpleIsoLineColorShadeHigh2Value;  // **** Versio 3 parametri ****
 	NFmiColor itsSimpleIsoLineColorShadeLowValueColor;
 	NFmiColor itsSimpleIsoLineColorShadeMidValueColor;
 	NFmiColor itsSimpleIsoLineColorShadeHighValueColor;
 	NFmiColor itsSimpleIsoLineColorShadeHigh2ValueColor;  // **** Versio 3 parametri ****
-	int itsSimpleIsoLineColorShadeClassCount; // kuinka monta v‰ri luokkaa tehd‰‰n skaalaukseen
-// speciaali isoviiva asetukset (otetaan k‰yttˆˆn, jos fUseSimpleIsoLineDefinitions=false)
-	checkedVector<float> itsSpecialIsoLineValues; // t‰h‰n laitetaan kaikki arvot, johon halutaan isoviiva
+	int itsSimpleIsoLineColorShadeClassCount; // kuinka monta v√§ri luokkaa tehd√§√§n skaalaukseen
+// speciaali isoviiva asetukset (otetaan k√§ytt√∂√∂n, jos fUseSimpleIsoLineDefinitions=false)
+	checkedVector<float> itsSpecialIsoLineValues; // t√§h√§n laitetaan kaikki arvot, johon halutaan isoviiva
 	checkedVector<float> itsSpecialContourValues;  // **** Versio 3 parametri ****
 	checkedVector<float> itsSpecialIsoLineLabelHeight; // isoviivalabeleiden korkeudet (0=ei labelia)
 	checkedVector<float> itsSpecialContourLabelHeight;  // **** Versio 3 parametri ****
@@ -632,43 +632,43 @@ protected:
 	checkedVector<float> itsSpecialContourWidth;  // **** Versio 3 parametri ****
 	checkedVector<int> itsSpecialIsoLineStyle; // viiva tyylit
 	checkedVector<int> itsSpecialContourStyle;  // **** Versio 3 parametri ****
-	checkedVector<int> itsSpecialIsoLineColorIndexies; // eri viivojen v‰ri indeksit (pit‰‰ tehd‰ n‰yttˆ taulukko k‰ytt‰j‰lle)
+	checkedVector<int> itsSpecialIsoLineColorIndexies; // eri viivojen v√§ri indeksit (pit√§√§ tehd√§ n√§ytt√∂ taulukko k√§ytt√§j√§lle)
 	checkedVector<int> itsSpecialContourColorIndexies;  // **** Versio 3 parametri ****
-	checkedVector<bool> itsSpecialIsoLineShowLabelBox; // eri viivojen v‰ri indeksit (pit‰‰ tehd‰ n‰yttˆ taulukko k‰ytt‰j‰lle)
+	checkedVector<bool> itsSpecialIsoLineShowLabelBox; // eri viivojen v√§ri indeksit (pit√§√§ tehd√§ n√§ytt√∂ taulukko k√§ytt√§j√§lle)
 // colorcontouring ja quick contouring asetukset
-	bool fDrawOnlyOverMask; // jos true, data piirret‰‰n vain maskin p‰‰lle
-	bool fUseCustomColorContouring; // true ja saa m‰‰ritell‰ luokka rajat ja v‰rit
+	bool fDrawOnlyOverMask; // jos true, data piirret√§√§n vain maskin p√§√§lle
+	bool fUseCustomColorContouring; // true ja saa m√§√§ritell√§ luokka rajat ja v√§rit
 	bool fUseCustomIsoLineing;  // **** Versio 3 parametri ****
-	checkedVector<float> itsSpecialColorContouringValues; // t‰h‰n laitetaan kaikki arvot, johon halutaan color contour luokka rajoiksi
-	checkedVector<int> itsSpecialColorContouringColorIndexies; // eri viivojen v‰ri indeksit (pit‰‰ tehd‰ n‰yttˆ taulukko k‰ytt‰j‰lle)
-	float itsColorContouringColorShadeLowValue; //v‰ri skaalaus alkaa t‰st‰ arvosta
-	float itsColorContouringColorShadeMidValue; //v‰ri skaalauksen keskiarvo
+	checkedVector<float> itsSpecialColorContouringValues; // t√§h√§n laitetaan kaikki arvot, johon halutaan color contour luokka rajoiksi
+	checkedVector<int> itsSpecialColorContouringColorIndexies; // eri viivojen v√§ri indeksit (pit√§√§ tehd√§ n√§ytt√∂ taulukko k√§ytt√§j√§lle)
+	float itsColorContouringColorShadeLowValue; //v√§ri skaalaus alkaa t√§st√§ arvosta
+	float itsColorContouringColorShadeMidValue; //v√§ri skaalauksen keskiarvo
 	float itsColorContouringColorShadeHighValue;
-	float itsColorContouringColorShadeHigh2Value; //v‰ri skaalaus loppuu t‰h‰n arvoon
+	float itsColorContouringColorShadeHigh2Value; //v√§ri skaalaus loppuu t√§h√§n arvoon
 	NFmiColor itsColorContouringColorShadeLowValueColor;
 	NFmiColor itsColorContouringColorShadeMidValueColor;
 	NFmiColor itsColorContouringColorShadeHighValueColor;
 	NFmiColor itsColorContouringColorShadeHigh2ValueColor;
-// isoviivojen kanssa voi k‰ytt‰‰ myˆs hatch‰ttyj‰ alueita (2 kpl)
+// isoviivojen kanssa voi k√§ytt√§√§ my√∂s hatch√§ttyj√§ alueita (2 kpl)
 	bool fUseWithIsoLineHatch1;
 	bool fDrawIsoLineHatchWithBorders1;
 	float itsIsoLineHatchLowValue1; // hatch alueen ala-arvo
-	float itsIsoLineHatchHighValue1; // hatch alueen yl‰arvo
+	float itsIsoLineHatchHighValue1; // hatch alueen yl√§arvo
 	int itsIsoLineHatchType1; // hatch tyyppi 1=vinoviiva oikealle, 2=vinoviiva vasemmalle jne.
 	NFmiColor itsIsoLineHatchColor1;
 	NFmiColor itsIsoLineHatchBorderColor1;
 	bool fUseWithIsoLineHatch2;
 	bool fDrawIsoLineHatchWithBorders2;
 	float itsIsoLineHatchLowValue2; // hatch alueen ala-arvo
-	float itsIsoLineHatchHighValue2; // hatch alueen yl‰arvo
+	float itsIsoLineHatchHighValue2; // hatch alueen yl√§arvo
 	int itsIsoLineHatchType2; // hatch tyyppi 1=vinoviiva oikealle, 2=vinoviiva vasemmalle jne.
 	NFmiColor itsIsoLineHatchColor2;
-	int itsIsoLineLabelDigitCount; // isoviiva labelin n‰ytett‰vien digitaalien lukum‰‰r‰
+	int itsIsoLineLabelDigitCount; // isoviiva labelin n√§ytett√§vien digitaalien lukum√§√§r√§
 	int itsContourLabelDigitCount;  // **** Versio 3 parametri ****
 //***********************************************
 //********** 'versio 2' parametreja *************
 //***********************************************
-	float itsAlpha; // l‰pin‰kyvyys kerroin, 0 on t‰ysin l‰pin‰kyv‰ ja 100 t‰ysin l‰pin‰kym‰tˆn (0 on estetty ja itsMinAlpha on s‰‰detty minimi raja)
+	float itsAlpha; // l√§pin√§kyvyys kerroin, 0 on t√§ysin l√§pin√§kyv√§ ja 100 t√§ysin l√§pin√§kym√§t√∂n (0 on estetty ja itsMinAlpha on s√§√§detty minimi raja)
 
 private:
 
@@ -676,41 +676,41 @@ private:
 	float itsInitFileVersionNumber;
 
 
-	bool fHidden;			// n‰yttˆ voidaan piiloittaa t‰m‰n mukaisesti
-	bool fEditedParam;	// vain yksi parametreista voidaan editoida yht‰ aikaa
-//	bool fEditableParam;	// onko parametri suoraan editoitavissa ollenkaan? (esim. HESSAA tai tuulivektori eiv‰t ole)
+	bool fHidden;			// n√§ytt√∂ voidaan piiloittaa t√§m√§n mukaisesti
+	bool fEditedParam;	// vain yksi parametreista voidaan editoida yht√§ aikaa
+//	bool fEditableParam;	// onko parametri suoraan editoitavissa ollenkaan? (esim. HESSAA tai tuulivektori eiv√§t ole)
 
 	std::string itsUnit;
-	bool fActive;			// onko kyseinen parametri n‰ytˆn aktiivinen parametri (jokaisella n‰yttˆrivill‰ aina yksi aktivoitunut parametri)
-	bool fShowDifference;	// n‰ytet‰‰nkˆ kartalla parametrin arvo, vai erotus edelliseen aikaan (ei ole viel‰ talletettu tiedostoon)
+	bool fActive;			// onko kyseinen parametri n√§yt√∂n aktiivinen parametri (jokaisella n√§ytt√∂rivill√§ aina yksi aktivoitunut parametri)
+	bool fShowDifference;	// n√§ytet√§√§nk√∂ kartalla parametrin arvo, vai erotus edelliseen aikaan (ei ole viel√§ talletettu tiedostoon)
 	bool fShowDifferenceToOriginalData;
 
-	NFmiInfoData::Type itsDataType; // lis‰sin t‰m‰n, kun laitoin editoriin satelliitti kuvien katselun mahdollisuuden (satel-datalla ei ole infoa)
+	NFmiInfoData::Type itsDataType; // lis√§sin t√§m√§n, kun laitoin editoriin satelliitti kuvien katselun mahdollisuuden (satel-datalla ei ole infoa)
 	bool fViewMacroDrawParam; // is this DrawParam from viewmacro, if it is, then some things are handled
 							  // differently when modifying options, default value is false
 							  // This is not stored in file!
 	bool fBorrowedParam; // onko parametri lainassa vai ei (A-J Punkan vilkutus juttu)
 
-	// Arkistodatan k‰yttˆˆn liittyvi‰ asetuksia (historialliseen dataan voidaan viitata kahdella eri tavalla)
-	// Joko suoraan fixatulla itsModelOriginTime:lla tai itsModelRunIndex:ill‰, jolla kerrotaan monesko ajo 
-	// kiinnostaa viimeiseen n‰hden. 
-	// Prioriteetti j‰rjestys on, ett‰ ensin tarkistetaan lˆytyykˆ fiksattu aika (itsModelOriginTime) ja sitten vasta onko suhteellinen.
-	NFmiMetTime itsModelOriginTime; // Jos t‰ss‰ arvo, etsit‰‰n arkistosta (SmartMetin (tulevaisuudessa) oma tai Q2Server) 
-									// suoraan kyseinen aika. Jos arvo on NFmiDrawParam::gMissingOriginTime, t‰m‰ ei 
-									// ole k‰ytˆss‰.
-	int itsModelRunIndex; // Jos t‰ss‰ on negatiivinen arvo (-1 on edellinen malliajo, -2 on sit‰ edellinen jne.), haetaan
-						// arkistosta dataa. T‰m‰ luku on siis verrattuna kyseisen mallin viimeisimp‰‰n data osaan, joka lˆytyy.
-						// Tarkoittaen ett‰ jos Hirlamista on pinta ja painepinta datasta tullut jo 06:n ajo ja 
-						// mallipintadatasta vasta 00, silloin viimeisin ajo on 06 ja -1 viittaa t‰llˆin 00-ajoon.
-						// Jos t‰m‰ on 0 tai positiivinen, t‰m‰ ei ole k‰ytˆss‰.
-	NFmiMetTime itsModelOriginTimeCalculated; // t‰h‰n lasketaan relatiivisen malliajon mukainen origin aika, jot‰ k‰ytet‰‰n sitten mm. tooltipeiss‰ ja muualla
-	int itsTimeSerialModelRunCount; // t‰h‰n m‰‰r‰t‰‰n kuinka monta viimeista ajoa n‰ytet‰‰n mallille 
-									// kerrallaa aikasarjassa. Jos arvo on 0 (default), ei n‰ytet‰ kuin viimeinen ajo normaalisti.
-	int itsModelRunDifferenceIndex; // t‰m‰n avulla on tarkoitus verrata eri malliajoja. Jos t‰m‰ on >= 0, ei ole vertailua, jos se on -1 verrataan edelliseen ajoon, -2:lla verrataan sit‰ edelliseen jne
+	// Arkistodatan k√§ytt√∂√∂n liittyvi√§ asetuksia (historialliseen dataan voidaan viitata kahdella eri tavalla)
+	// Joko suoraan fixatulla itsModelOriginTime:lla tai itsModelRunIndex:ill√§, jolla kerrotaan monesko ajo 
+	// kiinnostaa viimeiseen n√§hden. 
+	// Prioriteetti j√§rjestys on, ett√§ ensin tarkistetaan l√∂ytyyk√∂ fiksattu aika (itsModelOriginTime) ja sitten vasta onko suhteellinen.
+	NFmiMetTime itsModelOriginTime; // Jos t√§ss√§ arvo, etsit√§√§n arkistosta (SmartMetin (tulevaisuudessa) oma tai Q2Server) 
+									// suoraan kyseinen aika. Jos arvo on NFmiDrawParam::gMissingOriginTime, t√§m√§ ei 
+									// ole k√§yt√∂ss√§.
+	int itsModelRunIndex; // Jos t√§ss√§ on negatiivinen arvo (-1 on edellinen malliajo, -2 on sit√§ edellinen jne.), haetaan
+						// arkistosta dataa. T√§m√§ luku on siis verrattuna kyseisen mallin viimeisimp√§√§n data osaan, joka l√∂ytyy.
+						// Tarkoittaen ett√§ jos Hirlamista on pinta ja painepinta datasta tullut jo 06:n ajo ja 
+						// mallipintadatasta vasta 00, silloin viimeisin ajo on 06 ja -1 viittaa t√§ll√∂in 00-ajoon.
+						// Jos t√§m√§ on 0 tai positiivinen, t√§m√§ ei ole k√§yt√∂ss√§.
+	NFmiMetTime itsModelOriginTimeCalculated; // t√§h√§n lasketaan relatiivisen malliajon mukainen origin aika, jot√§ k√§ytet√§√§n sitten mm. tooltipeiss√§ ja muualla
+	int itsTimeSerialModelRunCount; // t√§h√§n m√§√§r√§t√§√§n kuinka monta viimeista ajoa n√§ytet√§√§n mallille 
+									// kerrallaa aikasarjassa. Jos arvo on 0 (default), ei n√§ytet√§ kuin viimeinen ajo normaalisti.
+	int itsModelRunDifferenceIndex; // t√§m√§n avulla on tarkoitus verrata eri malliajoja. Jos t√§m√§ on >= 0, ei ole vertailua, jos se on -1 verrataan edelliseen ajoon, -2:lla verrataan sit√§ edelliseen jne
 
-	// Mallidatoja voidaan verrata analyysi ja havainto datoihin. Siis sellaiseen dataan, mill‰ on vain yhdet arvot kullekin havainto hetkelle.
-	unsigned long itsDataComparisonProdId; // Jos t‰m‰ on 0, ei vertailu-optio ole p‰‰ll‰. Muuten t‰ss‰ on halutun vertailudatan tuottaja id (analyysi/havainto datan)
-	NFmiInfoData::Type itsDataComparisonType; // t‰ss‰ on k‰ytetty datatyyppi esim. kAnalyzeData tai kObservations
+	// Mallidatoja voidaan verrata analyysi ja havainto datoihin. Siis sellaiseen dataan, mill√§ on vain yhdet arvot kullekin havainto hetkelle.
+	unsigned long itsDataComparisonProdId; // Jos t√§m√§ on 0, ei vertailu-optio ole p√§√§ll√§. Muuten t√§ss√§ on halutun vertailudatan tuottaja id (analyysi/havainto datan)
+	NFmiInfoData::Type itsDataComparisonType; // t√§ss√§ on k√§ytetty datatyyppi esim. kAnalyzeData tai kObservations
 };
 //@{ \name Globaalit NFmiDrawParam-luokan uudelleenohjaus-operaatiot
 inline std::ostream& operator<<(std::ostream& os, const NFmiDrawParam& item){return item.Write(os);}

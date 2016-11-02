@@ -18,14 +18,14 @@
 //
 //
 //  Description:
-//   Voi olla ett‰ t‰ss‰ riitt‰‰ suoraan uuden
-//   template lista luokan ilmentym‰.
+//   Voi olla ett√§ t√§ss√§ riitt√§√§ suoraan uuden
+//   template lista luokan ilmentym√§.
 //
 //  Change Log:
 //
 //**********************************************************
 #ifdef _MSC_VER
-#pragma warning(disable : 4786 4512) // poistaa n kpl VC++ k‰‰nt‰j‰n "liian pitk‰ tyyppi nimi" varoitusta
+#pragma warning(disable : 4786 4512) // poistaa n kpl VC++ k√§√§nt√§j√§n "liian pitk√§ tyyppi nimi" varoitusta
 #endif
 
 #include "NFmiDrawParamList.h"
@@ -59,8 +59,8 @@ bool NFmiDrawParamList::Add(boost::shared_ptr<NFmiDrawParam> &theParam)
 {
 	if(theParam)
 	{
-		if(theParam->DataType() == NFmiInfoData::kSatelData) // kSatelData tarkoittaa oikeasti vain kuva muotoista dataa eli ei v‰ltt‰m‰tt‰ satelliitti dataa siis
-		{ // satelliitti-kuvat pit‰‰ laitaa aina 1. n‰ytˆlle, koska ne peitt‰v‰t muut
+		if(theParam->DataType() == NFmiInfoData::kSatelData) // kSatelData tarkoittaa oikeasti vain kuva muotoista dataa eli ei v√§ltt√§m√§tt√§ satelliitti dataa siis
+		{ // satelliitti-kuvat pit√§√§ laitaa aina 1. n√§yt√∂lle, koska ne peitt√§v√§t muut
 			itsList.push_front(theParam);
 			fDirtyList = true;
 			return true;
@@ -101,7 +101,7 @@ bool NFmiDrawParamList::Add(boost::shared_ptr<NFmiDrawParam> &theParam, unsigned
    return false;
 }
 
-// ottaa toiselta listalta parametrit lainaan (tekee kopiot, mutta merkit‰‰ lainatuiksi)
+// ottaa toiselta listalta parametrit lainaan (tekee kopiot, mutta merkit√§√§ lainatuiksi)
 void NFmiDrawParamList::BorrowParams(NFmiDrawParamList &theList)
 {
 	for(theList.Reset(); theList.Next(); )
@@ -237,7 +237,7 @@ void NFmiDrawParamList::HideAllParams(bool newState)
 		Current()->HideParam(newState);
 }
 
-// asettaa kaikkien listalla olevien tilan 'ei editoitaviksi' (toisin p‰in ei ole j‰rkev‰‰ tehd‰)
+// asettaa kaikkien listalla olevien tilan 'ei editoitaviksi' (toisin p√§in ei ole j√§rkev√§√§ tehd√§)
 void NFmiDrawParamList::DisableEditing(void)
 {
 	for(Reset(); Next();)
@@ -255,7 +255,7 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 	for(Reset(); Next();)
 	{
 		boost::shared_ptr<NFmiDrawParam> drawParam = Current();
-		if(theParam.GetParamIdent() == NFmiInfoData::kFmiSpSynoPlot) // pirun synop-parametrille pit‰‰ taas tehd‰ virityksi‰
+		if(theParam.GetParamIdent() == NFmiInfoData::kFmiSpSynoPlot) // pirun synop-parametrille pit√§√§ taas tehd√§ virityksi√§
 		{
 			if(fUseOnlyParamId || drawParam->Param() == theParam)
 				return true;
@@ -271,7 +271,7 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 					if(theLevel == 0 && drawParam->Level().LevelType() == 0)
 						return true;
 					if(drawParam->Level().LevelType() == 0 && (theLevel->LevelType() == kFmiAnyLevelType || theLevel->LevelType() == kFmiMeanSeaLevel))
-						return true; // t‰m‰ case tulee kun nyky‰‰n tehd‰‰n pinta parametreja
+						return true; // t√§m√§ case tulee kun nyky√§√§n tehd√§√§n pinta parametreja
 					if(theLevel && (*(theLevel) == drawParam->Level()))
 						return true;
 				}
@@ -282,9 +282,9 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam, const NFmiLevel* the
 }
 
 // Poistaa listalta kaikki halutun tuottajan ja mahd. annetun levelin parametrit.
-// Ei poista niit‰ parametreja, jotka ovat theParamIdsNotRemoved-listalla. Lˆy-
-// tynyt paramId poistetaan theParamIdsNotRemoved-listalta, ett‰ niit‰ ei
-// lis‰tt‰isi myˆhemmin t‰h‰n listaan.
+// Ei poista niit√§ parametreja, jotka ovat theParamIdsNotRemoved-listalla. L√∂y-
+// tynyt paramId poistetaan theParamIdsNotRemoved-listalta, ett√§ niit√§ ei
+// lis√§tt√§isi my√∂hemmin t√§h√§n listaan.
 void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int>& theParamIdsNotRemoved, NFmiLevel* theLevel)
 {
 	std::list<int> tmpParIdList;
@@ -315,7 +315,7 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int
 		{
 			if(*(Current()->Param().GetProducer()) == theProducer)
 			{
-				if(Current()->Level().LevelType() == 0) // jos drawParamilla on joku 'oikea' leveli, ei kosketa siihen, koska nyt k‰sittelemme pinta datoja
+				if(Current()->Level().LevelType() == 0) // jos drawParamilla on joku 'oikea' leveli, ei kosketa siihen, koska nyt k√§sittelemme pinta datoja
 				{
 					it = std::find(tmpParIdList.begin(), tmpParIdList.end(), static_cast<int>(Current()->Param().GetParamIdent()));
 					if(it == tmpParIdList.end())
@@ -333,9 +333,9 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, checkedVector<int
 
 /*!
  * Poistaa listalta kaikki halutun tuottajan ja mahd. annetun levelin parametrit.
- * Ei poista niit‰ parametreja, jotka ovat theParamIdsNotRemoved-listalla. Lˆy-
- * tynyt paramId poistetaan theParamIdsNotRemoved-listalta, ett‰ niit‰ ei
- * lis‰tt‰isi myˆhemmin t‰h‰n listaan.
+ * Ei poista niit√§ parametreja, jotka ovat theParamIdsNotRemoved-listalla. L√∂y-
+ * tynyt paramId poistetaan theParamIdsNotRemoved-listalta, ett√§ niit√§ ei
+ * lis√§tt√§isi my√∂hemmin t√§h√§n listaan.
  */
 void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pair<int, NFmiLevel> >& theParamIdsAndLevelsNotRemoved)
 {
@@ -344,7 +344,7 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pa
 	{
 		if(*(Current()->Param().GetProducer()) == theProducer)
 		{
-			if(Current()->Level().LevelType() == kFmiPressureLevel) // koska kyse vain painepinta parametreista, pit‰‰ level tyypin olla painepinta
+			if(Current()->Level().LevelType() == kFmiPressureLevel) // koska kyse vain painepinta parametreista, pit√§√§ level tyypin olla painepinta
 			{
 				std::pair<int, NFmiLevel> tmp(Current()->Param().GetParamIdent(), Current()->Level());
 				it = std::find(theParamIdsAndLevelsNotRemoved.begin(), theParamIdsAndLevelsNotRemoved.end(), tmp);
@@ -358,9 +358,9 @@ void NFmiDrawParamList::Clear(const NFmiProducer& theProducer, std::list<std::pa
 }
 
 /*!
- * Poistaa halutun macroParamin listalta. Eli DrawParamin tyyppi pit‰‰ olla oikein
- * Ja sitten tutkitaan drawParamin nimen lyhennyst‰, joka on macroparametrien tunnus.
- * Palauttaa true, jos poistettiin mit‰‰n, muuten false.
+ * Poistaa halutun macroParamin listalta. Eli DrawParamin tyyppi pit√§√§ olla oikein
+ * Ja sitten tutkitaan drawParamin nimen lyhennyst√§, joka on macroparametrien tunnus.
+ * Palauttaa true, jos poistettiin mit√§√§n, muuten false.
  */
 bool NFmiDrawParamList::RemoveMacroParam(const std::string &theName)
 {
@@ -381,11 +381,11 @@ bool NFmiDrawParamList::RemoveMacroParam(const std::string &theName)
 }
 
 /*!
- * Liikuttaa aktiivista parametri‰ listalla halutun verran als/ylˆs p‰in.
- * Tarkoitus on muuttaa esim. karttan‰ytˆll‰ parametrien piirtoj‰rjestyst‰.
+ * Liikuttaa aktiivista parametri√§ listalla halutun verran als/yl√∂s p√§in.
+ * Tarkoitus on muuttaa esim. karttan√§yt√∂ll√§ parametrien piirtoj√§rjestyst√§.
  * Palauttaa true jos lista meni likaiseksi eli siirto tapahtui.
- * Lis‰sin alusta loppuun ja lopusta alkuun erikois k‰sittelyt, koska vanha koodi ei toiminut.
- * TODO Koodi n‰ytt‰‰ nyt tosi hankalalta ja sen saisi varmaan yksinkertaisemminkin tehty‰.
+ * Lis√§sin alusta loppuun ja lopusta alkuun erikois k√§sittelyt, koska vanha koodi ei toiminut.
+ * TODO Koodi n√§ytt√§√§ nyt tosi hankalalta ja sen saisi varmaan yksinkertaisemminkin tehty√§.
  */
 bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 {
@@ -393,8 +393,8 @@ bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 	if(theMovement && paramCount > 1)
 	{
 		int index = FindActive();
-		// pit‰‰ huolehtia kahdest‰ erikoistapauksesta
-		// 1. siirret‰‰n alusta loppuun
+		// pit√§√§ huolehtia kahdest√§ erikoistapauksesta
+		// 1. siirret√§√§n alusta loppuun
 		if(index == 1 && theMovement < 0)
 		{
 			IterType iter = itsList.begin();
@@ -404,7 +404,7 @@ bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 			fDirtyList = true;
 			return true;
 		}
-		//  2. siirret‰‰n lopusta alkuun
+		//  2. siirret√§√§n lopusta alkuun
 		else if(index == paramCount && theMovement > 0)
 		{
 			IterType iter = itsList.end();
@@ -422,14 +422,14 @@ bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 			{
 				index += theMovement;
 				if(index < 1)
-					index = (index + paramCount); // menn‰‰n listan ymp‰ri tarvittaessa
+					index = (index + paramCount); // menn√§√§n listan ymp√§ri tarvittaessa
 				else if(index > paramCount)
-					index = (index - paramCount); // menn‰‰n listan ymp‰ri tarvittaessa
+					index = (index - paramCount); // menn√§√§n listan ymp√§ri tarvittaessa
 
 				// tarkistus koodia sille jos theMovement on suurempi kuin paramCount
 				index = FmiMax(index, 1);
 				index = FmiMin(index, paramCount);
-				if(index != oldIndex) // jos todella tapahtuu siirto, tehd‰‰n se ja laitetaan lista likaiseksi
+				if(index != oldIndex) // jos todella tapahtuu siirto, tehd√§√§n se ja laitetaan lista likaiseksi
 				{
 					Swap(index, oldIndex);
 					return true;
@@ -440,8 +440,8 @@ bool NFmiDrawParamList::MoveActiveParam(int theMovement)
 	return false;
 }
 
-// Siirret‰‰n osoitettua parametria osoitettuun paikkaan listassa,
-// jos listassa on kaksi tai enemm‰n parametreja
+// Siirret√§√§n osoitettua parametria osoitettuun paikkaan listassa,
+// jos listassa on kaksi tai enemm√§n parametreja
 // jos indeksit ovat kunnollisia ja eri suuruisia
 bool NFmiDrawParamList::MoveParam(int theMovedParamIndex, int theMoveToPosition)
 {
@@ -452,8 +452,8 @@ bool NFmiDrawParamList::MoveParam(int theMovedParamIndex, int theMoveToPosition)
             if(Index(theMovedParamIndex))
             {
                 boost::shared_ptr<NFmiDrawParam> movedDrawPAram = Current(); // Otetaan osoitetulta kohdalta drawParam talteen
-                Remove(); // poistetaan siirrett‰v‰ drawParam
-                Add(movedDrawPAram, theMoveToPosition); // lis‰t‰‰n se haluttuun kohtaan ennen jo poistettua drawParamiajolloin voidaan k‰ytt‰‰ annettua indeksi‰
+                Remove(); // poistetaan siirrett√§v√§ drawParam
+                Add(movedDrawPAram, theMoveToPosition); // lis√§t√§√§n se haluttuun kohtaan ennen jo poistettua drawParamiajolloin voidaan k√§ytt√§√§ annettua indeksi√§
                 return fDirtyList;
             }
         }
@@ -461,8 +461,8 @@ bool NFmiDrawParamList::MoveParam(int theMovedParamIndex, int theMoveToPosition)
     return false;
 }
 
-// T‰m‰ tekee tarkistamattoman kahden itemin swapin listassa.
-// indeksit alkoivat 1:st‰, eli listan 1. itemi on indeksi 1:ss‰.
+// T√§m√§ tekee tarkistamattoman kahden itemin swapin listassa.
+// indeksit alkoivat 1:st√§, eli listan 1. itemi on indeksi 1:ss√§.
 void NFmiDrawParamList::Swap(int index1, int index2)
 {
 	if(Index(index1))
@@ -478,8 +478,8 @@ void NFmiDrawParamList::Swap(int index1, int index2)
 }
 
 /*!
- * Etsii aktiivisen parametrin listalta. Jos lˆytyy, Currentti osoittaa siihen
- * ja sen indeksi palautetaan (indeksit alkavat 1:st‰). Jos ei ole aktiivista
+ * Etsii aktiivisen parametrin listalta. Jos l√∂ytyy, Currentti osoittaa siihen
+ * ja sen indeksi palautetaan (indeksit alkavat 1:st√§). Jos ei ole aktiivista
  * palautetaan 0.
  */
 int NFmiDrawParamList::FindActive(void)
@@ -506,7 +506,7 @@ int NFmiDrawParamList::FindEdited(void)
 
 /*!
  * Tekee annetusta listasta kopioidut drawParamit omaan listaansa. clearList parametrilla voidaan
- * 'this' -lista tyhjent‰‰ ennen kopiointia.
+ * 'this' -lista tyhjent√§√§ ennen kopiointia.
 */
 void NFmiDrawParamList::CopyList(NFmiDrawParamList &theList, bool clearFirst)
 {
@@ -521,9 +521,9 @@ void NFmiDrawParamList::CopyList(NFmiDrawParamList &theList, bool clearFirst)
 	ActivateOnlyOne();
 }
 
-// T‰m‰ metodi varmistaa, ett‰ listassa on vain yksi aktivoitu DrawParami.
-// Jos listassa on useita aktiivisia, ensimm‰inen niist‰ j‰‰ aktiiviseksi.
-// Jos listassa ei ole yht‰‰n aktiivista, ensimm‰inen aktivoidaan.
+// T√§m√§ metodi varmistaa, ett√§ listassa on vain yksi aktivoitu DrawParami.
+// Jos listassa on useita aktiivisia, ensimm√§inen niist√§ j√§√§ aktiiviseksi.
+// Jos listassa ei ole yht√§√§n aktiivista, ensimm√§inen aktivoidaan.
 void NFmiDrawParamList::ActivateOnlyOne(void)
 {
 	if(NumberOfItems() == 0)
@@ -532,6 +532,6 @@ void NFmiDrawParamList::ActivateOnlyOne(void)
 	DeactivateAll();
 	if(activeIndex == 0)
 		activeIndex++;
-	if(Index(activeIndex)) // pit‰isi lˆyty‰!!
+	if(Index(activeIndex)) // pit√§isi l√∂yty√§!!
 		Current()->Activate(true);
 }

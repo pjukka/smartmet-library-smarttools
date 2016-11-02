@@ -5,7 +5,7 @@
 //  Creation Date  : 8.11. 2010 
 //**********************************************************
 #ifdef _MSC_VER
-#pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
+#pragma warning(disable : 4786) // poistaa n kpl VC++ k√§√§nt√§j√§n varoitusta
 #endif
 
 #include "NFmiSmartToolCalculationSectionInfo.h"
@@ -28,7 +28,7 @@ void NFmiSmartToolCalculationSectionInfo::AddCalculationInfo(boost::shared_ptr<N
 		itsSmartToolCalculationInfoVector.push_back(value);
 }
 
-// Lis‰t‰‰n set:iin kaikki parametrit, joita t‰ss‰ sectioniossa voidaan muokata.
+// Lis√§t√§√§n set:iin kaikki parametrit, joita t√§ss√§ sectioniossa voidaan muokata.
 // talteen otetaan vain identti, koska muu ei kiinnosta (ainakaan nyt)
 void NFmiSmartToolCalculationSectionInfo::AddModifiedParams(std::set<int> &theModifiedParams)
 {

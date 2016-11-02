@@ -7,9 +7,9 @@
 /*!
  * \class NFmiSmartToolUtil
  *
- * T‰m‰ luokka tekee halutut smarttool-operaatiot halutuille datoille.
+ * T√§m√§ luokka tekee halutut smarttool-operaatiot halutuille datoille.
  * Toiminta samanlainen kuin NFmiQueryDataUtil-luokalla, mutta muutokset 
- * tehd‰‰n erilaisilla scripteill‰. Muokkaus datoihin tapahtuu luokan static
+ * tehd√§√§n erilaisilla scripteill√§. Muokkaus datoihin tapahtuu luokan static
  * funktioilla.
  */
 // ======================================================================

@@ -19,11 +19,11 @@
 // calculationSection5
 //
 // Eli Voi olla laskuja, jotka suoritetaan aina ensin (calculationSection1), sitten tulee
-// haluttu m‰‰r‰ IF - ELSEIF - ELSE osioita, joihin jokaiseen liittyy jokin calculationSection.
-// ELSEIF:j‰ voi olla useita, mutta IF ja ELSE osioita voi olla vain yksi kumpaakin
-// ja niiden on oltava p‰iss‰ (IF alussa ja ELSE lopussa).
-// Lopuksi viel‰ on calculationSection, joka suoritetaan aina.
-// Kaikki osiot sik‰ vapaa ehtoisia, ettei mit‰‰n tarvitse olla, mutta esim IF, ELSEIF ja ELSE:n j‰lkeen pit‰‰ tulla calculationSection.
+// haluttu m√§√§r√§ IF - ELSEIF - ELSE osioita, joihin jokaiseen liittyy jokin calculationSection.
+// ELSEIF:j√§ voi olla useita, mutta IF ja ELSE osioita voi olla vain yksi kumpaakin
+// ja niiden on oltava p√§iss√§ (IF alussa ja ELSE lopussa).
+// Lopuksi viel√§ on calculationSection, joka suoritetaan aina.
+// Kaikki osiot sik√§ vapaa ehtoisia, ettei mit√§√§n tarvitse olla, mutta esim IF, ELSEIF ja ELSE:n j√§lkeen pit√§√§ tulla calculationSection.
 //**********************************************************
 
 #include <NFmiParameterName.h>
@@ -64,7 +64,7 @@ public:
 	bool Empty(void) const{return itsCalculationBlockInfos.empty();}
 
 private:
-	// luokka ei omista vektorissa olevia otuksia, Clear pit‰‰ kutsua erikseen!!!
+	// luokka ei omista vektorissa olevia otuksia, Clear pit√§√§ kutsua erikseen!!!
 	checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlockInfo> > itsCalculationBlockInfos;
 };
 
@@ -76,7 +76,7 @@ public:
 	void Clear(void);
 	void AddModifiedParams(std::set<int> &theModifiedParams);
 
-	// luokka ei omista n‰it‰, Clear pit‰‰ kutsua erikseen!!!
+	// luokka ei omista n√§it√§, Clear pit√§√§ kutsua erikseen!!!
 	boost::shared_ptr<NFmiSmartToolCalculationSectionInfo> itsFirstCalculationSectionInfo;
 	boost::shared_ptr<NFmiAreaMaskSectionInfo> itsIfAreaMaskSectionInfo;
 	boost::shared_ptr<NFmiSmartToolCalculationBlockInfoVector> itsIfCalculationBlockInfos;
@@ -106,7 +106,7 @@ public:
 	checkedVector<NFmiSmartToolCalculationBlockInfo>& SmartToolCalculationBlocks(void){return itsSmartToolCalculationBlocks;}
 	NFmiParamBag ModifiedParams(void);
 	NFmiParam GetParamFromString(const std::string &theParamText);
-	bool IsInterpretedSkriptMacroParam(void); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysy‰, onko kyseinen makro ns. macroParam-skripti eli sis‰lt‰‰kˆ se RESULT = ??? tapaista teksti‰
+	bool IsInterpretedSkriptMacroParam(void); // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysy√§, onko kyseinen makro ns. macroParam-skripti eli sis√§lt√§√§k√∂ se RESULT = ??? tapaista teksti√§
 
 private:
 	typedef std::map<std::string, FmiParameterName> ParamMap;
@@ -185,12 +185,12 @@ private:
 	std::string itsCheckOutSectionText; // esim. if-sectionin koko teksti
 	std::string::iterator itsCheckOutTextStartPosition; // sen hetkinen tekstiosan alkupiste
 	std::string::iterator itsCheckOutTextEndPosition; // sen hetkinen tekstiosan alkupiste
-	bool fContinueCurrentSectionCheckOut; // jatketaanko sen hetkisen sectionin tutkimista, vai onko selv‰‰, ettei esim. else-sectionia ole olemassa
+	bool fContinueCurrentSectionCheckOut; // jatketaanko sen hetkisen sectionin tutkimista, vai onko selv√§√§, ettei esim. else-sectionia ole olemassa
 
 	void SetMacroTexts(const std::string &theMacroText);
 	std::string itsMacroText;
 	std::string itsStrippedMacroText;
-	std::string itsIncludeDirectory; // mist‰ ladataan mahd. include filet
+	std::string itsIncludeDirectory; // mist√§ ladataan mahd. include filet
 
 	checkedVector<NFmiSmartToolCalculationBlockInfo> itsSmartToolCalculationBlocks;
 
@@ -212,8 +212,8 @@ private:
 	static checkedVector<std::string> itsTokenRampDownFunctions;
 	static checkedVector<std::string> itsTokenDoubleRampFunctions;
 	static checkedVector<std::string> itsTokenRampFunctions;
-	static checkedVector<std::string> itsTokenMacroParamIdentifiers; // t‰nne listataan result jne. sanat joita k‰ytet‰‰n makrojen visualisoinnissa
-	static checkedVector<std::string> itsTokenDeltaZIdentifiers; // t‰nne listataan deltaz 'funktiot'
+	static checkedVector<std::string> itsTokenMacroParamIdentifiers; // t√§nne listataan result jne. sanat joita k√§ytet√§√§n makrojen visualisoinnissa
+	static checkedVector<std::string> itsTokenDeltaZIdentifiers; // t√§nne listataan deltaz 'funktiot'
 
 	typedef std::map<std::string, FmiMaskOperation> MaskOperMap;
 	static MaskOperMap itsTokenMaskOperations;
@@ -228,21 +228,21 @@ private:
 	static FunctionMap itsTokenFunctions;
 	static FunctionMap itsTokenThreeArgumentFunctions;
 
-	typedef boost::tuple<NFmiAreaMask::FunctionType, NFmiAreaMask::MetFunctionDirection, int, std::string> MetFunctionMapValue; // MetFunktioihin talletetaan 'taika'-sanan lis‰ksi Funktio tyyppi ja 
-																							// funktion argumenttien lukum‰‰r‰ ja funktion oikea 'muoto' stringin‰, 
-																							// joka pit‰‰ sis‰ll‰‰n esim. grad-funktion tapauksessa "grad(param)"
-	typedef std::map<std::string, MetFunctionMapValue> MetFunctionMap; // 'Meteorologiset' funktiot. N‰ill‰ funktioilla k‰sitell‰‰n queryData-olioita eli pyydet‰‰n erilaisia 
-																		// arvoja siit‰ (esim. advektiota Adv(T_Hir)).
+	typedef boost::tuple<NFmiAreaMask::FunctionType, NFmiAreaMask::MetFunctionDirection, int, std::string> MetFunctionMapValue; // MetFunktioihin talletetaan 'taika'-sanan lis√§ksi Funktio tyyppi ja 
+																							// funktion argumenttien lukum√§√§r√§ ja funktion oikea 'muoto' stringin√§, 
+																							// joka pit√§√§ sis√§ll√§√§n esim. grad-funktion tapauksessa "grad(param)"
+	typedef std::map<std::string, MetFunctionMapValue> MetFunctionMap; // 'Meteorologiset' funktiot. N√§ill√§ funktioilla k√§sitell√§√§n queryData-olioita eli pyydet√§√§n erilaisia 
+																		// arvoja siit√§ (esim. advektiota Adv(T_Hir)).
 	static MetFunctionMap itsTokenMetFunctions;
 
 
 	typedef boost::tuple<NFmiAreaMask::FunctionType, NFmiAreaMask::FunctionType, int, std::string> VertFunctionMapValue; // Vert(ikaali)Funktioihin talletetaan 'taika'-sanan 
-																							// lis‰ksi Funktio tyyppi1 (avg,max,find, jne.) ja tyyppi2 (vertikaali rajojen muoto, eli ala- ja yl‰rajojen m‰‰ritykset,
+																							// lis√§ksi Funktio tyyppi1 (avg,max,find, jne.) ja tyyppi2 (vertikaali rajojen muoto, eli ala- ja yl√§rajojen m√§√§ritykset,
 																							// joilla voi olla arvoja VertP = Pressure, VertZ = height, VertFL = flight-level tai VertHyb = hybridi levelit) 
-																							// ja funktion argumenttien lukum‰‰r‰ (int) ja funktion oikea 'muoto' stringin‰, 
-																							// joka pit‰‰ sis‰ll‰‰n esim. grad-funktion tapauksessa "grad(param)"
-	typedef std::map<std::string, VertFunctionMapValue> VertFunctionMap; // Vertikaali funktiot. N‰ill‰ funktioilla k‰sitell‰‰n queryData-olioita eli pyydet‰‰n erilaisia 
-																		// arvoja siit‰ (esim. vertp_max(WS_hir, p1, p2) hakee hirlamin maksimi tuulen nopeuden p1 ja p2 painepintojen v‰lilt‰).
+																							// ja funktion argumenttien lukum√§√§r√§ (int) ja funktion oikea 'muoto' stringin√§, 
+																							// joka pit√§√§ sis√§ll√§√§n esim. grad-funktion tapauksessa "grad(param)"
+	typedef std::map<std::string, VertFunctionMapValue> VertFunctionMap; // Vertikaali funktiot. N√§ill√§ funktioilla k√§sitell√§√§n queryData-olioita eli pyydet√§√§n erilaisia 
+																		// arvoja siit√§ (esim. vertp_max(WS_hir, p1, p2) hakee hirlamin maksimi tuulen nopeuden p1 ja p2 painepintojen v√§lilt√§).
 	static VertFunctionMap itsTokenVertFunctions;
 
 
@@ -253,19 +253,19 @@ private:
 	static MathFunctionMap itsMathFunctions;
 
 	typedef std::map<std::string, int> ScriptVariableMap;
-	ScriptVariableMap itsTokenScriptVariableNames; // skriptiss‰ varatut muuttujat (var x = ?) talletetaan t‰nne, ett‰ voidaan tarkistaa niiden olemassa olo
-	int itsScriptVariableParamIdCounter; // pit‰‰ keksia muutujille id, joten tehd‰‰ juokseva counter
+	ScriptVariableMap itsTokenScriptVariableNames; // skriptiss√§ varatut muuttujat (var x = ?) talletetaan t√§nne, ett√§ voidaan tarkistaa niiden olemassa olo
+	int itsScriptVariableParamIdCounter; // pit√§√§ keksia muutujille id, joten tehd√§√§ juokseva counter
 
-	// normaali ja macroParam sijoituksia halutaan seurata, ett‰ ei tapahdu vahinkoja eli niit‰ olisi sekaisin, jolloin seuramukset ovat vahingollisia
-	bool fNormalAssigmentFound; // loytyykˆ skriptist‰ normaaleja sijoituksia esim. T = ???
-	bool fMacroParamFound; // loytyykˆ skriptist‰ ns. macroParameri sijoituksia eli RESULT = ?????
-	bool fMacroParamSkriptInProgress; // Tieto siit‰ tulkitaanko macroParam-skripti‰ vai tavallista skripti‰. Poikkeus heitet‰‰n jos macrpParam-skripti p‰‰ll‰, mutta tehd‰‰n tavallinen sijoitus
+	// normaali ja macroParam sijoituksia halutaan seurata, ett√§ ei tapahdu vahinkoja eli niit√§ olisi sekaisin, jolloin seuramukset ovat vahingollisia
+	bool fNormalAssigmentFound; // loytyyk√∂ skriptist√§ normaaleja sijoituksia esim. T = ???
+	bool fMacroParamFound; // loytyyk√∂ skriptist√§ ns. macroParameri sijoituksia eli RESULT = ?????
+	bool fMacroParamSkriptInProgress; // Tieto siit√§ tulkitaanko macroParam-skripti√§ vai tavallista skripti√§. Poikkeus heitet√§√§n jos macrpParam-skripti p√§√§ll√§, mutta tehd√§√§n tavallinen sijoitus
 
 // GetToken ja IsDelim otettu H. Schilbertin  C++: the Complete Refeference third ed.
-// jouduin muuttamaan niit‰ v‰h‰n sopimaan t‰h‰n ymp‰ristˆˆn.
+// jouduin muuttamaan niit√§ v√§h√§n sopimaan t√§h√§n ymp√§rist√∂√∂n.
 	bool GetToken(void);
 	bool IsDelim(char c);
-	// Ed. funktiot k‰ytt‰v‰t seuraavia muuttujia:
+	// Ed. funktiot k√§ytt√§v√§t seuraavia muuttujia:
 	enum types { NOTYPE=0, DELIMITER = 1, VARIABLE, NUMBER};
     std::string::iterator exp_ptr;  // points to the expression
     std::string::iterator exp_end;

@@ -5,7 +5,7 @@
 //  Creation Date  : 8.11. 2010
 //**********************************************************
 #ifdef _MSC_VER
-#pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
+#pragma warning(disable : 4786) // poistaa n kpl VC++ k√§√§nt√§j√§n varoitusta
 #endif
 
 #include "NFmiAreaMaskInfo.h"
@@ -38,12 +38,12 @@
 #include <stdexcept>
 
 #ifdef _MSC_VER
-#pragma warning (disable : 4244 4267 4512) // boost:in thread kirjastosta tulee ik‰v‰sti 4244 varoituksia
+#pragma warning (disable : 4244 4267 4512) // boost:in thread kirjastosta tulee ik√§v√§sti 4244 varoituksia
 #endif
 #include <boost/thread.hpp>
 
 #ifdef _MSC_VER
-#pragma warning (default : 4244 4267 4512) // laitetaan 4244 takaisin p‰‰lle, koska se on t‰rke‰ (esim. double -> int auto castaus varoitus)
+#pragma warning (default : 4244 4267 4512) // laitetaan 4244 takaisin p√§√§lle, koska se on t√§rke√§ (esim. double -> int auto castaus varoitus)
 #endif
 
 using namespace std;
@@ -75,7 +75,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolCalculationBlockVector::FirstV
 	Iterator it = Begin();
 	Iterator endIt = End();
 	for( ; it != endIt; ++it)
-		if((*it)->FirstVariableInfo()) // pit‰isi lˆyty‰ aina jotain!!!
+		if((*it)->FirstVariableInfo()) // pit√§isi l√∂yty√§ aina jotain!!!
 			return (*it)->FirstVariableInfo();
 	return boost::shared_ptr<NFmiFastQueryInfo>();
 }
@@ -237,7 +237,7 @@ NFmiSmartToolModifier::~NFmiSmartToolModifier(void)
 //--------------------------------------------------------
 // InitSmartTool
 //--------------------------------------------------------
-// Tulkitsee macron, luo tavittavat systeemit, ett‰ makro voidaan suorittaa.
+// Tulkitsee macron, luo tavittavat systeemit, ett√§ makro voidaan suorittaa.
 void NFmiSmartToolModifier::InitSmartTool(const std::string &theSmartToolText, bool fThisIsMacroParamSkript)
 {
 	fMacroRunnable = true;
@@ -318,10 +318,10 @@ boost::shared_ptr<NFmiSmartToolCalculation> NFmiSmartToolModifier::CreateConditi
 			areaMaskHandler = boost::shared_ptr<NFmiSmartToolCalculation>(new NFmiSmartToolCalculation());
 			areaMaskHandler->SetCalculationText(theAreaMaskSectionInfo->GetCalculationText());
 			for(size_t i=0; i<size; i++)
-// HUOM!!!! editoitavaN DATAN QDatasta pit‰‰ tehd‰ kopiot, muuten maskit eiv‰t toimi
-// kaikissa tilanteissa oikein!! KORJAA TƒMƒ!!!!!
+// HUOM!!!! editoitavaN DATAN QDatasta pit√§√§ tehd√§ kopiot, muuten maskit eiv√§t toimi
+// kaikissa tilanteissa oikein!! KORJAA T√ÑM√Ñ!!!!!
 				areaMaskHandler->AddCalculation(CreateAreaMask(*maskInfos[i]));
-			// loppuun lis‰t‰‰n viel‰ lopetus 'merkki'
+			// loppuun lis√§t√§√§n viel√§ lopetus 'merkki'
 			areaMaskHandler->AddCalculation(CreateEndingAreaMask());
 
 			return areaMaskHandler;
@@ -360,21 +360,21 @@ boost::shared_ptr<NFmiSmartToolCalculation> NFmiSmartToolModifier::CreateCalcula
 		calculation = boost::shared_ptr<NFmiSmartToolCalculation>(new NFmiSmartToolCalculation());
 		calculation->SetCalculationText(theCalcInfo->GetCalculationText());
 		calculation->SetCalculationText(theCalcInfo->GetCalculationText());
-		bool mustUsePressureInterpolation = false; // t‰t‰ei k‰ytet‰ t‰ss‰, mutta pakko laittaa metodin interfacen takia
+		bool mustUsePressureInterpolation = false; // t√§t√§ei k√§ytet√§ t√§ss√§, mutta pakko laittaa metodin interfacen takia
 		calculation->SetResultInfo(CreateInfo(*theCalcInfo->GetResultDataInfo(), mustUsePressureInterpolation));
 		if(calculation->GetResultInfo() && calculation->GetResultInfo()->Grid())
-			itsWorkingGrid = boost::shared_ptr<MyGrid>(new MyGrid(*calculation->GetResultInfo()->Grid())); // t‰m‰ tyˆskentely alueen hila ja area otettava talteen
+			itsWorkingGrid = boost::shared_ptr<MyGrid>(new MyGrid(*calculation->GetResultInfo()->Grid())); // t√§m√§ ty√∂skentely alueen hila ja area otettava talteen
 
 		float lowerLimit = kFloatMissing;
 		float upperLimit = kFloatMissing;
-		bool checkLimits = true; // yleens‰ parametreille k‰ytetd‰‰n min/max rajoja, mutta ei esim TotalWind tai W&C:lle
+		bool checkLimits = true; // yleens√§ parametreille k√§ytetd√§√§n min/max rajoja, mutta ei esim TotalWind tai W&C:lle
 		GetParamValueLimits(*theCalcInfo->GetResultDataInfo(), &lowerLimit, &upperLimit, &checkLimits);
 		calculation->SetLimits(lowerLimit, upperLimit, checkLimits);
 		calculation->AllowMissingValueAssignment(theCalcInfo->AllowMissingValueAssignment());
 		for(size_t i=0; i<size; i++)
 		{
 			if(areaMaskInfos[i] != 0)
-				calculation->AddCalculation(CreateAreaMask(*areaMaskInfos[i])); // HUOM! TƒHƒN KAATUU JOSKUS, TUTKI ASIAA!!!!!
+				calculation->AddCalculation(CreateAreaMask(*areaMaskInfos[i])); // HUOM! T√ÑH√ÑN KAATUU JOSKUS, TUTKI ASIAA!!!!!
 			else
 			{
 				string errStr("Error in application: NFmiSmartToolModifier::CreateCalculation - zero pointer error with calculation\n");
@@ -383,7 +383,7 @@ boost::shared_ptr<NFmiSmartToolCalculation> NFmiSmartToolModifier::CreateCalcula
 				throw runtime_error(errStr);
 			}
 		}
-		// loppuun lis‰t‰‰n viel‰ loputus 'merkki'
+		// loppuun lis√§t√§√§n viel√§ loputus 'merkki'
 		calculation->AddCalculation(CreateEndingAreaMask());
 		return calculation;
 	}
@@ -391,8 +391,8 @@ boost::shared_ptr<NFmiSmartToolCalculation> NFmiSmartToolModifier::CreateCalcula
 }
 
 // Laskee smarttool-systeemin avulla halutun poikkileikkauksen arvo-matriisin.
-// T‰m‰ on universaali metodi, joka hoitaa kaikki kolme tapausta: poikkileikkaus, aika-poikkileikkaus ja reitti-poikkileikkaus.
-// Parametreina annetaa aina sopiva pisteet ja ajat, ett‰ saadaan eri efektit aikaan. Eli aika-poikkileikkauksessa
+// T√§m√§ on universaali metodi, joka hoitaa kaikki kolme tapausta: poikkileikkaus, aika-poikkileikkaus ja reitti-poikkileikkaus.
+// Parametreina annetaa aina sopiva pisteet ja ajat, ett√§ saadaan eri efektit aikaan. Eli aika-poikkileikkauksessa
 // kaikki pisteet ovat samoja, normaali poikkileikkauksessa kaikki ajat ovat samoja ja reitti versiossa ajat ja pisteet muuttuvat.
 void NFmiSmartToolModifier::CalcCrossSectionSmartToolValues(NFmiDataMatrix<float> &theValues, checkedVector<float> &thePressures, checkedVector<NFmiPoint> &theLatlonPoints, const checkedVector<NFmiMetTime> &thePointTimes)
 {
@@ -409,14 +409,14 @@ void NFmiSmartToolModifier::CalcCrossSectionSmartToolValues(NFmiDataMatrix<float
 	macroParamValue.fSetValue = true;
 	macroParamValue.fDoCrossSectionCalculations = true;
 
-	// lasketaan l‰pi yksitt‰isi‰ arvoja kaikille halutuille pisteille
+	// lasketaan l√§pi yksitt√§isi√§ arvoja kaikille halutuille pisteille
 	for(size_t i = 0; i<sizeX; i++)
 	{
 		macroParamValue.itsLatlon = theLatlonPoints[i];
 		macroParamValue.itsTime = thePointTimes[i];
 		NFmiTimeBag timeBag(macroParamValue.itsTime, macroParamValue.itsTime, 60);
 		NFmiTimeDescriptor times(macroParamValue.itsTime, timeBag);
-		itsInfoOrganizer->CrossSectionMacroParamData()->SetTimeDescriptor(times); // asetetaan makroData-infon aikasysteemi currentin kartan kohtaan (feikki datassa vain yksi aika ja se pit‰‰ s‰‰t‰‰ kohdalleen, ett‰ laskut onnistuvat)
+		itsInfoOrganizer->CrossSectionMacroParamData()->SetTimeDescriptor(times); // asetetaan makroData-infon aikasysteemi currentin kartan kohtaan (feikki datassa vain yksi aika ja se pit√§√§ s√§√§t√§√§ kohdalleen, ett√§ laskut onnistuvat)
 		for(size_t j = 0; j<sizeY; j++)
 		{
 			macroParamValue.itsPressureHeight = thePressures[j];
@@ -430,7 +430,7 @@ float NFmiSmartToolModifier::CalcSmartToolValue(NFmiMacroParamValue &theMacroPar
 {
 	NFmiTimeBag validTimes(theMacroParamValue.itsTime, theMacroParamValue.itsTime, 60);
 	NFmiTimeDescriptor times(validTimes, theMacroParamValue.itsTime);
-	// oikeasti t‰ss‰ ei modifioida mit‰‰n, vaan palautetaan vain yksi arvo
+	// oikeasti t√§ss√§ ei modifioida mit√§√§n, vaan palautetaan vain yksi arvo
 	ModifyData(&times, false, true, theMacroParamValue, 0);
 	return theMacroParamValue.itsValue;
 }
@@ -448,8 +448,8 @@ float NFmiSmartToolModifier::CalcSmartToolValue(const NFmiMetTime &theTime, cons
 //--------------------------------------------------------
 // ModifyData
 //--------------------------------------------------------
-// Suorittaa varsinaiset modifikaatiot. K‰ytt‰j‰ voi antaa parametrina rajoitetun ajan
-// modifioinneille, jos theModifiedTimes on 0-pointteri, tehd‰‰n operaatiot kaikille
+// Suorittaa varsinaiset modifikaatiot. K√§ytt√§j√§ voi antaa parametrina rajoitetun ajan
+// modifioinneille, jos theModifiedTimes on 0-pointteri, tehd√§√§n operaatiot kaikille
 // datan ajoille.
 void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, bool fSelectedLocationsOnly, bool isMacroParamCalculation, NFmiThreadCallBacks *theThreadCallBacks)
 {
@@ -457,7 +457,7 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, boo
 	ModifyData(theModifiedTimes, fSelectedLocationsOnly, isMacroParamCalculation, macroParamValue, theThreadCallBacks);
 }
 
-// t‰ss‰ lasketaan jos k‰ytˆss‰ on progress-dialogi, smarttool:in kokonais steppi m‰‰r‰ ja asetetaan se dialogille
+// t√§ss√§ lasketaan jos k√§yt√∂ss√§ on progress-dialogi, smarttool:in kokonais steppi m√§√§r√§ ja asetetaan se dialogille
 static void CalcTotalProgressStepCount(checkedVector<NFmiSmartToolCalculationBlockInfo> &theCalcInfoVector, NFmiTimeDescriptor *theModifiedTimes, NFmiThreadCallBacks *theThreadCallBacks)
 {
 	if(theThreadCallBacks && theModifiedTimes)
@@ -497,11 +497,11 @@ void NFmiSmartToolModifier::ModifyData(NFmiTimeDescriptor* theModifiedTimes, boo
 				ModifyBlockData(block, theMacroParamValue, theThreadCallBacks);
 			}
 		}
-		ClearScriptVariableInfos(); // lopuksi n‰m‰ skripti-muuttujat tyhjennet‰‰n
+		ClearScriptVariableInfos(); // lopuksi n√§m√§ skripti-muuttujat tyhjennet√§√§n
 	}
 	catch(...)
 	{
-		ClearScriptVariableInfos(); // lopuksi n‰m‰ skripti-muuttujat tyhjennet‰‰n
+		ClearScriptVariableInfos(); // lopuksi n√§m√§ skripti-muuttujat tyhjennet√§√§n
 		fMacroRunnable = false;
 		throw ;
 	}
@@ -526,17 +526,17 @@ void NFmiSmartToolModifier::ModifyData_ver2(NFmiTimeDescriptor* theModifiedTimes
 				ModifyBlockData_ver2(block, theThreadCallBacks);
 			}
 		}
-		ClearScriptVariableInfos(); // lopuksi n‰m‰ skripti-muuttujat tyhjennet‰‰n
+		ClearScriptVariableInfos(); // lopuksi n√§m√§ skripti-muuttujat tyhjennet√§√§n
 	}
 	catch(...)
 	{
-		ClearScriptVariableInfos(); // lopuksi n‰m‰ skripti-muuttujat tyhjennet‰‰n
+		ClearScriptVariableInfos(); // lopuksi n√§m√§ skripti-muuttujat tyhjennet√§√§n
 		fMacroRunnable = false;
 		throw ;
 	}
 }
 
-// Kun intepreter on tulkinnut smarttool-tekstin, voidaan kysy‰, onko kyseinen makro ns. macroParam-skripti eli sis‰lt‰‰kˆ se RESULT = ??? tapaista teksti‰
+// Kun intepreter on tulkinnut smarttool-tekstin, voidaan kysy√§, onko kyseinen makro ns. macroParam-skripti eli sis√§lt√§√§k√∂ se RESULT = ??? tapaista teksti√§
 bool NFmiSmartToolModifier::IsInterpretedSkriptMacroParam(void)
 {
 	return itsSmartToolIntepreter ? itsSmartToolIntepreter->IsInterpretedSkriptMacroParam() : false;
@@ -544,10 +544,10 @@ bool NFmiSmartToolModifier::IsInterpretedSkriptMacroParam(void)
 
 void NFmiSmartToolModifier::ModifyBlockData(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiMacroParamValue &theMacroParamValue, NFmiThreadCallBacks *theThreadCallBacks)
 {
-	// HUOM!! Koska jostain syyst‰ alku ja loppu CalculationSection:it lasketaan erikseen, pit‰‰ muistaa 
-	// ett‰ ModifyConditionalData-osiossa ei saa k‰sitell‰ n‰it‰ sectioneita!!!!
-	// Ok, nyt tied‰n, ett‰ t‰m‰ johtuu siit‰ ett‰ ModifyData2(_ver2) -funktioissa laskut suoritetaan aina rivi kerrallaa (kaikki ajat ja paikat l‰‰pi),
-	// kun taas if-elseif-else -rakenteissa lasketaan koko hˆkˆtys kerrallaan l‰pi.
+	// HUOM!! Koska jostain syyst√§ alku ja loppu CalculationSection:it lasketaan erikseen, pit√§√§ muistaa 
+	// ett√§ ModifyConditionalData-osiossa ei saa k√§sitell√§ n√§it√§ sectioneita!!!!
+	// Ok, nyt tied√§n, ett√§ t√§m√§ johtuu siit√§ ett√§ ModifyData2(_ver2) -funktioissa laskut suoritetaan aina rivi kerrallaa (kaikki ajat ja paikat l√§√§pi),
+	// kun taas if-elseif-else -rakenteissa lasketaan koko h√∂k√∂tys kerrallaan l√§pi.
 	ModifyData2(theCalculationBlock->itsFirstCalculationSection, theMacroParamValue, theThreadCallBacks);
 	ModifyConditionalData(theCalculationBlock, theMacroParamValue, theThreadCallBacks);
 	ModifyData2(theCalculationBlock->itsLastCalculationSection, theMacroParamValue, theThreadCallBacks);
@@ -555,10 +555,10 @@ void NFmiSmartToolModifier::ModifyBlockData(const boost::shared_ptr<NFmiSmartToo
 
 void NFmiSmartToolModifier::ModifyBlockData_ver2(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock, NFmiThreadCallBacks *theThreadCallBacks)
 {
-	// HUOM!! Koska jostain syyst‰ alku ja loppu CalculationSection:it lasketaan erikseen, pit‰‰ muistaa 
-	// ett‰ ModifyConditionalData-osiossa ei saa k‰sitell‰ n‰it‰ sectioneita!!!!
-	// Ok, nyt tied‰n, ett‰ t‰m‰ johtuu siit‰ ett‰ ModifyData2(_ver2) -funktioissa laskut suoritetaan aina rivi kerrallaa (kaikki ajat ja paikat l‰‰pi),
-	// kun taas if-elseif-else -rakenteissa lasketaan koko hˆkˆtys kerrallaan l‰pi.
+	// HUOM!! Koska jostain syyst√§ alku ja loppu CalculationSection:it lasketaan erikseen, pit√§√§ muistaa 
+	// ett√§ ModifyConditionalData-osiossa ei saa k√§sitell√§ n√§it√§ sectioneita!!!!
+	// Ok, nyt tied√§n, ett√§ t√§m√§ johtuu siit√§ ett√§ ModifyData2(_ver2) -funktioissa laskut suoritetaan aina rivi kerrallaa (kaikki ajat ja paikat l√§√§pi),
+	// kun taas if-elseif-else -rakenteissa lasketaan koko h√∂k√∂tys kerrallaan l√§pi.
 	ModifyData2_ver2(theCalculationBlock->itsFirstCalculationSection, theThreadCallBacks);
 	ModifyConditionalData_ver2(theCalculationBlock, theThreadCallBacks);
 	ModifyData2_ver2(theCalculationBlock->itsLastCalculationSection, theThreadCallBacks);
@@ -582,13 +582,13 @@ void NFmiSmartToolModifier::ModifyConditionalData(const boost::shared_ptr<NFmiSm
 				if(info->Time(modifiedTimes.Time()))
 				{
 					NFmiQueryDataUtil::CheckIfStopped(theThreadCallBacks);
-					NFmiQueryDataUtil::DoStepIt(theThreadCallBacks); // stepataan vasta 0-tarkastuksen j‰lkeen!
+					NFmiQueryDataUtil::DoStepIt(theThreadCallBacks); // stepataan vasta 0-tarkastuksen j√§lkeen!
 					calculationParams.itsTime = modifiedTimes.Time();
 					if(theMacroParamValue.fSetValue)
 						calculationParams.itsTime = theMacroParamValue.itsTime;
 					calculationParams.itsTimeIndex = info->TimeIndex();
-					theCalculationBlock->itsIfAreaMaskSection->Time(calculationParams.itsTime); // yritet‰‰n optimoida laskuja hieman kun mahdollista
-					theCalculationBlock->itsIfCalculationBlocks->SetTime(calculationParams.itsTime); // yritet‰‰n optimoida laskuja hieman kun mahdollista
+					theCalculationBlock->itsIfAreaMaskSection->Time(calculationParams.itsTime); // yritet√§√§n optimoida laskuja hieman kun mahdollista
+					theCalculationBlock->itsIfCalculationBlocks->SetTime(calculationParams.itsTime); // yritet√§√§n optimoida laskuja hieman kun mahdollista
 					if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks)
 					{
 						theCalculationBlock->itsElseIfAreaMaskSection->Time(calculationParams.itsTime);
@@ -603,9 +603,9 @@ void NFmiSmartToolModifier::ModifyConditionalData(const boost::shared_ptr<NFmiSm
 						if(theMacroParamValue.fSetValue)
 						{
 							calculationParams.itsLatlon = theMacroParamValue.itsLatlon;
-							info->Location(calculationParams.itsLatlon); // pit‰‰ laittaa nearestlocation p‰‰lle, ett‰ tuloksia voidaan myˆhemmin hakea interpolaation avulla
+							info->Location(calculationParams.itsLatlon); // pit√§√§ laittaa nearestlocation p√§√§lle, ett√§ tuloksia voidaan my√∂hemmin hakea interpolaation avulla
 						}
-						calculationParams.itsLocationIndex = info->LocationIndex(); // t‰m‰ locationindex juttu liittyy kai optimointiin, jota ei tehd‰ en‰‰, pit‰isikˆ poistaa
+						calculationParams.itsLocationIndex = info->LocationIndex(); // t√§m√§ locationindex juttu liittyy kai optimointiin, jota ei tehd√§ en√§√§, pit√§isik√∂ poistaa
 						if(theCalculationBlock->itsIfAreaMaskSection->IsMasked(calculationParams))
 							theCalculationBlock->itsIfCalculationBlocks->Calculate(calculationParams, theMacroParamValue);
 						else if(theCalculationBlock->itsElseIfAreaMaskSection && theCalculationBlock->itsElseIfCalculationBlocks && theCalculationBlock->itsElseIfAreaMaskSection->IsMasked(calculationParams))
@@ -629,9 +629,9 @@ void NFmiSmartToolModifier::ModifyConditionalData(const boost::shared_ptr<NFmiSm
 	}
 }
 
-// Kun dataa k‰yd‰‰n l‰pi NextLocation-menetelm‰ll‰, ja kyseess‰ on NFmiSmartInfo-olio, on niill‰ tiedossa sis‰inen bitmaski, jonka
-// avulla osataan tarvittaessa hyppi‰ ei kiinnostavien paikkojen yli. Nyt en halua tehd‰ joka threadille aina Clone:a n‰ist‰ infoista.
-// Mutta otan talteen tarvittavan bitmaksin, jos sellainen oli k‰ytˆss‰ ja hypin sen avulla ohi ei-toivottujen pisteiden.
+// Kun dataa k√§yd√§√§n l√§pi NextLocation-menetelm√§ll√§, ja kyseess√§ on NFmiSmartInfo-olio, on niill√§ tiedossa sis√§inen bitmaski, jonka
+// avulla osataan tarvittaessa hyppi√§ ei kiinnostavien paikkojen yli. Nyt en halua tehd√§ joka threadille aina Clone:a n√§ist√§ infoista.
+// Mutta otan talteen tarvittavan bitmaksin, jos sellainen oli k√§yt√∂ss√§ ja hypin sen avulla ohi ei-toivottujen pisteiden.
 static const NFmiBitMask* GetUsedBitmask(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, bool modifySelectedLocationsOnly)
 {
 	if(modifySelectedLocationsOnly)
@@ -642,7 +642,7 @@ static const NFmiBitMask* GetUsedBitmask(boost::shared_ptr<NFmiFastQueryInfo> &t
 			return &(smartInfo->Mask(NFmiMetEditorTypes::kFmiSelectionMask));
 		}
 	}
-	return 0; // ei ole maskia k‰ytˆss‰
+	return 0; // ei ole maskia k√§yt√∂ss√§
 }
 
 // globaali asetus luokka for_each-funktioon
@@ -672,7 +672,7 @@ static void DoPartialGridCalculationBlockInThread(NFmiLocationIndexRangeCalculat
 					{
 						theCalculationParams.itsLatlon = theInfo->LatLon();
 						theCalculationParams.itsLocationIndex = theInfo->LocationIndex();
-						// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseist‰ optimointi juttua ei kai en‰‰ k‰ytet‰
+						// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseist√§ optimointi juttua ei kai en√§√§ k√§ytet√§
 						theCalculationBlock->Calculate_ver2(theCalculationParams, true);
 					}
 				}
@@ -707,7 +707,7 @@ static void DoPartialGridCalculationInThread(NFmiLocationIndexRangeCalculator &t
 					{
 						theCalculationParams.itsLatlon = theInfo->LatLon();
 						theCalculationParams.itsLocationIndex = theInfo->LocationIndex();
-						// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseist‰ optimointi juttua ei kai en‰‰ k‰ytet‰
+						// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseist√§ optimointi juttua ei kai en√§√§ k√§ytet√§
 						theCalculation->Calculate_ver2(theCalculationParams);
 					}
 				}
@@ -716,7 +716,7 @@ static void DoPartialGridCalculationInThread(NFmiLocationIndexRangeCalculator &t
 	}
 	catch(...)
 	{
-		// pakko ottaa vain vastaan poikkeukset, ei tehd‰ mit‰‰n
+		// pakko ottaa vain vastaan poikkeukset, ei tehd√§ mit√§√§n
 	}
 }
 
@@ -732,7 +732,7 @@ void NFmiSmartToolModifier::ModifyConditionalData_ver2(const boost::shared_ptr<N
 
 		try
 		{
-			info->LatLon(); // t‰m‰ on pyydett‰v‰ kerran multi-thread jutuissa, koska t‰m‰ rakentaa kaikille info-kopioille yhteisen latlon-cache:n
+			info->LatLon(); // t√§m√§ on pyydett√§v√§ kerran multi-thread jutuissa, koska t√§m√§ rakentaa kaikille info-kopioille yhteisen latlon-cache:n
 			NFmiCalculationParams calculationParams;
 			SetInfosMaskType(info);
 			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
@@ -742,7 +742,7 @@ void NFmiSmartToolModifier::ModifyConditionalData_ver2(const boost::shared_ptr<N
 			std::vector<boost::shared_ptr<NFmiFastQueryInfo> > infoVector;
 			for(size_t i=0; i < usedThreadCount; i++)
 				infoVector.push_back(NFmiAreaMask::DoShallowCopy(info));
-			std::vector<boost::shared_ptr<NFmiSmartToolCalculationBlock> > calculationBlockVector; // tehd‰‰n joka coren s‰ikeelle oma calculaatioBlokki kopio
+			std::vector<boost::shared_ptr<NFmiSmartToolCalculationBlock> > calculationBlockVector; // tehd√§√§n joka coren s√§ikeelle oma calculaatioBlokki kopio
 			for(size_t i=0; i < usedThreadCount; i++)
 				calculationBlockVector.push_back(boost::shared_ptr<NFmiSmartToolCalculationBlock>(new NFmiSmartToolCalculationBlock(*theCalculationBlock)));
 
@@ -751,21 +751,21 @@ void NFmiSmartToolModifier::ModifyConditionalData_ver2(const boost::shared_ptr<N
 				if(info->Time(modifiedTimes.Time()))
 				{
 					NFmiQueryDataUtil::CheckIfStopped(theThreadCallBacks);
-					NFmiQueryDataUtil::DoStepIt(theThreadCallBacks); // stepataan vasta 0-tarkastuksen j‰lkeen!
+					NFmiQueryDataUtil::DoStepIt(theThreadCallBacks); // stepataan vasta 0-tarkastuksen j√§lkeen!
 					calculationParams.itsTime = modifiedTimes.Time();
 					calculationParams.itsTimeIndex = info->TimeIndex();
 					theCalculationBlock->Time(calculationParams.itsTime);
-					std::for_each(calculationBlockVector.begin(), calculationBlockVector.end(), TimeSetter<NFmiSmartToolCalculationBlock>(calculationParams.itsTime)); // calculaatioiden kopioiden ajat pit‰‰ myˆs asettaa
-					std::for_each(infoVector.begin(), infoVector.end(), TimeSetter<NFmiFastQueryInfo>(calculationParams.itsTime)); // info kopioiden ajat pit‰‰ myˆs asettaa
+					std::for_each(calculationBlockVector.begin(), calculationBlockVector.end(), TimeSetter<NFmiSmartToolCalculationBlock>(calculationParams.itsTime)); // calculaatioiden kopioiden ajat pit√§√§ my√∂s asettaa
+					std::for_each(infoVector.begin(), infoVector.end(), TimeSetter<NFmiFastQueryInfo>(calculationParams.itsTime)); // info kopioiden ajat pit√§√§ my√∂s asettaa
 					std::vector<NFmiCalculationParams> calculationParamsVector;
 					for(size_t i=0; i < usedThreadCount; i++)
-						calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, miss‰ on jo aika oikein
+						calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, miss√§ on jo aika oikein
 					NFmiLocationIndexRangeCalculator locationIndexRangeCalculator(info->SizeLocations(), 100);
 
 					boost::thread_group calcParts;
 					for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
 						calcParts.add_thread(new boost::thread(::DoPartialGridCalculationBlockInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationBlockVector[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
-					calcParts.join_all(); // odotetaan ett‰ threadit lopettavat
+					calcParts.join_all(); // odotetaan ett√§ threadit lopettavat
 				}
 			}
 		}
@@ -792,7 +792,7 @@ void NFmiSmartToolModifier::SetInfosMaskType(const boost::shared_ptr<NFmiFastQue
 	{
 		boost::shared_ptr<NFmiFastQueryInfo> editedInfo = itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable);
 		if(theInfo->DataType() == NFmiInfoData::kScriptVariableData && editedInfo)
-		{ // skripti muuttujalle pit‰‰ asettaa sama valittujen pisteiden maski kuin on editoidulla datalla
+		{ // skripti muuttujalle pit√§√§ asettaa sama valittujen pisteiden maski kuin on editoidulla datalla
 			::DoSafeMaskOperation(theInfo, editedInfo);
 		}
 		theInfo->MaskType(NFmiMetEditorTypes::kFmiSelectionMask);
@@ -814,13 +814,13 @@ void NFmiSmartToolModifier::ModifyData2(boost::shared_ptr<NFmiSmartToolCalculati
 			SetInfosMaskType(info);
 			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
 
-			// Muutin lasku systeemin suoritusta, koska tuli ongelmia mm. muuttujien kanssa, kun niit‰ k‰ytettiin samassa calculationSectionissa
-			// CalculationSection = lasku rivej‰ per‰kk‰in esim.
+			// Muutin lasku systeemin suoritusta, koska tuli ongelmia mm. muuttujien kanssa, kun niit√§ k√§ytettiin samassa calculationSectionissa
+			// CalculationSection = lasku rivej√§ per√§kk√§in esim.
 			// T = T + 1
 			// P = P + 1
 			// jne. ilman IF-lauseita
-			// ENNEN laskettiin t‰ll‰inen sectio siten ett‰ k‰ytiin l‰pi koko sectio samalla paikalla ja ajalla ja sitten siirryttiin eteenp‰in.
-			// NYT lasketaan aina yksi laskurivi l‰pi kaikkien aikojen ja paikkojen, ja sitten siirryt‰‰n seuraavalle lasku riville.
+			// ENNEN laskettiin t√§ll√§inen sectio siten ett√§ k√§ytiin l√§pi koko sectio samalla paikalla ja ajalla ja sitten siirryttiin eteenp√§in.
+			// NYT lasketaan aina yksi laskurivi l√§pi kaikkien aikojen ja paikkojen, ja sitten siirryt√§√§n seuraavalle lasku riville.
 			size_t size = theCalculationSection->GetCalculations().size();
 			for(size_t i=0; i<size; i++)
 			{
@@ -829,21 +829,21 @@ void NFmiSmartToolModifier::ModifyData2(boost::shared_ptr<NFmiSmartToolCalculati
 					calculationParams.itsTime = modifiedTimes.Time();
 					if(theMacroParamValue.fSetValue)
 						calculationParams.itsTime = theMacroParamValue.itsTime;
-					if(info->Time(calculationParams.itsTime)) // asetetaan myˆs t‰m‰, ett‰ saadaan oikea timeindex
+					if(info->Time(calculationParams.itsTime)) // asetetaan my√∂s t√§m√§, ett√§ saadaan oikea timeindex
 					{
 						NFmiQueryDataUtil::CheckIfStopped(theThreadCallBacks);
-						NFmiQueryDataUtil::DoStepIt(theThreadCallBacks); // stepataan vasta 0-tarkastuksen j‰lkeen!
-						theCalculationSection->SetTime(calculationParams.itsTime); // yritet‰‰n optimoida laskuja hieman kun mahdollista
+						NFmiQueryDataUtil::DoStepIt(theThreadCallBacks); // stepataan vasta 0-tarkastuksen j√§lkeen!
+						theCalculationSection->SetTime(calculationParams.itsTime); // yritet√§√§n optimoida laskuja hieman kun mahdollista
 						for(info->ResetLocation(); info->NextLocation(); )
 						{
 							calculationParams.itsLatlon = info->LatLon();
 							if(theMacroParamValue.fSetValue)
 							{
 								calculationParams.itsLatlon = theMacroParamValue.itsLatlon;
-								info->Location(calculationParams.itsLatlon); // pit‰‰ laittaa nearestlocation p‰‰lle, ett‰ tuloksia voidaan myˆhemmin hakea interpolaation avulla
+								info->Location(calculationParams.itsLatlon); // pit√§√§ laittaa nearestlocation p√§√§lle, ett√§ tuloksia voidaan my√∂hemmin hakea interpolaation avulla
 							}
 							calculationParams.itsLocationIndex = info->LocationIndex();
-							// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseist‰ optimointi juttua ei kai en‰‰ k‰ytet‰
+							// TUON LOCATIONINDEX jutun voisi kai poistaa, kun kyseist√§ optimointi juttua ei kai en√§√§ k√§ytet√§
 							theCalculationSection->GetCalculations()[i]->Calculate(calculationParams, theMacroParamValue);
 
 							if(theMacroParamValue.fSetValue)
@@ -873,7 +873,7 @@ void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalc
 			return ;
 		try
 		{
-			info->LatLon(); // t‰m‰ on pyydett‰v‰ kerran multi-thread jutuissa, koska t‰m‰ rakentaa kaikille info-kopioille yhteisen latlon-cache:n
+			info->LatLon(); // t√§m√§ on pyydett√§v√§ kerran multi-thread jutuissa, koska t√§m√§ rakentaa kaikille info-kopioille yhteisen latlon-cache:n
 			NFmiCalculationParams calculationParams;
 			SetInfosMaskType(info);
 			NFmiTimeDescriptor modifiedTimes(itsModifiedTimes ? *itsModifiedTimes : info->TimeDescriptor());
@@ -884,40 +884,40 @@ void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalc
 			for(size_t i=0; i < usedThreadCount; i++)
 				infoVector.push_back(NFmiAreaMask::DoShallowCopy(info));
 
-			// Muutin lasku systeemin suoritusta, koska tuli ongelmia mm. muuttujien kanssa, kun niit‰ k‰ytettiin samassa calculationSectionissa
-			// CalculationSection = lasku rivej‰ per‰kk‰in esim.
+			// Muutin lasku systeemin suoritusta, koska tuli ongelmia mm. muuttujien kanssa, kun niit√§ k√§ytettiin samassa calculationSectionissa
+			// CalculationSection = lasku rivej√§ per√§kk√§in esim.
 			// T = T + 1
 			// P = P + 1
 			// jne. ilman IF-lauseita
-			// ENNEN laskettiin t‰ll‰inen sectio siten ett‰ k‰ytiin l‰pi koko sectio samalla paikalla ja ajalla ja sitten siirryttiin eteenp‰in.
-			// NYT lasketaan aina yksi laskurivi l‰pi kaikkien aikojen ja paikkojen, ja sitten siirryt‰‰n seuraavalle lasku riville.
+			// ENNEN laskettiin t√§ll√§inen sectio siten ett√§ k√§ytiin l√§pi koko sectio samalla paikalla ja ajalla ja sitten siirryttiin eteenp√§in.
+			// NYT lasketaan aina yksi laskurivi l√§pi kaikkien aikojen ja paikkojen, ja sitten siirryt√§√§n seuraavalle lasku riville.
 			checkedVector<boost::shared_ptr<NFmiSmartToolCalculation> > &calculationVector = theCalculationSection->GetCalculations();
 			for(size_t i=0; i < calculationVector.size(); i++)
 			{
 				boost::shared_ptr<NFmiSmartToolCalculation> smartToolCalculation = calculationVector[i];
-				std::vector<boost::shared_ptr<NFmiSmartToolCalculation> > calculationVectorForThread; // tehd‰‰n joka coren s‰ikeelle oma calculaatio kopio
+				std::vector<boost::shared_ptr<NFmiSmartToolCalculation> > calculationVectorForThread; // tehd√§√§n joka coren s√§ikeelle oma calculaatio kopio
 				for(size_t j=0; j < usedThreadCount; j++)
 					calculationVectorForThread.push_back(boost::shared_ptr<NFmiSmartToolCalculation>(new NFmiSmartToolCalculation(*smartToolCalculation)));
 
 				for(modifiedTimes.Reset(); modifiedTimes.Next(); )
 				{
 					calculationParams.itsTime = modifiedTimes.Time();
-					if(info->Time(calculationParams.itsTime)) // asetetaan myˆs t‰m‰, ett‰ saadaan oikea timeindex
+					if(info->Time(calculationParams.itsTime)) // asetetaan my√∂s t√§m√§, ett√§ saadaan oikea timeindex
 					{
 						NFmiQueryDataUtil::CheckIfStopped(theThreadCallBacks);
-						NFmiQueryDataUtil::DoStepIt(theThreadCallBacks); // stepataan vasta 0-tarkastuksen j‰lkeen!
-						smartToolCalculation->Time(calculationParams.itsTime); // yritet‰‰n optimoida laskuja hieman kun mahdollista
-						std::for_each(calculationVectorForThread.begin(), calculationVectorForThread.end(), TimeSetter<NFmiSmartToolCalculation>(calculationParams.itsTime)); // calculaatioiden kopioiden ajat pit‰‰ myˆs asettaa
-						std::for_each(infoVector.begin(), infoVector.end(), TimeSetter<NFmiFastQueryInfo>(calculationParams.itsTime)); // info kopioiden ajat pit‰‰ myˆs asettaa
+						NFmiQueryDataUtil::DoStepIt(theThreadCallBacks); // stepataan vasta 0-tarkastuksen j√§lkeen!
+						smartToolCalculation->Time(calculationParams.itsTime); // yritet√§√§n optimoida laskuja hieman kun mahdollista
+						std::for_each(calculationVectorForThread.begin(), calculationVectorForThread.end(), TimeSetter<NFmiSmartToolCalculation>(calculationParams.itsTime)); // calculaatioiden kopioiden ajat pit√§√§ my√∂s asettaa
+						std::for_each(infoVector.begin(), infoVector.end(), TimeSetter<NFmiFastQueryInfo>(calculationParams.itsTime)); // info kopioiden ajat pit√§√§ my√∂s asettaa
 						std::vector<NFmiCalculationParams> calculationParamsVector;
 						for(size_t k=0; k < usedThreadCount; k++)
-							calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, miss‰ on jo aika oikein
+							calculationParamsVector.push_back(calculationParams); // tallentaa kopiot, miss√§ on jo aika oikein
 						NFmiLocationIndexRangeCalculator locationIndexRangeCalculator(info->SizeLocations(), 100);
 
 						boost::thread_group calcParts;
 						for(unsigned int threadIndex = 0; threadIndex < usedThreadCount; threadIndex++)
 							calcParts.add_thread(new boost::thread(::DoPartialGridCalculationInThread, boost::ref(locationIndexRangeCalculator), infoVector[threadIndex], calculationVectorForThread[threadIndex], calculationParamsVector[threadIndex], usedBitmask));
-						calcParts.join_all(); // odotetaan ett‰ threadit lopettavat
+						calcParts.join_all(); // odotetaan ett√§ threadit lopettavat
 					}
 				}
 
@@ -934,11 +934,11 @@ void NFmiSmartToolModifier::ModifyData2_ver2(boost::shared_ptr<NFmiSmartToolCalc
 boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreatePeekFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &fMustUsePressureInterpolation)
 {
 	boost::shared_ptr<NFmiAreaMask> areaMask;
-	// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
-	// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
+	// HUOM!! T√§h√§n vaaditaan syv√§ data kopio!!!
+	// JOS kyseess√§ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
 	boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, fMustUsePressureInterpolation);
 	if(theAreaMaskInfo.GetUseDefaultProducer())
-	{ // Pit‰‰ tehd‰ syv‰ kopio datasta, ett‰ datan muuttuminen ei vaikuta laskuihin.
+	{ // Pit√§√§ tehd√§ syv√§ kopio datasta, ett√§ datan muuttuminen ei vaikuta laskuihin.
 		boost::shared_ptr<NFmiFastQueryInfo> tmp(dynamic_cast<NFmiFastQueryInfo*>(info->Clone()));
 		info = tmp;
 	}
@@ -981,14 +981,14 @@ void DoErrorExceptionForMetFunction(const NFmiAreaMaskInfo &theAreaMaskInfo, con
 boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMetFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &fMustUsePressureInterpolation)
 {
 	boost::shared_ptr<NFmiAreaMask> areaMask;
-	// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
-	// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
+	// HUOM!! T√§h√§n vaaditaan syv√§ data kopio!!!
+	// JOS kyseess√§ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
 	boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, fMustUsePressureInterpolation);
 	if(info == 0)
 		DoErrorExceptionForMetFunction(theAreaMaskInfo, ::GetDictionaryString("Can't find wanted parameter for given function"), ::GetDictionaryString("with line"));
 
 	if(theAreaMaskInfo.GetUseDefaultProducer())
-	{ // Pit‰‰ tehd‰ syv‰ kopio datasta, ett‰ datan muuttuminen ei vaikuta laskuihin.
+	{ // Pit√§√§ tehd√§ syv√§ kopio datasta, ett√§ datan muuttuminen ei vaikuta laskuihin.
 		boost::shared_ptr<NFmiFastQueryInfo> tmp(dynamic_cast<NFmiFastQueryInfo*>(info->Clone()));
 		info = tmp;
 	}
@@ -1026,14 +1026,14 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMetFunctionAreaMask
 	return areaMask;
 }
 
-// Jos areaMaskin info on havaittua luotausdataa, pit‰‰ tehd‰ leveliin liittyv‰ fiksaus.
+// Jos areaMaskin info on havaittua luotausdataa, pit√§√§ tehd√§ leveliin liittyv√§ fiksaus.
 void NFmiSmartToolModifier::MakeSoundingLevelFix(boost::shared_ptr<NFmiAreaMask> &theAreaMask, const NFmiAreaMaskInfo &theAreaMaskInfo)
 {
     if(theAreaMask)
     {
 	    if(theAreaMask->Info()->LevelType() == kFmiSoundingLevel) 
-	    { // Luotaus data on poikkeus, jonka haluttu painepinta level pit‰‰ asettaa t‰ss‰ erikseen.
-		    // Lis‰ksi levelType pit‰‰ vaihtaa pressuresta kFmiSoundingLevel!
+	    { // Luotaus data on poikkeus, jonka haluttu painepinta level pit√§√§ asettaa t√§ss√§ erikseen.
+		    // Lis√§ksi levelType pit√§√§ vaihtaa pressuresta kFmiSoundingLevel!
 		    NFmiLevel soundingLevel(kFmiSoundingLevel, theAreaMaskInfo.GetLevel()->GetName(), theAreaMaskInfo.GetLevel()->LevelValue());
 		    theAreaMask->Level(soundingLevel);
 	    }
@@ -1054,10 +1054,10 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 	{
 		case NFmiAreaMask::InfoVariable:
 			{
-			// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
-			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
+			// HUOM!! T√§h√§n vaaditaan syv√§ data kopio!!!
+			// JOS kyseess√§ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
 			boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-			// HUOM!!! pit‰isikˆ t‰h‰n laittaa joku debug-info raportti, jos level on reset-tilassa
+			// HUOM!!! pit√§isik√∂ t√§h√§n laittaa joku debug-info raportti, jos level on reset-tilassa
 
 			areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMask(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info));
 			break;
@@ -1082,11 +1082,11 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 		case NFmiAreaMask::FunctionAreaIntergration:
 		case NFmiAreaMask::FunctionTimeIntergration:
 			{
-			// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
-			// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
+			// HUOM!! T√§h√§n vaaditaan syv√§ data kopio!!!
+			// JOS kyseess√§ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
 			boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 			if(theAreaMaskInfo.GetUseDefaultProducer())
-			{ // Pit‰‰ tehd‰ syv‰ kopio datasta, ett‰ datan muuttuminen ei vaikuta laskuihin.
+			{ // Pit√§√§ tehd√§ syv√§ kopio datasta, ett√§ datan muuttuminen ei vaikuta laskuihin.
 				boost::shared_ptr<NFmiFastQueryInfo> tmp(dynamic_cast<NFmiFastQueryInfo*>(info->Clone()));
 				info = tmp;
 			}
@@ -1163,10 +1163,10 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 			{
 				itsCommaCounter++;
 				if(itsCommaCounter >= 2)
-				{  // kun pilkku-laskuri tuli t‰yteen
-					fUseLevelData = true; // on aika ruveta k‰ytt‰m‰‰n level-dataa infoissa
-					itsParethesisCounter = 1; // lis‰ksi ruvetaan mets‰st‰m‰‰n sulkuja,
-											  // ett‰ tiedet‰‰n milloin funktio ja level datan k‰yttˆ loppuu
+				{  // kun pilkku-laskuri tuli t√§yteen
+					fUseLevelData = true; // on aika ruveta k√§ytt√§m√§√§n level-dataa infoissa
+					itsParethesisCounter = 1; // lis√§ksi ruvetaan mets√§st√§m√§√§n sulkuja,
+											  // ett√§ tiedet√§√§n milloin funktio ja level datan k√§ytt√∂ loppuu
 				}
 			}
 			break;
@@ -1197,7 +1197,7 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 			areaMask->SetFunctionType(theAreaMaskInfo.GetFunctionType());
 			areaMask->IntegrationFunctionType(theAreaMaskInfo.IntegrationFunctionType());
 			if(theAreaMaskInfo.IntegrationFunctionType() == 2 || theAreaMaskInfo.IntegrationFunctionType() == 3)
-			{ // jos funktio oli SumZ tai MinH tyyppinen, laitetaan seuraavat jutut 'p‰‰lle'
+			{ // jos funktio oli SumZ tai MinH tyyppinen, laitetaan seuraavat jutut 'p√§√§lle'
 				fHeightFunctionFlag = true;
 				fUseLevelData = false;
 				itsCommaCounter = 0;
@@ -1247,7 +1247,7 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
                         areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskTimeVertFunc(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
                     else
                         areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMaskVertFunc(theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.GetFunctionType(), theAreaMaskInfo.GetSecondaryFunctionType(), theAreaMaskInfo.FunctionArgumentCount()));
-                    fUseLevelData = false; // en tied‰ pit‰‰kˆ t‰m‰ laittaa takaisin falseksi, mutta laitan varmuuden vuoksi
+                    fUseLevelData = false; // en tied√§ pit√§√§k√∂ t√§m√§ laittaa takaisin falseksi, mutta laitan varmuuden vuoksi
                 }
                 break;
             }
@@ -1268,10 +1268,10 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 	if(areaMask)
 	{
 		if(areaMask->Info() && areaMask->Info()->Grid() == 0)
-		{ // jos oli info dataa ja viel‰ asemadatasta, tarkistetaan ett‰ kyse oli viel‰ infoData-tyypist‰, muuten oli virheellinen lauseke
+		{ // jos oli info dataa ja viel√§ asemadatasta, tarkistetaan ett√§ kyse oli viel√§ infoData-tyypist√§, muuten oli virheellinen lauseke
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
             if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue || theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::Occurrence)
-            { // t‰m‰ on ok, ei tarvitse tehd‰ mit‰‰n
+            { // t√§m√§ on ok, ei tarvitse tehd√§ mit√§√§n
             }
 			else if(maskType == NFmiAreaMask::InfoVariable)
 			{
@@ -1295,7 +1295,7 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 			}
 		}
 
-		areaMask->Initialize(); // virtuaalinen initialisointi konstruktion j‰lkeen
+		areaMask->Initialize(); // virtuaalinen initialisointi konstruktion j√§lkeen
 		areaMask->SetCalculationOperationType(maskType);
 		if(mustUsePressureInterpolation)
 		{
@@ -1312,12 +1312,12 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(const NFmi
 
 boost::shared_ptr<NFmiAreaMask>  NFmiSmartToolModifier::CreateSoundingIndexFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo)
 {
-	// HUOM!! T‰h‰n vaaditaan syv‰ data kopio!!!
-	// JOS kyseess‰ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
-	bool mustUsePressureInterpolation = false; // t‰t‰ei k‰ytet‰ t‰ss‰, mutta pakko laittaa metodin interfacen takia
+	// HUOM!! T√§h√§n vaaditaan syv√§ data kopio!!!
+	// JOS kyseess√§ on ehtolauseen muuttujasta, joka on editoitavaa dataa.
+	bool mustUsePressureInterpolation = false; // t√§t√§ei k√§ytet√§ t√§ss√§, mutta pakko laittaa metodin interfacen takia
 	boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 	if(theAreaMaskInfo.GetUseDefaultProducer())
-	{ // Pit‰‰ tehd‰ syv‰ kopio datasta, ett‰ datan muuttuminen ei vaikuta laskuihin.
+	{ // Pit√§√§ tehd√§ syv√§ kopio datasta, ett√§ datan muuttuminen ei vaikuta laskuihin.
 		boost::shared_ptr<NFmiFastQueryInfo> tmp(dynamic_cast<NFmiFastQueryInfo*>(info->Clone()));
 		info = tmp;
 	}
@@ -1355,7 +1355,7 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateCalculatedAreaMask(
 	throw runtime_error(::GetDictionaryString("SmartToolModifierErrorStrangeVariable"));
 }
 
-// Muista jos tulee p‰ivityksi‰, smanlainen funktio lˆytyy myˆs NFmiSmartToolCalculation-luokasta
+// Muista jos tulee p√§ivityksi√§, smanlainen funktio l√∂ytyy my√∂s NFmiSmartToolCalculation-luokasta
 boost::shared_ptr<NFmiDataModifier> NFmiSmartToolModifier::CreateIntegrationFuction(const NFmiAreaMaskInfo &theAreaMaskInfo)
 {
 	boost::shared_ptr<NFmiDataModifier> modifier;
@@ -1374,7 +1374,7 @@ boost::shared_ptr<NFmiDataModifier> NFmiSmartToolModifier::CreateIntegrationFuct
 	case NFmiAreaMask::Sum:
 		modifier = boost::shared_ptr<NFmiDataModifier>(new NFmiDataModifierSum());
 		break;
-		// HUOM!!!! Tee WAvg-modifier myˆs, joka on peritty Avg-modifierist‰ ja tee joku kerroin juttu painotukseen.
+		// HUOM!!!! Tee WAvg-modifier my√∂s, joka on peritty Avg-modifierist√§ ja tee joku kerroin juttu painotukseen.
 	default:
 		throw runtime_error(::GetDictionaryString("SmartToolModifierErrorStrangeIntegrationFunction"));
 	}
@@ -1388,7 +1388,7 @@ boost::shared_ptr<NFmiDataIterator> NFmiSmartToolModifier::CreateIterator(const 
 	switch(mType)
 	{
 		case NFmiAreaMask::FunctionAreaIntergration:
-			// HUOM!! NFmiRelativeDataIterator:iin pit‰‰ tehd‰ joustavampi 'laatikon' s‰‰tˆ systeemi, ett‰ laatikko ei olisi aina keskitetty
+			// HUOM!! NFmiRelativeDataIterator:iin pit√§√§ tehd√§ joustavampi 'laatikon' s√§√§t√∂ systeemi, ett√§ laatikko ei olisi aina keskitetty
 			iterator = boost::shared_ptr<NFmiDataIterator>(new NFmiRelativeDataIterator(theInfo.get(),
 													static_cast<long>(theAreaMaskInfo.GetOffsetPoint1().X()),
 													static_cast<long>(theAreaMaskInfo.GetOffsetPoint1().Y()),
@@ -1444,7 +1444,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
 				{
 					tmpInfo->FirstLevel();
 					if(tmpInfo->Level()->GetIdent() == kFmiHybridLevel)
-					{ // l‰hdet‰‰n t‰ss‰ siit‰ ett‰ jos lˆytyy mallipinta-dataa, mik‰ sopii tarkoitukseen, se valitaan ensisijaisesti
+					{ // l√§hdet√§√§n t√§ss√§ siit√§ ett√§ jos l√∂ytyy mallipinta-dataa, mik√§ sopii tarkoitukseen, se valitaan ensisijaisesti
 						info = tmpInfo;
 						break;
 					}
@@ -1467,11 +1467,11 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
 			}
 		}
 	}
-	if(info == 0 && possiblePressureLevelDataInfo != 0) // jos ei lˆytynyt sopivaa mallipinta-dataa, mutta painepinta-dataa lˆytyi, otetaan se k‰yttˆˆn
+	if(info == 0 && possiblePressureLevelDataInfo != 0) // jos ei l√∂ytynyt sopivaa mallipinta-dataa, mutta painepinta-dataa l√∂ytyi, otetaan se k√§ytt√∂√∂n
 		info = possiblePressureLevelDataInfo;
 	if(info)
 	{
-		// Tarkistetaan viel‰ haluttiinko vanhaa malliajodataa
+		// Tarkistetaan viel√§ haluttiinko vanhaa malliajodataa
 		if(theAreaMaskInfo.ModelRunIndex() < 0)
 		{
 			checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infos = itsInfoOrganizer->GetInfos(info->DataFilePattern());
@@ -1485,7 +1485,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
 	return info;
 }
 
-// t‰m‰ funktio on tehty siksi ett‰ voidaan hanskata z-parametri (poikkeus) yhten‰isell‰ tavalla
+// t√§m√§ funktio on tehty siksi ett√§ voidaan hanskata z-parametri (poikkeus) yhten√§isell√§ tavalla
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetInfoFromOrganizer(const NFmiDataIdent& theIdent, const NFmiLevel* theLevel, NFmiInfoData::Type theType, bool fUseParIdOnly, bool fLevelData, int theModelRunIndex)
 {
 	boost::shared_ptr<NFmiFastQueryInfo> info = itsInfoOrganizer->Info(theIdent, theLevel, theType, fUseParIdOnly, fLevelData, theModelRunIndex);
@@ -1494,7 +1494,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetInfoFromOrganizer
 		std::string parName(theIdent.GetParamName());
 		NFmiStringTools::LowerCase(parName);
 		if(parName == "z")
-		{ // z-parametri on poikkeus (siis smarttool-kielen tekstin‰ annettu "z" -parametri), eli t‰t‰ yritet‰‰n hakea sek‰ kFmiGeomHeight:ista (id=3), joka on default, ja kFmiGeopHeight:ista (id=2)
+		{ // z-parametri on poikkeus (siis smarttool-kielen tekstin√§ annettu "z" -parametri), eli t√§t√§ yritet√§√§n hakea sek√§ kFmiGeomHeight:ista (id=3), joka on default, ja kFmiGeopHeight:ista (id=2)
 			NFmiParam secondaryParam(*theIdent.GetParam());
 			secondaryParam.SetIdent(kFmiGeopHeight);
 			NFmiDataIdent secondaryDataIdent(secondaryParam, *theIdent.GetProducer());
@@ -1526,14 +1526,14 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetWantedAreaMaskDat
 		info = GetInfoFromOrganizer(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel(), usedDataType, fUseParIdOnly, fUseLevelData | fDoCrossSectionCalculation, theAreaMaskInfo.ModelRunIndex());
 	else
 	{
-		if(theAreaMaskInfo.GetLevel()) // level voi olla 0-pointteri, joten se pit‰‰ tarkistaa
+		if(theAreaMaskInfo.GetLevel()) // level voi olla 0-pointteri, joten se pit√§√§ tarkistaa
 		{
 			NFmiLevel aLevel(*theAreaMaskInfo.GetLevel());
 			aLevel.SetIdent(theOverRideLevelType);
 			info = GetInfoFromOrganizer(theAreaMaskInfo.GetDataIdent(), &aLevel, usedDataType, fUseParIdOnly, fUseLevelData, theAreaMaskInfo.ModelRunIndex());
 		}
 	}
-	return NFmiSmartInfo::CreateShallowCopyOfHighestInfo(info); // tehd‰‰n viel‰ 'kevyt' kopio lˆytyneest‰ datasta
+	return NFmiSmartInfo::CreateShallowCopyOfHighestInfo(info); // tehd√§√§n viel√§ 'kevyt' kopio l√∂ytyneest√§ datasta
 }
 
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
@@ -1545,7 +1545,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 	else if(theAreaMaskInfo.GetUseDefaultProducer() || theAreaMaskInfo.GetDataType() == NFmiInfoData::kCopyOfEdited)
 	{
 		if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kMacroParam)
-		{ // t‰m‰ macroParam data viritys on multi threaddaavaa serveri‰ varten, eli macroparam data pit‰‰ olla thread-kohtainen
+		{ // t√§m√§ macroParam data viritys on multi threaddaavaa serveri√§ varten, eli macroparam data pit√§√§ olla thread-kohtainen
 			// ja se on aina annettu luodulle NFmiSmartToolModifier-luokan instansille erikseen.
 			if(UsedMacroParamData())
 				info = NFmiSmartInfo::CreateShallowCopyOfHighestInfo(UsedMacroParamData());
@@ -1563,40 +1563,40 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 	}
 	else
 	{
-		if(fUseLevelData && theAreaMaskInfo.GetLevel() != 0) // jos pit‰‰ k‰ytt‰‰ level dataa (SumZ ja MinH funktiot), ei saa antaa level infoa parametrin yhteydess‰
+		if(fUseLevelData && theAreaMaskInfo.GetLevel() != 0) // jos pit√§√§ k√§ytt√§√§ level dataa (SumZ ja MinH funktiot), ei saa antaa level infoa parametrin yhteydess√§
 			throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNoLevel") + "\n" + theAreaMaskInfo.GetMaskText());
-		if(fUseLevelData || fDoCrossSectionCalculation) // jos leveldata-flagi p‰‰ll‰, yritet‰‰n ensin, lˆytyykˆ hybridi dataa
+		if(fUseLevelData || fDoCrossSectionCalculation) // jos leveldata-flagi p√§√§ll√§, yritet√§√§n ensin, l√∂ytyyk√∂ hybridi dataa
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kHybridData);
 		if(info == 0)
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false);
-		if(info == 0 && theAreaMaskInfo.GetDataType() == NFmiInfoData::kAnalyzeData) // analyysi datalle piti tehd‰ pika viritys t‰h‰n
+		if(info == 0 && theAreaMaskInfo.GetDataType() == NFmiInfoData::kAnalyzeData) // analyysi datalle piti tehd√§ pika viritys t√§h√§n
 			info = CreateCopyOfAnalyzeInfo(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetLevel());
 		if(info == 0)
 			info = GetPossibleLevelInterpolatedInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-		if(info == 0 && theAreaMaskInfo.GetLevel() != 0) // kokeillaan viel‰ jos halutaan hybridi datan leveli‰
+		if(info == 0 && theAreaMaskInfo.GetLevel() != 0) // kokeillaan viel√§ jos halutaan hybridi datan leveli√§
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kHybridData, kFmiHybridLevel);
-		if(info == 0 && theAreaMaskInfo.GetLevel() != 0) // kokeillaan viel‰ jos halutaan 'height' (type 105) datan leveli‰
+		if(info == 0 && theAreaMaskInfo.GetLevel() != 0) // kokeillaan viel√§ jos halutaan 'height' (type 105) datan leveli√§
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kViewable, kFmiHeight);
 
-		if(info == 0) // kokeillaan viel‰ model-help-dataa (esim. EPS-data, sounding-index-data jne)
+		if(info == 0) // kokeillaan viel√§ model-help-dataa (esim. EPS-data, sounding-index-data jne)
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kModelHelpData);
-		if(info == 0) // kokeillaan viel‰ analyysi-dataa (esim. mesan, LAPS jne) HUOM! t‰m‰ on eri asia kuin edella oli analyysi-dataa. t‰ss‰ on pyydetty PAR_PRODid yhdistelm‰ll‰ analyysi-dataa
+		if(info == 0) // kokeillaan viel√§ analyysi-dataa (esim. mesan, LAPS jne) HUOM! t√§m√§ on eri asia kuin edella oli analyysi-dataa. t√§ss√§ on pyydetty PAR_PRODid yhdistelm√§ll√§ analyysi-dataa
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kAnalyzeData);
-		if(info == 0) // kokeillaan viel‰ fraktiili-dataa (esim. EC:n fraktiili dataa jne)
+		if(info == 0) // kokeillaan viel√§ fraktiili-dataa (esim. EC:n fraktiili dataa jne)
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kClimatologyData);
 
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
-		if(info == 0) // kokeillaan viel‰ havainto dataa (eli ne on yleens‰ asemadataa)
+		if(info == 0) // kokeillaan viel√§ havainto dataa (eli ne on yleens√§ asemadataa)
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kObservations);
-		if(info == 0) // kokeillaan viel‰ eri level vaihtoehtoja
+		if(info == 0) // kokeillaan viel√§ eri level vaihtoehtoja
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kObservations, kFmiHeight);
-		if(info == 0) // kokeillaan viel‰ luotaus datan leveltyyppi
+		if(info == 0) // kokeillaan viel√§ luotaus datan leveltyyppi
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kObservations, kFmiSoundingLevel);
-		if(info == 0) // kokeillaan viel‰ yksitt‰isten tutkien dataa level moodissa
+		if(info == 0) // kokeillaan viel√§ yksitt√§isten tutkien dataa level moodissa
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kSingleStationRadarData, kFmiPressureLevel);
-		if(info == 0) // kokeillaan viel‰ yksitt‰isten tutkien dataa ilman level moodia (esim. vertikaali-funktioiden yhteydess‰)
+		if(info == 0) // kokeillaan viel√§ yksitt√§isten tutkien dataa ilman level moodia (esim. vertikaali-funktioiden yhteydess√§)
 			info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kSingleStationRadarData);
-        if(info == 0) // kokeillaan viel‰ salama dataa
+        if(info == 0) // kokeillaan viel√§ salama dataa
             info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kFlashData);
 
 #endif // FMI_SUPPORT_STATION_DATA_SMARTTOOL
@@ -1604,14 +1604,14 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(const NFm
 	}
 	if(!info)
 		throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNotFound") + "\n" + theAreaMaskInfo.GetMaskText());
-	info->LatLon(); // t‰m‰ on varmistus uusia multi-thread laskuja varten, ett‰ jokaisella infolla on olemassa latlon-cache, ennen kuin menn‰‰n eri s‰ikeisiin hommiin
+	info->LatLon(); // t√§m√§ on varmistus uusia multi-thread laskuja varten, ett√§ jokaisella infolla on olemassa latlon-cache, ennen kuin menn√§√§n eri s√§ikeisiin hommiin
 	return info;
 }
 
 void NFmiSmartToolModifier::GetParamValueLimits(const NFmiAreaMaskInfo &theAreaMaskInfo, float *theLowerLimit, float *theUpperLimit, bool *fCheckLimits)
 {
     FmiParameterName parName = static_cast<FmiParameterName>(theAreaMaskInfo.GetDataIdent().GetParamIdent());
-    // yhdistelm‰ parametreille ei ole rajoja, samoin par-id kFmiBadParameter, koska silloin on kyse erikoisfunktioista kuten grad tms.
+    // yhdistelm√§ parametreille ei ole rajoja, samoin par-id kFmiBadParameter, koska silloin on kyse erikoisfunktioista kuten grad tms.
     if(parName == kFmiTotalWindMS || parName == kFmiWeatherAndCloudiness || parName == kFmiBadParameter)
 		*fCheckLimits = false;
     else if(theAreaMaskInfo.GetDataType() == NFmiInfoData::kScriptVariableData)
@@ -1642,7 +1642,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateScriptVariable
 	boost::shared_ptr<NFmiFastQueryInfo> tmp = GetScriptVariableInfo(theDataIdent);
 	if(tmp)
 		return NFmiSmartInfo::CreateShallowCopyOfHighestInfo(tmp);
-	else // pit‰‰ viel‰ luoda kyseinen skripti-muuttuja, koska sit‰ k‰ytet‰‰n nyt 1. kertaa
+	else // pit√§√§ viel√§ luoda kyseinen skripti-muuttuja, koska sit√§ k√§ytet√§√§n nyt 1. kertaa
 	{
 		boost::shared_ptr<NFmiFastQueryInfo> tmp2 = CreateRealScriptVariableInfo(theDataIdent);
 		if(tmp2)

@@ -1,17 +1,17 @@
 #pragma once
 
-// T‰m‰ luokka tulee nykyisen NFmiSmartInfo-luokan tilalle.
+// T√§m√§ luokka tulee nykyisen NFmiSmartInfo-luokan tilalle.
 // Uusi luokka on tarkoitettu vain SmartMetissa olevan 
-// editoitavan datan k‰sittely. Eli t‰‰ll‰ on tietoa mm.
+// editoitavan datan k√§sittely. Eli t√§√§ll√§ on tietoa mm.
 // valitusta maskista (selction, display jne.).
 // Undo/Redo toiminnot ja Harmonisaattorin vastaava 
 // kirjanpito.
-// Luokka tehd‰‰n uusiksi siksi, ett‰ sit‰ yksinkertaistetaan
-// ja ett‰ esim. undo/redo datojen omistus ja tuhoaminen tehd‰‰n
-// automaattisesti smart-pointtereilla eik‰ niin kuin nykyisin
+// Luokka tehd√§√§n uusiksi siksi, ett√§ sit√§ yksinkertaistetaan
+// ja ett√§ esim. undo/redo datojen omistus ja tuhoaminen tehd√§√§n
+// automaattisesti smart-pointtereilla eik√§ niin kuin nykyisin
 // erillisen DestroyData-funktion avulla.
 // TODO: keksi parempi nimi, toi poista lopuksi NFmiSmartInfo
-// -luokka ja laita t‰m‰ sen nimiseksi.
+// -luokka ja laita t√§m√§ sen nimiseksi.
 
 #include "NFmiOwnerInfo.h"
 
@@ -28,10 +28,10 @@ public:
 	~NFmiSmartInfo(void);
 
 	NFmiSmartInfo& operator=(const NFmiSmartInfo &theInfo); // matala kopio, eli jaettu data
-	NFmiSmartInfo* Clone(void) const; // syv‰ kopio, eli kloonille luodaan oma queryData sen omistukseen
-										// TODO: katso pit‰‰kˆ metodin nimi muuttaa, koska emoissa Clone on 
+	NFmiSmartInfo* Clone(void) const; // syv√§ kopio, eli kloonille luodaan oma queryData sen omistukseen
+										// TODO: katso pit√§√§k√∂ metodin nimi muuttaa, koska emoissa Clone on 
 										// virtuaali funktio, jossa eri paluu-luokka.
-    // Apu funktio tekem‰‰n kevyit‰ kopoioita, koska Clone tekee raskaan kopion (= data kopioidaan myˆs)
+    // Apu funktio tekem√§√§n kevyit√§ kopoioita, koska Clone tekee raskaan kopion (= data kopioidaan my√∂s)
     static boost::shared_ptr<NFmiFastQueryInfo> CreateShallowCopyOfHighestInfo(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
     bool NextLocation (void);
 
@@ -47,12 +47,12 @@ public:
 	bool LocationSelectionRedo(void);		// kysyy onko redo mahdollinen
 	bool LocationSelectionUndoData(void);	// suorittaa todellisen undon
 	bool LocationSelectionRedoData(void);	// suorittaa todellisen redon
-	void LocationSelectionUndoLevel(int theNewUndoLevel); // undolevel asetetaan t‰ll‰
+	void LocationSelectionUndoLevel(int theNewUndoLevel); // undolevel asetetaan t√§ll√§
 	bool LoadedFromFile(void);
 	void LoadedFromFile(bool loadedFromFile);
 	bool IsDirty(void) const;
 	void Dirty(bool newState);
-	const NFmiHarmonizerBookKeepingData* CurrentHarmonizerBookKeepingData(void) const; // palauttaa nyt k‰ytˆss‰ olevan harmonisaattori parambagin
+	const NFmiHarmonizerBookKeepingData* CurrentHarmonizerBookKeepingData(void) const; // palauttaa nyt k√§yt√∂ss√§ olevan harmonisaattori parambagin
 
 	int MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea);
 	void InverseMask(unsigned long theMaskType);

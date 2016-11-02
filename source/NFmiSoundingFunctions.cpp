@@ -3,7 +3,7 @@
  * \file NFmiSoundingFunctions.cpp
  *
  * Namespace, jossa erilaisia irto funktioita, joiden avulla lasketaan
- * erilaisia mm. luotauksiin liittvi‰ juttuja.
+ * erilaisia mm. luotauksiin liittvi√§ juttuja.
  */
 // ======================================================================
 
@@ -18,8 +18,8 @@
 namespace NFmiSoundingFunctions
 {
 
-// Funktio laskee kastepisteen (DP) l‰mpˆtilan (T) ja suhteellisen
-// kosteuden (RH) avulla. L‰mpˆtila ja kastepiste ovat celsiuksina.
+// Funktio laskee kastepisteen (DP) l√§mp√∂tilan (T) ja suhteellisen
+// kosteuden (RH) avulla. L√§mp√∂tila ja kastepiste ovat celsiuksina.
 double CalcDP(double T, double RH)
 {
 	static bool firstTime = true;
@@ -36,7 +36,7 @@ double CalcDP(double T, double RH)
 //	double x = (log(RH/100.) + b * (T / (T + c))) / b;
 
 	int logIndex = static_cast<int>(round(RH*10));
-	if(T != kFloatMissing && RH != kFloatMissing && logIndex > 0 && logIndex < arraySize) // logIndex pit‰‰ olla > 0 koska 0-kohdassa on not a number!
+	if(T != kFloatMissing && RH != kFloatMissing && logIndex > 0 && logIndex < arraySize) // logIndex pit√§√§ olla > 0 koska 0-kohdassa on not a number!
 	{
 		double x = (gLogTable0_100[logIndex] + b * (T / (T + c))) / b;
 		if(x != 1) // tarkistus ettei tule nollalla jakoa
@@ -72,7 +72,7 @@ double WMR(double T, double P)
 }
 
 // http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/
-double ESAT(double T) // T kelvinein‰ tai celsiuksina
+double ESAT(double T) // T kelvinein√§ tai celsiuksina
 {
 	double T0 = 0.;
 	if(T < 105.)
@@ -103,7 +103,7 @@ double ESAT(double T) // T kelvinein‰ tai celsiuksina
 }
 
 /*
-double ESAT2(double Tk) // T kelvinein‰ (HUOM! kaavassa on jotain vikaa, EI TOIMI)
+double ESAT2(double Tk) // T kelvinein√§ (HUOM! kaavassa on jotain vikaa, EI TOIMI)
 {
     double T0 = 273.15;
     double esat2 = ::exp( -6763.6/(Tk+T0) - 4.9283* ::log((Tk+T0)) + 54.2190 );
@@ -116,7 +116,7 @@ double ESAT3(double Tc) // T celsiuksina
     return ESAT3;
 }
 
-double ESAT4(double Tc) // T celsiuksina (t‰ll‰ saadaan parhaat tulokset verrattuna ESAT-funktioon ja t‰ss‰ on vain yksi exp kun ESAT:issa on 3xpow ja 1xlog10)
+double ESAT4(double Tc) // T celsiuksina (t√§ll√§ saadaan parhaat tulokset verrattuna ESAT-funktioon ja t√§ss√§ on vain yksi exp kun ESAT:issa on 3xpow ja 1xlog10)
 {	
     if(Tc > 105.)
         Tc -= 273.15; // muutetaan celsiuksiksi
@@ -143,7 +143,7 @@ static const double gTMR_gamma = 0.0915;
 static const double gTMR_gamma2 = 38.9114;
 static const double gTMR_gamma3 = 1.2035;
 
-// l‰hde: http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/skewt.pro
+// l√§hde: http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/skewt.pro
 //;========================================================================
 //;  FUNCTION TO COMPUTE THE TEMPERATURE (KELVIN) OF AIR AT A GIVEN
 //;  PRESSURE AND WITH A GIVEN MIXING RATIO.
@@ -163,7 +163,7 @@ double TMR(double W, double P)
 }
 
 
-// l‰hde: http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/skewt.pro
+// l√§hde: http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/skewt.pro
 //;========================================================================
 //;  FUNCTION TO COMPUTE SATURATION ADIABATIC TEMP AT 1000 MB GIVEN T & P.
 //;  OS AND T (KELVIN or CELSIUS), P (MILLIBARS )
@@ -181,7 +181,7 @@ double OS(double T, double P)
 }
 
 
-// l‰hde: http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/skewt.pro
+// l√§hde: http://www.iac.ethz.ch/staff/dominik/idltools/atmos_phys/skewt.pro
 //;========================================================================
 //;  FUNCTION TO COMPUTE TEMPERATUE (KELVIN) OF A MOIST ADIABAT GIVEN
 //;  OS(KELVIN), P(MILLIBARS)
@@ -205,8 +205,8 @@ double OS(double T, double P)
 double TSA(double OS, double P)
 {
     if(P < 1.3)
-        P = 1.3; // Marko: TSA-funktio ei toimi esim. P = 1 arvoilla, t‰llˆin laskettu l‰mpˆtila saa arvokseen ‰lyttˆm‰n suuria arvoja (~99 astetta celsiusta), kokeellisesti saatu minimi P raja oli 1.3
-	double A = OS + 273.16; // muutetaan t‰ss‰ kelvineiksi
+        P = 1.3; // Marko: TSA-funktio ei toimi esim. P = 1 arvoilla, t√§ll√∂in laskettu l√§mp√∂tila saa arvokseen √§lytt√∂m√§n suuria arvoja (~99 astetta celsiusta), kokeellisesti saatu minimi P raja oli 1.3
+	double A = OS + 273.16; // muutetaan t√§ss√§ kelvineiksi
 	double TQ = 253.16;
 	double D = 120.;
 	for(int I = 1; I < 12; I++)
@@ -216,7 +216,7 @@ double TSA(double OS, double P)
 		//;  IF THE TEMPERATURE DIFFERENCE, X, IS SMALL, EXIT THIS LOOP.
 		if( ::fabs(X) < 0.01 )
 			break;
-		D = (X < 0) ? -fabs(D) : fabs(D); // h‰m‰r‰‰ koodia alkuper‰isess‰ kieless‰
+		D = (X < 0) ? -fabs(D) : fabs(D); // h√§m√§r√§√§ koodia alkuper√§isess√§ kieless√§
 		TQ = TQ + D;
 	}
 	double TSA=TQ;
@@ -226,17 +226,17 @@ double TSA(double OS, double P)
 static const double gTpot2tConstant1 = 0.2854;
 static const double gKelvinChange = 273.16;
 
-// Laskee annetun potentiaalil‰mpˆtilan ja paineen avulla l‰mpˆtilan haluttuun korkeuteen.
-// Se on k‰‰nteinen funktio CalcThetaT:n verrattuna.
+// Laskee annetun potentiaalil√§mp√∂tilan ja paineen avulla l√§mp√∂tilan haluttuun korkeuteen.
+// Se on k√§√§nteinen funktio CalcThetaT:n verrattuna.
 // tpot annetaan celsiuksina.
 // Oletus: kaikki parametrit ovat ei-puuttuvia!
 double Tpot2t(double tpot, double p)
 {
-	// HUOM! pot l‰mpˆtila muutetaan ensin kelvineiksi ja lopuksi tulos muutetaan takaisin celsiuksiksi
+	// HUOM! pot l√§mp√∂tila muutetaan ensin kelvineiksi ja lopuksi tulos muutetaan takaisin celsiuksiksi
 	return ( (gKelvinChange + tpot) * ::pow(p/1000, gTpot2tConstant1) ) - gKelvinChange;
 }
 
-// Laskee potentiaalil‰mpˆtila theta kun annetaan l‰mpˆtila ja paine, miss‰ l‰mpˆtila on otettu.
+// Laskee potentiaalil√§mp√∂tila theta kun annetaan l√§mp√∂tila ja paine, miss√§ l√§mp√∂tila on otettu.
 // T annetaan celsiuksina.
 // Oletus: kaikki parametrit ovat ei-puuttuvia!
 double T2tpot(double T, double P)
@@ -245,30 +245,30 @@ double T2tpot(double T, double P)
 	return ((T+T0) * ::pow(1000/P, 0.2854)) - T0;
 }
 
-// laskee suhteellisen kosteuden l‰mpˆtilan ja kastepisteen avulla.
+// laskee suhteellisen kosteuden l√§mp√∂tilan ja kastepisteen avulla.
 // Oletus: kaikki parametrit ovat ei-puuttuvia!
-// L‰mpˆtila ja kastepiste celsiuksina.
+// L√§mp√∂tila ja kastepiste celsiuksina.
 double CalcRH(double T, double Td)
 {
 	double RH = 100 * ::pow((112-0.1*T+Td)/(112+0.9*T) ,8);
 	return RH;
 }
 
-// Laskee kyll‰stysvesihˆyrynpaineen es l‰mpˆtilan avulla.
+// Laskee kyll√§stysvesih√∂yrynpaineen es l√§mp√∂tilan avulla.
 // Oletus: kaikki parametrit ovat ei-puuttuvia!
-// L‰mpˆtila celsiuksina.
+// L√§mp√∂tila celsiuksina.
 double CalcEs(double T)
 {
 	const double T0 = 273.16; // kelvin asteikon muunnos
-	const double Rv = 462; // vesihˆyryn kaasuvakio [J/kg/K]
-	const double L = 2.5 * 1000000; // vesihˆyryn tiivistymisl‰mpˆ [J/kg]
+	const double Rv = 462; // vesih√∂yryn kaasuvakio [J/kg/K]
+	const double L = 2.5 * 1000000; // vesih√∂yryn tiivistymisl√§mp√∂ [J/kg]
 	double es = 6.11 * ::exp(L/Rv*(1/T0 - 1/(T+T0)));
 	return es;
 }
 
-// Laskee kyll‰stysvesihˆyrynpaineen es l‰mpˆtilan avulla. Saulin lˆyt‰m‰ 'tarkka' kaava.
+// Laskee kyll√§stysvesih√∂yrynpaineen es l√§mp√∂tilan avulla. Saulin l√∂yt√§m√§ 'tarkka' kaava.
 // Oletus: kaikki parametrit ovat ei-puuttuvia!
-// L‰mpˆtila celsiuksina.
+// L√§mp√∂tila celsiuksina.
 double CalcEs2(double Tcelsius)
 {
 	const double b = 17.2694;
@@ -284,7 +284,7 @@ double CalcEs2(double Tcelsius)
 	return es;
 }
 
-// Laskee vesihˆyryn osapaineen (e)
+// Laskee vesih√∂yryn osapaineen (e)
 // Oletus: kaikki parametrit ovat ei-puuttuvia!
 double CalcE(double RH, double es)
 {
@@ -292,7 +292,7 @@ double CalcE(double RH, double es)
 	return e;
 }
 
-// Laskee vesihˆyryn osapaineen (e) ja kyll‰styspaineen (es)
+// Laskee vesih√∂yryn osapaineen (e) ja kyll√§styspaineen (es)
 // avulla suhteellisen kosteuden RH.
 // Oletus: kaikki parametrit ovat ei-puuttuvia!
 double CalcRH2(double e, double es)
@@ -310,7 +310,7 @@ double CalcW(double e, double P)
 }
 
 // Laskee sekoitussuhteen w (mixing ratio) [g/kg]
-// ja paineen avulla vesihˆyryn paineen e
+// ja paineen avulla vesih√∂yryn paineen e
 // Oletus: kaikki parametrit ovat ei-puuttuvia!
 double CalcE2(double w, double P)
 {
@@ -340,7 +340,7 @@ double CalcDewPoint(double T, double w, double P)
 	return Td;
 }
 
-// Laskee virtuaali l‰mpˆtilan Tv
+// Laskee virtuaali l√§mp√∂tilan Tv
 // Oletus: kaikki parametrit ovat ei-puuttuvia!
 double CalcTv(double T, double Td, double P)
 {
@@ -362,12 +362,12 @@ double CalcThetaE(double T, double Td, double P)
 // Laskee LCL-levelin T, Td, ja 'aloitus' P:n avulla
 double CalcLCLPressure(double T, double Td, double P)
 {
-	int iterationCount = 0; // T‰m‰n voi poistaa profiloinnin j‰lkeen
+	int iterationCount = 0; // T√§m√§n voi poistaa profiloinnin j√§lkeen
 	double lclPressure = kFloatMissing;
 	// 2. Laske sekoitussuhde pinnalla
 	double w = CalcMixingRatio(T, Td, P);
-	double tpot = T2tpot(T, P); // pit‰‰ laskea mit‰ l‰mpˆtilaa vastaa pinnan 'potentiaalil‰mpˆtila'
-	// 3. iteroi pinnasta ylˆsp‰in ja laske, milloin mixing-ratio k‰yr‰ ja l‰mpˆtilan kostea-adiapaatti leikkaavat
+	double tpot = T2tpot(T, P); // pit√§√§ laskea mit√§ l√§mp√∂tilaa vastaa pinnan 'potentiaalil√§mp√∂tila'
+	// 3. iteroi pinnasta yl√∂sp√§in ja laske, milloin mixing-ratio k√§yr√§ ja l√§mp√∂tilan kostea-adiapaatti leikkaavat
 	double lastP=P;
 	for(double currentP = P; currentP > 100; currentP -= 1)
 	{
@@ -377,7 +377,7 @@ double CalcLCLPressure(double T, double Td, double P)
 
 		if(Tdry < Tw)
 			break;
-		lastP = currentP; // viimeisinta painetta ennen kuin Tw ja Tdry ovat leikanneet, voidaan k‰ytt‰‰ tarkemman LCL painepinnan interpolointiin
+		lastP = currentP; // viimeisinta painetta ennen kuin Tw ja Tdry ovat leikanneet, voidaan k√§ytt√§√§ tarkemman LCL painepinnan interpolointiin
 	}
 
 	// laske tarkempi paine jos viitsit lastP ja currentP;n avulla interpoloimalla
@@ -385,8 +385,8 @@ double CalcLCLPressure(double T, double Td, double P)
 	return lclPressure;
 }
 
-// Laskee newtonin menetelm‰ll‰ seuraavan P:n arvon funktion ja sen derivaatan avulla.
-// Palauttaa myˆs viimeisimm‰ll‰ arvolla lasketun erotuksen.
+// Laskee newtonin menetelm√§ll√§ seuraavan P:n arvon funktion ja sen derivaatan avulla.
+// Palauttaa my√∂s viimeisimm√§ll√§ arvolla lasketun erotuksen.
 double IterateMixMoistDiffWithNewtonMethod(double W, double Tpot, double P, double &diffOut)
 {
 	double P2 = P + 0.001;
@@ -406,23 +406,23 @@ double CalcLCLPressureFast(double T, double Td, double P)
 {
 	double lastLCL = 900; // aloitetaan haku jostain korkeudesta
 
-	int iterationCount = 0; // T‰m‰n voi poistaa profiloinnin j‰lkeen
+	int iterationCount = 0; // T√§m√§n voi poistaa profiloinnin j√§lkeen
 	double lclPressure = kFloatMissing;
 	// 2. Laske sekoitussuhde pinnalla
 	double w = CalcMixingRatio(T, Td, P);
-	double tpot = T2tpot(T, P); // pit‰‰ laskea mit‰ l‰mpˆtilaa vastaa pinnan 'potentiaalil‰mpˆtila'
+	double tpot = T2tpot(T, P); // pit√§√§ laskea mit√§ l√§mp√∂tilaa vastaa pinnan 'potentiaalil√§mp√∂tila'
 	double currentP = lastLCL;
 	double diff = 99999;
 	int maxIterations = 20;
-	// Etsi newtonin menetelm‰ll‰ LCL pressure
+	// Etsi newtonin menetelm√§ll√§ LCL pressure
 	do
 	{
 		iterationCount++;
 		currentP = IterateMixMoistDiffWithNewtonMethod(w, tpot, currentP, diff);
 		if(::fabs(diff) < 0.01)
 			break;
-		if(currentP < 100) // most unstable tapauksissa etsint‰ piste saattaa pompata tosi ylˆs
-		{ // t‰ss‰ on paineen arvoksi tullut niin pieni ett‰ nostetaan sit‰ takaisin ylˆs ja jatketaan etsintˆj‰
+		if(currentP < 100) // most unstable tapauksissa etsint√§ piste saattaa pompata tosi yl√∂s
+		{ // t√§ss√§ on paineen arvoksi tullut niin pieni ett√§ nostetaan sit√§ takaisin yl√∂s ja jatketaan etsint√∂j√§
 			currentP = 100;
 		}
 	}while(iterationCount < maxIterations);
@@ -436,7 +436,7 @@ double CalcLCLPressureFast(double T, double Td, double P)
 	return lclPressure;
 }
 
-// etsii monotonisen 'funktion' juurta kun sille on annettu kaksi funktion pistett‰
+// etsii monotonisen 'funktion' juurta kun sille on annettu kaksi funktion pistett√§
 double FindRoot(double x1, double x2, double y1, double y2)
 {
 	double x0 = x1 - y1*((x1-x2)/(y1-y2));
@@ -444,10 +444,10 @@ double FindRoot(double x1, double x2, double y1, double y2)
 }
 
 // laskee kostea adiapaattisen arvon (iteroimalla), kun annetaan
-// l‰mpˆtila (celcius) ja paine (mb).
+// l√§mp√∂tila (celcius) ja paine (mb).
 // Oletus: parametrit ovat ei puuttuvia.
 // Etsii kostea-adiapaattiarvoa alueelta -40 - 50 astetta celsiusta.
-// HUOM!!!!! t‰m‰ voi varmaan optimoida jollain puolitus haulla!?!?, luulen ett‰ t‰m‰ hidastaa luotaus piirtoa rankasti!
+// HUOM!!!!! t√§m√§ voi varmaan optimoida jollain puolitus haulla!?!?, luulen ett√§ t√§m√§ hidastaa luotaus piirtoa rankasti!
 double CalcMoistT(double T, double P)
 {
 	double minDiff = 999999.;
@@ -458,8 +458,8 @@ double CalcMoistT(double T, double P)
 	int counter = 0;
 	do
 	{
-		double AOS1 = OS(moistT1, 1000.); // t‰m‰ on h‰m‰r‰, miksi t‰m‰ tehd‰‰n, mutta muutetaan kostea-l‰mpp‰si jotenkin pintaan
-		double ATSA1  = TSA(AOS1, P); // lasketaan sen avulla l‰mpˆtila taas halutulle korkeudelle
+		double AOS1 = OS(moistT1, 1000.); // t√§m√§ on h√§m√§r√§, miksi t√§m√§ tehd√§√§n, mutta muutetaan kostea-l√§mpp√§si jotenkin pintaan
+		double ATSA1  = TSA(AOS1, P); // lasketaan sen avulla l√§mp√∂tila taas halutulle korkeudelle
 		double diff1 = ATSA1 - T;
 		double AOS2 = OS(moistT2, 1000.);
 		double ATSA2  = TSA(AOS2, P);
@@ -469,25 +469,25 @@ double CalcMoistT(double T, double P)
 		double ATSA0  = TSA(AOS0, P);
 		double diff0 = ATSA0 - T;
 		if(::fabs(diff0) < minDiff)
-		{ // jos laskettu l‰mpˆtila oli tarpeeksi l‰hell‰ annettua, laitetaan arvo talteen
+		{ // jos laskettu l√§mp√∂tila oli tarpeeksi l√§hell√§ annettua, laitetaan arvo talteen
 			minDiff = ::fabs(diff0);
 			minDiffMoistT = moistT0;
 		}
-		if(diff1 < 0 && diff0 < 0) // katsotaan kumman kanssa etumerkki on sama ja alustetaan iterointi alkuarvot sen mukaan ett‰ ollaan eri puolella 0:aa
+		if(diff1 < 0 && diff0 < 0) // katsotaan kumman kanssa etumerkki on sama ja alustetaan iterointi alkuarvot sen mukaan ett√§ ollaan eri puolella 0:aa
 			moistT1 = moistT0;
 		else
 			moistT2 = moistT0;
 		counter++;
 	} while(minDiff > deltaT && counter < 10);
 
-	if(minDiff <= deltaT) // jos l‰himm‰n lasketun l‰mpp‰rin ero oli tarpeeksi pieni, palautetaan sit‰ vastaava kostea-l‰mpˆtila
+	if(minDiff <= deltaT) // jos l√§himm√§n lasketun l√§mpp√§rin ero oli tarpeeksi pieni, palautetaan sit√§ vastaava kostea-l√§mp√∂tila
 		return minDiffMoistT;
 	return kFloatMissing;
 }
 
 // Laskee logaritmisessa asteikossa interpoloidun arvon.
-// K‰ytet‰‰n esim. logaritmisen paine asteikon kanssa.
-// Palauttaa x:‰‰ vastaavan y:n, kun x1 arvoa vastaa y1 ja x2:n arvoa vastaa y2.
+// K√§ytet√§√§n esim. logaritmisen paine asteikon kanssa.
+// Palauttaa x:√§√§ vastaavan y:n, kun x1 arvoa vastaa y1 ja x2:n arvoa vastaa y2.
 float CalcLogInterpolatedValue(float x1, float x2, float x, float y1, float y2)
 {
 	float y = kFloatMissing;
@@ -509,8 +509,8 @@ float CalcLogInterpolatedValue(float x1, float x2, float x, float y1, float y2)
 }
 
 // Laskee logaritmisessa asteikossa interpoloidun arvon.
-// K‰ytet‰‰n esim. logaritmisen paine asteikon kanssa.
-// Palauttaa x:‰‰ vastaavan y:n, kun x1 arvoa vastaa y1 ja x2:n arvoa vastaa y2.
+// K√§ytet√§√§n esim. logaritmisen paine asteikon kanssa.
+// Palauttaa x:√§√§ vastaavan y:n, kun x1 arvoa vastaa y1 ja x2:n arvoa vastaa y2.
 float CalcLogModLinearInterpolatedValue(float x1, float x2, float x, float y1, float y2, unsigned int modulo)
 {
 	float y = kFloatMissing;
@@ -624,18 +624,18 @@ double FindNearestW(double T, double P)
 		double t0 = TMR(w0, P);
 		double diff0 = t0 - T;
 		if(::fabs(diff0) < minDiff)
-		{ // jos laskettu l‰mpˆtila oli tarpeeksi l‰hell‰ annettua, laitetaan arvo talteen
+		{ // jos laskettu l√§mp√∂tila oli tarpeeksi l√§hell√§ annettua, laitetaan arvo talteen
 			minDiff = ::fabs(diff0);
 			minDiffW = w0;
 		}
-		if(diff1 < 0 && diff0 < 0) // katsotaan kumman kanssa etumerkki on sama ja alustetaan iterointi alkuarvot sen mukaan ett‰ ollaan eri puolella 0:aa
+		if(diff1 < 0 && diff0 < 0) // katsotaan kumman kanssa etumerkki on sama ja alustetaan iterointi alkuarvot sen mukaan ett√§ ollaan eri puolella 0:aa
 			w1 = w0;
 		else
 			w2 = w0;
 		counter++;
 	} while(minDiff > deltaW && counter < 50);
 
-	if(minDiff <= deltaW) // jos l‰himm‰n lasketun W:n ero oli tarpeeksi pieni, palautetaan sit‰ vastaava arvo
+	if(minDiff <= deltaW) // jos l√§himm√§n lasketun W:n ero oli tarpeeksi pieni, palautetaan sit√§ vastaava arvo
 		return minDiffW;
 	return kFloatMissing;
 }

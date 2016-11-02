@@ -81,7 +81,7 @@ bool NFmiUndoRedoQData::SnapShotData(const std::string& theAction, const NFmiHar
 
 	(*itsCurrentUndoLevelPtr)++;
 	theRawData.Backup(itsUndoTable[*itsCurrentUndoLevelPtr]);
-	itsUndoRedoHarmonizerBookKeepingData->push_back(theHarmonizerBookKeepingData); // lis‰t‰‰n per‰‰n annettu bagi
+	itsUndoRedoHarmonizerBookKeepingData->push_back(theHarmonizerBookKeepingData); // lis√§t√§√§n per√§√§n annettu bagi
 	(*itsCurrentRedoLevelPtr) = (*itsCurrentUndoLevelPtr);
 	(*itsMaxRedoLevelPtr) = (*itsCurrentRedoLevelPtr);
 
@@ -144,8 +144,8 @@ bool NFmiUndoRedoQData::UndoData(const NFmiHarmonizerBookKeepingData &theHarmoni
 	if ((*itsCurrentUndoLevelPtr) == (*itsCurrentRedoLevelPtr))
 	{
 		std::string action("");
-		SnapShotData(action, theHarmonizerBookKeepingData, theRawData);		// "Ottaa kuvan" undo-toimintoa edelt‰neest‰ tilanteesta,
-		(*itsCurrentUndoLevelPtr)--;		// jos siihen halutaankin myˆhemmin palata redo:lla.
+		SnapShotData(action, theHarmonizerBookKeepingData, theRawData);		// "Ottaa kuvan" undo-toimintoa edelt√§neest√§ tilanteesta,
+		(*itsCurrentUndoLevelPtr)--;		// jos siihen halutaankin my√∂hemmin palata redo:lla.
 	}
 
 	theRawData.Undo(itsUndoTable[*itsCurrentUndoLevelPtr]);
@@ -171,7 +171,7 @@ bool NFmiUndoRedoQData::RedoData(NFmiRawData &theRawData)
 }
 
 void NFmiUndoRedoQData::UndoLevel(long theDepth, const NFmiRawData &theRawData)	// theDepth kuvaa kuinka monta
-{														// Undota voidaan tehd‰.
+{														// Undota voidaan tehd√§.
 	if (!itsUndoTable && !itsUndoTextTable)	// Muuten taulukon ulkopuolelle viittaaminen voisi
 	{										// olla mahdollista!
 		itsMaxUndoLevelPtr = new long;
@@ -189,17 +189,17 @@ void NFmiUndoRedoQData::UndoLevel(long theDepth, const NFmiRawData &theRawData)	
 			*itsMaxUndoLevelPtr = theDepth + 1;		// Redon tekemisen mahdollistamiseksi yksi
 			try
 			{
-				itsUndoTable = new char* [*itsMaxUndoLevelPtr];				// taso lis‰‰.
+				itsUndoTable = new char* [*itsMaxUndoLevelPtr];				// taso lis√§√§.
 				itsUndoTextTable = new std::string [*itsMaxUndoLevelPtr];
 				for (int level = 0; level < (*itsMaxUndoLevelPtr); level++)
-					itsUndoTable[level] = 0; // nollataan ensin pointteri, ett‰ voidaan siivota j‰lki‰ jos muistin varaus pett‰‰ joskus
+					itsUndoTable[level] = 0; // nollataan ensin pointteri, ett√§ voidaan siivota j√§lki√§ jos muistin varaus pett√§√§ joskus
 
 				for (int level = 0; level < (*itsMaxUndoLevelPtr); level++)
 				  itsUndoTable[level] = new char[theRawData.Size()*sizeof(float)];
 				itsUndoRedoHarmonizerBookKeepingData = new std::deque<NFmiHarmonizerBookKeepingData>;
 			}
 			catch(...)
-			{ // oletetaan ett‰ poikkeus liittyi muistin varaamiseen ja lopetetaan t‰h‰n
+			{ // oletetaan ett√§ poikkeus liittyi muistin varaamiseen ja lopetetaan t√§h√§n
 				// siivotaan talukot tyhjiksi.
 				delete itsUndoRedoHarmonizerBookKeepingData;
 				itsUndoRedoHarmonizerBookKeepingData = 0;
@@ -215,7 +215,7 @@ void NFmiUndoRedoQData::UndoLevel(long theDepth, const NFmiRawData &theRawData)	
 				delete [] itsUndoTextTable;
 				itsUndoTextTable = 0;
 
-				throw ; // heitet‰‰n lopuksi poikkeus eteenp‰in
+				throw ; // heitet√§√§n lopuksi poikkeus eteenp√§in
 			}
 		}
 	}
@@ -223,7 +223,7 @@ void NFmiUndoRedoQData::UndoLevel(long theDepth, const NFmiRawData &theRawData)	
 
 const NFmiHarmonizerBookKeepingData* NFmiUndoRedoQData::CurrentHarmonizerBookKeepingData(void) const
 {
-	int usedIndex = *itsCurrentUndoLevelPtr + 1; // t‰ss‰ pit‰‰ olla +1, koska t‰m‰ bookkeepin data systeemi on poikkeava originaali undo/redo datan kanssa
+	int usedIndex = *itsCurrentUndoLevelPtr + 1; // t√§ss√§ pit√§√§ olla +1, koska t√§m√§ bookkeepin data systeemi on poikkeava originaali undo/redo datan kanssa
 	if(itsUndoRedoHarmonizerBookKeepingData == 0)
 		return 0;
 	else if(usedIndex >= 0 && usedIndex < static_cast<int>(itsUndoRedoHarmonizerBookKeepingData->size()))

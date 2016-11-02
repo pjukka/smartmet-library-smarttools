@@ -18,10 +18,10 @@
 // 
 // 
 //  Description: 
-//   Halusin tehd‰ NFmiMultiLevelMask:iin undo/redo 
+//   Halusin tehd√§ NFmiMultiLevelMask:iin undo/redo 
 //   mahdollisuuden. Tein NFmiMultiLevelMask- 
 //   smartpointerin, jolla on multilevelmask ja 
-//   lis‰ksi undo/redo-lista, jossa on multilevelmask-pointereita.
+//   lis√§ksi undo/redo-lista, jossa on multilevelmask-pointereita.
 //   
 // 
 //  Change Log: 
@@ -47,7 +47,7 @@ NFmiUndoableMultiLevelMask::NFmiUndoableMultiLevelMask(unsigned long theSize)
 NFmiUndoableMultiLevelMask::NFmiUndoableMultiLevelMask(const NFmiUndoableMultiLevelMask& theMask)
 :itsMultiLevelMask(theMask.itsMultiLevelMask ? new NFmiMultiLevelMask(*theMask.itsMultiLevelMask) : 0)
 ,itsUndoList() // undolistaa ei kopioida!!!!!
-,itsMaxUndoLevel(0) // eik‰ mit‰‰n undo/redo juttuihin liittyv‰‰!!!!!
+,itsMaxUndoLevel(0) // eik√§ mit√§√§n undo/redo juttuihin liittyv√§√§!!!!!
 ,itsMaxRedoLevel(0)
 ,itsCurrentUndoLevel(0)
 ,itsCurrentRedoLevel(0)
@@ -59,7 +59,7 @@ NFmiUndoableMultiLevelMask& NFmiUndoableMultiLevelMask::operator=(const NFmiUndo
 	itsMultiLevelMask = 0;
 	itsMultiLevelMask = theMask.itsMultiLevelMask ? new NFmiMultiLevelMask(*theMask.itsMultiLevelMask) : 0;
 //	itsUndoList // undolistaa ei kopioida!!!!!
-	itsMaxUndoLevel = 0; // eik‰ mit‰‰n undo/redo juttuihin liittyv‰‰!!!!!
+	itsMaxUndoLevel = 0; // eik√§ mit√§√§n undo/redo juttuihin liittyv√§√§!!!!!
 	itsMaxRedoLevel = 0;
 	itsCurrentUndoLevel = 0;
 	itsCurrentRedoLevel = 0;
@@ -85,7 +85,7 @@ bool NFmiUndoableMultiLevelMask::SnapShotData(void)
 	itsCurrentUndoLevel++;
 	NFmiPtrList<NFmiMultiLevelMask>::Iterator it = itsUndoList.Index(itsCurrentUndoLevel);
 	if(it.CurrentPtr() == 0)
-		return false; // ei pit‰isi menn‰ t‰h‰n, exceptionin paikka!
+		return false; // ei pit√§isi menn√§ t√§h√§n, exceptionin paikka!
 	it.Current() = *itsMultiLevelMask;
 	itsCurrentRedoLevel = itsCurrentUndoLevel;
 	itsMaxRedoLevel = itsCurrentRedoLevel;
@@ -96,18 +96,18 @@ bool NFmiUndoableMultiLevelMask::SnapShotData(void)
 // RearrangeUndoTable 
 //--------------------------------------------------------
 
-//   Kun Snapshot:illa menn‰‰n listan yli, j‰rjestet‰‰n 
-//   lista niin, ett‰ siirret‰‰n listan ensimm‰inen 
+//   Kun Snapshot:illa menn√§√§n listan yli, j√§rjestet√§√§n 
+//   lista niin, ett√§ siirret√§√§n listan ensimm√§inen 
 //   alkio viimeiseksi ja asetetaan listan osoittimille 
 //   uudet arvot. Eli jos undo-level olisi 5 ja 
-//   tehd‰‰n kuudes per‰kk‰inen Snapshot, pit‰‰ 
-//   uudelle snapshotille tehd‰ tilaa listan alusta.
+//   tehd√§√§n kuudes per√§kk√§inen Snapshot, pit√§√§ 
+//   uudelle snapshotille tehd√§ tilaa listan alusta.
 //   
 void NFmiUndoableMultiLevelMask::RearrangeUndoTable(void)
 {
 	NFmiPtrList<NFmiMultiLevelMask>::Iterator it = itsUndoList.Index(1); // 1 = 1. paikka listassa
 	if(it.CurrentPtr() == 0)
-		return;  // ei pit‰isi menn‰ t‰h‰n, exceptionin paikka!
+		return;  // ei pit√§isi menn√§ t√§h√§n, exceptionin paikka!
 
 	NFmiMultiLevelMask* tempMask = it.CurrentPtr();
 	it.Remove(false); // false = ei tuhoa dataa
@@ -147,13 +147,13 @@ bool NFmiUndoableMultiLevelMask::UndoData(void)
 		return false;
 	if(itsCurrentUndoLevel == itsCurrentRedoLevel)
 	{
-		SnapShotData();		// "Ottaa kuvan" undo-toimintoa edelt‰neest‰ tilanteesta,
-		itsCurrentUndoLevel--;	// jos siihen halutaankin myˆhemmin palata redo:lla.
+		SnapShotData();		// "Ottaa kuvan" undo-toimintoa edelt√§neest√§ tilanteesta,
+		itsCurrentUndoLevel--;	// jos siihen halutaankin my√∂hemmin palata redo:lla.
 	}
 
 	NFmiPtrList<NFmiMultiLevelMask>::Iterator it = itsUndoList.Index(itsCurrentUndoLevel);
 	if(it.CurrentPtr() == 0)
-		return false;  // ei pit‰isi menn‰ t‰h‰n, exceptionin paikka!
+		return false;  // ei pit√§isi menn√§ t√§h√§n, exceptionin paikka!
 	*itsMultiLevelMask = *it.CurrentPtr();
 	itsCurrentUndoLevel--;
 	itsCurrentRedoLevel = itsCurrentUndoLevel + 2;
@@ -172,7 +172,7 @@ bool NFmiUndoableMultiLevelMask::RedoData(void)
 
 		NFmiPtrList<NFmiMultiLevelMask>::Iterator it = itsUndoList.Index(itsCurrentRedoLevel);
 		if(it.CurrentPtr() == 0)
-			return false;  // ei pit‰isi menn‰ t‰h‰n, exceptionin paikka!
+			return false;  // ei pit√§isi menn√§ t√§h√§n, exceptionin paikka!
 		*itsMultiLevelMask = *it.CurrentPtr();
 		
 		itsCurrentUndoLevel++;
@@ -185,11 +185,11 @@ bool NFmiUndoableMultiLevelMask::RedoData(void)
 // UndoLevel 
 //--------------------------------------------------------
 void NFmiUndoableMultiLevelMask::UndoLevel(int theNewUndoLevel)
-{ // jos undo leveli‰ vaihdetaan kesken kaiken, tuhotaan vanha undo-tieto
+{ // jos undo leveli√§ vaihdetaan kesken kaiken, tuhotaan vanha undo-tieto
 
-// undolistaan laitetaan level+1:lle tilaa, koska kun tehd‰‰n esim. 5 kertaa muutos, 
-// ja sitten tehd‰‰n undo, pit‰‰ ottaa talteen nykyhetkest‰ 6.s 'kuva', ett‰ voidaan 
-// palata takaisin nykyhetkeen (ja silti voidaan tehd‰ 5 kertaa undo per‰kk‰in). 
+// undolistaan laitetaan level+1:lle tilaa, koska kun tehd√§√§n esim. 5 kertaa muutos, 
+// ja sitten tehd√§√§n undo, pit√§√§ ottaa talteen nykyhetkest√§ 6.s 'kuva', ett√§ voidaan 
+// palata takaisin nykyhetkeen (ja silti voidaan tehd√§ 5 kertaa undo per√§kk√§in). 
 	itsMaxUndoLevel = theNewUndoLevel + 1;
 	itsMaxRedoLevel = 0;		// ??
 	itsCurrentUndoLevel = 0;	// ??
@@ -201,7 +201,7 @@ void NFmiUndoableMultiLevelMask::UndoLevel(int theNewUndoLevel)
 
 }
 
-// T‰m‰ asettaa halutun maskin, mutta ei tee undo/redo valmisteluja tai muuta.
+// T√§m√§ asettaa halutun maskin, mutta ei tee undo/redo valmisteluja tai muuta.
 bool NFmiUndoableMultiLevelMask::Mask(const NFmiBitMask& theMask, unsigned long theMaskType)
 {
 	if(itsMultiLevelMask)

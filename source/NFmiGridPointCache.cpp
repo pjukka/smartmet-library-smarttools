@@ -1,7 +1,7 @@
-//© Ilmatieteenlaitos/Marko.
+//Â© Ilmatieteenlaitos/Marko.
 //Original 09.10.2006
 //
-// Luokka pitää MetEditoriin imagine contourauksessa käytettyjen
+// Luokka pitÃ¤Ã¤ MetEditoriin imagine contourauksessa kÃ¤ytettyjen
 // xy-pisteiden cachea.
 //---------------------------------------------------------- NFmiGridPointCache.cpp
 
@@ -13,7 +13,7 @@ void NFmiGridPointCache::Add(const std::string &theGridStr, const NFmiGridPointC
 	pointMap::iterator it = itsPointCache.find(theGridStr);
 	if(it == itsPointCache.end())
 		itsPointCache.insert(std::make_pair(theGridStr, theData));
-	else // jos löytyi jo cachesta, korvataan arvot
+	else // jos lÃ¶ytyi jo cachesta, korvataan arvot
 	{
 		(*it).second = theData;
 	}

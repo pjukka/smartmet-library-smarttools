@@ -2,7 +2,7 @@
 /*!
  * \file NFmiSoundingIndexCalculator.cpp
  *
- * T‰m‰ luokka laskee erilaisia luotausi ndeksej‰ annettujen querinfojen avulla.
+ * T√§m√§ luokka laskee erilaisia luotausi ndeksej√§ annettujen querinfojen avulla.
  * Mm. CAPE, CIN, LCL, BulkShear StormRelatedHellicity jne.
  */
 // ======================================================================
@@ -22,11 +22,11 @@
 #ifndef BOOST_DISABLE_THREADS
 
 #ifdef _MSC_VER
-#pragma warning (disable : 4244) // boost:in thread kirjastosta tulee ik‰v‰sti 4244 varoituksia
+#pragma warning (disable : 4244) // boost:in thread kirjastosta tulee ik√§v√§sti 4244 varoituksia
 #endif
 #include <boost/thread.hpp>
 #ifdef _MSC_VER
-#pragma warning (default : 4244) // laitetaan 4244 takaisin p‰‰lle, koska se on t‰rke‰ (esim. double -> int auto castaus varoitus)
+#pragma warning (default : 4244) // laitetaan 4244 takaisin p√§√§lle, koska se on t√§rke√§ (esim. double -> int auto castaus varoitus)
 #endif
 
 #endif // BOOST_DISABLE_THREADS
@@ -114,8 +114,8 @@ static void CheckIfStopped(NFmiStopFunctor *theStopFunctor)
 
 static void CalcAllSoundingIndexParamFields(boost::shared_ptr<NFmiFastQueryInfo> &theSourceInfo, boost::shared_ptr<NFmiFastQueryInfo> &theResultInfo, bool useFastFill, NFmiStopFunctor *theStopFunctor)
 {
-    // bool fObsDataFound = false; // toistaiseksi ei k‰ytˆss‰
-	// bool useAnalyzeData = false; // toistaiseksi ei k‰ytˆss‰
+    // bool fObsDataFound = false; // toistaiseksi ei k√§yt√∂ss√§
+	// bool useAnalyzeData = false; // toistaiseksi ei k√§yt√∂ss√§
 
 	NFmiSoundingDataOpt1 soundingDataOpt1;
 	unsigned long counter = 0;
@@ -128,18 +128,18 @@ static void CalcAllSoundingIndexParamFields(boost::shared_ptr<NFmiFastQueryInfo>
 				theSourceInfo->LocationIndex(theResultInfo->LocationIndex());
 			::FillSoundingDataOpt1(theSourceInfo, soundingDataOpt1, theResultInfo->Time(), theResultInfo->LatLon(), useFastFill);
             if(theSourceInfo->Grid() && !soundingDataOpt1.IsDataGood())
-                continue; // jos oltiin mallidatassa ja datassa oli tiettyj‰ puutteita, ei tehd‰ laskentoja
+                continue; // jos oltiin mallidatassa ja datassa oli tiettyj√§ puutteita, ei tehd√§ laskentoja
 
 			for(theResultInfo->ResetParam(); theResultInfo->NextParam(); )
 			{
                 counter++;
 				if(counter%20 == 0)
-					::CheckIfStopped(theStopFunctor); // joka 20 hila/paramtrilla -pisteell‰ katsotaan, pit‰‰kˆ lopettaa
+					::CheckIfStopped(theStopFunctor); // joka 20 hila/paramtrilla -pisteell√§ katsotaan, pit√§√§k√∂ lopettaa
 
 				FmiSoundingParameters soundingParameter = static_cast<FmiSoundingParameters>(theResultInfo->Param().GetParamIdent());
 				// bool surfaceBasedCalculation = NFmiSoundingIndexCalculator::IsSurfaceBasedSoundingIndex(soundingParameter); // onko surfacebased???
 
-				// HUOM!!!! muista muuttaa luotaus-parametri pelk‰ksi surface arvoksi, koska loppu menee itsest‰‰n sitten
+				// HUOM!!!! muista muuttaa luotaus-parametri pelk√§ksi surface arvoksi, koska loppu menee itsest√§√§n sitten
 				float valueOpt1 = NFmiSoundingIndexCalculator::CalcOpt1(soundingDataOpt1, soundingParameter);
 				theResultInfo->FloatValue(valueOpt1);
             }
@@ -150,8 +150,8 @@ static void CalcAllSoundingIndexParamFields(boost::shared_ptr<NFmiFastQueryInfo>
         }
 		catch(...)
 		{
-			// jouduin laittamaan try-catch blokin t‰nne, koska aina silloin t‰llˆin jossain vaiheessa lent‰‰ poikkeus, joka lopettaa laskennat
-			// t‰ss‰ ei tehd‰ mit‰‰n, mutta laskennat jatkuvat ainakin seuraavasta pisteest‰...
+			// jouduin laittamaan try-catch blokin t√§nne, koska aina silloin t√§ll√∂in jossain vaiheessa lent√§√§ poikkeus, joka lopettaa laskennat
+			// t√§ss√§ ei tehd√§ mit√§√§n, mutta laskennat jatkuvat ainakin seuraavasta pisteest√§...
 		}
 	}
 }
@@ -244,23 +244,23 @@ static void CalculateSoundingDataOneTimeStepAtTime(boost::shared_ptr<NFmiFastQue
 }
 
 // Jos useFastFill on true, on datoilla sama hila ja aika descriptor rakenne
-// theMaxThreadCount -parametrilla voidaan rajoittaa k‰ytett‰vien threadien m‰‰r‰‰. Jos sen arvo on <=0, 
-// ei rajoitusta ole ja k‰ytet‰‰n koneen kaikkia coreja (paitsi jos fUseOnlyOneThread = true, jolloin 
-// k‰ytet‰‰n vain yht‰ threadia).
+// theMaxThreadCount -parametrilla voidaan rajoittaa k√§ytett√§vien threadien m√§√§r√§√§. Jos sen arvo on <=0, 
+// ei rajoitusta ole ja k√§ytet√§√§n koneen kaikkia coreja (paitsi jos fUseOnlyOneThread = true, jolloin 
+// k√§ytet√§√§n vain yht√§ threadia).
 void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theSourceData, NFmiQueryData &theResultData, bool useFastFill, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread, int theMaxThreadCount)
 {
-	NFmiSoundingFunctions::CalcDP(1, 56); // t‰m‰ funktio pit‰‰ varmistaa ett‰ se on alustettu, koska siell‰ on pari staattista muuttujaa, jotka 
-											// alustetaan ensimm‰isell‰ kerralla ja multi-threaddaavassa jutussa se voisi olla ongelma.
+	NFmiSoundingFunctions::CalcDP(1, 56); // t√§m√§ funktio pit√§√§ varmistaa ett√§ se on alustettu, koska siell√§ on pari staattista muuttujaa, jotka 
+											// alustetaan ensimm√§isell√§ kerralla ja multi-threaddaavassa jutussa se voisi olla ongelma.
 
 	unsigned long timeSize = theResultData.Info()->SizeTimes();
 	unsigned int usedThreadCount = boost::thread::hardware_concurrency();
 	if(theMaxThreadCount > 0 && usedThreadCount > static_cast<unsigned int>(theMaxThreadCount))
-		usedThreadCount = static_cast<unsigned int>(theMaxThreadCount); // jos on haluttu s‰‰t‰‰ maksim threadien m‰‰r‰‰, s‰‰det‰‰n maksimia jos usedThreadCount olisi muuten ylitt‰nyt sen.
+		usedThreadCount = static_cast<unsigned int>(theMaxThreadCount); // jos on haluttu s√§√§t√§√§ maksim threadien m√§√§r√§√§, s√§√§det√§√§n maksimia jos usedThreadCount olisi muuten ylitt√§nyt sen.
 
     usedThreadCount = NFmiQueryDataUtil::CalcOptimalThreadCount(usedThreadCount, timeSize);
 
 	if(fUseOnlyOneThread || usedThreadCount < 2)
-	{ // jos aikoja oli alle kaksi, lasketaan data yhdess‰ funktiossa
+	{ // jos aikoja oli alle kaksi, lasketaan data yhdess√§ funktiossa
 		if(fDoCerrReporting)
 			std::cerr << "making data in single thread" << std::endl;
 		boost::shared_ptr<NFmiFastQueryInfo> sourceInfo(new NFmiFastQueryInfo(&theSourceData));
@@ -272,7 +272,7 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 		if(fDoCerrReporting)
 			std::cerr << "making data in multiple threads" << std::endl;
 
-		theSourceData.LatLonCache(); // Ennen multi-thread laskuja pit‰‰ varmistaa ett‰ kunkin datan (source + result) latlon-cache on alustettu, muutern tulee ongelmia.
+		theSourceData.LatLonCache(); // Ennen multi-thread laskuja pit√§√§ varmistaa ett√§ kunkin datan (source + result) latlon-cache on alustettu, muutern tulee ongelmia.
 		theResultData.LatLonCache();
 
 		// pakko luoda dynaamisesti eri threadeille tarvittavat kopiot source ja target datoista
@@ -288,7 +288,7 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 		boost::thread_group calcParts;
 		for(unsigned int i = 0; i < usedThreadCount; i++)
 			calcParts.add_thread(new boost::thread(::CalculateSoundingDataOneTimeStepAtTime, sourceInfos[i], resultInfos[i], boost::ref(timeIndexCalculator), useFastFill, theStopFunctor, i+1, fDoCerrReporting));
-		calcParts.join_all(); // odotetaan ett‰ threadit lopettavat
+		calcParts.join_all(); // odotetaan ett√§ threadit lopettavat
 
 		if(fDoCerrReporting)
 			std::cerr << "all threads ended" << std::endl;
@@ -298,7 +298,7 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 float NFmiSoundingIndexCalculator::CalcOpt1(NFmiSoundingDataOpt1 &theSoundingDataOpt1, FmiSoundingParameters theParam)
 {
 	double value = kFloatMissing;
-	double xxxxValue = kFloatMissing; // t‰m‰ on ns. hukka parametri, koska jotkut parametrit syntyv‰t sivutuotteena ja t‰h‰n sijoitetaan aina se ei haluttu parametri
+	double xxxxValue = kFloatMissing; // t√§m√§ on ns. hukka parametri, koska jotkut parametrit syntyv√§t sivutuotteena ja t√§h√§n sijoitetaan aina se ei haluttu parametri
 	switch(theParam)
 	{
 	// **** 1. yksinkertaiset indeksit, tarvitaan vain soundingdata ***
@@ -321,7 +321,7 @@ float NFmiSoundingIndexCalculator::CalcOpt1(NFmiSoundingDataOpt1 &theSoundingDat
 		value = theSoundingDataOpt1.CalcTOTLIndex();
 		break;
 
-	// **** 2. indeksit joissa tarvitaan myˆs pintakerros lasku tyyppi soundingdatan lis‰ksi ja mahd. korkeus parametri ***
+	// **** 2. indeksit joissa tarvitaan my√∂s pintakerros lasku tyyppi soundingdatan lis√§ksi ja mahd. korkeus parametri ***
 	// **** surface ****
 	case kSoundingParLCLSur:
 	case kSoundingParLCLSurBas:
@@ -388,7 +388,7 @@ float NFmiSoundingIndexCalculator::CalcOpt1(NFmiSoundingDataOpt1 &theSoundingDat
 		value = theSoundingDataOpt1.CalcLCLHeightIndex(kLCLCalcMostUnstable);
 		break;
 
-	// **** 3. indeksit jotka lasketaan jonkun muun indeksin yhteydess‰, tarvitaan myˆs mahdollisesti pintakerros lasku tyyppi ja soundingdata ***
+	// **** 3. indeksit jotka lasketaan jonkun muun indeksin yhteydess√§, tarvitaan my√∂s mahdollisesti pintakerros lasku tyyppi ja soundingdata ***
 	case kSoundingParLFCSur:
 	case kSoundingParLFCSurBas:
 		value = theSoundingDataOpt1.CalcLFCIndex(kLCLCalcSurface, xxxxValue);
@@ -462,7 +462,7 @@ float NFmiSoundingIndexCalculator::CalcOpt1(NFmiSoundingDataOpt1 &theSoundingDat
 float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSoundingParameters theParam)
 {
 	double value = kFloatMissing;
-	double xxxxValue = kFloatMissing; // t‰m‰ on ns. hukka parametri, koska jotkut parametrit syntyv‰t sivutuotteena ja t‰h‰n sijoitetaan aina se ei haluttu parametri
+	double xxxxValue = kFloatMissing; // t√§m√§ on ns. hukka parametri, koska jotkut parametrit syntyv√§t sivutuotteena ja t√§h√§n sijoitetaan aina se ei haluttu parametri
 	switch(theParam)
 	{
 	// **** 1. yksinkertaiset indeksit, tarvitaan vain soundingdata ***
@@ -485,7 +485,7 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 		value = theSoundingData.CalcTOTLIndex();
 		break;
 
-	// **** 2. indeksit joissa tarvitaan myˆs pintakerros lasku tyyppi soundingdatan lis‰ksi ja mahd. korkeus parametri ***
+	// **** 2. indeksit joissa tarvitaan my√∂s pintakerros lasku tyyppi soundingdatan lis√§ksi ja mahd. korkeus parametri ***
 	// **** surface ****
 	case kSoundingParLCLSur:
 	case kSoundingParLCLSurBas:
@@ -552,7 +552,7 @@ float NFmiSoundingIndexCalculator::Calc(NFmiSoundingData &theSoundingData, FmiSo
 		value = theSoundingData.CalcLCLHeightIndex(kLCLCalcMostUnstable);
 		break;
 
-	// **** 3. indeksit jotka lasketaan jonkun muun indeksin yhteydess‰, tarvitaan myˆs mahdollisesti pintakerros lasku tyyppi ja soundingdata ***
+	// **** 3. indeksit jotka lasketaan jonkun muun indeksin yhteydess√§, tarvitaan my√∂s mahdollisesti pintakerros lasku tyyppi ja soundingdata ***
 	case kSoundingParLFCSur:
 	case kSoundingParLFCSurBas:
 		value = theSoundingData.CalcLFCIndex(kLCLCalcSurface, xxxxValue);
@@ -682,7 +682,7 @@ static const NFmiParamDescriptor& GetSoundingIndexParams(void)
 		parBag.Add(NFmiDataIdent(NFmiParam(kSoundingParCAPE_TT_MostUn, "CAPE -10-40 (mu)", kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly)));
 		parBag.Add(NFmiDataIdent(NFmiParam(kSoundingParCINMostUn, "CIN (mu)", kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly)));
 
-/* xxxx j‰‰ kommenttiin
+/* xxxx j√§√§ kommenttiin
 		parBag.Add(NFmiDataIdent(NFmiParam(kSoundingParLCLSurBas, "LCL (obs-bas)", kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly)));
 		parBag.Add(NFmiDataIdent(NFmiParam(kSoundingParLFCSurBas, "LFC (obs-bas)", kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly)));
 		parBag.Add(NFmiDataIdent(NFmiParam(kSoundingParELSurBas, "EL (obs-bas)", kFloatMissing, kFloatMissing, kFloatMissing, kFloatMissing, "%.1f", kLinearly)));
@@ -722,15 +722,15 @@ static NFmiQueryInfo MakeSoundingIndexInfo(NFmiQueryData &theSourceData, const s
 		prodName += " (sounding index)";
 		usedProducer.SetName(prodName);
 	}
-	params.SetProducer(usedProducer); // tuottaja pit‰‰ asettaa oikeaksi
+	params.SetProducer(usedProducer); // tuottaja pit√§√§ asettaa oikeaksi
 
-	NFmiQueryInfo info(params, fInfo.TimeDescriptor(), fInfo.HPlaceDescriptor()); // default vplaceDesc riitt‰‰ kun dataa lasketaan vain yhteen tasoon
+	NFmiQueryInfo info(params, fInfo.TimeDescriptor(), fInfo.HPlaceDescriptor()); // default vplaceDesc riitt√§√§ kun dataa lasketaan vain yhteen tasoon
 	return info;
 }
 
 boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingIndexData(const std::string &theSourceFileFilter, const std::string &theProducerName, bool fDoCerrReporting, NFmiStopFunctor *theStopFunctor, bool fUseOnlyOneThread, int theMaxThreadCount)
 {
-	// 1. lue uusin pohjadata k‰yttˆˆn
+	// 1. lue uusin pohjadata k√§ytt√∂√∂n
 	boost::shared_ptr<NFmiQueryData> sourceData(NFmiQueryDataUtil::ReadNewestData(theSourceFileFilter));
 	if(sourceData == 0)
 		throw std::runtime_error("Error in CreateNewSoundingIndexData, cannot read source data.");
@@ -753,11 +753,11 @@ boost::shared_ptr<NFmiQueryData> NFmiSoundingIndexCalculator::CreateNewSoundingI
 	boost::shared_ptr<NFmiQueryData> data(NFmiQueryDataUtil::CreateEmptyData(soundingIndexInfo));
 	if(data == 0)
 		throw std::runtime_error("Error in CreateNewSoundingIndexData, could not create result data.");
-	// 4. t‰yt‰ qdata
+	// 4. t√§yt√§ qdata
 	NFmiSoundingIndexCalculator::CalculateWholeSoundingData(*sourceData.get(), *data.get(), true, fDoCerrReporting, theStopFunctor, fUseOnlyOneThread, theMaxThreadCount);
 
     if(theStopFunctor && theStopFunctor->Stop())
-        return boost::shared_ptr<NFmiQueryData>(); // Jos Esim. SmartMetia ollaan sulkemassa ja laskut on lopetettu kesken, ei haluta tallettaa kesken j‰‰neit‰ laskuja tiedostoon, eli palautetaan t‰ss‰ tyhj‰ smart-pointer
+        return boost::shared_ptr<NFmiQueryData>(); // Jos Esim. SmartMetia ollaan sulkemassa ja laskut on lopetettu kesken, ei haluta tallettaa kesken j√§√§neit√§ laskuja tiedostoon, eli palautetaan t√§ss√§ tyhj√§ smart-pointer
     else
     	return data;
 }

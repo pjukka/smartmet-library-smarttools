@@ -47,12 +47,12 @@ public:
 	bool LocationSelectionRedo(void);		// kysyy onko redo mahdollinen
 	bool LocationSelectionUndoData(void);	// suorittaa todellisen undon
 	bool LocationSelectionRedoData(void);	// suorittaa todellisen redon
-	void LocationSelectionUndoLevel(int theNewUndoLevel); // undolevel asetetaan t‰ll‰
+	void LocationSelectionUndoLevel(int theNewUndoLevel); // undolevel asetetaan t√§ll√§
 private:
 	NFmiModifiableQDatasBookKeeping& operator=(const NFmiModifiableQDatasBookKeeping &theOther); // ei toteuteta sijoitus operaatiota!!
 
 	NFmiUndoableMultiLevelMask* itsAreaMask;
 	NFmiUndoRedoQData *itsUndoRedoQData;
-	bool *fLoadedFromFile; // kertoo onko data ladattu tiedostosta vai tyˆlistan mukaisesti
+	bool *fLoadedFromFile; // kertoo onko data ladattu tiedostosta vai ty√∂listan mukaisesti
    	bool *fDirty; // onko dataa editoitu
 };

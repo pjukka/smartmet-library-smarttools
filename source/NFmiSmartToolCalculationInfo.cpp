@@ -5,7 +5,7 @@
 //  Creation Date  : 8.11. 2010 
 //**********************************************************
 #ifdef _MSC_VER
-#pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta
+#pragma warning(disable : 4786) // poistaa n kpl VC++ k√§√§nt√§j√§n varoitusta
 #endif
 
 #include "NFmiSmartToolCalculationInfo.h"
@@ -33,8 +33,8 @@ void NFmiSmartToolCalculationInfo::AddCalculationInfo(boost::shared_ptr<NFmiArea
 
 /*! tarkistaa onko lause muotoa:
  * par = MISS
- * vain t‰ll‰inen lauseke sallii puuttuvan arvon sijoituksen dataan skripteill‰.
- * Pit‰‰ tehd‰ speciaali asetus systeemi, sill‰ muuten tulee ongelmia sijotusten kanssa,
+ * vain t√§ll√§inen lauseke sallii puuttuvan arvon sijoituksen dataan skripteill√§.
+ * Pit√§√§ tehd√§ speciaali asetus systeemi, sill√§ muuten tulee ongelmia sijotusten kanssa,
  * koska muuten puuttuvia arvoja tulee sijoitetuksi aina kun jotain dataa puuttuu, 
  * tai se ei kata koko aluetta tai aika-skaalaa.
  */

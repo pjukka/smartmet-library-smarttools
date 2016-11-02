@@ -9,7 +9,7 @@
 // *****    NFmiInfoAreaMaskOccurrance  *********************
 // **********************************************************
 
-std::function<void(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &, boost::shared_ptr<NFmiDrawParam> &, const boost::shared_ptr<NFmiArea> &)> NFmiInfoAreaMaskOccurrance::itsMultiSourceDataGetter; // Alustetaan tyhj‰ksi ensin
+std::function<void(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &, boost::shared_ptr<NFmiDrawParam> &, const boost::shared_ptr<NFmiArea> &)> NFmiInfoAreaMaskOccurrance::itsMultiSourceDataGetter; // Alustetaan tyhj√§ksi ensin
 
 NFmiInfoAreaMaskOccurrance::~NFmiInfoAreaMaskOccurrance(void)
 {}
@@ -41,7 +41,7 @@ NFmiInfoAreaMaskOccurrance::NFmiInfoAreaMaskOccurrance(const NFmiInfoAreaMaskOcc
     , itsInfoVector()
     , itsCalculatedLocationIndexies(theOther.itsCalculatedLocationIndexies)
 {
-    // tehd‰‰n matala kopio info-vektorista
+    // tehd√§√§n matala kopio info-vektorista
     for(size_t i = 0; i < theOther.itsInfoVector.size(); i++)
         itsInfoVector.push_back(NFmiSmartInfo::CreateShallowCopyOfHighestInfo(theOther.itsInfoVector[i]));
 }
@@ -58,7 +58,7 @@ void NFmiInfoAreaMaskOccurrance::SetMultiSourceDataGetterCallback(const std::fun
 
 void NFmiInfoAreaMaskOccurrance::Initialize(void)
 {
-    // cachejen alustuksia tehd‰‰n vain asemadatoille. Hila datat hanskataan emoluokassa ja sit‰ en l‰hde t‰ss‰ viel‰ optinmoimaan.
+    // cachejen alustuksia tehd√§√§n vain asemadatoille. Hila datat hanskataan emoluokassa ja sit√§ en l√§hde t√§ss√§ viel√§ optinmoimaan.
     if(!fUseMultiSourceData)
         itsInfoVector.push_back(itsInfo);
     else
@@ -80,9 +80,9 @@ void NFmiInfoAreaMaskOccurrance::InitializeLocationIndexCaches()
 std::vector<unsigned long> NFmiInfoAreaMaskOccurrance::CalcLocationIndexCache(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
 {
     if(theInfo->IsGrid())
-        return std::vector<unsigned long>(); // Hiladatoista k‰yd‰‰n kaikki pisteet toistaiseksi (laskut tehd‰‰n emoluokassa ja sinne ei saa t‰t‰ optimointia)
+        return std::vector<unsigned long>(); // Hiladatoista k√§yd√§√§n kaikki pisteet toistaiseksi (laskut tehd√§√§n emoluokassa ja sinne ei saa t√§t√§ optimointia)
     else if(theInfo->HasLatlonInfoInData())
-        return std::vector<unsigned long>(); // Liikkuvat asemadatat k‰yd‰‰n l‰pi kokonaan
+        return std::vector<unsigned long>(); // Liikkuvat asemadatat k√§yd√§√§n l√§pi kokonaan
     else
     {
         std::vector<unsigned long> locationIndexCache;
@@ -92,39 +92,39 @@ std::vector<unsigned long> NFmiInfoAreaMaskOccurrance::CalcLocationIndexCache(bo
                 locationIndexCache.push_back(theInfo->LocationIndex());
         }
         if(locationIndexCache.empty())
-            locationIndexCache.push_back(gMissingIndex); // Jos ei lˆytynyt laskettavan alueen sis‰lt‰ yht‰‰n paikkaa, lis‰t‰‰n yksi puuttuva indeksi vektoriin, muuten data k‰yd‰‰n l‰pi kokonaisuudessaa.
+            locationIndexCache.push_back(gMissingIndex); // Jos ei l√∂ytynyt laskettavan alueen sis√§lt√§ yht√§√§n paikkaa, lis√§t√§√§n yksi puuttuva indeksi vektoriin, muuten data k√§yd√§√§n l√§pi kokonaisuudessaa.
         return locationIndexCache;
     }
 }
 
-// Nyt synop ja salama datat ovat t‰ll‰isi‰. T‰m‰ on yritys tehd‰ v‰h‰n optimointia muutenkin jo pirun raskaaseen koodiin.
-// HUOM! T‰m‰ on riippuvainen NFmiEditMapGeneralDataDoc::MakeDrawedInfoVectorForMapView -metodin erikoistapauksista.
+// Nyt synop ja salama datat ovat t√§ll√§isi√§. T√§m√§ on yritys tehd√§ v√§h√§n optimointia muutenkin jo pirun raskaaseen koodiin.
+// HUOM! T√§m√§ on riippuvainen NFmiEditMapGeneralDataDoc::MakeDrawedInfoVectorForMapView -metodin erikoistapauksista.
 bool NFmiInfoAreaMaskOccurrance::IsKnownMultiSourceData()
 {
     if(itsInfo)
     {
         if(itsInfo->DataType() == NFmiInfoData::kFlashData)
             return true;
-        // HUOM! kaikkien synop datojen k‰yttˆ on aivan liian hidasta, k‰ytet‰‰n vain prim‰‰ri synop dataa laskuissa.
+        // HUOM! kaikkien synop datojen k√§ytt√∂ on aivan liian hidasta, k√§ytet√§√§n vain prim√§√§ri synop dataa laskuissa.
         if(itsInfo->Producer()->GetIdent() == kFmiSYNOP)
             return true;
     }
     return false;
 }
 
-// t‰t‰ kaytetaan smarttool-modifierin yhteydess‰
+// t√§t√§ kaytetaan smarttool-modifierin yhteydess√§
 double NFmiInfoAreaMaskOccurrance::Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways)
 {
-    // N‰m‰ occurance tetit tehd‰‰n erilailla riippuen onko kyse hila vai asema datasta
+    // N√§m√§ occurance tetit tehd√§√§n erilailla riippuen onko kyse hila vai asema datasta
     if(IsGridData())
     {
         NFmiInfoAreaMaskProbFunc::Value(theCalculationParams, fUseTimeInterpolationAlways);
-        return itsConditionFullfilledGridPointCount; // T‰h‰n on laskettu hiladatan tapauksessa emoluokan Value -metodissa halutun ehdon t‰yttymiset (tai puuttuva arvo)
+        return itsConditionFullfilledGridPointCount; // T√§h√§n on laskettu hiladatan tapauksessa emoluokan Value -metodissa halutun ehdon t√§yttymiset (tai puuttuva arvo)
     }
     else
     {
-        // Asemadatalle tehd‰‰n omat laskut. T‰t‰ ei ole toteutettu emoluokan laskuissa ollenkaan, koska en oikein n‰hnyt hyˆdylliseksi/oikeelliseksi laskea asemadatalle todenn‰kˆisyyksi‰.
-        // Mutta esiintymislukum‰‰r‰ on ihan ok laskea (mm. salamadatasta salamoiden esiintymiset jne.)
+        // Asemadatalle tehd√§√§n omat laskut. T√§t√§ ei ole toteutettu emoluokan laskuissa ollenkaan, koska en oikein n√§hnyt hy√∂dylliseksi/oikeelliseksi laskea asemadatalle todenn√§k√∂isyyksi√§.
+        // Mutta esiintymislukum√§√§r√§ on ihan ok laskea (mm. salamadatasta salamoiden esiintymiset jne.)
 
         InitializeFromArguments();
         NFmiLocation location(theCalculationParams.itsLatlon);
@@ -147,7 +147,7 @@ double NFmiInfoAreaMaskOccurrance::Value(const NFmiCalculationParams &theCalcula
 void NFmiInfoAreaMaskOccurrance::DoCalculations(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiCalculationParams &theCalculationParams, const NFmiLocation &theLocation, const std::vector<unsigned long> &theLocationIndexCache, int &theOccurranceCountInOut)
 {
     if(theLocationIndexCache.size() == 1 && theLocationIndexCache[0] == gMissingIndex)
-        return; // ei ole mit‰‰ laskettavaa t‰lle datalle
+        return; // ei ole mit√§√§ laskettavaa t√§lle datalle
 
     bool stationLocationsStoredInData = theInfo->HasLatlonInfoInData(); // Eri multi source datoille voi olla erilaiset lokaatio jutut (tosessa synop datassa vakio maaasema, toisessa liikkuva laiva)
     // Lasketaan aikaloopitus rajat
@@ -161,7 +161,7 @@ void NFmiInfoAreaMaskOccurrance::DoCalculations(boost::shared_ptr<NFmiFastQueryI
 
     for(unsigned long timeIndex = startTimeIndex; timeIndex <= endTimeIndex; timeIndex++)
     {
-        theInfo->TimeIndex(timeIndex); // K‰yd‰‰n l‰pi aikajakso datan originaali aikaresoluutiossa
+        theInfo->TimeIndex(timeIndex); // K√§yd√§√§n l√§pi aikajakso datan originaali aikaresoluutiossa
 
         if(useCachedIndexies)
         {
@@ -173,23 +173,23 @@ void NFmiInfoAreaMaskOccurrance::DoCalculations(boost::shared_ptr<NFmiFastQueryI
         }
         else
         {
-            for(theInfo->ResetLocation(); theInfo->NextLocation(); ) // K‰yd‰‰n l‰pi kaikki asemat (miten k‰yd‰‰n l‰pi eri synop datat????)
+            for(theInfo->ResetLocation(); theInfo->NextLocation(); ) // K√§yd√§√§n l√§pi kaikki asemat (miten k√§yd√§√§n l√§pi eri synop datat????)
             {
                 DoCalculateCurrentLocation(theInfo, theLocation, stationLocationsStoredInData, theOccurranceCountInOut);
             }
         }
         if(startTimeIndex == gMissingIndex || endTimeIndex == gMissingIndex || startTimeIndex > endTimeIndex)
-            break; // time-looppi voi menn‰ gMissingIndex => gMissingIndex, jolloin ++-operaatio veisi luvun takaisin 0:aan, siksi t‰m‰ ehto ja loopin breikki
+            break; // time-looppi voi menn√§ gMissingIndex => gMissingIndex, jolloin ++-operaatio veisi luvun takaisin 0:aan, siksi t√§m√§ ehto ja loopin breikki
     }
     theInfo->TimeIndex(origTimeIndex);
 }
 
 void NFmiInfoAreaMaskOccurrance::DoCalculateCurrentLocation(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiLocation &theLocation, bool theIsStationLocationsStoredInData, int &theOccurranceCountInOut)
 {
-    // Tarkastetaan jokainen piste erikseen, onko se halutun s‰teisen ympyr‰n sis‰ll‰
+    // Tarkastetaan jokainen piste erikseen, onko se halutun s√§teisen ympyr√§n sis√§ll√§
     double distanceInKM = theLocation.Distance(theIsStationLocationsStoredInData? theInfo->GetLatlonFromData() : theInfo->LatLon()) * 0.001;
     if(distanceInKM > itsSearchRangeInKM)
-        return ; // kyseinen piste oli ympyr‰n ulkopuolella
+        return ; // kyseinen piste oli ympyr√§n ulkopuolella
 
     float value = theInfo->FloatValue();
     if(value != kFloatMissing)

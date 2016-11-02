@@ -26,8 +26,8 @@ void NFmiModifiableQDatasBookKeeping::CopyClonedDatas(const NFmiModifiableQDatas
 {
 	if(this != &theOther)
 	{
-		// HUOM! Tässä kopioidaan dataa vain this:issa oleviin ei 0-pointtereihin.
-		// Eli ei luoda uusia olioita tässä, kuten ehkä normaalisti sijoitus operaatiossa tehtäisiin.
+		// HUOM! TÃ¤ssÃ¤ kopioidaan dataa vain this:issa oleviin ei 0-pointtereihin.
+		// Eli ei luoda uusia olioita tÃ¤ssÃ¤, kuten ehkÃ¤ normaalisti sijoitus operaatiossa tehtÃ¤isiin.
 		if(itsUndoRedoQData)
 			*itsUndoRedoQData = *(theOther.itsUndoRedoQData);
 		if(itsAreaMask)
@@ -123,7 +123,7 @@ bool NFmiModifiableQDatasBookKeeping::UndoData(const NFmiHarmonizerBookKeepingDa
 	{
 		if(itsUndoRedoQData->UndoData(theHarmonizerBookKeepingData, theRawData))
 		{
-			*fDirty = true; // 18.1.2002/Marko lisäsin datan likauksen.
+			*fDirty = true; // 18.1.2002/Marko lisÃ¤sin datan likauksen.
 			return true;
 		}
 	}
@@ -136,7 +136,7 @@ bool NFmiModifiableQDatasBookKeeping::RedoData(NFmiRawData &theRawData)
 	{
 		if(itsUndoRedoQData->RedoData(theRawData))
 		{
-			*fDirty = true; // 18.1.2002/Marko lisäsin datan likauksen.
+			*fDirty = true; // 18.1.2002/Marko lisÃ¤sin datan likauksen.
 			return true;
 		}
 	}

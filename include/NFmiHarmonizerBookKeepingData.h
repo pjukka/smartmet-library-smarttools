@@ -5,8 +5,8 @@
 #include <NFmiParamBag.h>
 #include <set>
 
-// smartinfon pit‰‰ pit‰‰ kirjaa harmonisaattoriin liittyvist‰ asioista
-// mitk‰ parametrit ja ajat ovat olleet mill‰kin hetkell‰ muokatttuina
+// smartinfon pit√§√§ pit√§√§ kirjaa harmonisaattoriin liittyvist√§ asioista
+// mitk√§ parametrit ja ajat ovat olleet mill√§kin hetkell√§ muokatttuina
 class NFmiHarmonizerBookKeepingData
 {
 public:
@@ -24,11 +24,11 @@ public:
 	std::set<NFmiMetTime>& HarmonizerTimesSet(void) {return itsHarmonizerTimesSet;}
 
 private:
-	std::set<NFmiMetTime> itsHarmonizerTimesSet; // t‰nne laitetaan kaikki muokatut ajat jotta voidaan
-												// harmonisoinnin yhteydess‰ tehd‰ timedesc, jonka avulla ajetaan
+	std::set<NFmiMetTime> itsHarmonizerTimesSet; // t√§nne laitetaan kaikki muokatut ajat jotta voidaan
+												// harmonisoinnin yhteydess√§ tehd√§ timedesc, jonka avulla ajetaan
 												// harmonisaattori skripti
-	bool fHarmonizeAllTimes; // apuna edellisen set:in lis‰ksi, ett‰ jos k‰yd‰‰n l‰pi koko data
-	NFmiParamBag itsHarmonizerParams; // t‰h‰n merkit‰‰n parametrit, joita on muokattu eri tyˆkaluilla.
+	bool fHarmonizeAllTimes; // apuna edellisen set:in lis√§ksi, ett√§ jos k√§yd√§√§n l√§pi koko data
+	NFmiParamBag itsHarmonizerParams; // t√§h√§n merkit√§√§n parametrit, joita on muokattu eri ty√∂kaluilla.
 };
 
 #endif // NFMIHARMONIZERBOOKKEEPINGDATA_H

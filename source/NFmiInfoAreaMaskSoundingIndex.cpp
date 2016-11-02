@@ -29,7 +29,7 @@ NFmiAreaMask* NFmiInfoAreaMaskSoundingIndex::Clone(void) const
 	return new NFmiInfoAreaMaskSoundingIndex(*this);
 }
 
-// t‰t‰ kaytetaan smarttool-modifierin yhteydess‰
+// t√§t√§ kaytetaan smarttool-modifierin yhteydess√§
 double NFmiInfoAreaMaskSoundingIndex::Value(const NFmiPoint & theLatlon, const NFmiMetTime & theTime, int /* theTimeIndex */ , bool /* fUseTimeInterpolationAlways */ )
 {
 	// RUMAA CAST-koodia!!!!!

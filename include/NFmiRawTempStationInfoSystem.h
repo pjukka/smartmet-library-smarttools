@@ -1,14 +1,14 @@
 // NFmiRawTempStationInfoSystem.h
 //
 // Luokka jossa on lista luotausasemia eri puolilta maailmaa.
-// T‰t‰ k‰ytet‰‰n silloin kun k‰ytet‰‰n MetEditorin ominaisuutta,
+// T√§t√§ k√§ytet√§√§n silloin kun k√§ytet√§√§n MetEditorin ominaisuutta,
 // jolloin katsotaan raaka TEMP sanomista tulkattuja luotaus sanomia.
-// N‰iss‰ sanomissa on vain aseman id. Tuon id:n avulla nimi ja 
+// N√§iss√§ sanomissa on vain aseman id. Tuon id:n avulla nimi ja 
 // sijainti saadaan selville, jos se on asema lista tiedostossa.
 // 
 // Asemalista tiedoston formaatti:
 // Kommentit sallittuja.
-// Aseman tiedot esitet‰‰n aina yhdell‰ rivill‰, rivej‰ voi olla kuinka monta tahansa.
+// Aseman tiedot esitet√§√§n aina yhdell√§ rivill√§, rivej√§ voi olla kuinka monta tahansa.
 // Asema_is lon lat nimi(rivin loppuun asti)
 
 #ifndef NFMIRAWTEMPSTATIONINFOSYSTEM_H
@@ -30,7 +30,7 @@ public:
 	const std::string& InitLogMessage(void) const {return itsInitLogMessage;}
 private:
 
-	std::string itsInitLogMessage; // onnistuneen initialisoinnin viesti, miss‰ voi olla varoituksia lokiin.
+	std::string itsInitLogMessage; // onnistuneen initialisoinnin viesti, miss√§ voi olla varoituksia lokiin.
 	NFmiHPlaceDescriptor itsLocations;
 };
 
@@ -85,7 +85,7 @@ private:
 //	double GetLatOrLonFromString(const std::string &theLatOrLonStr, const std::string &theLineStr, const std::string &theInitFileName, char posMark, char negMark);
 	bool GetAviationStationFromString(const std::string &theStationStr, const std::string &theInitFileName, AviationStation &theStationOut);
 
-	std::string itsInitLogMessage; // onnistuneen initialisoinnin viesti, miss‰ voi olla varoituksia lokiin.
+	std::string itsInitLogMessage; // onnistuneen initialisoinnin viesti, miss√§ voi olla varoituksia lokiin.
 	NFmiHPlaceDescriptor itsLocations;
 	bool fVerboseMode;
 };
@@ -114,19 +114,19 @@ public:
 	const std::string& InitLogMessage(void) const {return itsInitLogMessage;}
 private:
 
-	std::string itsInitLogMessage; // onnistuneen initialisoinnin viesti, miss‰ voi olla varoituksia lokiin.
+	std::string itsInitLogMessage; // onnistuneen initialisoinnin viesti, miss√§ voi olla varoituksia lokiin.
 	checkedVector<NFmiSilamStationList::Station> itsLocations;
 };
 
-// T‰h‰n puretaan NOAA:n taulukost asema rivi, esim:
+// T√§h√§n puretaan NOAA:n taulukost asema rivi, esim:
 // 02;974;EFHK;Helsinki-Vantaa;;Finland;6;60-19N;024-58E;60-19N;024-58E;51;56;P
 class NFmiWmoStation
 {
 public:
 
 	NFmiWmoStation(void)
-	:itsWmoId(0) // jostain syyst‰ "Buckland, Buckland Airport" asemalla on 0 id, joten 0:aa ei voi pit‰‰ puuttuvan aseman arvona
-	,itsName() // t‰m‰ on pakollinen kentt‰, jos t‰m‰ on tyhj‰, asemaa ei ole m‰‰ritetty
+	:itsWmoId(0) // jostain syyst√§ "Buckland, Buckland Airport" asemalla on 0 id, joten 0:aa ei voi pit√§√§ puuttuvan aseman arvona
+	,itsName() // t√§m√§ on pakollinen kentt√§, jos t√§m√§ on tyhj√§, asemaa ei ole m√§√§ritetty
 	,itsIcaoStr()
 	,itsState()
 	,itsCountry()
@@ -159,7 +159,7 @@ public:
 private:
 
   std::map<long,NFmiWmoStation> itsStations;	// Used to be a vector, but this should be fast enough
-  std::string itsInitLogMessage; // onnistuneen tai ep‰onnistuneen initialisoinnin viesti, miss‰ voi olla varoituksia lokiin.
+  std::string itsInitLogMessage; // onnistuneen tai ep√§onnistuneen initialisoinnin viesti, miss√§ voi olla varoituksia lokiin.
 };
 
 #endif // NFMIRAWTEMPSTATIONINFOSYSTEM_H

@@ -1,11 +1,11 @@
 // NFmiHelpDataInfo.h
 //
 // NFmiHelpDataInfo-luokka hoitaa yhden Meteorologin editorin apu-datan
-// tiedot. Se sis‰lt‰‰ tiedon poluista, tiedosto filttereist‰ ja mik‰
+// tiedot. Se sis√§lt√§√§ tiedon poluista, tiedosto filttereist√§ ja mik√§
 // on viimeksi ladatun datan tiedoston aikaleima jne.
 //
-// NFmiHelpDataInfoSystem-luokka taas pit‰‰ sis‰ll‰‰n kaikki Metkun editorin 
-// k‰ytt‰m‰t apudatat.
+// NFmiHelpDataInfoSystem-luokka taas pit√§√§ sis√§ll√§√§n kaikki Metkun editorin 
+// k√§ytt√§m√§t apudatat.
 
 #ifndef NFMIHELPDATAINFO_H
 #define NFMIHELPDATAINFO_H
@@ -32,7 +32,7 @@ public:
 	{Clear();}
 
 	void InitFromSettings(const std::string &theBaseKey, const std::string &theName, const NFmiHelpDataInfoSystem &theHelpDataSystem);
-	// void StoreToSettings(void);  // HUOM! ei toteuteta ainakaan viel‰ talletusta
+	// void StoreToSettings(void);  // HUOM! ei toteuteta ainakaan viel√§ talletusta
 
 	NFmiHelpDataInfo& operator=(const NFmiHelpDataInfo &theOther);
 	void Clear(void);
@@ -42,7 +42,7 @@ public:
 	void Name(const std::string &newValue) {itsName = newValue;}
 	const std::string& FileNameFilter(void) const {return itsFileNameFilter;}
 	void FileNameFilter(const std::string &newValue, bool forceFileNameFilter = false);
-	// t‰m‰ on viritys, ett‰ olisi funktio, jolla voidaan pyyt‰‰ k‰ytetty fileFilter, riippuen siit‰ onko cache k‰ytˆss‰ vai ei
+	// t√§m√§ on viritys, ett√§ olisi funktio, jolla voidaan pyyt√§√§ k√§ytetty fileFilter, riippuen siit√§ onko cache k√§yt√∂ss√§ vai ei
 	const std::string UsedFileNameFilter(const NFmiHelpDataInfoSystem &theHelpDataInfoSystem) const;
 	const std::string& LatestFileName(void) const {return itsLatestFileName;}
 	void LatestFileName(const std::string &newName) {itsLatestFileName = newName;}
@@ -90,44 +90,44 @@ public:
 	void PartialDataCacheFileNameFilter(const std::string &newValue) {itsPartialDataCacheFileNameFilter = newValue;}
 private:
 
-	std::string itsName; // t‰ll‰ nimell‰ erotetaan konffi-tiedostoissa eri datat
+	std::string itsName; // t√§ll√§ nimell√§ erotetaan konffi-tiedostoissa eri datat
 	std::string itsFileNameFilter; // tiedostonimi filtteri polun kera esim. d:\weto\wrk\data\in\data_1_*.sqd
-	std::string itsPartialDataCacheFileNameFilter; // cachen k‰yttˆ ja partial-datat ovat oma lukunsa ja niit‰ varten pit‰‰ tehd‰ filefiltteri
-	bool fForceFileFilterName; // jos t‰m‰ on erikoistilanteissa asetettu true:ksi, ei v‰litet‰ mahdillisista cachen k‰ytˆist‰, vaan UsedFilefilter-metodi palauttaa itsFileNameFilter:in arvon
-	std::string itsLatestFileName; // kun filtterill‰ on haettu tiedostot ja uusin on lˆytynyt, talletetaan se t‰h‰n
-	std::string itsLatestErroneousFileName; // Jos datatiedosto on jotenkin korruptoitunut, talletetaan viimeisimm‰n sellaisen nimi, jotta lokituksen yhteydess‰ ei tarvitse minuutin v‰lein raportoida saman tiedoston kanssa olevista ongelmista.
+	std::string itsPartialDataCacheFileNameFilter; // cachen k√§ytt√∂ ja partial-datat ovat oma lukunsa ja niit√§ varten pit√§√§ tehd√§ filefiltteri
+	bool fForceFileFilterName; // jos t√§m√§ on erikoistilanteissa asetettu true:ksi, ei v√§litet√§ mahdillisista cachen k√§yt√∂ist√§, vaan UsedFilefilter-metodi palauttaa itsFileNameFilter:in arvon
+	std::string itsLatestFileName; // kun filtterill√§ on haettu tiedostot ja uusin on l√∂ytynyt, talletetaan se t√§h√§n
+	std::string itsLatestErroneousFileName; // Jos datatiedosto on jotenkin korruptoitunut, talletetaan viimeisimm√§n sellaisen nimi, jotta lokituksen yhteydess√§ ei tarvitse minuutin v√§lein raportoida saman tiedoston kanssa olevista ongelmista.
 	NFmiInfoData::Type itsDataType; // esim. analyysi, havainto jne.
 	time_t itsLatestFileTimeStamp; // viimeksi luetus
-	int itsFakeProducerId; // joskus pit‰‰ muuttaa tuottaja id ennenkuin data otetaan k‰yttˆˆn esim. kepa data, jos t‰m‰ on 0, ei tehd‰ mit‰‰n
+	int itsFakeProducerId; // joskus pit√§√§ muuttaa tuottaja id ennenkuin data otetaan k√§ytt√∂√∂n esim. kepa data, jos t√§m√§ on 0, ei tehd√§ mit√§√§n
 
-	// Seuraavat koskevat vain image-tyyppisi‰ juttuja (muissa n‰it‰ ei lueta/talleteta tiedostoon)
-	std::string itsImageProjectionString; // jos data on image-tyyppist‰ (satel,radar, jne.), on tiedostossa
-									// stringi, joka sis‰lt‰‰ projektio tiedon jonka NFmiAreaFactory ymm‰rt‰‰
-	NFmiDataIdent itsImageDataIdent; // tieto image paramin id:st‰, nimest‰ (vain id ja nimi talletetaan tiedostoon)
-    boost::shared_ptr<NFmiArea> itsImageArea; // t‰h‰n luodaan ed. stringin avulla projektio, t‰m‰ ei ole tallessa tiedostossa
-	// Edelliset koskevat vain image-tyyppisi‰ juttuja
+	// Seuraavat koskevat vain image-tyyppisi√§ juttuja (muissa n√§it√§ ei lueta/talleteta tiedostoon)
+	std::string itsImageProjectionString; // jos data on image-tyyppist√§ (satel,radar, jne.), on tiedostossa
+									// stringi, joka sis√§lt√§√§ projektio tiedon jonka NFmiAreaFactory ymm√§rt√§√§
+	NFmiDataIdent itsImageDataIdent; // tieto image paramin id:st√§, nimest√§ (vain id ja nimi talletetaan tiedostoon)
+    boost::shared_ptr<NFmiArea> itsImageArea; // t√§h√§n luodaan ed. stringin avulla projektio, t√§m√§ ei ole tallessa tiedostossa
+	// Edelliset koskevat vain image-tyyppisi√§ juttuja
 
-	bool fNotifyOnLoad; // Jos datan latauksen yhteydess‰ halutaan tehd‰ ilmoitus, t‰m‰ on true. Oletus arvo on false
-	std::string itsNotificationLabel; // Jos notifikaatioon halutaan tietty sanoma, se voidaan antaa t‰h‰n. Defaulttina annetaan tiedoston nimi
-	std::string itsCustomMenuFolder; // Jos data halutaan laittaa haluttuun hakemistoon param-popupeissa, tehd‰‰ sellainen asetus helpdata 
-								// konffeihin. Defaulttina tyhj‰, jolloin data menee 'normaaliin' paikkaansa valikoissa.
-	int itsReportNewDataTimeStepInMinutes; // Default arvo on 0, jolloin t‰ll‰ ei ole vaikutusta. T‰m‰n avulla voidaan sanoa
-											// ett‰ SmartMetin pit‰‰ tehd‰ raportointia 'puhekuplilla', kun tulee uutta dataa esim. uudelle tunnille.
-	std::string itsReportNewDataLabel; // Jos halutaan tietty teksti viestiin, se lis‰t‰‰n t‰h‰n.
-	std::string itsCombineDataPathAndFileName; // jos t‰m‰ on m‰‰ritelty, tehd‰‰n fileNameFilterist‰ (hakemistosta) lˆytyvist‰ datoista yhdistelm‰ 
-											   // data ja se talletetaan t‰h‰n hakemistoon annetulla nimell‰ ja aikaleimalla (nimess‰ t‰hden tilalle laitetaan aikaleima)
-	int itsCombineDataMaxTimeSteps; // jos ei haluaa rajoittaa kuinka iso yhdistelm‰ datasta tehd‰‰n, t‰m‰n voi m‰‰ritell‰
-	bool fMakeSoundingIndexData; // jos t‰m‰ on true, SmartMet tekee datasta oman sounding-index datan
+	bool fNotifyOnLoad; // Jos datan latauksen yhteydess√§ halutaan tehd√§ ilmoitus, t√§m√§ on true. Oletus arvo on false
+	std::string itsNotificationLabel; // Jos notifikaatioon halutaan tietty sanoma, se voidaan antaa t√§h√§n. Defaulttina annetaan tiedoston nimi
+	std::string itsCustomMenuFolder; // Jos data halutaan laittaa haluttuun hakemistoon param-popupeissa, tehd√§√§ sellainen asetus helpdata 
+								// konffeihin. Defaulttina tyhj√§, jolloin data menee 'normaaliin' paikkaansa valikoissa.
+	int itsReportNewDataTimeStepInMinutes; // Default arvo on 0, jolloin t√§ll√§ ei ole vaikutusta. T√§m√§n avulla voidaan sanoa
+											// ett√§ SmartMetin pit√§√§ tehd√§ raportointia 'puhekuplilla', kun tulee uutta dataa esim. uudelle tunnille.
+	std::string itsReportNewDataLabel; // Jos halutaan tietty teksti viestiin, se lis√§t√§√§n t√§h√§n.
+	std::string itsCombineDataPathAndFileName; // jos t√§m√§ on m√§√§ritelty, tehd√§√§n fileNameFilterist√§ (hakemistosta) l√∂ytyvist√§ datoista yhdistelm√§ 
+											   // data ja se talletetaan t√§h√§n hakemistoon annetulla nimell√§ ja aikaleimalla (nimess√§ t√§hden tilalle laitetaan aikaleima)
+	int itsCombineDataMaxTimeSteps; // jos ei haluaa rajoittaa kuinka iso yhdistelm√§ datasta tehd√§√§n, t√§m√§n voi m√§√§ritell√§
+	bool fMakeSoundingIndexData; // jos t√§m√§ on true, SmartMet tekee datasta oman sounding-index datan
 	std::string itsBaseNameSpace;
-	int itsAdditionalArchiveFileCount;	// defaultti on 0, joitakin datoja (esim. kepa-datoja, joita tuotetaan n. 15-20 per p‰iv‰) 
-										// halutaan s‰ilytt‰‰ enemm‰n kuin muita NFmiInfoOrganizer:issa. T‰ll‰ s‰‰dˆll‰ saadaan pidetty‰ ylim‰‰r‰iset datat.
-	bool fEnable; // T‰m‰ on pakollinen s‰‰tˆ optio siit‰, ett‰ onko data k‰ytˆss‰. T‰m‰ s‰‰t‰‰ ladataanko dataa cacheen, SmartMEtiin, tehd‰‰nkˆ soundinIndex-dataa, 
-				  // yhdistelm‰ datoja. Lis‰ksi tuleeko data popup-valikoihin, tai mihink‰‰n muihin datavalikoihin.
-	bool fNonFixedTimeGab;  // T‰m‰ on valinnainen asetus. Onko datan malliajo v‰li m‰‰rittelem‰tˆn. Esim. silam-datat ovat ep‰m‰‰r‰isesti ajettuja, 
-							// myˆs virallinen editoitu data on m‰‰rittelem‰tˆn, mutta se hoidetaan erikois tapauksena.
-	float itsModelRunTimeGapInHours; // Joskus pit‰‰ laittaa tietyille datoille omat malliajo v‰lit, jos ne poikkeavat totutuista
-									// Esim. EC:ll‰ on normaalisti 12 h, mutta nyt 3vrk EC datat tulevat 6 tunnin v‰lein, joten 3 vrk datoille pit‰‰ asettaa t‰m‰ 6:ksi.
-									// Default arvo on 0, jolloin t‰st‰ ei v‰litet‰.
+	int itsAdditionalArchiveFileCount;	// defaultti on 0, joitakin datoja (esim. kepa-datoja, joita tuotetaan n. 15-20 per p√§iv√§) 
+										// halutaan s√§ilytt√§√§ enemm√§n kuin muita NFmiInfoOrganizer:issa. T√§ll√§ s√§√§d√∂ll√§ saadaan pidetty√§ ylim√§√§r√§iset datat.
+	bool fEnable; // T√§m√§ on pakollinen s√§√§t√∂ optio siit√§, ett√§ onko data k√§yt√∂ss√§. T√§m√§ s√§√§t√§√§ ladataanko dataa cacheen, SmartMEtiin, tehd√§√§nk√∂ soundinIndex-dataa, 
+				  // yhdistelm√§ datoja. Lis√§ksi tuleeko data popup-valikoihin, tai mihink√§√§n muihin datavalikoihin.
+	bool fNonFixedTimeGab;  // T√§m√§ on valinnainen asetus. Onko datan malliajo v√§li m√§√§rittelem√§t√∂n. Esim. silam-datat ovat ep√§m√§√§r√§isesti ajettuja, 
+							// my√∂s virallinen editoitu data on m√§√§rittelem√§t√∂n, mutta se hoidetaan erikois tapauksena.
+	float itsModelRunTimeGapInHours; // Joskus pit√§√§ laittaa tietyille datoille omat malliajo v√§lit, jos ne poikkeavat totutuista
+									// Esim. EC:ll√§ on normaalisti 12 h, mutta nyt 3vrk EC datat tulevat 6 tunnin v√§lein, joten 3 vrk datoille pit√§√§ asettaa t√§m√§ 6:ksi.
+									// Default arvo on 0, jolloin t√§st√§ ei v√§litet√§.
 };
 
 class NFmiHelpDataInfoSystem
@@ -195,32 +195,32 @@ public:
 private:
 	void InitDataType(const std::string &theBaseKey, checkedVector<NFmiHelpDataInfo> &theHelpDataInfos, bool fStaticData);
 
-	checkedVector<NFmiHelpDataInfo> itsDynamicHelpDataInfos; // t‰h‰n tulee jatkuvasti p‰ivitett‰v‰t datat kuten havainnot, tutka ja analyysi datat
-	checkedVector<NFmiHelpDataInfo> itsStaticHelpDataInfos; // t‰h‰n tulee kerran ladattavat jutut kuten maa/meri maskit ja klimatologiset jutut
+	checkedVector<NFmiHelpDataInfo> itsDynamicHelpDataInfos; // t√§h√§n tulee jatkuvasti p√§ivitett√§v√§t datat kuten havainnot, tutka ja analyysi datat
+	checkedVector<NFmiHelpDataInfo> itsStaticHelpDataInfos; // t√§h√§n tulee kerran ladattavat jutut kuten maa/meri maskit ja klimatologiset jutut
 
-	// SmartMet voidaan laittaa k‰ytt‰m‰‰n queryData cachetusta, jolloin verkkopalvelimelta
-	// luetaan data m‰‰r‰ttyyn cache-hakemistoon omalle kovalevylle. N‰in voidaan
-	// v‰ltt‰‰ mahdolliset verkko-ongelmat memory-mapattujen dataojen kanssa.
-	std::string itsCacheDirectory; // qdatat kopioidaan haluttaessa t‰h‰n hakemistoon
-	std::string itsCacheTmpDirectory; // qdatat kopioidaan ensin t‰h‰n hakemistoon tmp-nimell‰ ja lopuksi renametaan 
-									  // oiekaan hakemistoon oikealla nimell‰
-									  // HUOM!! ett‰ tmp-file rename toimisi ns 'atomisesti', on hakemistojen oltava samalla levypartitiolla!!!
-	std::string itsCachePartialDataDirectory; // combineData-threadin k‰ytt‰m‰t datat kopioidaan t‰nne cacheen
-	std::string itsCacheTmpFileNameFix; // t‰m‰ name fix lis‰t‰‰n tmp tiedosto nimen alkuun ja loppuun
-	bool fUseQueryDataCache; // onko cachetus systeemi p‰‰ll‰ vai ei?
+	// SmartMet voidaan laittaa k√§ytt√§m√§√§n queryData cachetusta, jolloin verkkopalvelimelta
+	// luetaan data m√§√§r√§ttyyn cache-hakemistoon omalle kovalevylle. N√§in voidaan
+	// v√§ltt√§√§ mahdolliset verkko-ongelmat memory-mapattujen dataojen kanssa.
+	std::string itsCacheDirectory; // qdatat kopioidaan haluttaessa t√§h√§n hakemistoon
+	std::string itsCacheTmpDirectory; // qdatat kopioidaan ensin t√§h√§n hakemistoon tmp-nimell√§ ja lopuksi renametaan 
+									  // oiekaan hakemistoon oikealla nimell√§
+									  // HUOM!! ett√§ tmp-file rename toimisi ns 'atomisesti', on hakemistojen oltava samalla levypartitiolla!!!
+	std::string itsCachePartialDataDirectory; // combineData-threadin k√§ytt√§m√§t datat kopioidaan t√§nne cacheen
+	std::string itsCacheTmpFileNameFix; // t√§m√§ name fix lis√§t√§√§n tmp tiedosto nimen alkuun ja loppuun
+	bool fUseQueryDataCache; // onko cachetus systeemi p√§√§ll√§ vai ei?
 	bool fDoCleanCache; // siivotaanko cachea vai ei
-	float itsCacheFileKeepMaxDays; // kuinka vanhat tiedostot ainakin siivotaan pois (esim. 1.5 on 1.5 p‰iv‰‰ eli 36 tuntia) jos luku on <= 0 ei t‰t‰ k‰ytet‰
-	int itsCacheMaxFilesPerPattern; // kuinka monta tiedostoa maksimissaan pidet‰‰n kutakin tiedosto patternia kohden, jos luku <= 0, ei t‰t‰ k‰ytet‰
+	float itsCacheFileKeepMaxDays; // kuinka vanhat tiedostot ainakin siivotaan pois (esim. 1.5 on 1.5 p√§iv√§√§ eli 36 tuntia) jos luku on <= 0 ei t√§t√§ k√§ytet√§
+	int itsCacheMaxFilesPerPattern; // kuinka monta tiedostoa maksimissaan pidet√§√§n kutakin tiedosto patternia kohden, jos luku <= 0, ei t√§t√§ k√§ytet√§
 
 	// medium ja large koot jakavat cachetettavat qdatat kolmeen osaan:
 	// 1. pienet tiedostot 0 <= size < medium
 	// 2. keskikokoiset tiedostot medium <= size < large
-	// 3. isot tiedostot large <= size < ‰‰retˆn
-	// Jokaiselle kokoluokalle tehd‰‰n SmartMetissa oma datan kopiointi threadi, n‰in isot tiedostot 
-	// eiv‰t j‰‰ blokkaamaan pinempien tiedostojen kopiointia.
+	// 3. isot tiedostot large <= size < √§√§ret√∂n
+	// Jokaiselle kokoluokalle tehd√§√§n SmartMetissa oma datan kopiointi threadi, n√§in isot tiedostot 
+	// eiv√§t j√§√§ blokkaamaan pinempien tiedostojen kopiointia.
 	double itsCacheMediumFileSizeMB; 
 	double itsCacheLargeFileSizeMB;
-	double itsCacheMaximumFileSizeMB; // t‰t‰ isompia tiedostoja ei cache suostu siirt‰m‰‰n
+	double itsCacheMaximumFileSizeMB; // t√§t√§ isompia tiedostoja ei cache suostu siirt√§m√§√§n
 
 	std::string itsBaseNameSpace;
 };

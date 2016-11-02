@@ -3,9 +3,9 @@
  * \file NFmiMetEditorTypes.h
  * \brief NFmiInfoData namespace declarations \par
  *
- * T‰h‰n on ker‰tty m‰‰rityksi‰, mit‰ tarvitaan mm. erilaisten maskien
- * ja datojen m‰‰rityksiss‰. Olen ker‰nnyt ne t‰h‰n, koska Metkun editorin 
- * luokkakirjastojen siivous vaatii tietyn koodin siirt‰mist‰ newbase:en.
+ * T√§h√§n on ker√§tty m√§√§rityksi√§, mit√§ tarvitaan mm. erilaisten maskien
+ * ja datojen m√§√§rityksiss√§. Olen ker√§nnyt ne t√§h√§n, koska Metkun editorin 
+ * luokkakirjastojen siivous vaatii tietyn koodin siirt√§mist√§ newbase:en.
  */
 // ======================================================================
 
@@ -43,7 +43,7 @@ typedef enum
 
 enum FmiUsedSmartMetTool
 {
-    kFmiNoToolSelected = 0, // default tyhj‰ arvo
+    kFmiNoToolSelected = 0, // default tyhj√§ arvo
     kFmiDataModificationTool = 1, // muokkausdialogi
     kFmiBrush = 2, // pensseli
     kFmiTimeSerialModification = 3, // aikasarja editointi

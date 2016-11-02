@@ -5,7 +5,7 @@
  */
 // ======================================================================
 #ifdef _MSC_VER
-#pragma warning(disable : 4786) // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta (liian pitk‰ nimi >255 merkki‰ joka johtuu 'puretuista' STL-template nimist‰)
+#pragma warning(disable : 4786) // poistaa n kpl VC++ k√§√§nt√§j√§n varoitusta (liian pitk√§ nimi >255 merkki√§ joka johtuu 'puretuista' STL-template nimist√§)
 #endif
 
 #include "NFmiInfoOrganizer.h"
@@ -54,18 +54,18 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 	try // suoritetaan macro sitten
 	{
 		if(goThroughLevels == false)
-			smartToolModifier.ModifyData_ver2(theTimes, false, false, 0); // false = ei tehd‰ muokkauksia vain valituille pisteille vaan kaikille pisteille
+			smartToolModifier.ModifyData_ver2(theTimes, false, false, 0); // false = ei tehd√§ muokkauksia vain valituille pisteille vaan kaikille pisteille
 		else
 		{
 			for(editedInfo->ResetLevel(); editedInfo->NextLevel(); )
 			{
-				if(editedInfo->SizeLevels() > 1) // jos kyseess‰ on level-data, pit‰‰ l‰pik‰yt‰v‰ leveli ottaa talteen, ett‰ smartToolModifier osaa luoda siihen osoittavia fastInfoja.
+				if(editedInfo->SizeLevels() > 1) // jos kyseess√§ on level-data, pit√§√§ l√§pik√§yt√§v√§ leveli ottaa talteen, ett√§ smartToolModifier osaa luoda siihen osoittavia fastInfoja.
 				{
 					boost::shared_ptr<NFmiLevel> theLevel(new NFmiLevel(*editedInfo->Level()));
 					smartToolModifier.ModifiedLevel(theLevel);
 				}
 
-				smartToolModifier.ModifyData_ver2(theTimes, false, false, 0); // false = ei tehd‰ muokkauksia vain valituille pisteille vaan kaikille pisteille
+				smartToolModifier.ModifyData_ver2(theTimes, false, false, 0); // false = ei tehd√§ muokkauksia vain valituille pisteille vaan kaikille pisteille
 				// ::DoSmartToolModification(smartToolModifier, theTimes);
 			}
 		}
@@ -90,7 +90,7 @@ NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NF
 
 NFmiQueryData* NFmiSmartToolUtil::ModifyData(const std::string &theMacroText, NFmiQueryData* theModifiedData, NFmiTimeDescriptor *theTimes, bool createDrawParamFileIfNotExist, bool fMakeStaticIfOneTimeStepData)
 {
-	return ModifyData(theMacroText, theModifiedData, theTimes, 0, createDrawParamFileIfNotExist, false, fMakeStaticIfOneTimeStepData); // 0=tyhj‰ apudata filename-lista
+	return ModifyData(theMacroText, theModifiedData, theTimes, 0, createDrawParamFileIfNotExist, false, fMakeStaticIfOneTimeStepData); // 0=tyhj√§ apudata filename-lista
 }
 
 std::string NFmiSmartToolUtil::GetWorkingDirectory(void)
@@ -114,10 +114,10 @@ bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase, NFmiQueryDa
 	if(theDataBase)
 	{
 		theDataBase->WorkingDirectory(GetWorkingDirectory());
-		theDataBase->Init(std::string(""), createDrawParamFileIfNotExist, false, false); // t‰h‰n annetaan drawparametrien lataus polku, mutta niit‰ ei k‰ytet‰ t‰ss‰ tapauksessa
-																		// false tarkoittaa ett‰ ei tehd‰ kopiota editoidusta datasta, t‰ss‰ se on turhaa
+		theDataBase->Init(std::string(""), createDrawParamFileIfNotExist, false, false); // t√§h√§n annetaan drawparametrien lataus polku, mutta niit√§ ei k√§ytet√§ t√§ss√§ tapauksessa
+																		// false tarkoittaa ett√§ ei tehd√§ kopiota editoidusta datasta, t√§ss√§ se on turhaa
 		bool dataWasDeleted = false;
-		theModifiedData->LatLonCache(); // lasketaan latlon-cache valmiiksi, koska muuten multi-thread ymp‰ristˆss‰ tulee sen kanssa ongelmia
+		theModifiedData->LatLonCache(); // lasketaan latlon-cache valmiiksi, koska muuten multi-thread ymp√§rist√∂ss√§ tulee sen kanssa ongelmia
 		theDataBase->AddData(theModifiedData, "xxxfileName", "", NFmiInfoData::kEditable, 0, 0, 0, dataWasDeleted); // 0=undolevel
 		if(theHelperDataFileNames && theHelperDataFileNames->size())
 			InitDataBaseHelperData(*theDataBase, *theHelperDataFileNames, fMakeStaticIfOneTimeStepData);
@@ -139,7 +139,7 @@ bool NFmiSmartToolUtil::InitDataBaseHelperData(NFmiInfoOrganizer &theDataBase, c
 				if(fMakeStaticIfOneTimeStepData || sQData.QueryData()->Info()->Param(kFmiTopoGraf))
 					dataType = NFmiInfoData::kStationary;
 			}
-			sQData.QueryData()->LatLonCache(); // lasketaan latlon-cache valmiiksi, koska muuten multi-thread ymp‰ristˆss‰ tulee sen kanssa ongelmia
+			sQData.QueryData()->LatLonCache(); // lasketaan latlon-cache valmiiksi, koska muuten multi-thread ymp√§rist√∂ss√§ tulee sen kanssa ongelmia
 			bool dataWasDeleted = false;
 			theDataBase.AddData(sQData.QueryData(true), theHelperDataFileNames[i], theHelperDataFileNames[i], dataType, 0, 0, 0, dataWasDeleted); // 0=undolevel
 		}

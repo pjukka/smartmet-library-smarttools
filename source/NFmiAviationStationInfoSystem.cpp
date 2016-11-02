@@ -101,7 +101,7 @@ static bool GetAviationStationFromCsvString(const std::string &theStationStr, NF
 void NFmiAviationStationInfoSystem::InitFromMasterTableCsv(const std::string &theInitFileName)
 {
 	itsInitLogMessage = "";
-	 // tyhjennet‰‰n ensin asemalistat
+	 // tyhjennet√§√§n ensin asemalistat
 	itsIcaoStations.clear();
 	itsWmoStations.clear();
 
@@ -113,7 +113,7 @@ void NFmiAviationStationInfoSystem::InitFromMasterTableCsv(const std::string &th
 	{
 		std::stringstream in(fileContent);
 
-		const int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+		const int maxBufferSize = 1024+1; // kuinka pitk√§ yhden rivin maksimissaan oletetaan olevan
 		std::string buffer;
 		int i = 0;
 		int counter = 0;
@@ -167,7 +167,7 @@ void NFmiAviationStationInfoSystem::InitFromMasterTableCsv(const std::string &th
 }
 
 // theDegreeStr on puhtaasti arvo asteina (kokonaisluku)
-// theMinutesWithOrientationStr on arvo asteiden minuutteina ja jossa on  pohjoisella pallonpuoliskolla N ja etel‰isell‰ pallonpuoliskolla S kirjain per‰ss‰
+// theMinutesWithOrientationStr on arvo asteiden minuutteina ja jossa on  pohjoisella pallonpuoliskolla N ja etel√§isell√§ pallonpuoliskolla S kirjain per√§ss√§
 static double GetLatOrLon(const std::string &theLatOrLonStr, bool fDoLatitude)
 {
 	if(theLatOrLonStr.empty())
@@ -197,13 +197,13 @@ static double GetLatOrLon(const std::string &theLatOrLonStr, bool fDoLatitude)
 	return value;
 }
 
-// ensimm‰inen rivi tiedostossa on kommentti rivi kuten seuraava rivi ilman kommentti merkkej‰ '//'
+// ensimm√§inen rivi tiedostossa on kommentti rivi kuten seuraava rivi ilman kommentti merkkej√§ '//'
 // RegionId	RegionName	CountryArea	CountryCode	StationId	IndexNbr	IndexSubNbr	StationName	Latitude	Longitude	Hp	HpFlag	Hha	HhaFlag	PressureDefId	SO-1	SO-2	SO-3	SO-4	SO-5	SO-6	SO-7	SO-8	ObsHs	UA-1	UA-2	UA-3	UA-4	ObsRems
 //
-// loput rivit tiedostossa on asema data rivej‰, joissa erotin on tabulaattori ja sarake j‰rjestys on kuten 1. kommentti rivill‰ on ilmoitettu
+// loput rivit tiedostossa on asema data rivej√§, joissa erotin on tabulaattori ja sarake j√§rjestys on kuten 1. kommentti rivill√§ on ilmoitettu
 // 1	AFRICA / AFRIQUE	ALGERIA / ALGERIE	1030	57	60351	0	JIJEL- ACHOUAT	36 48N	05 53E	10		8			X	X	X	X	X	X	X	X	H00-24	.	.	.	.	A;CLIMAT(C);EVAP;M/B;METAR;SOILTEMP;SPECI;SUNDUR
 //
-// Kiinnostavat kohdat ovat (huom. t‰ss‰ kuvauksessa sarakkeet alkaa 1.:sta, koodissa indeksit alkavat 0:sta): 
+// Kiinnostavat kohdat ovat (huom. t√§ss√§ kuvauksessa sarakkeet alkaa 1.:sta, koodissa indeksit alkavat 0:sta): 
 // 6. sarake (wmo-id)
 // 8. sarake (asema nimi)
 // 9. sarake (lat asteet ja minuutit)
@@ -213,7 +213,7 @@ static bool GetAviationStationFromWmoFlatTableString(const std::string &theStati
 	static long currentWmoIdCounter = 128000;
 	if(theStationStr.size() > 2)
 	{
-		// HUOM! vaikka data formaatti ei tuekaan kommentteja, annetaan kommenttien tarkistus koodin olla t‰ss‰ varmuuden vuoksi
+		// HUOM! vaikka data formaatti ei tuekaan kommentteja, annetaan kommenttien tarkistus koodin olla t√§ss√§ varmuuden vuoksi
 		if(theStationStr[0] == '#')
 			return false;
 		if(theStationStr[0] == '/' && theStationStr[1] == '/')
@@ -264,7 +264,7 @@ static bool GetAviationStationFromWmoFlatTableString(const std::string &theStati
 void NFmiAviationStationInfoSystem::InitFromWmoFlatTable(const std::string &theInitFileName)
 {
 	itsInitLogMessage = "";
-	 // tyhjennet‰‰n ensin asemalistat
+	 // tyhjennet√§√§n ensin asemalistat
 	itsIcaoStations.clear();
 	itsWmoStations.clear();
 
@@ -278,7 +278,7 @@ void NFmiAviationStationInfoSystem::InitFromWmoFlatTable(const std::string &theI
 	{
 		std::stringstream in(fileContent);
 
-		const int maxBufferSize = 1024+1; // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+		const int maxBufferSize = 1024+1; // kuinka pitk√§ yhden rivin maksimissaan oletetaan olevan
 		std::string buffer;
 		int i = 0;
 		int counter = 0;
