@@ -224,8 +224,6 @@ class NFmiNearestObsValue2GridMask : public NFmiInfoAreaMask
   NFmiNearestObsValue2GridMask(Type theMaskType,
                                NFmiInfoData::Type theDataType,
                                boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-                               NFmiAreaMask::FunctionType thePrimaryFunc,
-                               NFmiAreaMask::FunctionType theSecondaryFunc,
                                int theArgumentCount);
   ~NFmiNearestObsValue2GridMask(void);
   NFmiNearestObsValue2GridMask(const NFmiNearestObsValue2GridMask &theOther);
@@ -250,9 +248,6 @@ class NFmiNearestObsValue2GridMask : public NFmiInfoAreaMask
                                       // aika), mutta onko se sama kuin itsTime, jos ei ole, pitää
                                       // laskea juuri tälle ajalle
 
-  NFmiAreaMask::FunctionType itsPrimaryFunc;    // esim. ClosestObsTimeOffset
-  NFmiAreaMask::FunctionType itsSecondaryFunc;  // esim. ClosestObsValue
-
   // Näille muuttujille pitää asettaa arvot erillisellä SetGridHelpers-funktiolla
   boost::shared_ptr<NFmiArea> itsAreaPtr;  // omistaa ja tuhoaa!!
   NFmiEditMapGeneralDataDoc *itsDoc;
@@ -273,3 +268,22 @@ class NFmiNearestObsValue2GridMask : public NFmiInfoAreaMask
 };
 
 #endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
+
+// NFmiPeekTimeMask -luokka 'kurkkaa' datasta annetun tunti offsetin verran ajassa eteen/taaksepäin.
+class NFmiPeekTimeMask : public NFmiInfoAreaMask
+{
+public:
+    NFmiPeekTimeMask(Type theMaskType,
+        NFmiInfoData::Type theDataType,
+        boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+        int theArgumentCount);
+    ~NFmiPeekTimeMask(void);
+    NFmiPeekTimeMask(const NFmiPeekTimeMask &theOther);
+    NFmiAreaMask *Clone(void) const;
+
+    double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
+    void SetArguments(std::vector<float> &theArgumentVector);
+
+private:
+    long itsTimeOffsetInMinutes; // kuinka paljon kurkataan ajassa eteen/taakse
+};

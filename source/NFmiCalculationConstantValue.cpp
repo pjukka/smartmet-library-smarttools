@@ -330,16 +330,12 @@ NFmiNearestObsValue2GridMask::NFmiNearestObsValue2GridMask(
     Type theMaskType,
     NFmiInfoData::Type theDataType,
     boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-    NFmiAreaMask::FunctionType thePrimaryFunc,
-    NFmiAreaMask::FunctionType theSecondaryFunc,
     int theArgumentCount)
     : NFmiInfoAreaMask(
           NFmiCalculationCondition(), theMaskType, theDataType, theInfo, NFmiAreaMask::kNoValue),
       itsNearestObsValuesData(new DataCache()),
       itsCurrentNearestObsValuesData(0),
       itsLastCalculatedTime(NFmiMetTime::gMissingTime),
-      itsPrimaryFunc(thePrimaryFunc),
-      itsSecondaryFunc(theSecondaryFunc),
       itsAreaPtr(),
       itsDoc(0),
       itsResultGridSize(1, 1),
@@ -356,11 +352,8 @@ NFmiNearestObsValue2GridMask::NFmiNearestObsValue2GridMask(
     const NFmiNearestObsValue2GridMask &theOther)
     : NFmiInfoAreaMask(theOther),
       itsNearestObsValuesData(theOther.itsNearestObsValuesData),
-      itsCurrentNearestObsValuesData(0)  // tämä laitetaan aina 0:ksi
-      ,
+      itsCurrentNearestObsValuesData(0),  // tämä laitetaan aina 0:ksi
       itsLastCalculatedTime(theOther.itsLastCalculatedTime),
-      itsPrimaryFunc(theOther.itsPrimaryFunc),
-      itsSecondaryFunc(theOther.itsSecondaryFunc),
       itsAreaPtr(theOther.itsAreaPtr.get() ? theOther.itsAreaPtr.get()->Clone() : 0),
       itsDoc(theOther.itsDoc),
       itsResultGridSize(theOther.itsResultGridSize),
@@ -529,3 +522,61 @@ void NFmiNearestObsValue2GridMask::DoNearestValueGriddingCheck(
 // ****************************************************************************
 
 #endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
+
+
+// *********************************************************************
+// *************** NFmiPeekTimeMask ************************************
+// *********************************************************************
+
+NFmiPeekTimeMask::NFmiPeekTimeMask(
+    Type theMaskType,
+    NFmiInfoData::Type theDataType,
+    boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+    int theArgumentCount)
+    : NFmiInfoAreaMask(
+        NFmiCalculationCondition(), theMaskType, theDataType, theInfo, NFmiAreaMask::kNoValue)
+    , itsTimeOffsetInMinutes(0)
+{
+    itsFunctionArgumentCount = theArgumentCount;
+}
+
+NFmiPeekTimeMask::~NFmiPeekTimeMask(void)
+{
+}
+
+NFmiPeekTimeMask::NFmiPeekTimeMask(
+    const NFmiPeekTimeMask &theOther)
+    : NFmiInfoAreaMask(theOther)
+    , itsTimeOffsetInMinutes(theOther.itsTimeOffsetInMinutes)
+{
+}
+
+NFmiAreaMask *NFmiPeekTimeMask::Clone(void) const
+{
+    return new NFmiPeekTimeMask(*this);
+}
+
+double NFmiPeekTimeMask::Value(const NFmiCalculationParams &theCalculationParams,
+    bool /* fUseTimeInterpolationAlways */)
+{
+    NFmiMetTime peekTime(theCalculationParams.itsTime);
+    peekTime.ChangeByMinutes(itsTimeOffsetInMinutes);
+    return itsInfo->InterpolatedValue(theCalculationParams.itsLatlon, peekTime);
+}
+
+void NFmiPeekTimeMask::SetArguments(std::vector<float> &theArgumentVector)
+{
+    // jokaiselle pisteelle ja ajanhetkelle annetaan eri argumentit tässä
+    if(theArgumentVector.size() == (itsFunctionArgumentCount - 1))
+    {
+        itsTimeOffsetInMinutes = static_cast<long>(std::round(theArgumentVector[0] * 60));
+    }
+    else
+        throw std::runtime_error(
+            "Internal SmartMet error: PeekTime function was given invalid number of arguments, "
+            "cannot calculate the macro.");
+}
+
+// *********************************************************************
+// *************** NFmiPeekTimeMask ************************************
+// *********************************************************************
