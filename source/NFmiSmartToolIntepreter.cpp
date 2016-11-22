@@ -2787,6 +2787,9 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     // Hae asemadatasta lähin arvo funktionaalisuus
     itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("closestvalue"), VertFunctionMapValue(NFmiAreaMask::ClosestObsTimeOffset, NFmiAreaMask::ClosestObsValue, 2, string("closestvalue(par, timeoffset)"))));
 
+    // Hae datasta arvo aika offsetin [h] avulla
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("peekt"), VertFunctionMapValue(NFmiAreaMask::PeekT, NFmiAreaMask::PeekT, 2, string("peekt(par, timeoffset)"))));
+
     // time_*-funktiot laskevat halutun operaation läpi halutun aikahaarukan. Laskut käydään läpi
     // datan omassa aikaresoluutiossa, eli tässä ei ole aikainterpolaatioita kuten esim. maxt
     // vastaavissa funktioissa.
