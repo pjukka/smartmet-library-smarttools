@@ -153,6 +153,7 @@ class NFmiSmartToolIntepreter
                             boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
   bool IsVariableDeltaZ(const std::string &theVariableText,
                         boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
+  bool IsVariableExtraInfoCommand(const std::string &theVariableText);
   bool IsVariableRampFunction(const std::string &theVariableText,
                               boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
   bool FindParamAndSetMaskInfo(const std::string &theVariableText,
@@ -305,6 +306,7 @@ class NFmiSmartToolIntepreter
                                                                     // sanat joita käytetään
                                                                     // makrojen visualisoinnissa
   static checkedVector<std::string> itsTokenDeltaZIdentifiers;  // tänne listataan deltaz 'funktiot'
+  static checkedVector<std::string> itsExtraInfoCommands; // Tänne mm. resolution- ja calculationpoint -jutut
 
   typedef std::map<std::string, FmiMaskOperation> MaskOperMap;
   static MaskOperMap itsTokenMaskOperations;

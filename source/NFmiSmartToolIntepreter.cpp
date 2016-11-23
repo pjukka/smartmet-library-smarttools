@@ -139,6 +139,7 @@ checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenDoubleRampFunctions;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenRampFunctions;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenMacroParamIdentifiers;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenDeltaZIdentifiers;
+checkedVector<std::string> NFmiSmartToolIntepreter::itsExtraInfoCommands;
 
 NFmiSmartToolIntepreter::MaskOperMap NFmiSmartToolIntepreter::itsTokenMaskOperations;
 NFmiSmartToolIntepreter::CalcOperMap NFmiSmartToolIntepreter::itsCalculationOperations;
@@ -1288,6 +1289,9 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(
   if (IsVariableDeltaZ(theVariableText, theMaskInfo))
     return true;
 
+  if(IsVariableExtraInfoCommand(theVariableText))
+      return true;
+
   if (IsVariableBinaryOperator(theVariableText,
                                theMaskInfo))  // tämä on and ja or tapausten käsittelyyn
     return true;
@@ -1894,6 +1898,11 @@ bool NFmiSmartToolIntepreter::IsVariableDeltaZ(const std::string &theVariableTex
     return true;
   }
   return false;
+}
+
+bool NFmiSmartToolIntepreter::IsVariableExtraInfoCommand(const std::string &theVariableText)
+{
+    return false;
 }
 
 bool NFmiSmartToolIntepreter::IsVariableMathFunction(
@@ -2573,7 +2582,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("synopx"), static_cast<FmiProducerName>(NFmiInfoData::kFmiSpSynoXProducer)));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("metar"), kFmiMETAR));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("wxt"), kFmiTestBed));
-    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("road"), kFmiRoadObs));
+    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("road"), static_cast<FmiProducerName>(20013))); // kFmiRoadObs));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("temp"), kFmiTEMP));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("temp"), kFmiBufrTEMP));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("nrd"), kFmiRADARNRD));
@@ -2852,6 +2861,8 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenDeltaZIdentifiers.push_back(string("deltaz"));
     itsTokenDeltaZIdentifiers.push_back(string("DeltaZ"));
     itsTokenDeltaZIdentifiers.push_back(string("DELTAZ"));
+
+    itsExtraInfoCommands.push_back(string("resolution"));
 
     itsMathFunctions.insert(MathFunctionMap::value_type(string("exp"), NFmiAreaMask::Exp));
     itsMathFunctions.insert(MathFunctionMap::value_type(string("sqrt"), NFmiAreaMask::Sqrt));
