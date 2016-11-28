@@ -23,6 +23,7 @@
 #include "NFmiSmartToolCalculationSectionInfo.h"
 #include "NFmiSmartToolIntepreter.h"
 #include "NFmiSmartToolModifier.h"
+#include "NFmiExtraMacroParamData.h"
 
 #include <NFmiBitMask.h>
 #include <NFmiCalculatedAreaMask.h>
@@ -281,6 +282,8 @@ void NFmiSmartToolModifier::InitSmartTool(const std::string &theSmartToolText,
   {
     itsSmartToolIntepreter->IncludeDirectory(itsIncludeDirectory);
     itsSmartToolIntepreter->Interpret(theSmartToolText, fThisIsMacroParamSkript);
+    itsExtraMacroParamData = itsSmartToolIntepreter->GetOwnershipOfExtraMacroParamData();
+    itsExtraMacroParamData->FinalizeData(*itsInfoOrganizer);
   }
   catch (...)
   {
@@ -2290,7 +2293,12 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::UsedMacroParamData(v
   if (fDoCrossSectionCalculation)
     return itsInfoOrganizer->CrossSectionMacroParamData();
   else
-    return itsInfoOrganizer->MacroParamData();
+  {
+      if(itsExtraMacroParamData->UseSpecialResolution())
+          return itsExtraMacroParamData->ResolutionMacroParamData();
+      else
+          return itsInfoOrganizer->MacroParamData();
+  }
 }
 
 void NFmiSmartToolModifier::ModifiedLevel(boost::shared_ptr<NFmiLevel> &theLevel)

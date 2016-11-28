@@ -49,6 +49,7 @@ class NFmiSmartToolCalculationBlockInfo;
 class NFmiSmartToolCalculationBlockInfoVector;
 class MyGrid;
 class NFmiThreadCallBacks;
+class NFmiExtraMacroParamData;
 
 class NFmiSmartToolCalculationBlockVector
 {
@@ -126,6 +127,7 @@ class NFmiSmartToolModifier
   const std::string &GetStrippedMacroText(void) const;
   bool IsInterpretedSkriptMacroParam(void);  // kun intepreter on tulkinnut smarttool-tekstin,
                                              // voidaan kysyä, onko kyseinen makro ns.
+  boost::shared_ptr<NFmiFastQueryInfo> UsedMacroParamData(void);
   // macroParam-skripti eli sisältääkö se RESULT = ???
   // tapaista tekstiä
 
@@ -143,7 +145,6 @@ class NFmiSmartToolModifier
   boost::shared_ptr<NFmiAreaMask> CreateMetFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo,
                                                             bool &fMustUsePressureInterpolation);
   void SetInfosMaskType(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
-  boost::shared_ptr<NFmiFastQueryInfo> UsedMacroParamData(void);
   void ModifyConditionalData(
       const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock,
       NFmiMacroParamValue &theMacroParamValue,
@@ -235,6 +236,7 @@ class NFmiSmartToolModifier
   boost::shared_ptr<NFmiSmartToolIntepreter> itsSmartToolIntepreter;
   bool fMacroRunnable;
   std::string itsErrorText;
+  std::unique_ptr<NFmiExtraMacroParamData> itsExtraMacroParamData; // Tämä alustetaan smarttool-tulkissa (itsSmartToolIntepreter), ja otetaan omistukseen 'suorittajaan'
 
   bool fModifySelectedLocationsOnly;
   checkedVector<boost::shared_ptr<NFmiFastQueryInfo> >
