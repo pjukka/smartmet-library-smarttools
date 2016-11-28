@@ -16,6 +16,7 @@
 #include "NFmiSmartToolCalculationInfo.h"
 #include "NFmiDictionaryFunction.h"
 #include "NFmiProducerSystem.h"
+#include "NFmiExtraMacroParamData.h"
 
 #include <NFmiPreProcessor.h>
 #include <NFmiValueString.h>
@@ -139,7 +140,6 @@ checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenDoubleRampFunctions;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenRampFunctions;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenMacroParamIdentifiers;
 checkedVector<std::string> NFmiSmartToolIntepreter::itsTokenDeltaZIdentifiers;
-checkedVector<std::string> NFmiSmartToolIntepreter::itsExtraInfoCommands;
 
 NFmiSmartToolIntepreter::MaskOperMap NFmiSmartToolIntepreter::itsTokenMaskOperations;
 NFmiSmartToolIntepreter::CalcOperMap NFmiSmartToolIntepreter::itsCalculationOperations;
@@ -148,10 +148,12 @@ NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenStaticParamet
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenCalculatedParameterNamesAndIds;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenThreeArgumentFunctions;
+NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsExtraInfoCommands;
 NFmiSmartToolIntepreter::MetFunctionMap NFmiSmartToolIntepreter::itsTokenMetFunctions;
 NFmiSmartToolIntepreter::VertFunctionMap NFmiSmartToolIntepreter::itsTokenVertFunctions;
 NFmiSmartToolIntepreter::PeekFunctionMap NFmiSmartToolIntepreter::itsTokenPeekFunctions;
 NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctions;
+NFmiSmartToolIntepreter::ResolutionLevelTypesMap NFmiSmartToolIntepreter::itsResolutionLevelTypes;
 
 //--------------------------------------------------------
 // Constructor/Destructor
@@ -162,7 +164,8 @@ NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiProducerSystem *theProducer
       itsSmartToolCalculationBlocks(),
       fNormalAssigmentFound(false),
       fMacroParamFound(false),
-      fMacroParamSkriptInProgress(false)
+      fMacroParamSkriptInProgress(false),
+      itsExtraMacroParamData(std::make_unique<NFmiExtraMacroParamData>())
 {
   NFmiSmartToolIntepreter::InitTokens(itsProducerSystem, theObservationProducerSystem);
 }
@@ -748,6 +751,13 @@ bool NFmiSmartToolIntepreter::InterpretMasks(
                       theMaskSectionText);
 }
 
+// Vain tyhjä luokka erikoispoikkeusta varten.
+// Kun luetaan Extra info rivejä, otetaan niiden tiedot NFmiExtraMacroParamData
+// luokan olioon talteen ja siirrytään seuraavaan riviin ilman normaaleja toimintoja.
+class ExtraInfoMacroLineException
+{
+};
+
 //--------------------------------------------------------
 // InterpretCalculationSection
 //--------------------------------------------------------
@@ -764,13 +774,19 @@ bool NFmiSmartToolIntepreter::InterpretCalculationSection(
   do
   {
     string nextLine = ExtractNextLine(theCalculationSectiontext, pos, &end);
-    if (!nextLine.empty() && !ConsistOnlyWhiteSpaces(nextLine))
+    try
     {
-      boost::shared_ptr<NFmiSmartToolCalculationInfo> calculationInfo =
-          InterpretCalculationLine(nextLine);
-      if (calculationInfo)
-        theSectionInfo->AddCalculationInfo(calculationInfo);
+        if(!nextLine.empty() && !ConsistOnlyWhiteSpaces(nextLine))
+        {
+            boost::shared_ptr<NFmiSmartToolCalculationInfo> calculationInfo =
+                InterpretCalculationLine(nextLine);
+            if(calculationInfo)
+                theSectionInfo->AddCalculationInfo(calculationInfo);
+        }
     }
+    catch(ExtraInfoMacroLineException &)
+    { }
+
     if (end != theCalculationSectiontext.end())  // jos ei tarkistusta, menee yli lopusta
       pos = ++end;
   } while (end != theCalculationSectiontext.end());
@@ -1288,9 +1304,6 @@ bool NFmiSmartToolIntepreter::InterpretVariableCheckTokens(
 
   if (IsVariableDeltaZ(theVariableText, theMaskInfo))
     return true;
-
-  if(IsVariableExtraInfoCommand(theVariableText))
-      return true;
 
   if (IsVariableBinaryOperator(theVariableText,
                                theMaskInfo))  // tämä on and ja or tapausten käsittelyyn
@@ -1900,11 +1913,6 @@ bool NFmiSmartToolIntepreter::IsVariableDeltaZ(const std::string &theVariableTex
   return false;
 }
 
-bool NFmiSmartToolIntepreter::IsVariableExtraInfoCommand(const std::string &theVariableText)
-{
-    return false;
-}
-
 bool NFmiSmartToolIntepreter::IsVariableMathFunction(
     const std::string &theVariableText, boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
 {
@@ -1978,6 +1986,8 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
     return true;
   if (IsVariableVertFunction(theVariableText, theMaskInfo))
     return true;
+  if(IsVariableExtraInfoCommand(theVariableText))
+      throw ExtraInfoMacroLineException();
 
   // sitten katsotaan onko jokin integraatio funktioista
   std::string tmp(theVariableText);
@@ -2211,6 +2221,70 @@ bool NFmiSmartToolIntepreter::IsVariableVertFunction(
   return false;
 }
 
+bool NFmiSmartToolIntepreter::ExtractResolutionInfo()
+{
+    // Haluttu macroParam resoluutio kerrotaan seuraavanlaisilla lausekkeilla:
+    // resolution = 12.5  // [km]
+    // TAI
+    // resolution = hir_surface  // tai level tyyppi voi olla myös pressure/hybrid/height
+
+    GetToken();
+    string assignOperator = token;
+    if(assignOperator == string("="))
+    {
+        GetToken();
+        string resolutionStr = token;
+        NFmiStringTools::LowerCase(resolutionStr);
+        vector<string> resolutionParts = NFmiStringTools::Split(resolutionStr, "_");
+        if(resolutionParts.size() == 1)
+        {
+            // Konversio heittää poikkeuksen, jos kyseessä ei ole luku, joten siitä tulee oma virheilmoitus
+            itsExtraMacroParamData->GivenResolutionInKm(NFmiStringTools::Convert<float>(resolutionParts[0]));
+            return true;
+        }
+        else if(resolutionParts.size() == 2)
+        {
+            itsExtraMacroParamData->Producer(GetPossibleProducerInfo(resolutionParts[0]));
+            auto iter = itsResolutionLevelTypes.find(resolutionParts[1]);
+            if(iter != itsResolutionLevelTypes.end())
+            {
+                itsExtraMacroParamData->LevelType(iter->second);
+                return true;
+            }
+            else
+            {
+                std::string errorStr(::GetDictionaryString("Given 'resolution' data level type was illegal"));
+                errorStr += ".\n" + ::GetDictionaryString("Try something like following") + ":\n";
+                errorStr += ::GetDictionaryString("resolution = ec_surface OR pressure\\hybrid\\height");
+                throw std::runtime_error(errorStr);
+            }
+        }
+    }
+
+    // Jos löytyi resolution -lauseke, mutta muuten ehdot eivät täyttyneet, tehdään virheilmoitus.
+    std::string errorStr(::GetDictionaryString("Given 'resolution' operation was illegal"));
+    errorStr += ".\n";
+    errorStr += ::GetDictionaryString("Try something like following");
+    errorStr += ":\n";
+    errorStr += ::GetDictionaryString("resolution = 12.5");
+    errorStr += "\n" + ::GetDictionaryString("OR") + "\n";
+    errorStr += ::GetDictionaryString("resolution = ec_surface");
+    throw std::runtime_error(errorStr);
+}
+
+bool NFmiSmartToolIntepreter::IsVariableExtraInfoCommand(const std::string &theVariableText)
+{
+    std::string aVariableText(theVariableText);
+    NFmiStringTools::LowerCase(aVariableText); // Tässä tarkastellaan case insensitiivisesti
+    FunctionMap::iterator it = itsExtraInfoCommands.find(aVariableText);
+    if(it != itsExtraInfoCommands.end())
+    {
+        if(it->second == NFmiAreaMask::Resolution)
+            return ExtractResolutionInfo();
+    }
+    return false;
+}
+
 std::string NFmiSmartToolIntepreter::HandlePossibleUnaryMarkers(const std::string &theCurrentString)
 {
   string returnStr(theCurrentString);
@@ -2287,6 +2361,11 @@ bool NFmiSmartToolIntepreter::IsVariableBinaryOperator(
     return true;
   }
   return false;
+}
+
+std::unique_ptr<NFmiExtraMacroParamData> NFmiSmartToolIntepreter::GetOwnershipOfExtraMacroParamData() 
+{ 
+    return std::move(itsExtraMacroParamData); 
 }
 
 NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &theParamText)
@@ -2676,6 +2755,8 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxh"), NFmiAreaMask::Max));
     itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("minh"), NFmiAreaMask::Min));
 
+    itsExtraInfoCommands.insert(FunctionMap::value_type(string("resolution"), NFmiAreaMask::Resolution));
+
     itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad"), MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionXandY, 1, "grad(param)")));
     itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div"), MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionXandY, 1, "div(param)")));
     itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionXandY, 1, "adv(param)")));
@@ -2862,8 +2943,6 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenDeltaZIdentifiers.push_back(string("DeltaZ"));
     itsTokenDeltaZIdentifiers.push_back(string("DELTAZ"));
 
-    itsExtraInfoCommands.push_back(string("resolution"));
-
     itsMathFunctions.insert(MathFunctionMap::value_type(string("exp"), NFmiAreaMask::Exp));
     itsMathFunctions.insert(MathFunctionMap::value_type(string("sqrt"), NFmiAreaMask::Sqrt));
     itsMathFunctions.insert(MathFunctionMap::value_type(string("ln"), NFmiAreaMask::Log));
@@ -2882,6 +2961,11 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsMathFunctions.insert(MathFunctionMap::value_type(string("round"), NFmiAreaMask::Round));
     itsMathFunctions.insert(MathFunctionMap::value_type(string("abs"), NFmiAreaMask::Abs));
     itsMathFunctions.insert(MathFunctionMap::value_type(string("rand"), NFmiAreaMask::Rand));
+
+    itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("surface"), kFmiMeanSeaLevel));
+    itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("pressure"), kFmiPressureLevel));
+    itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("hybrid"), kFmiHybridLevel));
+    itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("height"), kFmiHeight));
 
     // clang-format on
   }
