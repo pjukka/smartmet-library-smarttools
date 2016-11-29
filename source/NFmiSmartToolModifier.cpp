@@ -1588,6 +1588,36 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateNormalVertFuncMask(
     return areaMask;
 }
 
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateVertConditionalMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
+{
+    fUseLevelData = true;
+    boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+    boost::shared_ptr<NFmiAreaMask> areaMask(
+            new NFmiInfoAreaMaskVertConditionalFunc(theAreaMaskInfo.GetMaskCondition(),
+                NFmiAreaMask::kInfo,
+                info->DataType(),
+                info,
+                theAreaMaskInfo.GetFunctionType(),
+                theAreaMaskInfo.GetSecondaryFunctionType(),
+                theAreaMaskInfo.FunctionArgumentCount()));
+    fUseLevelData = false;  // en tiedä pitääkö tämä laittaa takaisin falseksi, mutta laitan
+                            // varmuuden vuoksi
+    return areaMask;
+}
+
+static bool IsVertConditionalFunction(const NFmiAreaMaskInfo &theAreaMaskInfo)
+{
+    NFmiAreaMask::FunctionType primaryFunction = theAreaMaskInfo.GetFunctionType();
+    if(primaryFunction >= NFmiInfoAreaMask::ProbOver && primaryFunction <= NFmiInfoAreaMask::ProbBetweenEq)
+    {
+        NFmiAreaMask::FunctionType secondaryFunction = theAreaMaskInfo.GetSecondaryFunctionType();
+        if(secondaryFunction >= NFmiInfoAreaMask::VertP && secondaryFunction <= NFmiInfoAreaMask::VertHyb)
+            return true;
+    }
+
+    return false;
+}
+
 boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateVertFunctionStartMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
     boost::shared_ptr<NFmiAreaMask> areaMask;
@@ -1614,6 +1644,10 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateVertFunctionStartMa
     else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::PeekT)
     {
         areaMask = CreatePeekTimeMask(theAreaMaskInfo, mustUsePressureInterpolation);
+    }
+    else if(::IsVertConditionalFunction(theAreaMaskInfo))
+    {
+        areaMask = CreateVertConditionalMask(theAreaMaskInfo, mustUsePressureInterpolation);
     }
     else
     {
