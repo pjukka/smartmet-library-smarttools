@@ -21,6 +21,9 @@ public:
     bool UseSpecialResolution() const;
     static void SetUsedAreaForData(boost::shared_ptr<NFmiFastQueryInfo> &theData, const NFmiArea *theUsedArea);
 
+    bool UseEditedDataForResolution() const { return fUseEditedDataForResolution; }
+    void UseEditedDataForResolution(bool newValue) { fUseEditedDataForResolution = newValue; }
+
     float GivenResolutionInKm() const { return itsGivenResolutionInKm; }
     void GivenResolutionInKm(float newValue) {itsGivenResolutionInKm = newValue;}
     const NFmiProducer& Producer() const { return itsProducer; }
@@ -32,9 +35,13 @@ public:
     static void AdjustValueMatrixToMissing(const boost::shared_ptr<NFmiFastQueryInfo> &theData, NFmiDataMatrix<float> &theValueMatrix);
 
 private:
+    void InitializeResolutionWithEditedData(NFmiInfoOrganizer &theInfoOrganizer);
     void InitializeResolutionData(NFmiInfoOrganizer &theInfoOrganizer, float usedResolutionInKm);
     void InitializeDataBasedResolutionData(NFmiInfoOrganizer &theInfoOrganizer, const NFmiProducer &theProducer, FmiLevelType theLevelType);
+    void UseDataForResolutionCalculations(NFmiInfoOrganizer &theInfoOrganizer, boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
 
+    // Jos skriptiss‰ on resolution = edited, k‰ytet‰‰n editoitua dataa resoluutio laskuissa.
+    bool fUseEditedDataForResolution;
     // Jos skriptiss‰ on annettu haluttu laskenta resoluutio tyyliin "resolution = 12.5", talletetaan kyseinen luku t‰h‰n. 
     // Jos ei ole asetettu, on arvo missing.
     float itsGivenResolutionInKm;

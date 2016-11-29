@@ -2238,9 +2238,18 @@ bool NFmiSmartToolIntepreter::ExtractResolutionInfo()
         vector<string> resolutionParts = NFmiStringTools::Split(resolutionStr, "_");
         if(resolutionParts.size() == 1)
         {
-            // Konversio heittää poikkeuksen, jos kyseessä ei ole luku, joten siitä tulee oma virheilmoitus
-            itsExtraMacroParamData->GivenResolutionInKm(NFmiStringTools::Convert<float>(resolutionParts[0]));
-            return true;
+            // Editoitu data on poikkeus, joka hanskataan ensin
+            if(resolutionParts[0] == std::string("edited"))
+            {
+                itsExtraMacroParamData->UseEditedDataForResolution(true);
+                return true;
+            }
+            else
+            {
+                // Konversio heittää poikkeuksen, jos kyseessä ei ole luku, joten siitä tulee oma virheilmoitus
+                itsExtraMacroParamData->GivenResolutionInKm(NFmiStringTools::Convert<float>(resolutionParts[0]));
+                return true;
+            }
         }
         else if(resolutionParts.size() == 2)
         {

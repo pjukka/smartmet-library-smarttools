@@ -3,7 +3,8 @@
 #include "NFmiInfoOrganizer.h"
 
 NFmiExtraMacroParamData::NFmiExtraMacroParamData()
-:itsGivenResolutionInKm(kFloatMissing)
+:fUseEditedDataForResolution(false)
+,itsGivenResolutionInKm(kFloatMissing)
 ,itsProducer()
 ,itsLevelType(kFmiNoLevelType)
 ,itsDataBasedResolutionInKm(kFloatMissing)
@@ -13,7 +14,11 @@ NFmiExtraMacroParamData::NFmiExtraMacroParamData()
 
 void NFmiExtraMacroParamData::FinalizeData(NFmiInfoOrganizer &theInfoOrganizer)
 {
-    if(itsGivenResolutionInKm != kFloatMissing)
+    if(fUseEditedDataForResolution)
+    {
+        InitializeResolutionWithEditedData(theInfoOrganizer);
+    }
+    else if(itsGivenResolutionInKm != kFloatMissing)
     {
         InitializeResolutionData(theInfoOrganizer, itsGivenResolutionInKm);
     }
@@ -158,14 +163,35 @@ static float CalcDataBasedResolutionInKm(boost::shared_ptr<NFmiFastQueryInfo> &t
     return static_cast<float>((resolutionX + resolutionY) / (2. * 1000.));
 }
 
+void NFmiExtraMacroParamData::InitializeResolutionWithEditedData(NFmiInfoOrganizer &theInfoOrganizer)
+{
+    boost::shared_ptr<NFmiFastQueryInfo> info = theInfoOrganizer.FindInfo(NFmiInfoData::kEditable);
+    if(info)
+    {
+        if(info->Grid())
+        {
+            UseDataForResolutionCalculations(theInfoOrganizer, info);
+        }
+        else
+            throw std::runtime_error(std::string("Edited data has no grid for 'resolution' calculations"));
+    }
+    else
+        throw std::runtime_error(std::string("Could not find the edited data for 'resolution' calculations"));
+}
+
+void NFmiExtraMacroParamData::UseDataForResolutionCalculations(NFmiInfoOrganizer &theInfoOrganizer, boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+    itsDataBasedResolutionInKm = CalcDataBasedResolutionInKm(theInfo);
+    InitializeResolutionData(theInfoOrganizer, itsDataBasedResolutionInKm);
+}
+
 void NFmiExtraMacroParamData::InitializeDataBasedResolutionData(NFmiInfoOrganizer &theInfoOrganizer, const NFmiProducer &theProducer, FmiLevelType theLevelType)
 {
     checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infos = theInfoOrganizer.GetInfos(theProducer.GetIdent());
     boost::shared_ptr<NFmiFastQueryInfo> info = ::FindWantedInfo(infos, theLevelType);
     if(info)
     {
-        itsDataBasedResolutionInKm = CalcDataBasedResolutionInKm(info);
-        InitializeResolutionData(theInfoOrganizer, itsDataBasedResolutionInKm);
+        UseDataForResolutionCalculations(theInfoOrganizer, info);
     }
     else
         throw std::runtime_error(std::string("Could not find the given 'resolution' data for ") + ::GetProducerInfoForResolutionError(theProducer, theLevelType));
