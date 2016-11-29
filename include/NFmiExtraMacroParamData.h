@@ -33,6 +33,7 @@ public:
 
 private:
     void InitializeResolutionData(NFmiInfoOrganizer &theInfoOrganizer, float usedResolutionInKm);
+    void InitializeDataBasedResolutionData(NFmiInfoOrganizer &theInfoOrganizer, const NFmiProducer &theProducer, FmiLevelType theLevelType);
 
     // Jos skriptissä on annettu haluttu laskenta resoluutio tyyliin "resolution = 12.5", talletetaan kyseinen luku tähän. 
     // Jos ei ole asetettu, on arvo missing.

@@ -14,12 +14,13 @@ NFmiExtraMacroParamData::NFmiExtraMacroParamData()
 void NFmiExtraMacroParamData::FinalizeData(NFmiInfoOrganizer &theInfoOrganizer)
 {
     if(itsGivenResolutionInKm != kFloatMissing)
+    {
         InitializeResolutionData(theInfoOrganizer, itsGivenResolutionInKm);
-    //else if(itsProducer.GetIdent() != 0)
-    //{
-    //    // Alusta datapohjainen resoluutio
-    //}
-
+    }
+    else if(itsProducer.GetIdent() != 0)
+    {
+        InitializeDataBasedResolutionData(theInfoOrganizer, itsProducer, itsLevelType);
+    }
 }
 
 bool NFmiExtraMacroParamData::UseSpecialResolution() const
@@ -77,4 +78,95 @@ void NFmiExtraMacroParamData::AdjustValueMatrixToMissing(const boost::shared_ptr
             theValueMatrix = kFloatMissing;
         }
     }
+}
+
+static bool IsPrimarySurfaceDataType(boost::shared_ptr<NFmiFastQueryInfo> &info)
+{
+    NFmiInfoData::Type dataType = info->DataType();
+    if(dataType == NFmiInfoData::kViewable || dataType == NFmiInfoData::kObservations || dataType == NFmiInfoData::kKepaData || dataType == NFmiInfoData::kAnalyzeData)
+        return true;
+    else
+        return false;
+}
+
+static bool IsPrimaryLevelDataType(boost::shared_ptr<NFmiFastQueryInfo> &info)
+{
+    NFmiInfoData::Type dataType = info->DataType();
+    if(dataType == NFmiInfoData::kViewable || dataType == NFmiInfoData::kHybridData || dataType == NFmiInfoData::kSingleStationRadarData || dataType == NFmiInfoData::kAnalyzeData)
+        return true;
+    else
+        return false;
+}
+
+static boost::shared_ptr<NFmiFastQueryInfo> FindWantedInfo(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &theInfos, FmiLevelType theLevelType)
+{
+    boost::shared_ptr<NFmiFastQueryInfo> backupData; // Tähän laitetaan talteen ei primääri datatyyppi varmuuden varalle
+    bool searchSingleLevelData = (theLevelType == kFmiMeanSeaLevel);
+    for(size_t i = 0; i < theInfos.size(); i++)
+    {
+        boost::shared_ptr<NFmiFastQueryInfo> &info = theInfos[i];
+        // Vain hiladatat kelpaavat tarkasteluissa
+        if(info->Grid()) 
+        {
+            if(searchSingleLevelData)
+            {
+                if(info->SizeLevels() == 1)
+                {
+                    if(::IsPrimarySurfaceDataType(info))
+                        return info; // Palautetaan surface tapauksessa 1. yksi tasoinen 'primääri' data
+                    else
+                        backupData = info;
+                }
+            }
+            else
+            {
+                if(theLevelType == info->LevelType())
+                {
+                    if(::IsPrimaryLevelDataType(info))
+                        return info; // Palautetaan level tapauksessa 1. 'primääri' data
+                    else
+                        backupData = info;
+                }
+            }
+        }
+    }
+    return backupData;
+}
+
+static std::string GetProducerInfoForResolutionError(const NFmiProducer &theProducer, FmiLevelType theLevelType)
+{
+    std::string str = theProducer.GetName();
+    str += " ";
+    if(theLevelType == kFmiMeanSeaLevel)
+        str += "surface";
+    else if(theLevelType == kFmiPressureLevel)
+        str += "pressure";
+    else if(theLevelType == kFmiHybridLevel)
+        str += "hybrid";
+    else if(theLevelType == kFmiHeight)
+        str += "height";
+
+    return str;
+}
+
+// Oletus theInfo on hilamuotoista dataa, eli siltä löytyy area.
+// Lasketaan hilan x- ja y-resoluutioiden keskiarvo kilometreissa.
+static float CalcDataBasedResolutionInKm(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+    double resolutionX = theInfo->Area()->WorldXYWidth() / theInfo->GridXNumber();
+    double resolutionY = theInfo->Area()->WorldXYHeight() / theInfo->GridYNumber();
+    return static_cast<float>((resolutionX + resolutionY) / (2. * 1000.));
+}
+
+void NFmiExtraMacroParamData::InitializeDataBasedResolutionData(NFmiInfoOrganizer &theInfoOrganizer, const NFmiProducer &theProducer, FmiLevelType theLevelType)
+{
+    checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infos = theInfoOrganizer.GetInfos(theProducer.GetIdent());
+    boost::shared_ptr<NFmiFastQueryInfo> info = ::FindWantedInfo(infos, theLevelType);
+    if(info)
+    {
+        itsDataBasedResolutionInKm = CalcDataBasedResolutionInKm(info);
+        InitializeResolutionData(theInfoOrganizer, itsDataBasedResolutionInKm);
+    }
+    else
+        throw std::runtime_error(std::string("Could not find the given 'resolution' data for ") + ::GetProducerInfoForResolutionError(theProducer, theLevelType));
 }
