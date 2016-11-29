@@ -2850,6 +2850,39 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertHyb, 3, string("vertlev_minh(par, hyb1, hyb2)"))));
     itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_grad"), VertFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::VertHyb, 3, string("vertlev_grad(par, hyb1, hyb2)"))));
 
+    // Kaikki vert-conditional funktiot yhdessä nipussa. 
+    // Niillä etsitään korkeutta mistä alkaen jokin ehto on voimassa. 
+    // Jätetty pois tarkoituksella yhtäsuuruus ehdot, koska niitä voi etsiä vertXXX_findh -funktioilla.
+    // VertP -osio
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::VertP, 4, string("vertp_findh_over(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::VertP, 4, string("vertp_findh_overeq(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::VertP, 4, string("vertp_findh_under(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh_undereq"), VertFunctionMapValue(NFmiAreaMask::ProbUnderEq, NFmiAreaMask::VertP, 4, string("vertp_findh_undereq(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::VertP, 5, string("vertp_findh_between(par, p1, p2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::VertP, 5, string("vertp_findh_betweeneq(par, p1, p2, limit1, limit2)"))));
+    // VertFL -osio
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::VertFL, 4, string("vertfl_findh_over(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::VertFL, 4, string("vertfl_findh_overeq(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::VertFL, 4, string("vertfl_findh_under(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh_undereq"), VertFunctionMapValue(NFmiAreaMask::ProbUnderEq, NFmiAreaMask::VertFL, 4, string("vertfl_findh_undereq(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::VertFL, 5, string("vertfl_findh_between(par, p1, p2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::VertFL, 5, string("vertfl_findh_betweeneq(par, p1, p2, limit1, limit2)"))));
+    // VertZ -osio
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::VertZ, 4, string("vertz_findh_over(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::VertZ, 4, string("vertz_findh_overeq(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::VertZ, 4, string("vertz_findh_under(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh_undereq"), VertFunctionMapValue(NFmiAreaMask::ProbUnderEq, NFmiAreaMask::VertZ, 4, string("vertz_findh_undereq(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::VertZ, 5, string("vertz_findh_between(par, p1, p2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::VertZ, 5, string("vertz_findh_betweeneq(par, p1, p2, limit1, limit2)"))));
+    // VertLev -osio
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::VertHyb, 4, string("verthyp_findh_over(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::VertHyb, 4, string("verthyp_findh_overeq(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::VertHyb, 4, string("verthyp_findh_under(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh_undereq"), VertFunctionMapValue(NFmiAreaMask::ProbUnderEq, NFmiAreaMask::VertHyb, 4, string("verthyp_findh_undereq(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::VertHyb, 5, string("verthyp_findh_between(par, p1, p2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::VertHyb, 5, string("verthyp_findh_betweeneq(par, p1, p2, limit1, limit2)"))));
+
+
     // Probability-laskenta (laatikko eli rect) vertlev-funktiot eli nämä on laitettu tähän, koska
     // tämän funktion parametrien käsittely sopii tn-laskuille
     itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::ProbRect, 5, string("probrect_over(par, radius_km, time_offset1, time_offset2, limit)"))));
