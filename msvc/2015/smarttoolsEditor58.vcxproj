@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\FmiColorTypes.h" />
+    <ClInclude Include="..\..\include\NFmiAreaMaskInfo.h" />
+    <ClInclude Include="..\..\include\NFmiAreaMaskSectionInfo.h" />
+    <ClInclude Include="..\..\include\NFmiAviationStationInfoSystem.h" />
+    <ClInclude Include="..\..\include\NFmiCalculationConstantValue.h" />
+    <ClInclude Include="..\..\include\NFmiColor.h" />
+    <ClInclude Include="..\..\include\NFmiColorSpaces.h" />
+    <ClInclude Include="..\..\include\NFmiDataStoringHelpers.h" />
+    <ClInclude Include="..\..\include\NFmiDictionaryFunction.h" />
+    <ClInclude Include="..\..\include\NFmiDrawParam.h" />
+    <ClInclude Include="..\..\include\NFmiDrawParamFactory.h" />
+    <ClInclude Include="..\..\include\NFmiDrawParamList.h" />
+    <ClInclude Include="..\..\include\NFmiGridPointCache.h" />
+    <ClInclude Include="..\..\include\NFmiHarmonizerBookKeepingData.h" />
+    <ClInclude Include="..\..\include\NFmiHelpDataInfo.h" />
+    <ClInclude Include="..\..\include\NFmiInfoAreaMaskOccurrance.h" />
+    <ClInclude Include="..\..\include\NFmiInfoAreaMaskSoundingIndex.h" />
+    <ClInclude Include="..\..\include\NFmiInfoOrganizer.h" />
+    <ClInclude Include="..\..\include\NFmiMetEditorTypes.h" />
+    <ClInclude Include="..\..\include\NFmiModifiableQDatasBookKeeping.h" />
+    <ClInclude Include="..\..\include\NFmiMultiLevelMask.h" />
+    <ClInclude Include="..\..\include\NFmiOwnerInfo.h" />
+    <ClInclude Include="..\..\include\NFmiProducerSystem.h" />
+    <ClInclude Include="..\..\include\NFmiQueryDataKeeper.h" />
+    <ClInclude Include="..\..\include\NFmiRawTempStationInfoSystem.h" />
+    <ClInclude Include="..\..\include\NFmiSmartInfo.h" />
+    <ClInclude Include="..\..\include\NFmiSmartToolCalculation.h" />
+    <ClInclude Include="..\..\include\NFmiSmartToolCalculationInfo.h" />
+    <ClInclude Include="..\..\include\NFmiSmartToolCalculationSection.h" />
+    <ClInclude Include="..\..\include\NFmiSmartToolCalculationSectionInfo.h" />
+    <ClInclude Include="..\..\include\NFmiSmartToolInfo.h" />
+    <ClInclude Include="..\..\include\NFmiSmartToolIntepreter.h" />
+    <ClInclude Include="..\..\include\NFmiSmartToolModifier.h" />
+    <ClInclude Include="..\..\include\NFmiSmartToolUtil.h" />
+    <ClInclude Include="..\..\include\NFmiSortedPtrList.h" />
+    <ClInclude Include="..\..\include\NFmiSoundingData.h" />
+    <ClInclude Include="..\..\include\NFmiSoundingDataOpt1.h" />
+    <ClInclude Include="..\..\include\NFmiSoundingFunctions.h" />
+    <ClInclude Include="..\..\include\NFmiSoundingIndexCalculator.h" />
+    <ClInclude Include="..\..\include\NFmiTEMPCode.h" />
+    <ClInclude Include="..\..\include\NFmiUndoableMultiLevelMask.h" />
+    <ClInclude Include="..\..\include\NFmiUndoRedoQData.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\NFmiAreaMaskInfo.cpp" />
+    <ClCompile Include="..\..\source\NFmiAreaMaskSectionInfo.cpp" />
+    <ClCompile Include="..\..\source\NFmiAviationStationInfoSystem.cpp" />
+    <ClCompile Include="..\..\source\NFmiCalculationConstantValue.cpp" />
+    <ClCompile Include="..\..\source\NFmiColor.cpp" />
+    <ClCompile Include="..\..\source\NFmiColorSpaces.cpp" />
+    <ClCompile Include="..\..\source\NFmiDataStoringHelpers.cpp" />
+    <ClCompile Include="..\..\source\NFmiDictionaryFunction.cpp" />
+    <ClCompile Include="..\..\source\NFmiDrawParam.cpp" />
+    <ClCompile Include="..\..\source\NFmiDrawParamFactory.cpp" />
+    <ClCompile Include="..\..\source\NFmiDrawParamList.cpp" />
+    <ClCompile Include="..\..\source\NFmiGridPointCache.cpp" />
+    <ClCompile Include="..\..\source\NFmiHarmonizerBookKeepingData.cpp" />
+    <ClCompile Include="..\..\source\NFmiHelpDataInfo.cpp" />
+    <ClCompile Include="..\..\source\NFmiInfoAreaMaskOccurrance.cpp" />
+    <ClCompile Include="..\..\source\NFmiInfoAreaMaskSoundingIndex.cpp" />
+    <ClCompile Include="..\..\source\NFmiInfoOrganizer.cpp" />
+    <ClCompile Include="..\..\source\NFmiModifiableQDatasBookKeeping.cpp" />
+    <ClCompile Include="..\..\source\NFmiMultiLevelMask.cpp" />
+    <ClCompile Include="..\..\source\NFmiOwnerInfo.cpp" />
+    <ClCompile Include="..\..\source\NFmiProducerSystem.cpp" />
+    <ClCompile Include="..\..\source\NFmiQueryDataKeeper.cpp" />
+    <ClCompile Include="..\..\source\NFmiRawTempStationInfoSystem.cpp" />
+    <ClCompile Include="..\..\source\NFmiSmartInfo.cpp" />
+    <ClCompile Include="..\..\source\NFmiSmartToolCalculation.cpp" />
+    <ClCompile Include="..\..\source\NFmiSmartToolCalculationInfo.cpp" />
+    <ClCompile Include="..\..\source\NFmiSmartToolCalculationSection.cpp" />
+    <ClCompile Include="..\..\source\NFmiSmartToolCalculationSectionInfo.cpp" />
+    <ClCompile Include="..\..\source\NFmiSmartToolInfo.cpp" />
+    <ClCompile Include="..\..\source\NFmiSmartToolIntepreter.cpp" />
+    <ClCompile Include="..\..\source\NFmiSmartToolModifier.cpp" />
+    <ClCompile Include="..\..\source\NFmiSmartToolUtil.cpp" />
+    <ClCompile Include="..\..\source\NFmiSortedPtrList.cpp" />
+    <ClCompile Include="..\..\source\NFmiSoundingData.cpp" />
+    <ClCompile Include="..\..\source\NFmiSoundingDataOpt1.cpp" />
+    <ClCompile Include="..\..\source\NFmiSoundingFunctions.cpp" />
+    <ClCompile Include="..\..\source\NFmiSoundingIndexCalculator.cpp" />
+    <ClCompile Include="..\..\source\NFmiTEMPCode.cpp" />
+    <ClCompile Include="..\..\source\NFmiUndoableMultiLevelMask.cpp" />
+    <ClCompile Include="..\..\source\NFmiUndoRedoQData.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2B8FA67C-B5BA-460C-9209-D71C510492E0}</ProjectGuid>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.60315.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\..\$(Platform)\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>..\..\$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(BUILD_DIR)\$(Platform)\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>$(BUILD_DIR)\$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\$(Platform)\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>..\..\$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(BUILD_DIR)\$(Platform)\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>$(BUILD_DIR)\$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\Src\smarttools\include;..\..\Src\newbase\include;$(BOOST_INCLUDE_DIR);..\..\Src\smartmetbizcode\stationviews\include;..\..\Src\smartmetbizcode\ctrlviews\include;..\..\Src\smartmetbizcode\generaldoc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FMI_SUPPORT_STATION_DATA_SMARTTOOL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation />
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(LIBS_FMI)\smarttools\include;$(LIBS_FMI)\newbase\include;$(BOOST_INCLUDE_DIR);$(LIBS_FMI)\bizcode\stationviews\include;$(LIBS_FMI)\bizcode\ctrlviews\include;$(LIBS_FMI)\bizcode\generaldoc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WIN64;_DEBUG;_LIB;FMI_SUPPORT_STATION_DATA_SMARTTOOL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation />
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/EHa %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\..\Src\smarttools\include;..\..\Src\newbase\include;$(BOOST_INCLUDE_DIR);..\..\Src\smartmetbizcode\stationviews\include;..\..\Src\smartmetbizcode\ctrlviews\include;..\..\Src\smartmetbizcode\generaldoc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FMI_SUPPORT_STATION_DATA_SMARTTOOL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation />
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/EHa %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>$(LIBS_FMI)\smarttools\include;$(LIBS_FMI)\newbase\include;$(BOOST_INCLUDE_DIR);$(LIBS_FMI)\bizcode\stationviews\include;$(LIBS_FMI)\bizcode\ctrlviews\include;$(LIBS_FMI)\bizcode\generaldoc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WIN64;NDEBUG;_LIB;FMI_SUPPORT_STATION_DATA_SMARTTOOL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation />
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0809</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
