@@ -2335,6 +2335,11 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::UsedMacroParamData(v
   }
 }
 
+const std::vector<NFmiPoint>& NFmiSmartToolModifier::CalculationPoints() const
+{
+    return itsExtraMacroParamData->CalculationPoints();
+}
+
 void NFmiSmartToolModifier::ModifiedLevel(boost::shared_ptr<NFmiLevel> &theLevel)
 {
   itsModifiedLevel = theLevel;

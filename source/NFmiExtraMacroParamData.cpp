@@ -3,12 +3,13 @@
 #include "NFmiInfoOrganizer.h"
 
 NFmiExtraMacroParamData::NFmiExtraMacroParamData()
-:fUseEditedDataForResolution(false)
-,itsGivenResolutionInKm(kFloatMissing)
-,itsProducer()
-,itsLevelType(kFmiNoLevelType)
-,itsDataBasedResolutionInKm(kFloatMissing)
-,itsResolutionMacroParamData()
+    :fUseEditedDataForResolution(false)
+    , itsGivenResolutionInKm(kFloatMissing)
+    , itsProducer()
+    , itsLevelType(kFmiNoLevelType)
+    , itsDataBasedResolutionInKm(kFloatMissing)
+    , itsResolutionMacroParamData()
+    , itsCalculationPoints()
 {
 }
 

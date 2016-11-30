@@ -34,6 +34,10 @@ public:
     boost::shared_ptr<NFmiFastQueryInfo> ResolutionMacroParamData() { return itsResolutionMacroParamData; }
     static void AdjustValueMatrixToMissing(const boost::shared_ptr<NFmiFastQueryInfo> &theData, NFmiDataMatrix<float> &theValueMatrix);
 
+    void AddCalculationPoint(const NFmiPoint &latlon) { itsCalculationPoints.push_back(latlon); }
+    const std::vector<NFmiPoint>& CalculationPoints() const { return itsCalculationPoints; }
+    bool UseCalculationPoints() const { return !itsCalculationPoints.empty(); }
+
 private:
     void InitializeResolutionWithEditedData(NFmiInfoOrganizer &theInfoOrganizer);
     void InitializeResolutionData(NFmiInfoOrganizer &theInfoOrganizer, float usedResolutionInKm);
@@ -55,5 +59,10 @@ private:
     // dataan on laskettu haluttu resoluutio tämän macroParamin laskujen ajaksi.    
     float itsDataBasedResolutionInKm; 
     boost::shared_ptr<NFmiFastQueryInfo> itsResolutionMacroParamData;
+
+    // CalculationPoint listassa on pisteet jos niitä on annettu "CalculationPoint = lat,lon" -lausekkeilla.
+    // Tämä muuttaa macroParamin laskuja niin että lopullinen laskettu matriisi nollataan muiden pisteiden 
+    // kohdalta paitsi näiden pisteiden lähimmissä hilapisteissä.
+    std::vector<NFmiPoint> itsCalculationPoints;
 };
 

@@ -2281,6 +2281,70 @@ bool NFmiSmartToolIntepreter::ExtractResolutionInfo()
     throw std::runtime_error(errorStr);
 }
 
+// Numero voi koostua kahdesta tokenista, merkistä ja itse numerosta.
+// Tämä metodi varmistaa että se ottaa kokonaisen numeron stringin.
+std::string NFmiSmartToolIntepreter::GetWholeNumberFromTokens()
+{
+    GetToken();
+    string numberStr = token;
+    if(numberStr == "-" || numberStr == "+")
+    {
+        GetToken();
+        numberStr += token;
+    }
+    return numberStr;
+}
+
+const std::string gCalculationPointErrorStart = "\"CalculationPoint = lat,lon\" operation was given illegal";
+
+bool NFmiSmartToolIntepreter::ExtractCalculationPointInfo()
+{
+    // Haluttu laskenta piste kerrotaan seuraavanlaisilla lausekkeilla
+    // calculationpoint = 60.1,24.9
+    // Laskentapisteet otetaan talteen itsExtraMacroParamData -olioon.
+
+    GetToken();
+    string assignOperator = token;
+    if(assignOperator == string("="))
+    {
+        string latitudeStr = GetWholeNumberFromTokens();
+        GetToken();
+        string commaOperator = token;
+        if(commaOperator == string(","))
+        {
+            string longitudeStr = GetWholeNumberFromTokens();
+            try
+            {
+                double latitude = NFmiStringTools::Convert<double>(latitudeStr);
+                double longitude = NFmiStringTools::Convert<double>(longitudeStr);
+                if(latitude >= -90 && latitude <= 90)
+                {
+                    if(longitude >= -180 && longitude <= 360)
+                    {
+                        NFmiPoint latlon(longitude, latitude);
+                        itsExtraMacroParamData->AddCalculationPoint(latlon);
+                        return true;
+                    }
+                    else
+                        throw std::runtime_error(gCalculationPointErrorStart + " lon value.\nValue must be between -180 and 360 degrees.");
+                }
+                else
+                    throw std::runtime_error(gCalculationPointErrorStart + " lat value.\nValue must be between -90 and 90 degrees.");
+            }
+            catch(std::exception &e)
+            {
+                std::string errorStr = gCalculationPointErrorStart + " lat/lon point:\n";
+                errorStr += e.what();
+                throw std::runtime_error(errorStr);
+            }
+        }
+    }
+
+    std::string errorStr = gCalculationPointErrorStart + " values, try something like this:\n";
+    errorStr += "\"CalculationPoint = 60.1,24.9\"";
+    throw std::runtime_error(errorStr);
+}
+
 bool NFmiSmartToolIntepreter::IsVariableExtraInfoCommand(const std::string &theVariableText)
 {
     std::string aVariableText(theVariableText);
@@ -2290,6 +2354,8 @@ bool NFmiSmartToolIntepreter::IsVariableExtraInfoCommand(const std::string &theV
     {
         if(it->second == NFmiAreaMask::Resolution)
             return ExtractResolutionInfo();
+        else if(it->second == NFmiAreaMask::CalculationPoint)
+            return ExtractCalculationPointInfo();
     }
     return false;
 }
@@ -2764,8 +2830,6 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxh"), NFmiAreaMask::Max));
     itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("minh"), NFmiAreaMask::Min));
 
-    itsExtraInfoCommands.insert(FunctionMap::value_type(string("resolution"), NFmiAreaMask::Resolution));
-
     itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad"), MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionXandY, 1, "grad(param)")));
     itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div"), MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionXandY, 1, "div(param)")));
     itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionXandY, 1, "adv(param)")));
@@ -3004,6 +3068,9 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsMathFunctions.insert(MathFunctionMap::value_type(string("abs"), NFmiAreaMask::Abs));
     itsMathFunctions.insert(MathFunctionMap::value_type(string("rand"), NFmiAreaMask::Rand));
 
+    itsExtraInfoCommands.insert(FunctionMap::value_type(string("resolution"), NFmiAreaMask::Resolution));
+    itsExtraInfoCommands.insert(FunctionMap::value_type(string("calculationpoint"), NFmiAreaMask::CalculationPoint));
+    
     itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("surface"), kFmiMeanSeaLevel));
     itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("pressure"), kFmiPressureLevel));
     itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("hybrid"), kFmiHybridLevel));

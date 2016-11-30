@@ -271,6 +271,8 @@ class NFmiSmartToolIntepreter
   bool IsFunctionNameWithUnderScore(const std::string &theVariableText);
   void CheckIfVariableResemblesVerticalFunction(const std::string &theVariableText);
   bool ExtractResolutionInfo();
+  bool ExtractCalculationPointInfo();
+  std::string GetWholeNumberFromTokens();
 
   NFmiProducerSystem *itsProducerSystem;               // ei omista
   std::string itsCheckOutSectionText;                  // esim. if-sectionin koko teksti
