@@ -1257,7 +1257,7 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMetFunctionAreaMask
                                  info,
                                  peekAlongTudes,
                                  theAreaMaskInfo.MetFunctionDirection()));
-    if (funcType == NFmiAreaMask::Divergence)
+    if (funcType == NFmiAreaMask::Divergence || funcType == NFmiAreaMask::Divergence2)
       dynamic_cast<NFmiInfoAreaMaskGrad *>(areaMask.get())->CalculateDivergence(true);
   }
   else if (funcType == NFmiAreaMask::Adv || funcType == NFmiAreaMask::Adv2)
