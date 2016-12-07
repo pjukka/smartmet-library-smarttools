@@ -235,6 +235,7 @@ NFmiStation2GridMask::NFmiStation2GridMask(Type theMaskType,
       itsAreaPtr(),
       itsDoc(0),
       itsStation2GridSize(1, 1),
+      itsObservationRadiusRelative(kFloatMissing),
       itsCacheMutex(new MutexType())
 {
 }
@@ -252,6 +253,7 @@ NFmiStation2GridMask::NFmiStation2GridMask(const NFmiStation2GridMask &theOther)
       itsAreaPtr(theOther.itsAreaPtr.get() ? theOther.itsAreaPtr.get()->Clone() : 0),
       itsDoc(theOther.itsDoc),
       itsStation2GridSize(theOther.itsStation2GridSize),
+    itsObservationRadiusRelative(theOther.itsObservationRadiusRelative),
       itsCacheMutex(theOther.itsCacheMutex)
 {
 }
@@ -274,11 +276,13 @@ double NFmiStation2GridMask::Value(const NFmiCalculationParams &theCalculationPa
 
 void NFmiStation2GridMask::SetGriddingHelpers(NFmiArea *theArea,
                                               NFmiEditMapGeneralDataDoc *theDoc,
-                                              const NFmiPoint &theStation2GridSize)
+                                              const NFmiPoint &theStation2GridSize,
+                                              float theObservationRadiusRelative)
 {
   itsAreaPtr.reset(theArea->Clone());
   itsDoc = theDoc;
   itsStation2GridSize = theStation2GridSize;
+  itsObservationRadiusRelative = theObservationRadiusRelative;
 }
 
 void NFmiStation2GridMask::DoGriddingCheck(const NFmiCalculationParams &theCalculationParams)
@@ -306,7 +310,7 @@ void NFmiStation2GridMask::DoGriddingCheck(const NFmiCalculationParams &theCalcu
             static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.Y()),
             kFloatMissing);
         NFmiStationView::GridStationData(
-            itsDoc, itsAreaPtr, drawParam, griddedData, theCalculationParams.itsTime);
+            itsDoc, itsAreaPtr, drawParam, griddedData, theCalculationParams.itsTime, itsObservationRadiusRelative);
         std::pair<DataCache::iterator, bool> insertResult = itsGriddedStationData->insert(
             std::make_pair(theCalculationParams.itsTime, griddedData));
         if (insertResult.second)

@@ -2345,6 +2345,29 @@ bool NFmiSmartToolIntepreter::ExtractCalculationPointInfo()
     throw std::runtime_error(errorStr);
 }
 
+bool NFmiSmartToolIntepreter::ExtractObservationRadiusInfo()
+{
+    // Jos skriptistä löytyy 'usemissingobservations = 1' tai = true , ei muuta tarvita sen asetukseen.
+    GetToken();
+    string assignOperator = token;
+    if(assignOperator == string("="))
+    {
+        string obsRadiusStr = GetWholeNumberFromTokens();
+        try
+        {
+            float obsRadiusInKm = NFmiStringTools::Convert<float>(obsRadiusStr);
+            itsExtraMacroParamData->ObservationRadiusInKm(obsRadiusInKm);
+            return true;
+        }
+        catch(...)
+        { }
+    }
+
+    std::string errorStr = "Given ObservationRadius -clause was illegal, try something like this:\n";
+    errorStr += "\"ObservationRadius = 20 \\\\ [km]\"";
+    throw std::runtime_error(errorStr);
+}
+
 bool NFmiSmartToolIntepreter::IsVariableExtraInfoCommand(const std::string &theVariableText)
 {
     std::string aVariableText(theVariableText);
@@ -2356,6 +2379,8 @@ bool NFmiSmartToolIntepreter::IsVariableExtraInfoCommand(const std::string &theV
             return ExtractResolutionInfo();
         else if(it->second == NFmiAreaMask::CalculationPoint)
             return ExtractCalculationPointInfo();
+        else if(it->second == NFmiAreaMask::ObservationRadius)
+            return ExtractObservationRadiusInfo();
     }
     return false;
 }
@@ -3071,6 +3096,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
 
     itsExtraInfoCommands.insert(FunctionMap::value_type(string("resolution"), NFmiAreaMask::Resolution));
     itsExtraInfoCommands.insert(FunctionMap::value_type(string("calculationpoint"), NFmiAreaMask::CalculationPoint));
+    itsExtraInfoCommands.insert(FunctionMap::value_type(string("observationradius"), NFmiAreaMask::ObservationRadius));
     
     itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("surface"), kFmiMeanSeaLevel));
     itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("pressure"), kFmiPressureLevel));

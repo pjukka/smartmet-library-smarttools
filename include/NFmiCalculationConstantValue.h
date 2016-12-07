@@ -177,7 +177,8 @@ class NFmiStation2GridMask : public NFmiInfoAreaMask
   double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
   void SetGriddingHelpers(NFmiArea *theArea,
                           NFmiEditMapGeneralDataDoc *theDoc,
-                          const NFmiPoint &theStation2GridSize);
+                          const NFmiPoint &theStation2GridSize,
+                          float theObservationRadiusRelative);
 
  private:
   void DoGriddingCheck(const NFmiCalculationParams &theCalculationParams);
@@ -198,6 +199,9 @@ class NFmiStation2GridMask : public NFmiInfoAreaMask
   NFmiEditMapGeneralDataDoc *itsDoc;
   NFmiPoint itsStation2GridSize;  // tämän kokoiseen hilaan asema data lasketaan
                                   // (itsGriddedStationData -koko)
+  // Normaalisti havainto laskuissa ei rajoiteta käytettyjä havaintoja etäisyyden perusteellä.
+  // Jos tähän annetaan jotain kFloatMissing:istä poikkeavaa, niin silloin rajoitetaan.
+  float itsObservationRadiusRelative;
 
   // Kun itsCurrentGriddedStationData -muuttujaa lasketaan tai asetetaan, sen saa tehdä kullekin
   // ajalle vain kerran. Tämä lukko systeemi takaa sen.

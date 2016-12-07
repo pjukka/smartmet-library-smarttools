@@ -272,6 +272,7 @@ class NFmiSmartToolIntepreter
   void CheckIfVariableResemblesVerticalFunction(const std::string &theVariableText);
   bool ExtractResolutionInfo();
   bool ExtractCalculationPointInfo();
+  bool ExtractObservationRadiusInfo();
   std::string GetWholeNumberFromTokens();
 
   NFmiProducerSystem *itsProducerSystem;               // ei omista

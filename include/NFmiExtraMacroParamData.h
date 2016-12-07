@@ -38,11 +38,17 @@ public:
     const std::vector<NFmiPoint>& CalculationPoints() const { return itsCalculationPoints; }
     bool UseCalculationPoints() const { return !itsCalculationPoints.empty(); }
 
+    float ObservationRadiusInKm() const { return itsObservationRadiusInKm; }
+    void ObservationRadiusInKm(float newValue) { itsObservationRadiusInKm = newValue; }
+    float ObservationRadiusRelative() const { return itsObservationRadiusRelative; }
+    void ObservationRadiusRelative(float newValue) { itsObservationRadiusRelative = newValue; }
+
 private:
     void InitializeResolutionWithEditedData(NFmiInfoOrganizer &theInfoOrganizer);
     void InitializeResolutionData(NFmiInfoOrganizer &theInfoOrganizer, float usedResolutionInKm);
     void InitializeDataBasedResolutionData(NFmiInfoOrganizer &theInfoOrganizer, const NFmiProducer &theProducer, FmiLevelType theLevelType);
     void UseDataForResolutionCalculations(NFmiInfoOrganizer &theInfoOrganizer, boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
+    void InitializeRelativeObservationRange(NFmiInfoOrganizer &theInfoOrganizer, float usedRangeInKm);
 
     // Jos skriptiss‰ on resolution = edited, k‰ytet‰‰n editoitua dataa resoluutio laskuissa.
     bool fUseEditedDataForResolution;
@@ -64,5 +70,11 @@ private:
     // T‰m‰ muuttaa macroParamin laskuja niin ett‰ lopullinen laskettu matriisi nollataan muiden pisteiden 
     // kohdalta paitsi n‰iden pisteiden l‰himmiss‰ hilapisteiss‰.
     std::vector<NFmiPoint> itsCalculationPoints;
+
+    // Jos halutaan ett‰ havaintojen k‰yttˆ‰ laskuissa rajoitetaan laskentas‰teell‰, annetaan se 
+    // t‰h‰n kilometreiss‰. Jos t‰m‰ on kFloatMissing, k‰ytet‰‰n laskuissa havaintoja rajattomasti.
+    float itsObservationRadiusInKm;
+    // T‰h‰n lasketaan k‰ytetyn kartta-alueen mukainen relatiivinen et‰isyys (jota k‰ytet‰‰n itse laskuissa)
+    float itsObservationRadiusRelative;
 };
 

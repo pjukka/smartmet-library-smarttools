@@ -1678,7 +1678,8 @@ void NFmiSmartToolModifier::DoFinalAreaMaskInitializations(boost::shared_ptr<NFm
                 station2GridMask->SetGriddingHelpers(
                     itsWorkingGrid->itsArea,
                     itsDoc,
-                    NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
+                    NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY),
+                    itsExtraMacroParamData->ObservationRadiusRelative());
                 areaMask = boost::shared_ptr<NFmiAreaMask>(station2GridMask);
                 MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
             }

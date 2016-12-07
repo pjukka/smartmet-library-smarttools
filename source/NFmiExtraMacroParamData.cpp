@@ -10,6 +10,8 @@ NFmiExtraMacroParamData::NFmiExtraMacroParamData()
     , itsDataBasedResolutionInKm(kFloatMissing)
     , itsResolutionMacroParamData()
     , itsCalculationPoints()
+    , itsObservationRadiusInKm(kFloatMissing)
+    , itsObservationRadiusRelative(kFloatMissing)
 {
 }
 
@@ -27,6 +29,8 @@ void NFmiExtraMacroParamData::FinalizeData(NFmiInfoOrganizer &theInfoOrganizer)
     {
         InitializeDataBasedResolutionData(theInfoOrganizer, itsProducer, itsLevelType);
     }
+
+    InitializeRelativeObservationRange(theInfoOrganizer, itsObservationRadiusInKm);
 }
 
 bool NFmiExtraMacroParamData::UseSpecialResolution() const
@@ -71,6 +75,21 @@ void NFmiExtraMacroParamData::InitializeResolutionData(NFmiInfoOrganizer &theInf
     itsResolutionMacroParamData = theInfoOrganizer.CreateNewMacroParamData(gridSizeX, gridSizeY, NFmiInfoData::kMacroParam);
     // Pitää vielä säätää datan alue kartan zoomaus alueeseen. Se saadaan infoOrganizerin omasta macroParamDatasta.
     SetUsedAreaForData(itsResolutionMacroParamData, usedArea);
+}
+
+void NFmiExtraMacroParamData::InitializeRelativeObservationRange(NFmiInfoOrganizer &theInfoOrganizer, float usedRangeInKm)
+{
+    if(usedRangeInKm == kFloatMissing)
+    {
+        itsObservationRadiusRelative = kFloatMissing;
+    }
+    else
+    {
+        const NFmiArea *usedArea = theInfoOrganizer.MacroParamData()->Area();
+        double xRatio = (usedRangeInKm * 1000.) / usedArea->WorldXYWidth();
+        double yRatio = (usedRangeInKm * 1000.) / usedArea->WorldXYHeight();
+        itsObservationRadiusRelative = static_cast<float>((xRatio + yRatio) / 2.);
+    }
 }
 
 void NFmiExtraMacroParamData::AdjustValueMatrixToMissing(const boost::shared_ptr<NFmiFastQueryInfo> &theData, NFmiDataMatrix<float> &theValueMatrix)
