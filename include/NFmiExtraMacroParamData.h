@@ -37,6 +37,8 @@ public:
     void AddCalculationPoint(const NFmiPoint &latlon) { itsCalculationPoints.push_back(latlon); }
     const std::vector<NFmiPoint>& CalculationPoints() const { return itsCalculationPoints; }
     bool UseCalculationPoints() const { return !itsCalculationPoints.empty(); }
+    const NFmiProducer& CalculationPointProducer() const { return itsCalculationPointProducer; }
+    void CalculationPointProducer(const NFmiProducer &theProducer) { itsCalculationPointProducer = theProducer; }
 
     float ObservationRadiusInKm() const { return itsObservationRadiusInKm; }
     void ObservationRadiusInKm(float newValue) { itsObservationRadiusInKm = newValue; }
@@ -49,6 +51,7 @@ private:
     void InitializeDataBasedResolutionData(NFmiInfoOrganizer &theInfoOrganizer, const NFmiProducer &theProducer, FmiLevelType theLevelType);
     void UseDataForResolutionCalculations(NFmiInfoOrganizer &theInfoOrganizer, boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
     void InitializeRelativeObservationRange(NFmiInfoOrganizer &theInfoOrganizer, float usedRangeInKm);
+    void AddCalculationPointsFromData(NFmiInfoOrganizer &theInfoOrganizer, const NFmiProducer &theProducer);
 
     // Jos skriptiss‰ on resolution = edited, k‰ytet‰‰n editoitua dataa resoluutio laskuissa.
     bool fUseEditedDataForResolution;
@@ -70,6 +73,10 @@ private:
     // T‰m‰ muuttaa macroParamin laskuja niin ett‰ lopullinen laskettu matriisi nollataan muiden pisteiden 
     // kohdalta paitsi n‰iden pisteiden l‰himmiss‰ hilapisteiss‰.
     std::vector<NFmiPoint> itsCalculationPoints;
+    // Jos skriptiss‰ on annettu CalculationPoint on muodossa "CalculationPoint = synop",
+    // talletetaan lausekkeen tuottaja t‰nne ja kyseisen datan asemat lis‰t‰‰n itsCalculationPoints -listaan.
+    NFmiProducer itsCalculationPointProducer; // puuttuva arvo on kun id = 0
+
 
     // Jos halutaan ett‰ havaintojen k‰yttˆ‰ laskuissa rajoitetaan laskentas‰teell‰, annetaan se 
     // t‰h‰n kilometreiss‰. Jos t‰m‰ on kFloatMissing, k‰ytet‰‰n laskuissa havaintoja rajattomasti.

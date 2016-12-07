@@ -10,6 +10,7 @@ NFmiExtraMacroParamData::NFmiExtraMacroParamData()
     , itsDataBasedResolutionInKm(kFloatMissing)
     , itsResolutionMacroParamData()
     , itsCalculationPoints()
+    , itsCalculationPointProducer()
     , itsObservationRadiusInKm(kFloatMissing)
     , itsObservationRadiusRelative(kFloatMissing)
 {
@@ -28,6 +29,11 @@ void NFmiExtraMacroParamData::FinalizeData(NFmiInfoOrganizer &theInfoOrganizer)
     else if(itsProducer.GetIdent() != 0)
     {
         InitializeDataBasedResolutionData(theInfoOrganizer, itsProducer, itsLevelType);
+    }
+
+    if(itsCalculationPointProducer.GetIdent() != 0)
+    {
+        AddCalculationPointsFromData(theInfoOrganizer, itsCalculationPointProducer);
     }
 
     InitializeRelativeObservationRange(theInfoOrganizer, itsObservationRadiusInKm);
@@ -215,4 +221,42 @@ void NFmiExtraMacroParamData::InitializeDataBasedResolutionData(NFmiInfoOrganize
     }
     else
         throw std::runtime_error(std::string("Could not find the given 'resolution' data for ") + ::GetProducerInfoForResolutionError(theProducer, theLevelType));
+}
+
+static void AddCalculationPoints(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiArea *theArea, std::vector<NFmiPoint> &theCalculationPoints)
+{
+    if(theInfo && theArea)
+    {
+        // Infon pitää olla asema dataa.
+        // Siinä ei saa olla datassa paikkatietoa, kuten SHIP ja BOUY datoissa on,
+        // koska tällöin niiden paikka muuttuu ajan mukana.
+        if(!theInfo->Grid() && !theInfo->HasLatlonInfoInData())
+        {
+            for(theInfo->ResetLocation(); theInfo->NextLocation(); )
+            {
+                const NFmiPoint &latlon = theInfo->LatLonFast();
+                if(theArea->IsInside(latlon))
+                {
+                    theCalculationPoints.push_back(latlon);
+                }
+            }
+        }
+    }
+}
+
+static void AddCalculationPoints(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &theInfos, const NFmiArea *theArea, std::vector<NFmiPoint> &theCalculationPoints)
+{
+    for(size_t i = 0; i < theInfos.size(); i++)
+    {
+        ::AddCalculationPoints(theInfos[i], theArea, theCalculationPoints);
+    }
+}
+
+
+void NFmiExtraMacroParamData::AddCalculationPointsFromData(NFmiInfoOrganizer &theInfoOrganizer, const NFmiProducer &theProducer)
+{
+    checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infos = theInfoOrganizer.GetInfos(theProducer.GetIdent());
+    const NFmiArea *usedArea = theInfoOrganizer.MacroParamData()->Area();
+
+    ::AddCalculationPoints(infos, usedArea, itsCalculationPoints);
 }

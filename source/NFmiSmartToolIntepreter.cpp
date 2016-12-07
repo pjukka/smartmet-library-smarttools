@@ -2308,6 +2308,20 @@ bool NFmiSmartToolIntepreter::ExtractCalculationPointInfo()
     if(assignOperator == string("="))
     {
         string latitudeStr = GetWholeNumberFromTokens();
+
+        // Kokeillaan onko annettu tuottaja, jonka datasta asemat otetaan (pitää hanskata poikkeukset, että voidaan tarvittaessa jatkaa)
+        try
+        {
+            itsExtraMacroParamData->CalculationPointProducer(GetPossibleProducerInfo(latitudeStr));
+            if(itsExtraMacroParamData->CalculationPointProducer().GetIdent())
+            {
+                return true;
+            }
+        }
+        catch(...)
+        {
+        }
+
         GetToken();
         string commaOperator = token;
         if(commaOperator == string(","))
@@ -2342,12 +2356,14 @@ bool NFmiSmartToolIntepreter::ExtractCalculationPointInfo()
 
     std::string errorStr = gCalculationPointErrorStart + " values, try something like this:\n";
     errorStr += "\"CalculationPoint = 60.1,24.9\"";
+    errorStr += " or ";
+    errorStr += "\"CalculationPoint = synop\\metar\\other_producer\"";
     throw std::runtime_error(errorStr);
 }
 
 bool NFmiSmartToolIntepreter::ExtractObservationRadiusInfo()
 {
-    // Jos skriptistä löytyy 'usemissingobservations = 1' tai = true , ei muuta tarvita sen asetukseen.
+    // Jos skriptistä on löytynyt 'ObservationRadius = xxx'
     GetToken();
     string assignOperator = token;
     if(assignOperator == string("="))
