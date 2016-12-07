@@ -1869,6 +1869,9 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateCalculatedAreaMask(
   else if (parId == kFmiSecond)
     areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiUtcHourAreaMask(
         theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition()));
+  else if(parId == kFmiMinute)
+      areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiMinuteAreaMask(
+          theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition()));
   else if (parId == kFmiForecastPeriod)
     areaMask = boost::shared_ptr<NFmiAreaMask>(
         new NFmiForecastHourAreaMask(itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable),

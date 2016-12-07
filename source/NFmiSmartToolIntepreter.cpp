@@ -2717,6 +2717,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("lhour"), kFmiHour));  // local hour oikeasti
     itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("utchour"), kFmiSecond));  // utc hour käyttää secondia, koska ei ollut omaa parametria utc hourille enkä lisää sellaista
     itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("fhour"), kFmiForecastPeriod));  // forecast hour pikaviritys forperiodia käytetty, koska ei ollut valmista parametria
+    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("minute"), kFmiMinute));  // kyseisen ajanhetken minuutit, aina samat 0-59 riippumatta oliko kyse lokaali, utc tai forecast timesta
     itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("timestep"), kFmiDeltaTime));  // TIMESTEP eli timestep palauttaa datan currentin ajan aika stepin tunneissa
 
     itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("gridsizex"), kFmiLastParameter));  // hilan x suuntainen koko metreissä (muokattavan datan tai macroParam hilan koko)
