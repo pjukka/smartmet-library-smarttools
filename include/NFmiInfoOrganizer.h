@@ -169,20 +169,14 @@ class NFmiInfoOrganizer
   const std::string &WorkingDirectory(void) const { return itsWorkingDirectory; };
   void WorkingDirectory(const std::string &newValue) { itsWorkingDirectory = newValue; };
   void UpdateEditedDataCopy(void);  // 28.09.1999/Marko
-  NFmiDataMatrix<float> &MacroParamMissingValueMatrix(void)
-  {
-    return itsMacroParamMissingValueMatrix;
-  }
-  NFmiDataMatrix<float> &CrossSectionMacroParamMissingValueMatrix(void)
-  {
-    return itsCrossSectionMacroParamMissingValueMatrix;
-  }
 
   void SetDrawParamPath(const std::string &theDrawParamPath);
   const std::string GetDrawParamPath(void);
   void SetMacroParamDataGridSize(int x, int y);
   void SetMacroParamDataMinGridSize(int x, int y);
   void SetMacroParamDataMaxGridSize(int x, int y);
+
+  boost::shared_ptr<NFmiFastQueryInfo> CreateNewMacroParamData(int x, int y, NFmiInfoData::Type theDataType);
 
   const NFmiPoint &GetMacroParamDataGridSize(void) const { return itsMacroParamGridSize; }
   const NFmiPoint &GetMacroParamDataMaxGridSize(void) const { return itsMacroParamMaxGridSize; }
@@ -233,6 +227,8 @@ class NFmiInfoOrganizer
                          const NFmiProducer &theProducer,
                          bool ignoreProducer,
                          const ParamCheckFlags &paramCheckFlags);
+  void FixMacroParamDataGridSize(int &x, int &y);
+  boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CreateNewMacroParamData_checkeInput(int x, int y, NFmiInfoData::Type theDataType);
 
   boost::shared_ptr<NFmiQueryDataKeeper>
       itsEditedDataKeeper;  // pitää sisällään oikeasti NFmiSmartInfo-olion
@@ -248,10 +244,6 @@ class NFmiInfoOrganizer
   // pitää yllä yhden hilan kokoista dataa
   // (yksi aika,param ja level, editoitavan
   // datan hplaceDesc)
-  NFmiDataMatrix<float> itsMacroParamMissingValueMatrix;  // tähän talletetaan editoitavan datan
-                                                          // hilan suuruinen kFloatMissing:eilla
-                                                          // alustettu matriisi että sillä voi
-                                                          // alustaa makroParam dataa ennen laskuja
   boost::shared_ptr<NFmiFastQueryInfo> itsCrossSectionMacroParamData;  // poikkileikkaus
                                                                        // makro-parametrien laskuja
   // varten pitää pitää yllä
@@ -259,14 +251,6 @@ class NFmiInfoOrganizer
   // (yksi aika,param ja level,
   // editoitavan datan
   // hplaceDesc)
-  NFmiDataMatrix<float> itsCrossSectionMacroParamMissingValueMatrix;  // tähän talletetaan
-                                                                      // editoitavan datan hilan
-                                                                      // suuruinen
-                                                                      // kFloatMissing:eilla
-                                                                      // alustettu matriisi että
-                                                                      // sillä voi alustaa
-                                                                      // makroParam dataa ennen
-                                                                      // laskuja
   bool fCreateEditedDataCopy;  // luodaanko vai eikö luoda kopiota editoidusta datasta
   static std::vector<FmiParameterName> itsWantedSoundingParams;
   static std::vector<FmiParameterName> itsWantedTrajectoryParams;

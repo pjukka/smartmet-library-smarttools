@@ -49,6 +49,7 @@ class NFmiAreaMaskInfo;
 class NFmiSmartToolCalculationInfo;
 class NFmiSmartToolCalculationBlockInfo;
 class NFmiProducerSystem;
+class NFmiExtraMacroParamData;
 
 class NFmiSmartToolCalculationBlockInfoVector
 {
@@ -109,10 +110,11 @@ class NFmiSmartToolIntepreter
   }
   NFmiParamBag ModifiedParams(void);
   NFmiParam GetParamFromString(const std::string &theParamText);
-  bool IsInterpretedSkriptMacroParam(void);  // kun intepreter on tulkinnut smarttool-tekstin,
-                                             // voidaan kysyä, onko kyseinen makro ns.
-  // macroParam-skripti eli sisältääkö se RESULT = ???
-  // tapaista tekstiä
+  // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns.
+  // macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
+  bool IsInterpretedSkriptMacroParam(void);  
+  std::unique_ptr<NFmiExtraMacroParamData> GetOwnershipOfExtraMacroParamData();
+
 
  private:
   typedef std::map<std::string, FmiParameterName> ParamMap;
@@ -153,6 +155,7 @@ class NFmiSmartToolIntepreter
                             boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
   bool IsVariableDeltaZ(const std::string &theVariableText,
                         boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
+  bool IsVariableExtraInfoCommand(const std::string &theVariableText);
   bool IsVariableRampFunction(const std::string &theVariableText,
                               boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo);
   bool FindParamAndSetMaskInfo(const std::string &theVariableText,
@@ -267,6 +270,10 @@ class NFmiSmartToolIntepreter
   void SearchUntil(std::string::iterator &theExp_ptr, char *theTempCharPtr, char theSearchedCh);
   bool IsFunctionNameWithUnderScore(const std::string &theVariableText);
   void CheckIfVariableResemblesVerticalFunction(const std::string &theVariableText);
+  bool ExtractResolutionInfo();
+  bool ExtractCalculationPointInfo();
+  bool ExtractObservationRadiusInfo();
+  std::string GetWholeNumberFromTokens();
 
   NFmiProducerSystem *itsProducerSystem;               // ei omista
   std::string itsCheckOutSectionText;                  // esim. if-sectionin koko teksti
@@ -281,8 +288,8 @@ class NFmiSmartToolIntepreter
   std::string itsIncludeDirectory;  // mistä ladataan mahd. include filet
 
   checkedVector<NFmiSmartToolCalculationBlockInfo> itsSmartToolCalculationBlocks;
-
   int itsMaxCalculationSectionCount;
+  std::unique_ptr<NFmiExtraMacroParamData> itsExtraMacroParamData;
 
   static void InitTokens(NFmiProducerSystem *theProducerSystem,
                          NFmiProducerSystem *theObservationProducerSystem);
@@ -318,6 +325,7 @@ class NFmiSmartToolIntepreter
   typedef std::map<std::string, NFmiAreaMask::FunctionType> FunctionMap;
   static FunctionMap itsTokenFunctions;
   static FunctionMap itsTokenThreeArgumentFunctions;
+  static FunctionMap itsExtraInfoCommands; // Tänne mm. resolution- ja calculationpoint -jutut
 
   typedef boost::tuple<NFmiAreaMask::FunctionType,
                        NFmiAreaMask::MetFunctionDirection,
@@ -356,6 +364,9 @@ class NFmiSmartToolIntepreter
 
   typedef std::map<std::string, NFmiAreaMask::MathFunctionType> MathFunctionMap;
   static MathFunctionMap itsMathFunctions;
+
+  typedef std::map<std::string, FmiLevelType> ResolutionLevelTypesMap;
+  static ResolutionLevelTypesMap itsResolutionLevelTypes;
 
   typedef std::map<std::string, int> ScriptVariableMap;
   ScriptVariableMap itsTokenScriptVariableNames;  // skriptissä varatut muuttujat (var x = ?)

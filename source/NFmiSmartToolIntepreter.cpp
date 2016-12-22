@@ -16,6 +16,7 @@
 #include "NFmiSmartToolCalculationInfo.h"
 #include "NFmiDictionaryFunction.h"
 #include "NFmiProducerSystem.h"
+#include "NFmiExtraMacroParamData.h"
 
 #include <NFmiPreProcessor.h>
 #include <NFmiValueString.h>
@@ -147,10 +148,12 @@ NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenStaticParamet
 NFmiSmartToolIntepreter::ParamMap NFmiSmartToolIntepreter::itsTokenCalculatedParameterNamesAndIds;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenFunctions;
 NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsTokenThreeArgumentFunctions;
+NFmiSmartToolIntepreter::FunctionMap NFmiSmartToolIntepreter::itsExtraInfoCommands;
 NFmiSmartToolIntepreter::MetFunctionMap NFmiSmartToolIntepreter::itsTokenMetFunctions;
 NFmiSmartToolIntepreter::VertFunctionMap NFmiSmartToolIntepreter::itsTokenVertFunctions;
 NFmiSmartToolIntepreter::PeekFunctionMap NFmiSmartToolIntepreter::itsTokenPeekFunctions;
 NFmiSmartToolIntepreter::MathFunctionMap NFmiSmartToolIntepreter::itsMathFunctions;
+NFmiSmartToolIntepreter::ResolutionLevelTypesMap NFmiSmartToolIntepreter::itsResolutionLevelTypes;
 
 //--------------------------------------------------------
 // Constructor/Destructor
@@ -161,7 +164,8 @@ NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiProducerSystem *theProducer
       itsSmartToolCalculationBlocks(),
       fNormalAssigmentFound(false),
       fMacroParamFound(false),
-      fMacroParamSkriptInProgress(false)
+      fMacroParamSkriptInProgress(false),
+      itsExtraMacroParamData(std::make_unique<NFmiExtraMacroParamData>())
 {
   NFmiSmartToolIntepreter::InitTokens(itsProducerSystem, theObservationProducerSystem);
 }
@@ -747,6 +751,13 @@ bool NFmiSmartToolIntepreter::InterpretMasks(
                       theMaskSectionText);
 }
 
+// Vain tyhjä luokka erikoispoikkeusta varten.
+// Kun luetaan Extra info rivejä, otetaan niiden tiedot NFmiExtraMacroParamData
+// luokan olioon talteen ja siirrytään seuraavaan riviin ilman normaaleja toimintoja.
+class ExtraInfoMacroLineException
+{
+};
+
 //--------------------------------------------------------
 // InterpretCalculationSection
 //--------------------------------------------------------
@@ -763,13 +774,19 @@ bool NFmiSmartToolIntepreter::InterpretCalculationSection(
   do
   {
     string nextLine = ExtractNextLine(theCalculationSectiontext, pos, &end);
-    if (!nextLine.empty() && !ConsistOnlyWhiteSpaces(nextLine))
+    try
     {
-      boost::shared_ptr<NFmiSmartToolCalculationInfo> calculationInfo =
-          InterpretCalculationLine(nextLine);
-      if (calculationInfo)
-        theSectionInfo->AddCalculationInfo(calculationInfo);
+        if(!nextLine.empty() && !ConsistOnlyWhiteSpaces(nextLine))
+        {
+            boost::shared_ptr<NFmiSmartToolCalculationInfo> calculationInfo =
+                InterpretCalculationLine(nextLine);
+            if(calculationInfo)
+                theSectionInfo->AddCalculationInfo(calculationInfo);
+        }
     }
+    catch(ExtraInfoMacroLineException &)
+    { }
+
     if (end != theCalculationSectiontext.end())  // jos ei tarkistusta, menee yli lopusta
       pos = ++end;
   } while (end != theCalculationSectiontext.end());
@@ -1969,6 +1986,8 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
     return true;
   if (IsVariableVertFunction(theVariableText, theMaskInfo))
     return true;
+  if(IsVariableExtraInfoCommand(theVariableText))
+      throw ExtraInfoMacroLineException();
 
   // sitten katsotaan onko jokin integraatio funktioista
   std::string tmp(theVariableText);
@@ -2202,6 +2221,186 @@ bool NFmiSmartToolIntepreter::IsVariableVertFunction(
   return false;
 }
 
+bool NFmiSmartToolIntepreter::ExtractResolutionInfo()
+{
+    // Haluttu macroParam resoluutio kerrotaan seuraavanlaisilla lausekkeilla:
+    // resolution = 12.5  // [km]
+    // TAI
+    // resolution = hir_surface  // tai level tyyppi voi olla myös pressure/hybrid/height
+
+    GetToken();
+    string assignOperator = token;
+    if(assignOperator == string("="))
+    {
+        GetToken();
+        string resolutionStr = token;
+        NFmiStringTools::LowerCase(resolutionStr);
+        vector<string> resolutionParts = NFmiStringTools::Split(resolutionStr, "_");
+        if(resolutionParts.size() == 1)
+        {
+            // Editoitu data on poikkeus, joka hanskataan ensin
+            if(resolutionParts[0] == std::string("edited"))
+            {
+                itsExtraMacroParamData->UseEditedDataForResolution(true);
+                return true;
+            }
+            else
+            {
+                // Konversio heittää poikkeuksen, jos kyseessä ei ole luku, joten siitä tulee oma virheilmoitus
+                itsExtraMacroParamData->GivenResolutionInKm(NFmiStringTools::Convert<float>(resolutionParts[0]));
+                return true;
+            }
+        }
+        else if(resolutionParts.size() == 2)
+        {
+            itsExtraMacroParamData->Producer(GetPossibleProducerInfo(resolutionParts[0]));
+            auto iter = itsResolutionLevelTypes.find(resolutionParts[1]);
+            if(iter != itsResolutionLevelTypes.end())
+            {
+                itsExtraMacroParamData->LevelType(iter->second);
+                return true;
+            }
+            else
+            {
+                std::string errorStr(::GetDictionaryString("Given 'resolution' data level type was illegal"));
+                errorStr += ".\n" + ::GetDictionaryString("Try something like following") + ":\n";
+                errorStr += ::GetDictionaryString("resolution = ec_surface OR pressure\\hybrid\\height");
+                throw std::runtime_error(errorStr);
+            }
+        }
+    }
+
+    // Jos löytyi resolution -lauseke, mutta muuten ehdot eivät täyttyneet, tehdään virheilmoitus.
+    std::string errorStr(::GetDictionaryString("Given 'resolution' operation was illegal"));
+    errorStr += ".\n";
+    errorStr += ::GetDictionaryString("Try something like following");
+    errorStr += ":\n";
+    errorStr += ::GetDictionaryString("resolution = 12.5");
+    errorStr += "\n" + ::GetDictionaryString("OR") + "\n";
+    errorStr += ::GetDictionaryString("resolution = ec_surface");
+    throw std::runtime_error(errorStr);
+}
+
+// Numero voi koostua kahdesta tokenista, merkistä ja itse numerosta.
+// Tämä metodi varmistaa että se ottaa kokonaisen numeron stringin.
+std::string NFmiSmartToolIntepreter::GetWholeNumberFromTokens()
+{
+    GetToken();
+    string numberStr = token;
+    if(numberStr == "-" || numberStr == "+")
+    {
+        GetToken();
+        numberStr += token;
+    }
+    return numberStr;
+}
+
+const std::string gCalculationPointErrorStart = "\"CalculationPoint = lat,lon\" operation was given illegal";
+
+bool NFmiSmartToolIntepreter::ExtractCalculationPointInfo()
+{
+    // Haluttu laskenta piste kerrotaan seuraavanlaisilla lausekkeilla
+    // calculationpoint = 60.1,24.9
+    // Laskentapisteet otetaan talteen itsExtraMacroParamData -olioon.
+
+    GetToken();
+    string assignOperator = token;
+    if(assignOperator == string("="))
+    {
+        string latitudeStr = GetWholeNumberFromTokens();
+
+        // Kokeillaan onko annettu tuottaja, jonka datasta asemat otetaan (pitää hanskata poikkeukset, että voidaan tarvittaessa jatkaa)
+        try
+        {
+            itsExtraMacroParamData->CalculationPointProducer(GetPossibleProducerInfo(latitudeStr));
+            if(itsExtraMacroParamData->CalculationPointProducer().GetIdent())
+            {
+                return true;
+            }
+        }
+        catch(...)
+        {
+        }
+
+        GetToken();
+        string commaOperator = token;
+        if(commaOperator == string(","))
+        {
+            string longitudeStr = GetWholeNumberFromTokens();
+            try
+            {
+                double latitude = NFmiStringTools::Convert<double>(latitudeStr);
+                double longitude = NFmiStringTools::Convert<double>(longitudeStr);
+                if(latitude >= -90 && latitude <= 90)
+                {
+                    if(longitude >= -180 && longitude <= 360)
+                    {
+                        NFmiPoint latlon(longitude, latitude);
+                        itsExtraMacroParamData->AddCalculationPoint(latlon);
+                        return true;
+                    }
+                    else
+                        throw std::runtime_error(gCalculationPointErrorStart + " lon value.\nValue must be between -180 and 360 degrees.");
+                }
+                else
+                    throw std::runtime_error(gCalculationPointErrorStart + " lat value.\nValue must be between -90 and 90 degrees.");
+            }
+            catch(std::exception &e)
+            {
+                std::string errorStr = gCalculationPointErrorStart + " lat/lon point:\n";
+                errorStr += e.what();
+                throw std::runtime_error(errorStr);
+            }
+        }
+    }
+
+    std::string errorStr = gCalculationPointErrorStart + " values, try something like this:\n";
+    errorStr += "\"CalculationPoint = 60.1,24.9\"";
+    errorStr += " or ";
+    errorStr += "\"CalculationPoint = synop\\metar\\other_producer\"";
+    throw std::runtime_error(errorStr);
+}
+
+bool NFmiSmartToolIntepreter::ExtractObservationRadiusInfo()
+{
+    // Jos skriptistä on löytynyt 'ObservationRadius = xxx'
+    GetToken();
+    string assignOperator = token;
+    if(assignOperator == string("="))
+    {
+        string obsRadiusStr = GetWholeNumberFromTokens();
+        try
+        {
+            float obsRadiusInKm = NFmiStringTools::Convert<float>(obsRadiusStr);
+            itsExtraMacroParamData->ObservationRadiusInKm(obsRadiusInKm);
+            return true;
+        }
+        catch(...)
+        { }
+    }
+
+    std::string errorStr = "Given ObservationRadius -clause was illegal, try something like this:\n";
+    errorStr += "\"ObservationRadius = 20 \\\\ [km]\"";
+    throw std::runtime_error(errorStr);
+}
+
+bool NFmiSmartToolIntepreter::IsVariableExtraInfoCommand(const std::string &theVariableText)
+{
+    std::string aVariableText(theVariableText);
+    NFmiStringTools::LowerCase(aVariableText); // Tässä tarkastellaan case insensitiivisesti
+    FunctionMap::iterator it = itsExtraInfoCommands.find(aVariableText);
+    if(it != itsExtraInfoCommands.end())
+    {
+        if(it->second == NFmiAreaMask::Resolution)
+            return ExtractResolutionInfo();
+        else if(it->second == NFmiAreaMask::CalculationPoint)
+            return ExtractCalculationPointInfo();
+        else if(it->second == NFmiAreaMask::ObservationRadius)
+            return ExtractObservationRadiusInfo();
+    }
+    return false;
+}
+
 std::string NFmiSmartToolIntepreter::HandlePossibleUnaryMarkers(const std::string &theCurrentString)
 {
   string returnStr(theCurrentString);
@@ -2278,6 +2477,11 @@ bool NFmiSmartToolIntepreter::IsVariableBinaryOperator(
     return true;
   }
   return false;
+}
+
+std::unique_ptr<NFmiExtraMacroParamData> NFmiSmartToolIntepreter::GetOwnershipOfExtraMacroParamData() 
+{ 
+    return std::move(itsExtraMacroParamData); 
 }
 
 NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &theParamText)
@@ -2357,13 +2561,13 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
   {
     NFmiSmartToolIntepreter::fTokensInitialized = true;
 
+    // clang-format off
+
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("t"), kFmiTemperature));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("p"), kFmiPressure));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rh"), kFmiHumidity));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("tpot"), kFmiPotentialTemperature));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("thetaw"), kFmiPseudoAdiabaticPotentialTemperature));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("tpot"), kFmiPotentialTemperature));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("thetaw"), kFmiPseudoAdiabaticPotentialTemperature));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("kind"), kFmiKIndex));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("td"), kFmiDewPoint));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("dp"), kFmiDewPoint));
@@ -2380,12 +2584,9 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cm"), kFmiMediumCloudCover));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("ch"), kFmiHighCloudCover));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rr"), kFmiPrecipitation1h));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("pref"), kFmiPrecipitationForm));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("pret"), kFmiPrecipitationType));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("thund"), kFmiProbabilityThunderstorm));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pref"), kFmiPrecipitationForm));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pret"), kFmiPrecipitationType));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("thund"), kFmiProbabilityThunderstorm));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fog"), kFmiFogIntensity));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("hsade"), kFmiWeatherSymbol1));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("hessaa"), kFmiWeatherSymbol3));
@@ -2394,350 +2595,212 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("geom"), kFmiGeomHeight));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("geop"), kFmiGeopHeight));
 
-    // laitetaan kokoelma parametritkin kieleen, että niitä voi sijoittaa kerralla yhdellä
-    // komennolla
+    // laitetaan kokoelma parametritkin kieleen, että niitä voi sijoittaa kerralla yhdellä komennolla
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wind"), kFmiTotalWindMS));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("weather"), kFmiWeatherAndCloudiness));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("weather"), kFmiWeatherAndCloudiness));
 
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("rrcon"), kFmiPrecipitationConv));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("rrlar"), kFmiPrecipitationLarge));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrcon"), kFmiPrecipitationConv));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("rrlar"), kFmiPrecipitationLarge));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape"), kFmiCAPE));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cin"), kFmiCIN));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("tke"), kFmiTurbulentKineticEnergy));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("tke"), kFmiTurbulentKineticEnergy));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("icing"), kFmiIcing));
 
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1base"), kFmi_FL_1_Base));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1top"), kFmi_FL_1_Top));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1cover"), kFmi_FL_1_Cover));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("fl1cloudtype"), kFmi_FL_1_CloudType));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl1cloudtype"), kFmi_FL_1_CloudType));
 
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl2base"), kFmi_FL_2_Base));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl2top"), kFmi_FL_2_Top));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl2cover"), kFmi_FL_2_Cover));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("fl2cloudtype"), kFmi_FL_2_CloudType));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl2cloudtype"), kFmi_FL_2_CloudType));
 
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl3base"), kFmi_FL_3_Base));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl3top"), kFmi_FL_3_Top));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl3cover"), kFmi_FL_3_Cover));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("fl3cloudtype"), kFmi_FL_3_CloudType));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl3cloudtype"), kFmi_FL_3_CloudType));
 
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl4base"), kFmi_FL_4_Base));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl4top"), kFmi_FL_4_Top));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl4cover"), kFmi_FL_4_Cover));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("fl4cloudtype"), kFmi_FL_4_CloudType));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl4cloudtype"), kFmi_FL_4_CloudType));
 
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl5base"), kFmi_FL_5_Base));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl5top"), kFmi_FL_5_Top));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl5cover"), kFmi_FL_5_Cover));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("fl5cloudtype"), kFmi_FL_5_CloudType));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl5cloudtype"), kFmi_FL_5_CloudType));
 
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl6base"), kFmi_FL_6_Base));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl6top"), kFmi_FL_6_Top));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl6cover"), kFmi_FL_6_Cover));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("fl6cloudtype"), kFmi_FL_6_CloudType));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl6cloudtype"), kFmi_FL_6_CloudType));
 
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl7base"), kFmi_FL_7_Base));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl7top"), kFmi_FL_7_Top));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl7cover"), kFmi_FL_7_Cover));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("fl7cloudtype"), kFmi_FL_7_CloudType));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl7cloudtype"), kFmi_FL_7_CloudType));
 
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl8base"), kFmi_FL_8_Base));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl8top"), kFmi_FL_8_Top));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl8cover"), kFmi_FL_8_Cover));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("fl8cloudtype"), kFmi_FL_8_CloudType));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("fl8cloudtype"), kFmi_FL_8_CloudType));
 
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("flcbbase"), kFmi_FL_Cb_Base));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("flcbcover"), kFmi_FL_Cb_Cover));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("flcbcover"), kFmi_FL_Cb_Cover));
 
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("flminbase"), kFmi_FL_Min_Base));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("flmaxbase"), kFmi_FL_Max_Base));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("flminbase"), kFmi_FL_Min_Base));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("flmaxbase"), kFmi_FL_Max_Base));
 
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("avivis"), kFmiAviationVisibility));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("vervis"), kFmiVerticalVisibility));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("avivis"), kFmiAviationVisibility));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("vervis"), kFmiVerticalVisibility));
 
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pop"), kFmiPoP));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("mist"), kFmiMist));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("pseudosatel"), kFmiRadiationNetTopAtmLW));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("pseudosatel"), kFmiRadiationNetTopAtmLW));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("vis"), kFmiVisibility));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("gust"), kFmiHourlyMaximumGust));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("wsmax"), kFmiHourlyMaximumWindSpeed));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("gust"), kFmiHourlyMaximumGust));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wsmax"), kFmiHourlyMaximumWindSpeed));
 
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("boundarylh"), kFmiMixedLayerDepth));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("snowfall"), kFmiSnowAccumulation));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("boundarylh"), kFmiMixedLayerDepth));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("snowfall"), kFmiSnowAccumulation));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cloudwater"), kFmiCloudWater));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("cloudice"), static_cast<FmiParameterName>(277)));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("stationp"), kFmiPressureAtStationLevel));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cloudice"), static_cast<FmiParameterName>(277)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("stationp"), kFmiPressureAtStationLevel));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("zeroh"), kFmiFreezingLevel));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("snowdepth"), kFmiWaterEquivalentOfSnow));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("snowdepth"), kFmiWaterEquivalentOfSnow));
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("icecover"), kFmiIceCover));
 
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("wso1"), kFmiProbabilityOfWindLimit1));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("wso2"), kFmiProbabilityOfWindLimit2));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("wso3"), kFmiProbabilityOfWindLimit3));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("wso4"), kFmiProbabilityOfWindLimit4));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("wso5"), kFmiProbabilityOfWindLimit5));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("wso6"), kFmiProbabilityOfWindLimit6));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso1"), kFmiProbabilityOfWindLimit1));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso2"), kFmiProbabilityOfWindLimit2));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso3"), kFmiProbabilityOfWindLimit3));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso4"), kFmiProbabilityOfWindLimit4));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso5"), kFmiProbabilityOfWindLimit5));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("wso6"), kFmiProbabilityOfWindLimit6));
 
     itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("icing"), kFmiIcing));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("qnh"), static_cast<FmiParameterName>(1207)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("qnh"), static_cast<FmiParameterName>(1207)));
 
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("messagetype"), kFmiHakeMessageType));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("messagetype"), kFmiHakeMessageType));
 
-    // ****** sounding index funktiot  HUOM! ne käsitellään case insensitiveinä!!
-    // *************************
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("lclsur"), static_cast<FmiParameterName>(kSoundingParLCLSur)));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("lfcsur"), static_cast<FmiParameterName>(kSoundingParLFCSur)));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("elsur"), static_cast<FmiParameterName>(kSoundingParELSur)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lclheightsur"), static_cast<FmiParameterName>(kSoundingParLCLHeightSur)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lfcheightsur"), static_cast<FmiParameterName>(kSoundingParLFCHeightSur)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("elheightsur"), static_cast<FmiParameterName>(kSoundingParELHeightSur)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("capesur"), static_cast<FmiParameterName>(kSoundingParCAPESur)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("cape03kmsur"), static_cast<FmiParameterName>(kSoundingParCAPE0_3kmSur)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("cape1040sur"), static_cast<FmiParameterName>(kSoundingParCAPE_TT_Sur)));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("cinsur"), static_cast<FmiParameterName>(kSoundingParCINSur)));
+    // ****** sounding index funktiot  HUOM! ne käsitellään case insensitiveinä!! *************************
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclsur"), static_cast<FmiParameterName>(kSoundingParLCLSur)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcsur"), static_cast<FmiParameterName>(kSoundingParLFCSur)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elsur"), static_cast<FmiParameterName>(kSoundingParELSur)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclheightsur"), static_cast<FmiParameterName>(kSoundingParLCLHeightSur)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcheightsur"), static_cast<FmiParameterName>(kSoundingParLFCHeightSur)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elheightsur"), static_cast<FmiParameterName>(kSoundingParELHeightSur)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("capesur"), static_cast<FmiParameterName>(kSoundingParCAPESur)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape03kmsur"), static_cast<FmiParameterName>(kSoundingParCAPE0_3kmSur)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape1040sur"), static_cast<FmiParameterName>(kSoundingParCAPE_TT_Sur)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cinsur"), static_cast<FmiParameterName>(kSoundingParCINSur)));
 
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lcl500m"), static_cast<FmiParameterName>(kSoundingParLCL500m)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lfc500m"), static_cast<FmiParameterName>(kSoundingParLFC500m)));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("el500m"), static_cast<FmiParameterName>(kSoundingParEL500m)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lclheight500m"), static_cast<FmiParameterName>(kSoundingParLCLHeight500m)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lfcheight500m"), static_cast<FmiParameterName>(kSoundingParLFCHeight500m)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("elheight500m"), static_cast<FmiParameterName>(kSoundingParELHeight500m)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("cape500m"), static_cast<FmiParameterName>(kSoundingParCAPE500m)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("cape03km500m"), static_cast<FmiParameterName>(kSoundingParCAPE0_3km500m)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("cape1040500m"), static_cast<FmiParameterName>(kSoundingParCAPE_TT_500m)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("cin500m"), static_cast<FmiParameterName>(kSoundingParCIN500m)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lcl500m"), static_cast<FmiParameterName>(kSoundingParLCL500m)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfc500m"), static_cast<FmiParameterName>(kSoundingParLFC500m)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("el500m"), static_cast<FmiParameterName>(kSoundingParEL500m)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclheight500m"), static_cast<FmiParameterName>(kSoundingParLCLHeight500m)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcheight500m"), static_cast<FmiParameterName>(kSoundingParLFCHeight500m)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elheight500m"), static_cast<FmiParameterName>(kSoundingParELHeight500m)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape500m"), static_cast<FmiParameterName>(kSoundingParCAPE500m)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape03km500m"), static_cast<FmiParameterName>(kSoundingParCAPE0_3km500m)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape1040500m"), static_cast<FmiParameterName>(kSoundingParCAPE_TT_500m)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cin500m"), static_cast<FmiParameterName>(kSoundingParCIN500m)));
 
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lclmostun"), static_cast<FmiParameterName>(kSoundingParLCLMostUn)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lfcmostun"), static_cast<FmiParameterName>(kSoundingParLFCMostUn)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("elmostun"), static_cast<FmiParameterName>(kSoundingParELMostUn)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lclheightmostun"), static_cast<FmiParameterName>(kSoundingParLCLHeightMostUn)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lfcheightmostun"), static_cast<FmiParameterName>(kSoundingParLFCHeightMostUn)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("elheightmostun"), static_cast<FmiParameterName>(kSoundingParELHeightMostUn)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("capemostun"), static_cast<FmiParameterName>(kSoundingParCAPEMostUn)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("cape03kmmostun"), static_cast<FmiParameterName>(kSoundingParCAPE0_3kmMostUn)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("cape1040mostun"), static_cast<FmiParameterName>(kSoundingParCAPE_TT_MostUn)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("cinmostun"), static_cast<FmiParameterName>(kSoundingParCINMostUn)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclmostun"), static_cast<FmiParameterName>(kSoundingParLCLMostUn)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcmostun"), static_cast<FmiParameterName>(kSoundingParLFCMostUn)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elmostun"), static_cast<FmiParameterName>(kSoundingParELMostUn)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclheightmostun"), static_cast<FmiParameterName>(kSoundingParLCLHeightMostUn)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcheightmostun"), static_cast<FmiParameterName>(kSoundingParLFCHeightMostUn)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elheightmostun"), static_cast<FmiParameterName>(kSoundingParELHeightMostUn)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("capemostun"), static_cast<FmiParameterName>(kSoundingParCAPEMostUn)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape03kmmostun"), static_cast<FmiParameterName>(kSoundingParCAPE0_3kmMostUn)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape1040mostun"), static_cast<FmiParameterName>(kSoundingParCAPE_TT_MostUn)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cinmostun"), static_cast<FmiParameterName>(kSoundingParCINMostUn)));
 
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lclobsbas"), static_cast<FmiParameterName>(kSoundingParLCLSurBas)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lfcobsbas"), static_cast<FmiParameterName>(kSoundingParLFCSurBas)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("elobsbas"), static_cast<FmiParameterName>(kSoundingParELSurBas)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lclheightobsbas"), static_cast<FmiParameterName>(kSoundingParLCLHeightSurBas)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("lfcheightobsbas"), static_cast<FmiParameterName>(kSoundingParLFCHeightSurBas)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("elheightobsbas"), static_cast<FmiParameterName>(kSoundingParELHeightSurBas)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("capeobsbas"), static_cast<FmiParameterName>(kSoundingParCAPESurBas)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("cape03kmobsbas"), static_cast<FmiParameterName>(kSoundingParCAPE0_3kmSurBas)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("cape1040obsbas"), static_cast<FmiParameterName>(kSoundingParCAPE_TT_SurBas)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("cinobsbas"), static_cast<FmiParameterName>(kSoundingParCINSurBas)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclobsbas"), static_cast<FmiParameterName>(kSoundingParLCLSurBas)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcobsbas"), static_cast<FmiParameterName>(kSoundingParLFCSurBas)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elobsbas"), static_cast<FmiParameterName>(kSoundingParELSurBas)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lclheightobsbas"), static_cast<FmiParameterName>(kSoundingParLCLHeightSurBas)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lfcheightobsbas"), static_cast<FmiParameterName>(kSoundingParLFCHeightSurBas)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("elheightobsbas"), static_cast<FmiParameterName>(kSoundingParELHeightSurBas)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("capeobsbas"), static_cast<FmiParameterName>(kSoundingParCAPESurBas)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape03kmobsbas"), static_cast<FmiParameterName>(kSoundingParCAPE0_3kmSurBas)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cape1040obsbas"), static_cast<FmiParameterName>(kSoundingParCAPE_TT_SurBas)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("cinobsbas"), static_cast<FmiParameterName>(kSoundingParCINSurBas)));
 
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("show"), static_cast<FmiParameterName>(kSoundingParSHOW)));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("lift"), static_cast<FmiParameterName>(kSoundingParLIFT)));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("kinx"), static_cast<FmiParameterName>(kSoundingParKINX)));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("ctot"), static_cast<FmiParameterName>(kSoundingParCTOT)));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("vtot"), static_cast<FmiParameterName>(kSoundingParVTOT)));
-    itsTokenParameterNamesAndIds.insert(
-        ParamMap::value_type(string("totl"), static_cast<FmiParameterName>(kSoundingParTOTL)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("bulkshear06km"), static_cast<FmiParameterName>(kSoundingParBS0_6km)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("bulkshear01km"), static_cast<FmiParameterName>(kSoundingParBS0_1km)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("srh03km"), static_cast<FmiParameterName>(kSoundingParSRH0_3km)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("srh01km"), static_cast<FmiParameterName>(kSoundingParSRH0_1km)));
-    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(
-        string("thetae03km"), static_cast<FmiParameterName>(kSoundingParThetaE0_3km)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("show"), static_cast<FmiParameterName>(kSoundingParSHOW)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("lift"), static_cast<FmiParameterName>(kSoundingParLIFT)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("kinx"), static_cast<FmiParameterName>(kSoundingParKINX)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("ctot"), static_cast<FmiParameterName>(kSoundingParCTOT)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("vtot"), static_cast<FmiParameterName>(kSoundingParVTOT)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("totl"), static_cast<FmiParameterName>(kSoundingParTOTL)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("bulkshear06km"), static_cast<FmiParameterName>(kSoundingParBS0_6km)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("bulkshear01km"), static_cast<FmiParameterName>(kSoundingParBS0_1km)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("srh03km"), static_cast<FmiParameterName>(kSoundingParSRH0_3km)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("srh01km"), static_cast<FmiParameterName>(kSoundingParSRH0_1km)));
+    itsTokenParameterNamesAndIds.insert(ParamMap::value_type(string("thetae03km"), static_cast<FmiParameterName>(kSoundingParThetaE0_3km)));
     // ****** sounding index funktiot *************************
-
-    /*
-
-      ,
-      ,
-
-      ,
-      ,
-            kFmiPacked_FL_1 = 625,
-            kFmiPacked_FL_2,
-            kFmiPacked_FL_3,
-            kFmiPacked_FL_4,
-            kFmiPacked_FL_5,
-            kFmiPacked_FL_6,
-            kFmiPacked_FL_7,
-            kFmiPacked_FL_8,
-            kFmiPacked_FL_9,
-            kFmiPacked_FL_10,
-            kFmiPacked_FL_11,
-            kFmiPacked_FL_12,
-    */
 
     itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("topo"), kFmiTopoGraf));
     itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("slope"), kFmiTopoSlope));
-    itsTokenStaticParameterNamesAndIds.insert(
-        ParamMap::value_type(string("slopedir"), kFmiTopoAzimuth));
-    itsTokenStaticParameterNamesAndIds.insert(
-        ParamMap::value_type(string("distsea"), kFmiTopoDistanceToSea));
-    itsTokenStaticParameterNamesAndIds.insert(
-        ParamMap::value_type(string("dirsea"), kFmiTopoDirectionToSea));
-    itsTokenStaticParameterNamesAndIds.insert(
-        ParamMap::value_type(string("distland"), kFmiTopoDistanceToLand));
-    itsTokenStaticParameterNamesAndIds.insert(
-        ParamMap::value_type(string("dirland"), kFmiTopoDirectionToLand));
-    itsTokenStaticParameterNamesAndIds.insert(
-        ParamMap::value_type(string("landseemask"), kFmiLandSeaMask));
-    itsTokenStaticParameterNamesAndIds.insert(
-        ParamMap::value_type(string("reltopo"), kFmiTopoRelativeHeight));
+    itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("slopedir"), kFmiTopoAzimuth));
+    itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("distsea"), kFmiTopoDistanceToSea));
+    itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("dirsea"), kFmiTopoDirectionToSea));
+    itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("distland"), kFmiTopoDistanceToLand));
+    itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("dirland"), kFmiTopoDirectionToLand));
+    itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("landseemask"), kFmiLandSeaMask));
+    itsTokenStaticParameterNamesAndIds.insert(ParamMap::value_type(string("reltopo"), kFmiTopoRelativeHeight));
 
-    itsTokenCalculatedParameterNamesAndIds.insert(
-        ParamMap::value_type(string("lat"), kFmiLatitude));
-    itsTokenCalculatedParameterNamesAndIds.insert(
-        ParamMap::value_type(string("lon"), kFmiLongitude));
-    itsTokenCalculatedParameterNamesAndIds.insert(
-        ParamMap::value_type(string("eangle"), kFmiElevationAngle));
-    itsTokenCalculatedParameterNamesAndIds.insert(
-        ParamMap::value_type(string("jday"), kFmiDay));  // julian day oikeasti
-    itsTokenCalculatedParameterNamesAndIds.insert(
-        ParamMap::value_type(string("lhour"), kFmiHour));  // local hour oikeasti
-    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(
-        string("utchour"), kFmiSecond));  // utc hour käyttää secondia, koska ei ollut omaa
-                                          // parametria utc hourille enkä lisää sellaista
-    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(
-        string("fhour"), kFmiForecastPeriod));  // forecast hour pikaviritys forperiodia käytetty,
-                                                // koska ei ollut valmista parametria
-    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(
-        string("timestep"), kFmiDeltaTime));  // TIMESTEP eli timestep palauttaa datan currentin
-                                              // ajan aika stepin tunneissa
+    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("lat"), kFmiLatitude));
+    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("lon"), kFmiLongitude));
+    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("eangle"), kFmiElevationAngle));
+    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("jday"), kFmiDay));  // julian day oikeasti
+    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("lhour"), kFmiHour));  // local hour oikeasti
+    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("utchour"), kFmiSecond));  // utc hour käyttää secondia, koska ei ollut omaa parametria utc hourille enkä lisää sellaista
+    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("fhour"), kFmiForecastPeriod));  // forecast hour pikaviritys forperiodia käytetty, koska ei ollut valmista parametria
+    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("minute"), kFmiMinute));  // kyseisen ajanhetken minuutit, aina samat 0-59 riippumatta oliko kyse lokaali, utc tai forecast timesta
+    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("timestep"), kFmiDeltaTime));  // TIMESTEP eli timestep palauttaa datan currentin ajan aika stepin tunneissa
 
-    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(
-        string("gridsizex"), kFmiLastParameter));  // hilan x suuntainen koko metreissä (muokattavan
-                                                   // datan tai macroParam hilan koko)
-    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(
-        string("gridsizey"),
-        static_cast<FmiParameterName>(kFmiLastParameter + 1)));  // hilan y suuntainen koko
-    // metreissä (muokattavan datan tai
-    // macroParam hilan koko)
+    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("gridsizex"), kFmiLastParameter));  // hilan x suuntainen koko metreissä (muokattavan datan tai macroParam hilan koko)
+    itsTokenCalculatedParameterNamesAndIds.insert(ParamMap::value_type(string("gridsizey"), static_cast<FmiParameterName>(kFmiLastParameter + 1)));  // hilan y suuntainen koko metreissä (muokattavan datan tai macroParam hilan koko)
 
     // Alustetaan ensin tuottaja listaan muut tarvittavat tuottajat, Huom! nimi pienellä, koska
     // tehdään case insensitiivejä tarkasteluja!!
-    itsTokenProducerNamesAndIds.insert(
-        ProducerMap::value_type(string("met"), static_cast<FmiProducerName>(999)));
+    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("met"), static_cast<FmiProducerName>(999)));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("orig"), kFmiMETEOR));
-    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(
-        string("anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
-    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(
-        string("ana"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
-    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(
-        string("help"), static_cast<FmiProducerName>(NFmiProducerSystem::gHelpEditorDataProdId)));
-    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(
-        string("ec3vrk"), static_cast<FmiProducerName>(NFmiInfoData::kFmiSpEcmwf3Vrk)));
+    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("anal"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
+    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ana"), static_cast<FmiProducerName>(gMesanProdId)));  // analyysi mesan tuottaja
+    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("help"), static_cast<FmiProducerName>(NFmiProducerSystem::gHelpEditorDataProdId)));
+    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ec3vrk"), static_cast<FmiProducerName>(NFmiInfoData::kFmiSpEcmwf3Vrk)));
 
     // havainto datoja
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("synop"), kFmiSYNOP));
-    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(
-        string("synopx"), static_cast<FmiProducerName>(NFmiInfoData::kFmiSpSynoXProducer)));
+    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("synopx"), static_cast<FmiProducerName>(NFmiInfoData::kFmiSpSynoXProducer)));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("metar"), kFmiMETAR));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("wxt"), kFmiTestBed));
-    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("road"), kFmiRoadObs));
+    itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("road"), static_cast<FmiProducerName>(20013))); // kFmiRoadObs));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("temp"), kFmiTEMP));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("temp"), kFmiBufrTEMP));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("nrd"), kFmiRADARNRD));
     itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("hake"), kFmiHakeMessages));
 
-    if (theProducerSystem)
+    if(theProducerSystem)
     {
-      NFmiSmartToolIntepreter::InitProducerTokens(theProducerSystem);
-      NFmiSmartToolIntepreter::InitProducerTokens(theObservationProducerSystem);
+        NFmiSmartToolIntepreter::InitProducerTokens(theProducerSystem);
+        NFmiSmartToolIntepreter::InitProducerTokens(theObservationProducerSystem);
     }
     else
     {
-      // tästä pitäisi varoittaa ja heittää poikkeus, mutta aina ei voi alustaa smarttool-systeemiä
-      // producersystemillä (esim. SmarttoolFilter ei tiedä moisesta mitään!!)
-      //			throw std::runtime_error("NFmiSmartToolIntepreter::InitTokens - Was
-      // not initialized correctly, ProducerSystem missing, error in program, report it!");
+        // tästä pitäisi varoittaa ja heittää poikkeus, mutta aina ei voi alustaa smarttool-systeemiä
+        // producersystemillä (esim. SmarttoolFilter ei tiedä moisesta mitään!!)
+        //			throw std::runtime_error("NFmiSmartToolIntepreter::InitTokens - Was
+        // not initialized correctly, ProducerSystem missing, error in program, report it!");
 
-      // joten pakko alustaa tämä tässä tapauksessa sitten jollain hardcode tuottajilla
-      itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("hir"), kFmiMTAHIRLAM));
-      itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ec"), kFmiMTAECMWF));
-      itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("mbe"), kFmiMTAHIRMESO));
-      itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(
-          string("ala"),
-          static_cast<FmiProducerName>(555)));  // aladdinille laitetaan pikaviritys 555
+        // joten pakko alustaa tämä tässä tapauksessa sitten jollain hardcode tuottajilla
+        itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("hir"), kFmiMTAHIRLAM));
+        itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ec"), kFmiMTAECMWF));
+        itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("mbe"), kFmiMTAHIRMESO));
+        itsTokenProducerNamesAndIds.insert(ProducerMap::value_type(string("ala"), static_cast<FmiProducerName>(555)));  // aladdinille laitetaan pikaviritys 555
     }
 
     itsTokenConstants.insert(ConstantMap::value_type(string("miss"), kFloatMissing));
@@ -2756,14 +2819,9 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenElseCommands.push_back(string("Else"));
 
     // tehdaan yhtenainen ehto komento joukko erilaisiin tarkastuksiin
-    itsTokenConditionalCommands.insert(
-        itsTokenConditionalCommands.end(), itsTokenIfCommands.begin(), itsTokenIfCommands.end());
-    itsTokenConditionalCommands.insert(itsTokenConditionalCommands.end(),
-                                       itsTokenElseIfCommands.begin(),
-                                       itsTokenElseIfCommands.end());
-    itsTokenConditionalCommands.insert(itsTokenConditionalCommands.end(),
-                                       itsTokenElseCommands.begin(),
-                                       itsTokenElseCommands.end());
+    itsTokenConditionalCommands.insert(itsTokenConditionalCommands.end(), itsTokenIfCommands.begin(), itsTokenIfCommands.end());
+    itsTokenConditionalCommands.insert(itsTokenConditionalCommands.end(), itsTokenElseIfCommands.begin(), itsTokenElseIfCommands.end());
+    itsTokenConditionalCommands.insert(itsTokenConditionalCommands.end(), itsTokenElseCommands.begin(), itsTokenElseCommands.end());
 
     itsTokenMaskOperations.insert(MaskOperMap::value_type(string("="), kFmiMaskEqual));
     itsTokenMaskOperations.insert(MaskOperMap::value_type(string("=="), kFmiMaskEqual));
@@ -2771,8 +2829,7 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenMaskOperations.insert(MaskOperMap::value_type(string("<>"), kFmiMaskNotEqual));
     itsTokenMaskOperations.insert(MaskOperMap::value_type(string(">"), kFmiMaskGreaterThan));
     itsTokenMaskOperations.insert(MaskOperMap::value_type(string("<"), kFmiMaskLessThan));
-    itsTokenMaskOperations.insert(
-        MaskOperMap::value_type(string(">="), kFmiMaskGreaterOrEqualThan));
+    itsTokenMaskOperations.insert(MaskOperMap::value_type(string(">="), kFmiMaskGreaterOrEqualThan));
     itsTokenMaskOperations.insert(MaskOperMap::value_type(string("<="), kFmiMaskLessOrEqualThan));
 
     itsBinaryOperator.insert(BinaOperMap::value_type(string("&&"), NFmiAreaMask::kAnd));
@@ -2801,684 +2858,212 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenFunctions.insert(FunctionMap::value_type(string("min"), NFmiAreaMask::Min));
     itsTokenFunctions.insert(FunctionMap::value_type(string("max"), NFmiAreaMask::Max));
     itsTokenFunctions.insert(FunctionMap::value_type(string("sum"), NFmiAreaMask::Sum));
-    //		itsTokenFunctions.insert(FunctionMap::value_type(string("wavg"),
-    // NFmiAreaMask::WAvg));
 
-    itsTokenThreeArgumentFunctions.insert(
-        FunctionMap::value_type(string("sumt"), NFmiAreaMask::Sum));
-    itsTokenThreeArgumentFunctions.insert(
-        FunctionMap::value_type(string("maxt"), NFmiAreaMask::Max));
-    itsTokenThreeArgumentFunctions.insert(
-        FunctionMap::value_type(string("mint"), NFmiAreaMask::Min));
-    itsTokenThreeArgumentFunctions.insert(
-        FunctionMap::value_type(string("avgt"), NFmiAreaMask::Avg));
+    itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("sumt"), NFmiAreaMask::Sum));
+    itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxt"), NFmiAreaMask::Max));
+    itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("mint"), NFmiAreaMask::Min));
+    itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("avgt"), NFmiAreaMask::Avg));
 
-    itsTokenThreeArgumentFunctions.insert(
-        FunctionMap::value_type(string("sumz"), NFmiAreaMask::Sum));
-    itsTokenThreeArgumentFunctions.insert(
-        FunctionMap::value_type(string("maxz"), NFmiAreaMask::Max));
-    itsTokenThreeArgumentFunctions.insert(
-        FunctionMap::value_type(string("minz"), NFmiAreaMask::Min));
-    itsTokenThreeArgumentFunctions.insert(
-        FunctionMap::value_type(string("avgz"), NFmiAreaMask::Avg));
+    itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("sumz"), NFmiAreaMask::Sum));
+    itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxz"), NFmiAreaMask::Max));
+    itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("minz"), NFmiAreaMask::Min));
+    itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("avgz"), NFmiAreaMask::Avg));
 
-    itsTokenThreeArgumentFunctions.insert(
-        FunctionMap::value_type(string("maxh"), NFmiAreaMask::Max));
-    itsTokenThreeArgumentFunctions.insert(
-        FunctionMap::value_type(string("minh"), NFmiAreaMask::Min));
+    itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("maxh"), NFmiAreaMask::Max));
+    itsTokenThreeArgumentFunctions.insert(FunctionMap::value_type(string("minh"), NFmiAreaMask::Min));
 
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("grad"),
-        MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionXandY, 1, "grad(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("div"),
-        MetFunctionMapValue(
-            NFmiAreaMask::Divergence, NFmiAreaMask::DirectionXandY, 1, "div(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("adv"),
-        MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionXandY, 1, "adv(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("lap"),
-        MetFunctionMapValue(NFmiAreaMask::Lap, NFmiAreaMask::DirectionXandY, 1, "lap(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("rot"),
-        MetFunctionMapValue(
-            NFmiAreaMask::Rot, NFmiAreaMask::DirectionXandY, 1, "rot(wind)")));  // roottori ottaa
-                                                                                 // totalwind:in
-                                                                                 // parametrina,
-                                                                                 // siitä saadaan
-                                                                                 // tuulen u- ja
-                                                                                 // v-komponentit
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad"), MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionXandY, 1, "grad(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div"), MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionXandY, 1, "div(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv"), MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionXandY, 1, "adv(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap"), MetFunctionMapValue(NFmiAreaMask::Lap, NFmiAreaMask::DirectionXandY, 1, "lap(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot"), MetFunctionMapValue(NFmiAreaMask::Rot, NFmiAreaMask::DirectionXandY, 1, "rot(wind)")));  // vain totalwind
 
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("gradx"),
-        MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionX, 1, "gradx(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("divx"),
-        MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionX, 1, "divx(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("advx"),
-        MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionX, 1, "advx(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("lapx"),
-        MetFunctionMapValue(NFmiAreaMask::Lap, NFmiAreaMask::DirectionX, 1, "lapx(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("rotx"),
-        MetFunctionMapValue(
-            NFmiAreaMask::Rot, NFmiAreaMask::DirectionX, 1, "rotx(wind)")));  // roottori ottaa
-                                                                              // totalwind:in
-                                                                              // parametrina, siitä
-                                                                              // saadaan tuulen u-
-                                                                              // ja v-komponentit
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("gradx"), MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionX, 1, "gradx(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("divx"), MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionX, 1, "divx(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("advx"), MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionX, 1, "advx(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lapx"), MetFunctionMapValue(NFmiAreaMask::Lap, NFmiAreaMask::DirectionX, 1, "lapx(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rotx"), MetFunctionMapValue(NFmiAreaMask::Rot, NFmiAreaMask::DirectionX, 1, "rotx(wind)")));  // vain totalwind
 
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("grady"),
-        MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionY, 1, "grady(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("divy"),
-        MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionY, 1, "divy(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("advy"),
-        MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionY, 1, "advy(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("lapy"),
-        MetFunctionMapValue(NFmiAreaMask::Lap, NFmiAreaMask::DirectionY, 1, "lapy(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("roty"),
-        MetFunctionMapValue(
-            NFmiAreaMask::Rot, NFmiAreaMask::DirectionY, 1, "roty(wind)")));  // roottori ottaa
-                                                                              // totalwind:in
-                                                                              // parametrina, siitä
-                                                                              // saadaan tuulen u-
-                                                                              // ja v-komponentit
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grady"), MetFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::DirectionY, 1, "grady(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("divy"), MetFunctionMapValue(NFmiAreaMask::Divergence, NFmiAreaMask::DirectionY, 1, "divy(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("advy"), MetFunctionMapValue(NFmiAreaMask::Adv, NFmiAreaMask::DirectionY, 1, "advy(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lapy"), MetFunctionMapValue(NFmiAreaMask::Lap, NFmiAreaMask::DirectionY, 1, "lapy(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("roty"), MetFunctionMapValue(NFmiAreaMask::Rot, NFmiAreaMask::DirectionY, 1, "roty(wind)")));  // vain totalwind
 
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("grad2"),
-        MetFunctionMapValue(NFmiAreaMask::Grad2, NFmiAreaMask::DirectionXandY, 1, "grad2(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("div2"),
-        MetFunctionMapValue(
-            NFmiAreaMask::Divergence2, NFmiAreaMask::DirectionXandY, 1, "div2(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("adv2"),
-        MetFunctionMapValue(NFmiAreaMask::Adv2, NFmiAreaMask::DirectionXandY, 1, "adv2(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("lap2"),
-        MetFunctionMapValue(NFmiAreaMask::Lap2, NFmiAreaMask::DirectionXandY, 1, "lap2(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("rot2"),
-        MetFunctionMapValue(
-            NFmiAreaMask::Rot2, NFmiAreaMask::DirectionXandY, 1, "rot2(wind)")));  // roottori ottaa
-                                                                                   // totalwind:in
-                                                                                   // parametrina,
-                                                                                   // siitä saadaan
-                                                                                   // tuulen u- ja
-                                                                                   // v-komponentit
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad2"), MetFunctionMapValue(NFmiAreaMask::Grad2, NFmiAreaMask::DirectionXandY, 1, "grad2(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div2"), MetFunctionMapValue(NFmiAreaMask::Divergence2, NFmiAreaMask::DirectionXandY, 1, "div2(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv2"), MetFunctionMapValue(NFmiAreaMask::Adv2, NFmiAreaMask::DirectionXandY, 1, "adv2(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap2"), MetFunctionMapValue(NFmiAreaMask::Lap2, NFmiAreaMask::DirectionXandY, 1, "lap2(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2"), MetFunctionMapValue(NFmiAreaMask::Rot2, NFmiAreaMask::DirectionXandY, 1, "rot2(wind)")));  // vain totalwind
 
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("grad2x"),
-        MetFunctionMapValue(NFmiAreaMask::Grad2, NFmiAreaMask::DirectionX, 1, "grad2x(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("div2x"),
-        MetFunctionMapValue(
-            NFmiAreaMask::Divergence2, NFmiAreaMask::DirectionX, 1, "div2x(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("adv2x"),
-        MetFunctionMapValue(NFmiAreaMask::Adv2, NFmiAreaMask::DirectionX, 1, "adv2x(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("lap2x"),
-        MetFunctionMapValue(NFmiAreaMask::Lap2, NFmiAreaMask::DirectionX, 1, "lap2x(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("rot2x"),
-        MetFunctionMapValue(
-            NFmiAreaMask::Rot2, NFmiAreaMask::DirectionX, 1, "rot2x(wind)")));  // roottori ottaa
-                                                                                // totalwind:in
-                                                                                // parametrina,
-                                                                                // siitä saadaan
-                                                                                // tuulen u- ja
-                                                                                // v-komponentit
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad2x"), MetFunctionMapValue(NFmiAreaMask::Grad2, NFmiAreaMask::DirectionX, 1, "grad2x(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div2x"), MetFunctionMapValue(NFmiAreaMask::Divergence2, NFmiAreaMask::DirectionX, 1, "div2x(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv2x"), MetFunctionMapValue(NFmiAreaMask::Adv2, NFmiAreaMask::DirectionX, 1, "adv2x(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap2x"), MetFunctionMapValue(NFmiAreaMask::Lap2, NFmiAreaMask::DirectionX, 1, "lap2x(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2x"), MetFunctionMapValue(NFmiAreaMask::Rot2, NFmiAreaMask::DirectionX, 1, "rot2x(wind)")));  // vain totalwind
 
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("grad2y"),
-        MetFunctionMapValue(NFmiAreaMask::Grad2, NFmiAreaMask::DirectionY, 1, "grad2y(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("div2y"),
-        MetFunctionMapValue(
-            NFmiAreaMask::Divergence2, NFmiAreaMask::DirectionY, 1, "div2y(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("adv2y"),
-        MetFunctionMapValue(NFmiAreaMask::Adv2, NFmiAreaMask::DirectionY, 1, "adv2y(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("lap2y"),
-        MetFunctionMapValue(NFmiAreaMask::Lap2, NFmiAreaMask::DirectionY, 1, "lap2y(param)")));
-    itsTokenMetFunctions.insert(MetFunctionMap::value_type(
-        string("rot2y"),
-        MetFunctionMapValue(
-            NFmiAreaMask::Rot2, NFmiAreaMask::DirectionY, 1, "rot2y(wind)")));  // roottori ottaa
-                                                                                // totalwind:in
-                                                                                // parametrina,
-                                                                                // siitä saadaan
-                                                                                // tuulen u- ja
-                                                                                // v-komponentit
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("grad2y"), MetFunctionMapValue(NFmiAreaMask::Grad2, NFmiAreaMask::DirectionY, 1, "grad2y(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("div2y"), MetFunctionMapValue(NFmiAreaMask::Divergence2, NFmiAreaMask::DirectionY, 1, "div2y(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("adv2y"), MetFunctionMapValue(NFmiAreaMask::Adv2, NFmiAreaMask::DirectionY, 1, "adv2y(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("lap2y"), MetFunctionMapValue(NFmiAreaMask::Lap2, NFmiAreaMask::DirectionY, 1, "lap2y(param)")));
+    itsTokenMetFunctions.insert(MetFunctionMap::value_type(string("rot2y"), MetFunctionMapValue(NFmiAreaMask::Rot2, NFmiAreaMask::DirectionY, 1, "rot2y(wind)")));  // vain totalwind
 
-    // tässä on vertikaaliset-funktiot
-    // vertp-funktiot eli näitä operoidaan aina painepinnoilla [hPa]
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertp_max"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Max, NFmiAreaMask::VertP, 3, string("vertp_max(par, p1, p2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertp_min"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Min, NFmiAreaMask::VertP, 3, string("vertp_min(par, p1, p2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertp_avg"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Avg, NFmiAreaMask::VertP, 3, string("vertp_avg(par, p1, p2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertp_sum"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Sum, NFmiAreaMask::VertP, 3, string("vertp_sum(par, p1, p2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertp_get"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Get, NFmiAreaMask::VertP, 2, string("vertp_get(par, p)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertp_findh"),
-        VertFunctionMapValue(NFmiAreaMask::FindH,
-                             NFmiAreaMask::VertP,
-                             5,
-                             string("vertp_findh(par, p1, p2, value, nth)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertp_findc"),
-        VertFunctionMapValue(NFmiAreaMask::FindC,
-                             NFmiAreaMask::VertP,
-                             4,
-                             string("vertp_findc(par, p1, p2, value)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertp_maxh"),
-        VertFunctionMapValue(
-            NFmiAreaMask::MaxH, NFmiAreaMask::VertP, 3, string("vertp_maxh(par, p1, p2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertp_minh"),
-        VertFunctionMapValue(
-            NFmiAreaMask::MinH, NFmiAreaMask::VertP, 3, string("vertp_minh(par, p1, p2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertp_grad"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Grad, NFmiAreaMask::VertP, 3, string("vertp_grad(par, p1, p2)"))));
+    // tässä on vertikaaliset-funktiot vertp-funktiot eli näitä operoidaan aina painepinnoilla [hPa]
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertP, 3, string("vertp_max(par, p1, p2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertP, 3, string("vertp_min(par, p1, p2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertP, 3, string("vertp_avg(par, p1, p2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::VertP, 3, string("vertp_sum(par, p1, p2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_get"), VertFunctionMapValue(NFmiAreaMask::Get, NFmiAreaMask::VertP, 2, string("vertp_get(par, p)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh"), VertFunctionMapValue(NFmiAreaMask::FindH,NFmiAreaMask::VertP, 5, string("vertp_findh(par, p1, p2, value, nth)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findc"), VertFunctionMapValue(NFmiAreaMask::FindC, NFmiAreaMask::VertP, 4, string("vertp_findc(par, p1, p2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_maxh"), VertFunctionMapValue(NFmiAreaMask::MaxH, NFmiAreaMask::VertP, 3, string("vertp_maxh(par, p1, p2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertP, 3, string("vertp_minh(par, p1, p2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_grad"),VertFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::VertP, 3, string("vertp_grad(par, p1, p2)"))));
 
     // vertfl-funktiot eli näitä operoidaan aina lentopinnoilla flight-level [hft]
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertfl_max"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Max, NFmiAreaMask::VertFL, 3, string("vertfl_max(par, fl1, fl2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertfl_min"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Min, NFmiAreaMask::VertFL, 3, string("vertfl_min(par, fl1, fl2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertfl_avg"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Avg, NFmiAreaMask::VertFL, 3, string("vertfl_avg(par, fl1, fl2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertfl_sum"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Sum, NFmiAreaMask::VertFL, 3, string("vertfl_sum(par, fl1, fl2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertfl_get"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Get, NFmiAreaMask::VertFL, 2, string("vertfl_get(par, fl)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertfl_findh"),
-        VertFunctionMapValue(NFmiAreaMask::FindH,
-                             NFmiAreaMask::VertFL,
-                             5,
-                             string("vertfl_findh(par, fl1, fl2, value, nth)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertfl_findc"),
-        VertFunctionMapValue(NFmiAreaMask::FindC,
-                             NFmiAreaMask::VertFL,
-                             4,
-                             string("vertfl_findc(par, fl1, fl2, value)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertfl_maxh"),
-        VertFunctionMapValue(
-            NFmiAreaMask::MaxH, NFmiAreaMask::VertFL, 3, string("vertfl_maxh(par, fl1, fl2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertfl_minh"),
-        VertFunctionMapValue(
-            NFmiAreaMask::MinH, NFmiAreaMask::VertFL, 3, string("vertfl_minh(par, fl1, fl2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertfl_grad"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Grad, NFmiAreaMask::VertFL, 3, string("vertfl_grad(par, fl1, fl2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertFL, 3, string("vertfl_max(par, fl1, fl2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertFL, 3, string("vertfl_min(par, fl1, fl2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertFL, 3, string("vertfl_avg(par, fl1, fl2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::VertFL, 3, string("vertfl_sum(par, fl1, fl2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_get"), VertFunctionMapValue(NFmiAreaMask::Get, NFmiAreaMask::VertFL, 2, string("vertfl_get(par, fl)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh"), VertFunctionMapValue(NFmiAreaMask::FindH, NFmiAreaMask::VertFL,5, string("vertfl_findh(par, fl1, fl2, value, nth)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findc"), VertFunctionMapValue(NFmiAreaMask::FindC, NFmiAreaMask::VertFL, 4, string("vertfl_findc(par, fl1, fl2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_maxh"), VertFunctionMapValue(NFmiAreaMask::MaxH, NFmiAreaMask::VertFL, 3, string("vertfl_maxh(par, fl1, fl2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertFL, 3, string("vertfl_minh(par, fl1, fl2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_grad"), VertFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::VertFL, 3, string("vertfl_grad(par, fl1, fl2)"))));
 
     // vertz-funktiot eli näitä operoidaan aina metrisillä korkeuksilla [m]
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertz_max"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Max, NFmiAreaMask::VertZ, 3, string("vertz_max(par, z1, z2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertz_min"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Min, NFmiAreaMask::VertZ, 3, string("vertz_min(par, z1, z2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertz_avg"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Avg, NFmiAreaMask::VertZ, 3, string("vertz_avg(par, z1, z2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertz_sum"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Sum, NFmiAreaMask::VertZ, 3, string("vertz_sum(par, z1, z2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertz_get"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Get, NFmiAreaMask::VertZ, 2, string("vertz_get(par, z)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertz_findh"),
-        VertFunctionMapValue(NFmiAreaMask::FindH,
-                             NFmiAreaMask::VertZ,
-                             5,
-                             string("vertz_findh(par, z1, z2, value, nth)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertz_findc"),
-        VertFunctionMapValue(NFmiAreaMask::FindC,
-                             NFmiAreaMask::VertZ,
-                             4,
-                             string("vertz_findc(par, z1, z2, value)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertz_maxh"),
-        VertFunctionMapValue(
-            NFmiAreaMask::MaxH, NFmiAreaMask::VertZ, 3, string("vertz_maxh(par, z1, z2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertz_minh"),
-        VertFunctionMapValue(
-            NFmiAreaMask::MinH, NFmiAreaMask::VertZ, 3, string("vertz_minh(par, z1, z2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertz_grad"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Grad, NFmiAreaMask::VertZ, 3, string("vertz_grad(par, z1, z2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertZ, 3, string("vertz_max(par, z1, z2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertZ, 3, string("vertz_min(par, z1, z2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertZ, 3, string("vertz_avg(par, z1, z2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::VertZ, 3, string("vertz_sum(par, z1, z2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_get"), VertFunctionMapValue(NFmiAreaMask::Get, NFmiAreaMask::VertZ, 2, string("vertz_get(par, z)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh"), VertFunctionMapValue(NFmiAreaMask::FindH, NFmiAreaMask::VertZ, 5, string("vertz_findh(par, z1, z2, value, nth)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findc"), VertFunctionMapValue(NFmiAreaMask::FindC, NFmiAreaMask::VertZ, 4, string("vertz_findc(par, z1, z2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_maxh"), VertFunctionMapValue(NFmiAreaMask::MaxH, NFmiAreaMask::VertZ, 3, string("vertz_maxh(par, z1, z2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertZ, 3, string("vertz_minh(par, z1, z2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_grad"), VertFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::VertZ, 3, string("vertz_grad(par, z1, z2)"))));
 
-    // vertlev-funktiot eli näitä operoidaan aina mallipintadatan hybrid-level arvoilla esim.
-    // hirlamissa arvot ovat 60 - 1
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertlev_max"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Max, NFmiAreaMask::VertHyb, 3, string("vertlev_max(par, hyb1, hyb2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertlev_min"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Min, NFmiAreaMask::VertHyb, 3, string("vertlev_min(par, hyb1, hyb2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertlev_avg"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Avg, NFmiAreaMask::VertHyb, 3, string("vertlev_avg(par, hyb1, hyb2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertlev_sum"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Sum, NFmiAreaMask::VertHyb, 3, string("vertlev_sum(par, hyb1, hyb2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertlev_get"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Get, NFmiAreaMask::VertHyb, 2, string("vertlev_get(par, hyb)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertlev_findh"),
-        VertFunctionMapValue(NFmiAreaMask::FindH,
-                             NFmiAreaMask::VertHyb,
-                             5,
-                             string("vertlev_findh(par, hyb1, hyb2, value, nth)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("vertlev_findc"),
-        VertFunctionMapValue(NFmiAreaMask::FindC,
-                             NFmiAreaMask::VertHyb,
-                             4,
-                             string("vertlev_findc(par, hyb1, hyb2, value)"))));
-    itsTokenVertFunctions.insert(
-        VertFunctionMap::value_type(string("vertlev_maxh"),
-                                    VertFunctionMapValue(NFmiAreaMask::MaxH,
-                                                         NFmiAreaMask::VertHyb,
-                                                         3,
-                                                         string("vertlev_maxh(par, hyb1, hyb2)"))));
-    itsTokenVertFunctions.insert(
-        VertFunctionMap::value_type(string("vertlev_minh"),
-                                    VertFunctionMapValue(NFmiAreaMask::MinH,
-                                                         NFmiAreaMask::VertHyb,
-                                                         3,
-                                                         string("vertlev_minh(par, hyb1, hyb2)"))));
-    itsTokenVertFunctions.insert(
-        VertFunctionMap::value_type(string("vertlev_grad"),
-                                    VertFunctionMapValue(NFmiAreaMask::Grad,
-                                                         NFmiAreaMask::VertHyb,
-                                                         3,
-                                                         string("vertlev_grad(par, hyb1, hyb2)"))));
+    // vertlev-funktiot eli näitä operoidaan aina mallipintadatan hybrid-level arvoilla esim. hirlamissa arvot ovat 60 - 1
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::VertHyb, 3, string("vertlev_max(par, hyb1, hyb2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::VertHyb, 3, string("vertlev_min(par, hyb1, hyb2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::VertHyb, 3, string("vertlev_avg(par, hyb1, hyb2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::VertHyb, 3, string("vertlev_sum(par, hyb1, hyb2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_get"), VertFunctionMapValue(NFmiAreaMask::Get, NFmiAreaMask::VertHyb, 2, string("vertlev_get(par, hyb)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh"), VertFunctionMapValue(NFmiAreaMask::FindH, NFmiAreaMask::VertHyb, 5, string("vertlev_findh(par, hyb1, hyb2, value, nth)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findc"), VertFunctionMapValue(NFmiAreaMask::FindC, NFmiAreaMask::VertHyb, 4, string("vertlev_findc(par, hyb1, hyb2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_maxh"), VertFunctionMapValue(NFmiAreaMask::MaxH, NFmiAreaMask::VertHyb, 3, string("vertlev_maxh(par, hyb1, hyb2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_minh"), VertFunctionMapValue(NFmiAreaMask::MinH, NFmiAreaMask::VertHyb, 3, string("vertlev_minh(par, hyb1, hyb2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_grad"), VertFunctionMapValue(NFmiAreaMask::Grad, NFmiAreaMask::VertHyb, 3, string("vertlev_grad(par, hyb1, hyb2)"))));
+
+    // Kaikki vert-conditional funktiot yhdessä nipussa. 
+    // Niillä etsitään korkeutta mistä alkaen jokin ehto on voimassa. 
+    // Jätetty pois tarkoituksella yhtäsuuruus ehdot, koska niitä voi etsiä vertXXX_findh -funktioilla.
+    // VertP -osio
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::VertP, 4, string("vertp_findh_over(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::VertP, 4, string("vertp_findh_overeq(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::VertP, 4, string("vertp_findh_under(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh_undereq"), VertFunctionMapValue(NFmiAreaMask::ProbUnderEq, NFmiAreaMask::VertP, 4, string("vertp_findh_undereq(par, p1, p2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::VertP, 5, string("vertp_findh_between(par, p1, p2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertp_findh_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::VertP, 5, string("vertp_findh_betweeneq(par, p1, p2, limit1, limit2)"))));
+    // VertFL -osio
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::VertFL, 4, string("vertfl_findh_over(par, fl1, fl2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::VertFL, 4, string("vertfl_findh_overeq(par, fl1, fl2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::VertFL, 4, string("vertfl_findh_under(par, fl1, fl2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh_undereq"), VertFunctionMapValue(NFmiAreaMask::ProbUnderEq, NFmiAreaMask::VertFL, 4, string("vertfl_findh_undereq(par, fl1, fl2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::VertFL, 5, string("vertfl_findh_between(par, fl1, fl2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertfl_findh_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::VertFL, 5, string("vertfl_findh_betweeneq(par, z1, z2, limit1, limit2)"))));
+    // VertZ -osio
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::VertZ, 4, string("vertz_findh_over(par, z1, z2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::VertZ, 4, string("vertz_findh_overeq(par, z1, z2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::VertZ, 4, string("vertz_findh_under(par, z1, z2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh_undereq"), VertFunctionMapValue(NFmiAreaMask::ProbUnderEq, NFmiAreaMask::VertZ, 4, string("vertz_findh_undereq(par, z1, z2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::VertZ, 5, string("vertz_findh_between(par, z1, z2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertz_findh_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::VertZ, 5, string("vertz_findh_betweeneq(par, z1, z2, limit1, limit2)"))));
+    // VertLev -osio
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::VertHyb, 4, string("vertlev_findh_over(par, lev1, lev2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::VertHyb, 4, string("vertlev_findh_overeq(par, lev1, lev2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::VertHyb, 4, string("vertlev_findh_under(par, lev1, lev2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh_undereq"), VertFunctionMapValue(NFmiAreaMask::ProbUnderEq, NFmiAreaMask::VertHyb, 4, string("vertlev_findh_undereq(par, lev1, lev2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::VertHyb, 5, string("vertlev_findh_between(par, lev1, lev2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("vertlev_findh_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::VertHyb, 5, string("vertlev_findh_betweeneq(par, lev1, lev2, limit1, limit2)"))));
+
 
     // Probability-laskenta (laatikko eli rect) vertlev-funktiot eli nämä on laitettu tähän, koska
     // tämän funktion parametrien käsittely sopii tn-laskuille
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probrect_over"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbOver,
-            NFmiAreaMask::ProbRect,
-            5,
-            string("probrect_over(par, radius_km, time_offset1, time_offset2, limit)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probrect_overeq"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbOverEq,
-            NFmiAreaMask::ProbRect,
-            5,
-            string("probrect_overeq(par, radius_km, time_offset1, time_offset2, limit)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probrect_under"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbUnder,
-            NFmiAreaMask::ProbRect,
-            5,
-            string("probrect_under(par, radius_km, time_offset1, time_offset2, limit)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probrect_undereq"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbUnderEq,
-            NFmiAreaMask::ProbRect,
-            5,
-            string("probrect_undereq(par, radius_km, time_offset1, time_offset2, limit)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probrect_equal"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbEqual,
-            NFmiAreaMask::ProbRect,
-            5,
-            string("probrect_equal(par, radius_km, time_offset1, time_offset2, value)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probrect_notequal"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbNotEqual,
-            NFmiAreaMask::ProbRect,
-            5,
-            string("probrect_notequal(par, radius_km, time_offset1, time_offset2, value)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probrect_between"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbBetween,
-            NFmiAreaMask::ProbRect,
-            6,
-            string(
-                "probrect_between(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probrect_betweeneq"),
-        VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq,
-                             NFmiAreaMask::ProbRect,
-                             6,
-                             string("probrect_betweeneq(par, radius_km, time_offset1, "
-                                    "time_offset2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::ProbRect, 5, string("probrect_over(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::ProbRect, 5, string("probrect_overeq(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::ProbRect, 5, string("probrect_under(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_undereq"), VertFunctionMapValue(NFmiAreaMask::ProbUnderEq, NFmiAreaMask::ProbRect, 5, string("probrect_undereq(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_equal"), VertFunctionMapValue(NFmiAreaMask::ProbEqual, NFmiAreaMask::ProbRect, 5, string("probrect_equal(par, radius_km, time_offset1, time_offset2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_notequal"), VertFunctionMapValue(NFmiAreaMask::ProbNotEqual, NFmiAreaMask::ProbRect, 5, string("probrect_notequal(par, radius_km, time_offset1, time_offset2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::ProbRect, 6, string("probrect_between(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probrect_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::ProbRect, 6, string("probrect_betweeneq(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
 
     // Probability-laskenta (ympyrä eli circle) vertlev-funktiot eli nämä on laitettu tähän, koska
     // tämän funktion parametrien käsittely sopii tn-laskuille
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probcircle_over"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbOver,
-            NFmiAreaMask::ProbCircle,
-            5,
-            string("probcircle_over(par, radius_km, time_offset1, time_offset2, limit)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probcircle_overeq"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbOverEq,
-            NFmiAreaMask::ProbCircle,
-            5,
-            string("probcircle_overeq(par, radius_km, time_offset1, time_offset2, limit)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probcircle_under"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbUnder,
-            NFmiAreaMask::ProbCircle,
-            5,
-            string("probcircle_under(par, radius_km, time_offset1, time_offset2, limit)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probcircle_undereq"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbUnderEq,
-            NFmiAreaMask::ProbCircle,
-            5,
-            string("probcircle_undereq(par, radius_km, time_offset1, time_offset2, limit)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probcircle_equal"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbEqual,
-            NFmiAreaMask::ProbCircle,
-            5,
-            string("probcircle_equal(par, radius_km, time_offset1, time_offset2, value)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probcircle_notequal"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbNotEqual,
-            NFmiAreaMask::ProbCircle,
-            5,
-            string("probcircle_equal(par, radius_km, time_offset1, time_offset2, value)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probcircle_between"),
-        VertFunctionMapValue(NFmiAreaMask::ProbBetween,
-                             NFmiAreaMask::ProbCircle,
-                             6,
-                             string("probcircle_between(par, radius_km, time_offset1, "
-                                    "time_offset2, limit1, limit2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("probcircle_betweeneq"),
-        VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq,
-                             NFmiAreaMask::ProbCircle,
-                             6,
-                             string("probcircle_betweeneq(par, radius_km, time_offset1, "
-                                    "time_offset2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::ProbCircle, 5, string("probcircle_over(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::ProbCircle, 5, string("probcircle_overeq(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::ProbCircle, 5, string("probcircle_under(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_undereq"), VertFunctionMapValue(NFmiAreaMask::ProbUnderEq, NFmiAreaMask::ProbCircle, 5, string("probcircle_undereq(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_equal"), VertFunctionMapValue(NFmiAreaMask::ProbEqual, NFmiAreaMask::ProbCircle, 5, string("probcircle_equal(par, radius_km, time_offset1, time_offset2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_notequal"), VertFunctionMapValue(NFmiAreaMask::ProbNotEqual, NFmiAreaMask::ProbCircle, 5, string("probcircle_equal(par, radius_km, time_offset1, time_offset2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::ProbCircle, 6, string("probcircle_between(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("probcircle_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::ProbCircle, 6, string("probcircle_betweeneq(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
 
     // Esiintymä funktio eli kuinka monta kertaa joku ehto halutulle parametrille pitää paikkaansa
     // (halutulla aikavälillä ja halutun säteisellä alueella).
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("occurrence_over"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbOver,
-            NFmiAreaMask::Occurrence,
-            5,
-            string("occurrence_over(par, radius_km, time_offset1, time_offset2, limit)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("occurrence_overeq"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbOverEq,
-            NFmiAreaMask::Occurrence,
-            5,
-            string("occurrence_overeq(par, radius_km, time_offset1, time_offset2, limit)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("occurrence_under"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbUnder,
-            NFmiAreaMask::Occurrence,
-            5,
-            string("occurrence_under(par, radius_km, time_offset1, time_offset2, limit)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("occurrence_undereq"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbUnderEq,
-            NFmiAreaMask::Occurrence,
-            5,
-            string("occurrence_undereq(par, radius_km, time_offset1, time_offset2, limit)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("occurrence_equal"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbEqual,
-            NFmiAreaMask::Occurrence,
-            5,
-            string("occurrence_equal(par, radius_km, time_offset1, time_offset2, value)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("occurrence_notequal"),
-        VertFunctionMapValue(
-            NFmiAreaMask::ProbNotEqual,
-            NFmiAreaMask::Occurrence,
-            5,
-            string("occurrence_notequal(par, radius_km, time_offset1, time_offset2, value)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("occurrence_between"),
-        VertFunctionMapValue(NFmiAreaMask::ProbBetween,
-                             NFmiAreaMask::Occurrence,
-                             6,
-                             string("occurrence_between(par, radius_km, time_offset1, "
-                                    "time_offset2, limit1, limit2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("occurrence_betweeneq"),
-        VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq,
-                             NFmiAreaMask::Occurrence,
-                             6,
-                             string("occurrence_betweeneq(par, radius_km, time_offset1, "
-                                    "time_offset2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_over"), VertFunctionMapValue(NFmiAreaMask::ProbOver, NFmiAreaMask::Occurrence, 5, string("occurrence_over(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_overeq"), VertFunctionMapValue(NFmiAreaMask::ProbOverEq, NFmiAreaMask::Occurrence, 5, string("occurrence_overeq(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_under"), VertFunctionMapValue(NFmiAreaMask::ProbUnder, NFmiAreaMask::Occurrence, 5, string("occurrence_under(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_undereq"), VertFunctionMapValue(NFmiAreaMask::ProbUnderEq, NFmiAreaMask::Occurrence, 5, string("occurrence_undereq(par, radius_km, time_offset1, time_offset2, limit)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_equal"), VertFunctionMapValue(NFmiAreaMask::ProbEqual, NFmiAreaMask::Occurrence, 5, string("occurrence_equal(par, radius_km, time_offset1, time_offset2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_notequal"), VertFunctionMapValue(NFmiAreaMask::ProbNotEqual, NFmiAreaMask::Occurrence, 5, string("occurrence_notequal(par, radius_km, time_offset1, time_offset2, value)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_between"), VertFunctionMapValue(NFmiAreaMask::ProbBetween, NFmiAreaMask::Occurrence, 6, string("occurrence_between(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("occurrence_betweeneq"), VertFunctionMapValue(NFmiAreaMask::ProbBetweenEq, NFmiAreaMask::Occurrence, 6, string("occurrence_betweeneq(par, radius_km, time_offset1, time_offset2, limit1, limit2)"))));
 
     // Hae asemadatasta lähin arvo funktionaalisuus
-    itsTokenVertFunctions.insert(
-        VertFunctionMap::value_type(string("closestvalue"),
-                                    VertFunctionMapValue(NFmiAreaMask::ClosestObsTimeOffset,
-                                                         NFmiAreaMask::ClosestObsValue,
-                                                         2,
-                                                         string("closestvalue(par, timeoffset)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("closestvalue"), VertFunctionMapValue(NFmiAreaMask::ClosestObsTimeOffset, NFmiAreaMask::ClosestObsValue, 2, string("closestvalue(par, timeoffset)"))));
+
+    // Hae datasta arvo aika offsetin [h] avulla
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("peekt"), VertFunctionMapValue(NFmiAreaMask::PeekT, NFmiAreaMask::PeekT, 2, string("peekt(par, timeoffset)"))));
 
     // time_*-funktiot laskevat halutun operaation läpi halutun aikahaarukan. Laskut käydään läpi
     // datan omassa aikaresoluutiossa, eli tässä ei ole aikainterpolaatioita kuten esim. maxt
     // vastaavissa funktioissa.
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("time_max"),
-        VertFunctionMapValue(NFmiAreaMask::Max,
-                             NFmiAreaMask::TimeRange,
-                             3,
-                             string("time_max(par, time_offset1, time_offset2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("time_min"),
-        VertFunctionMapValue(NFmiAreaMask::Min,
-                             NFmiAreaMask::TimeRange,
-                             3,
-                             string("time_min(par, time_offset1, time_offset2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("time_avg"),
-        VertFunctionMapValue(NFmiAreaMask::Avg,
-                             NFmiAreaMask::TimeRange,
-                             3,
-                             string("time_avg(par, time_offset1, time_offset2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("time_sum"),
-        VertFunctionMapValue(NFmiAreaMask::Sum,
-                             NFmiAreaMask::TimeRange,
-                             3,
-                             string("time_sum(par, time_offset1, time_offset2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::TimeRange, 3, string("time_max(par, time_offset1, time_offset2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::TimeRange, 3, string("time_min(par, time_offset1, time_offset2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::TimeRange, 3, string("time_avg(par, time_offset1, time_offset2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("time_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::TimeRange, 3, string("time_sum(par, time_offset1, time_offset2)"))));
 
     // Tässä on time-range vertikaaliset-funktiot, jotka operoivat datan omassa aika ja level
     // resoluutiossa.
     // Esim. hae maksimi arvo 2h aikavälillä 1000 ja 500 hPa väliltä.
     // =================================================================
     // timevertp-funktiot eli näitä operoidaan aina painepinnoilla [hPa]
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertp_max"),
-        VertFunctionMapValue(NFmiAreaMask::Max,
-                             NFmiAreaMask::TimeVertP,
-                             5,
-                             string("timevertp_max(par, timeoffset1, timeoffset2, p1, p2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertp_min"),
-        VertFunctionMapValue(NFmiAreaMask::Min,
-                             NFmiAreaMask::TimeVertP,
-                             5,
-                             string("timevertp_min(par, timeoffset1, timeoffset2, p1, p2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertp_avg"),
-        VertFunctionMapValue(NFmiAreaMask::Avg,
-                             NFmiAreaMask::TimeVertP,
-                             5,
-                             string("timevertp_avg(par, timeoffset1, timeoffset2, p1, p2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertp_sum"),
-        VertFunctionMapValue(NFmiAreaMask::Sum,
-                             NFmiAreaMask::TimeVertP,
-                             5,
-                             string("timevertp_sum(par, timeoffset1, timeoffset2, p1, p2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertp_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::TimeVertP, 5, string("timevertp_max(par, timeoffset1, timeoffset2, p1, p2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertp_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::TimeVertP, 5, string("timevertp_min(par, timeoffset1, timeoffset2, p1, p2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertp_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::TimeVertP, 5, string("timevertp_avg(par, timeoffset1, timeoffset2, p1, p2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertp_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::TimeVertP, 5, string("timevertp_sum(par, timeoffset1, timeoffset2, p1, p2)"))));
 
     // timevertfl-funktiot eli näitä operoidaan aina flight level pinnoilla [hft]
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertfl_max"),
-        VertFunctionMapValue(NFmiAreaMask::Max,
-                             NFmiAreaMask::TimeVertFL,
-                             5,
-                             string("timevertfl_max(par, timeoffset1, timeoffset2, fl1, fl2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertfl_min"),
-        VertFunctionMapValue(NFmiAreaMask::Min,
-                             NFmiAreaMask::TimeVertFL,
-                             5,
-                             string("timevertfl_min(par, timeoffset1, timeoffset2, fl1, fl2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertfl_avg"),
-        VertFunctionMapValue(NFmiAreaMask::Avg,
-                             NFmiAreaMask::TimeVertFL,
-                             5,
-                             string("timevertfl_avg(par, timeoffset1, timeoffset2, fl1, fl2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertfl_sum"),
-        VertFunctionMapValue(NFmiAreaMask::Sum,
-                             NFmiAreaMask::TimeVertFL,
-                             5,
-                             string("timevertfl_sum(par, timeoffset1, timeoffset2, fl1, fl2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertfl_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::TimeVertFL, 5, string("timevertfl_max(par, timeoffset1, timeoffset2, fl1, fl2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertfl_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::TimeVertFL, 5, string("timevertfl_min(par, timeoffset1, timeoffset2, fl1, fl2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertfl_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::TimeVertFL, 5, string("timevertfl_avg(par, timeoffset1, timeoffset2, fl1, fl2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertfl_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::TimeVertFL, 5, string("timevertfl_sum(par, timeoffset1, timeoffset2, fl1, fl2)"))));
 
     // timevertz-funktiot eli näitä operoidaan aina metrisillä korkeuksilla [m]
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertz_max"),
-        VertFunctionMapValue(NFmiAreaMask::Max,
-                             NFmiAreaMask::TimeVertZ,
-                             5,
-                             string("timevertz_max(par, timeoffset1, timeoffset2, z1, z2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertz_min"),
-        VertFunctionMapValue(NFmiAreaMask::Min,
-                             NFmiAreaMask::TimeVertZ,
-                             5,
-                             string("timevertz_min(par, timeoffset1, timeoffset2, z1, z2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertz_avg"),
-        VertFunctionMapValue(NFmiAreaMask::Avg,
-                             NFmiAreaMask::TimeVertZ,
-                             5,
-                             string("timevertz_avg(par, timeoffset1, timeoffset2, z1, z2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertz_sum"),
-        VertFunctionMapValue(NFmiAreaMask::Sum,
-                             NFmiAreaMask::TimeVertZ,
-                             5,
-                             string("timevertz_sum(par, timeoffset1, timeoffset2, z1, z2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertz_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::TimeVertZ, 5, string("timevertz_max(par, timeoffset1, timeoffset2, z1, z2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertz_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::TimeVertZ, 5, string("timevertz_min(par, timeoffset1, timeoffset2, z1, z2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertz_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::TimeVertZ, 5, string("timevertz_avg(par, timeoffset1, timeoffset2, z1, z2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertz_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::TimeVertZ, 5, string("timevertz_sum(par, timeoffset1, timeoffset2, z1, z2)"))));
 
     // timevertlev-funktiot eli näitä operoidaan aina mallipintadatan hybrid-level arvoilla esim.
     // hirlamissa arvot ovat 60 - 1
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertlev_max"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Max,
-            NFmiAreaMask::TimeVertHyb,
-            5,
-            string("timevertlev_max(par, timeoffset1, timeoffset2, lev1, lev2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertlev_min"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Min,
-            NFmiAreaMask::TimeVertHyb,
-            5,
-            string("timevertlev_min(par, timeoffset1, timeoffset2, lev1, lev2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertlev_avg"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Avg,
-            NFmiAreaMask::TimeVertHyb,
-            5,
-            string("timevertlev_avg(par, timeoffset1, timeoffset2, lev1, lev2)"))));
-    itsTokenVertFunctions.insert(VertFunctionMap::value_type(
-        string("timevertlev_sum"),
-        VertFunctionMapValue(
-            NFmiAreaMask::Sum,
-            NFmiAreaMask::TimeVertHyb,
-            5,
-            string("timevertlev_sum(par, timeoffset1, timeoffset2, lev1, lev2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertlev_max"), VertFunctionMapValue(NFmiAreaMask::Max, NFmiAreaMask::TimeVertHyb, 5, string("timevertlev_max(par, timeoffset1, timeoffset2, lev1, lev2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertlev_min"), VertFunctionMapValue(NFmiAreaMask::Min, NFmiAreaMask::TimeVertHyb, 5, string("timevertlev_min(par, timeoffset1, timeoffset2, lev1, lev2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertlev_avg"), VertFunctionMapValue(NFmiAreaMask::Avg, NFmiAreaMask::TimeVertHyb, 5, string("timevertlev_avg(par, timeoffset1, timeoffset2, lev1, lev2)"))));
+    itsTokenVertFunctions.insert(VertFunctionMap::value_type(string("timevertlev_sum"), VertFunctionMapValue(NFmiAreaMask::Sum, NFmiAreaMask::TimeVertHyb, 5, string("timevertlev_sum(par, timeoffset1, timeoffset2, lev1, lev2)"))));
 
     itsTokenPeekFunctions.insert(std::make_pair(string("peekxy"), NFmiAreaMask::FunctionPeekXY));
     itsTokenPeekFunctions.insert(std::make_pair(string("peekxy2"), NFmiAreaMask::FunctionPeekXY2));
@@ -3494,15 +3079,9 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsTokenDoubleRampFunctions.push_back(string("Dd"));
     itsTokenDoubleRampFunctions.push_back(string("dd"));
 
-    itsTokenRampFunctions.insert(itsTokenRampFunctions.end(),
-                                 itsTokenRampUpFunctions.begin(),
-                                 itsTokenRampUpFunctions.end());
-    itsTokenRampFunctions.insert(itsTokenRampFunctions.end(),
-                                 itsTokenRampDownFunctions.begin(),
-                                 itsTokenRampDownFunctions.end());
-    itsTokenRampFunctions.insert(itsTokenRampFunctions.end(),
-                                 itsTokenDoubleRampFunctions.begin(),
-                                 itsTokenDoubleRampFunctions.end());
+    itsTokenRampFunctions.insert(itsTokenRampFunctions.end(), itsTokenRampUpFunctions.begin(), itsTokenRampUpFunctions.end());
+    itsTokenRampFunctions.insert(itsTokenRampFunctions.end(), itsTokenRampDownFunctions.begin(), itsTokenRampDownFunctions.end());
+    itsTokenRampFunctions.insert(itsTokenRampFunctions.end(), itsTokenDoubleRampFunctions.begin(), itsTokenDoubleRampFunctions.end());
 
     itsTokenMacroParamIdentifiers.push_back(string("result"));
     itsTokenMacroParamIdentifiers.push_back(string("Result"));
@@ -3530,5 +3109,16 @@ void NFmiSmartToolIntepreter::InitTokens(NFmiProducerSystem *theProducerSystem,
     itsMathFunctions.insert(MathFunctionMap::value_type(string("round"), NFmiAreaMask::Round));
     itsMathFunctions.insert(MathFunctionMap::value_type(string("abs"), NFmiAreaMask::Abs));
     itsMathFunctions.insert(MathFunctionMap::value_type(string("rand"), NFmiAreaMask::Rand));
+
+    itsExtraInfoCommands.insert(FunctionMap::value_type(string("resolution"), NFmiAreaMask::Resolution));
+    itsExtraInfoCommands.insert(FunctionMap::value_type(string("calculationpoint"), NFmiAreaMask::CalculationPoint));
+    itsExtraInfoCommands.insert(FunctionMap::value_type(string("observationradius"), NFmiAreaMask::ObservationRadius));
+    
+    itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("surface"), kFmiMeanSeaLevel));
+    itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("pressure"), kFmiPressureLevel));
+    itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("hybrid"), kFmiHybridLevel));
+    itsResolutionLevelTypes.insert(ResolutionLevelTypesMap::value_type(string("height"), kFmiHeight));
+
+    // clang-format on
   }
 }

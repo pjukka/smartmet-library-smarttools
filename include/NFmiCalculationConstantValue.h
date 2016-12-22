@@ -177,7 +177,8 @@ class NFmiStation2GridMask : public NFmiInfoAreaMask
   double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
   void SetGriddingHelpers(NFmiArea *theArea,
                           NFmiEditMapGeneralDataDoc *theDoc,
-                          const NFmiPoint &theStation2GridSize);
+                          const NFmiPoint &theStation2GridSize,
+                          float theObservationRadiusRelative);
 
  private:
   void DoGriddingCheck(const NFmiCalculationParams &theCalculationParams);
@@ -198,6 +199,9 @@ class NFmiStation2GridMask : public NFmiInfoAreaMask
   NFmiEditMapGeneralDataDoc *itsDoc;
   NFmiPoint itsStation2GridSize;  // tämän kokoiseen hilaan asema data lasketaan
                                   // (itsGriddedStationData -koko)
+  // Normaalisti havainto laskuissa ei rajoiteta käytettyjä havaintoja etäisyyden perusteellä.
+  // Jos tähän annetaan jotain kFloatMissing:istä poikkeavaa, niin silloin rajoitetaan.
+  float itsObservationRadiusRelative;
 
   // Kun itsCurrentGriddedStationData -muuttujaa lasketaan tai asetetaan, sen saa tehdä kullekin
   // ajalle vain kerran. Tämä lukko systeemi takaa sen.
@@ -224,8 +228,6 @@ class NFmiNearestObsValue2GridMask : public NFmiInfoAreaMask
   NFmiNearestObsValue2GridMask(Type theMaskType,
                                NFmiInfoData::Type theDataType,
                                boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-                               NFmiAreaMask::FunctionType thePrimaryFunc,
-                               NFmiAreaMask::FunctionType theSecondaryFunc,
                                int theArgumentCount);
   ~NFmiNearestObsValue2GridMask(void);
   NFmiNearestObsValue2GridMask(const NFmiNearestObsValue2GridMask &theOther);
@@ -250,9 +252,6 @@ class NFmiNearestObsValue2GridMask : public NFmiInfoAreaMask
                                       // aika), mutta onko se sama kuin itsTime, jos ei ole, pitää
                                       // laskea juuri tälle ajalle
 
-  NFmiAreaMask::FunctionType itsPrimaryFunc;    // esim. ClosestObsTimeOffset
-  NFmiAreaMask::FunctionType itsSecondaryFunc;  // esim. ClosestObsValue
-
   // Näille muuttujille pitää asettaa arvot erillisellä SetGridHelpers-funktiolla
   boost::shared_ptr<NFmiArea> itsAreaPtr;  // omistaa ja tuhoaa!!
   NFmiEditMapGeneralDataDoc *itsDoc;
@@ -273,3 +272,22 @@ class NFmiNearestObsValue2GridMask : public NFmiInfoAreaMask
 };
 
 #endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
+
+// NFmiPeekTimeMask -luokka 'kurkkaa' datasta annetun tunti offsetin verran ajassa eteen/taaksepäin.
+class NFmiPeekTimeMask : public NFmiInfoAreaMask
+{
+public:
+    NFmiPeekTimeMask(Type theMaskType,
+        NFmiInfoData::Type theDataType,
+        boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+        int theArgumentCount);
+    ~NFmiPeekTimeMask(void);
+    NFmiPeekTimeMask(const NFmiPeekTimeMask &theOther);
+    NFmiAreaMask *Clone(void) const;
+
+    double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
+    void SetArguments(std::vector<float> &theArgumentVector);
+
+private:
+    long itsTimeOffsetInMinutes; // kuinka paljon kurkataan ajassa eteen/taakse
+};

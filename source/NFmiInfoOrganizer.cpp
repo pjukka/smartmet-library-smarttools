@@ -47,9 +47,7 @@ NFmiInfoOrganizer::NFmiInfoOrganizer(void)
       itsMacroParamMinGridSize(5, 5),
       itsMacroParamMaxGridSize(2000, 2000),
       itsMacroParamData(),
-      itsMacroParamMissingValueMatrix(),
       itsCrossSectionMacroParamData(),
-      itsCrossSectionMacroParamMissingValueMatrix(),
       fCreateEditedDataCopy(false)
 {
   InitializeCheckParams();
@@ -128,11 +126,6 @@ bool NFmiInfoOrganizer::AddEditedData(NFmiSmartInfo *theEditedData, int theUndoL
     return true;
   }
   return false;
-}
-
-static void SetFastInfoToZero(boost::shared_ptr<NFmiFastQueryInfo> &theOwnerInfo)
-{
-  theOwnerInfo = boost::shared_ptr<NFmiFastQueryInfo>(static_cast<NFmiFastQueryInfo *>(0));
 }
 
 static void SetDataKeeperToZero(boost::shared_ptr<NFmiQueryDataKeeper> &theDataKeeper)
@@ -1226,15 +1219,28 @@ const std::string NFmiInfoOrganizer::GetDrawParamPath(void)
   return retValue;
 }
 
+// Tätä metodia käytetään ainakin aluksi luomaan dataa infoOrganizerin ulkopuolelle.
+// Sitä käytetään NFmiExtraMacroParamData -luokassa luomaan halutun resoluutioista 
+// macroParam dataa.
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CreateNewMacroParamData(int x, int y, NFmiInfoData::Type theDataType)
+{
+    FixMacroParamDataGridSize(x, y);
+    return CreateNewMacroParamData_checkeInput(x, y, theDataType);
+}
+
+void NFmiInfoOrganizer::FixMacroParamDataGridSize(int &x, int &y)
+{
+    x = FmiMin(x, static_cast<int>(itsMacroParamMaxGridSize.X()));
+    y = FmiMin(y, static_cast<int>(itsMacroParamMaxGridSize.Y()));
+    x = FmiMax(x, static_cast<int>(itsMacroParamMinGridSize.X()));
+    y = FmiMax(y, static_cast<int>(itsMacroParamMinGridSize.Y()));
+}
+
 void NFmiInfoOrganizer::SetMacroParamDataGridSize(int x, int y)
 {
-  x = FmiMin(x, static_cast<int>(itsMacroParamMaxGridSize.X()));
-  y = FmiMin(y, static_cast<int>(itsMacroParamMaxGridSize.Y()));
-  x = FmiMax(x, static_cast<int>(itsMacroParamMinGridSize.X()));
-  y = FmiMax(y, static_cast<int>(itsMacroParamMinGridSize.Y()));
+  FixMacroParamDataGridSize(x, y);
   itsMacroParamGridSize = NFmiPoint(x, y);
   UpdateMacroParamDataSize(x, y);
-  //	UpdateMacroParamData();
 }
 void NFmiInfoOrganizer::SetMacroParamDataMinGridSize(int x, int y)
 {
@@ -1269,48 +1275,32 @@ static NFmiQueryData *CreateDefaultMacroParamQueryData(const NFmiArea *theArea,
   return NFmiQueryDataUtil::CreateEmptyData(info);
 }
 
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CreateNewMacroParamData_checkeInput(int x, int y, NFmiInfoData::Type theDataType)
+{
+    static boost::shared_ptr<NFmiArea> dummyArea(
+        new NFmiLatLonArea(NFmiPoint(19, 57), NFmiPoint(32, 71)));
+
+    // Luo uusi data jossa on yksi aika,param ja level ja luo hplaceDesc annetusta areasta ja hila
+    // koosta
+    NFmiQueryData *data = ::CreateDefaultMacroParamQueryData(dummyArea.get(), x, y);
+    if(data)
+    {
+        return boost::shared_ptr<NFmiFastQueryInfo>(
+            new NFmiOwnerInfo(data, theDataType, "", ""));
+    }
+    else
+        return boost::shared_ptr<NFmiFastQueryInfo>();
+}
+
+
 void NFmiInfoOrganizer::UpdateMacroParamDataSize(int x, int y)
 {
-  static boost::shared_ptr<NFmiArea> dummyArea(
-      new NFmiLatLonArea(NFmiPoint(19, 57), NFmiPoint(32, 71)));
-
-  // Luo uusi data jossa on yksi aika,param ja level ja luo hplaceDesc annetusta areasta ja hila
-  // koosta
-  NFmiQueryData *data = CreateDefaultMacroParamQueryData(dummyArea.get(), x, y);
-  if (data)
-  {
-    itsMacroParamData = boost::shared_ptr<NFmiFastQueryInfo>(
-        new NFmiOwnerInfo(data, NFmiInfoData::kMacroParam, "", ""));
-    itsMacroParamMissingValueMatrix.Resize(
-        itsMacroParamData->Grid()->XNumber(), itsMacroParamData->Grid()->YNumber(), kFloatMissing);
-    return;
-  }
-
-  // virhetilanteissa nollataan data
-  ::SetFastInfoToZero(itsMacroParamData);
+    itsMacroParamData = CreateNewMacroParamData_checkeInput(x, y, NFmiInfoData::kMacroParam);
 }
 
 void NFmiInfoOrganizer::UpdateCrossSectionMacroParamDataSize(int x, int y)
 {
-  static boost::shared_ptr<NFmiArea> dummyArea(
-      new NFmiLatLonArea(NFmiPoint(19, 57), NFmiPoint(32, 71)));
-
-  // Luo uusi data jossa on yksi aika,param ja level ja luo hplaceDesc annetusta areasta ja hila
-  // koosta
-  NFmiQueryData *data = CreateDefaultMacroParamQueryData(dummyArea.get(), x, y);
-  if (data)
-  {
-    itsCrossSectionMacroParamData = boost::shared_ptr<NFmiFastQueryInfo>(
-        new NFmiOwnerInfo(data, NFmiInfoData::kCrossSectionMacroParam, "", ""));
-    itsCrossSectionMacroParamMissingValueMatrix.Resize(
-        itsCrossSectionMacroParamData->Grid()->XNumber(),
-        itsCrossSectionMacroParamData->Grid()->YNumber(),
-        kFloatMissing);
-    return;
-  }
-
-  // virhetilanteissa nollataan data
-  ::SetFastInfoToZero(itsCrossSectionMacroParamData);
+    itsCrossSectionMacroParamData = CreateNewMacroParamData_checkeInput(x, y, NFmiInfoData::kCrossSectionMacroParam);
 }
 
 int NFmiInfoOrganizer::CountData(void)
