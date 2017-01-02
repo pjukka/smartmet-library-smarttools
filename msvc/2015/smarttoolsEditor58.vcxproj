@@ -31,6 +31,7 @@
     <ClInclude Include="..\..\include\NFmiDrawParam.h" />
     <ClInclude Include="..\..\include\NFmiDrawParamFactory.h" />
     <ClInclude Include="..\..\include\NFmiDrawParamList.h" />
+    <ClInclude Include="..\..\include\NFmiExtraMacroParamData.h" />
     <ClInclude Include="..\..\include\NFmiGridPointCache.h" />
     <ClInclude Include="..\..\include\NFmiHarmonizerBookKeepingData.h" />
     <ClInclude Include="..\..\include\NFmiHelpDataInfo.h" />
@@ -74,6 +75,7 @@
     <ClCompile Include="..\..\source\NFmiDrawParam.cpp" />
     <ClCompile Include="..\..\source\NFmiDrawParamFactory.cpp" />
     <ClCompile Include="..\..\source\NFmiDrawParamList.cpp" />
+    <ClCompile Include="..\..\source\NFmiExtraMacroParamData.cpp" />
     <ClCompile Include="..\..\source\NFmiGridPointCache.cpp" />
     <ClCompile Include="..\..\source\NFmiHarmonizerBookKeepingData.cpp" />
     <ClCompile Include="..\..\source\NFmiHelpDataInfo.cpp" />

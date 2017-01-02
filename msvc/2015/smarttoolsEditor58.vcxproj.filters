@@ -137,6 +137,9 @@
     <ClInclude Include="..\..\include\NFmiUndoRedoQData.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\NFmiExtraMacroParamData.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\NFmiAreaMaskInfo.cpp">
@@ -257,6 +260,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\NFmiUndoRedoQData.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\NFmiExtraMacroParamData.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
