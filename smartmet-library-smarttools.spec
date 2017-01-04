@@ -8,7 +8,7 @@ Version: 17.1.4
 Release: 1%{?dist}.fmi
 License: MIT
 Group: Development/Libraries
-URL: http://www.weatherproof.fi
+URL: https://github.com/fmidev/smartmet-library-smarttools
 Source: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
 BuildRequires: smartmet-library-newbase-devel >= 16.12.19
