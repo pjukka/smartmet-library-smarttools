@@ -1,4 +1,7 @@
-LIB = smarttools
+SUBNAME = smarttools
+LIB = smartmet-$(SUBNAME)
+SPEC = smartmet-library-$(SUBNAME)
+INCDIR = smartmet/$(SUBNAME)
 
 # Installation directories
 
@@ -81,11 +84,9 @@ LIBS = -L$(libdir) \
 
 rpmsourcedir = /tmp/$(shell whoami)/rpmbuild
 
-rpmerr = "There's no spec file ($(LIB).spec). RPM wasn't created. Please make a spec file or copy and rename it into $(LIB).spec"
-
 # What to install
 
-LIBFILE = libsmartmet_$(LIB).so
+LIBFILE = lib$(LIB).so
 
 # How to install
 
@@ -135,12 +136,12 @@ format:
 	clang-format -i -style=file include/*.h source/*.cpp
 
 install:
-	@mkdir -p $(includedir)/smartmet/$(LIB)
+	@mkdir -p $(includedir)/$(INCDIR)
 	@list='$(HDRS)'; \
 	for hdr in $$list; do \
 	  HDR=$$(basename $$hdr); \
-	  echo $(INSTALL_DATA) $$hdr $(includedir)/smartmet/$(LIB)/$$HDR; \
-	  $(INSTALL_DATA) $$hdr $(includedir)/smartmet/$(LIB)/$$HDR; \
+	  echo $(INSTALL_DATA) $$hdr $(includedir)/$(INCDIR)/$$HDR; \
+	  $(INSTALL_DATA) $$hdr $(includedir)/$(INCDIR)/$$HDR; \
 	done
 	@mkdir -p $(libdir)
 	$(INSTALL_PROG) $(LIBFILE) $(libdir)/$(LIBFILE)
@@ -152,16 +153,16 @@ objdir:
 	@mkdir -p $(objdir)
 
 rpm: clean
-	if [ -e $(LIB).spec ]; \
+	if [ -e $(SPEC).spec ]; \
 	then \
-	  smartspecupdate $(LIB).spec ; \
+	  smartspecupdate $(SPEC).spec ; \
 	  mkdir -p $(rpmsourcedir) ; \
-	  tar -C ../ -cf $(rpmsourcedir)/libsmartmet-$(LIB).tar $(LIB) ; \
-	  gzip -f $(rpmsourcedir)/libsmartmet-$(LIB).tar ; \
-	  TAR_OPTIONS=--wildcards rpmbuild -v -ta $(rpmsourcedir)/libsmartmet-$(LIB).tar.gz ; \
-	  rm -f $(rpmsourcedir)/libsmartmet-$(LIB).tar.gz ; \
+	  tar -C ../ -cf $(rpmsourcedir)/$(SPEC).tar $(SUBNAME) ; \
+	  gzip -f $(rpmsourcedir)/$(SPEC).tar ; \
+	  TAR_OPTIONS=--wildcards rpmbuild -v -ta $(rpmsourcedir)/$(SPEC).tar.gz ; \
+	  rm -f $(rpmsourcedir)/$(SPEC).tar.gz ; \
 	else \
-	  echo $(rpmerr); \
+	  echo $(SPEC).spec file missing; \
 	fi;
 
 .SUFFIXES: $(SUFFIXES) .cpp
