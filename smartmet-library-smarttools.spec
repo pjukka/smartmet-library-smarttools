@@ -15,6 +15,8 @@ BuildRequires: smartmet-library-newbase-devel >= 16.12.19
 BuildRequires: boost-devel
 Requires: smartmet-library-newbase >= 16.12.19
 Provides: %{LIBNAME}
+Obsoletes: libsmartmet-smarttools < 17.1.4
+Obsoletes: libsmartmet-smarttools-debuginfo < 17.1.4
 
 %description
 FMI smarttools library
@@ -43,6 +45,7 @@ rm -rf $RPM_BUILD_ROOT
 %package -n %{DEVELNAME}
 Summary: FMI smarttools development files
 Provides: %{DEVELNAME}
+Obsoletes: libsmartmet-smarttools-devel < 17.1.4
 
 %description -n %{DEVELNAME}
 FMI smarttools development files
