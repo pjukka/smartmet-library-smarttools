@@ -85,6 +85,9 @@ class NFmiInfoOrganizer
   static bool IsAmdarData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
   static bool IsTempData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
   static bool IsTempData(unsigned long theProducerId, bool includeRawTemp = false);
+  static int CalcWantedParameterCount(boost::shared_ptr<NFmiFastQueryInfo> &info, const std::vector<FmiParameterName> &wantedParameters);
+  static boost::shared_ptr<NFmiFastQueryInfo> GetInfoWithMostWantedParams(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &infos, const std::vector<FmiParameterName> &wantedParameters);
+
 
   // ***************************************************************************************************************
   // Tässä perässä on pienin mahdollinen julkinen rajapinta, jonka sain siivottua originaali

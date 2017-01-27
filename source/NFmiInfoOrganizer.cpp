@@ -691,6 +691,41 @@ bool NFmiInfoOrganizer::IsTempData(unsigned long theProducerId, bool includeRawT
     return false;
 }
 
+int NFmiInfoOrganizer::CalcWantedParameterCount(boost::shared_ptr<NFmiFastQueryInfo> &info, const std::vector<FmiParameterName> &wantedParameters)
+{
+    int counter = 0;
+    if(info && wantedParameters.size())
+    {
+        FmiParameterName oldParamId = static_cast<FmiParameterName>(info->Param().GetParamIdent());
+        for(size_t i = 0; i < wantedParameters.size(); i++)
+        {
+            if(info->Param(wantedParameters[i]))
+                counter++;
+        }
+        info->Param(oldParamId);
+    }
+    return counter;
+}
+
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfoWithMostWantedParams(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &infos, const std::vector<FmiParameterName> &wantedParameters)
+{
+    boost::shared_ptr<NFmiFastQueryInfo> info;
+    if(infos.size())
+    {
+        int maxWantedParams = 0;
+        for(size_t i = 0; i < infos.size(); i++)
+        {
+            int currentWantedParams = NFmiInfoOrganizer::CalcWantedParameterCount(infos[i], wantedParameters);
+            if(currentWantedParams > maxWantedParams)
+            {
+                info = infos[i];
+                maxWantedParams = currentWantedParams;
+            }
+        }
+    }
+    return info;
+}
+
 bool NFmiInfoOrganizer::HasGoodParamsForSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
                                                      const ParamCheckFlags &paramCheckFlags)
 {
