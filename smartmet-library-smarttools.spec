@@ -4,16 +4,16 @@
 %define DEVELNAME %{SPECNAME}-devel
 Summary: smarttools library
 Name: %{SPECNAME}
-Version: 17.1.4
+Version: 17.1.27
 Release: 1%{?dist}.fmi
 License: MIT
 Group: Development/Libraries
 URL: https://github.com/fmidev/smartmet-library-smarttools
 Source: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: smartmet-library-newbase-devel >= 16.12.19
+BuildRequires: smartmet-library-newbase-devel >= 17.1.26
 BuildRequires: boost-devel
-Requires: smartmet-library-newbase >= 16.12.19
+Requires: smartmet-library-newbase >= 17.1.26
 Provides: %{LIBNAME}
 Obsoletes: libsmartmet-smarttools < 17.1.4
 Obsoletes: libsmartmet-smarttools-debuginfo < 17.1.4
@@ -56,6 +56,9 @@ FMI smarttools development files
 
 
 %changelog
+* Fri Jan 27 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.1.27-1.fmi
+- Recompiled since NFmiQueryData size changed
+
 * Wed Jan  4 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.1.4-1.fmi
 - Switched to FMI open source naming conventions
 
