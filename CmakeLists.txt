@@ -1,16 +1,9 @@
 cmake_minimum_required(VERSION 3.7.1)
 project(smarttoolsEditor58)
 
-set(output_dir "$ENV{BUILD_DIR}/$(Platform)/${PROJECT_NAME}/$(Configuration)" )
 set(CMAKE_MFC_FLAG 2)
 
 add_definitions( -D_UNICODE -DUNICODE -DFMI_SUPPORT_STATION_DATA_SMARTTOOL)
-
-foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
-    string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
-    set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${output_dir} )
-    set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${output_dir} )
-endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
 include_directories( 
     $ENV{LIBS_FMI}/smarttools/include
@@ -21,11 +14,12 @@ include_directories(
     $ENV{LIBS_FMI}/bizcode/generaldoc/include
     )
 
-file( GLOB sources source/*.cpp include/*.h )
+file( GLOB CPP_FILES source/*.cpp )
+file( GLOB H_FILES include/*.h )
 
 add_library( 
-    smarttoolsEditor58 STATIC
-    ${sources} 
+    ${PROJECT_NAME} STATIC
+    ${CPP_FILES} 
+    ${H_FILES} 
     )
 
-source_group( source FILES ${sources} )
