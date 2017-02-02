@@ -6,12 +6,12 @@ set(CMAKE_MFC_FLAG 2)
 add_definitions( -D_UNICODE -DUNICODE -DFMI_SUPPORT_STATION_DATA_SMARTTOOL)
 
 include_directories( 
-    $ENV{LIBS_FMI}/smarttools/include
-    $ENV{LIBS_FMI}/newbase/include
-    $ENV{BOOST_INCLUDE_DIR}
-    $ENV{LIBS_FMI}/bizcode/stationviews/include
-    $ENV{LIBS_FMI}/bizcode/ctrlviews/include
-    $ENV{LIBS_FMI}/bizcode/generaldoc/include
+    ${LIBS_FMI}/smarttools/include
+    ${LIBS_FMI}/newbase/include
+    ${BOOST_INCLUDE_DIR}
+    ${LIBS_FMI}/bizcode/stationviews/include
+    ${LIBS_FMI}/bizcode/ctrlviews/include
+    ${LIBS_FMI}/bizcode/generaldoc/include
     )
 
 file( GLOB CPP_FILES source/*.cpp )
