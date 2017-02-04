@@ -195,30 +195,29 @@ bool NFmiSmartToolUtil::InitDataBaseHelperData(
     const checkedVector<std::string> &theHelperDataFileNames,
     bool fMakeStaticIfOneTimeStepData)
 {
-  NFmiStreamQueryData sQData;
   for (unsigned int i = 0; i < theHelperDataFileNames.size(); i++)
   {
-    if (sQData.ReadData(theHelperDataFileNames[i]))
-    {
-      NFmiInfoData::Type dataType = NFmiInfoData::kViewable;
-      if (sQData.QueryData()->Info()->SizeTimes() == 1)
-      {
-        if (fMakeStaticIfOneTimeStepData || sQData.QueryData()->Info()->Param(kFmiTopoGraf))
-          dataType = NFmiInfoData::kStationary;
-      }
-      sQData.QueryData()->LatLonCache();  // lasketaan latlon-cache valmiiksi, koska muuten
-                                          // multi-thread ympäristössä tulee sen kanssa ongelmia
-      bool dataWasDeleted = false;
+    NFmiQueryData *helperdata = new NFmiQueryData(theHelperDataFileNames[i]);
 
-      theDataBase.AddData(sQData.QueryData(true),
-                          theHelperDataFileNames[i],
-                          theHelperDataFileNames[i],
-                          dataType,
-                          0,
-                          0,
-                          0,
-                          dataWasDeleted);  // 0=undolevel
+    NFmiInfoData::Type dataType = NFmiInfoData::kViewable;
+    if (helperdata->Info()->SizeTimes() == 1)
+    {
+      if (fMakeStaticIfOneTimeStepData || helperdata->Info()->Param(kFmiTopoGraf))
+        dataType = NFmiInfoData::kStationary;
     }
+
+    helperdata->LatLonCache();
+
+    bool dataWasDeleted = false;
+
+    theDataBase.AddData(helperdata,
+                        theHelperDataFileNames[i],
+                        theHelperDataFileNames[i],
+                        dataType,
+                        0,
+                        0,
+                        0,
+                        dataWasDeleted);  // 0=undolevel
   }
   return true;
 }

@@ -4,16 +4,16 @@
 %define DEVELNAME %{SPECNAME}-devel
 Summary: smarttools library
 Name: %{SPECNAME}
-Version: 17.1.27
+Version: 17.2.4
 Release: 1%{?dist}.fmi
 License: MIT
 Group: Development/Libraries
 URL: https://github.com/fmidev/smartmet-library-smarttools
 Source: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: smartmet-library-newbase-devel >= 17.1.26
+BuildRequires: smartmet-library-newbase-devel >= 17.2.2
 BuildRequires: boost-devel
-Requires: smartmet-library-newbase >= 17.1.26
+Requires: smartmet-library-newbase >= 17.2.2
 Provides: %{LIBNAME}
 Obsoletes: libsmartmet-smarttools < 17.1.4
 Obsoletes: libsmartmet-smarttools-debuginfo < 17.1.4
@@ -56,6 +56,9 @@ FMI smarttools development files
 
 
 %changelog
+* Sat Feb  4 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.2.4-1.fmi
+- Memory map helper files to enable larger input data for qdscript
+
 * Fri Jan 27 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.1.27-1.fmi
 - Recompiled since NFmiQueryData size changed
 
