@@ -9,7 +9,6 @@
 
 #include "NFmiSoundingFunctions.h"
 #include <NFmiAngle.h>
-#include <NFmiValueString.h>
 #include <NFmiInterpolation.h>
 
 #include <iostream>

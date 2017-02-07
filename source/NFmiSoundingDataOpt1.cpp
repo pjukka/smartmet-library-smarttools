@@ -16,8 +16,6 @@
 #include <NFmiValueString.h>
 #include <NFmiQueryDataUtil.h>
 
-#include <fstream>
-
 // hakee lähimmän sopivan painepinnan, mistä löytyy halutuille parametreille arvot
 // Mutta ei sallita muokkausta ennen 1. validia leveliä!
 bool NFmiSoundingDataOpt1::GetTandTdValuesFromNearestPressureLevel(double P,

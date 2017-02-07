@@ -11,7 +11,6 @@
 #include "NFmiSmartToolCalculationSectionInfo.h"
 #include "NFmiAreaMaskInfo.h"
 #include "NFmiSmartToolCalculationInfo.h"
-#include <algorithm>
 //--------------------------------------------------------
 // Constructor/Destructor
 //--------------------------------------------------------

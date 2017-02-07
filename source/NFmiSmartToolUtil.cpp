@@ -16,7 +16,6 @@
 #include <NFmiQueryData.h>
 #include <NFmiStreamQueryData.h>
 
-#include <stdexcept>
 #ifndef UNIX
 #include <direct.h>  // working directory juttuja varten
 #else

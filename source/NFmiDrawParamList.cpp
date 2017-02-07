@@ -31,7 +31,6 @@
 
 #include "NFmiDrawParamList.h"
 #include "NFmiDrawParam.h"
-#include <algorithm>
 
 //--------------------------------------------------------
 // Constructor  NFmiDrawParamList

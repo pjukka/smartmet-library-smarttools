@@ -5,7 +5,6 @@
 #include <NFmiDataMatrix.h>
 #include <NFmiMetTime.h>
 #include <NFmiInfoData.h>
-#include <boost/shared_ptr.hpp>
 #include <list>
 #include <set>
 

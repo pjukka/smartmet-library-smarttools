@@ -9,7 +9,6 @@
 
 #include <NFmiAreaMaskImpl.h>
 #include <NFmiInfoAreaMask.h>
-#include <boost/shared_ptr.hpp>
 
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
 

@@ -10,7 +10,6 @@
 #include <NFmiSettings.h>
 #include <fstream>
 #include <iterator>
-#include <algorithm>
 #include "boost/filesystem.hpp"
 
 using namespace std;

@@ -11,7 +11,6 @@
 
 #include <NFmiDataMatrix.h>  // täältä tulee myös checkedVector
 #include <boost/shared_ptr.hpp>
-#include <string>
 
 class NFmiAreaMaskInfo;
 

@@ -35,7 +35,6 @@
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
-#include <float.h>
 #include "NFmiDictionaryFunction.h"
 
 using namespace std;

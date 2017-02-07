@@ -33,7 +33,6 @@
 
 #include "NFmiMetEditorTypes.h"
 
-#include <NFmiParameterName.h>
 #include <NFmiDataIdent.h>
 #include <NFmiColor.h>
 #include <NFmiPoint.h>
@@ -41,7 +40,6 @@
 #include <NFmiInfoData.h>
 #include <NFmiDataMatrix.h>  // täältä tulee myös checkedVector
 #include <NFmiMetTime.h>
-#include <boost/shared_ptr.hpp>
 
 class NFmiDrawingEnvironment;
 

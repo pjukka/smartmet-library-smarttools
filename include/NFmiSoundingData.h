@@ -13,7 +13,6 @@
 #include <NFmiMetTime.h>
 #include <NFmiLocation.h>
 #include <NFmiParameterName.h>
-#include <boost/shared_ptr.hpp>
 #include <deque>
 
 class NFmiFastQueryInfo;

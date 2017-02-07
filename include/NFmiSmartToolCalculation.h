@@ -13,7 +13,6 @@
 #include <NFmiDataMatrix.h>
 #include <NFmiMetTime.h>
 #include <boost/shared_ptr.hpp>
-#include <string>
 
 class NFmiFastQueryInfo;
 class NFmiDataModifier;

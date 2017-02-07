@@ -15,7 +15,6 @@
 #include <NFmiProducer.h>
 #include <NFmiProducerName.h>
 #include <NFmiInfoData.h>
-#include <string>
 #include <vector>
 
 class NFmiLevel;

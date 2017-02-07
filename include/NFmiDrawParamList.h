@@ -32,7 +32,6 @@
 #ifndef NFMIDRAWPARAMLIST_H
 #define NFMIDRAWPARAMLIST_H
 
-#include "NFmiSortedPtrList.h"
 #include <NFmiDataMatrix.h>
 #include <NFmiInfoData.h>
 #include "NFmiDrawParam.h"
