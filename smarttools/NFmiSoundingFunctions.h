@@ -3,8 +3,8 @@
  * \file NFmiSoundingFunctions.h
  *
  * Namespace, jossa erilaisia irto funktioita, joiden avulla lasketaan
- * erilaisia mm. luotauksiin liittvi‰ juttuja.
- * Julkisia funktioita on vain osa, cpp-filessa on paljon lis‰‰ tavaraa.
+ * erilaisia mm. luotauksiin liittvi√§ juttuja.
+ * Julkisia funktioita on vain osa, cpp-filessa on paljon lis√§√§ tavaraa.
  */
 // ======================================================================
 
@@ -45,7 +45,8 @@ float CalcLogInterpolatedWindWectorValue(float x1, float x2, float x, float wv1,
 template <typename T>
 bool IsEqualEnough(T value1, T value2, T usedEpsilon)
 {
-  if (::fabs(static_cast<double>(value1 - value2)) < usedEpsilon) return true;
+  if (::fabs(static_cast<double>(value1 - value2)) < usedEpsilon)
+    return true;
   return false;
 }
 

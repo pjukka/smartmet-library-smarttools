@@ -7,11 +7,11 @@
 //
 //  Change Log     :
 //
-// Luokka sis‰lt‰‰ calculationSectionista yhden laskurivin esim.
+// Luokka sis√§lt√§√§ calculationSectionista yhden laskurivin esim.
 //
 // T = T + 1
 //
-// Lasku rivi sis‰lt‰‰ aina TulosParametrin ja sijoituksen. Lis‰ksi se sis‰lt‰‰ joukon
+// Lasku rivi sis√§lt√§√§ aina TulosParametrin ja sijoituksen. Lis√§ksi se sis√§lt√§√§ joukon
 // operandeja (n kpl) ja operaatioita (n-1 kpl).
 //**********************************************************
 
@@ -39,12 +39,12 @@ class NFmiSmartToolCalculationInfo
   void CheckIfAllowMissingValueAssignment(void);
   bool AllowMissingValueAssignment(void) { return fAllowMissingValueAssignment; };
  private:
-  // HUOM!! T‰m‰ erillinen ResultInfo-systeemi oli huono ratkaisu, laita ne mielluummin
+  // HUOM!! T√§m√§ erillinen ResultInfo-systeemi oli huono ratkaisu, laita ne mielluummin
   // osaksi laskentaketjua (itsCalculationOperandInfoVector:iin).
-  // Silloin voi mm. ottaa t‰m‰n luokan k‰yttˆˆn NFmiAreaMaskSectionInfo-luokan sijasta.
+  // Silloin voi mm. ottaa t√§m√§n luokan k√§ytt√∂√∂n NFmiAreaMaskSectionInfo-luokan sijasta.
   boost::shared_ptr<NFmiAreaMaskInfo> itsResultDataInfo;  // omistaa+tuhoaa
   checkedVector<boost::shared_ptr<NFmiAreaMaskInfo> >
       itsCalculationOperandInfoVector;  // omistaa+tuhoaa
-  std::string itsCalculationText;       // originaali teksti, mist‰ t‰m‰ lasku on tulkittu
+  std::string itsCalculationText;       // originaali teksti, mist√§ t√§m√§ lasku on tulkittu
   bool fAllowMissingValueAssignment;
 };

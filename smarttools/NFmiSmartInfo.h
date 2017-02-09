@@ -1,17 +1,17 @@
 #pragma once
 
-// T‰m‰ luokka tulee nykyisen NFmiSmartInfo-luokan tilalle.
+// T√§m√§ luokka tulee nykyisen NFmiSmartInfo-luokan tilalle.
 // Uusi luokka on tarkoitettu vain SmartMetissa olevan
-// editoitavan datan k‰sittely. Eli t‰‰ll‰ on tietoa mm.
+// editoitavan datan k√§sittely. Eli t√§√§ll√§ on tietoa mm.
 // valitusta maskista (selction, display jne.).
 // Undo/Redo toiminnot ja Harmonisaattorin vastaava
 // kirjanpito.
-// Luokka tehd‰‰n uusiksi siksi, ett‰ sit‰ yksinkertaistetaan
-// ja ett‰ esim. undo/redo datojen omistus ja tuhoaminen tehd‰‰n
-// automaattisesti smart-pointtereilla eik‰ niin kuin nykyisin
+// Luokka tehd√§√§n uusiksi siksi, ett√§ sit√§ yksinkertaistetaan
+// ja ett√§ esim. undo/redo datojen omistus ja tuhoaminen tehd√§√§n
+// automaattisesti smart-pointtereilla eik√§ niin kuin nykyisin
 // erillisen DestroyData-funktion avulla.
 // TODO: keksi parempi nimi, toi poista lopuksi NFmiSmartInfo
-// -luokka ja laita t‰m‰ sen nimiseksi.
+// -luokka ja laita t√§m√§ sen nimiseksi.
 
 #include "NFmiOwnerInfo.h"
 
@@ -22,27 +22,30 @@ class NFmiSmartInfo : public NFmiOwnerInfo
 {
  public:
   NFmiSmartInfo(void);
-  NFmiSmartInfo(const NFmiOwnerInfo& theInfo);  // matala kopio, eli jaettu data
-  NFmiSmartInfo(const NFmiSmartInfo& theInfo);  // matala kopio, eli jaettu data
-  NFmiSmartInfo(NFmiQueryData* theOwnedData,
+  NFmiSmartInfo(const NFmiOwnerInfo &theInfo);  // matala kopio, eli jaettu data
+  NFmiSmartInfo(const NFmiSmartInfo &theInfo);  // matala kopio, eli jaettu data
+  NFmiSmartInfo(NFmiQueryData *theOwnedData,
                 NFmiInfoData::Type theDataType,
-                const std::string& theDataFileName,
-                const std::string& theDataFilePattern);  // ottaa datan omistukseensa emossa
+                const std::string &theDataFileName,
+                const std::string &theDataFilePattern);  // ottaa datan omistukseensa emossa
   ~NFmiSmartInfo(void);
 
-  NFmiSmartInfo& operator=(const NFmiSmartInfo& theInfo);  // matala kopio, eli jaettu data
-  NFmiSmartInfo* Clone(
-      void) const;  // syv‰ kopio, eli kloonille luodaan oma queryData sen omistukseen
-                    // TODO: katso pit‰‰kˆ metodin nimi muuttaa, koska emoissa Clone on
+  NFmiSmartInfo &operator=(const NFmiSmartInfo &theInfo);  // matala kopio, eli jaettu data
+  NFmiSmartInfo *Clone(
+      void) const;  // syv√§ kopio, eli kloonille luodaan oma queryData sen omistukseen
+                    // TODO: katso pit√§√§k√∂ metodin nimi muuttaa, koska emoissa Clone on
                     // virtuaali funktio, jossa eri paluu-luokka.
-
+  // Apu funktio tekem√§√§n kevyit√§ kopoioita, koska Clone tekee raskaan kopion (= data kopioidaan
+  // my√∂s)
+  static boost::shared_ptr<NFmiFastQueryInfo> CreateShallowCopyOfHighestInfo(
+      const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
   bool NextLocation(void);
 
-  bool SnapShotData(const std::string& theAction,
-                    const NFmiHarmonizerBookKeepingData& theCurrentHarmonizerBookKeepingData);
+  bool SnapShotData(const std::string &theAction,
+                    const NFmiHarmonizerBookKeepingData &theCurrentHarmonizerBookKeepingData);
   bool Undo(void);
   bool Redo(void);
-  bool UndoData(const NFmiHarmonizerBookKeepingData& theHarmonizerBookKeepingData);
+  bool UndoData(const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData);
   bool RedoData(void);
   void UndoLevel(long theDepth);
 
@@ -51,26 +54,26 @@ class NFmiSmartInfo : public NFmiOwnerInfo
   bool LocationSelectionRedo(void);                      // kysyy onko redo mahdollinen
   bool LocationSelectionUndoData(void);                  // suorittaa todellisen undon
   bool LocationSelectionRedoData(void);                  // suorittaa todellisen redon
-  void LocationSelectionUndoLevel(int theNewUndoLevel);  // undolevel asetetaan t‰ll‰
+  void LocationSelectionUndoLevel(int theNewUndoLevel);  // undolevel asetetaan t√§ll√§
   bool LoadedFromFile(void);
   void LoadedFromFile(bool loadedFromFile);
   bool IsDirty(void) const;
   void Dirty(bool newState);
-  const NFmiHarmonizerBookKeepingData* CurrentHarmonizerBookKeepingData(
-      void) const;  // palauttaa nyt k‰ytˆss‰ olevan harmonisaattori parambagin
+  const NFmiHarmonizerBookKeepingData *CurrentHarmonizerBookKeepingData(
+      void) const;  // palauttaa nyt k√§yt√∂ss√§ olevan harmonisaattori parambagin
 
-  int MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect& theSearchArea);
+  int MaskedCount(unsigned long theMaskType, unsigned long theIndex, const NFmiRect &theSearchArea);
   void InverseMask(unsigned long theMaskType);
-  void MaskAllLocations(const bool& newState, unsigned long theMaskType);
+  void MaskAllLocations(const bool &newState, unsigned long theMaskType);
   unsigned long LocationMaskedCount(unsigned long theMaskType);
-  bool Mask(const NFmiBitMask& theMask, unsigned long theMaskType);
-  const NFmiBitMask& Mask(unsigned long theMaskType) const;
-  void MaskLocation(const bool& newState, unsigned long theMaskType);
+  bool Mask(const NFmiBitMask &theMask, unsigned long theMaskType);
+  const NFmiBitMask &Mask(unsigned long theMaskType) const;
+  void MaskLocation(const bool &newState, unsigned long theMaskType);
   void MaskType(unsigned long theMaskType);
   unsigned long MaskType(void);
 
  protected:
-  void CopyClonedDatas(const NFmiSmartInfo& theOther);
+  void CopyClonedDatas(const NFmiSmartInfo &theOther);
 
   boost::shared_ptr<NFmiModifiableQDatasBookKeeping> itsQDataBookKeepingPtr;
 };

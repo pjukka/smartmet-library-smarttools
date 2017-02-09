@@ -5,8 +5,8 @@
  */
 // ======================================================================
 #ifdef _MSC_VER
-#pragma warning(disable : 4786)  // poistaa n kpl VC++ k‰‰nt‰j‰n varoitusta (liian pitk‰ nimi >255
-                                 // merkki‰ joka johtuu 'puretuista' STL-template nimist‰)
+#pragma warning(disable : 4786)  // poistaa n kpl VC++ k√§√§nt√§j√§n varoitusta (liian pitk√§ nimi >255
+                                 // merkki√§ joka johtuu 'puretuista' STL-template nimist√§)
 #endif
 
 #include "NFmiInfoOrganizer.h"
@@ -81,13 +81,13 @@ NFmiQueryData *NFmiSmartToolUtil::ModifyData(
           theTimes,
           false,
           false,
-          0);  // false = ei tehd‰ muokkauksia vain valituille pisteille vaan kaikille pisteille
+          0);  // false = ei tehd√§ muokkauksia vain valituille pisteille vaan kaikille pisteille
     else
     {
       for (editedInfo->ResetLevel(); editedInfo->NextLevel();)
       {
-        if (editedInfo->SizeLevels() > 1)  // jos kyseess‰ on level-data, pit‰‰ l‰pik‰yt‰v‰ leveli
-                                           // ottaa talteen, ett‰ smartToolModifier osaa luoda
+        if (editedInfo->SizeLevels() > 1)  // jos kyseess√§ on level-data, pit√§√§ l√§pik√§yt√§v√§ leveli
+                                           // ottaa talteen, ett√§ smartToolModifier osaa luoda
                                            // siihen osoittavia fastInfoja.
         {
           boost::shared_ptr<NFmiLevel> theLevel(new NFmiLevel(*editedInfo->Level()));
@@ -98,7 +98,7 @@ NFmiQueryData *NFmiSmartToolUtil::ModifyData(
             theTimes,
             false,
             false,
-            0);  // false = ei tehd‰ muokkauksia vain valituille pisteille vaan kaikille pisteille
+            0);  // false = ei tehd√§ muokkauksia vain valituille pisteille vaan kaikille pisteille
                  // ::DoSmartToolModification(smartToolModifier, theTimes);
       }
     }
@@ -139,7 +139,7 @@ NFmiQueryData *NFmiSmartToolUtil::ModifyData(const std::string &theMacroText,
                     0,
                     createDrawParamFileIfNotExist,
                     false,
-                    fMakeStaticIfOneTimeStepData);  // 0=tyhj‰ apudata filename-lista
+                    fMakeStaticIfOneTimeStepData);  // 0=tyhj√§ apudata filename-lista
 }
 
 std::string NFmiSmartToolUtil::GetWorkingDirectory(void)
@@ -167,14 +167,14 @@ bool NFmiSmartToolUtil::InitDataBase(NFmiInfoOrganizer *theDataBase,
   {
     theDataBase->WorkingDirectory(GetWorkingDirectory());
     theDataBase->Init(
-        std::string(""), createDrawParamFileIfNotExist, false, false);  // t‰h‰n annetaan
+        std::string(""), createDrawParamFileIfNotExist, false, false);  // t√§h√§n annetaan
                                                                         // drawparametrien lataus
-                                                                        // polku, mutta niit‰ ei
-    // k‰ytet‰ t‰ss‰ tapauksessa
-    // false tarkoittaa ett‰ ei tehd‰ kopiota editoidusta datasta, t‰ss‰ se on turhaa
+                                                                        // polku, mutta niit√§ ei
+    // k√§ytet√§ t√§ss√§ tapauksessa
+    // false tarkoittaa ett√§ ei tehd√§ kopiota editoidusta datasta, t√§ss√§ se on turhaa
     bool dataWasDeleted = false;
     theModifiedData->LatLonCache();  // lasketaan latlon-cache valmiiksi, koska muuten multi-thread
-                                     // ymp‰ristˆss‰ tulee sen kanssa ongelmia
+                                     // ymp√§rist√∂ss√§ tulee sen kanssa ongelmia
     theDataBase->AddData(theModifiedData,
                          "xxxfileName",
                          "",

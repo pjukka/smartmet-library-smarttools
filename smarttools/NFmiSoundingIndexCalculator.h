@@ -2,7 +2,7 @@
 /*!
  * \file NFmiSoundingIndexCalculator.h
  *
- * T‰m‰ luokka laskee erilaisia luotausi ndeksej‰ annettujen querinfojen avulla.
+ * T√§m√§ luokka laskee erilaisia luotausi ndeksej√§ annettujen querinfojen avulla.
  * Mm. CAPE, CIN, LCL, BulkShear StormRelatedHellicity jne.
  */
 // ======================================================================
@@ -24,15 +24,15 @@ class NFmiLocation;
 class NFmiPoint;
 class NFmiStopFunctor;
 
-// N‰m‰ parametrit ovat niit‰ joita lasketaan luotausn‰ytˆss‰.
-// Tarkoitus on nyt pysty‰ laskemaan niit‰ myˆs hilamuodossa karttan‰ytˆlle.
-// Sit‰ varten tein oman parametrilistan, joka kuuluisi NFmiParameterName-enumiin.
-// Mutta en halua sotkea sit‰ n‰ill‰, joten tein oman listan, jota kuitenkin k‰ytet‰‰n
+// N√§m√§ parametrit ovat niit√§ joita lasketaan luotausn√§yt√∂ss√§.
+// Tarkoitus on nyt pysty√§ laskemaan niit√§ my√∂s hilamuodossa karttan√§yt√∂lle.
+// Sit√§ varten tein oman parametrilistan, joka kuuluisi NFmiParameterName-enumiin.
+// Mutta en halua sotkea sit√§ n√§ill√§, joten tein oman listan, jota kuitenkin k√§ytet√§√§n
 // kuin se olisi originaali NFmiParameterName-enumissa.
 typedef enum
 {
   kSoundingParNone =
-      4619,  // aloitan luvut jostain numerosta mik‰ ei mene sekaisin originaali param-listan kanssa
+      4619,  // aloitan luvut jostain numerosta mik√§ ei mene sekaisin originaali param-listan kanssa
   // aluksi surface (sur) arvojen avulla lasketut parametrit
   kSoundingParLCLSur = 4720,
   kSoundingParLFCSur,
@@ -43,7 +43,7 @@ typedef enum
   kSoundingParLCLHeightSur,
   kSoundingParLFCHeightSur,
   kSoundingParELHeightSur,
-  kSoundingParCAPE_TT_Sur,  // cape -10 ja -40 asteen kerroksen l‰pi
+  kSoundingParCAPE_TT_Sur,  // cape -10 ja -40 asteen kerroksen l√§pi
   // sitten 500m arvojen avulla lasketut parametrit
   kSoundingParLCL500m = 4730,
   kSoundingParLFC500m,
@@ -54,7 +54,7 @@ typedef enum
   kSoundingParLCLHeight500m,
   kSoundingParLFCHeight500m,
   kSoundingParELHeight500m,
-  kSoundingParCAPE_TT_500m,  // cape -10 ja -40 asteen kerroksen l‰pi
+  kSoundingParCAPE_TT_500m,  // cape -10 ja -40 asteen kerroksen l√§pi
   // sitten mostunstable (MostUn) arvojen avulla lasketut parametrit
   kSoundingParLCLMostUn = 4740,
   kSoundingParLFCMostUn,
@@ -65,15 +65,15 @@ typedef enum
   kSoundingParLCLHeightMostUn,
   kSoundingParLFCHeightMostUn,
   kSoundingParELHeightMostUn,
-  kSoundingParCAPE_TT_MostUn,  // cape -10 ja -40 asteen kerroksen l‰pi
-  // sitten normaaleja yleis indeksej‰
+  kSoundingParCAPE_TT_MostUn,  // cape -10 ja -40 asteen kerroksen l√§pi
+  // sitten normaaleja yleis indeksej√§
   kSoundingParSHOW = 4750,
   kSoundingParLIFT,
   kSoundingParKINX,
   kSoundingParCTOT,
   kSoundingParVTOT,
   kSoundingParTOTL,
-  // sitten viel‰ 'speciaali' paramereja
+  // sitten viel√§ 'speciaali' paramereja
   kSoundingParBS0_6km = 4770,  // BS=bulkshear
   kSoundingParBS0_1km,
   kSoundingParSRH0_3km,  // SRH=storm related helicity
@@ -90,7 +90,7 @@ typedef enum
   kSoundingParLCLHeightSurBas,
   kSoundingParLFCHeightSurBas,
   kSoundingParELHeightSurBas,
-  kSoundingParCAPE_TT_SurBas  // cape -10 ja -40 asteen kerroksen l‰pi
+  kSoundingParCAPE_TT_SurBas  // cape -10 ja -40 asteen kerroksen l√§pi
 } FmiSoundingParameters;
 
 class NFmiSoundingIndexCalculator

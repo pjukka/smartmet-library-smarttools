@@ -18,9 +18,9 @@
 //
 //
 //  Description:
-//   Pointeri lista jossa itemit ovat j‰rjestetty
-//   haluttuun j‰rjestykseen.
-//   T‰h‰n luokkaan laitettavilla olioiden luokilla
+//   Pointeri lista jossa itemit ovat j√§rjestetty
+//   haluttuun j√§rjestykseen.
+//   T√§h√§n luokkaan laitettavilla olioiden luokilla
 //   on oltava operaattorit < ja ==
 //
 //  Change Log:
@@ -47,7 +47,8 @@ class NFmiSortedPtrList : public NFmiPtrList<Type>
       typename NFmiPtrList<Type>::Iterator tempIter = this->Start();
       while (tempIter.Next())
       {
-        if (*theItem < tempIter.Current()) return tempIter.AddBefore(theItem);
+        if (*theItem < tempIter.Current())
+          return tempIter.AddBefore(theItem);
       }
       return this->AddEnd(theItem);
     }
@@ -78,14 +79,15 @@ class NFmiSortedPtrList : public NFmiPtrList<Type>
     typename NFmiPtrList<Type>::Iterator theIter = this->Start();
     while (theIter.Next())
     {
-      if (theIter.Current() == *theItem) return theIter;
+      if (theIter.Current() == *theItem)
+        return theIter;
     }
     return theIter;
   };
 
  private:
  private:
-  bool fAscending;  //   M‰‰r‰‰ listan j‰rjestyksen (true = nouseva).
+  bool fAscending;  //   M√§√§r√§√§ listan j√§rjestyksen (true = nouseva).
 };
 
 #endif

@@ -90,29 +90,29 @@ class NFmiAreaMaskInfo
   NFmiDataIdent itsDataIdent;
   bool fUseDefaultProducer;
   NFmiCalculationCondition itsMaskCondition;
-  NFmiAreaMask::CalculationOperationType itsOperationType;  // t‰m‰ menee p‰‰llekk‰in erilaisten
+  NFmiAreaMask::CalculationOperationType itsOperationType;  // t√§m√§ menee p√§√§llekk√§in erilaisten
                                                             // maski ja info tyyppien kanssa, mutta
-                                                            // piti tehd‰
-  // smarttooleja varten viel‰ t‰mmˆinen mm. hoitamaan laskuj‰rjestyksi‰ ja sulkuja jne.
+                                                            // piti tehd√§
+  // smarttooleja varten viel√§ t√§mm√∂inen mm. hoitamaan laskuj√§rjestyksi√§ ja sulkuja jne.
   NFmiAreaMask::CalculationOperator
-      itsCalculationOperator;  // jos operation, t‰ss‰ tieto mist‰ niist‰ on kyse esim. +, -, * jne.
+      itsCalculationOperator;  // jos operation, t√§ss√§ tieto mist√§ niist√§ on kyse esim. +, -, * jne.
   NFmiAreaMask::BinaryOperator itsBinaryOperator;
-  NFmiInfoData::Type itsDataType;  // jos kyseess‰ infoVariable, tarvitaan viel‰ datan tyyppi, ett‰
+  NFmiInfoData::Type itsDataType;  // jos kyseess√§ infoVariable, tarvitaan viel√§ datan tyyppi, ett√§
                                    // parametri saadaan tietokannasta (=infoOrganizerista)
   NFmiLevel* itsLevel;             // mahd. level tieto, omistaa ja tuhoaa
-  std::string itsMaskText;  // originaali teksti, mist‰ t‰m‰ maskinfo on tulkittu, t‰m‰ on siis vain
+  std::string itsMaskText;  // originaali teksti, mist√§ t√§m√§ maskinfo on tulkittu, t√§m√§ on siis vain
                             // yksi sana tai luku
-  std::string itsOrigLineText;  // originaali koko rivin teksti, mist‰ t‰m‰ currentti sana
-                                // (itsMaskText) on otettu (t‰t‰ k‰ytet‰‰n virhe teksteiss‰)
+  std::string itsOrigLineText;  // originaali koko rivin teksti, mist√§ t√§m√§ currentti sana
+                                // (itsMaskText) on otettu (t√§t√§ k√§ytet√§√§n virhe teksteiss√§)
   NFmiAreaMask::FunctionType itsFunctionType;  // onko mahd. funktio esim. min, max jne. (ei
                                                // matemaattisia funktioita kuten sin, cos, pow,
                                                // jne.)
-  NFmiAreaMask::FunctionType itsSecondaryFunctionType;  // T‰h‰n laitetaan mm. vertikaali
-                                                        // funktioissa k‰ytetty korkeus tyyppi esim.
-                                                        // VertP tai VertZ
+  NFmiAreaMask::FunctionType itsSecondaryFunctionType;  // T√§h√§n laitetaan mm. vertikaali
+  // funktioissa k√§ytetty korkeus tyyppi esim.
+  // VertP tai VertZ
   NFmiAreaMask::MetFunctionDirection itsMetFunctionDirection;  // grad, adv, div rot ja lap
-                                                               // -funktioille (ja n‰iden
-                                                               // 2-versioille) m‰‰r‰t‰‰n myˆs
+                                                               // -funktioille (ja n√§iden
+                                                               // 2-versioille) m√§√§r√§t√§√§n my√∂s
                                                                // suunta, joka voi olla X, Y tai
                                                                // molemmat
   NFmiPoint itsOffsetPoint1;  // esim. aikaoffset (x alku ja y loppu) tai paikkaoffset (alku x ja y
@@ -121,7 +121,7 @@ class NFmiAreaMaskInfo
   NFmiAreaMask::MathFunctionType itsMathFunctionType;
   int itsIntegrationFunctionType;  // 1=SumT tyylinen ja 2=SumZ tyylinen ja 3=MinH tyylinen funktio
   int itsFunctionArgumentCount;    // kuinka monta pilkulla eroteltua argumenttia on odotettavissa
-  // t‰h‰n 'meteorologiseen' funktioon (mm. grad, adv, div, lap, rot
+  // t√§h√§n 'meteorologiseen' funktioon (mm. grad, adv, div, lap, rot
   // jne....).
   FmiSoundingParameters itsSoundingParameter;
   int itsModelRunIndex;

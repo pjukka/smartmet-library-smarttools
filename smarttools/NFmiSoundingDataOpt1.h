@@ -2,7 +2,7 @@
 /*!
  * \file NFmiSoundingDataOpt1.h
  *
- * Apuluokka laskemaan ja tutkimaan luotaus dataa. Osaa t‰ytt‰‰ itsens‰
+ * Apuluokka laskemaan ja tutkimaan luotaus dataa. Osaa t√§ytt√§√§ itsens√§
  * mm. mallipinta QueryDatasta (infosta).
  */
 // ======================================================================
@@ -60,7 +60,7 @@ class NFmiSoundingDataOpt1
 
   NFmiSoundingDataOpt1(void){};
 
-  // TODO Fill-metodeille pit‰‰ laittaa haluttu parametri-lista parametriksi (jolla t‰ytet‰‰n sitten
+  // TODO Fill-metodeille pit√§√§ laittaa haluttu parametri-lista parametriksi (jolla t√§ytet√§√§n sitten
   // dynaamisesti NFmiDataMatrix-otus)
   bool FillSoundingData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
                         const NFmiMetTime &theTime,
@@ -74,13 +74,13 @@ class NFmiSoundingDataOpt1
                         const NFmiString &theName,
                         const boost::shared_ptr<NFmiFastQueryInfo> &theGroundDataInfo,
                         bool useFastFill = false);
-  void CutEmptyData(void);  // t‰m‰ leikkaa Fill.. -metodeissa laskettuja data vektoreita niin ett‰
-                            // pelk‰t puuttuvat kerrokset otetaan pois
+  void CutEmptyData(void);  // t√§m√§ leikkaa Fill.. -metodeissa laskettuja data vektoreita niin ett√§
+                            // pelk√§t puuttuvat kerrokset otetaan pois
   static bool HasRealSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theSoundingLevelInfo);
   bool IsDataGood();
 
-  // FillSoundingData-metodeilla t‰ytet‰‰n kunkin parametrin vektorit ja t‰ll‰ saa haluamansa
-  // parametrin vektorin k‰yttˆˆn
+  // FillSoundingData-metodeilla t√§ytet√§√§n kunkin parametrin vektorit ja t√§ll√§ saa haluamansa
+  // parametrin vektorin k√§ytt√∂√∂n
   std::deque<float> &GetParamData(FmiParameterName theId);
   const NFmiLocation &Location(void) const { return itsLocation; }
   void Location(const NFmiLocation &newValue) { itsLocation = newValue; }
@@ -172,7 +172,7 @@ class NFmiSoundingDataOpt1
                      const NFmiPoint &theLatlon);
   bool FastFillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
                          FmiParameterName theId);
-  void InitZeroHeight(void);  // t‰t‰ kutsutaan FillParamData-metodeista
+  void InitZeroHeight(void);  // t√§t√§ kutsutaan FillParamData-metodeista
   void CalculateHumidityData(void);
   std::string MakeCacheString(double T, double Td, double fromP, double toP);
   bool FillHeightDataFromLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
@@ -180,15 +180,15 @@ class NFmiSoundingDataOpt1
 
   NFmiLocation itsLocation;
   NFmiMetTime itsTime;
-  NFmiMetTime itsOriginTime;  // t‰m‰ otetaan talteen IsSameSounding-metodia varten
+  NFmiMetTime itsOriginTime;  // t√§m√§ otetaan talteen IsSameSounding-metodia varten
 
-  // TODO Laita k‰ytt‰m‰‰n NFmiDataMatrix-luokkaa dynaamista datalistaa varten. Laita myˆs
+  // TODO Laita k√§ytt√§m√§√§n NFmiDataMatrix-luokkaa dynaamista datalistaa varten. Laita my√∂s
   // param-lista (joka annetaan fillData-metodeissa) data osaksi
   std::deque<float> itsTemperatureData;
   std::deque<float> itsDewPointData;
   std::deque<float> itsHumidityData;
   std::deque<float> itsPressureData;
-  std::deque<float> itsGeomHeightData;  // t‰m‰ on korkeus dataa metreiss‰
+  std::deque<float> itsGeomHeightData;  // t√§m√§ on korkeus dataa metreiss√§
   std::deque<float> itsWindSpeedData;
   std::deque<float> itsWindDirectionData;
   std::deque<float> itsWindComponentUData;
@@ -196,9 +196,9 @@ class NFmiSoundingDataOpt1
   std::deque<float> itsWindVectorData;
   std::deque<float> itsTotalCloudinessData;
 
-  float itsZeroHeight;  // t‰lt‰ korkeudelta alkaa luotauksen 0-korkeus, eli vuoristossa luotaus
-                        // alkaa oikeasti korkeammalta ja se korkeus pit‰‰ k‰sitell‰ pintakorkeutena
-  int itsZeroHeightIndex;  // edellisen indeksi (paikka vektorissa). Arvo on -1 jos ei lˆytynyt
+  float itsZeroHeight;  // t√§lt√§ korkeudelta alkaa luotauksen 0-korkeus, eli vuoristossa luotaus
+  // alkaa oikeasti korkeammalta ja se korkeus pit√§√§ k√§sitell√§ pintakorkeutena
+  int itsZeroHeightIndex;  // edellisen indeksi (paikka vektorissa). Arvo on -1 jos ei l√∂ytynyt
                            // kunnollista 0-korkeutta
   bool fObservationData;
   bool fPressureDataAvailable;

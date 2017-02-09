@@ -1,7 +1,7 @@
-//© Ilmatieteenlaitos/Marko.
+//¬© Ilmatieteenlaitos/Marko.
 // Original 09.10.2006
 //
-// Luokka pit‰‰ MetEditoriin imagine contourauksessa k‰ytettyjen
+// Luokka pit√§√§ MetEditoriin imagine contourauksessa k√§ytettyjen
 // xy-pisteiden cachea.
 //---------------------------------------------------------- NFmiGridPointCache.h
 
@@ -22,9 +22,9 @@ class NFmiGridPointCache
  public:
   struct Data
   {
-    NFmiPoint itsOffSet;  // koska lasketut hilat lasketaan (usean ruudukon karttan‰ytˆss‰) eri
-                          // kohdissa 0,0 - 1,1 maailmaa, pit‰‰
-    // 'originaalin' hilan offset origoon laittaa talteen, ett‰ myˆhemmin voidaan laskea haluttuja
+    NFmiPoint itsOffSet;  // koska lasketut hilat lasketaan (usean ruudukon karttan√§yt√∂ss√§) eri
+                          // kohdissa 0,0 - 1,1 maailmaa, pit√§√§
+    // 'originaalin' hilan offset origoon laittaa talteen, ett√§ my√∂hemmin voidaan laskea haluttuja
     // offsetteja contoureille
     NFmiDataMatrix<NFmiPoint> itsPoints;
   };

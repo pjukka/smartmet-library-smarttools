@@ -3,7 +3,10 @@
 #include "NFmiModifiableQDatasBookKeeping.h"
 #include <NFmiQueryData.h>
 
-NFmiSmartInfo::NFmiSmartInfo(void) : NFmiOwnerInfo(), itsQDataBookKeepingPtr() {}
+NFmiSmartInfo::NFmiSmartInfo(void) : NFmiOwnerInfo(), itsQDataBookKeepingPtr()
+{
+}
+
 NFmiSmartInfo::NFmiSmartInfo(NFmiQueryData *theOwnedData,
                              NFmiInfoData::Type theDataType,
                              const std::string &theDataFileName,
@@ -25,7 +28,10 @@ NFmiSmartInfo::NFmiSmartInfo(const NFmiSmartInfo &theInfo)
 {
 }
 
-NFmiSmartInfo::~NFmiSmartInfo(void) {}
+NFmiSmartInfo::~NFmiSmartInfo(void)
+{
+}
+
 NFmiSmartInfo &NFmiSmartInfo::operator=(const NFmiSmartInfo &theInfo)
 {
   if (this != &theInfo)
@@ -38,21 +44,42 @@ NFmiSmartInfo &NFmiSmartInfo::operator=(const NFmiSmartInfo &theInfo)
 
 NFmiSmartInfo *NFmiSmartInfo::Clone(void) const
 {
-  NFmiQueryData *cloneData = itsDataPtr.get()->Clone();  // datasta tehtävä tässä kopio!
+  NFmiQueryData *cloneData = itsDataPtr.get()->Clone();  // datasta tehtÃ¤vÃ¤ tÃ¤ssÃ¤ kopio!
   NFmiSmartInfo *copy = new NFmiSmartInfo(
       cloneData,
       itsDataType,
       itsDataFileName,
-      itsDataFilePattern);       // tämä ei osaa tehdä kaikesta tarvittavasta datasta kopiota
-  copy->CopyClonedDatas(*this);  // tässä laitetaan kaikki loput tarvittavat NFmiSmartInfo-data osat
+      itsDataFilePattern);       // tÃ¤mÃ¤ ei osaa tehdÃ¤ kaikesta tarvittavasta datasta kopiota
+  copy->CopyClonedDatas(*this);  // tÃ¤ssÃ¤ laitetaan kaikki loput tarvittavat NFmiSmartInfo-data osat
                                  // kopioitavaksi clooniin.
-  // Pitää asettaa iteraattorit myös kohdalleen
-  copy->Param(Param());  // Tämä pitää asettaa parametrilla, pelkkä indeksin asetus ei riitä
+  // PitÃ¤Ã¤ asettaa iteraattorit myÃ¶s kohdalleen
+  copy->Param(Param());  // TÃ¤mÃ¤ pitÃ¤Ã¤ asettaa parametrilla, pelkkÃ¤ indeksin asetus ei riitÃ¤
                          // (aliparametri juttu)!!!
   copy->TimeIndex(TimeIndex());
   copy->LevelIndex(LevelIndex());
   copy->LocationIndex(LocationIndex());
   return copy;
+}
+
+boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartInfo::CreateShallowCopyOfHighestInfo(
+    const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+  if (theInfo)
+  {
+    NFmiSmartInfo *smartInfo = dynamic_cast<NFmiSmartInfo *>(theInfo.get());
+    if (smartInfo)
+      return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(*smartInfo));
+
+    NFmiOwnerInfo *ownerInfo = dynamic_cast<NFmiOwnerInfo *>(theInfo.get());
+    if (ownerInfo)
+      return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiOwnerInfo(*ownerInfo));
+
+    NFmiFastQueryInfo *fastInfo = dynamic_cast<NFmiFastQueryInfo *>(theInfo.get());
+    if (fastInfo)
+      return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*fastInfo));
+  }
+
+  return boost::shared_ptr<NFmiFastQueryInfo>();
 }
 
 void NFmiSmartInfo::CopyClonedDatas(const NFmiSmartInfo &theOther)
@@ -63,7 +90,7 @@ void NFmiSmartInfo::CopyClonedDatas(const NFmiSmartInfo &theOther)
   }
 }
 
-void NFmiSmartInfo::UndoLevel(long theDepth)  // theDepth kuvaa kuinka monta Undota voidaan tehdä.
+void NFmiSmartInfo::UndoLevel(long theDepth)  // theDepth kuvaa kuinka monta Undota voidaan tehdÃ¤.
 {
   itsQDataBookKeepingPtr->UndoLevel(theDepth, *itsRefRawData);
 }
@@ -98,19 +125,23 @@ void NFmiSmartInfo::LocationSelectionUndoLevel(int theNewUndoLevel)
   itsQDataBookKeepingPtr->LocationSelectionUndoLevel(theNewUndoLevel);
 }
 
-bool NFmiSmartInfo::LoadedFromFile(void) { return itsQDataBookKeepingPtr->LoadedFromFile(); }
+bool NFmiSmartInfo::LoadedFromFile(void)
+{
+  return itsQDataBookKeepingPtr->LoadedFromFile();
+}
+
 void NFmiSmartInfo::LoadedFromFile(bool loadedFromFile)
 {
   itsQDataBookKeepingPtr->LoadedFromFile(loadedFromFile);
 }
 
-//   Siirtää 'iteraattorin' osoittamaan seuraavaa
+//   SiirtÃ¤Ã¤ 'iteraattorin' osoittamaan seuraavaa
 //   maskattua paikkaa.
 //   Kutsutaan emon Next()-metodia ja katsotaan,
-//   mikä itsAreaMask-olio
+//   mikÃ¤ itsAreaMask-olio
 //   palauttaa. Jos Maski on true, palautetaan
 //   true, muuten kutsutaan
-//   taas emon Next:iä ja jatketaan kunnes emon
+//   taas emon Next:iÃ¤ ja jatketaan kunnes emon
 //   Next palauttaa falsen.
 bool NFmiSmartInfo::NextLocation()
 {
@@ -130,21 +161,41 @@ bool NFmiSmartInfo::SnapShotData(const std::string &theAction,
       theAction, theHarmonizerBookKeepingData, *itsRefRawData);
 }
 
-bool NFmiSmartInfo::Undo(void) { return itsQDataBookKeepingPtr->Undo(); }
-bool NFmiSmartInfo::Redo(void) { return itsQDataBookKeepingPtr->Redo(); }
+bool NFmiSmartInfo::Undo(void)
+{
+  return itsQDataBookKeepingPtr->Undo();
+}
+
+bool NFmiSmartInfo::Redo(void)
+{
+  return itsQDataBookKeepingPtr->Redo();
+}
+
 bool NFmiSmartInfo::UndoData(const NFmiHarmonizerBookKeepingData &theHarmonizerBookKeepingData)
 {
   return itsQDataBookKeepingPtr->UndoData(theHarmonizerBookKeepingData, *itsRefRawData);
 }
 
-bool NFmiSmartInfo::RedoData(void) { return itsQDataBookKeepingPtr->RedoData(*itsRefRawData); }
+bool NFmiSmartInfo::RedoData(void)
+{
+  return itsQDataBookKeepingPtr->RedoData(*itsRefRawData);
+}
+
 const NFmiHarmonizerBookKeepingData *NFmiSmartInfo::CurrentHarmonizerBookKeepingData(void) const
 {
   return itsQDataBookKeepingPtr->CurrentHarmonizerBookKeepingData();
 }
 
-bool NFmiSmartInfo::IsDirty(void) const { return itsQDataBookKeepingPtr->IsDirty(); }
-void NFmiSmartInfo::Dirty(bool newState) { itsQDataBookKeepingPtr->Dirty(newState); }
+bool NFmiSmartInfo::IsDirty(void) const
+{
+  return itsQDataBookKeepingPtr->IsDirty();
+}
+
+void NFmiSmartInfo::Dirty(bool newState)
+{
+  itsQDataBookKeepingPtr->Dirty(newState);
+}
+
 int NFmiSmartInfo::MaskedCount(unsigned long theMaskType,
                                unsigned long theIndex,
                                const NFmiRect &theSearchArea)
@@ -188,4 +239,7 @@ void NFmiSmartInfo::MaskType(unsigned long theMaskType)
   itsQDataBookKeepingPtr->MaskType(theMaskType);
 }
 
-unsigned long NFmiSmartInfo::MaskType(void) { return itsQDataBookKeepingPtr->MaskType(); }
+unsigned long NFmiSmartInfo::MaskType(void)
+{
+  return itsQDataBookKeepingPtr->MaskType();
+}

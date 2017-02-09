@@ -33,7 +33,7 @@ class NFmiUndoRedoQData
   char** itsUndoTable;
   std::string* itsUndoTextTable;
   std::deque<NFmiHarmonizerBookKeepingData>*
-      itsUndoRedoHarmonizerBookKeepingData;  // t‰m‰n elin kaari seuraa tiiviisti itsUndoTable:a
-  // t‰h‰n talletetaan harmonisaatiossa 'likaantuvat' parametrit ja ajat ja koska
-  // editorissa on undo/redo toiminto, pit‰‰ myˆs t‰m‰n olla synkassa datan kanssa
+      itsUndoRedoHarmonizerBookKeepingData;  // t√§m√§n elin kaari seuraa tiiviisti itsUndoTable:a
+  // t√§h√§n talletetaan harmonisaatiossa 'likaantuvat' parametrit ja ajat ja koska
+  // editorissa on undo/redo toiminto, pit√§√§ my√∂s t√§m√§n olla synkassa datan kanssa
 };

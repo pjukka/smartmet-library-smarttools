@@ -49,8 +49,10 @@ static bool GetAviationStationFromCsvString(const std::string &theStationStr,
   static long currentWmoIdCounter = 128000;
   if (theStationStr.size() > 2)
   {
-    if (theStationStr[0] == '#') return false;
-    if (theStationStr[0] == '/' && theStationStr[1] == '/') return false;
+    if (theStationStr[0] == '#')
+      return false;
+    if (theStationStr[0] == '/' && theStationStr[1] == '/')
+      return false;
 
     std::vector<std::string> stationParts = NFmiStringTools::Split(theStationStr, ",");
     if (stationParts.size() >= 30)
@@ -64,7 +66,8 @@ static bool GetAviationStationFromCsvString(const std::string &theStationStr,
       long wmoId = missingWmoId;
       double lat = -9999;
       double lon = -9999;
-      if (icaoStr.size() == 4) icaoOk = true;
+      if (icaoStr.size() == 4)
+        icaoOk = true;
       try
       {
         wmoId = NFmiStringTools::Convert<long>(stationParts[21]);
@@ -87,7 +90,8 @@ static bool GetAviationStationFromCsvString(const std::string &theStationStr,
       if (latlonOk && (fIcaoNeeded == false || (fIcaoNeeded && icaoOk)) &&
           (fWmoNeeded == false || (fWmoNeeded && wmoOk)))
       {
-        if (wmoId == missingWmoId) wmoId = currentWmoIdCounter++;
+        if (wmoId == missingWmoId)
+          wmoId = currentWmoIdCounter++;
         theStationOut.SetIdent(wmoId);
         theStationOut.SetLatitude(lat);
         theStationOut.SetLongitude(lon);
@@ -103,7 +107,7 @@ static bool GetAviationStationFromCsvString(const std::string &theStationStr,
 void NFmiAviationStationInfoSystem::InitFromMasterTableCsv(const std::string &theInitFileName)
 {
   itsInitLogMessage = "";
-  // tyhjennet‰‰n ensin asemalistat
+  // tyhjennet√§√§n ensin asemalistat
   itsIcaoStations.clear();
   itsWmoStations.clear();
 
@@ -116,7 +120,7 @@ void NFmiAviationStationInfoSystem::InitFromMasterTableCsv(const std::string &th
   {
     std::stringstream in(fileContent);
 
-    const int maxBufferSize = 1024 + 1;  // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+    const int maxBufferSize = 1024 + 1;  // kuinka pitk√§ yhden rivin maksimissaan oletetaan olevan
     std::string buffer;
     int i = 0;
     int counter = 0;
@@ -181,7 +185,7 @@ void NFmiAviationStationInfoSystem::InitFromMasterTableCsv(const std::string &th
 
 // theDegreeStr on puhtaasti arvo asteina (kokonaisluku)
 // theMinutesWithOrientationStr on arvo asteiden minuutteina ja jossa on  pohjoisella
-// pallonpuoliskolla N ja etel‰isell‰ pallonpuoliskolla S kirjain per‰ss‰
+// pallonpuoliskolla N ja etel√§isell√§ pallonpuoliskolla S kirjain per√§ss√§
 static double GetLatOrLon(const std::string &theLatOrLonStr, bool fDoLatitude)
 {
   if (theLatOrLonStr.empty())
@@ -201,31 +205,34 @@ static double GetLatOrLon(const std::string &theLatOrLonStr, bool fDoLatitude)
   value += (NFmiStringTools::Convert<double>(minutesStr) / 60. * 100.) / 100.;
   if (fDoLatitude)
   {
-    if (orientationStr == "S") value = -value;
+    if (orientationStr == "S")
+      value = -value;
   }
   else
   {
-    if (orientationStr == "W") value = -value;
+    if (orientationStr == "W")
+      value = -value;
   }
   return value;
 }
 
-// ensimm‰inen rivi tiedostossa on kommentti rivi kuten seuraava rivi ilman kommentti merkkej‰ '//'
+// ensimm√§inen rivi tiedostossa on kommentti rivi kuten seuraava rivi ilman kommentti merkkej√§ '//'
 // RegionId	RegionName	CountryArea	CountryCode	StationId	IndexNbr
 // IndexSubNbr	StationName	Latitude	Longitude	Hp	HpFlag	Hha	HhaFlag
 // PressureDefId	SO-1	SO-2	SO-3	SO-4	SO-5	SO-6	SO-7	SO-8	ObsHs
 // UA-1	UA-2	UA-3	UA-4	ObsRems
 //
-// loput rivit tiedostossa on asema data rivej‰, joissa erotin on tabulaattori ja sarake j‰rjestys
-// on kuten 1. kommentti rivill‰ on ilmoitettu
+// loput rivit tiedostossa on asema data rivej√§, joissa erotin on tabulaattori ja sarake j√§rjestys
+// on kuten 1. kommentti rivill√§ on ilmoitettu
 // 1	AFRICA / AFRIQUE	ALGERIA / ALGERIE	1030	57	60351	0	JIJEL-
 // ACHOUAT
-// 36 48N	05 53E	10		8			X	X	X	X	X	X
+// 36 48N	05 53E	10		8			X	X	X	X	X
+// X
 // X
 // X
 // H00-24	.	.	.	.	A;CLIMAT(C);EVAP;M/B;METAR;SOILTEMP;SPECI;SUNDUR
 //
-// Kiinnostavat kohdat ovat (huom. t‰ss‰ kuvauksessa sarakkeet alkaa 1.:sta, koodissa indeksit
+// Kiinnostavat kohdat ovat (huom. t√§ss√§ kuvauksessa sarakkeet alkaa 1.:sta, koodissa indeksit
 // alkavat 0:sta):
 // 6. sarake (wmo-id)
 // 8. sarake (asema nimi)
@@ -238,9 +245,11 @@ static bool GetAviationStationFromWmoFlatTableString(const std::string &theStati
   if (theStationStr.size() > 2)
   {
     // HUOM! vaikka data formaatti ei tuekaan kommentteja, annetaan kommenttien tarkistus koodin
-    // olla t‰ss‰ varmuuden vuoksi
-    if (theStationStr[0] == '#') return false;
-    if (theStationStr[0] == '/' && theStationStr[1] == '/') return false;
+    // olla t√§ss√§ varmuuden vuoksi
+    if (theStationStr[0] == '#')
+      return false;
+    if (theStationStr[0] == '/' && theStationStr[1] == '/')
+      return false;
 
     std::vector<std::string> stationParts = NFmiStringTools::Split(theStationStr, "\t");
     if (stationParts.size() >= 13)
@@ -273,7 +282,8 @@ static bool GetAviationStationFromWmoFlatTableString(const std::string &theStati
 
       if (latlonOk && wmoOk)
       {
-        if (wmoId == missingWmoId) wmoId = currentWmoIdCounter++;
+        if (wmoId == missingWmoId)
+          wmoId = currentWmoIdCounter++;
         theStationOut.SetIdent(wmoId);
         theStationOut.SetLatitude(lat);
         theStationOut.SetLongitude(lon);
@@ -288,7 +298,7 @@ static bool GetAviationStationFromWmoFlatTableString(const std::string &theStati
 void NFmiAviationStationInfoSystem::InitFromWmoFlatTable(const std::string &theInitFileName)
 {
   itsInitLogMessage = "";
-  // tyhjennet‰‰n ensin asemalistat
+  // tyhjennet√§√§n ensin asemalistat
   itsIcaoStations.clear();
   itsWmoStations.clear();
 
@@ -305,7 +315,7 @@ void NFmiAviationStationInfoSystem::InitFromWmoFlatTable(const std::string &theI
   {
     std::stringstream in(fileContent);
 
-    const int maxBufferSize = 1024 + 1;  // kuinka pitk‰ yhden rivin maksimissaan oletetaan olevan
+    const int maxBufferSize = 1024 + 1;  // kuinka pitk√§ yhden rivin maksimissaan oletetaan olevan
     std::string buffer;
     int i = 0;
     int counter = 0;

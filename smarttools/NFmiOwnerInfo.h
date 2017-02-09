@@ -1,10 +1,10 @@
 #pragma once
 
-// Luokan teht‰v‰ on toimia ns. smart-pointer luokkana, joka on queryData
-// iteraattori ja omistaa smart-pointterin avulla sen queryDatan, mit‰ se iteroi.
+// Luokan teht√§v√§ on toimia ns. smart-pointer luokkana, joka on queryData
+// iteraattori ja omistaa smart-pointterin avulla sen queryDatan, mit√§ se iteroi.
 // Eli SmartMetissa voi olla useita info-iteraattoreita, jotka osoittavat samaan
-// queryDataan. Niit‰ voidaan k‰ytt‰‰ eri s‰ikeiss‰ ja n‰m‰ talletetaan
-// ns. InfoOrganizer-luokkaan talteen, mist‰ eri datojen infoja pyydet‰‰n.
+// queryDataan. Niit√§ voidaan k√§ytt√§√§ eri s√§ikeiss√§ ja n√§m√§ talletetaan
+// ns. InfoOrganizer-luokkaan talteen, mist√§ eri datojen infoja pyydet√§√§n.
 // TODO: Keksi luokalle parempi nimi.
 
 #include <NFmiFastQueryInfo.h>
@@ -23,8 +23,8 @@ class NFmiOwnerInfo : public NFmiFastQueryInfo
 
   NFmiOwnerInfo &operator=(const NFmiOwnerInfo &theInfo);  // matala kopio, eli jaettu data
   NFmiOwnerInfo *Clone(
-      void) const;  // syv‰ kopio, eli kloonille luodaan oma queryData sen omistukseen
-                    // TODO: katso pit‰‰kˆ metodin nimi muuttaa, koska emoissa Clone on
+      void) const;  // syv√§ kopio, eli kloonille luodaan oma queryData sen omistukseen
+                    // TODO: katso pit√§√§k√∂ metodin nimi muuttaa, koska emoissa Clone on
                     // virtuaali funktio, jossa eri paluu-luokka.
   const std::string &DataFileName(void) const { return itsDataFileName; }
   void DataFileName(const std::string &theDataFileName) { itsDataFileName = theDataFileName; }
@@ -38,7 +38,7 @@ class NFmiOwnerInfo : public NFmiFastQueryInfo
  protected:
   boost::shared_ptr<NFmiQueryData> itsDataPtr;
   std::string itsDataFileName;
-  std::string itsDataFilePattern;  // t‰t‰ k‰ytet‰‰n tunnistamaan mm. info-organizerissa, ett‰ onko
-                                   // data samanlaista, eli pyyhit‰‰nkˆ vanha t‰ll‰inen data pois
-                                   // alta
+  std::string itsDataFilePattern;  // t√§t√§ k√§ytet√§√§n tunnistamaan mm. info-organizerissa, ett√§ onko
+  // data samanlaista, eli pyyhit√§√§nk√∂ vanha t√§ll√§inen data pois
+  // alta
 };

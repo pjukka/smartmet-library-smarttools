@@ -1,7 +1,7 @@
-//© Ilmatieteenlaitos/Marko.
+//¬© Ilmatieteenlaitos/Marko.
 // Original 4.11.2011
 //
-// namespacessa on muutamia helper funktioita ja 'ylim‰‰r‰isen' datan talletus luokka.
+// namespacessa on muutamia helper funktioita ja 'ylim√§√§r√§isen' datan talletus luokka.
 //---------------------------------------------------------- NFmiDataStoringHelpers.cpp
 
 #include "NFmiDataStoringHelpers.h"
@@ -10,7 +10,7 @@ namespace
 {
 NFmiMetTime itsViewMacroTime =
     NFmiMetTime(1900, 0, 0, 0, 0, 0);  // NFmiMetTime::gMissingTime; EI TOIMI!!!
-// Ei toiminut gMissingTime-arvon k‰yttˆ ainakaan VC++2008 k‰‰nt‰j‰ll‰.
+// Ei toiminut gMissingTime-arvon k√§ytt√∂ ainakaan VC++2008 k√§√§nt√§j√§ll√§.
 // itsViewMacroTime sai arvokseen 0 v 0 kk 0 pv 0 h 0 min 0 sec
 // Ilmeisesti anonymous namespace alustetaan ensin ja sitten vasta NFmiMetTime-luokan staattinen
 // const dataosa.
@@ -28,7 +28,8 @@ void NFmiDataStoringHelpers::WriteTimeWithOffsets(const NFmiMetTime &theUsedCurr
   aTime.SetSec(0);
   long hourShift = aTime.DifferenceInHours(theTime);
   long usedDayShift = hourShift / 24;
-  if (hourShift > 0) usedDayShift++;
+  if (hourShift > 0)
+    usedDayShift++;
   os << utcHour << " " << utcMinute << " " << usedDayShift << std::endl;
 }
 
@@ -48,13 +49,14 @@ void NFmiDataStoringHelpers::ReadTimeWithOffsets(const NFmiMetTime &theUsedCurre
   aTime.ChangeByDays(-dayShift);
   aTime.SetHour(utcHour);
   aTime.SetMin(utcMinute);
-  // alkuper‰isess‰ tallennuskoodissa on ollut bugi, kun ei olla nollattu minuutteja eik‰
+  // alkuper√§isess√§ tallennuskoodissa on ollut bugi, kun ei olla nollattu minuutteja eik√§
   // sekunteja ennen dayshift-laskuja.
-  // En voi t‰ysin korjata t‰t‰, koska se saattaa sekoittaa pakkaa enemm‰n kuin tarpeen.
-  // Siksi jos utc-tunti oli 0 ja dayShift oli positiivinen, pit‰‰ lopullista aikaa siirt‰‰ p‰iv‰ll‰
-  // eteenp‰in
+  // En voi t√§ysin korjata t√§t√§, koska se saattaa sekoittaa pakkaa enemm√§n kuin tarpeen.
+  // Siksi jos utc-tunti oli 0 ja dayShift oli positiivinen, pit√§√§ lopullista aikaa siirt√§√§ p√§iv√§ll√§
+  // eteenp√§in
   bool uglyAfterFix = ((utcHour == 0) && (dayShift > 0));
-  if (uglyAfterFix) aTime.ChangeByDays(1);
+  if (uglyAfterFix)
+    aTime.ChangeByDays(1);
   theTime = aTime;
 }
 
@@ -145,22 +147,24 @@ void NFmiDataStoringHelpers::NFmiExtraDataStorage::Write(std::ostream &os) const
   size_t i = 0;
   for (i = 0; i < ssize; i++)
   {
-    if (i > 0)  // t‰m‰n avulla viimeisen arvon j‰lkeen ei tule spacea
+    if (i > 0)  // t√§m√§n avulla viimeisen arvon j√§lkeen ei tule spacea
       os << " ";
     os << itsDoubleValues[i];
   }
-  if (ssize > 0) os << std::endl;
+  if (ssize > 0)
+    os << std::endl;
 
   ssize = itsStringValues.size();
   os << ssize << std::endl;
   for (i = 0; i < ssize; i++)
   {
-    // muutetaan std::string NFmiString:iksi ett‰ saadaan stringin pituus mukaan kirjoitukseen
-    // luku vaiheessa muuten hˆmma tˆkk‰‰ ensimm‰iseen white spaceen
+    // muutetaan std::string NFmiString:iksi ett√§ saadaan stringin pituus mukaan kirjoitukseen
+    // luku vaiheessa muuten h√∂mma t√∂kk√§√§ ensimm√§iseen white spaceen
     NFmiString tmpStr(itsStringValues[i]);
-    os << tmpStr;  // NFmiString heitt‰‰ itse endl:in per‰‰n.
+    os << tmpStr;  // NFmiString heitt√§√§ itse endl:in per√§√§n.
   }
-  if (ssize > 0) os << std::endl;
+  if (ssize > 0)
+    os << std::endl;
 }
 
 void NFmiDataStoringHelpers::NFmiExtraDataStorage::Read(std::istream &is)
@@ -189,9 +193,9 @@ void NFmiDataStoringHelpers::NFmiExtraDataStorage::Read(std::istream &is)
   itsStringValues.resize(ssize);
   for (i = 0; i < ssize; i++)
   {
-    // Luetaan NFmiString otus sis‰‰n ja muutetaan se std::string:iksi
-    // ett‰ saadaan stringin pituus mukaan kirjoitukseen
-    // luku vaiheessa muuten hˆmma tˆkk‰‰ ensimm‰iseen white spaceen
+    // Luetaan NFmiString otus sis√§√§n ja muutetaan se std::string:iksi
+    // ett√§ saadaan stringin pituus mukaan kirjoitukseen
+    // luku vaiheessa muuten h√∂mma t√∂kk√§√§ ensimm√§iseen white spaceen
     NFmiString tmpStr;
     is >> tmpStr;
     itsStringValues[i] = tmpStr;

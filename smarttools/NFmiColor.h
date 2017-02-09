@@ -27,7 +27,7 @@ class NFmiColor
 
   NFmiColor(const NFmiColor &aColor);
 
-  // HUOM! tämä tekee rajojen tarkistuksen, siksi en tehnyt suoraa kopiota
+  // HUOM! tÃ¤mÃ¤ tekee rajojen tarkistuksen, siksi en tehnyt suoraa kopiota
   NFmiColor(const FmiRGBColor &aColor);
 
   // Color handling methods
@@ -49,8 +49,8 @@ class NFmiColor
   float Green(void) const { return itsColor.green; }
   float Blue(void) const { return itsColor.blue; }
   float Alpha(void) const { return itsColor.alpha; }
-  // Taaksepäin yhteensopivuuden takia TFmiColor:in GetVäri-metodeja
-  // toteutetaan tässä samallalailla kuten poistetussa TFmiColor-luokassa.
+  // TaaksepÃ¤in yhteensopivuuden takia TFmiColor:in GetVÃ¤ri-metodeja
+  // toteutetaan tÃ¤ssÃ¤ samallalailla kuten poistetussa TFmiColor-luokassa.
 
   float GetRed(void) const { return Red(); }
   float GetGreen(void) const { return Green(); }
@@ -131,8 +131,8 @@ class NFmiColor
   FmiRGBColor itsColor;
 };
 
-// Taaksepäin yhteensopivuuden takia TFmiColor (poistettu luokka)
-// määritellään tässä samaksi kuin NFmiColor.
+// TaaksepÃ¤in yhteensopivuuden takia TFmiColor (poistettu luokka)
+// mÃ¤Ã¤ritellÃ¤Ã¤n tÃ¤ssÃ¤ samaksi kuin NFmiColor.
 
 typedef NFmiColor TFmiColor;
 
@@ -144,10 +144,25 @@ inline void NFmiColor::SetRGBA(const FmiRGBColor &aColor)
   itsColor.alpha = (aColor.alpha >= 0.0f) ? ((aColor.alpha <= 1.0f) ? aColor.alpha : 1.0f) : 0.0f;
 }
 
-inline NFmiColor::NFmiColor(const NFmiColor &aColor) : itsColor(aColor.itsColor) {}
-inline NFmiColor::NFmiColor(const FmiRGBColor &aColor) : itsColor() { SetRGBA(aColor); }
-inline std::ostream &operator<<(std::ostream &os, const NFmiColor &ob) { return ob.Write(os); }
-inline std::istream &operator>>(std::istream &os, NFmiColor &ob) { return ob.Read(os); }
+inline NFmiColor::NFmiColor(const NFmiColor &aColor) : itsColor(aColor.itsColor)
+{
+}
+
+inline NFmiColor::NFmiColor(const FmiRGBColor &aColor) : itsColor()
+{
+  SetRGBA(aColor);
+}
+
+inline std::ostream &operator<<(std::ostream &os, const NFmiColor &ob)
+{
+  return ob.Write(os);
+}
+
+inline std::istream &operator>>(std::istream &os, NFmiColor &ob)
+{
+  return ob.Read(os);
+}
+
 inline void NFmiColor::SetRGBA(float aRedValue,
                                float aGreenValue,
                                float aBlueValue,

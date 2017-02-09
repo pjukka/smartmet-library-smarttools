@@ -1,19 +1,19 @@
 #pragma once
 // Luokan on tarkoitus kovata nykyinen NFmiSmartToolModifier-luokka.
-// Vanha luokka on rˆnsyillyt pahasti ja nyt on aika siivota j‰ljet
-// kirjoittamaal toiminnallisuus uusiksi. T‰ss‰ tulee mukaan myˆs
-// uuden NFmiInfoOrganizer-luokan k‰yttˆ.
+// Vanha luokka on r√∂nsyillyt pahasti ja nyt on aika siivota j√§ljet
+// kirjoittamaal toiminnallisuus uusiksi. T√§ss√§ tulee mukaan my√∂s
+// uuden NFmiInfoOrganizer-luokan k√§ytt√∂.
 // TODO:
-// 1. Keksi parempi nimi tai muuta lopuksi NFmiSmartToolModifier-nimiseksi ja tuhoa alkuper‰inen
+// 1. Keksi parempi nimi tai muuta lopuksi NFmiSmartToolModifier-nimiseksi ja tuhoa alkuper√§inen
 // luokka.
 // 2. Siivoa rajapintaa jos pystyt.
-// 3. Muuta luokka k‰ytt‰‰‰n NFmiOwnerInfo-luokkaa, t‰m‰ tosin piilossa, koska rajapinnoissa
-// k‰ytet‰‰n NFmiFastQueryInfo.
-// 4. Lis‰‰ tuki edellisiin mallidatoihin eli T_HIR[-1] viittaa edelliseen hirlam-ajoon.
-// 5. Lis‰‰ tuki havaintodatan k‰ytˆlle (muuta asema-data hilaksi ja k‰yt‰ laskuissa.)
-// 6. Voisi tehd‰ parserin fiksummin (boost:in tms avulla)
+// 3. Muuta luokka k√§ytt√§√§√§n NFmiOwnerInfo-luokkaa, t√§m√§ tosin piilossa, koska rajapinnoissa
+// k√§ytet√§√§n NFmiFastQueryInfo.
+// 4. Lis√§√§ tuki edellisiin mallidatoihin eli T_HIR[-1] viittaa edelliseen hirlam-ajoon.
+// 5. Lis√§√§ tuki havaintodatan k√§yt√∂lle (muuta asema-data hilaksi ja k√§yt√§ laskuissa.)
+// 6. Voisi tehd√§ parserin fiksummin (boost:in tms avulla)
 //
-// T‰m‰ luokka hoitaa koko smarttool-toiminnan. Sill‰ on tietokanta,
+// T√§m√§ luokka hoitaa koko smarttool-toiminnan. Sill√§ on tietokanta,
 // tulkki, ja erilaisia maski/operaatio generaattoreita, joiden avulla
 // laskut suoritetaan.
 //**********************************************************
@@ -49,6 +49,7 @@ class NFmiSmartToolCalculationBlockInfo;
 class NFmiSmartToolCalculationBlockInfoVector;
 class MyGrid;
 class NFmiThreadCallBacks;
+class NFmiExtraMacroParamData;
 
 class NFmiSmartToolCalculationBlockVector
 {
@@ -67,7 +68,7 @@ class NFmiSmartToolCalculationBlockVector
   Iterator Begin(void) { return itsCalculationBlocks.begin(); }
   Iterator End(void) { return itsCalculationBlocks.end(); }
  private:
-  // luokka ei omista vektorissa olevia otuksia, Clear pit‰‰ kutsua erikseen!!!
+  // luokka ei omista vektorissa olevia otuksia, Clear pit√§√§ kutsua erikseen!!!
   checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlock> > itsCalculationBlocks;
 };
 
@@ -125,9 +126,11 @@ class NFmiSmartToolModifier
   NFmiParamBag ModifiedParams(void);
   const std::string &GetStrippedMacroText(void) const;
   bool IsInterpretedSkriptMacroParam(void);  // kun intepreter on tulkinnut smarttool-tekstin,
-                                             // voidaan kysy‰, onko kyseinen makro ns.
-                                             // macroParam-skripti eli sis‰lt‰‰kˆ se RESULT = ???
-                                             // tapaista teksti‰
+                                             // voidaan kysy√§, onko kyseinen makro ns.
+  boost::shared_ptr<NFmiFastQueryInfo> UsedMacroParamData(void);
+  const std::vector<NFmiPoint>& CalculationPoints() const;
+  // macroParam-skripti eli sis√§lt√§√§k√∂ se RESULT = ???
+  // tapaista teksti√§
 
   void ModifiedLevel(boost::shared_ptr<NFmiLevel> &theLevel);
 
@@ -143,7 +146,6 @@ class NFmiSmartToolModifier
   boost::shared_ptr<NFmiAreaMask> CreateMetFunctionAreaMask(const NFmiAreaMaskInfo &theAreaMaskInfo,
                                                             bool &fMustUsePressureInterpolation);
   void SetInfosMaskType(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
-  boost::shared_ptr<NFmiFastQueryInfo> UsedMacroParamData(void);
   void ModifyConditionalData(
       const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theCalculationBlock,
       NFmiMacroParamValue &theMacroParamValue,
@@ -214,43 +216,61 @@ class NFmiSmartToolModifier
                                                             int theModelRunIndex = 0);
   void MakeSoundingLevelFix(boost::shared_ptr<NFmiAreaMask> &theAreaMask,
                             const NFmiAreaMaskInfo &theAreaMaskInfo);
+  boost::shared_ptr<NFmiAreaMask> CreateInfoVariableMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateRampFunctionMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateAreaIntegrationMask(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiAreaMask::CalculationOperationType maskType, bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateStartParenthesisMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
+  boost::shared_ptr<NFmiAreaMask> CreateEndParenthesisMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
+  boost::shared_ptr<NFmiAreaMask> CreateCommaOperatorMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
+  boost::shared_ptr<NFmiAreaMask> CreateMathFunctionStartMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
+  boost::shared_ptr<NFmiAreaMask> CreateThreeArgumentFunctionStartMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
+  boost::shared_ptr<NFmiAreaMask> CreateVertFunctionStartMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  void DoFinalAreaMaskInitializations(boost::shared_ptr<NFmiAreaMask> &areaMask, const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateOccurrenceMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateTimeRangeMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateProbabilityFunctionMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateClosestObsValueMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateNormalVertFuncMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreatePeekTimeMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateVertConditionalMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
 
   NFmiInfoOrganizer *itsInfoOrganizer;  // eli database, ei omista ei tuhoa
   boost::shared_ptr<NFmiSmartToolIntepreter> itsSmartToolIntepreter;
   bool fMacroRunnable;
   std::string itsErrorText;
+  std::unique_ptr<NFmiExtraMacroParamData> itsExtraMacroParamData; // T√§m√§ alustetaan smarttool-tulkissa (itsSmartToolIntepreter), ja otetaan omistukseen 'suorittajaan'
 
   bool fModifySelectedLocationsOnly;
   checkedVector<boost::shared_ptr<NFmiFastQueryInfo> >
-      itsScriptVariableInfos;       // mahdolliset skripti-muuttujat talletetaan t‰nne
-  std::string itsIncludeDirectory;  // mist‰ ladataan mahd. include filet
+      itsScriptVariableInfos;       // mahdolliset skripti-muuttujat talletetaan t√§nne
+  std::string itsIncludeDirectory;  // mist√§ ladataan mahd. include filet
 
   NFmiTimeDescriptor *itsModifiedTimes;  // ei omista/tuhoa
-  bool fMacroParamCalculation;           // t‰m‰ tieto tarvitaan scriptVariablejen kanssa, jos true,
-  // k‰ytet‰‰n pohjana macroParam-infoa, muuten editoitua dataa
+  bool fMacroParamCalculation;  // t√§m√§ tieto tarvitaan scriptVariablejen kanssa, jos true,
+  // k√§ytet√§√§n pohjana macroParam-infoa, muuten editoitua dataa
 
-  // N‰m‰ muuttujat ovat sit‰ varten ett‰ SumZ ja MinH tyyppisiss‰ funktoissa
-  // k‰ytet‰‰n parasta mahdollista level-dataa. Eli ensin hybridi ja sitten painepinta dataa.
-  bool fHeightFunctionFlag;  // ollaanko tekem‰ss‰ SumZ tai MinH tyyppisen funktion
+  // N√§m√§ muuttujat ovat sit√§ varten ett√§ SumZ ja MinH tyyppisiss√§ funktoissa
+  // k√§ytet√§√§n parasta mahdollista level-dataa. Eli ensin hybridi ja sitten painepinta dataa.
+  bool fHeightFunctionFlag;  // ollaanko tekem√§ss√§ SumZ tai MinH tyyppisen funktion
                              // calculaatio-otusta
-  bool fUseLevelData;  // kun t‰m‰ flagi on p‰‰ll‰, k‰ytet‰‰n CreateInfo-metodissa hybridi-datoja
+  bool fUseLevelData;  // kun t√§m√§ flagi on p√§√§ll√§, k√§ytet√§√§n CreateInfo-metodissa hybridi-datoja
                        // jos mahd. ja sitten painepinta datoja.
-  bool fDoCrossSectionCalculation;  // kun t‰m‰ flagi on p‰‰ll‰, ollaan laskemassa poikkileikkauksia
-                                    // ja silloin level-infot yritet‰‰n tehd‰ ensin hybrididatasta
-                                    // ja sitten painepintadatasta
-  int itsCommaCounter;  // tarvitaan laskemaan pilkkuja, kun lasketaan milloin level-dataa pit‰‰
-                        // k‰ytt‰‰.
-  int itsParethesisCounter;  // kun k‰ytet‰‰n esim. Sumz-funktion 2. pilkun j‰lkeen level-dataa,
-                             // pit‰‰ laskea sulkujen avulla, milloin funktio loppuu.
-  // HUOM! sulkujen lis‰ksi pit‰‰ laskea myˆs erilaisten funktioiden alut.
+  bool fDoCrossSectionCalculation;  // kun t√§m√§ flagi on p√§√§ll√§, ollaan laskemassa poikkileikkauksia
+  // ja silloin level-infot yritet√§√§n tehd√§ ensin hybrididatasta
+  // ja sitten painepintadatasta
+  int itsCommaCounter;  // tarvitaan laskemaan pilkkuja, kun lasketaan milloin level-dataa pit√§√§
+                        // k√§ytt√§√§.
+  int itsParethesisCounter;  // kun k√§ytet√§√§n esim. Sumz-funktion 2. pilkun j√§lkeen level-dataa,
+                             // pit√§√§ laskea sulkujen avulla, milloin funktio loppuu.
+  // HUOM! sulkujen lis√§ksi pit√§√§ laskea my√∂s erilaisten funktioiden alut.
 
-  boost::shared_ptr<MyGrid> itsWorkingGrid;  // T‰h‰n talletetaan ns. tyˆskentely gidi, eli miss‰ on
-                                             // tyˆskentely alueen area-m‰‰ritys ja laskennallinen
-                                             // hila koko.
-  boost::shared_ptr<NFmiLevel> itsModifiedLevel;  // Jos ollaan editoimassa level-dataa, t‰h‰n on
+  boost::shared_ptr<MyGrid> itsWorkingGrid;  // T√§h√§n talletetaan ns. ty√∂skentely gidi, eli miss√§ on
+  // ty√∂skentely alueen area-m√§√§ritys ja laskennallinen
+  // hila koko.
+  boost::shared_ptr<NFmiLevel> itsModifiedLevel;  // Jos ollaan editoimassa level-dataa, t√§h√§n on
                                                   // tarkoitus laittaa kulloinenkin muokattava level
                                                   // talteen.
-// T‰m‰ asetetaan nyt vain NFmiSmartToolUtil::ModifyData-funktiosta, jossa k‰yd‰‰n levelit l‰pi.
+// T√§m√§ asetetaan nyt vain NFmiSmartToolUtil::ModifyData-funktiosta, jossa k√§yd√§√§n levelit l√§pi.
 
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
  public:

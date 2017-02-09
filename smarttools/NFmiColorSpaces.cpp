@@ -1,12 +1,18 @@
 // NFmiColorSpaces.cpp
 //
-// NFmiColorSpaces-namespacen ja siin‰ olevien luokkien toteutus.
+// NFmiColorSpaces-namespacen ja siin√§ olevien luokkien toteutus.
 
 #include "NFmiColorSpaces.h"
 
 // NFmiColorSpaces::RGB_color -struct
-NFmiColorSpaces::RGB_color::RGB_color(void) : r(0), g(0), b(0) {}
-NFmiColorSpaces::RGB_color::RGB_color(int r_, int g_, int b_) : r(r_), g(g_), b(b_) {}
+NFmiColorSpaces::RGB_color::RGB_color(void) : r(0), g(0), b(0)
+{
+}
+
+NFmiColorSpaces::RGB_color::RGB_color(int r_, int g_, int b_) : r(r_), g(g_), b(b_)
+{
+}
+
 NFmiColorSpaces::RGB_color::RGB_color(const NFmiColor &theColor)
     : r(static_cast<int>(FmiRound(theColor.GetRed() * 255.f))),
       g(static_cast<int>(FmiRound(theColor.GetGreen() * 255.f))),
@@ -15,8 +21,14 @@ NFmiColorSpaces::RGB_color::RGB_color(const NFmiColor &theColor)
 }
 
 // NFmiColorSpaces::HSL_color -struct
-NFmiColorSpaces::HSL_color::HSL_color(void) : h(0), s(0), l(0) {}
-NFmiColorSpaces::HSL_color::HSL_color(int h_, int s_, int l_) : h(h_), s(s_), l(l_) {}
+NFmiColorSpaces::HSL_color::HSL_color(void) : h(0), s(0), l(0)
+{
+}
+
+NFmiColorSpaces::HSL_color::HSL_color(int h_, int s_, int l_) : h(h_), s(s_), l(l_)
+{
+}
+
 // Color conversio funktioita:
 // <summary>
 // Converts RGB to HSL.
@@ -108,8 +120,10 @@ NFmiColorSpaces::RGB_color NFmiColorSpaces::HSLtoRGB(double h, double s, double 
 
     for (int i = 0; i < 3; i++)
     {
-      if (T[i] < 0) T[i] += 1.0;
-      if (T[i] > 1) T[i] -= 1.0;
+      if (T[i] < 0)
+        T[i] += 1.0;
+      if (T[i] > 1)
+        T[i] -= 1.0;
 
       if ((T[i] * 6) < 1)
       {
@@ -133,9 +147,9 @@ NFmiColorSpaces::RGB_color NFmiColorSpaces::HSLtoRGB(double h, double s, double 
   }
 }
 
-// theBrightningFactor on prosentti luku, jolla annettua v‰ri‰ saadaan vaalennettua tai
+// theBrightningFactor on prosentti luku, jolla annettua v√§ri√§ saadaan vaalennettua tai
 // tummennettua.
-// jos prosentti luku on > 0, vaalenee v‰ri, jos se on < 0, tummenee v‰ri.
+// jos prosentti luku on > 0, vaalenee v√§ri, jos se on < 0, tummenee v√§ri.
 NFmiColor NFmiColorSpaces::GetBrighterColor(const NFmiColor &theColor, double theBrightningFactor)
 {
   RGB_color rgbCol(theColor);
@@ -143,11 +157,13 @@ NFmiColor NFmiColorSpaces::GetBrighterColor(const NFmiColor &theColor, double th
   double lightness = hslCol.l;
   if (lightness)
     lightness = lightness + lightness * (theBrightningFactor / 100.);
-  else  // jos lightness oli 0, pit‰‰ vain lis‰t‰ kirkastus kerroin
+  else  // jos lightness oli 0, pit√§√§ vain lis√§t√§ kirkastus kerroin
     lightness = theBrightningFactor;
 
-  if (lightness > 100) lightness = 100;
-  if (lightness < 0) lightness = 0;
+  if (lightness > 100)
+    lightness = 100;
+  if (lightness < 0)
+    lightness = 0;
 
   RGB_color rgbCol2 = NFmiColorSpaces::HSLtoRGB(hslCol.h, hslCol.s / 100., lightness / 100.);
 

@@ -54,10 +54,10 @@ class NFmiAviationStationInfoSystem
   bool WmoStationsWanted(void) const { return fWmoStationsWanted; }
  private:
   std::string
-      itsInitLogMessage;  // onnistuneen initialisoinnin viesti, miss‰ voi olla varoituksia lokiin.
+      itsInitLogMessage;  // onnistuneen initialisoinnin viesti, miss√§ voi olla varoituksia lokiin.
   std::map<std::string, NFmiAviationStation> itsIcaoStations;
   std::map<long, NFmiAviationStation> itsWmoStations;
-  bool fWmoStationsWanted;  // t‰m‰ p‰‰tt‰‰, k‰ytet‰‰nkˆ luokassa WMO vai ICAO asemia
+  bool fWmoStationsWanted;  // t√§m√§ p√§√§tt√§√§, k√§ytet√§√§nk√∂ luokassa WMO vai ICAO asemia
   bool fVerboseMode;
 };
 

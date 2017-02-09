@@ -21,7 +21,7 @@
 //
 //  Change Log:
 // 1999.08.26/Marko	Laitoin DrawParam:in (oikeastaan DataParam tarvitsee)
-//					luontiin mukaan tiedon levelist‰.
+//					luontiin mukaan tiedon levelist√§.
 //
 //**********************************************************
 #ifndef NFMIDRAWPARAMFACTORY_H
