@@ -230,7 +230,7 @@ class NFmiInfoOrganizer
                          bool ignoreProducer,
                          const ParamCheckFlags &paramCheckFlags);
   void FixMacroParamDataGridSize(int &x, int &y);
-  boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CreateNewMacroParamData_checkeInput(
+  boost::shared_ptr<NFmiFastQueryInfo> CreateNewMacroParamData_checkeInput(
       int x, int y, NFmiInfoData::Type theDataType);
 
   boost::shared_ptr<NFmiQueryDataKeeper>
