@@ -335,6 +335,7 @@ struct ThetaEValues
 };
 
 // Tällä operaattorilla sortataan lasketut theta kerrokset
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static bool operator<(const ThetaEValues &theta1, const ThetaEValues &theta2)
 {
   if (theta1.P != kFloatMissing && theta2.P != kFloatMissing && theta1.ThetaE != kFloatMissing &&
@@ -349,8 +350,10 @@ static bool operator<(const ThetaEValues &theta1, const ThetaEValues &theta2)
   }
   return true;
 }
+#endif
 
 // Tällä operaattorilla sortataan lasketut theta kerrokset
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static bool operator>(const ThetaEValues &theta1, const ThetaEValues &theta2)
 {
   if (theta1.P != kFloatMissing && theta2.P != kFloatMissing)
@@ -359,7 +362,9 @@ static bool operator>(const ThetaEValues &theta1, const ThetaEValues &theta2)
   }
   return false;
 }
+#endif
 
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static bool isCloseToUpperLevelLimit(const ThetaEValues &theta, double topPressureLevel)
 {
   if (std::fabs((theta.P - topPressureLevel) / topPressureLevel) < 0.3)
@@ -367,7 +372,9 @@ static bool isCloseToUpperLevelLimit(const ThetaEValues &theta, double topPressu
   else
     return false;
 }
+#endif
 
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static bool isGlobalAndLocalThetasCloseEnough(double globalMaxTheta, double localThetaE)
 {
   if (std::fabs((globalMaxTheta - localThetaE) / globalMaxTheta) < 0.15)
@@ -375,12 +382,15 @@ static bool isGlobalAndLocalThetasCloseEnough(double globalMaxTheta, double loca
   else
     return false;
 }
+#endif
 
 // Jos globaali maksimi on lähempänä maanpintaa eli kauempana annetusta yläkerroksen rajasta,
 // annetaan se.
 // Jos globaali maksimi lähellä yläkerroksen rajaa, katsotaan löytyykö alemmista kerroksista lokaali
 // maksimi,
 // joka on tarpeeksi lähellä globaalin maksimin arvoa ja palautetaan se.
+
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static ThetaEValues getBestMUThetaValues(std::set<ThetaEValues> &thetas, double topPressureLevel)
 {
   if (thetas.size() == 0)
@@ -410,10 +420,13 @@ static ThetaEValues getBestMUThetaValues(std::set<ThetaEValues> &thetas, double 
                               // palautetaan globaali maksimi
   }
 }
+#endif
 
 // Etsitään maanpinnasta ylöspäin lokaali maksimeja. Jos lokaali maksimi on tarpeeksi lähellä
 // totaali maksimia, palautetaan sen arvo.
 // Muuten palautetaan globaali maksimi.
+
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static ThetaEValues getBestMUThetaValues2(std::vector<ThetaEValues> &thetas,
                                           double topPressureLevel)
 {
@@ -445,7 +458,9 @@ static ThetaEValues getBestMUThetaValues2(std::vector<ThetaEValues> &thetas,
                             // pitää olla sama kuin vectorin viimeisen elementin
   }
 }
+#endif
 
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static void setThetaValues(
     const ThetaEValues &theta, double &T, double &Td, double &P, double &theMaxThetaE)
 {
@@ -454,6 +469,7 @@ static void setThetaValues(
   Td = theta.Td;
   P = theta.P;
 }
+#endif
 
 // Käy läpi luotausta ja etsi sen kerroksen arvot, jolta löytyy suurin theta-E ja
 // palauta sen kerroksen T, Td ja P ja laskettu max Theta-e.
