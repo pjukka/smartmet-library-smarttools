@@ -11,9 +11,9 @@ Group: Development/Libraries
 URL: https://github.com/fmidev/smartmet-library-smarttools
 Source: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: smartmet-library-newbase-devel >= 17.2.2
+BuildRequires: smartmet-library-newbase-devel >= 17.2.10
 BuildRequires: boost-devel
-Requires: smartmet-library-newbase >= 17.2.2
+Requires: smartmet-library-newbase >= 17.2.10
 Provides: %{LIBNAME}
 Obsoletes: libsmartmet-smarttools < 17.1.4
 Obsoletes: libsmartmet-smarttools-debuginfo < 17.1.4
