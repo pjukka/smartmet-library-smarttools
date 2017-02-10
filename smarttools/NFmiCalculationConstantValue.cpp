@@ -537,7 +537,7 @@ double NFmiPeekTimeMask::Value(const NFmiCalculationParams &theCalculationParams
 void NFmiPeekTimeMask::SetArguments(std::vector<float> &theArgumentVector)
 {
   // jokaiselle pisteelle ja ajanhetkelle annetaan eri argumentit tässä
-  if (theArgumentVector.size() == (itsFunctionArgumentCount - 1))
+  if (static_cast<long>(theArgumentVector.size()) == itsFunctionArgumentCount - 1)
   {
     itsTimeOffsetInMinutes = static_cast<long>(std::round(theArgumentVector[0] * 60));
   }
