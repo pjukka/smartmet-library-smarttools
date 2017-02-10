@@ -31,11 +31,11 @@
 #ifndef NFMIDRAWPARAM_H
 #define NFMIDRAWPARAM_H
 
+#include "NFmiColor.h"
 #include "NFmiMetEditorTypes.h"
 
 #include <NFmiParameterName.h>
 #include <NFmiDataIdent.h>
-#include <NFmiColor.h>
 #include <NFmiPoint.h>
 #include <NFmiLevel.h>
 #include <NFmiInfoData.h>

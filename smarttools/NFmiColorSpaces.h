@@ -8,7 +8,7 @@
 #ifndef NFMICOLORSPACES_H
 #define NFMICOLORSPACES_H
 
-#include <NFmiColor.h>
+#include "NFmiColor.h"
 
 namespace NFmiColorSpaces
 {
