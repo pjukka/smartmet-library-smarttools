@@ -4,7 +4,7 @@
 %define DEVELNAME %{SPECNAME}-devel
 Summary: smarttools library
 Name: %{SPECNAME}
-Version: 17.2.4
+Version: 17.2.10
 Release: 1%{?dist}.fmi
 License: MIT
 Group: Development/Libraries
@@ -56,6 +56,9 @@ FMI smarttools development files
 
 
 %changelog
+* Fri Feb 10 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.2.10-1.fmi
+- Merged SmartMet Editor changes
+
 * Sat Feb  4 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.2.4-1.fmi
 - Memory map helper files to enable larger input data for qdscript
 
