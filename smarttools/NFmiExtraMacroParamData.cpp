@@ -182,7 +182,7 @@ static boost::shared_ptr<NFmiFastQueryInfo> FindWantedInfo(
 static std::string GetProducerInfoForResolutionError(const NFmiProducer &theProducer,
                                                      FmiLevelType theLevelType)
 {
-  std::string str = theProducer.GetName();
+  std::string str = theProducer.GetName().CharPtr();
   str += " ";
   if (theLevelType == kFmiMeanSeaLevel)
     str += "surface";
