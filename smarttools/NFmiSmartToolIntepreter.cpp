@@ -149,10 +149,10 @@ NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiProducerSystem *theProducer
                                                  NFmiProducerSystem *theObservationProducerSystem)
     : itsProducerSystem(theProducerSystem),
       itsSmartToolCalculationBlocks(),
+      itsExtraMacroParamData(new NFmiExtraMacroParamData()),
       fNormalAssigmentFound(false),
       fMacroParamFound(false),
-      fMacroParamSkriptInProgress(false),
-      itsExtraMacroParamData(std::make_unique<NFmiExtraMacroParamData>())
+      fMacroParamSkriptInProgress(false)
 {
   NFmiSmartToolIntepreter::InitTokens(itsProducerSystem, theObservationProducerSystem);
 }
