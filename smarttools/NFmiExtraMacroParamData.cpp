@@ -2,6 +2,8 @@
 #include "NFmiFastQueryInfo.h"
 #include "NFmiInfoOrganizer.h"
 
+#include <boost/math/special_functions/round.hpp>
+
 NFmiExtraMacroParamData::NFmiExtraMacroParamData()
     : fUseEditedDataForResolution(false),
       itsGivenResolutionInKm(kFloatMissing),
