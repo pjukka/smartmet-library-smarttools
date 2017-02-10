@@ -276,18 +276,18 @@ class NFmiNearestObsValue2GridMask : public NFmiInfoAreaMask
 // NFmiPeekTimeMask -luokka 'kurkkaa' datasta annetun tunti offsetin verran ajassa eteen/taaksepäin.
 class NFmiPeekTimeMask : public NFmiInfoAreaMask
 {
-public:
-    NFmiPeekTimeMask(Type theMaskType,
-        NFmiInfoData::Type theDataType,
-        boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-        int theArgumentCount);
-    ~NFmiPeekTimeMask(void);
-    NFmiPeekTimeMask(const NFmiPeekTimeMask &theOther);
-    NFmiAreaMask *Clone(void) const;
+ public:
+  NFmiPeekTimeMask(Type theMaskType,
+                   NFmiInfoData::Type theDataType,
+                   boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+                   int theArgumentCount);
+  ~NFmiPeekTimeMask(void);
+  NFmiPeekTimeMask(const NFmiPeekTimeMask &theOther);
+  NFmiAreaMask *Clone(void) const;
 
-    double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
-    void SetArguments(std::vector<float> &theArgumentVector);
+  double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
+  void SetArguments(std::vector<float> &theArgumentVector);
 
-private:
-    long itsTimeOffsetInMinutes; // kuinka paljon kurkataan ajassa eteen/taakse
+ private:
+  long itsTimeOffsetInMinutes;  // kuinka paljon kurkataan ajassa eteen/taakse
 };

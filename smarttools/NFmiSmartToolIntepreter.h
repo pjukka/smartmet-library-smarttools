@@ -112,9 +112,8 @@ class NFmiSmartToolIntepreter
   NFmiParam GetParamFromString(const std::string &theParamText);
   // kun intepreter on tulkinnut smarttool-tekstin, voidaan kysyä, onko kyseinen makro ns.
   // macroParam-skripti eli sisältääkö se RESULT = ??? tapaista tekstiä
-  bool IsInterpretedSkriptMacroParam(void);  
+  bool IsInterpretedSkriptMacroParam(void);
   std::unique_ptr<NFmiExtraMacroParamData> GetOwnershipOfExtraMacroParamData();
-
 
  private:
   typedef std::map<std::string, FmiParameterName> ParamMap;
@@ -325,7 +324,7 @@ class NFmiSmartToolIntepreter
   typedef std::map<std::string, NFmiAreaMask::FunctionType> FunctionMap;
   static FunctionMap itsTokenFunctions;
   static FunctionMap itsTokenThreeArgumentFunctions;
-  static FunctionMap itsExtraInfoCommands; // Tänne mm. resolution- ja calculationpoint -jutut
+  static FunctionMap itsExtraInfoCommands;  // Tänne mm. resolution- ja calculationpoint -jutut
 
   typedef boost::tuple<NFmiAreaMask::FunctionType,
                        NFmiAreaMask::MetFunctionDirection,

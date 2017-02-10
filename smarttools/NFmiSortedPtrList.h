@@ -47,8 +47,7 @@ class NFmiSortedPtrList : public NFmiPtrList<Type>
       typename NFmiPtrList<Type>::Iterator tempIter = this->Start();
       while (tempIter.Next())
       {
-        if (*theItem < tempIter.Current())
-          return tempIter.AddBefore(theItem);
+        if (*theItem < tempIter.Current()) return tempIter.AddBefore(theItem);
       }
       return this->AddEnd(theItem);
     }
@@ -79,8 +78,7 @@ class NFmiSortedPtrList : public NFmiPtrList<Type>
     typename NFmiPtrList<Type>::Iterator theIter = this->Start();
     while (theIter.Next())
     {
-      if (theIter.Current() == *theItem)
-        return theIter;
+      if (theIter.Current() == *theItem) return theIter;
     }
     return theIter;
   };

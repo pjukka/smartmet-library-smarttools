@@ -53,8 +53,7 @@ static bool GetStationFromString(const std::string &theStationStr,
   std::string name;
   for (unsigned int i = 3; i < strVector.size(); i++)
   {
-    if (i != 3)
-      name += " ";
+    if (i != 3) name += " ";
     name += strVector[i];
   }
   theStationOut.SetName(NFmiString(name));
@@ -373,8 +372,7 @@ static double GetLatOrLonFromString(const std::string &theLatOrLonStr,
   double value = degrees;
   value += minutes / 60.;
   value += seconds / 3600.;
-  if (posSign == false)
-    value = -value;
+  if (posSign == false) value = -value;
   return value;
 }
 
@@ -430,8 +428,7 @@ bool NFmiAviationStationInfoSystem_Obsolite::GetAviationStationFromString(
     return false;  // en ole varma splitteristä, mutta ignoorataan vain tyhjä/yhden osion rivit
 
   std::string icaoId = strVector[2];
-  if (icaoId.empty())
-    return false;  // otetaan vain asemat missä icao id
+  if (icaoId.empty()) return false;  // otetaan vain asemat missä icao id
 
   theStationOut.IcaoStr(icaoId);
   unsigned long stationId = NFmiStringTools::Convert<unsigned long>(strVector[0]) * 1000 +
@@ -459,8 +456,7 @@ bool NFmiAviationStationInfoSystem_Obsolite::FindAviationStation(const std::stri
   {
     const AviationStation &aviStation =
         *static_cast<const AviationStation *>(itsLocations.Location());
-    if (aviStation.IcaoStr() == theIcaoStr)
-      return true;
+    if (aviStation.IcaoStr() == theIcaoStr) return true;
   }
   return false;
 }
@@ -609,17 +605,10 @@ void NFmiSilamStationList::Init(const std::string &theInitFileName)
                              theInitFileName);
 }
 
-void NFmiSilamStationList::Clear(void)
-{
-  itsLocations.clear();
-}
-
+void NFmiSilamStationList::Clear(void) { itsLocations.clear(); }
 // ****************   NFmiWmoStationLookUpSystem  *************************************
 
-NFmiWmoStationLookUpSystem::NFmiWmoStationLookUpSystem(void) : itsStations(), itsInitLogMessage()
-{
-}
-
+NFmiWmoStationLookUpSystem::NFmiWmoStationLookUpSystem(void) : itsStations(), itsInitLogMessage() {}
 const NFmiWmoStation &NFmiWmoStationLookUpSystem::GetStation(long theWmoId)
 {
   const static NFmiWmoStation dummy;

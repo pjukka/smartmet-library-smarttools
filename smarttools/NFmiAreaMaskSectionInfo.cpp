@@ -29,13 +29,8 @@
 //--------------------------------------------------------
 // Constructor/Destructor
 //--------------------------------------------------------
-NFmiAreaMaskSectionInfo::NFmiAreaMaskSectionInfo()
-{
-}
-NFmiAreaMaskSectionInfo::~NFmiAreaMaskSectionInfo()
-{
-}
-
+NFmiAreaMaskSectionInfo::NFmiAreaMaskSectionInfo() {}
+NFmiAreaMaskSectionInfo::~NFmiAreaMaskSectionInfo() {}
 boost::shared_ptr<NFmiAreaMaskInfo> NFmiAreaMaskSectionInfo::MaskInfo(int theIndex)
 {
   if (theIndex >= 0 && static_cast<unsigned int>(theIndex) < itsAreaMaskInfoVector.size())

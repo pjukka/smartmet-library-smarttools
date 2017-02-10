@@ -176,7 +176,9 @@ class NFmiInfoOrganizer
   void SetMacroParamDataMinGridSize(int x, int y);
   void SetMacroParamDataMaxGridSize(int x, int y);
 
-  boost::shared_ptr<NFmiFastQueryInfo> CreateNewMacroParamData(int x, int y, NFmiInfoData::Type theDataType);
+  boost::shared_ptr<NFmiFastQueryInfo> CreateNewMacroParamData(int x,
+                                                               int y,
+                                                               NFmiInfoData::Type theDataType);
 
   const NFmiPoint &GetMacroParamDataGridSize(void) const { return itsMacroParamGridSize; }
   const NFmiPoint &GetMacroParamDataMaxGridSize(void) const { return itsMacroParamMaxGridSize; }
@@ -228,7 +230,8 @@ class NFmiInfoOrganizer
                          bool ignoreProducer,
                          const ParamCheckFlags &paramCheckFlags);
   void FixMacroParamDataGridSize(int &x, int &y);
-  boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CreateNewMacroParamData_checkeInput(int x, int y, NFmiInfoData::Type theDataType);
+  boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CreateNewMacroParamData_checkeInput(
+      int x, int y, NFmiInfoData::Type theDataType);
 
   boost::shared_ptr<NFmiQueryDataKeeper>
       itsEditedDataKeeper;  // pitää sisällään oikeasti NFmiSmartInfo-olion

@@ -128,7 +128,7 @@ class NFmiSmartToolModifier
   bool IsInterpretedSkriptMacroParam(void);  // kun intepreter on tulkinnut smarttool-tekstin,
                                              // voidaan kysyä, onko kyseinen makro ns.
   boost::shared_ptr<NFmiFastQueryInfo> UsedMacroParamData(void);
-  const std::vector<NFmiPoint>& CalculationPoints() const;
+  const std::vector<NFmiPoint> &CalculationPoints() const;
   // macroParam-skripti eli sisältääkö se RESULT = ???
   // tapaista tekstiä
 
@@ -216,29 +216,51 @@ class NFmiSmartToolModifier
                                                             int theModelRunIndex = 0);
   void MakeSoundingLevelFix(boost::shared_ptr<NFmiAreaMask> &theAreaMask,
                             const NFmiAreaMaskInfo &theAreaMaskInfo);
-  boost::shared_ptr<NFmiAreaMask> CreateInfoVariableMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-  boost::shared_ptr<NFmiAreaMask> CreateRampFunctionMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-  boost::shared_ptr<NFmiAreaMask> CreateAreaIntegrationMask(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiAreaMask::CalculationOperationType maskType, bool &mustUsePressureInterpolation);
-  boost::shared_ptr<NFmiAreaMask> CreateStartParenthesisMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
+  boost::shared_ptr<NFmiAreaMask> CreateInfoVariableMask(const NFmiAreaMaskInfo &theAreaMaskInfo,
+                                                         bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateRampFunctionMask(const NFmiAreaMaskInfo &theAreaMaskInfo,
+                                                         bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateAreaIntegrationMask(
+      const NFmiAreaMaskInfo &theAreaMaskInfo,
+      NFmiAreaMask::CalculationOperationType maskType,
+      bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateStartParenthesisMask(
+      const NFmiAreaMaskInfo &theAreaMaskInfo);
   boost::shared_ptr<NFmiAreaMask> CreateEndParenthesisMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
   boost::shared_ptr<NFmiAreaMask> CreateCommaOperatorMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
-  boost::shared_ptr<NFmiAreaMask> CreateMathFunctionStartMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
-  boost::shared_ptr<NFmiAreaMask> CreateThreeArgumentFunctionStartMask(const NFmiAreaMaskInfo &theAreaMaskInfo);
-  boost::shared_ptr<NFmiAreaMask> CreateVertFunctionStartMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-  void DoFinalAreaMaskInitializations(boost::shared_ptr<NFmiAreaMask> &areaMask, const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-  boost::shared_ptr<NFmiAreaMask> CreateOccurrenceMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-  boost::shared_ptr<NFmiAreaMask> CreateTimeRangeMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-  boost::shared_ptr<NFmiAreaMask> CreateProbabilityFunctionMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-  boost::shared_ptr<NFmiAreaMask> CreateClosestObsValueMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-  boost::shared_ptr<NFmiAreaMask> CreateNormalVertFuncMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-  boost::shared_ptr<NFmiAreaMask> CreatePeekTimeMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
-  boost::shared_ptr<NFmiAreaMask> CreateVertConditionalMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateMathFunctionStartMask(
+      const NFmiAreaMaskInfo &theAreaMaskInfo);
+  boost::shared_ptr<NFmiAreaMask> CreateThreeArgumentFunctionStartMask(
+      const NFmiAreaMaskInfo &theAreaMaskInfo);
+  boost::shared_ptr<NFmiAreaMask> CreateVertFunctionStartMask(
+      const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  void DoFinalAreaMaskInitializations(boost::shared_ptr<NFmiAreaMask> &areaMask,
+                                      const NFmiAreaMaskInfo &theAreaMaskInfo,
+                                      bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateOccurrenceMask(const NFmiAreaMaskInfo &theAreaMaskInfo,
+                                                       bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateTimeRangeMask(const NFmiAreaMaskInfo &theAreaMaskInfo,
+                                                      bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateProbabilityFunctionMask(
+      const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateClosestObsValueMask(const NFmiAreaMaskInfo &theAreaMaskInfo,
+                                                            bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateNormalVertFuncMask(const NFmiAreaMaskInfo &theAreaMaskInfo,
+                                                           bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreatePeekTimeMask(const NFmiAreaMaskInfo &theAreaMaskInfo,
+                                                     bool &mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> CreateVertConditionalMask(const NFmiAreaMaskInfo &theAreaMaskInfo,
+                                                            bool &mustUsePressureInterpolation);
 
   NFmiInfoOrganizer *itsInfoOrganizer;  // eli database, ei omista ei tuhoa
   boost::shared_ptr<NFmiSmartToolIntepreter> itsSmartToolIntepreter;
   bool fMacroRunnable;
   std::string itsErrorText;
-  std::unique_ptr<NFmiExtraMacroParamData> itsExtraMacroParamData; // Tämä alustetaan smarttool-tulkissa (itsSmartToolIntepreter), ja otetaan omistukseen 'suorittajaan'
+  std::unique_ptr<NFmiExtraMacroParamData> itsExtraMacroParamData;  // Tämä alustetaan
+                                                                    // smarttool-tulkissa
+                                                                    // (itsSmartToolIntepreter), ja
+                                                                    // otetaan omistukseen
+                                                                    // 'suorittajaan'
 
   bool fModifySelectedLocationsOnly;
   checkedVector<boost::shared_ptr<NFmiFastQueryInfo> >

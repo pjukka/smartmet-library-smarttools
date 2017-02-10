@@ -74,10 +74,7 @@ NFmiSmartToolCalculationBlockVector::NFmiSmartToolCalculationBlockVector(
 {
 }
 
-NFmiSmartToolCalculationBlockVector::~NFmiSmartToolCalculationBlockVector(void)
-{
-}
-
+NFmiSmartToolCalculationBlockVector::~NFmiSmartToolCalculationBlockVector(void) {}
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolCalculationBlockVector::FirstVariableInfo(void)
 {
   Iterator it = Begin();
@@ -163,44 +160,30 @@ NFmiSmartToolCalculationBlock::NFmiSmartToolCalculationBlock(
 {
 }
 
-NFmiSmartToolCalculationBlock::~NFmiSmartToolCalculationBlock(void)
-{
-}
-
+NFmiSmartToolCalculationBlock::~NFmiSmartToolCalculationBlock(void) {}
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolCalculationBlock::FirstVariableInfo(void)
 {
   boost::shared_ptr<NFmiFastQueryInfo> info;
-  if (itsFirstCalculationSection)
-    info = itsFirstCalculationSection->FirstVariableInfo();
-  if (info == 0 && itsIfCalculationBlocks)
-    info = itsIfCalculationBlocks->FirstVariableInfo();
+  if (itsFirstCalculationSection) info = itsFirstCalculationSection->FirstVariableInfo();
+  if (info == 0 && itsIfCalculationBlocks) info = itsIfCalculationBlocks->FirstVariableInfo();
   if (info == 0 && itsElseIfCalculationBlocks)
     info = itsElseIfCalculationBlocks->FirstVariableInfo();
-  if (info == 0 && itsElseCalculationBlocks)
-    info = itsElseCalculationBlocks->FirstVariableInfo();
-  if (info == 0 && itsLastCalculationSection)
-    info = itsLastCalculationSection->FirstVariableInfo();
+  if (info == 0 && itsElseCalculationBlocks) info = itsElseCalculationBlocks->FirstVariableInfo();
+  if (info == 0 && itsLastCalculationSection) info = itsLastCalculationSection->FirstVariableInfo();
   return info;
 }
 
 void NFmiSmartToolCalculationBlock::Time(const NFmiMetTime &theTime)
 {
-  if (itsFirstCalculationSection)
-    itsFirstCalculationSection->SetTime(theTime);
+  if (itsFirstCalculationSection) itsFirstCalculationSection->SetTime(theTime);
 
-  if (itsIfAreaMaskSection)
-    itsIfAreaMaskSection->Time(theTime);
-  if (itsIfCalculationBlocks)
-    itsIfCalculationBlocks->SetTime(theTime);
-  if (itsElseIfAreaMaskSection)
-    itsElseIfAreaMaskSection->Time(theTime);
-  if (itsElseIfCalculationBlocks)
-    itsElseIfCalculationBlocks->SetTime(theTime);
-  if (itsElseCalculationBlocks)
-    itsElseCalculationBlocks->SetTime(theTime);
+  if (itsIfAreaMaskSection) itsIfAreaMaskSection->Time(theTime);
+  if (itsIfCalculationBlocks) itsIfCalculationBlocks->SetTime(theTime);
+  if (itsElseIfAreaMaskSection) itsElseIfAreaMaskSection->Time(theTime);
+  if (itsElseIfCalculationBlocks) itsElseIfCalculationBlocks->SetTime(theTime);
+  if (itsElseCalculationBlocks) itsElseCalculationBlocks->SetTime(theTime);
 
-  if (itsLastCalculationSection)
-    itsLastCalculationSection->SetTime(theTime);
+  if (itsLastCalculationSection) itsLastCalculationSection->SetTime(theTime);
 }
 
 void NFmiSmartToolCalculationBlock::Calculate(const NFmiCalculationParams &theCalculationParams,
@@ -238,8 +221,7 @@ void NFmiSmartToolCalculationBlock::Calculate_ver2(
 
   if (fDoMiddlePartOnly == false)
   {
-    if (itsLastCalculationSection)
-      itsLastCalculationSection->Calculate_ver2(theCalculationParams);
+    if (itsLastCalculationSection) itsLastCalculationSection->Calculate_ver2(theCalculationParams);
   }
 }
 
@@ -266,9 +248,7 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer *theInfoOrganizer
 #endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
 {
 }
-NFmiSmartToolModifier::~NFmiSmartToolModifier(void)
-{
-}
+NFmiSmartToolModifier::~NFmiSmartToolModifier(void) {}
 //--------------------------------------------------------
 // InitSmartTool
 //--------------------------------------------------------
@@ -703,8 +683,7 @@ void NFmiSmartToolModifier::ModifyConditionalData(
           NFmiQueryDataUtil::DoStepIt(
               theThreadCallBacks);  // stepataan vasta 0-tarkastuksen jälkeen!
           calculationParams.itsTime = modifiedTimes.Time();
-          if (theMacroParamValue.fSetValue)
-            calculationParams.itsTime = theMacroParamValue.itsTime;
+          if (theMacroParamValue.fSetValue) calculationParams.itsTime = theMacroParamValue.itsTime;
           calculationParams.itsTimeIndex = info->TimeIndex();
           theCalculationBlock->itsIfAreaMaskSection->Time(
               calculationParams.itsTime);  // yritetään optimoida laskuja hieman kun mahdollista
@@ -877,8 +856,7 @@ void NFmiSmartToolModifier::ModifyConditionalData_ver2(
       throw runtime_error(::GetDictionaryString("SmartToolModifierErrorUnknownProblem"));
     boost::shared_ptr<NFmiFastQueryInfo> info(
         dynamic_cast<NFmiFastQueryInfo *>(theCalculationBlock->FirstVariableInfo()->Clone()));
-    if (info == 0)
-      return;
+    if (info == 0) return;
 
     try
     {
@@ -982,8 +960,7 @@ void NFmiSmartToolModifier::ModifyData2(
   {
     boost::shared_ptr<NFmiFastQueryInfo> info(
         dynamic_cast<NFmiFastQueryInfo *>(theCalculationSection->FirstVariableInfo()->Clone()));
-    if (info == 0)
-      return;
+    if (info == 0) return;
     try
     {
       NFmiCalculationParams calculationParams;
@@ -1007,8 +984,7 @@ void NFmiSmartToolModifier::ModifyData2(
         for (modifiedTimes.Reset(); modifiedTimes.Next();)
         {
           calculationParams.itsTime = modifiedTimes.Time();
-          if (theMacroParamValue.fSetValue)
-            calculationParams.itsTime = theMacroParamValue.itsTime;
+          if (theMacroParamValue.fSetValue) calculationParams.itsTime = theMacroParamValue.itsTime;
           if (info->Time(
                   calculationParams.itsTime))  // asetetaan myös tämä, että saadaan oikea timeindex
           {
@@ -1034,12 +1010,10 @@ void NFmiSmartToolModifier::ModifyData2(
               theCalculationSection->GetCalculations()[i]->Calculate(calculationParams,
                                                                      theMacroParamValue);
 
-              if (theMacroParamValue.fSetValue)
-                break;
+              if (theMacroParamValue.fSetValue) break;
             }
           }
-          if (theMacroParamValue.fSetValue)
-            break;
+          if (theMacroParamValue.fSetValue) break;
         }
       }
     }
@@ -1058,8 +1032,7 @@ void NFmiSmartToolModifier::ModifyData2_ver2(
   {
     boost::shared_ptr<NFmiFastQueryInfo> info(
         dynamic_cast<NFmiFastQueryInfo *>(theCalculationSection->FirstVariableInfo()->Clone()));
-    if (info == 0)
-      return;
+    if (info == 0) return;
     try
     {
       info->LatLon();  // tämä on pyydettävä kerran multi-thread jutuissa, koska tämä rakentaa
@@ -1190,8 +1163,7 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreatePeekFunctionAreaMas
         theAreaMaskInfo.GetOffsetPoint1().Y(),
         NFmiAreaMask::kNoValue));
 
-  if (fUseLevelData)
-    itsParethesisCounter++;
+  if (fUseLevelData) itsParethesisCounter++;
 
   return areaMask;
 }
@@ -1333,385 +1305,401 @@ void NFmiSmartToolModifier::MakeSoundingLevelFix(boost::shared_ptr<NFmiAreaMask>
   }
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateInfoVariableMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateInfoVariableMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
-    boost::shared_ptr<NFmiFastQueryInfo> info =
-        CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiFastQueryInfo> info =
+      CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
 
-    return boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMask(
-        theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info));
+  return boost::shared_ptr<NFmiAreaMask>(new NFmiInfoAreaMask(
+      theAreaMaskInfo.GetMaskCondition(), NFmiAreaMask::kInfo, info->DataType(), info));
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateRampFunctionMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateRampFunctionMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
-    if(fUseLevelData)
-        itsParethesisCounter++;
-    NFmiInfoData::Type type = theAreaMaskInfo.GetDataType();
-    if(type != NFmiInfoData::kCalculatedValue)
+  if (fUseLevelData) itsParethesisCounter++;
+  NFmiInfoData::Type type = theAreaMaskInfo.GetDataType();
+  if (type != NFmiInfoData::kCalculatedValue)
+  {
+    boost::shared_ptr<NFmiFastQueryInfo> info =
+        CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+    return boost::shared_ptr<NFmiAreaMask>(
+        new NFmiCalculationRampFuction(theAreaMaskInfo.GetMaskCondition(),
+                                       NFmiAreaMask::kInfo,
+                                       theAreaMaskInfo.GetDataType(),
+                                       info));
+  }
+  else
+  {
+    boost::shared_ptr<NFmiAreaMask> areaMask2 = CreateCalculatedAreaMask(theAreaMaskInfo);
+    return boost::shared_ptr<NFmiAreaMask>(
+        new NFmiCalculationRampFuctionWithAreaMask(theAreaMaskInfo.GetMaskCondition(),
+                                                   NFmiAreaMask::kInfo,
+                                                   theAreaMaskInfo.GetDataType(),
+                                                   areaMask2));
+  }
+}
+
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaIntegrationMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo,
+    NFmiAreaMask::CalculationOperationType maskType,
+    bool &mustUsePressureInterpolation)
+{
+  boost::shared_ptr<NFmiFastQueryInfo> info =
+      CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+  if (theAreaMaskInfo.GetUseDefaultProducer())
+  {  // Pitää tehdä syvä kopio datasta, että datan muuttuminen ei vaikuta laskuihin.
+    boost::shared_ptr<NFmiFastQueryInfo> tmp(dynamic_cast<NFmiFastQueryInfo *>(info->Clone()));
+    info = tmp;
+  }
+
+  if (fUseLevelData) itsParethesisCounter++;
+
+  int startX = static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X());
+  int startY = static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y());
+  int endX = static_cast<int>(theAreaMaskInfo.GetOffsetPoint2().X());
+  int endY = static_cast<int>(theAreaMaskInfo.GetOffsetPoint2().Y());
+
+  if (maskType == NFmiAreaMask::FunctionAreaIntergration)
+    return boost::shared_ptr<NFmiAreaMask>(
+        new NFmiInfoRectAreaIntegrator(theAreaMaskInfo.GetMaskCondition(),
+                                       NFmiAreaMask::kInfo,
+                                       theAreaMaskInfo.GetDataType(),
+                                       info,
+                                       theAreaMaskInfo.GetFunctionType(),
+                                       startX,
+                                       endX,
+                                       startY,
+                                       endY));
+  else
+    return boost::shared_ptr<NFmiAreaMask>(
+        new NFmiInfoTimeIntegrator(theAreaMaskInfo.GetMaskCondition(),
+                                   NFmiAreaMask::kInfo,
+                                   theAreaMaskInfo.GetDataType(),
+                                   info,
+                                   theAreaMaskInfo.GetFunctionType(),
+                                   startX,
+                                   startY));
+}
+
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateStartParenthesisMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo)
+{
+  if (fUseLevelData) itsParethesisCounter++;
+  return boost::shared_ptr<NFmiAreaMask>(
+      new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator()));
+}
+
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateEndParenthesisMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo)
+{
+  if (fUseLevelData)
+  {
+    itsParethesisCounter--;
+    if (itsParethesisCounter <= 0)
     {
-        boost::shared_ptr<NFmiFastQueryInfo> info =
-            CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-        return boost::shared_ptr<NFmiAreaMask>(
-            new NFmiCalculationRampFuction(theAreaMaskInfo.GetMaskCondition(),
-                NFmiAreaMask::kInfo,
-                theAreaMaskInfo.GetDataType(),
-                info));
+      fHeightFunctionFlag = false;
+      fUseLevelData = false;
     }
-    else
-    {
-        boost::shared_ptr<NFmiAreaMask> areaMask2 = CreateCalculatedAreaMask(theAreaMaskInfo);
-        return boost::shared_ptr<NFmiAreaMask>(
-            new NFmiCalculationRampFuctionWithAreaMask(theAreaMaskInfo.GetMaskCondition(),
-                NFmiAreaMask::kInfo,
-                theAreaMaskInfo.GetDataType(),
-                areaMask2));
+  }
+
+  return boost::shared_ptr<NFmiAreaMask>(
+      new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator()));
+}
+
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateCommaOperatorMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo)
+{
+  if (fHeightFunctionFlag)
+  {
+    itsCommaCounter++;
+    if (itsCommaCounter >= 2)
+    {                            // kun pilkku-laskuri tuli täyteen
+      fUseLevelData = true;      // on aika ruveta käyttämään level-dataa infoissa
+      itsParethesisCounter = 1;  // lisäksi ruvetaan metsästämään sulkuja,
+                                 // että tiedetään milloin funktio ja level datan käyttö loppuu
     }
+  }
+  return boost::shared_ptr<NFmiAreaMask>(
+      new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator()));
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaIntegrationMask(const NFmiAreaMaskInfo &theAreaMaskInfo, NFmiAreaMask::CalculationOperationType maskType, bool &mustUsePressureInterpolation)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMathFunctionStartMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo)
 {
-    boost::shared_ptr<NFmiFastQueryInfo> info =
-        CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-    if(theAreaMaskInfo.GetUseDefaultProducer())
-    {  // Pitää tehdä syvä kopio datasta, että datan muuttuminen ei vaikuta laskuihin.
-        boost::shared_ptr<NFmiFastQueryInfo> tmp(dynamic_cast<NFmiFastQueryInfo *>(info->Clone()));
-        info = tmp;
-    }
-
-    if(fUseLevelData)
-        itsParethesisCounter++;
-
-    int startX = static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X());
-    int startY = static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y());
-    int endX = static_cast<int>(theAreaMaskInfo.GetOffsetPoint2().X());
-    int endY = static_cast<int>(theAreaMaskInfo.GetOffsetPoint2().Y());
-
-    if(maskType == NFmiAreaMask::FunctionAreaIntergration)
-        return boost::shared_ptr<NFmiAreaMask>(
-            new NFmiInfoRectAreaIntegrator(theAreaMaskInfo.GetMaskCondition(),
-                NFmiAreaMask::kInfo,
-                theAreaMaskInfo.GetDataType(),
-                info,
-                theAreaMaskInfo.GetFunctionType(),
-                startX,
-                endX,
-                startY,
-                endY));
-    else
-        return boost::shared_ptr<NFmiAreaMask>(
-            new NFmiInfoTimeIntegrator(theAreaMaskInfo.GetMaskCondition(),
-                NFmiAreaMask::kInfo,
-                theAreaMaskInfo.GetDataType(),
-                info,
-                theAreaMaskInfo.GetFunctionType(),
-                startX,
-                startY));
+  boost::shared_ptr<NFmiAreaMask> areaMask =
+      boost::shared_ptr<NFmiAreaMask>(new NFmiCalculationSpecialCase());
+  areaMask->SetMathFunctionType(theAreaMaskInfo.GetMathFunctionType());
+  if (fUseLevelData) itsParethesisCounter++;
+  return areaMask;
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateStartParenthesisMask(const NFmiAreaMaskInfo &theAreaMaskInfo)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateThreeArgumentFunctionStartMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo)
 {
-    if(fUseLevelData)
-        itsParethesisCounter++;
-    return boost::shared_ptr<NFmiAreaMask>(
-        new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator()));
+  boost::shared_ptr<NFmiAreaMask> areaMask =
+      boost::shared_ptr<NFmiAreaMask>(new NFmiCalculationSpecialCase());
+  areaMask->SetFunctionType(theAreaMaskInfo.GetFunctionType());
+  areaMask->IntegrationFunctionType(theAreaMaskInfo.IntegrationFunctionType());
+  if (theAreaMaskInfo.IntegrationFunctionType() == 2 ||
+      theAreaMaskInfo.IntegrationFunctionType() == 3)
+  {  // jos funktio oli SumZ tai MinH tyyppinen, laitetaan seuraavat jutut 'päälle'
+    fHeightFunctionFlag = true;
+    fUseLevelData = false;
+    itsCommaCounter = 0;
+  }
+  return areaMask;
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateEndParenthesisMask(const NFmiAreaMaskInfo &theAreaMaskInfo)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateOccurrenceMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
-    if(fUseLevelData)
-    {
-        itsParethesisCounter--;
-        if(itsParethesisCounter <= 0)
-        {
-            fHeightFunctionFlag = false;
-            fUseLevelData = false;
-        }
-    }
-
-    return boost::shared_ptr<NFmiAreaMask>(
-        new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator()));
+  bool synopXCase =
+      theAreaMaskInfo.GetDataIdent().GetProducer()->GetIdent() == NFmiInfoData::kFmiSpSynoXProducer;
+  if (synopXCase) theAreaMaskInfo.GetDataIdent().GetProducer()->SetIdent(kFmiSYNOP);
+  boost::shared_ptr<NFmiFastQueryInfo> info =
+      CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiArea> calculationArea(UsedMacroParamData()->Area()->Clone());
+  return boost::shared_ptr<NFmiAreaMask>(
+      new NFmiInfoAreaMaskOccurrance(theAreaMaskInfo.GetMaskCondition(),
+                                     NFmiAreaMask::kInfo,
+                                     info->DataType(),
+                                     info,
+                                     theAreaMaskInfo.GetFunctionType(),
+                                     theAreaMaskInfo.GetSecondaryFunctionType(),
+                                     theAreaMaskInfo.FunctionArgumentCount(),
+                                     calculationArea,
+                                     synopXCase));
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateCommaOperatorMask(const NFmiAreaMaskInfo &theAreaMaskInfo)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateTimeRangeMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
-    if(fHeightFunctionFlag)
-    {
-        itsCommaCounter++;
-        if(itsCommaCounter >= 2)
-        {                            // kun pilkku-laskuri tuli täyteen
-            fUseLevelData = true;      // on aika ruveta käyttämään level-dataa infoissa
-            itsParethesisCounter = 1;  // lisäksi ruvetaan metsästämään sulkuja,
-                                       // että tiedetään milloin funktio ja level datan käyttö loppuu
-        }
-    }
-    return boost::shared_ptr<NFmiAreaMask>(
-        new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator()));
+  boost::shared_ptr<NFmiFastQueryInfo> info =
+      CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+  return boost::shared_ptr<NFmiAreaMask>(
+      new NFmiInfoAreaMaskTimeRange(theAreaMaskInfo.GetMaskCondition(),
+                                    NFmiAreaMask::kInfo,
+                                    info->DataType(),
+                                    info,
+                                    theAreaMaskInfo.GetFunctionType(),
+                                    theAreaMaskInfo.FunctionArgumentCount()));
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMathFunctionStartMask(const NFmiAreaMaskInfo &theAreaMaskInfo)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateProbabilityFunctionMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
-    boost::shared_ptr<NFmiAreaMask> areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiCalculationSpecialCase());
-    areaMask->SetMathFunctionType(theAreaMaskInfo.GetMathFunctionType());
-    if(fUseLevelData)
-        itsParethesisCounter++;
-    return areaMask;
+  boost::shared_ptr<NFmiFastQueryInfo> info =
+      CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+  return boost::shared_ptr<NFmiAreaMask>(
+      new NFmiInfoAreaMaskProbFunc(theAreaMaskInfo.GetMaskCondition(),
+                                   NFmiAreaMask::kInfo,
+                                   info->DataType(),
+                                   info,
+                                   theAreaMaskInfo.GetFunctionType(),
+                                   theAreaMaskInfo.GetSecondaryFunctionType(),
+                                   theAreaMaskInfo.FunctionArgumentCount()));
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateThreeArgumentFunctionStartMask(const NFmiAreaMaskInfo &theAreaMaskInfo)
-{
-    boost::shared_ptr<NFmiAreaMask> areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiCalculationSpecialCase());
-    areaMask->SetFunctionType(theAreaMaskInfo.GetFunctionType());
-    areaMask->IntegrationFunctionType(theAreaMaskInfo.IntegrationFunctionType());
-    if(theAreaMaskInfo.IntegrationFunctionType() == 2 ||
-        theAreaMaskInfo.IntegrationFunctionType() == 3)
-    {  // jos funktio oli SumZ tai MinH tyyppinen, laitetaan seuraavat jutut 'päälle'
-        fHeightFunctionFlag = true;
-        fUseLevelData = false;
-        itsCommaCounter = 0;
-    }
-    return areaMask;
-}
-
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateOccurrenceMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
-{
-    bool synopXCase = theAreaMaskInfo.GetDataIdent().GetProducer()->GetIdent() ==
-        NFmiInfoData::kFmiSpSynoXProducer;
-    if(synopXCase)
-        theAreaMaskInfo.GetDataIdent().GetProducer()->SetIdent(kFmiSYNOP);
-    boost::shared_ptr<NFmiFastQueryInfo> info =
-        CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-    boost::shared_ptr<NFmiArea> calculationArea(UsedMacroParamData()->Area()->Clone());
-    return boost::shared_ptr<NFmiAreaMask>(
-        new NFmiInfoAreaMaskOccurrance(theAreaMaskInfo.GetMaskCondition(),
-            NFmiAreaMask::kInfo,
-            info->DataType(),
-            info,
-            theAreaMaskInfo.GetFunctionType(),
-            theAreaMaskInfo.GetSecondaryFunctionType(),
-            theAreaMaskInfo.FunctionArgumentCount(),
-            calculationArea,
-            synopXCase));
-}
-
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateTimeRangeMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
-{
-    boost::shared_ptr<NFmiFastQueryInfo> info =
-        CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-    return boost::shared_ptr<NFmiAreaMask>(
-        new NFmiInfoAreaMaskTimeRange(theAreaMaskInfo.GetMaskCondition(),
-            NFmiAreaMask::kInfo,
-            info->DataType(),
-            info,
-            theAreaMaskInfo.GetFunctionType(),
-            theAreaMaskInfo.FunctionArgumentCount()));
-}
-
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateProbabilityFunctionMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
-{
-    boost::shared_ptr<NFmiFastQueryInfo> info =
-        CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-    return boost::shared_ptr<NFmiAreaMask>(
-        new NFmiInfoAreaMaskProbFunc(theAreaMaskInfo.GetMaskCondition(),
-            NFmiAreaMask::kInfo,
-            info->DataType(),
-            info,
-            theAreaMaskInfo.GetFunctionType(),
-            theAreaMaskInfo.GetSecondaryFunctionType(),
-            theAreaMaskInfo.FunctionArgumentCount()));
-}
-
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateClosestObsValueMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateClosestObsValueMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
-    boost::shared_ptr<NFmiFastQueryInfo> info =
-        CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-    if(info->IsGrid())
-        throw std::runtime_error(
-            "With closestvalue -function you must choose observation (station) data producer, "
-            "not data with grid.");
-    NFmiNearestObsValue2GridMask *nearestObsValue2GridMask =
-        new NFmiNearestObsValue2GridMask(NFmiAreaMask::kInfo,
-            info->DataType(),
-            info,
-            theAreaMaskInfo.FunctionArgumentCount());
-    nearestObsValue2GridMask->SetGriddingHelpers(
-        itsWorkingGrid->itsArea,
-        itsDoc,
-        NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
-    boost::shared_ptr<NFmiAreaMask> areaMask = boost::shared_ptr<NFmiAreaMask>(nearestObsValue2GridMask);
-    MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
-    return areaMask;
+  boost::shared_ptr<NFmiFastQueryInfo> info =
+      CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+  if (info->IsGrid())
+    throw std::runtime_error(
+        "With closestvalue -function you must choose observation (station) data producer, "
+        "not data with grid.");
+  NFmiNearestObsValue2GridMask *nearestObsValue2GridMask = new NFmiNearestObsValue2GridMask(
+      NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.FunctionArgumentCount());
+  nearestObsValue2GridMask->SetGriddingHelpers(
+      itsWorkingGrid->itsArea, itsDoc, NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
+  boost::shared_ptr<NFmiAreaMask> areaMask =
+      boost::shared_ptr<NFmiAreaMask>(nearestObsValue2GridMask);
+  MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
+  return areaMask;
 #else
-    throw std::runtime_error("No support for closestvalue -function in this build, enable FMI_SUPPORT_STATION_DATA_SMARTTOOL macro");
+  throw std::runtime_error(
+      "No support for closestvalue -function in this build, enable "
+      "FMI_SUPPORT_STATION_DATA_SMARTTOOL macro");
 #endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreatePeekTimeMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreatePeekTimeMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
-    boost::shared_ptr<NFmiFastQueryInfo> info =
-        CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-    return boost::shared_ptr<NFmiAreaMask>(
-        new NFmiPeekTimeMask(NFmiAreaMask::kInfo,
-            info->DataType(),
-            info,
-            theAreaMaskInfo.FunctionArgumentCount()));
+  boost::shared_ptr<NFmiFastQueryInfo> info =
+      CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+  return boost::shared_ptr<NFmiAreaMask>(new NFmiPeekTimeMask(
+      NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.FunctionArgumentCount()));
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateNormalVertFuncMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateNormalVertFuncMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
-    NFmiAreaMask::FunctionType secondaryFunc = theAreaMaskInfo.GetSecondaryFunctionType();
-    fUseLevelData = true;
-    boost::shared_ptr<NFmiFastQueryInfo> info =
-        CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-    boost::shared_ptr<NFmiAreaMask> areaMask;
-    if(secondaryFunc == NFmiAreaMask::TimeVertP || secondaryFunc == NFmiAreaMask::TimeVertFL ||
-        secondaryFunc == NFmiAreaMask::TimeVertZ || secondaryFunc == NFmiAreaMask::TimeVertHyb)
-        areaMask = boost::shared_ptr<NFmiAreaMask>(
-            new NFmiInfoAreaMaskTimeVertFunc(theAreaMaskInfo.GetMaskCondition(),
-                NFmiAreaMask::kInfo,
-                info->DataType(),
-                info,
-                theAreaMaskInfo.GetFunctionType(),
-                theAreaMaskInfo.GetSecondaryFunctionType(),
-                theAreaMaskInfo.FunctionArgumentCount()));
-    else
-        areaMask = boost::shared_ptr<NFmiAreaMask>(
-            new NFmiInfoAreaMaskVertFunc(theAreaMaskInfo.GetMaskCondition(),
-                NFmiAreaMask::kInfo,
-                info->DataType(),
-                info,
-                theAreaMaskInfo.GetFunctionType(),
-                theAreaMaskInfo.GetSecondaryFunctionType(),
-                theAreaMaskInfo.FunctionArgumentCount()));
-    fUseLevelData = false;  // en tiedä pitääkö tämä laittaa takaisin falseksi, mutta laitan
-                            // varmuuden vuoksi
-    return areaMask;
+  NFmiAreaMask::FunctionType secondaryFunc = theAreaMaskInfo.GetSecondaryFunctionType();
+  fUseLevelData = true;
+  boost::shared_ptr<NFmiFastQueryInfo> info =
+      CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> areaMask;
+  if (secondaryFunc == NFmiAreaMask::TimeVertP || secondaryFunc == NFmiAreaMask::TimeVertFL ||
+      secondaryFunc == NFmiAreaMask::TimeVertZ || secondaryFunc == NFmiAreaMask::TimeVertHyb)
+    areaMask = boost::shared_ptr<NFmiAreaMask>(
+        new NFmiInfoAreaMaskTimeVertFunc(theAreaMaskInfo.GetMaskCondition(),
+                                         NFmiAreaMask::kInfo,
+                                         info->DataType(),
+                                         info,
+                                         theAreaMaskInfo.GetFunctionType(),
+                                         theAreaMaskInfo.GetSecondaryFunctionType(),
+                                         theAreaMaskInfo.FunctionArgumentCount()));
+  else
+    areaMask = boost::shared_ptr<NFmiAreaMask>(
+        new NFmiInfoAreaMaskVertFunc(theAreaMaskInfo.GetMaskCondition(),
+                                     NFmiAreaMask::kInfo,
+                                     info->DataType(),
+                                     info,
+                                     theAreaMaskInfo.GetFunctionType(),
+                                     theAreaMaskInfo.GetSecondaryFunctionType(),
+                                     theAreaMaskInfo.FunctionArgumentCount()));
+  fUseLevelData = false;  // en tiedä pitääkö tämä laittaa takaisin falseksi, mutta laitan
+                          // varmuuden vuoksi
+  return areaMask;
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateVertConditionalMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateVertConditionalMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
-    fUseLevelData = true;
-    boost::shared_ptr<NFmiFastQueryInfo> info = CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
-    boost::shared_ptr<NFmiAreaMask> areaMask(
-            new NFmiInfoAreaMaskVertConditionalFunc(theAreaMaskInfo.GetMaskCondition(),
-                NFmiAreaMask::kInfo,
-                info->DataType(),
-                info,
-                theAreaMaskInfo.GetFunctionType(),
-                theAreaMaskInfo.GetSecondaryFunctionType(),
-                theAreaMaskInfo.FunctionArgumentCount()));
-    fUseLevelData = false;  // en tiedä pitääkö tämä laittaa takaisin falseksi, mutta laitan
-                            // varmuuden vuoksi
-    return areaMask;
+  fUseLevelData = true;
+  boost::shared_ptr<NFmiFastQueryInfo> info =
+      CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
+  boost::shared_ptr<NFmiAreaMask> areaMask(
+      new NFmiInfoAreaMaskVertConditionalFunc(theAreaMaskInfo.GetMaskCondition(),
+                                              NFmiAreaMask::kInfo,
+                                              info->DataType(),
+                                              info,
+                                              theAreaMaskInfo.GetFunctionType(),
+                                              theAreaMaskInfo.GetSecondaryFunctionType(),
+                                              theAreaMaskInfo.FunctionArgumentCount()));
+  fUseLevelData = false;  // en tiedä pitääkö tämä laittaa takaisin falseksi, mutta laitan
+                          // varmuuden vuoksi
+  return areaMask;
 }
 
 static bool IsVertConditionalFunction(const NFmiAreaMaskInfo &theAreaMaskInfo)
 {
-    NFmiAreaMask::FunctionType primaryFunction = theAreaMaskInfo.GetFunctionType();
-    if(primaryFunction >= NFmiInfoAreaMask::ProbOver && primaryFunction <= NFmiInfoAreaMask::ProbBetweenEq)
-    {
-        NFmiAreaMask::FunctionType secondaryFunction = theAreaMaskInfo.GetSecondaryFunctionType();
-        if(secondaryFunction >= NFmiInfoAreaMask::VertP && secondaryFunction <= NFmiInfoAreaMask::VertHyb)
-            return true;
-    }
+  NFmiAreaMask::FunctionType primaryFunction = theAreaMaskInfo.GetFunctionType();
+  if (primaryFunction >= NFmiInfoAreaMask::ProbOver &&
+      primaryFunction <= NFmiInfoAreaMask::ProbBetweenEq)
+  {
+    NFmiAreaMask::FunctionType secondaryFunction = theAreaMaskInfo.GetSecondaryFunctionType();
+    if (secondaryFunction >= NFmiInfoAreaMask::VertP &&
+        secondaryFunction <= NFmiInfoAreaMask::VertHyb)
+      return true;
+  }
 
-    return false;
+  return false;
 }
 
-boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateVertFunctionStartMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
+boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateVertFunctionStartMask(
+    const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
-    boost::shared_ptr<NFmiAreaMask> areaMask;
-    if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::Occurrence)
-    {
-        areaMask = CreateOccurrenceMask(theAreaMaskInfo, mustUsePressureInterpolation);
-    }
-    else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::TimeRange)
-    {
-        areaMask = CreateTimeRangeMask(theAreaMaskInfo, mustUsePressureInterpolation);
-    }
-    else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ProbRect ||
-        theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ProbCircle)
-    {
-        areaMask = CreateProbabilityFunctionMask(theAreaMaskInfo, mustUsePressureInterpolation);
-    }
+  boost::shared_ptr<NFmiAreaMask> areaMask;
+  if (theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::Occurrence)
+  {
+    areaMask = CreateOccurrenceMask(theAreaMaskInfo, mustUsePressureInterpolation);
+  }
+  else if (theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::TimeRange)
+  {
+    areaMask = CreateTimeRangeMask(theAreaMaskInfo, mustUsePressureInterpolation);
+  }
+  else if (theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ProbRect ||
+           theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ProbCircle)
+  {
+    areaMask = CreateProbabilityFunctionMask(theAreaMaskInfo, mustUsePressureInterpolation);
+  }
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
-    else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue)
-    {
-        areaMask = CreateClosestObsValueMask(theAreaMaskInfo, mustUsePressureInterpolation);
-    }
+  else if (theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue)
+  {
+    areaMask = CreateClosestObsValueMask(theAreaMaskInfo, mustUsePressureInterpolation);
+  }
 #endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
 
-    else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::PeekT)
-    {
-        areaMask = CreatePeekTimeMask(theAreaMaskInfo, mustUsePressureInterpolation);
-    }
-    else if(::IsVertConditionalFunction(theAreaMaskInfo))
-    {
-        areaMask = CreateVertConditionalMask(theAreaMaskInfo, mustUsePressureInterpolation);
-    }
-    else
-    {
-        areaMask = CreateNormalVertFuncMask(theAreaMaskInfo, mustUsePressureInterpolation);
-    }
+  else if (theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::PeekT)
+  {
+    areaMask = CreatePeekTimeMask(theAreaMaskInfo, mustUsePressureInterpolation);
+  }
+  else if (::IsVertConditionalFunction(theAreaMaskInfo))
+  {
+    areaMask = CreateVertConditionalMask(theAreaMaskInfo, mustUsePressureInterpolation);
+  }
+  else
+  {
+    areaMask = CreateNormalVertFuncMask(theAreaMaskInfo, mustUsePressureInterpolation);
+  }
 
-    return areaMask;
+  return areaMask;
 }
 
-void NFmiSmartToolModifier::DoFinalAreaMaskInitializations(boost::shared_ptr<NFmiAreaMask> &areaMask, const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
+void NFmiSmartToolModifier::DoFinalAreaMaskInitializations(
+    boost::shared_ptr<NFmiAreaMask> &areaMask,
+    const NFmiAreaMaskInfo &theAreaMaskInfo,
+    bool &mustUsePressureInterpolation)
 {
-    if(areaMask)
-    {
-        NFmiAreaMask::CalculationOperationType maskType = theAreaMaskInfo.GetOperationType();
-        if(areaMask->Info() && areaMask->Info()->Grid() == 0)
-        {  // jos oli info dataa ja vielä asemadatasta, tarkistetaan että kyse oli vielä
-           // infoData-tyypistä, muuten oli virheellinen lauseke
+  if (areaMask)
+  {
+    NFmiAreaMask::CalculationOperationType maskType = theAreaMaskInfo.GetOperationType();
+    if (areaMask->Info() && areaMask->Info()->Grid() == 0)
+    {  // jos oli info dataa ja vielä asemadatasta, tarkistetaan että kyse oli vielä
+       // infoData-tyypistä, muuten oli virheellinen lauseke
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
-            if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue ||
-                theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::Occurrence)
-            {  // tämä on ok, ei tarvitse tehdä mitään
-            }
-            else if(maskType == NFmiAreaMask::InfoVariable)
-            {
-                boost::shared_ptr<NFmiFastQueryInfo> info = areaMask->Info();
-                NFmiStation2GridMask *station2GridMask =
-                    new NFmiStation2GridMask(areaMask->MaskType(), areaMask->GetDataType(), info);
-                station2GridMask->SetGriddingHelpers(
-                    itsWorkingGrid->itsArea,
-                    itsDoc,
-                    NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY),
-                    itsExtraMacroParamData->ObservationRadiusRelative());
-                areaMask = boost::shared_ptr<NFmiAreaMask>(station2GridMask);
-                MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
-            }
-            else
+      if (theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue ||
+          theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::Occurrence)
+      {  // tämä on ok, ei tarvitse tehdä mitään
+      }
+      else if (maskType == NFmiAreaMask::InfoVariable)
+      {
+        boost::shared_ptr<NFmiFastQueryInfo> info = areaMask->Info();
+        NFmiStation2GridMask *station2GridMask =
+            new NFmiStation2GridMask(areaMask->MaskType(), areaMask->GetDataType(), info);
+        station2GridMask->SetGriddingHelpers(
+            itsWorkingGrid->itsArea,
+            itsDoc,
+            NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY),
+            itsExtraMacroParamData->ObservationRadiusRelative());
+        areaMask = boost::shared_ptr<NFmiAreaMask>(station2GridMask);
+        MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
+      }
+      else
 #endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
-            {
-                std::string errStr;
-                errStr += ::GetDictionaryString(
-                    "Trying to use unsupported smarttool function with station (non-grid) data.\n'");
-                errStr += theAreaMaskInfo.GetMaskText();
-                errStr += ::GetDictionaryString("' ");
-                errStr += ::GetDictionaryString("in line:");
-                errStr += ::GetDictionaryString("\n");
-                errStr += theAreaMaskInfo.GetOrigLineText();
-                throw std::runtime_error(errStr);
-            }
-        }
-
-        areaMask->Initialize();  // virtuaalinen initialisointi konstruktion jälkeen
-        areaMask->SetCalculationOperationType(maskType);
-        if(mustUsePressureInterpolation)
-        {
-            areaMask->UsePressureLevelInterpolation(true);
-            areaMask->UsedPressureLevelValue(theAreaMaskInfo.GetLevel()->LevelValue());
-            if(theAreaMaskInfo.GetLevel()->LevelType() == kFmiFlightLevel)
-                const_cast<NFmiLevel *>(areaMask->Level())
-                ->SetIdent(static_cast<unsigned long>(kFmiFlightLevel));
-            else if(theAreaMaskInfo.GetLevel()->LevelType() == kFmiHeight)
-                const_cast<NFmiLevel *>(areaMask->Level())
-                ->SetIdent(static_cast<unsigned long>(kFmiHeight));
-        }
+      {
+        std::string errStr;
+        errStr += ::GetDictionaryString(
+            "Trying to use unsupported smarttool function with station (non-grid) data.\n'");
+        errStr += theAreaMaskInfo.GetMaskText();
+        errStr += ::GetDictionaryString("' ");
+        errStr += ::GetDictionaryString("in line:");
+        errStr += ::GetDictionaryString("\n");
+        errStr += theAreaMaskInfo.GetOrigLineText();
+        throw std::runtime_error(errStr);
+      }
     }
+
+    areaMask->Initialize();  // virtuaalinen initialisointi konstruktion jälkeen
+    areaMask->SetCalculationOperationType(maskType);
+    if (mustUsePressureInterpolation)
+    {
+      areaMask->UsePressureLevelInterpolation(true);
+      areaMask->UsedPressureLevelValue(theAreaMaskInfo.GetLevel()->LevelValue());
+      if (theAreaMaskInfo.GetLevel()->LevelType() == kFmiFlightLevel)
+        const_cast<NFmiLevel *>(areaMask->Level())
+            ->SetIdent(static_cast<unsigned long>(kFmiFlightLevel));
+      else if (theAreaMaskInfo.GetLevel()->LevelType() == kFmiHeight)
+        const_cast<NFmiLevel *>(areaMask->Level())
+            ->SetIdent(static_cast<unsigned long>(kFmiHeight));
+    }
+  }
 }
 
 //--------------------------------------------------------
@@ -1733,13 +1721,13 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(
     }
     case NFmiAreaMask::RampFunction:
     {
-        areaMask = CreateRampFunctionMask(theAreaMaskInfo, mustUsePressureInterpolation);
+      areaMask = CreateRampFunctionMask(theAreaMaskInfo, mustUsePressureInterpolation);
       break;
     }
     case NFmiAreaMask::FunctionAreaIntergration:
     case NFmiAreaMask::FunctionTimeIntergration:
     {
-        areaMask = CreateAreaIntegrationMask(theAreaMaskInfo, maskType, mustUsePressureInterpolation);
+      areaMask = CreateAreaIntegrationMask(theAreaMaskInfo, maskType, mustUsePressureInterpolation);
       break;
     }
     case NFmiAreaMask::FunctionPeekXY:
@@ -1810,7 +1798,7 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaMask(
     }
     case NFmiAreaMask::VertFunctionStart:
     {
-        areaMask = CreateVertFunctionStartMask(theAreaMaskInfo, mustUsePressureInterpolation);
+      areaMask = CreateVertFunctionStartMask(theAreaMaskInfo, mustUsePressureInterpolation);
       break;
     }
     case NFmiAreaMask::DeltaZFunction:
@@ -1870,9 +1858,9 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateCalculatedAreaMask(
   else if (parId == kFmiSecond)
     areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiUtcHourAreaMask(
         theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition()));
-  else if(parId == kFmiMinute)
-      areaMask = boost::shared_ptr<NFmiAreaMask>(new NFmiMinuteAreaMask(
-          theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition()));
+  else if (parId == kFmiMinute)
+    areaMask = boost::shared_ptr<NFmiAreaMask>(
+        new NFmiMinuteAreaMask(theAreaMaskInfo.GetDataIdent(), theAreaMaskInfo.GetMaskCondition()));
   else if (parId == kFmiForecastPeriod)
     areaMask = boost::shared_ptr<NFmiAreaMask>(
         new NFmiForecastHourAreaMask(itsInfoOrganizer->FindInfo(NFmiInfoData::kEditable),
@@ -1898,8 +1886,7 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateCalculatedAreaMask(
         theAreaMaskInfo.GetMaskCondition(),
         false));
 
-  if (areaMask)
-    return areaMask;
+  if (areaMask) return areaMask;
 
   throw runtime_error(::GetDictionaryString("SmartToolModifierErrorStrangeVariable"));
 }
@@ -1974,10 +1961,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateEndingAreaMask(void
 
 static bool IsBetweenValues(double value, double value1, double value2)
 {
-  if (value >= value1 && value <= value2)
-    return true;
-  if (value >= value2 && value <= value1)
-    return true;
+  if (value >= value1 && value <= value2) return true;
+  if (value >= value2 && value <= value1) return true;
   return false;
 }
 
@@ -2038,8 +2023,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetPossibleLevelInte
     {
       checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infos =
           itsInfoOrganizer->GetInfos(info->DataFilePattern());
-      if (infos.size())
-        info = infos[0];
+      if (infos.size()) info = infos[0];
     }
 
     info = NFmiSmartInfo::CreateShallowCopyOfHighestInfo(info);
@@ -2098,8 +2082,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetWantedAreaMaskDat
     FmiLevelType theOverRideLevelType)
 {
   NFmiInfoData::Type usedDataType = theAreaMaskInfo.GetDataType();
-  if (theOverRideDataType != NFmiInfoData::kNoDataType)
-    usedDataType = theOverRideDataType;
+  if (theOverRideDataType != NFmiInfoData::kNoDataType) usedDataType = theOverRideDataType;
 
   boost::shared_ptr<NFmiFastQueryInfo> info;
   if (theOverRideLevelType == kFmiNoLevelType)
@@ -2150,8 +2133,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(
     else
     {
       info = GetWantedAreaMaskData(theAreaMaskInfo, true);
-      if (info && itsModifiedLevel)
-        info->Level(*itsModifiedLevel);
+      if (info && itsModifiedLevel) info->Level(*itsModifiedLevel);
     }
     if (info == 0)
       info = GetPossibleLevelInterpolatedInfo(theAreaMaskInfo, mustUsePressureInterpolation);
@@ -2166,8 +2148,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(
     if (fUseLevelData || fDoCrossSectionCalculation)  // jos leveldata-flagi päällä, yritetään
                                                       // ensin, löytyykö hybridi dataa
       info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kHybridData);
-    if (info == 0)
-      info = GetWantedAreaMaskData(theAreaMaskInfo, false);
+    if (info == 0) info = GetWantedAreaMaskData(theAreaMaskInfo, false);
     if (info == 0 &&
         theAreaMaskInfo.GetDataType() ==
             NFmiInfoData::kAnalyzeData)  // analyysi datalle piti tehdä pika viritys tähän
@@ -2269,8 +2250,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateScriptVariable
     {
       itsScriptVariableInfos.push_back(tmp2);
       tmp = GetScriptVariableInfo(theDataIdent);
-      if (tmp)
-        return NFmiSmartInfo::CreateShallowCopyOfHighestInfo(tmp);
+      if (tmp) return NFmiSmartInfo::CreateShallowCopyOfHighestInfo(tmp);
     }
   }
 
@@ -2286,16 +2266,11 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::GetScriptVariableInf
       std::find_if(itsScriptVariableInfos.begin(),
                    itsScriptVariableInfos.end(),
                    FindScriptVariable(theDataIdent.GetParamIdent()));
-  if (it != itsScriptVariableInfos.end())
-    return *it;
+  if (it != itsScriptVariableInfos.end()) return *it;
   return boost::shared_ptr<NFmiFastQueryInfo>();
 }
 
-void NFmiSmartToolModifier::ClearScriptVariableInfos(void)
-{
-  itsScriptVariableInfos.clear();
-}
-
+void NFmiSmartToolModifier::ClearScriptVariableInfos(void) { itsScriptVariableInfos.clear(); }
 boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateRealScriptVariableInfo(
     const NFmiDataIdent &theDataIdent)
 {
@@ -2332,16 +2307,16 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::UsedMacroParamData(v
     return itsInfoOrganizer->CrossSectionMacroParamData();
   else
   {
-      if(itsExtraMacroParamData->UseSpecialResolution())
-          return itsExtraMacroParamData->ResolutionMacroParamData();
-      else
-          return itsInfoOrganizer->MacroParamData();
+    if (itsExtraMacroParamData->UseSpecialResolution())
+      return itsExtraMacroParamData->ResolutionMacroParamData();
+    else
+      return itsInfoOrganizer->MacroParamData();
   }
 }
 
-const std::vector<NFmiPoint>& NFmiSmartToolModifier::CalculationPoints() const
+const std::vector<NFmiPoint> &NFmiSmartToolModifier::CalculationPoints() const
 {
-    return itsExtraMacroParamData->CalculationPoints();
+  return itsExtraMacroParamData->CalculationPoints();
 }
 
 void NFmiSmartToolModifier::ModifiedLevel(boost::shared_ptr<NFmiLevel> &theLevel)
@@ -2351,9 +2326,5 @@ void NFmiSmartToolModifier::ModifiedLevel(boost::shared_ptr<NFmiLevel> &theLevel
 
 #ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
 
-void NFmiSmartToolModifier::SetGeneralDoc(NFmiEditMapGeneralDataDoc *theDoc)
-{
-  itsDoc = theDoc;
-}
-
+void NFmiSmartToolModifier::SetGeneralDoc(NFmiEditMapGeneralDataDoc *theDoc) { itsDoc = theDoc; }
 #endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL

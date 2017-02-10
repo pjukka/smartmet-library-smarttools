@@ -3,260 +3,289 @@
 #include "NFmiInfoOrganizer.h"
 
 NFmiExtraMacroParamData::NFmiExtraMacroParamData()
-    :fUseEditedDataForResolution(false)
-    , itsGivenResolutionInKm(kFloatMissing)
-    , itsProducer()
-    , itsLevelType(kFmiNoLevelType)
-    , itsDataBasedResolutionInKm(kFloatMissing)
-    , itsResolutionMacroParamData()
-    , itsCalculationPoints()
-    , itsCalculationPointProducer()
-    , itsObservationRadiusInKm(kFloatMissing)
-    , itsObservationRadiusRelative(kFloatMissing)
+    : fUseEditedDataForResolution(false),
+      itsGivenResolutionInKm(kFloatMissing),
+      itsProducer(),
+      itsLevelType(kFmiNoLevelType),
+      itsDataBasedResolutionInKm(kFloatMissing),
+      itsResolutionMacroParamData(),
+      itsCalculationPoints(),
+      itsCalculationPointProducer(),
+      itsObservationRadiusInKm(kFloatMissing),
+      itsObservationRadiusRelative(kFloatMissing)
 {
 }
 
 void NFmiExtraMacroParamData::FinalizeData(NFmiInfoOrganizer &theInfoOrganizer)
 {
-    if(fUseEditedDataForResolution)
-    {
-        InitializeResolutionWithEditedData(theInfoOrganizer);
-    }
-    else if(itsGivenResolutionInKm != kFloatMissing)
-    {
-        InitializeResolutionData(theInfoOrganizer, itsGivenResolutionInKm);
-    }
-    else if(itsProducer.GetIdent() != 0)
-    {
-        InitializeDataBasedResolutionData(theInfoOrganizer, itsProducer, itsLevelType);
-    }
+  if (fUseEditedDataForResolution)
+  {
+    InitializeResolutionWithEditedData(theInfoOrganizer);
+  }
+  else if (itsGivenResolutionInKm != kFloatMissing)
+  {
+    InitializeResolutionData(theInfoOrganizer, itsGivenResolutionInKm);
+  }
+  else if (itsProducer.GetIdent() != 0)
+  {
+    InitializeDataBasedResolutionData(theInfoOrganizer, itsProducer, itsLevelType);
+  }
 
-    if(itsCalculationPointProducer.GetIdent() != 0)
-    {
-        AddCalculationPointsFromData(theInfoOrganizer, itsCalculationPointProducer);
-    }
+  if (itsCalculationPointProducer.GetIdent() != 0)
+  {
+    AddCalculationPointsFromData(theInfoOrganizer, itsCalculationPointProducer);
+  }
 
-    InitializeRelativeObservationRange(theInfoOrganizer, itsObservationRadiusInKm);
+  InitializeRelativeObservationRange(theInfoOrganizer, itsObservationRadiusInKm);
 }
 
 bool NFmiExtraMacroParamData::UseSpecialResolution() const
 {
-    return itsResolutionMacroParamData != 0;
+  return itsResolutionMacroParamData != 0;
 }
 
-void NFmiExtraMacroParamData::SetUsedAreaForData(boost::shared_ptr<NFmiFastQueryInfo> &theData, const NFmiArea *theUsedArea)
+void NFmiExtraMacroParamData::SetUsedAreaForData(boost::shared_ptr<NFmiFastQueryInfo> &theData,
+                                                 const NFmiArea *theUsedArea)
 {
-    if(theData->Grid() && theUsedArea)
+  if (theData->Grid() && theUsedArea)
+  {
+    try
     {
-        try
-        {
-            NFmiGrid grid(theUsedArea, theData->Grid()->XNumber(), theData->Grid()->YNumber());
-            grid.Area()->SetXYArea(NFmiRect(0, 0, 1, 1)); // t‰ss‰ pit‰‰ laittaa xy-alue 0,0 - 1,1 :ksi, koska macroParam datat zoomataan sitten erikseen
-            NFmiHPlaceDescriptor hplace(grid);
-            theData->SetHPlaceDescriptor(hplace);
-        }
-        catch(...)
-        {
-            // ei tehd‰ mit‰‰n, otetaan vain poikkeukset kiinni
-        }
+      NFmiGrid grid(theUsedArea, theData->Grid()->XNumber(), theData->Grid()->YNumber());
+      grid.Area()->SetXYArea(NFmiRect(0, 0, 1, 1));  // t‰ss‰ pit‰‰ laittaa xy-alue 0,0 - 1,1 :ksi,
+                                                     // koska macroParam datat zoomataan sitten
+                                                     // erikseen
+      NFmiHPlaceDescriptor hplace(grid);
+      theData->SetHPlaceDescriptor(hplace);
     }
-}
-
-static void CalcUsedGridSize(const NFmiArea *usedArea, int &gridSizeX, int &gridSizeY, float usedResolutionInKm)
-{
-    if(usedArea)
+    catch (...)
     {
-        gridSizeX = boost::math::iround(usedArea->WorldXYWidth() / (usedResolutionInKm*1000.));
-        gridSizeY = boost::math::iround(usedArea->WorldXYHeight() / (usedResolutionInKm*1000.));
+      // ei tehd‰ mit‰‰n, otetaan vain poikkeukset kiinni
     }
+  }
 }
 
-void NFmiExtraMacroParamData::InitializeResolutionData(NFmiInfoOrganizer &theInfoOrganizer, float usedResolutionInKm)
+static void CalcUsedGridSize(const NFmiArea *usedArea,
+                             int &gridSizeX,
+                             int &gridSizeY,
+                             float usedResolutionInKm)
 {
-    int gridSizeX = 0;
-    int gridSizeY = 0;
+  if (usedArea)
+  {
+    gridSizeX = boost::math::iround(usedArea->WorldXYWidth() / (usedResolutionInKm * 1000.));
+    gridSizeY = boost::math::iround(usedArea->WorldXYHeight() / (usedResolutionInKm * 1000.));
+  }
+}
+
+void NFmiExtraMacroParamData::InitializeResolutionData(NFmiInfoOrganizer &theInfoOrganizer,
+                                                       float usedResolutionInKm)
+{
+  int gridSizeX = 0;
+  int gridSizeY = 0;
+  const NFmiArea *usedArea = theInfoOrganizer.MacroParamData()->Area();
+  ::CalcUsedGridSize(usedArea, gridSizeX, gridSizeY, usedResolutionInKm);
+
+  itsResolutionMacroParamData =
+      theInfoOrganizer.CreateNewMacroParamData(gridSizeX, gridSizeY, NFmiInfoData::kMacroParam);
+  // Pit‰‰ viel‰ s‰‰t‰‰ datan alue kartan zoomaus alueeseen. Se saadaan infoOrganizerin omasta
+  // macroParamDatasta.
+  SetUsedAreaForData(itsResolutionMacroParamData, usedArea);
+}
+
+void NFmiExtraMacroParamData::InitializeRelativeObservationRange(
+    NFmiInfoOrganizer &theInfoOrganizer, float usedRangeInKm)
+{
+  if (usedRangeInKm == kFloatMissing)
+  {
+    itsObservationRadiusRelative = kFloatMissing;
+  }
+  else
+  {
     const NFmiArea *usedArea = theInfoOrganizer.MacroParamData()->Area();
-    ::CalcUsedGridSize(usedArea, gridSizeX, gridSizeY, usedResolutionInKm);
-
-    itsResolutionMacroParamData = theInfoOrganizer.CreateNewMacroParamData(gridSizeX, gridSizeY, NFmiInfoData::kMacroParam);
-    // Pit‰‰ viel‰ s‰‰t‰‰ datan alue kartan zoomaus alueeseen. Se saadaan infoOrganizerin omasta macroParamDatasta.
-    SetUsedAreaForData(itsResolutionMacroParamData, usedArea);
+    double xRatio = (usedRangeInKm * 1000.) / usedArea->WorldXYWidth();
+    double yRatio = (usedRangeInKm * 1000.) / usedArea->WorldXYHeight();
+    itsObservationRadiusRelative = static_cast<float>((xRatio + yRatio) / 2.);
+  }
 }
 
-void NFmiExtraMacroParamData::InitializeRelativeObservationRange(NFmiInfoOrganizer &theInfoOrganizer, float usedRangeInKm)
+void NFmiExtraMacroParamData::AdjustValueMatrixToMissing(
+    const boost::shared_ptr<NFmiFastQueryInfo> &theData, NFmiDataMatrix<float> &theValueMatrix)
 {
-    if(usedRangeInKm == kFloatMissing)
+  if (theData)
+  {
+    const NFmiGrid *grid = theData->Grid();
+    if (grid)
     {
-        itsObservationRadiusRelative = kFloatMissing;
+      theValueMatrix.Resize(grid->XNumber(), grid->YNumber());
+      theValueMatrix = kFloatMissing;
     }
-    else
-    {
-        const NFmiArea *usedArea = theInfoOrganizer.MacroParamData()->Area();
-        double xRatio = (usedRangeInKm * 1000.) / usedArea->WorldXYWidth();
-        double yRatio = (usedRangeInKm * 1000.) / usedArea->WorldXYHeight();
-        itsObservationRadiusRelative = static_cast<float>((xRatio + yRatio) / 2.);
-    }
-}
-
-void NFmiExtraMacroParamData::AdjustValueMatrixToMissing(const boost::shared_ptr<NFmiFastQueryInfo> &theData, NFmiDataMatrix<float> &theValueMatrix)
-{
-    if(theData)
-    {
-        const NFmiGrid *grid = theData->Grid();
-        if(grid)
-        {
-            theValueMatrix.Resize(grid->XNumber(),grid->YNumber());
-            theValueMatrix = kFloatMissing;
-        }
-    }
+  }
 }
 
 static bool IsPrimarySurfaceDataType(boost::shared_ptr<NFmiFastQueryInfo> &info)
 {
-    NFmiInfoData::Type dataType = info->DataType();
-    if(dataType == NFmiInfoData::kViewable || dataType == NFmiInfoData::kObservations || dataType == NFmiInfoData::kKepaData || dataType == NFmiInfoData::kAnalyzeData)
-        return true;
-    else
-        return false;
+  NFmiInfoData::Type dataType = info->DataType();
+  if (dataType == NFmiInfoData::kViewable || dataType == NFmiInfoData::kObservations ||
+      dataType == NFmiInfoData::kKepaData || dataType == NFmiInfoData::kAnalyzeData)
+    return true;
+  else
+    return false;
 }
 
 static bool IsPrimaryLevelDataType(boost::shared_ptr<NFmiFastQueryInfo> &info)
 {
-    NFmiInfoData::Type dataType = info->DataType();
-    if(dataType == NFmiInfoData::kViewable || dataType == NFmiInfoData::kHybridData || dataType == NFmiInfoData::kSingleStationRadarData || dataType == NFmiInfoData::kAnalyzeData)
-        return true;
-    else
-        return false;
+  NFmiInfoData::Type dataType = info->DataType();
+  if (dataType == NFmiInfoData::kViewable || dataType == NFmiInfoData::kHybridData ||
+      dataType == NFmiInfoData::kSingleStationRadarData || dataType == NFmiInfoData::kAnalyzeData)
+    return true;
+  else
+    return false;
 }
 
-static boost::shared_ptr<NFmiFastQueryInfo> FindWantedInfo(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &theInfos, FmiLevelType theLevelType)
+static boost::shared_ptr<NFmiFastQueryInfo> FindWantedInfo(
+    checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &theInfos, FmiLevelType theLevelType)
 {
-    boost::shared_ptr<NFmiFastQueryInfo> backupData; // T‰h‰n laitetaan talteen ei prim‰‰ri datatyyppi varmuuden varalle
-    bool searchSingleLevelData = (theLevelType == kFmiMeanSeaLevel);
-    for(size_t i = 0; i < theInfos.size(); i++)
+  boost::shared_ptr<NFmiFastQueryInfo>
+      backupData;  // T‰h‰n laitetaan talteen ei prim‰‰ri datatyyppi varmuuden varalle
+  bool searchSingleLevelData = (theLevelType == kFmiMeanSeaLevel);
+  for (size_t i = 0; i < theInfos.size(); i++)
+  {
+    boost::shared_ptr<NFmiFastQueryInfo> &info = theInfos[i];
+    // Vain hiladatat kelpaavat tarkasteluissa
+    if (info->Grid())
     {
-        boost::shared_ptr<NFmiFastQueryInfo> &info = theInfos[i];
-        // Vain hiladatat kelpaavat tarkasteluissa
-        if(info->Grid()) 
+      if (searchSingleLevelData)
+      {
+        if (info->SizeLevels() == 1)
         {
-            if(searchSingleLevelData)
-            {
-                if(info->SizeLevels() == 1)
-                {
-                    if(::IsPrimarySurfaceDataType(info))
-                        return info; // Palautetaan surface tapauksessa 1. yksi tasoinen 'prim‰‰ri' data
-                    else
-                        backupData = info;
-                }
-            }
-            else
-            {
-                if(theLevelType == info->LevelType())
-                {
-                    if(::IsPrimaryLevelDataType(info))
-                        return info; // Palautetaan level tapauksessa 1. 'prim‰‰ri' data
-                    else
-                        backupData = info;
-                }
-            }
+          if (::IsPrimarySurfaceDataType(info))
+            return info;  // Palautetaan surface tapauksessa 1. yksi tasoinen 'prim‰‰ri' data
+          else
+            backupData = info;
         }
+      }
+      else
+      {
+        if (theLevelType == info->LevelType())
+        {
+          if (::IsPrimaryLevelDataType(info))
+            return info;  // Palautetaan level tapauksessa 1. 'prim‰‰ri' data
+          else
+            backupData = info;
+        }
+      }
     }
-    return backupData;
+  }
+  return backupData;
 }
 
-static std::string GetProducerInfoForResolutionError(const NFmiProducer &theProducer, FmiLevelType theLevelType)
+static std::string GetProducerInfoForResolutionError(const NFmiProducer &theProducer,
+                                                     FmiLevelType theLevelType)
 {
-    std::string str = theProducer.GetName();
-    str += " ";
-    if(theLevelType == kFmiMeanSeaLevel)
-        str += "surface";
-    else if(theLevelType == kFmiPressureLevel)
-        str += "pressure";
-    else if(theLevelType == kFmiHybridLevel)
-        str += "hybrid";
-    else if(theLevelType == kFmiHeight)
-        str += "height";
+  std::string str = theProducer.GetName();
+  str += " ";
+  if (theLevelType == kFmiMeanSeaLevel)
+    str += "surface";
+  else if (theLevelType == kFmiPressureLevel)
+    str += "pressure";
+  else if (theLevelType == kFmiHybridLevel)
+    str += "hybrid";
+  else if (theLevelType == kFmiHeight)
+    str += "height";
 
-    return str;
+  return str;
 }
 
 // Oletus theInfo on hilamuotoista dataa, eli silt‰ lˆytyy area.
 // Lasketaan hilan x- ja y-resoluutioiden keskiarvo kilometreissa.
 static float CalcDataBasedResolutionInKm(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
 {
-    double resolutionX = theInfo->Area()->WorldXYWidth() / theInfo->GridXNumber();
-    double resolutionY = theInfo->Area()->WorldXYHeight() / theInfo->GridYNumber();
-    return static_cast<float>((resolutionX + resolutionY) / (2. * 1000.));
+  double resolutionX = theInfo->Area()->WorldXYWidth() / theInfo->GridXNumber();
+  double resolutionY = theInfo->Area()->WorldXYHeight() / theInfo->GridYNumber();
+  return static_cast<float>((resolutionX + resolutionY) / (2. * 1000.));
 }
 
-void NFmiExtraMacroParamData::InitializeResolutionWithEditedData(NFmiInfoOrganizer &theInfoOrganizer)
+void NFmiExtraMacroParamData::InitializeResolutionWithEditedData(
+    NFmiInfoOrganizer &theInfoOrganizer)
 {
-    boost::shared_ptr<NFmiFastQueryInfo> info = theInfoOrganizer.FindInfo(NFmiInfoData::kEditable);
-    if(info)
+  boost::shared_ptr<NFmiFastQueryInfo> info = theInfoOrganizer.FindInfo(NFmiInfoData::kEditable);
+  if (info)
+  {
+    if (info->Grid())
     {
-        if(info->Grid())
-        {
-            UseDataForResolutionCalculations(theInfoOrganizer, info);
-        }
-        else
-            throw std::runtime_error(std::string("Edited data has no grid for 'resolution' calculations"));
+      UseDataForResolutionCalculations(theInfoOrganizer, info);
     }
     else
-        throw std::runtime_error(std::string("Could not find the edited data for 'resolution' calculations"));
+      throw std::runtime_error(
+          std::string("Edited data has no grid for 'resolution' calculations"));
+  }
+  else
+    throw std::runtime_error(
+        std::string("Could not find the edited data for 'resolution' calculations"));
 }
 
-void NFmiExtraMacroParamData::UseDataForResolutionCalculations(NFmiInfoOrganizer &theInfoOrganizer, boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+void NFmiExtraMacroParamData::UseDataForResolutionCalculations(
+    NFmiInfoOrganizer &theInfoOrganizer, boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
 {
-    itsDataBasedResolutionInKm = CalcDataBasedResolutionInKm(theInfo);
-    InitializeResolutionData(theInfoOrganizer, itsDataBasedResolutionInKm);
+  itsDataBasedResolutionInKm = CalcDataBasedResolutionInKm(theInfo);
+  InitializeResolutionData(theInfoOrganizer, itsDataBasedResolutionInKm);
 }
 
-void NFmiExtraMacroParamData::InitializeDataBasedResolutionData(NFmiInfoOrganizer &theInfoOrganizer, const NFmiProducer &theProducer, FmiLevelType theLevelType)
+void NFmiExtraMacroParamData::InitializeDataBasedResolutionData(NFmiInfoOrganizer &theInfoOrganizer,
+                                                                const NFmiProducer &theProducer,
+                                                                FmiLevelType theLevelType)
 {
-    checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infos = theInfoOrganizer.GetInfos(theProducer.GetIdent());
-    boost::shared_ptr<NFmiFastQueryInfo> info = ::FindWantedInfo(infos, theLevelType);
-    if(info)
+  checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infos =
+      theInfoOrganizer.GetInfos(theProducer.GetIdent());
+  boost::shared_ptr<NFmiFastQueryInfo> info = ::FindWantedInfo(infos, theLevelType);
+  if (info)
+  {
+    UseDataForResolutionCalculations(theInfoOrganizer, info);
+  }
+  else
+    throw std::runtime_error(std::string("Could not find the given 'resolution' data for ") +
+                             ::GetProducerInfoForResolutionError(theProducer, theLevelType));
+}
+
+static void AddCalculationPoints(boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+                                 const NFmiArea *theArea,
+                                 std::vector<NFmiPoint> &theCalculationPoints)
+{
+  if (theInfo && theArea)
+  {
+    // Infon pit‰‰ olla asema dataa.
+    // Siin‰ ei saa olla datassa paikkatietoa, kuten SHIP ja BOUY datoissa on,
+    // koska t‰llˆin niiden paikka muuttuu ajan mukana.
+    if (!theInfo->Grid() && !theInfo->HasLatlonInfoInData())
     {
-        UseDataForResolutionCalculations(theInfoOrganizer, info);
-    }
-    else
-        throw std::runtime_error(std::string("Could not find the given 'resolution' data for ") + ::GetProducerInfoForResolutionError(theProducer, theLevelType));
-}
-
-static void AddCalculationPoints(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, const NFmiArea *theArea, std::vector<NFmiPoint> &theCalculationPoints)
-{
-    if(theInfo && theArea)
-    {
-        // Infon pit‰‰ olla asema dataa.
-        // Siin‰ ei saa olla datassa paikkatietoa, kuten SHIP ja BOUY datoissa on,
-        // koska t‰llˆin niiden paikka muuttuu ajan mukana.
-        if(!theInfo->Grid() && !theInfo->HasLatlonInfoInData())
+      for (theInfo->ResetLocation(); theInfo->NextLocation();)
+      {
+        const NFmiPoint &latlon = theInfo->LatLonFast();
+        if (theArea->IsInside(latlon))
         {
-            for(theInfo->ResetLocation(); theInfo->NextLocation(); )
-            {
-                const NFmiPoint &latlon = theInfo->LatLonFast();
-                if(theArea->IsInside(latlon))
-                {
-                    theCalculationPoints.push_back(latlon);
-                }
-            }
+          theCalculationPoints.push_back(latlon);
         }
+      }
     }
+  }
 }
 
-static void AddCalculationPoints(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &theInfos, const NFmiArea *theArea, std::vector<NFmiPoint> &theCalculationPoints)
+static void AddCalculationPoints(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &theInfos,
+                                 const NFmiArea *theArea,
+                                 std::vector<NFmiPoint> &theCalculationPoints)
 {
-    for(size_t i = 0; i < theInfos.size(); i++)
-    {
-        ::AddCalculationPoints(theInfos[i], theArea, theCalculationPoints);
-    }
+  for (size_t i = 0; i < theInfos.size(); i++)
+  {
+    ::AddCalculationPoints(theInfos[i], theArea, theCalculationPoints);
+  }
 }
 
-
-void NFmiExtraMacroParamData::AddCalculationPointsFromData(NFmiInfoOrganizer &theInfoOrganizer, const NFmiProducer &theProducer)
+void NFmiExtraMacroParamData::AddCalculationPointsFromData(NFmiInfoOrganizer &theInfoOrganizer,
+                                                           const NFmiProducer &theProducer)
 {
-    checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infos = theInfoOrganizer.GetInfos(theProducer.GetIdent());
-    const NFmiArea *usedArea = theInfoOrganizer.MacroParamData()->Area();
+  checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > infos =
+      theInfoOrganizer.GetInfos(theProducer.GetIdent());
+  const NFmiArea *usedArea = theInfoOrganizer.MacroParamData()->Area();
 
-    ::AddCalculationPoints(infos, usedArea, itsCalculationPoints);
+  ::AddCalculationPoints(infos, usedArea, itsCalculationPoints);
 }

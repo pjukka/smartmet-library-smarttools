@@ -28,10 +28,7 @@ NFmiSmartToolInfo::NFmiSmartToolInfo(void)
 {
 }
 
-NFmiSmartToolInfo::~NFmiSmartToolInfo(void)
-{
-}
-
+NFmiSmartToolInfo::~NFmiSmartToolInfo(void) {}
 // luetaan  asetukset nykyään NFmiSetting-luokasta
 bool NFmiSmartToolInfo::Init(const std::string &theLoadDirectory)
 {
@@ -153,8 +150,7 @@ bool NFmiSmartToolInfo::ScriptExist(const std::string &theScriptName)
 {
   checkedVector<string> names = GetScriptNames();
   checkedVector<string>::iterator it = std::find(names.begin(), names.end(), theScriptName);
-  if (it != names.end())
-    return true;
+  if (it != names.end()) return true;
   return false;
 }
 checkedVector<std::string> NFmiSmartToolInfo::GetScriptNames(void)
@@ -168,11 +164,9 @@ checkedVector<std::string> NFmiSmartToolInfo::GetScriptNames(void)
   for (; itDir != itEndDir; ++itDir)
   {
     // "this"-hakemistoa ei laiteta
-    if (*itDir == ".")
-      continue;
+    if (*itDir == ".") continue;
     // jos ollaan ns. root hakemistossa, ei up-hakemistoa laiteta
-    if (itsLoadDirectory == itsRootLoadDirectory && *itDir == "..")
-      continue;
+    if (itsLoadDirectory == itsRootLoadDirectory && *itDir == "..") continue;
     std::string name("<");
     name += *itDir;
     name += ">";
@@ -216,8 +210,7 @@ void NFmiSmartToolInfo::LoadDirectory(const std::string &newValue, bool fSaveSet
   else if (itsLoadDirectory[itsLoadDirectory.size() - 1] != '\\')
     itsLoadDirectory += "\\";
   itsRootLoadDirectory = itsLoadDirectory;
-  if (fSaveSettings)
-    SaveSettings();
+  if (fSaveSettings) SaveSettings();
 }
 
 /*
@@ -244,8 +237,7 @@ static void RemoveLastPartOfDirectory(string &thePath)
   else if (pos2 != string::npos)
     usedPos = pos2;
 
-  if (usedPos != string::npos)
-    thePath = string(thePath.begin(), thePath.begin() + usedPos + 1);
+  if (usedPos != string::npos) thePath = string(thePath.begin(), thePath.begin() + usedPos + 1);
 }
 
 void NFmiSmartToolInfo::SetCurrentLoadDirectory(const std::string &newValue)

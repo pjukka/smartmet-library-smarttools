@@ -19,13 +19,8 @@
 //--------------------------------------------------------
 // Constructor/Destructor
 //--------------------------------------------------------
-NFmiCalculationConstantValue::NFmiCalculationConstantValue(double value) : itsValue(value)
-{
-}
-NFmiCalculationConstantValue::~NFmiCalculationConstantValue()
-{
-}
-
+NFmiCalculationConstantValue::NFmiCalculationConstantValue(double value) : itsValue(value) {}
+NFmiCalculationConstantValue::~NFmiCalculationConstantValue() {}
 NFmiCalculationConstantValue::NFmiCalculationConstantValue(
     const NFmiCalculationConstantValue &theOther)
     : NFmiAreaMaskImpl(theOther), itsValue(theOther.itsValue)
@@ -87,10 +82,7 @@ NFmiCalculationRampFuction::NFmiCalculationRampFuction(
 {
 }
 
-NFmiCalculationRampFuction::~NFmiCalculationRampFuction(void)
-{
-}
-
+NFmiCalculationRampFuction::~NFmiCalculationRampFuction(void) {}
 NFmiCalculationRampFuction::NFmiCalculationRampFuction(const NFmiCalculationRampFuction &theOther)
     : NFmiInfoAreaMask(theOther)
 {
@@ -128,10 +120,7 @@ NFmiCalculationIntegrationFuction::NFmiCalculationIntegrationFuction(
 {
 }
 
-NFmiCalculationIntegrationFuction::~NFmiCalculationIntegrationFuction(void)
-{
-}
-
+NFmiCalculationIntegrationFuction::~NFmiCalculationIntegrationFuction(void) {}
 double NFmiCalculationIntegrationFuction::Value(const NFmiCalculationParams &theCalculationParams,
                                                 bool /* fUseTimeInterpolationAlways */)
 {
@@ -174,10 +163,7 @@ NFmiCalculationRampFuctionWithAreaMask::NFmiCalculationRampFuctionWithAreaMask(
 {
 }
 
-NFmiCalculationRampFuctionWithAreaMask::~NFmiCalculationRampFuctionWithAreaMask(void)
-{
-}
-
+NFmiCalculationRampFuctionWithAreaMask::~NFmiCalculationRampFuctionWithAreaMask(void) {}
 NFmiCalculationRampFuctionWithAreaMask::NFmiCalculationRampFuctionWithAreaMask(
     const NFmiCalculationRampFuctionWithAreaMask &theOther)
     : NFmiAreaMaskImpl(theOther),
@@ -199,10 +185,7 @@ NFmiAreaMask *NFmiCalculationRampFuctionWithAreaMask::Clone(void) const
 // ****************************************************************************
 double NFmiCalculationDeltaZValue::itsHeightValue;
 
-NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(void) : NFmiAreaMaskImpl()
-{
-}
-
+NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(void) : NFmiAreaMaskImpl() {}
 NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(const NFmiCalculationDeltaZValue &theOther)
     : NFmiAreaMaskImpl(theOther)
 {
@@ -240,10 +223,7 @@ NFmiStation2GridMask::NFmiStation2GridMask(Type theMaskType,
 {
 }
 
-NFmiStation2GridMask::~NFmiStation2GridMask(void)
-{
-}
-
+NFmiStation2GridMask::~NFmiStation2GridMask(void) {}
 NFmiStation2GridMask::NFmiStation2GridMask(const NFmiStation2GridMask &theOther)
     : NFmiInfoAreaMask(theOther),
       itsGriddedStationData(theOther.itsGriddedStationData),
@@ -253,16 +233,12 @@ NFmiStation2GridMask::NFmiStation2GridMask(const NFmiStation2GridMask &theOther)
       itsAreaPtr(theOther.itsAreaPtr.get() ? theOther.itsAreaPtr.get()->Clone() : 0),
       itsDoc(theOther.itsDoc),
       itsStation2GridSize(theOther.itsStation2GridSize),
-    itsObservationRadiusRelative(theOther.itsObservationRadiusRelative),
+      itsObservationRadiusRelative(theOther.itsObservationRadiusRelative),
       itsCacheMutex(theOther.itsCacheMutex)
 {
 }
 
-NFmiAreaMask *NFmiStation2GridMask::Clone(void) const
-{
-  return new NFmiStation2GridMask(*this);
-}
-
+NFmiAreaMask *NFmiStation2GridMask::Clone(void) const { return new NFmiStation2GridMask(*this); }
 double NFmiStation2GridMask::Value(const NFmiCalculationParams &theCalculationParams,
                                    bool /* fUseTimeInterpolationAlways */)
 {
@@ -309,8 +285,12 @@ void NFmiStation2GridMask::DoGriddingCheck(const NFmiCalculationParams &theCalcu
             static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.X()),
             static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.Y()),
             kFloatMissing);
-        NFmiStationView::GridStationData(
-            itsDoc, itsAreaPtr, drawParam, griddedData, theCalculationParams.itsTime, itsObservationRadiusRelative);
+        NFmiStationView::GridStationData(itsDoc,
+                                         itsAreaPtr,
+                                         drawParam,
+                                         griddedData,
+                                         theCalculationParams.itsTime,
+                                         itsObservationRadiusRelative);
         std::pair<DataCache::iterator, bool> insertResult = itsGriddedStationData->insert(
             std::make_pair(theCalculationParams.itsTime, griddedData));
         if (insertResult.second)
@@ -348,10 +328,7 @@ NFmiNearestObsValue2GridMask::NFmiNearestObsValue2GridMask(
   itsFunctionArgumentCount = theArgumentCount;
 }
 
-NFmiNearestObsValue2GridMask::~NFmiNearestObsValue2GridMask(void)
-{
-}
-
+NFmiNearestObsValue2GridMask::~NFmiNearestObsValue2GridMask(void) {}
 NFmiNearestObsValue2GridMask::NFmiNearestObsValue2GridMask(
     const NFmiNearestObsValue2GridMask &theOther)
     : NFmiInfoAreaMask(theOther),
@@ -527,58 +504,47 @@ void NFmiNearestObsValue2GridMask::DoNearestValueGriddingCheck(
 
 #endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
 
-
 // *********************************************************************
 // *************** NFmiPeekTimeMask ************************************
 // *********************************************************************
 
-NFmiPeekTimeMask::NFmiPeekTimeMask(
-    Type theMaskType,
-    NFmiInfoData::Type theDataType,
-    boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-    int theArgumentCount)
+NFmiPeekTimeMask::NFmiPeekTimeMask(Type theMaskType,
+                                   NFmiInfoData::Type theDataType,
+                                   boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+                                   int theArgumentCount)
     : NFmiInfoAreaMask(
-        NFmiCalculationCondition(), theMaskType, theDataType, theInfo, NFmiAreaMask::kNoValue)
-    , itsTimeOffsetInMinutes(0)
+          NFmiCalculationCondition(), theMaskType, theDataType, theInfo, NFmiAreaMask::kNoValue),
+      itsTimeOffsetInMinutes(0)
 {
-    itsFunctionArgumentCount = theArgumentCount;
+  itsFunctionArgumentCount = theArgumentCount;
 }
 
-NFmiPeekTimeMask::~NFmiPeekTimeMask(void)
-{
-}
-
-NFmiPeekTimeMask::NFmiPeekTimeMask(
-    const NFmiPeekTimeMask &theOther)
-    : NFmiInfoAreaMask(theOther)
-    , itsTimeOffsetInMinutes(theOther.itsTimeOffsetInMinutes)
+NFmiPeekTimeMask::~NFmiPeekTimeMask(void) {}
+NFmiPeekTimeMask::NFmiPeekTimeMask(const NFmiPeekTimeMask &theOther)
+    : NFmiInfoAreaMask(theOther), itsTimeOffsetInMinutes(theOther.itsTimeOffsetInMinutes)
 {
 }
 
-NFmiAreaMask *NFmiPeekTimeMask::Clone(void) const
-{
-    return new NFmiPeekTimeMask(*this);
-}
-
+NFmiAreaMask *NFmiPeekTimeMask::Clone(void) const { return new NFmiPeekTimeMask(*this); }
 double NFmiPeekTimeMask::Value(const NFmiCalculationParams &theCalculationParams,
-    bool /* fUseTimeInterpolationAlways */)
+                               bool /* fUseTimeInterpolationAlways */)
 {
-    NFmiMetTime peekTime(theCalculationParams.itsTime);
-    peekTime.ChangeByMinutes(itsTimeOffsetInMinutes);
-    return itsInfo->InterpolatedValue(theCalculationParams.itsLatlon, peekTime);
+  NFmiMetTime peekTime(theCalculationParams.itsTime);
+  peekTime.ChangeByMinutes(itsTimeOffsetInMinutes);
+  return itsInfo->InterpolatedValue(theCalculationParams.itsLatlon, peekTime);
 }
 
 void NFmiPeekTimeMask::SetArguments(std::vector<float> &theArgumentVector)
 {
-    // jokaiselle pisteelle ja ajanhetkelle annetaan eri argumentit tässä
-    if(theArgumentVector.size() == (itsFunctionArgumentCount - 1))
-    {
-        itsTimeOffsetInMinutes = static_cast<long>(std::round(theArgumentVector[0] * 60));
-    }
-    else
-        throw std::runtime_error(
-            "Internal SmartMet error: PeekTime function was given invalid number of arguments, "
-            "cannot calculate the macro.");
+  // jokaiselle pisteelle ja ajanhetkelle annetaan eri argumentit tässä
+  if (theArgumentVector.size() == (itsFunctionArgumentCount - 1))
+  {
+    itsTimeOffsetInMinutes = static_cast<long>(std::round(theArgumentVector[0] * 60));
+  }
+  else
+    throw std::runtime_error(
+        "Internal SmartMet error: PeekTime function was given invalid number of arguments, "
+        "cannot calculate the macro.");
 }
 
 // *********************************************************************

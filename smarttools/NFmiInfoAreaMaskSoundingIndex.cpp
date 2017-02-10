@@ -8,10 +8,7 @@
 #include "NFmiInfoAreaMaskSoundingIndex.h"
 #include <NFmiFastQueryInfo.h>
 
-NFmiInfoAreaMaskSoundingIndex::~NFmiInfoAreaMaskSoundingIndex(void)
-{
-}
-
+NFmiInfoAreaMaskSoundingIndex::~NFmiInfoAreaMaskSoundingIndex(void) {}
 NFmiInfoAreaMaskSoundingIndex::NFmiInfoAreaMaskSoundingIndex(
     boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiSoundingParameters theSoundingParam)
     : NFmiInfoAreaMask(theInfo, kNoValue), itsSoundingParam(theSoundingParam)
