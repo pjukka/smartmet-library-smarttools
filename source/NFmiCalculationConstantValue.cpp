@@ -8,6 +8,7 @@
 
 #include "NFmiCalculationConstantValue.h"
 #include "NFmiDrawParam.h"
+#include "NFmiEditMapGeneralDataDoc.h"
 #include <NFmiDataModifier.h>
 #include <NFmiDataIterator.h>
 #include <NFmiFastQueryInfo.h>
@@ -470,8 +471,6 @@ static NFmiDataMatrix<float> CalcNearestValueMatrix(
   }
   return nearestValueMatrix;
 }
-
-#include "NFmiEditMapGeneralDataDoc.h"
 
 void NFmiNearestObsValue2GridMask::DoNearestValueGriddingCheck(
     const NFmiCalculationParams &theCalculationParams)

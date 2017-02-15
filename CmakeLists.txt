@@ -1,18 +1,9 @@
 cmake_minimum_required(VERSION 3.7.1)
-project(smarttoolsEditor58)
+project(SmartTools)
 
 set(CMAKE_MFC_FLAG 2)
 
 add_definitions( -D_UNICODE -DUNICODE -DFMI_SUPPORT_STATION_DATA_SMARTTOOL)
-
-include_directories( 
-    ${LIBS_FMI}/smarttools/include
-    ${LIBS_FMI}/newbase/include
-    ${BOOST_INCLUDE_DIR}
-    ${LIBS_FMI}/bizcode/stationviews/include
-    ${LIBS_FMI}/bizcode/ctrlviews/include
-    ${LIBS_FMI}/bizcode/generaldoc/include
-    )
 
 file( GLOB CPP_FILES source/*.cpp )
 file( GLOB H_FILES include/*.h )
@@ -23,3 +14,34 @@ add_library(
     ${H_FILES} 
     )
 
+target_link_libraries(
+    ${PROJECT_NAME}
+    Newbase
+    #generaldoc     # circular
+    #stationviews   # circular
+    )
+
+target_include_directories( 
+    ${PROJECT_NAME}
+    PUBLIC ${PROJECT_SOURCE_DIR}/include
+    PUBLIC ${Newbase_INCLUDE_DIRS}
+    PUBLIC ${BOOST_INCLUDE_DIR}
+    PUBLIC ${LIBS_FMI}/bizcode/stationviews/include # circular
+    PUBLIC ${LIBS_FMI}/bizcode/generaldoc/include # circular
+    PUBLIC ${LIBS_FMI}/bizcode/ctrlviews/include
+    PUBLIC ${LIBS_FMI}/bizcode/modifyediteddata/include
+    PUBLIC ${SRC}/mfcutils
+    )
+
+set(
+    ${PROJECT_NAME}_INCLUDE_DIRS
+    ${PROJECT_SOURCE_DIR}/include
+    ${Newbase_INCLUDE_DIRS}
+    ${BOOST_INCLUDE_DIR}
+    ${LIBS_FMI}/bizcode/stationviews/include # circular
+    ${LIBS_FMI}/bizcode/generaldoc/include # circular
+    ${LIBS_FMI}/bizcode/ctrlviews/include
+    ${LIBS_FMI}/bizcode/modifyediteddata/include
+    ${SRC}/mfcutils
+    CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE
+    )
