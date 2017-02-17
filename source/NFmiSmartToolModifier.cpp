@@ -1628,13 +1628,10 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateVertFunctionStartMa
     {
         areaMask = CreateProbabilityFunctionMask(theAreaMaskInfo, mustUsePressureInterpolation);
     }
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
     else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue)
     {
         areaMask = CreateClosestObsValueMask(theAreaMaskInfo, mustUsePressureInterpolation);
     }
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
-
     else if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::PeekT)
     {
         areaMask = CreatePeekTimeMask(theAreaMaskInfo, mustUsePressureInterpolation);
@@ -2184,7 +2181,6 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(
     if (info == 0)  // kokeillaan vielä fraktiili-dataa (esim. EC:n fraktiili dataa jne)
       info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kClimatologyData);
 
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
     if (info == 0)  // kokeillaan vielä havainto dataa (eli ne on yleensä asemadataa)
       info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kObservations);
     if (info == 0)  // kokeillaan vielä eri level vaihtoehtoja
@@ -2200,8 +2196,6 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(
       info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kSingleStationRadarData);
     if (info == 0)  // kokeillaan vielä salama dataa
       info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kFlashData);
-
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
   }
   if (!info)
     throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNotFound") + "\n" +
