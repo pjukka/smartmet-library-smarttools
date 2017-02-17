@@ -8,6 +8,7 @@ class NFmiDataModifier;
 class NFmiDataIterator;
 class NFmiFastQueryInfo;
 class NFmiGriddingHelperInterface;
+class NFmiDrawParam;
 
 // tämä maski osaa laskea halutulle asemadatalle hilatut arvot halutulle alueelle
 // Jos maskin itsInfo on station-dataa, sen laskut tehdään toisella tavalla kuin 'normaalin'
@@ -21,6 +22,8 @@ class NFmiStation2GridMask : public NFmiInfoAreaMask
   typedef std::map<NFmiMetTime, NFmiDataMatrix<float> > DataCache;
 
  public:
+     using GriddingFunctionCallBackType = std::function<void(NFmiGriddingHelperInterface*, const boost::shared_ptr<NFmiArea>&, boost::shared_ptr<NFmiDrawParam>&, NFmiDataMatrix<float>&, const NFmiMetTime&, float)>;
+
   NFmiStation2GridMask(Type theMaskType,
                        NFmiInfoData::Type theDataType,
                        boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
@@ -33,6 +36,7 @@ class NFmiStation2GridMask : public NFmiInfoAreaMask
       NFmiGriddingHelperInterface *theGriddingHelper,
                           const NFmiPoint &theStation2GridSize,
                           float theObservationRadiusRelative);
+  static void SetGriddingStationDataCallback(GriddingFunctionCallBackType theGridStationDataCallback) { itsGridStationDataCallback = theGridStationDataCallback; }
 
  private:
   void DoGriddingCheck(const NFmiCalculationParams &theCalculationParams);
@@ -63,8 +67,11 @@ class NFmiStation2GridMask : public NFmiInfoAreaMask
   typedef boost::shared_lock<MutexType>
       ReadLock;  // Read-lockia ei oikeasti tarvita, mutta laitan sen tähän, jos joskus tarvitaankin
   typedef boost::unique_lock<MutexType> WriteLock;
-  boost::shared_ptr<MutexType> itsCacheMutex;  // TÄMÄ jaetaan kaikkien kopioiden kesken, jotta
-                                               // multi-thread -koodi saa jaettua työtä
+  // TÄMÄ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua työtä
+  boost::shared_ptr<MutexType> itsCacheMutex;  
+  // Callback funktio asemadatan griddaus funktioon
+  static GriddingFunctionCallBackType itsGridStationDataCallback;
+
 };
 
 // NFmiNearestObsValue2GridMask -luokka laskee havainto datasta sellaisen

@@ -2,16 +2,14 @@
 #include "NFmiDrawParam.h"
 #include <NFmiFastQueryInfo.h>
 #include <NFmiGriddingHelperInterface.h>
+#include "NFmiFastInfoUtils.h"
 
-
-
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
-
-#include "NFmiStationView.h"
 
 // ****************************************************************************
 // ****************** NFmiStation2GridMask ************************************
 // ****************************************************************************
+
+NFmiStation2GridMask::GriddingFunctionCallBackType NFmiStation2GridMask::itsGridStationDataCallback;
 
 NFmiStation2GridMask::NFmiStation2GridMask(Type theMaskType,
                                            NFmiInfoData::Type theDataType,
@@ -98,7 +96,8 @@ void NFmiStation2GridMask::DoGriddingCheck(const NFmiCalculationParams &theCalcu
             static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.X()),
             static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.Y()),
             kFloatMissing);
-        NFmiStationView::GridStationData(
+        if(itsGridStationDataCallback)
+            itsGridStationDataCallback(
             itsGriddingHelper, itsAreaPtr, drawParam, griddedData, theCalculationParams.itsTime, itsObservationRadiusRelative);
         std::pair<DataCache::iterator, bool> insertResult = itsGriddedStationData->insert(
             std::make_pair(theCalculationParams.itsTime, griddedData));
@@ -218,7 +217,7 @@ static NFmiDataMatrix<float> CalcNearestValueMatrix(
     {
       // data ei saa olla hiladataa, eikä ns. laivadataa (lokaatio muuttuu ajan myötä ja lat/lon
       // arvot ovat erillisiä parametreja)
-      if (!infoIter->IsGrid() && !NFmiStationView::IsInfoShipTypeData(*infoIter))
+      if (!infoIter->IsGrid() && !NFmiFastInfoUtils::IsInfoShipTypeData(*infoIter))
       {
         NFmiMetTime wantedTime(theCalculationParams.itsTime);
         if (theTimePeekInHours)
@@ -241,7 +240,7 @@ static NFmiDataMatrix<float> CalcNearestValueMatrix(
                 if (distance < distanceMatrix[grid.CurrentX()][grid.CurrentY()])
                 {
                   distanceMatrix[grid.CurrentX()][grid.CurrentY()] = distance;
-                  NFmiStationView::SetSoundingDataLevel(
+                  NFmiFastInfoUtils::SetSoundingDataLevel(
                       theLevel, *infoIter);  // Tämä tehdään vain luotaus datalle: tämä level pitää
                                              // asettaa joka pisteelle erikseen, koska vakio
                   // painepinnat eivät ole kaikille luotaus parametreille
@@ -311,5 +310,3 @@ void NFmiNearestObsValue2GridMask::DoNearestValueGriddingCheck(
 // ****************************************************************************
 // *************** NFmiNearestObsValue2GridMask *******************************
 // ****************************************************************************
-
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
