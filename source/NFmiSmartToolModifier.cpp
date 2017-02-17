@@ -35,6 +35,7 @@
 #include <NFmiQueryDataUtil.h>
 #include <NFmiRelativeDataIterator.h>
 #include <NFmiRelativeTimeIntegrationIterator.h>
+#include "NFmiStation2GridMask.h"
 
 #include <stdexcept>
 
@@ -259,11 +260,8 @@ NFmiSmartToolModifier::NFmiSmartToolModifier(NFmiInfoOrganizer *theInfoOrganizer
       itsCommaCounter(0),
       itsParethesisCounter(0),
       itsWorkingGrid(new MyGrid()),
-      itsModifiedLevel()
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
-      ,
-      itsDoc(0)
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
+      itsModifiedLevel(),
+      itsGriddingHelper(0)
 {
 }
 NFmiSmartToolModifier::~NFmiSmartToolModifier(void)
@@ -1522,7 +1520,6 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateProbabilityFunction
 
 boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateClosestObsValueMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
     boost::shared_ptr<NFmiFastQueryInfo> info =
         CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
     if(info->IsGrid())
@@ -1536,14 +1533,11 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateClosestObsValueMask
             theAreaMaskInfo.FunctionArgumentCount());
     nearestObsValue2GridMask->SetGriddingHelpers(
         itsWorkingGrid->itsArea,
-        itsDoc,
+        itsGriddingHelper,
         NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
     boost::shared_ptr<NFmiAreaMask> areaMask = boost::shared_ptr<NFmiAreaMask>(nearestObsValue2GridMask);
     MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
     return areaMask;
-#else
-    throw std::runtime_error("No support for closestvalue -function in this build, enable FMI_SUPPORT_STATION_DATA_SMARTTOOL macro");
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
 }
 
 boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreatePeekTimeMask(const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
@@ -1665,7 +1659,6 @@ void NFmiSmartToolModifier::DoFinalAreaMaskInitializations(boost::shared_ptr<NFm
         if(areaMask->Info() && areaMask->Info()->Grid() == 0)
         {  // jos oli info dataa ja vielä asemadatasta, tarkistetaan että kyse oli vielä
            // infoData-tyypistä, muuten oli virheellinen lauseke
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
             if(theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue ||
                 theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::Occurrence)
             {  // tämä on ok, ei tarvitse tehdä mitään
@@ -1677,14 +1670,13 @@ void NFmiSmartToolModifier::DoFinalAreaMaskInitializations(boost::shared_ptr<NFm
                     new NFmiStation2GridMask(areaMask->MaskType(), areaMask->GetDataType(), info);
                 station2GridMask->SetGriddingHelpers(
                     itsWorkingGrid->itsArea,
-                    itsDoc,
+                    itsGriddingHelper,
                     NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY),
                     itsExtraMacroParamData->ObservationRadiusRelative());
                 areaMask = boost::shared_ptr<NFmiAreaMask>(station2GridMask);
                 MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
             }
             else
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
             {
                 std::string errStr;
                 errStr += ::GetDictionaryString(
@@ -2349,11 +2341,7 @@ void NFmiSmartToolModifier::ModifiedLevel(boost::shared_ptr<NFmiLevel> &theLevel
   itsModifiedLevel = theLevel;
 }
 
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
-
-void NFmiSmartToolModifier::SetGeneralDoc(NFmiEditMapGeneralDataDoc *theDoc)
+void NFmiSmartToolModifier::SetGriddingHelper(NFmiGriddingHelperInterface *theGriddingHelper)
 {
-  itsDoc = theDoc;
+  itsGriddingHelper = theGriddingHelper;
 }
-
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
