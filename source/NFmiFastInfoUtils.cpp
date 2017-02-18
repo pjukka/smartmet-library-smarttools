@@ -1,6 +1,8 @@
 #include "NFmiFastInfoUtils.h"
 #include "NFmiFastQueryInfo.h"
 #include "NFmiProducerName.h"
+#include "NFmiSmartInfo.h"
+#include "NFmiFileString.h"
 
 namespace NFmiFastInfoUtils
 {
@@ -37,4 +39,24 @@ namespace NFmiFastInfoUtils
                 info.ParamIndex(parIndex);
         }
     }
+
+    unsigned long GetMaskedCount(boost::shared_ptr<NFmiFastQueryInfo> &theInfo, NFmiMetEditorTypes::Mask theMask, bool fAllowRightClickSelection)
+    {
+        if(theMask == NFmiMetEditorTypes::kFmiDisplayedMask && !fAllowRightClickSelection)
+            return 0; // jos hiiren oikealla ei ole sallittua valita pisteitä kartalta, tämä palauttaa 0:aa
+
+        NFmiSmartInfo *info = dynamic_cast<NFmiSmartInfo*>(theInfo.get());
+        if(info)
+            return info->LocationMaskedCount(theMask);
+        else
+            return 0;
+    }
+
+    std::string GetTotalDataFilePath(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+    {
+        NFmiFileString totalFilePath(theInfo->DataFilePattern());
+        totalFilePath.FileName(theInfo->DataFileName());
+        return std::string(totalFilePath);
+    }
+
 }

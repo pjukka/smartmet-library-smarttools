@@ -1526,3 +1526,26 @@ bool NFmiDrawParam::DoDataComparison(void)
   }
   return false;
 }
+
+bool NFmiDrawParam::IsMacroParamCase(NFmiInfoData::Type theDataType)
+{
+    if(theDataType == NFmiInfoData::kMacroParam || theDataType == NFmiInfoData::kCrossSectionMacroParam || theDataType == NFmiInfoData::kQ3MacroParam)
+        return true;
+    else
+        return false;
+}
+
+bool NFmiDrawParam::IsMacroParamCase(bool justCheckDataType)
+{
+    if(justCheckDataType)
+    {
+        if(IsMacroParamCase(itsDataType))
+            return true;
+    }
+    else
+    {
+        if(ViewMacroDrawParam() == false && (IsMacroParamCase(itsDataType)) && ParameterAbbreviation() != std::string("macroParam"))
+            return true;
+    }
+    return false;
+}

@@ -709,6 +709,9 @@ class NFmiDrawParam
 
   const static float itsMinAlpha;
 
+  static bool IsMacroParamCase(NFmiInfoData::Type theDataType);
+  bool IsMacroParamCase(bool justCheckDataType);
+
  protected:
   NFmiDataIdent itsParameter;
   NFmiLevel itsLevel;
