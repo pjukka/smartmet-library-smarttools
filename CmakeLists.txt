@@ -3,6 +3,10 @@ project(SmartTools)
 
 set(CMAKE_MFC_FLAG 2)
 
+add_definitions(
+    -DFMI_SUPPORT_STATION_DATA_SMARTTOOL
+    )
+
 file( GLOB CPP_FILES source/*.cpp )
 file( GLOB H_FILES include/*.h )
 
