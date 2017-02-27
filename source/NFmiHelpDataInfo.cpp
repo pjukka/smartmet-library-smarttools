@@ -12,6 +12,7 @@
 #include <NFmiAreaFactory.h>
 #include <NFmiSettings.h>
 #include <NFmiFileString.h>
+#include "NFmiProducerName.h"
 
 using namespace std;
 

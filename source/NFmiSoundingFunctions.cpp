@@ -11,9 +11,6 @@
 #include <NFmiAngle.h>
 #include <NFmiInterpolation.h>
 
-#include <iostream>
-#include <map>
-
 namespace NFmiSoundingFunctions
 {
 // Funktio laskee kastepisteen (DP) lämpötilan (T) ja suhteellisen

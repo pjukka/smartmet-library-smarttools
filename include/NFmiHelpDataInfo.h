@@ -13,12 +13,8 @@
 #include <NFmiInfoData.h>
 #include <NFmiDataIdent.h>
 #include <NFmiDataMatrix.h>
-#include <NFmiProducerName.h>
 
 #include <boost/shared_ptr.hpp>
-
-#include <iosfwd>
-#include <string>
 
 class NFmiArea;
 class NFmiHelpDataInfoSystem;

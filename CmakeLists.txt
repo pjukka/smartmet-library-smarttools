@@ -19,8 +19,6 @@ add_library(
 target_link_libraries(
     ${PROJECT_NAME}
     Newbase
-    #generaldoc     # circular
-    #stationviews   # circular
     )
 
 target_include_directories( 
@@ -28,11 +26,6 @@ target_include_directories(
     PUBLIC ${PROJECT_SOURCE_DIR}/include
     PUBLIC ${Newbase_INCLUDE_DIRS}
     PUBLIC ${BOOST_INCLUDE_DIR}
-    PUBLIC ${LIBS_FMI}/bizcode/stationviews/include # circular
-    PUBLIC ${LIBS_FMI}/bizcode/generaldoc/include # circular
-    PUBLIC ${LIBS_FMI}/bizcode/ctrlviews/include
-    PUBLIC ${LIBS_FMI}/bizcode/modifyediteddata/include
-    PUBLIC ${SRC}/mfcutils
     )
 
 set(
@@ -40,10 +33,5 @@ set(
     ${PROJECT_SOURCE_DIR}/include
     ${Newbase_INCLUDE_DIRS}
     ${BOOST_INCLUDE_DIR}
-    ${LIBS_FMI}/bizcode/stationviews/include # circular
-    ${LIBS_FMI}/bizcode/generaldoc/include # circular
-    ${LIBS_FMI}/bizcode/ctrlviews/include
-    ${LIBS_FMI}/bizcode/modifyediteddata/include
-    ${SRC}/mfcutils
     CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE
     )
