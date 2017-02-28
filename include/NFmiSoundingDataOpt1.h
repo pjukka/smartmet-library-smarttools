@@ -25,7 +25,7 @@ class NFmiSoundingDataOpt1
 {
  public:
      using SoundingLevelContainer = std::vector<unsigned long>;
-     using SignifigantSoundingLevels = std::unique_ptr<SoundingLevelContainer>;
+     using SignificantSoundingLevels = std::unique_ptr<SoundingLevelContainer>;
 
   class LFCIndexCache
   {
@@ -168,7 +168,7 @@ class NFmiSoundingDataOpt1
   bool CheckForMissingLowLevelData(FmiParameterName theParaId, unsigned long theMissingIndexLimit);
   float GetPressureAtHeight(double H);
   void ClearDatas(void);
-  bool FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId, SignifigantSoundingLevels &theSoungingLevels);
+  bool FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId, SignificantSoundingLevels &theSoungingLevels);
   bool FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
                      FmiParameterName theId,
                      const NFmiMetTime &theTime,
@@ -183,9 +183,9 @@ class NFmiSoundingDataOpt1
   void DoAfterFillChecks(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, FmiParameterName theId);
   bool LookForFilledParamFromInfo(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId);
   std::deque<float>& GetResizedParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-      FmiParameterName theId, SignifigantSoundingLevels &theSoungingLevels);
+      FmiParameterName theId, SignificantSoundingLevels &theSoungingLevels);
   void FillParamDataNormally(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data);
-  void FillParamDataFromSignifigantLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, SignifigantSoundingLevels &signifigantLevels);
+  void FillParamDataFromSignificantLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, SignificantSoundingLevels &significantLevels);
   bool IsMovingSounding(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
 
   NFmiLocation itsLocation;

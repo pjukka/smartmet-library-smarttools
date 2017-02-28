@@ -656,7 +656,7 @@ bool NFmiSoundingDataOpt1::GetValuesStartingLookingFromPressureLevel(double &T,
 // oletuksia paljon:
 // theInfo on validi, aika ja paikka on jo asetettu
 bool NFmiSoundingDataOpt1::FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-                                         FmiParameterName theId, SignifigantSoundingLevels &theSoungingLevels)
+                                         FmiParameterName theId, SignificantSoundingLevels &theSoungingLevels)
 {
   try
   {
@@ -665,7 +665,7 @@ bool NFmiSoundingDataOpt1::FillParamData(const boost::shared_ptr<NFmiFastQueryIn
     if (paramFound)
     {
         if(theSoungingLevels)
-            FillParamDataFromSignifigantLevels(theInfo, data, theSoungingLevels);
+            FillParamDataFromSignificantLevels(theInfo, data, theSoungingLevels);
         else
             FillParamDataNormally(theInfo, data);
       DoAfterFillChecks(theInfo, data, theId);
@@ -685,10 +685,10 @@ void NFmiSoundingDataOpt1::FillParamDataNormally(const boost::shared_ptr<NFmiFas
         data[i] = theInfo->FloatValue();
 }
 
-void NFmiSoundingDataOpt1::FillParamDataFromSignifigantLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, SignifigantSoundingLevels &signifigantLevels)
+void NFmiSoundingDataOpt1::FillParamDataFromSignificantLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, SignificantSoundingLevels &significantLevels)
 {
     int i = 0;
-    for(auto levelIndex : *signifigantLevels)
+    for(auto levelIndex : *significantLevels)
     {
         if(theInfo->LevelIndex(levelIndex))
         {
@@ -698,7 +698,7 @@ void NFmiSoundingDataOpt1::FillParamDataFromSignifigantLevels(const boost::share
 }
 
 std::deque<float> & NFmiSoundingDataOpt1::GetResizedParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-    FmiParameterName theId, SignifigantSoundingLevels &theSoungingLevels)
+    FmiParameterName theId, SignificantSoundingLevels &theSoungingLevels)
 {
     std::deque<float> &data = GetParamData(theId);
     if(theSoungingLevels)
@@ -1045,7 +1045,7 @@ static bool FindAmdarSoundingTime(const boost::shared_ptr<NFmiFastQueryInfo> &th
   return false;
 }
 
-NFmiSoundingDataOpt1::SignifigantSoundingLevels GetSignifigantSoundingLevelIndices(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+NFmiSoundingDataOpt1::SignificantSoundingLevels GetSignificantSoundingLevelIndices(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
 {
     if(theInfo)
     {
@@ -1062,7 +1062,7 @@ NFmiSoundingDataOpt1::SignifigantSoundingLevels GetSignifigantSoundingLevelIndic
                 return indexVector;
         }
     }
-    return NFmiSoundingDataOpt1::SignifigantSoundingLevels();
+    return NFmiSoundingDataOpt1::SignificantSoundingLevels();
 }
 
 bool NFmiSoundingDataOpt1::IsMovingSounding(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
@@ -1106,21 +1106,21 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
         itsLocation = usedLocation;
         itsTime = usedTime;
         itsOriginTime = theOriginTime;
-        auto signifigantLevelIndices = ::GetSignifigantSoundingLevelIndices(theInfo);
+        auto significantLevelIndices = ::GetSignificantSoundingLevelIndices(theInfo);
 
-        FillParamData(theInfo, kFmiTemperature, signifigantLevelIndices);
-        FillParamData(theInfo, kFmiDewPoint, signifigantLevelIndices);
-        FillParamData(theInfo, kFmiPressure, signifigantLevelIndices);
-        if (!FillParamData(theInfo, kFmiGeomHeight, signifigantLevelIndices))
-          if (!FillParamData(theInfo, kFmiGeopHeight, signifigantLevelIndices))
-            if (!FillParamData(theInfo, kFmiFlAltitude, signifigantLevelIndices))  // eri datoissa on geom ja geop heightia,
+        FillParamData(theInfo, kFmiTemperature, significantLevelIndices);
+        FillParamData(theInfo, kFmiDewPoint, significantLevelIndices);
+        FillParamData(theInfo, kFmiPressure, significantLevelIndices);
+        if (!FillParamData(theInfo, kFmiGeomHeight, significantLevelIndices))
+          if (!FillParamData(theInfo, kFmiGeopHeight, significantLevelIndices))
+            if (!FillParamData(theInfo, kFmiFlAltitude, significantLevelIndices))  // eri datoissa on geom ja geop heightia,
                                                           // kokeillaan molempia tarvittaessa
               FillHeightDataFromLevels(theInfo);
-        FillParamData(theInfo, kFmiWindSpeedMS, signifigantLevelIndices);
-        FillParamData(theInfo, kFmiWindDirection, signifigantLevelIndices);
-        FillParamData(theInfo, kFmiWindUMS, signifigantLevelIndices);
-        FillParamData(theInfo, kFmiWindVMS, signifigantLevelIndices);
-        FillParamData(theInfo, kFmiWindVectorMS, signifigantLevelIndices);
+        FillParamData(theInfo, kFmiWindSpeedMS, significantLevelIndices);
+        FillParamData(theInfo, kFmiWindDirection, significantLevelIndices);
+        FillParamData(theInfo, kFmiWindUMS, significantLevelIndices);
+        FillParamData(theInfo, kFmiWindVMS, significantLevelIndices);
+        FillParamData(theInfo, kFmiWindVectorMS, significantLevelIndices);
         CalculateHumidityData();
         InitZeroHeight();
         SetVerticalParamStatus();
