@@ -656,29 +656,19 @@ bool NFmiSoundingDataOpt1::GetValuesStartingLookingFromPressureLevel(double &T,
 // oletuksia paljon:
 // theInfo on validi, aika ja paikka on jo asetettu
 bool NFmiSoundingDataOpt1::FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-                                         FmiParameterName theId)
+                                         FmiParameterName theId, SignifigantSoundingLevels &theSoungingLevels)
 {
   try
   {
-    std::deque<float> &data = GetParamData(theId);
-    data.resize(theInfo->SizeLevels(), kFloatMissing);  // alustetaan vektori puuttuvalla
-    bool paramFound = theInfo->Param(theId);
-    if (paramFound == false && theId == kFmiDewPoint)
-      paramFound = theInfo->Param(kFmiDewPoint2M);  // kastepiste data voi tulla luotausten
-    // yhteydessä tällä parametrilla ja mallidatan
-    // yhteydessä toisella
+    std::deque<float> &data = GetResizedParamData(theInfo, theId, theSoungingLevels);
+    bool paramFound = LookForFilledParamFromInfo(theInfo, theId);
     if (paramFound)
     {
-      int i = 0;
-      for (theInfo->ResetLevel(); theInfo->NextLevel(); i++)
-        data[i] = theInfo->FloatValue();
-      if (theInfo->HeightParamIsRising() ==
-          false)  // jos ei nousevassa järjestyksessä, käännetään vektorissa olevat arvot
-        std::reverse(data.begin(), data.end());
-      if (theId == kFmiPressure)
-        fPressureDataAvailable = true;
-      if (theId == kFmiGeomHeight || theId == kFmiGeopHeight || theId == kFmiFlAltitude)
-        fHeightDataAvailable = true;
+        if(theSoungingLevels)
+            FillParamDataFromSignifigantLevels(theInfo, data, theSoungingLevels);
+        else
+            FillParamDataNormally(theInfo, data);
+      DoAfterFillChecks(theInfo, data, theId);
       return true;
     }
   }
@@ -686,6 +676,59 @@ bool NFmiSoundingDataOpt1::FillParamData(const boost::shared_ptr<NFmiFastQueryIn
   {
   }
   return false;
+}
+
+void NFmiSoundingDataOpt1::FillParamDataNormally(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data)
+{
+    int i = 0;
+    for(theInfo->ResetLevel(); theInfo->NextLevel(); i++)
+        data[i] = theInfo->FloatValue();
+}
+
+void NFmiSoundingDataOpt1::FillParamDataFromSignifigantLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, SignifigantSoundingLevels &signifigantLevels)
+{
+    int i = 0;
+    for(auto levelIndex : *signifigantLevels)
+    {
+        if(theInfo->LevelIndex(levelIndex))
+        {
+            data[i++] = theInfo->FloatValue();
+        }
+    }
+}
+
+std::deque<float> & NFmiSoundingDataOpt1::GetResizedParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+    FmiParameterName theId, SignifigantSoundingLevels &theSoungingLevels)
+{
+    std::deque<float> &data = GetParamData(theId);
+    if(theSoungingLevels)
+        data.resize(theSoungingLevels->size(), kFloatMissing);
+    else
+        data.resize(theInfo->SizeLevels(), kFloatMissing);
+    return data;
+}
+
+// Asettaa fastInfon osoittamaan oikeaa parametria. 
+// Kastepiste parametri on erikoistapaus.
+bool NFmiSoundingDataOpt1::LookForFilledParamFromInfo(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId)
+{
+    bool paramFound = theInfo->Param(theId);
+    // Kastepiste parametri voi tulla luotausten yhteydessä tällä 
+    // parametrilla ja mallidatan yhteydessä toisella
+    if(paramFound == false && theId == kFmiDewPoint)
+        paramFound = theInfo->Param(kFmiDewPoint2M);
+    return paramFound;
+}
+
+void NFmiSoundingDataOpt1::DoAfterFillChecks(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, FmiParameterName theId)
+{
+    // jos ei nousevassa järjestyksessä, käännetään vektorissa olevat arvot
+    if(theInfo->HeightParamIsRising() == false)
+        std::reverse(data.begin(), data.end());
+    if(theId == kFmiPressure)
+        fPressureDataAvailable = true;
+    if(theId == kFmiGeomHeight || theId == kFmiGeopHeight || theId == kFmiFlAltitude)
+        fHeightDataAvailable = true;
 }
 
 // Oletus, tässä info on jo parametrissa ja ajassa kohdallaan.
@@ -1002,6 +1045,26 @@ static bool FindAmdarSoundingTime(const boost::shared_ptr<NFmiFastQueryInfo> &th
   return false;
 }
 
+NFmiSoundingDataOpt1::SignifigantSoundingLevels GetSignifigantSoundingLevelIndices(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+    if(theInfo)
+    {
+        if(theInfo->Param(kFmiVerticalSoundingSignificance))
+        {
+            auto indexVector = std::make_unique<NFmiSoundingDataOpt1::SoundingLevelContainer>();
+            for(theInfo->ResetLevel(); theInfo->NextLevel(); )
+            {
+                auto value = theInfo->FloatValue();
+                if(value != kFloatMissing && value > 0)
+                    indexVector->push_back(theInfo->LevelIndex());
+            }
+            if(indexVector->size())
+                return indexVector;
+        }
+    }
+    return NFmiSoundingDataOpt1::SignifigantSoundingLevels();
+}
+
 // Tälle anntaan asema dataa ja ei tehdä minkäänlaisia interpolointeja.
 bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
                                             const NFmiMetTime &theTime,
@@ -1038,20 +1101,21 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
         itsLocation = usedLocation;
         itsTime = usedTime;
         itsOriginTime = theOriginTime;
+        auto signifigantLevelIndices = ::GetSignifigantSoundingLevelIndices(theInfo);
 
-        FillParamData(theInfo, kFmiTemperature);
-        FillParamData(theInfo, kFmiDewPoint);
-        FillParamData(theInfo, kFmiPressure);
-        if (!FillParamData(theInfo, kFmiGeomHeight))
-          if (!FillParamData(theInfo, kFmiGeopHeight))
-            if (!FillParamData(theInfo, kFmiFlAltitude))  // eri datoissa on geom ja geop heightia,
+        FillParamData(theInfo, kFmiTemperature, signifigantLevelIndices);
+        FillParamData(theInfo, kFmiDewPoint, signifigantLevelIndices);
+        FillParamData(theInfo, kFmiPressure, signifigantLevelIndices);
+        if (!FillParamData(theInfo, kFmiGeomHeight, signifigantLevelIndices))
+          if (!FillParamData(theInfo, kFmiGeopHeight, signifigantLevelIndices))
+            if (!FillParamData(theInfo, kFmiFlAltitude, signifigantLevelIndices))  // eri datoissa on geom ja geop heightia,
                                                           // kokeillaan molempia tarvittaessa
               FillHeightDataFromLevels(theInfo);
-        FillParamData(theInfo, kFmiWindSpeedMS);
-        FillParamData(theInfo, kFmiWindDirection);
-        FillParamData(theInfo, kFmiWindUMS);
-        FillParamData(theInfo, kFmiWindVMS);
-        FillParamData(theInfo, kFmiWindVectorMS);
+        FillParamData(theInfo, kFmiWindSpeedMS, signifigantLevelIndices);
+        FillParamData(theInfo, kFmiWindDirection, signifigantLevelIndices);
+        FillParamData(theInfo, kFmiWindUMS, signifigantLevelIndices);
+        FillParamData(theInfo, kFmiWindVMS, signifigantLevelIndices);
+        FillParamData(theInfo, kFmiWindVectorMS, signifigantLevelIndices);
         CalculateHumidityData();
         InitZeroHeight();
         SetVerticalParamStatus();
@@ -2592,9 +2656,7 @@ double NFmiSoundingDataOpt1::CalcWSatHeightIndex(double theH)
 
 std::string NFmiSoundingDataOpt1::MakeCacheString(double T, double Td, double fromP, double toP)
 {
-  char buffer[128] = {0};
-  int counter = sprintf(buffer, "%f,%f,%f,%f", T, Td, fromP, toP);
-  return std::string(buffer, counter);
+    return (boost::format("%f,%f,%f,%f") % T % Td % fromP % toP).str();
 }
 
 // Laske ilmapaketin lämpötila nostamalla ilmapakettia
