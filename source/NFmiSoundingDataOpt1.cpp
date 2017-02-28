@@ -1065,6 +1065,11 @@ NFmiSoundingDataOpt1::SignifigantSoundingLevels GetSignifigantSoundingLevelIndic
     return NFmiSoundingDataOpt1::SignifigantSoundingLevels();
 }
 
+bool NFmiSoundingDataOpt1::IsMovingSounding(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+{
+    return theInfo->HasLatlonInfoInData();
+}
+
 // Tälle anntaan asema dataa ja ei tehdä minkäänlaisia interpolointeja.
 bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
                                             const NFmiMetTime &theTime,
@@ -1079,9 +1084,9 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
   {
     fObservationData = true;
     theInfo->FirstLevel();
-    bool amdarSounding = (theInfo->Level()->LevelType() == kFmiAmdarLevel);
+    bool isMovingSounding = IsMovingSounding(theInfo);
     bool timeOk = false;
-    if (amdarSounding)
+    if (isMovingSounding)
     {
       timeOk = ::FindAmdarSoundingTime(theInfo, usedTime, usedLocation);
       usedTime = theInfo->Time();
@@ -1091,7 +1096,7 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
     if (timeOk)
     {
       bool stationOk = false;
-      if (amdarSounding)
+      if (isMovingSounding)
         stationOk = true;  // asemaa ei etsitä, jokainen lento liittyy tiettyyn aikaa
       else
         stationOk = (useStationIdOnly ? theInfo->Location(usedLocation.GetIdent())

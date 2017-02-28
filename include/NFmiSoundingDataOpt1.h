@@ -186,6 +186,7 @@ class NFmiSoundingDataOpt1
       FmiParameterName theId, SignifigantSoundingLevels &theSoungingLevels);
   void FillParamDataNormally(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data);
   void FillParamDataFromSignifigantLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, SignifigantSoundingLevels &signifigantLevels);
+  bool IsMovingSounding(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
 
   NFmiLocation itsLocation;
   NFmiMetTime itsTime;
