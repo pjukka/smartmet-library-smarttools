@@ -656,7 +656,7 @@ bool NFmiSoundingDataOpt1::GetValuesStartingLookingFromPressureLevel(double &T,
 // oletuksia paljon:
 // theInfo on validi, aika ja paikka on jo asetettu
 bool NFmiSoundingDataOpt1::FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-                                         FmiParameterName theId, SignificantSoundingLevels &theSoungingLevels)
+                                         FmiParameterName theId, NFmiQueryDataUtil::SignificantSoundingLevels &theSoungingLevels)
 {
   try
   {
@@ -685,7 +685,7 @@ void NFmiSoundingDataOpt1::FillParamDataNormally(const boost::shared_ptr<NFmiFas
         data[i] = theInfo->FloatValue();
 }
 
-void NFmiSoundingDataOpt1::FillParamDataFromSignificantLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, SignificantSoundingLevels &significantLevels)
+void NFmiSoundingDataOpt1::FillParamDataFromSignificantLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, NFmiQueryDataUtil::SignificantSoundingLevels &significantLevels)
 {
     int i = 0;
     for(auto levelIndex : *significantLevels)
@@ -698,7 +698,7 @@ void NFmiSoundingDataOpt1::FillParamDataFromSignificantLevels(const boost::share
 }
 
 std::deque<float> & NFmiSoundingDataOpt1::GetResizedParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-    FmiParameterName theId, SignificantSoundingLevels &theSoungingLevels)
+    FmiParameterName theId, NFmiQueryDataUtil::SignificantSoundingLevels &theSoungingLevels)
 {
     std::deque<float> &data = GetParamData(theId);
     if(theSoungingLevels)
@@ -1045,26 +1045,6 @@ static bool FindAmdarSoundingTime(const boost::shared_ptr<NFmiFastQueryInfo> &th
   return false;
 }
 
-NFmiSoundingDataOpt1::SignificantSoundingLevels NFmiSoundingDataOpt1::GetSignificantSoundingLevelIndices(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
-{
-    if(theInfo)
-    {
-        if(theInfo->Param(kFmiVerticalSoundingSignificance))
-        {
-            auto indexVector = std::make_unique<NFmiSoundingDataOpt1::SoundingLevelContainer>();
-            for(theInfo->ResetLevel(); theInfo->NextLevel(); )
-            {
-                auto value = theInfo->FloatValue();
-                if(value != kFloatMissing && value > 0)
-                    indexVector->push_back(theInfo->LevelIndex());
-            }
-            if(indexVector->size())
-                return indexVector;
-        }
-    }
-    return NFmiSoundingDataOpt1::SignificantSoundingLevels();
-}
-
 bool NFmiSoundingDataOpt1::IsMovingSounding(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
 {
     return theInfo->HasLatlonInfoInData();
@@ -1106,7 +1086,7 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
         itsLocation = usedLocation;
         itsTime = usedTime;
         itsOriginTime = theOriginTime;
-        auto significantLevelIndices = NFmiSoundingDataOpt1::GetSignificantSoundingLevelIndices(theInfo);
+        auto significantLevelIndices = NFmiQueryDataUtil::GetSignificantSoundingLevelIndices(*theInfo);
 
         FillParamData(theInfo, kFmiTemperature, significantLevelIndices);
         FillParamData(theInfo, kFmiDewPoint, significantLevelIndices);
