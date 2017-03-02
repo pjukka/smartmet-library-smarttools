@@ -1045,7 +1045,7 @@ static bool FindAmdarSoundingTime(const boost::shared_ptr<NFmiFastQueryInfo> &th
   return false;
 }
 
-NFmiSoundingDataOpt1::SignificantSoundingLevels GetSignificantSoundingLevelIndices(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
+NFmiSoundingDataOpt1::SignificantSoundingLevels NFmiSoundingDataOpt1::GetSignificantSoundingLevelIndices(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
 {
     if(theInfo)
     {
@@ -1106,7 +1106,7 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
         itsLocation = usedLocation;
         itsTime = usedTime;
         itsOriginTime = theOriginTime;
-        auto significantLevelIndices = ::GetSignificantSoundingLevelIndices(theInfo);
+        auto significantLevelIndices = NFmiSoundingDataOpt1::GetSignificantSoundingLevelIndices(theInfo);
 
         FillParamData(theInfo, kFmiTemperature, significantLevelIndices);
         FillParamData(theInfo, kFmiDewPoint, significantLevelIndices);

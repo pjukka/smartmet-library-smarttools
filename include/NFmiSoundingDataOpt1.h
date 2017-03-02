@@ -80,6 +80,7 @@ class NFmiSoundingDataOpt1
   void CutEmptyData(void);  // tämä leikkaa Fill.. -metodeissa laskettuja data vektoreita niin että
                             // pelkät puuttuvat kerrokset otetaan pois
   static bool HasRealSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theSoundingLevelInfo);
+  static SignificantSoundingLevels GetSignificantSoundingLevelIndices(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
   bool IsDataGood();
 
   // FillSoundingData-metodeilla täytetään kunkin parametrin vektorit ja tällä saa haluamansa
