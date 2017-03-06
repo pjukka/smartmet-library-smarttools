@@ -40,8 +40,7 @@ ifeq ($(CXX), clang++)
 
  INCLUDES = \
 	-isystem $(includedir) \
-	-isystem $(includedir)/smartmet \
-	-isystem $(includedir)/smartmet/newbase
+	-isystem $(includedir)/smartmet
 
 else
 
@@ -63,8 +62,7 @@ else
 
  INCLUDES = \
 	-I$(includedir) \
-	-I$(includedir)/smartmet \
-	-I$(includedir)/smartmet/newbase
+	-I$(includedir)/smartmet
 
 endif
 
