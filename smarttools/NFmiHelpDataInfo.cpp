@@ -8,11 +8,11 @@
 #endif
 
 #include "NFmiHelpDataInfo.h"
-#include <NFmiArea.h>
-#include <NFmiAreaFactory.h>
-#include <NFmiStereographicArea.h>
-#include <NFmiSettings.h>
-#include <NFmiFileString.h>
+#include <newbase/NFmiArea.h>
+#include <newbase/NFmiAreaFactory.h>
+#include <newbase/NFmiStereographicArea.h>
+#include <newbase/NFmiSettings.h>
+#include <newbase/NFmiFileString.h>
 
 using namespace std;
 

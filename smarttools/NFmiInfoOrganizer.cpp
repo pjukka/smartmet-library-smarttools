@@ -4,10 +4,10 @@
 #include "NFmiSmartInfo.h"
 #include "NFmiQueryDataKeeper.h"
 #include "NFmiDrawParam.h"
-#include <NFmiQueryInfo.h>
-#include <NFmiGrid.h>
-#include <NFmiLatLonArea.h>
-#include <NFmiQueryDataUtil.h>
+#include <newbase/NFmiQueryInfo.h>
+#include <newbase/NFmiGrid.h>
+#include <newbase/NFmiLatLonArea.h>
+#include <newbase/NFmiQueryDataUtil.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4239)  // poistaa VC++ 2010 varoituksen: warning C4239: nonstandard

@@ -18,11 +18,11 @@
 #include "NFmiProducerSystem.h"
 #include "NFmiExtraMacroParamData.h"
 
-#include <NFmiPreProcessor.h>
-#include <NFmiValueString.h>
-#include <NFmiLevelType.h>
-#include <NFmiLevel.h>
-#include <NFmiEnumConverter.h>
+#include <newbase/NFmiPreProcessor.h>
+#include <newbase/NFmiValueString.h>
+#include <newbase/NFmiLevelType.h>
+#include <newbase/NFmiLevel.h>
+#include <newbase/NFmiEnumConverter.h>
 
 #include <algorithm>
 #include <cctype>

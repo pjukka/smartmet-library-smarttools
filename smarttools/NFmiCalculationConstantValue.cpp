@@ -8,9 +8,9 @@
 
 #include "NFmiCalculationConstantValue.h"
 #include "NFmiDrawParam.h"
-#include <NFmiDataModifier.h>
-#include <NFmiDataIterator.h>
-#include <NFmiFastQueryInfo.h>
+#include <newbase/NFmiDataModifier.h>
+#include <newbase/NFmiDataIterator.h>
+#include <newbase/NFmiFastQueryInfo.h>
 
 // ****************************************************************************
 // *************** NFmiCalculationConstantValue *******************************

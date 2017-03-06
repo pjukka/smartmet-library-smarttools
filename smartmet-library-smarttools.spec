@@ -4,16 +4,16 @@
 %define DEVELNAME %{SPECNAME}-devel
 Summary: smarttools library
 Name: %{SPECNAME}
-Version: 17.2.10
+Version: 17.3.6
 Release: 1%{?dist}.fmi
 License: MIT
 Group: Development/Libraries
 URL: https://github.com/fmidev/smartmet-library-smarttools
 Source: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: smartmet-library-newbase-devel >= 17.2.10
+BuildRequires: smartmet-library-newbase-devel >= 17.3.6
 BuildRequires: boost-devel
-Requires: smartmet-library-newbase >= 17.2.10
+Requires: smartmet-library-newbase >= 17.3.6
 Provides: %{LIBNAME}
 Obsoletes: libsmartmet-smarttools < 17.1.4
 Obsoletes: libsmartmet-smarttools-debuginfo < 17.1.4
@@ -56,7 +56,7 @@ FMI smarttools development files
 
 
 %changelog
-* Upcoming
+* Mon Mar  6 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.3.6-1.fmi
 - Include newbase library headers with correct notation
 
 * Fri Feb 10 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.2.10-1.fmi

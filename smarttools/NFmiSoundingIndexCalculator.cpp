@@ -13,11 +13,11 @@
 #include "NFmiSoundingDataOpt1.h"
 #include "NFmiSoundingFunctions.h"
 #include "NFmiSoundingIndexCalculator.h"
-#include <NFmiFastQueryInfo.h>
-#include <NFmiGrid.h>
-#include <NFmiQueryData.h>
-#include <NFmiQueryDataUtil.h>
-#include <NFmiValueString.h>
+#include <newbase/NFmiFastQueryInfo.h>
+#include <newbase/NFmiGrid.h>
+#include <newbase/NFmiQueryData.h>
+#include <newbase/NFmiQueryDataUtil.h>
+#include <newbase/NFmiValueString.h>
 
 #ifndef BOOST_DISABLE_THREADS
 

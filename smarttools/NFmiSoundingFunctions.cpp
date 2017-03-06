@@ -8,9 +8,9 @@
 // ======================================================================
 
 #include "NFmiSoundingFunctions.h"
-#include <NFmiAngle.h>
-#include <NFmiValueString.h>
-#include <NFmiInterpolation.h>
+#include <newbase/NFmiAngle.h>
+#include <newbase/NFmiValueString.h>
+#include <newbase/NFmiInterpolation.h>
 
 #include <iostream>
 #include <map>

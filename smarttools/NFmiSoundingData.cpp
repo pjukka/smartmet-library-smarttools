@@ -10,11 +10,11 @@
 #include "NFmiSoundingData.h"
 #include "NFmiSoundingFunctions.h"
 
-#include <NFmiAngle.h>
-#include <NFmiDataModifierAvg.h>
-#include <NFmiFastQueryInfo.h>
-#include <NFmiInterpolation.h>
-#include <NFmiValueString.h>
+#include <newbase/NFmiAngle.h>
+#include <newbase/NFmiDataModifierAvg.h>
+#include <newbase/NFmiFastQueryInfo.h>
+#include <newbase/NFmiInterpolation.h>
+#include <newbase/NFmiValueString.h>
 
 using namespace NFmiSoundingFunctions;
 

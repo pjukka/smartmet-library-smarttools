@@ -8,9 +8,9 @@
 //---------------------------------------------------------- NFmiWarningCenterSystem.h
 
 #include "NFmiProducerSystem.h"
-#include <NFmiSettings.h>
-#include <NFmiMetTime.h>
-#include <NFmiLevel.h>
+#include <newbase/NFmiSettings.h>
+#include <newbase/NFmiMetTime.h>
+#include <newbase/NFmiLevel.h>
 
 const std::string &NFmiProducerInfo::ShortName(size_t index) const
 {

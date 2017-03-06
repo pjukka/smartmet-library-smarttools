@@ -12,9 +12,9 @@
 #include "NFmiInfoOrganizer.h"
 #include "NFmiSmartToolModifier.h"
 #include "NFmiSmartToolUtil.h"
-#include <NFmiFastQueryInfo.h>
-#include <NFmiQueryData.h>
-#include <NFmiStreamQueryData.h>
+#include <newbase/NFmiFastQueryInfo.h>
+#include <newbase/NFmiQueryData.h>
+#include <newbase/NFmiStreamQueryData.h>
 
 #include <stdexcept>
 #ifndef UNIX

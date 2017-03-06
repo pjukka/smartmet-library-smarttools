@@ -34,7 +34,7 @@
 //**********************************************************
 #include "NFmiMultiLevelMask.h"
 #include "NFmiMetEditorTypes.h"
-#include <NFmiRect.h>
+#include <newbase/NFmiRect.h>
 #include <cassert>
 
 //--------------------------------------------------------

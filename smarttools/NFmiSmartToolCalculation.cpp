@@ -30,8 +30,8 @@
 #include "NFmiSmartToolCalculation.h"
 #include "NFmiAreaMaskInfo.h"
 #include "NFmiCalculationConstantValue.h"
-#include <NFmiFastQueryInfo.h>
-#include <NFmiDataModifierClasses.h>
+#include <newbase/NFmiFastQueryInfo.h>
+#include <newbase/NFmiDataModifierClasses.h>
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>

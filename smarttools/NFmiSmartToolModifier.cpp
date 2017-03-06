@@ -25,16 +25,16 @@
 #include "NFmiSmartToolModifier.h"
 #include "NFmiExtraMacroParamData.h"
 
-#include <NFmiBitMask.h>
-#include <NFmiCalculatedAreaMask.h>
-#include <NFmiDataModifierClasses.h>
-#include <NFmiFastQueryInfo.h>
-#include <NFmiInfoAreaMask.h>
+#include <newbase/NFmiBitMask.h>
+#include <newbase/NFmiCalculatedAreaMask.h>
+#include <newbase/NFmiDataModifierClasses.h>
+#include <newbase/NFmiFastQueryInfo.h>
+#include <newbase/NFmiInfoAreaMask.h>
 #include "NFmiInfoAreaMaskOccurrance.h"
-#include <NFmiQueryData.h>
-#include <NFmiQueryDataUtil.h>
-#include <NFmiRelativeDataIterator.h>
-#include <NFmiRelativeTimeIntegrationIterator.h>
+#include <newbase/NFmiQueryData.h>
+#include <newbase/NFmiQueryDataUtil.h>
+#include <newbase/NFmiRelativeDataIterator.h>
+#include <newbase/NFmiRelativeTimeIntegrationIterator.h>
 
 #include <stdexcept>
 

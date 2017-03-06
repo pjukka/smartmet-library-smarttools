@@ -9,12 +9,12 @@
 
 #include "NFmiSoundingDataOpt1.h"
 #include "NFmiSoundingFunctions.h"
-#include <NFmiAngle.h>
-#include <NFmiDataModifierAvg.h>
-#include <NFmiFastQueryInfo.h>
-#include <NFmiInterpolation.h>
-#include <NFmiValueString.h>
-#include <NFmiQueryDataUtil.h>
+#include <newbase/NFmiAngle.h>
+#include <newbase/NFmiDataModifierAvg.h>
+#include <newbase/NFmiFastQueryInfo.h>
+#include <newbase/NFmiInterpolation.h>
+#include <newbase/NFmiValueString.h>
+#include <newbase/NFmiQueryDataUtil.h>
 
 #include <fstream>
 

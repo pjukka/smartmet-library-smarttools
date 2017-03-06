@@ -5,9 +5,9 @@
  */
 
 #include "NFmiSmartToolInfo.h"
-#include <NFmiFileString.h>
-#include <NFmiFileSystem.h>
-#include <NFmiSettings.h>
+#include <newbase/NFmiFileString.h>
+#include <newbase/NFmiFileSystem.h>
+#include <newbase/NFmiSettings.h>
 #include <fstream>
 #include <iterator>
 #include <algorithm>
