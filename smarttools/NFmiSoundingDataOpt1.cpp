@@ -9,12 +9,14 @@
 
 #include "NFmiSoundingDataOpt1.h"
 #include "NFmiSoundingFunctions.h"
-#include <NFmiAngle.h>
-#include <NFmiDataModifierAvg.h>
-#include <NFmiFastQueryInfo.h>
-#include <NFmiInterpolation.h>
-#include <NFmiValueString.h>
-#include <NFmiQueryDataUtil.h>
+#include <newbase/NFmiAngle.h>
+#include <newbase/NFmiDataModifierAvg.h>
+#include <newbase/NFmiFastQueryInfo.h>
+#include <newbase/NFmiInterpolation.h>
+#include <newbase/NFmiValueString.h>
+#include <newbase/NFmiQueryDataUtil.h>
+
+#include <fstream>
 
 // hakee lähimmän sopivan painepinnan, mistä löytyy halutuille parametreille arvot
 // Mutta ei sallita muokkausta ennen 1. validia leveliä!
@@ -37,8 +39,7 @@ bool NFmiSoundingDataOpt1::GetTandTdValuesFromNearestPressureLevel(double P,
       bool foundLevel = false;
       for (int i = 0; i < static_cast<int>(pV.size()); i++)
       {
-        if (i < 0)
-          return false;  // jos 'tyhjä' luotaus, on tässä aluksi -1 indeksinä
+        if (i < 0) return false;  // jos 'tyhjä' luotaus, on tässä aluksi -1 indeksinä
         if (pV[i] != kFloatMissing)
         {
           double pDiff = ::fabs(pV[i] - P);
@@ -344,6 +345,7 @@ struct ThetaEValues
 };
 
 // Tällä operaattorilla sortataan lasketut theta kerrokset
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static bool operator<(const ThetaEValues &theta1, const ThetaEValues &theta2)
 {
   if (theta1.P != kFloatMissing && theta2.P != kFloatMissing && theta1.ThetaE != kFloatMissing &&
@@ -358,18 +360,21 @@ static bool operator<(const ThetaEValues &theta1, const ThetaEValues &theta2)
   }
   return true;
 }
+#endif
 
 // Tällä operaattorilla sortataan lasketut theta kerrokset
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static bool operator>(const ThetaEValues &theta1, const ThetaEValues &theta2)
 {
   if (theta1.P != kFloatMissing && theta2.P != kFloatMissing)
   {
-    if (theta1.P > theta2.P)
-      return true;
+    if (theta1.P > theta2.P) return true;
   }
   return false;
 }
+#endif
 
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static bool isCloseToUpperLevelLimit(const ThetaEValues &theta, double topPressureLevel)
 {
   if (std::fabs((theta.P - topPressureLevel) / topPressureLevel) < 0.3)
@@ -377,7 +382,9 @@ static bool isCloseToUpperLevelLimit(const ThetaEValues &theta, double topPressu
   else
     return false;
 }
+#endif
 
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static bool isGlobalAndLocalThetasCloseEnough(double globalMaxTheta, double localThetaE)
 {
   if (std::fabs((globalMaxTheta - localThetaE) / globalMaxTheta) < 0.15)
@@ -385,12 +392,15 @@ static bool isGlobalAndLocalThetasCloseEnough(double globalMaxTheta, double loca
   else
     return false;
 }
+#endif
 
 // Jos globaali maksimi on lähempänä maanpintaa eli kauempana annetusta yläkerroksen rajasta,
 // annetaan se.
 // Jos globaali maksimi lähellä yläkerroksen rajaa, katsotaan löytyykö alemmista kerroksista lokaali
 // maksimi,
 // joka on tarpeeksi lähellä globaalin maksimin arvoa ja palautetaan se.
+
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static ThetaEValues getBestMUThetaValues(std::set<ThetaEValues> &thetas, double topPressureLevel)
 {
   if (thetas.size() == 0)
@@ -420,10 +430,13 @@ static ThetaEValues getBestMUThetaValues(std::set<ThetaEValues> &thetas, double 
                               // palautetaan globaali maksimi
   }
 }
+#endif
 
 // Etsitään maanpinnasta ylöspäin lokaali maksimeja. Jos lokaali maksimi on tarpeeksi lähellä
 // totaali maksimia, palautetaan sen arvo.
 // Muuten palautetaan globaali maksimi.
+
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static ThetaEValues getBestMUThetaValues2(std::vector<ThetaEValues> &thetas,
                                           double topPressureLevel)
 {
@@ -455,7 +468,9 @@ static ThetaEValues getBestMUThetaValues2(std::vector<ThetaEValues> &thetas,
                             // pitää olla sama kuin vectorin viimeisen elementin
   }
 }
+#endif
 
+#ifdef THIS_IS_NOT_USED_ANYWHERE
 static void setThetaValues(
     const ThetaEValues &theta, double &T, double &Td, double &P, double &theMaxThetaE)
 {
@@ -464,6 +479,7 @@ static void setThetaValues(
   Td = theta.Td;
   P = theta.P;
 }
+#endif
 
 // Käy läpi luotausta ja etsi sen kerroksen arvot, jolta löytyy suurin theta-E ja
 // palauta sen kerroksen T, Td ja P ja laskettu max Theta-e.
@@ -582,8 +598,7 @@ bool NFmiSoundingDataOpt1::CalcLCLAvgValues(
       return false;
     int startP = static_cast<int>(round(GetPressureAtHeight(fromZ)));
     int endP = static_cast<int>(round(GetPressureAtHeight(toZ)));
-    if (startP == kFloatMissing || endP == kFloatMissing || startP <= endP)
-      return false;
+    if (startP == kFloatMissing || endP == kFloatMissing || startP <= endP) return false;
     NFmiDataModifierAvg avgT;   // riippuen moodista tässä lasketaan T tai Tpot keskiarvoa
     NFmiDataModifierAvg avgTd;  // riippuen moodista tässä lasketaan Td tai w keskiarvoa
     for (int pressure = startP; pressure > endP;
@@ -2111,8 +2126,7 @@ double NFmiSoundingDataOpt1::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double 
 {
   double lfcIndexValue = kFloatMissing;
   // 1. Katso löytyykö valmiiksi lasketut arvot cachesta.
-  if (CheckLFCIndexCache(theLCLCalcType, lfcIndexValue, EL))
-    return lfcIndexValue;
+  if (CheckLFCIndexCache(theLCLCalcType, lfcIndexValue, EL)) return lfcIndexValue;
 
   // 2. Hae halutun laskentatavan (sur/500mix/mostUnstable) mukaiset T, Td ja P arvot.
   double T = kFloatMissing, Td = kFloatMissing, P = kFloatMissing;
@@ -2235,8 +2249,7 @@ double NFmiSoundingDataOpt1::CalcCAPE500Index(FmiLCLCalcType theLCLCalcType, dou
     return kFloatMissing;
 
   // HUOM! Pitää ottaa huomioon aseman korkeus kun tehdään laskuja!!!!
-  if (theHeightLimit != kFloatMissing)
-    theHeightLimit += ZeroHeight();
+  if (theHeightLimit != kFloatMissing) theHeightLimit += ZeroHeight();
 
   std::deque<float> &pValues = GetParamData(kFmiPressure);
   std::deque<float> &tValues = GetParamData(kFmiTemperature);

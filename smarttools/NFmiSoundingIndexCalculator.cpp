@@ -13,11 +13,11 @@
 #include "NFmiSoundingDataOpt1.h"
 #include "NFmiSoundingFunctions.h"
 #include "NFmiSoundingIndexCalculator.h"
-#include <NFmiFastQueryInfo.h>
-#include <NFmiGrid.h>
-#include <NFmiQueryData.h>
-#include <NFmiQueryDataUtil.h>
-#include <NFmiValueString.h>
+#include <newbase/NFmiFastQueryInfo.h>
+#include <newbase/NFmiGrid.h>
+#include <newbase/NFmiQueryData.h>
+#include <newbase/NFmiQueryDataUtil.h>
+#include <newbase/NFmiValueString.h>
 
 #ifndef BOOST_DISABLE_THREADS
 
@@ -353,8 +353,8 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
 
   if (fUseOnlyOneThread || usedThreadCount < 2)
   {  // jos aikoja oli alle kaksi, lasketaan data yhdessä funktiossa
-    if (fDoCerrReporting)
-      std::cerr << "making data in single thread" << std::endl;
+
+    if (fDoCerrReporting) std::cerr << "making data in single thread" << std::endl;
     boost::shared_ptr<NFmiFastQueryInfo> sourceInfo(new NFmiFastQueryInfo(&theSourceData));
     boost::shared_ptr<NFmiFastQueryInfo> resultInfo(new NFmiFastQueryInfo(&theResultData));
     ::CalculatePartOfSoundingData(

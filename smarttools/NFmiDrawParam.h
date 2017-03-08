@@ -31,15 +31,17 @@
 #ifndef NFMIDRAWPARAM_H
 #define NFMIDRAWPARAM_H
 
+#include "NFmiColor.h"
 #include "NFmiMetEditorTypes.h"
 
-#include <NFmiDataIdent.h>
-#include <NFmiColor.h>
-#include <NFmiPoint.h>
-#include <NFmiLevel.h>
-#include <NFmiInfoData.h>
-#include <NFmiDataMatrix.h>  // täältä tulee myös checkedVector
-#include <NFmiMetTime.h>
+#include <newbase/NFmiParameterName.h>
+#include <newbase/NFmiDataIdent.h>
+#include <newbase/NFmiPoint.h>
+#include <newbase/NFmiLevel.h>
+#include <newbase/NFmiInfoData.h>
+#include <newbase/NFmiDataMatrix.h>  // täältä tulee myös checkedVector
+#include <newbase/NFmiMetTime.h>
+#include <boost/shared_ptr.hpp>
 
 class NFmiDrawingEnvironment;
 

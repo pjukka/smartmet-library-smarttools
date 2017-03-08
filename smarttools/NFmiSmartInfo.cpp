@@ -1,7 +1,7 @@
 
 #include "NFmiSmartInfo.h"
 #include "NFmiModifiableQDatasBookKeeping.h"
-#include <NFmiQueryData.h>
+#include <newbase/NFmiQueryData.h>
 
 NFmiSmartInfo::NFmiSmartInfo(void) : NFmiOwnerInfo(), itsQDataBookKeepingPtr()
 {
@@ -67,16 +67,13 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartInfo::CreateShallowCopyOfHighestIn
   if (theInfo)
   {
     NFmiSmartInfo *smartInfo = dynamic_cast<NFmiSmartInfo *>(theInfo.get());
-    if (smartInfo)
-      return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(*smartInfo));
+    if (smartInfo) return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiSmartInfo(*smartInfo));
 
     NFmiOwnerInfo *ownerInfo = dynamic_cast<NFmiOwnerInfo *>(theInfo.get());
-    if (ownerInfo)
-      return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiOwnerInfo(*ownerInfo));
+    if (ownerInfo) return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiOwnerInfo(*ownerInfo));
 
     NFmiFastQueryInfo *fastInfo = dynamic_cast<NFmiFastQueryInfo *>(theInfo.get());
-    if (fastInfo)
-      return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*fastInfo));
+    if (fastInfo) return boost::shared_ptr<NFmiFastQueryInfo>(new NFmiFastQueryInfo(*fastInfo));
   }
 
   return boost::shared_ptr<NFmiFastQueryInfo>();

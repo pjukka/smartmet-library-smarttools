@@ -1,9 +1,9 @@
 
 #include "NFmiQueryDataKeeper.h"
 #include "NFmiSmartInfo.h"
-#include <NFmiFileSystem.h>
-#include <NFmiFileString.h>
-#include <NFmiQueryData.h>
+#include <newbase/NFmiFileSystem.h>
+#include <newbase/NFmiFileString.h>
+#include <newbase/NFmiQueryData.h>
 #include <fstream>
 
 #ifdef _MSC_VER
@@ -117,10 +117,6 @@ NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> 
 {
   bool dataWasDeleted = false;
   AddData(theData, true, dataWasDeleted);  // true tarkoittaa että kyse on 1. lisättävästä datasta
-}
-
-NFmiQueryDataSetKeeper::~NFmiQueryDataSetKeeper(void)
-{
 }
 
 /*
@@ -444,8 +440,7 @@ bool NFmiQueryDataSetKeeper::CheckKeepTime(ListType::iterator &it)
 {
   if ((*it)->Index() != 0)
   {  // vain viimeisin data jää tutkimatta, koska sitä ei ole tarkoitus poistaa muistista koskaan
-    if ((*it)->LastUsedInMS() > itsKeepInMemoryTime * 60 * 1000)
-      return true;
+    if ((*it)->LastUsedInMS() > itsKeepInMemoryTime * 60 * 1000) return true;
   }
   return false;
 }

@@ -8,11 +8,12 @@
 #endif
 
 #include "NFmiHelpDataInfo.h"
-#include <NFmiArea.h>
-#include <NFmiAreaFactory.h>
-#include <NFmiSettings.h>
-#include <NFmiFileString.h>
-#include "NFmiProducerName.h"
+#include <newbase/NFmiProducerName.h>
+#include <newbase/NFmiArea.h>
+#include <newbase/NFmiAreaFactory.h>
+#include <newbase/NFmiStereographicArea.h>
+#include <newbase/NFmiSettings.h>
+#include <newbase/NFmiFileString.h>
 
 using namespace std;
 
@@ -385,8 +386,7 @@ void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey,
     // eri datojen enable-ominaisuudesta yhteen konffitiedostoon (mm.
     // helpdatainfo_enable_data_fmi_heavy.conf),
     // tuli mahdolliseksi, että tässä tuli ns. haamu dataInfoja, jotka nyt pitää karsia.
-    if (hdi.DataType() != NFmiInfoData::kNoDataType)
-      theHelpDataInfos.push_back(hdi);
+    if (hdi.DataType() != NFmiInfoData::kNoDataType) theHelpDataInfos.push_back(hdi);
   }
 }
 

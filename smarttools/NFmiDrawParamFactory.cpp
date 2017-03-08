@@ -31,8 +31,8 @@
 #include "NFmiDrawParamFactory.h"
 #include "NFmiDrawParam.h"
 
-#include <NFmiValueString.h>
-#include <NFmiFileSystem.h>
+#include <newbase/NFmiValueString.h>
+#include <newbase/NFmiFileSystem.h>
 
 #include <cassert>
 

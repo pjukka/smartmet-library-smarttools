@@ -5,9 +5,9 @@
  */
 
 #include "NFmiSmartToolInfo.h"
-#include <NFmiFileString.h>
-#include <NFmiFileSystem.h>
-#include <NFmiSettings.h>
+#include <newbase/NFmiFileString.h>
+#include <newbase/NFmiFileSystem.h>
+#include <newbase/NFmiSettings.h>
 #include <fstream>
 #include <iterator>
 #include "boost/filesystem.hpp"
@@ -27,10 +27,7 @@ NFmiSmartToolInfo::NFmiSmartToolInfo(void)
 {
 }
 
-NFmiSmartToolInfo::~NFmiSmartToolInfo(void)
-{
-}
-
+NFmiSmartToolInfo::~NFmiSmartToolInfo(void) {}
 // luetaan  asetukset nykyään NFmiSetting-luokasta
 bool NFmiSmartToolInfo::Init(const std::string &theLoadDirectory)
 {

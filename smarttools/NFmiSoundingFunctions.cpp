@@ -8,8 +8,9 @@
 // ======================================================================
 
 #include "NFmiSoundingFunctions.h"
-#include <NFmiAngle.h>
-#include <NFmiInterpolation.h>
+#include <newbase/NFmiAngle.h>
+#include <newbase/NFmiValueString.h>
+#include <newbase/NFmiInterpolation.h>
 
 namespace NFmiSoundingFunctions
 {
@@ -220,8 +221,7 @@ double TSA(double OS, double P)
     D = D / 2.;
     double X = A * ::exp(-2.6518986 * MIXR_SAT(TQ, P) / TQ) - TQ * (::pow((1000. / P), .286));
     //;  IF THE TEMPERATURE DIFFERENCE, X, IS SMALL, EXIT THIS LOOP.
-    if (::fabs(X) < 0.01)
-      break;
+    if (::fabs(X) < 0.01) break;
     D = (X < 0) ? -fabs(D) : fabs(D);  // hämärää koodia alkuperäisessä kielessä
     TQ = TQ + D;
   }
@@ -427,8 +427,7 @@ double CalcLCLPressureFast(double T, double Td, double P)
   {
     iterationCount++;
     currentP = IterateMixMoistDiffWithNewtonMethod(w, tpot, currentP, diff);
-    if (::fabs(diff) < 0.01)
-      break;
+    if (::fabs(diff) < 0.01) break;
     if (currentP < 100)  // most unstable tapauksissa etsintä piste saattaa pompata tosi ylös
     {  // tässä on paineen arvoksi tullut niin pieni että nostetaan sitä takaisin ylös ja jatketaan
       // etsintöjä

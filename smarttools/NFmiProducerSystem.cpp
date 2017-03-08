@@ -8,9 +8,9 @@
 //---------------------------------------------------------- NFmiWarningCenterSystem.h
 
 #include "NFmiProducerSystem.h"
-#include <NFmiSettings.h>
-#include <NFmiMetTime.h>
-#include <NFmiLevel.h>
+#include <newbase/NFmiSettings.h>
+#include <newbase/NFmiMetTime.h>
+#include <newbase/NFmiLevel.h>
 
 const std::string &NFmiProducerInfo::ShortName(size_t index) const
 {
@@ -132,8 +132,7 @@ void NFmiProducerSystem::InitFromSettings(const std::string &theInitNameSpace)
 bool NFmiProducerSystem::ExistProducer(unsigned int index1Based) const
 {
   // jos annettu indeksi on 0, o-1 -> 4 miljardia unsigned maailmassa, joten riittää yksi testi
-  if (index1Based - 1 < itsProducers.size())
-    return true;
+  if (index1Based - 1 < itsProducers.size()) return true;
   return false;
 }
 

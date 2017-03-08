@@ -28,14 +28,10 @@ void NFmiModifiableQDatasBookKeeping::CopyClonedDatas(
   {
     // HUOM! Tässä kopioidaan dataa vain this:issa oleviin ei 0-pointtereihin.
     // Eli ei luoda uusia olioita tässä, kuten ehkä normaalisti sijoitus operaatiossa tehtäisiin.
-    if (itsUndoRedoQData)
-      *itsUndoRedoQData = *(theOther.itsUndoRedoQData);
-    if (itsAreaMask)
-      *itsAreaMask = *(theOther.itsAreaMask);
-    if (fLoadedFromFile)
-      *fLoadedFromFile = *(theOther.fLoadedFromFile);
-    if (fDirty)
-      *fDirty = *(theOther.fDirty);
+    if (itsUndoRedoQData) *itsUndoRedoQData = *(theOther.itsUndoRedoQData);
+    if (itsAreaMask) *itsAreaMask = *(theOther.itsAreaMask);
+    if (fLoadedFromFile) *fLoadedFromFile = *(theOther.fLoadedFromFile);
+    if (fDirty) *fDirty = *(theOther.fDirty);
   }
 }
 

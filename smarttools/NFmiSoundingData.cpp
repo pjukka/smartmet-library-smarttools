@@ -7,13 +7,14 @@
  */
 // ======================================================================
 
-#include <NFmiAngle.h>
-#include <NFmiDataModifierAvg.h>
-#include <NFmiFastQueryInfo.h>
-#include <NFmiInterpolation.h>
-#include <NFmiSoundingData.h>
-#include <NFmiSoundingFunctions.h>
-#include <NFmiValueString.h>
+#include "NFmiSoundingData.h"
+#include "NFmiSoundingFunctions.h"
+
+#include <newbase/NFmiAngle.h>
+#include <newbase/NFmiDataModifierAvg.h>
+#include <newbase/NFmiFastQueryInfo.h>
+#include <newbase/NFmiInterpolation.h>
+#include <newbase/NFmiValueString.h>
 
 using namespace NFmiSoundingFunctions;
 
@@ -58,8 +59,7 @@ bool NFmiSoundingData::GetTandTdValuesFromNearestPressureLevel(double P,
       bool foundLevel = false;
       for (int i = 0; i < static_cast<int>(pV.size()); i++)
       {
-        if (i < 0)
-          return false;  // jos 'tyhjä' luotaus, on tässä aluksi -1 indeksinä
+        if (i < 0) return false;  // jos 'tyhjä' luotaus, on tässä aluksi -1 indeksinä
         if (pV[i] != kFloatMissing)
         {
           double pDiff = ::fabs(pV[i] - P);
@@ -415,8 +415,7 @@ bool NFmiSoundingData::CalcLCLAvgValues(
       return false;
     int startP = static_cast<int>(round(GetPressureAtHeight(fromZ)));
     int endP = static_cast<int>(round(GetPressureAtHeight(toZ)));
-    if (startP == kFloatMissing || endP == kFloatMissing || startP <= endP)
-      return false;
+    if (startP == kFloatMissing || endP == kFloatMissing || startP <= endP) return false;
     NFmiDataModifierAvg avgT;   // riippuen moodista tässä lasketaan T tai Tpot keskiarvoa
     NFmiDataModifierAvg avgTd;  // riippuen moodista tässä lasketaan Td tai w keskiarvoa
     for (int pressure = startP; pressure > endP;
@@ -1498,8 +1497,7 @@ double NFmiSoundingData::CalcCAPE500Index(FmiLCLCalcType theLCLCalcType, double 
     return kFloatMissing;
 
   // HUOM! Pitää ottaa huomioon aseman korkeus kun tehdään laskuja!!!!
-  if (theHeightLimit != kFloatMissing)
-    theHeightLimit += ZeroHeight();
+  if (theHeightLimit != kFloatMissing) theHeightLimit += ZeroHeight();
 
   std::deque<float> &pValues = GetParamData(kFmiPressure);
   std::deque<float> &tValues = GetParamData(kFmiTemperature);

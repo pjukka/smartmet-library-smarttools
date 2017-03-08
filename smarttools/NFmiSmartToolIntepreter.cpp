@@ -18,11 +18,11 @@
 #include "NFmiProducerSystem.h"
 #include "NFmiExtraMacroParamData.h"
 
-#include <NFmiPreProcessor.h>
-#include <NFmiValueString.h>
-#include <NFmiLevelType.h>
-#include <NFmiLevel.h>
-#include <NFmiEnumConverter.h>
+#include <newbase/NFmiPreProcessor.h>
+#include <newbase/NFmiValueString.h>
+#include <newbase/NFmiLevelType.h>
+#include <newbase/NFmiLevel.h>
+#include <newbase/NFmiEnumConverter.h>
 
 #include <algorithm>
 #include <cctype>
@@ -53,15 +53,8 @@ NFmiSmartToolCalculationBlockInfoVector::NFmiSmartToolCalculationBlockInfoVector
 {
 }
 
-NFmiSmartToolCalculationBlockInfoVector::~NFmiSmartToolCalculationBlockInfoVector(void)
-{
-}
-
-void NFmiSmartToolCalculationBlockInfoVector::Clear(void)
-{
-  itsCalculationBlockInfos.clear();
-}
-
+NFmiSmartToolCalculationBlockInfoVector::~NFmiSmartToolCalculationBlockInfoVector(void) {}
+void NFmiSmartToolCalculationBlockInfoVector::Clear(void) { itsCalculationBlockInfos.clear(); }
 // Ottaa pointterin 'omistukseensa' eli pitää luoda ulkona new:llä ja antaa tänne
 void NFmiSmartToolCalculationBlockInfoVector::Add(
     boost::shared_ptr<NFmiSmartToolCalculationBlockInfo> &theBlockInfo)
@@ -162,6 +155,7 @@ NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiProducerSystem *theProducer
                                                  NFmiProducerSystem *theObservationProducerSystem)
     : itsProducerSystem(theProducerSystem),
       itsSmartToolCalculationBlocks(),
+      itsExtraMacroParamData(new NFmiExtraMacroParamData()),
       fNormalAssigmentFound(false),
       fMacroParamFound(false),
       fMacroParamSkriptInProgress(false),
@@ -477,8 +471,7 @@ bool NFmiSmartToolIntepreter::IsPossibleElseConditionLine(const std::string &the
   stringstream sstream(theTextLine);
   string tmp;
   sstream >> tmp;
-  if (!FindAnyFromText(tmp, itsTokenElseCommands))
-    return false;
+  if (!FindAnyFromText(tmp, itsTokenElseCommands)) return false;
   tmp = "";  // nollataan tämä, koska MSVC++7.1 ei sijoita jostain syystä mitään kun ollaan tultu
              // loppuun (muilla kääntäjillä on sijoitettu tyhjä tmp-stringiin)
   sstream >> tmp;
@@ -745,8 +738,7 @@ bool NFmiSmartToolIntepreter::InterpretMasks(
   }
 
   // minimissään erilaisia lasku elementtejä pitää olla vahintäin 3 (esim. T > 15)
-  if (theAreaMaskSectionInfo->GetAreaMaskInfoVector().size() >= 3)
-    return true;
+  if (theAreaMaskSectionInfo->GetAreaMaskInfoVector().size() >= 3) return true;
   throw runtime_error(::GetDictionaryString("SmartToolErrorConditionalWasNotComplete") + ":\n" +
                       theMaskSectionText);
 }
@@ -776,16 +768,16 @@ bool NFmiSmartToolIntepreter::InterpretCalculationSection(
     string nextLine = ExtractNextLine(theCalculationSectiontext, pos, &end);
     try
     {
-        if(!nextLine.empty() && !ConsistOnlyWhiteSpaces(nextLine))
-        {
-            boost::shared_ptr<NFmiSmartToolCalculationInfo> calculationInfo =
-                InterpretCalculationLine(nextLine);
-            if(calculationInfo)
-                theSectionInfo->AddCalculationInfo(calculationInfo);
-        }
+      if (!nextLine.empty() && !ConsistOnlyWhiteSpaces(nextLine))
+      {
+        boost::shared_ptr<NFmiSmartToolCalculationInfo> calculationInfo =
+            InterpretCalculationLine(nextLine);
+        if (calculationInfo) theSectionInfo->AddCalculationInfo(calculationInfo);
+      }
     }
-    catch(ExtraInfoMacroLineException &)
-    { }
+    catch (ExtraInfoMacroLineException &)
+    {
+    }
 
     if (end != theCalculationSectiontext.end())  // jos ei tarkistusta, menee yli lopusta
       pos = ++end;
@@ -1980,14 +1972,10 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
                                                  boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
 {
   // katsotaan onko jokin peek-funktioista
-  if (IsVariablePeekFunction(theVariableText, theMaskInfo))
-    return true;
-  if (IsVariableMetFunction(theVariableText, theMaskInfo))
-    return true;
-  if (IsVariableVertFunction(theVariableText, theMaskInfo))
-    return true;
-  if(IsVariableExtraInfoCommand(theVariableText))
-      throw ExtraInfoMacroLineException();
+  if (IsVariablePeekFunction(theVariableText, theMaskInfo)) return true;
+  if (IsVariableMetFunction(theVariableText, theMaskInfo)) return true;
+  if (IsVariableVertFunction(theVariableText, theMaskInfo)) return true;
+  if (IsVariableExtraInfoCommand(theVariableText)) throw ExtraInfoMacroLineException();
 
   // sitten katsotaan onko jokin integraatio funktioista
   std::string tmp(theVariableText);
@@ -2223,182 +2211,190 @@ bool NFmiSmartToolIntepreter::IsVariableVertFunction(
 
 bool NFmiSmartToolIntepreter::ExtractResolutionInfo()
 {
-    // Haluttu macroParam resoluutio kerrotaan seuraavanlaisilla lausekkeilla:
-    // resolution = 12.5  // [km]
-    // TAI
-    // resolution = hir_surface  // tai level tyyppi voi olla myös pressure/hybrid/height
+  // Haluttu macroParam resoluutio kerrotaan seuraavanlaisilla lausekkeilla:
+  // resolution = 12.5  // [km]
+  // TAI
+  // resolution = hir_surface  // tai level tyyppi voi olla myös pressure/hybrid/height
 
+  GetToken();
+  string assignOperator = token;
+  if (assignOperator == string("="))
+  {
     GetToken();
-    string assignOperator = token;
-    if(assignOperator == string("="))
+    string resolutionStr = token;
+    NFmiStringTools::LowerCase(resolutionStr);
+    vector<string> resolutionParts = NFmiStringTools::Split(resolutionStr, "_");
+    if (resolutionParts.size() == 1)
     {
-        GetToken();
-        string resolutionStr = token;
-        NFmiStringTools::LowerCase(resolutionStr);
-        vector<string> resolutionParts = NFmiStringTools::Split(resolutionStr, "_");
-        if(resolutionParts.size() == 1)
-        {
-            // Editoitu data on poikkeus, joka hanskataan ensin
-            if(resolutionParts[0] == std::string("edited"))
-            {
-                itsExtraMacroParamData->UseEditedDataForResolution(true);
-                return true;
-            }
-            else
-            {
-                // Konversio heittää poikkeuksen, jos kyseessä ei ole luku, joten siitä tulee oma virheilmoitus
-                itsExtraMacroParamData->GivenResolutionInKm(NFmiStringTools::Convert<float>(resolutionParts[0]));
-                return true;
-            }
-        }
-        else if(resolutionParts.size() == 2)
-        {
-            itsExtraMacroParamData->Producer(GetPossibleProducerInfo(resolutionParts[0]));
-            auto iter = itsResolutionLevelTypes.find(resolutionParts[1]);
-            if(iter != itsResolutionLevelTypes.end())
-            {
-                itsExtraMacroParamData->LevelType(iter->second);
-                return true;
-            }
-            else
-            {
-                std::string errorStr(::GetDictionaryString("Given 'resolution' data level type was illegal"));
-                errorStr += ".\n" + ::GetDictionaryString("Try something like following") + ":\n";
-                errorStr += ::GetDictionaryString("resolution = ec_surface OR pressure\\hybrid\\height");
-                throw std::runtime_error(errorStr);
-            }
-        }
+      // Editoitu data on poikkeus, joka hanskataan ensin
+      if (resolutionParts[0] == std::string("edited"))
+      {
+        itsExtraMacroParamData->UseEditedDataForResolution(true);
+        return true;
+      }
+      else
+      {
+        // Konversio heittää poikkeuksen, jos kyseessä ei ole luku, joten siitä tulee oma
+        // virheilmoitus
+        itsExtraMacroParamData->GivenResolutionInKm(
+            NFmiStringTools::Convert<float>(resolutionParts[0]));
+        return true;
+      }
     }
+    else if (resolutionParts.size() == 2)
+    {
+      itsExtraMacroParamData->Producer(GetPossibleProducerInfo(resolutionParts[0]));
+      auto iter = itsResolutionLevelTypes.find(resolutionParts[1]);
+      if (iter != itsResolutionLevelTypes.end())
+      {
+        itsExtraMacroParamData->LevelType(iter->second);
+        return true;
+      }
+      else
+      {
+        std::string errorStr(
+            ::GetDictionaryString("Given 'resolution' data level type was illegal"));
+        errorStr += ".\n" + ::GetDictionaryString("Try something like following") + ":\n";
+        errorStr += ::GetDictionaryString("resolution = ec_surface OR pressure\\hybrid\\height");
+        throw std::runtime_error(errorStr);
+      }
+    }
+  }
 
-    // Jos löytyi resolution -lauseke, mutta muuten ehdot eivät täyttyneet, tehdään virheilmoitus.
-    std::string errorStr(::GetDictionaryString("Given 'resolution' operation was illegal"));
-    errorStr += ".\n";
-    errorStr += ::GetDictionaryString("Try something like following");
-    errorStr += ":\n";
-    errorStr += ::GetDictionaryString("resolution = 12.5");
-    errorStr += "\n" + ::GetDictionaryString("OR") + "\n";
-    errorStr += ::GetDictionaryString("resolution = ec_surface");
-    throw std::runtime_error(errorStr);
+  // Jos löytyi resolution -lauseke, mutta muuten ehdot eivät täyttyneet, tehdään virheilmoitus.
+  std::string errorStr(::GetDictionaryString("Given 'resolution' operation was illegal"));
+  errorStr += ".\n";
+  errorStr += ::GetDictionaryString("Try something like following");
+  errorStr += ":\n";
+  errorStr += ::GetDictionaryString("resolution = 12.5");
+  errorStr += "\n" + ::GetDictionaryString("OR") + "\n";
+  errorStr += ::GetDictionaryString("resolution = ec_surface");
+  throw std::runtime_error(errorStr);
 }
 
 // Numero voi koostua kahdesta tokenista, merkistä ja itse numerosta.
 // Tämä metodi varmistaa että se ottaa kokonaisen numeron stringin.
 std::string NFmiSmartToolIntepreter::GetWholeNumberFromTokens()
 {
+  GetToken();
+  string numberStr = token;
+  if (numberStr == "-" || numberStr == "+")
+  {
     GetToken();
-    string numberStr = token;
-    if(numberStr == "-" || numberStr == "+")
-    {
-        GetToken();
-        numberStr += token;
-    }
-    return numberStr;
+    numberStr += token;
+  }
+  return numberStr;
 }
 
-const std::string gCalculationPointErrorStart = "\"CalculationPoint = lat,lon\" operation was given illegal";
+const std::string gCalculationPointErrorStart =
+    "\"CalculationPoint = lat,lon\" operation was given illegal";
 
 bool NFmiSmartToolIntepreter::ExtractCalculationPointInfo()
 {
-    // Haluttu laskenta piste kerrotaan seuraavanlaisilla lausekkeilla
-    // calculationpoint = 60.1,24.9
-    // Laskentapisteet otetaan talteen itsExtraMacroParamData -olioon.
+  // Haluttu laskenta piste kerrotaan seuraavanlaisilla lausekkeilla
+  // calculationpoint = 60.1,24.9
+  // Laskentapisteet otetaan talteen itsExtraMacroParamData -olioon.
 
-    GetToken();
-    string assignOperator = token;
-    if(assignOperator == string("="))
+  GetToken();
+  string assignOperator = token;
+  if (assignOperator == string("="))
+  {
+    string latitudeStr = GetWholeNumberFromTokens();
+
+    // Kokeillaan onko annettu tuottaja, jonka datasta asemat otetaan (pitää hanskata poikkeukset,
+    // että voidaan tarvittaessa jatkaa)
+    try
     {
-        string latitudeStr = GetWholeNumberFromTokens();
-
-        // Kokeillaan onko annettu tuottaja, jonka datasta asemat otetaan (pitää hanskata poikkeukset, että voidaan tarvittaessa jatkaa)
-        try
-        {
-            itsExtraMacroParamData->CalculationPointProducer(GetPossibleProducerInfo(latitudeStr));
-            if(itsExtraMacroParamData->CalculationPointProducer().GetIdent())
-            {
-                return true;
-            }
-        }
-        catch(...)
-        {
-        }
-
-        GetToken();
-        string commaOperator = token;
-        if(commaOperator == string(","))
-        {
-            string longitudeStr = GetWholeNumberFromTokens();
-            try
-            {
-                double latitude = NFmiStringTools::Convert<double>(latitudeStr);
-                double longitude = NFmiStringTools::Convert<double>(longitudeStr);
-                if(latitude >= -90 && latitude <= 90)
-                {
-                    if(longitude >= -180 && longitude <= 360)
-                    {
-                        NFmiPoint latlon(longitude, latitude);
-                        itsExtraMacroParamData->AddCalculationPoint(latlon);
-                        return true;
-                    }
-                    else
-                        throw std::runtime_error(gCalculationPointErrorStart + " lon value.\nValue must be between -180 and 360 degrees.");
-                }
-                else
-                    throw std::runtime_error(gCalculationPointErrorStart + " lat value.\nValue must be between -90 and 90 degrees.");
-            }
-            catch(std::exception &e)
-            {
-                std::string errorStr = gCalculationPointErrorStart + " lat/lon point:\n";
-                errorStr += e.what();
-                throw std::runtime_error(errorStr);
-            }
-        }
+      itsExtraMacroParamData->CalculationPointProducer(GetPossibleProducerInfo(latitudeStr));
+      if (itsExtraMacroParamData->CalculationPointProducer().GetIdent())
+      {
+        return true;
+      }
+    }
+    catch (...)
+    {
     }
 
-    std::string errorStr = gCalculationPointErrorStart + " values, try something like this:\n";
-    errorStr += "\"CalculationPoint = 60.1,24.9\"";
-    errorStr += " or ";
-    errorStr += "\"CalculationPoint = synop\\metar\\other_producer\"";
-    throw std::runtime_error(errorStr);
+    GetToken();
+    string commaOperator = token;
+    if (commaOperator == string(","))
+    {
+      string longitudeStr = GetWholeNumberFromTokens();
+      try
+      {
+        double latitude = NFmiStringTools::Convert<double>(latitudeStr);
+        double longitude = NFmiStringTools::Convert<double>(longitudeStr);
+        if (latitude >= -90 && latitude <= 90)
+        {
+          if (longitude >= -180 && longitude <= 360)
+          {
+            NFmiPoint latlon(longitude, latitude);
+            itsExtraMacroParamData->AddCalculationPoint(latlon);
+            return true;
+          }
+          else
+            throw std::runtime_error(gCalculationPointErrorStart +
+                                     " lon value.\nValue must be between -180 and 360 degrees.");
+        }
+        else
+          throw std::runtime_error(gCalculationPointErrorStart +
+                                   " lat value.\nValue must be between -90 and 90 degrees.");
+      }
+      catch (std::exception &e)
+      {
+        std::string errorStr = gCalculationPointErrorStart + " lat/lon point:\n";
+        errorStr += e.what();
+        throw std::runtime_error(errorStr);
+      }
+    }
+  }
+
+  std::string errorStr = gCalculationPointErrorStart + " values, try something like this:\n";
+  errorStr += "\"CalculationPoint = 60.1,24.9\"";
+  errorStr += " or ";
+  errorStr += "\"CalculationPoint = synop\\metar\\other_producer\"";
+  throw std::runtime_error(errorStr);
 }
 
 bool NFmiSmartToolIntepreter::ExtractObservationRadiusInfo()
 {
-    // Jos skriptistä on löytynyt 'ObservationRadius = xxx'
-    GetToken();
-    string assignOperator = token;
-    if(assignOperator == string("="))
+  // Jos skriptistä on löytynyt 'ObservationRadius = xxx'
+  GetToken();
+  string assignOperator = token;
+  if (assignOperator == string("="))
+  {
+    string obsRadiusStr = GetWholeNumberFromTokens();
+    try
     {
-        string obsRadiusStr = GetWholeNumberFromTokens();
-        try
-        {
-            float obsRadiusInKm = NFmiStringTools::Convert<float>(obsRadiusStr);
-            itsExtraMacroParamData->ObservationRadiusInKm(obsRadiusInKm);
-            return true;
-        }
-        catch(...)
-        { }
+      float obsRadiusInKm = NFmiStringTools::Convert<float>(obsRadiusStr);
+      itsExtraMacroParamData->ObservationRadiusInKm(obsRadiusInKm);
+      return true;
     }
+    catch (...)
+    {
+    }
+  }
 
-    std::string errorStr = "Given ObservationRadius -clause was illegal, try something like this:\n";
-    errorStr += "\"ObservationRadius = 20 \\\\ [km]\"";
-    throw std::runtime_error(errorStr);
+  std::string errorStr = "Given ObservationRadius -clause was illegal, try something like this:\n";
+  errorStr += "\"ObservationRadius = 20 \\\\ [km]\"";
+  throw std::runtime_error(errorStr);
 }
 
 bool NFmiSmartToolIntepreter::IsVariableExtraInfoCommand(const std::string &theVariableText)
 {
-    std::string aVariableText(theVariableText);
-    NFmiStringTools::LowerCase(aVariableText); // Tässä tarkastellaan case insensitiivisesti
-    FunctionMap::iterator it = itsExtraInfoCommands.find(aVariableText);
-    if(it != itsExtraInfoCommands.end())
-    {
-        if(it->second == NFmiAreaMask::Resolution)
-            return ExtractResolutionInfo();
-        else if(it->second == NFmiAreaMask::CalculationPoint)
-            return ExtractCalculationPointInfo();
-        else if(it->second == NFmiAreaMask::ObservationRadius)
-            return ExtractObservationRadiusInfo();
-    }
-    return false;
+  std::string aVariableText(theVariableText);
+  NFmiStringTools::LowerCase(aVariableText);  // Tässä tarkastellaan case insensitiivisesti
+  FunctionMap::iterator it = itsExtraInfoCommands.find(aVariableText);
+  if (it != itsExtraInfoCommands.end())
+  {
+    if (it->second == NFmiAreaMask::Resolution)
+      return ExtractResolutionInfo();
+    else if (it->second == NFmiAreaMask::CalculationPoint)
+      return ExtractCalculationPointInfo();
+    else if (it->second == NFmiAreaMask::ObservationRadius)
+      return ExtractObservationRadiusInfo();
+  }
+  return false;
 }
 
 std::string NFmiSmartToolIntepreter::HandlePossibleUnaryMarkers(const std::string &theCurrentString)
@@ -2409,8 +2405,7 @@ std::string NFmiSmartToolIntepreter::HandlePossibleUnaryMarkers(const std::strin
     GetToken();
     returnStr += token;  // lisätään '-'-etumerkki ja seuraava token ja katsotaan mitä syntyy
   }
-  if (returnStr == string("+"))
-    GetToken();  // +-merkki ohitetaan merkityksettömänä
+  if (returnStr == string("+")) GetToken();  // +-merkki ohitetaan merkityksettömänä
   return returnStr;
 }
 
@@ -2479,9 +2474,10 @@ bool NFmiSmartToolIntepreter::IsVariableBinaryOperator(
   return false;
 }
 
-std::unique_ptr<NFmiExtraMacroParamData> NFmiSmartToolIntepreter::GetOwnershipOfExtraMacroParamData() 
-{ 
-    return std::move(itsExtraMacroParamData); 
+std::unique_ptr<NFmiExtraMacroParamData>
+NFmiSmartToolIntepreter::GetOwnershipOfExtraMacroParamData()
+{
+  return std::move(itsExtraMacroParamData);
 }
 
 NFmiParam NFmiSmartToolIntepreter::GetParamFromString(const std::string &theParamText)

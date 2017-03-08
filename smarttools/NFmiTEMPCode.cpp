@@ -2,12 +2,12 @@
 #include "NFmiAviationStationInfoSystem.h"
 #include "NFmiDictionaryFunction.h"
 #include "NFmiTEMPCode.h"
-#include <NFmiFastQueryInfo.h>
-#include <NFmiLocationBag.h>
-#include <NFmiQueryDataUtil.h>
-#include <NFmiStringTools.h>
-#include <NFmiTimeList.h>
-#include <NFmiTotalWind.h>
+#include <newbase/NFmiFastQueryInfo.h>
+#include <newbase/NFmiLocationBag.h>
+#include <newbase/NFmiQueryDataUtil.h>
+#include <newbase/NFmiStringTools.h>
+#include <newbase/NFmiTimeList.h>
+#include <newbase/NFmiTotalWind.h>
 #include <set>
 #include <sstream>
 
@@ -456,8 +456,7 @@ static bool DecodeHeader(std::stringstream &ssin,
     fTempMobil = doTempMobil;  // A-osiossa vain talletetaan onko mobiili temp kyseessä
   else
   {  // tarkistetaan että sama temp tyyppi, kuin A-osiossa ollut
-    if (fTempMobil != doTempMobil)
-      return false;  // pitäisi heittää poikkeus!!
+    if (fTempMobil != doTempMobil) return false;  // pitäisi heittää poikkeus!!
   }
 
   if (::toupper(MiMiMjMj_Str[2]) == theWantedSectionChar &&
@@ -501,9 +500,8 @@ static bool DecodeHeader(std::stringstream &ssin,
     if (fInitializeValues)
       theTime = tempTime;  // A-osiossa vain talletetaan aika
     else
-    {  // tarkistetaan että sama aika, kuin A-osiossa ollut
-      if (theTime != tempTime)
-        return false;  // pitäisi heittää poikkeus!!
+    {                                         // tarkistetaan että sama aika, kuin A-osiossa ollut
+      if (theTime != tempTime) return false;  // pitäisi heittää poikkeus!!
     }
 
     if (doTempMobil)
@@ -570,8 +568,7 @@ static bool DecodeHeader(std::stringstream &ssin,
       theStation = station;  // A-osiossa vain talletetaan aika
     else
     {  // tarkistetaan että sama asema, kuin A-osiossa ollut
-      if (theStation != station)
-        return false;  // pitäisi heittää poikkeus!!
+      if (theStation != station) return false;  // pitäisi heittää poikkeus!!
     }
     return true;
   }
@@ -705,8 +702,7 @@ bool NFmiTEMPCode::DecodeA(void)
           AddData(levelData);  // laitetaan saatu leveli talteen
 
           ssin >> PnPnhnhnhn_Str;  // tämä pitää lukea lopuksi, koska loopin lopetus riippuu tästä
-          if (ssin.good() == false)
-            break;
+          if (ssin.good() == false) break;
           // throw std::runtime_error("Data tiedostossa loppui kesken.");
           PnPn_Str = std::string(PnPnhnhnhn_Str.begin(), PnPnhnhnhn_Str.begin() + 2);
         }
@@ -754,12 +750,9 @@ bool NFmiTEMPCode::DecodeB(void)
         double Td = kFloatMissing;
 
         ssin >> XXPPP_Str;
-        if (XXPPP_Str.size() != 5)
-          return false;
-        if (XXPPP_Str == "21212")
-          break;  // nyt tultiin tämän osion loppuun
-        if (XXPPP_Str == "31313")
-          break;  // nyt tultiin tämän osion loppuun
+        if (XXPPP_Str.size() != 5) return false;
+        if (XXPPP_Str == "21212") break;  // nyt tultiin tämän osion loppuun
+        if (XXPPP_Str == "31313") break;  // nyt tultiin tämän osion loppuun
         if (XXPPP_Str == "41414")
         {
           _41414_groupMissing =
@@ -799,11 +792,9 @@ bool NFmiTEMPCode::DecodeB(void)
             double WS = kFloatMissing;
 
             ssin >> XXPPP_Str;
-            if (XXPPP_Str.size() != 5)
-              return false;
-            if (XXPPP_Str == "41414")
-              break;                   // nyt tultiin tämän osion loppuun
-            if (XXPPP_Str == "51515")  // joskus 51515 tulee ilman 41414:ää
+            if (XXPPP_Str.size() != 5) return false;
+            if (XXPPP_Str == "41414") break;  // nyt tultiin tämän osion loppuun
+            if (XXPPP_Str == "51515")         // joskus 51515 tulee ilman 41414:ää
             {
               _41414_groupMissing = true;
               break;  // nyt tultiin tämän osion loppuun

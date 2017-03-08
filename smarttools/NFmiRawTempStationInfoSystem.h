@@ -14,7 +14,8 @@
 #ifndef NFMIRAWTEMPSTATIONINFOSYSTEM_H
 #define NFMIRAWTEMPSTATIONINFOSYSTEM_H
 
-#include <NFmiHPlaceDescriptor.h>
+#include <newbase/NFmiHPlaceDescriptor.h>
+#include <newbase/NFmiStation.h>
 
 class NFmiRawTempStationInfoSystem
 {
@@ -27,6 +28,58 @@ class NFmiRawTempStationInfoSystem
   std::string
       itsInitLogMessage;  // onnistuneen initialisoinnin viesti, missä voi olla varoituksia lokiin.
   NFmiHPlaceDescriptor itsLocations;
+};
+
+class AviationStation : public NFmiStation
+{
+ public:
+  AviationStation(void) : NFmiStation(), itsIcaoStr() {}
+  AviationStation(long theIdent,
+                  const NFmiString &theName,
+                  double theLongitude,
+                  double theLatitude,
+                  const std::string &theIcaoStr)
+      : NFmiStation(theIdent, theName, theLongitude, theLatitude, kFloatMissing, kWMO),
+        itsIcaoStr(theIcaoStr)
+  {
+  }
+
+  ~AviationStation(void) {}
+  const std::string &IcaoStr(void) const { return itsIcaoStr; }
+  void IcaoStr(const std::string &newValue) { itsIcaoStr = newValue; }
+  NFmiLocation *Clone(void) const { return new AviationStation(*this); }
+ private:
+  std::string itsIcaoStr;  // icao tunnus (esim. EFHK)
+};
+
+class NFmiAviationStationInfoSystem_Obsolite  // use class NFmiAviationStationInfoSystem from
+                                              // NFmiAviationStationInfoSystem.h instead
+{
+ public:
+  NFmiAviationStationInfoSystem_Obsolite(bool verboseMode = false)
+      : itsInitLogMessage(), itsLocations(), fVerboseMode(verboseMode)
+  {
+  }
+
+  NFmiHPlaceDescriptor &Locations(void) { return itsLocations; }
+  const std::string &InitLogMessage(void) const { return itsInitLogMessage; }
+  void Init(const std::string &theInitFileName);
+
+  bool FindAviationStation(const std::string &theIcaoStr);
+  bool FindStation(long theStationId);
+  const NFmiLocation *CurrentLocation(const std::string &theIcaoStr);
+
+ private:
+  //	double GetLatOrLonFromString(const std::string &theLatOrLonStr, const std::string
+  //&theLineStr, const std::string &theInitFileName, char posMark, char negMark);
+  bool GetAviationStationFromString(const std::string &theStationStr,
+                                    const std::string &theInitFileName,
+                                    AviationStation &theStationOut);
+
+  std::string
+      itsInitLogMessage;  // onnistuneen initialisoinnin viesti, missä voi olla varoituksia lokiin.
+  NFmiHPlaceDescriptor itsLocations;
+  bool fVerboseMode;
 };
 
 class NFmiSilamStationList

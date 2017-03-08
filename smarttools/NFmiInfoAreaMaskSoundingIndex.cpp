@@ -6,7 +6,7 @@
 // ======================================================================
 
 #include "NFmiInfoAreaMaskSoundingIndex.h"
-#include <NFmiFastQueryInfo.h>
+#include <newbase/NFmiFastQueryInfo.h>
 
 NFmiInfoAreaMaskSoundingIndex::~NFmiInfoAreaMaskSoundingIndex(void)
 {
