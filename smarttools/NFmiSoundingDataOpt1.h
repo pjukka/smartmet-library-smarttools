@@ -15,6 +15,7 @@
 #include <newbase/NFmiMetTime.h>
 #include <newbase/NFmiLocation.h>
 #include <newbase/NFmiParameterName.h>
+#include <newbase/NFmiQueryDataUtil.h>
 
 #include <deque>
 #include <unordered_map>

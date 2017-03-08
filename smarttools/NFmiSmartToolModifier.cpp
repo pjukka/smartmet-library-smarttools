@@ -43,6 +43,7 @@
     disable : 4244 4267 4512)  // boost:in thread kirjastosta tulee ikävästi 4244 varoituksia
 #endif
 #include <boost/thread.hpp>
+#include "NFmiStation2GridMask.h"
 
 #ifdef _MSC_VER
 #pragma warning(default : 4244 4267 4512)  // laitetaan 4244 takaisin päälle, koska se on tärkeä
@@ -1530,7 +1531,6 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateProbabilityFunction
 boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateClosestObsValueMask(
     const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
   boost::shared_ptr<NFmiFastQueryInfo> info =
       CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
   if (info->IsGrid())
@@ -1540,16 +1540,11 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateClosestObsValueMask
   NFmiNearestObsValue2GridMask *nearestObsValue2GridMask = new NFmiNearestObsValue2GridMask(
       NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.FunctionArgumentCount());
   nearestObsValue2GridMask->SetGriddingHelpers(
-      itsWorkingGrid->itsArea, itsDoc, NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
+      itsWorkingGrid->itsArea, itsGriddingHelper, NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
   boost::shared_ptr<NFmiAreaMask> areaMask =
       boost::shared_ptr<NFmiAreaMask>(nearestObsValue2GridMask);
   MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
   return areaMask;
-#else
-  throw std::runtime_error(
-      "No support for closestvalue -function in this build, enable "
-      "FMI_SUPPORT_STATION_DATA_SMARTTOOL macro");
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
 }
 
 boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreatePeekTimeMask(
@@ -1644,13 +1639,10 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateVertFunctionStartMa
   {
     areaMask = CreateProbabilityFunctionMask(theAreaMaskInfo, mustUsePressureInterpolation);
   }
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
   else if (theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue)
   {
     areaMask = CreateClosestObsValueMask(theAreaMaskInfo, mustUsePressureInterpolation);
   }
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
-
   else if (theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::PeekT)
   {
     areaMask = CreatePeekTimeMask(theAreaMaskInfo, mustUsePressureInterpolation);
@@ -1678,7 +1670,6 @@ void NFmiSmartToolModifier::DoFinalAreaMaskInitializations(
     if (areaMask->Info() && areaMask->Info()->Grid() == 0)
     {  // jos oli info dataa ja vielä asemadatasta, tarkistetaan että kyse oli vielä
        // infoData-tyypistä, muuten oli virheellinen lauseke
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
       if (theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::ClosestObsValue ||
           theAreaMaskInfo.GetSecondaryFunctionType() == NFmiAreaMask::Occurrence)
       {  // tämä on ok, ei tarvitse tehdä mitään
@@ -1690,14 +1681,13 @@ void NFmiSmartToolModifier::DoFinalAreaMaskInitializations(
             new NFmiStation2GridMask(areaMask->MaskType(), areaMask->GetDataType(), info);
         station2GridMask->SetGriddingHelpers(
             itsWorkingGrid->itsArea,
-            itsDoc,
+            itsGriddingHelper,
             NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY),
             itsExtraMacroParamData->ObservationRadiusRelative());
         areaMask = boost::shared_ptr<NFmiAreaMask>(station2GridMask);
         MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
       }
       else
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
       {
         std::string errStr;
         errStr += ::GetDictionaryString(
@@ -2205,7 +2195,6 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(
     if (info == 0)  // kokeillaan vielä fraktiili-dataa (esim. EC:n fraktiili dataa jne)
       info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kClimatologyData);
 
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
     if (info == 0)  // kokeillaan vielä havainto dataa (eli ne on yleensä asemadataa)
       info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kObservations);
     if (info == 0)  // kokeillaan vielä eri level vaihtoehtoja
@@ -2221,8 +2210,6 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(
       info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kSingleStationRadarData);
     if (info == 0)  // kokeillaan vielä salama dataa
       info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kFlashData);
-
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
   }
   if (!info)
     throw runtime_error(::GetDictionaryString("SmartToolModifierErrorParamNotFound") + "\n" +

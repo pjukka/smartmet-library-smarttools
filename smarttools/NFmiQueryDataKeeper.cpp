@@ -119,6 +119,7 @@ NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> 
   AddData(theData, true, dataWasDeleted);  // true tarkoittaa että kyse on 1. lisättävästä datasta
 }
 
+NFmiQueryDataSetKeeper::~NFmiQueryDataSetKeeper(void) {}
 /*
 static void QDataListDestroyer(NFmiQueryDataSetKeeper::ListType *theQDataListToBeDestroyed)
 {
