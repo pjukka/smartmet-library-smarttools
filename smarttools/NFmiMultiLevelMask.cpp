@@ -119,7 +119,8 @@ bool NFmiMultiLevelMask::IsMasked(unsigned long theIndex) const
       return false;
   if ((itsMaskType & NFmiMetEditorTypes::kFmiDisplayedMask) ==
       NFmiMetEditorTypes::kFmiDisplayedMask)
-    if (!itsDisplayedMask.IsMasked(theIndex)) return false;
+    if (!itsDisplayedMask.IsMasked(theIndex))
+      return false;
   if ((itsMaskType & 0xffffffff) == 0)  // Jos mitään maaskityyppiä ei ole valittu.
     return false;                       // Tämä on käyttäjän aiheuttama virhetila.
   return true;
@@ -154,8 +155,10 @@ bool NFmiMultiLevelMask::IsMasked(unsigned long theIndex, unsigned long theMaskT
       return false;
   if ((theMaskType & NFmiMetEditorTypes::kFmiDisplayedMask) ==
       NFmiMetEditorTypes::kFmiDisplayedMask)
-    if (!itsDisplayedMask.IsMasked(theIndex)) return false;
-  if ((theMaskType & 0xffffffff) == 0) return false;  // Tämä on käyttäjän aiheuttama virhetila.
+    if (!itsDisplayedMask.IsMasked(theIndex))
+      return false;
+  if ((theMaskType & 0xffffffff) == 0)
+    return false;  // Tämä on käyttäjän aiheuttama virhetila.
   return true;
 }
 //--------------------------------------------------------

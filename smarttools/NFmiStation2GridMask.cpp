@@ -1,9 +1,8 @@
 #include "NFmiStation2GridMask.h"
 #include "NFmiDrawParam.h"
-#include <NFmiFastQueryInfo.h>
-#include <NFmiGriddingHelperInterface.h>
+#include "NFmiGriddingHelperInterface.h"
 #include "NFmiFastInfoUtils.h"
-
+#include <newbase/NFmiFastQueryInfo.h>
 
 // ****************************************************************************
 // ****************** NFmiStation2GridMask ************************************
@@ -38,9 +37,9 @@ NFmiStation2GridMask::NFmiStation2GridMask(const NFmiStation2GridMask &theOther)
       ,
       itsLastCalculatedTime(theOther.itsLastCalculatedTime),
       itsAreaPtr(theOther.itsAreaPtr.get() ? theOther.itsAreaPtr.get()->Clone() : 0),
-    itsGriddingHelper(theOther.itsGriddingHelper),
+      itsGriddingHelper(theOther.itsGriddingHelper),
       itsStation2GridSize(theOther.itsStation2GridSize),
-    itsObservationRadiusRelative(theOther.itsObservationRadiusRelative),
+      itsObservationRadiusRelative(theOther.itsObservationRadiusRelative),
       itsCacheMutex(theOther.itsCacheMutex)
 {
 }
@@ -96,9 +95,13 @@ void NFmiStation2GridMask::DoGriddingCheck(const NFmiCalculationParams &theCalcu
             static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.X()),
             static_cast<NFmiDataMatrix<float>::size_type>(itsStation2GridSize.Y()),
             kFloatMissing);
-        if(itsGridStationDataCallback)
-            itsGridStationDataCallback(
-            itsGriddingHelper, itsAreaPtr, drawParam, griddedData, theCalculationParams.itsTime, itsObservationRadiusRelative);
+        if (itsGridStationDataCallback)
+          itsGridStationDataCallback(itsGriddingHelper,
+                                     itsAreaPtr,
+                                     drawParam,
+                                     griddedData,
+                                     theCalculationParams.itsTime,
+                                     itsObservationRadiusRelative);
         std::pair<DataCache::iterator, bool> insertResult = itsGriddedStationData->insert(
             std::make_pair(theCalculationParams.itsTime, griddedData));
         if (insertResult.second)
@@ -129,7 +132,7 @@ NFmiNearestObsValue2GridMask::NFmiNearestObsValue2GridMask(
       itsCurrentNearestObsValuesData(0),
       itsLastCalculatedTime(NFmiMetTime::gMissingTime),
       itsAreaPtr(),
-    itsGriddingHelper(0),
+      itsGriddingHelper(0),
       itsResultGridSize(1, 1),
       itsCacheMutex(new MutexType())
 {
@@ -147,7 +150,7 @@ NFmiNearestObsValue2GridMask::NFmiNearestObsValue2GridMask(
       itsCurrentNearestObsValuesData(0),  // tämä laitetaan aina 0:ksi
       itsLastCalculatedTime(theOther.itsLastCalculatedTime),
       itsAreaPtr(theOther.itsAreaPtr.get() ? theOther.itsAreaPtr.get()->Clone() : 0),
-    itsGriddingHelper(theOther.itsGriddingHelper),
+      itsGriddingHelper(theOther.itsGriddingHelper),
       itsResultGridSize(theOther.itsResultGridSize),
       itsCacheMutex(theOther.itsCacheMutex)
 {
@@ -169,9 +172,10 @@ double NFmiNearestObsValue2GridMask::Value(const NFmiCalculationParams &theCalcu
     return kFloatMissing;
 }
 
-void NFmiNearestObsValue2GridMask::SetGriddingHelpers(NFmiArea *theArea,
+void NFmiNearestObsValue2GridMask::SetGriddingHelpers(
+    NFmiArea *theArea,
     NFmiGriddingHelperInterface *theGriddingHelper,
-                                                      const NFmiPoint &theResultGridSize)
+    const NFmiPoint &theResultGridSize)
 {
   itsAreaPtr.reset(theArea->Clone());
   itsGriddingHelper = theGriddingHelper;

@@ -25,7 +25,6 @@ class NFmiFastQueryInfo;
 class NFmiSoundingDataOpt1
 {
  public:
-
   class LFCIndexCache
   {
    public:
@@ -167,7 +166,9 @@ class NFmiSoundingDataOpt1
   bool CheckForMissingLowLevelData(FmiParameterName theParaId, unsigned long theMissingIndexLimit);
   float GetPressureAtHeight(double H);
   void ClearDatas(void);
-  bool FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId, NFmiQueryDataUtil::SignificantSoundingLevels &theSoungingLevels);
+  bool FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+                     FmiParameterName theId,
+                     NFmiQueryDataUtil::SignificantSoundingLevels &theSoungingLevels);
   bool FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
                      FmiParameterName theId,
                      const NFmiMetTime &theTime,
@@ -179,12 +180,21 @@ class NFmiSoundingDataOpt1
   std::string MakeCacheString(double T, double Td, double fromP, double toP);
   bool FillHeightDataFromLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
   void SetVerticalParamStatus(void);
-  void DoAfterFillChecks(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, FmiParameterName theId);
-  bool LookForFilledParamFromInfo(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId);
-  std::deque<float>& GetResizedParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-      FmiParameterName theId, NFmiQueryDataUtil::SignificantSoundingLevels &theSoungingLevels);
-  void FillParamDataNormally(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data);
-  void FillParamDataFromSignificantLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, NFmiQueryDataUtil::SignificantSoundingLevels &significantLevels);
+  void DoAfterFillChecks(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+                         std::deque<float> &data,
+                         FmiParameterName theId);
+  bool LookForFilledParamFromInfo(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+                                  FmiParameterName theId);
+  std::deque<float> &GetResizedParamData(
+      const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+      FmiParameterName theId,
+      NFmiQueryDataUtil::SignificantSoundingLevels &theSoungingLevels);
+  void FillParamDataNormally(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+                             std::deque<float> &data);
+  void FillParamDataFromSignificantLevels(
+      const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+      std::deque<float> &data,
+      NFmiQueryDataUtil::SignificantSoundingLevels &significantLevels);
   bool IsMovingSounding(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
 
   NFmiLocation itsLocation;

@@ -280,7 +280,8 @@ bool NFmiDrawParamList::Find(const NFmiDataIdent& theParam,
           if (drawParam->Level().LevelType() == 0 && (theLevel->LevelType() == kFmiAnyLevelType ||
                                                       theLevel->LevelType() == kFmiMeanSeaLevel))
             return true;  // tämä case tulee kun nykyään tehdään pinta parametreja
-          if (theLevel && (*(theLevel) == drawParam->Level())) return true;
+          if (theLevel && (*(theLevel) == drawParam->Level()))
+            return true;
         }
       }
     }
@@ -553,7 +554,8 @@ void NFmiDrawParamList::ActivateOnlyOne(void)
     return;
   int activeIndex = FindActive();
   DeactivateAll();
-  if (activeIndex == 0) activeIndex++;
+  if (activeIndex == 0)
+    activeIndex++;
   if (Index(activeIndex))  // pitäisi löytyä!!
     Current()->Activate(true);
 }

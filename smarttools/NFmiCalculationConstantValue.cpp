@@ -18,8 +18,12 @@
 //--------------------------------------------------------
 // Constructor/Destructor
 //--------------------------------------------------------
-NFmiCalculationConstantValue::NFmiCalculationConstantValue(double value) : itsValue(value) {}
-NFmiCalculationConstantValue::~NFmiCalculationConstantValue() {}
+NFmiCalculationConstantValue::NFmiCalculationConstantValue(double value) : itsValue(value)
+{
+}
+NFmiCalculationConstantValue::~NFmiCalculationConstantValue()
+{
+}
 NFmiCalculationConstantValue::NFmiCalculationConstantValue(
     const NFmiCalculationConstantValue &theOther)
     : NFmiAreaMaskImpl(theOther), itsValue(theOther.itsValue)
@@ -81,7 +85,9 @@ NFmiCalculationRampFuction::NFmiCalculationRampFuction(
 {
 }
 
-NFmiCalculationRampFuction::~NFmiCalculationRampFuction(void) {}
+NFmiCalculationRampFuction::~NFmiCalculationRampFuction(void)
+{
+}
 NFmiCalculationRampFuction::NFmiCalculationRampFuction(const NFmiCalculationRampFuction &theOther)
     : NFmiInfoAreaMask(theOther)
 {
@@ -119,7 +125,9 @@ NFmiCalculationIntegrationFuction::NFmiCalculationIntegrationFuction(
 {
 }
 
-NFmiCalculationIntegrationFuction::~NFmiCalculationIntegrationFuction(void) {}
+NFmiCalculationIntegrationFuction::~NFmiCalculationIntegrationFuction(void)
+{
+}
 double NFmiCalculationIntegrationFuction::Value(const NFmiCalculationParams &theCalculationParams,
                                                 bool /* fUseTimeInterpolationAlways */)
 {
@@ -162,7 +170,9 @@ NFmiCalculationRampFuctionWithAreaMask::NFmiCalculationRampFuctionWithAreaMask(
 {
 }
 
-NFmiCalculationRampFuctionWithAreaMask::~NFmiCalculationRampFuctionWithAreaMask(void) {}
+NFmiCalculationRampFuctionWithAreaMask::~NFmiCalculationRampFuctionWithAreaMask(void)
+{
+}
 NFmiCalculationRampFuctionWithAreaMask::NFmiCalculationRampFuctionWithAreaMask(
     const NFmiCalculationRampFuctionWithAreaMask &theOther)
     : NFmiAreaMaskImpl(theOther),
@@ -184,7 +194,9 @@ NFmiAreaMask *NFmiCalculationRampFuctionWithAreaMask::Clone(void) const
 // ****************************************************************************
 double NFmiCalculationDeltaZValue::itsHeightValue;
 
-NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(void) : NFmiAreaMaskImpl() {}
+NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(void) : NFmiAreaMaskImpl()
+{
+}
 NFmiCalculationDeltaZValue::NFmiCalculationDeltaZValue(const NFmiCalculationDeltaZValue &theOther)
     : NFmiAreaMaskImpl(theOther)
 {
@@ -197,7 +209,6 @@ NFmiAreaMask *NFmiCalculationDeltaZValue::Clone(void) const
 // ****************************************************************************
 // **************** NFmiCalculationDeltaZValue ********************************
 // ****************************************************************************
-
 
 // *********************************************************************
 // *************** NFmiPeekTimeMask ************************************
@@ -214,13 +225,18 @@ NFmiPeekTimeMask::NFmiPeekTimeMask(Type theMaskType,
   itsFunctionArgumentCount = theArgumentCount;
 }
 
-NFmiPeekTimeMask::~NFmiPeekTimeMask(void) {}
+NFmiPeekTimeMask::~NFmiPeekTimeMask(void)
+{
+}
 NFmiPeekTimeMask::NFmiPeekTimeMask(const NFmiPeekTimeMask &theOther)
     : NFmiInfoAreaMask(theOther), itsTimeOffsetInMinutes(theOther.itsTimeOffsetInMinutes)
 {
 }
 
-NFmiAreaMask *NFmiPeekTimeMask::Clone(void) const { return new NFmiPeekTimeMask(*this); }
+NFmiAreaMask *NFmiPeekTimeMask::Clone(void) const
+{
+  return new NFmiPeekTimeMask(*this);
+}
 double NFmiPeekTimeMask::Value(const NFmiCalculationParams &theCalculationParams,
                                bool /* fUseTimeInterpolationAlways */)
 {

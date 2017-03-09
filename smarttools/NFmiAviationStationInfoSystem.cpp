@@ -246,8 +246,10 @@ static bool GetAviationStationFromWmoFlatTableString(const std::string &theStati
   {
     // HUOM! vaikka data formaatti ei tuekaan kommentteja, annetaan kommenttien tarkistus koodin
     // olla tässä varmuuden vuoksi
-    if (theStationStr[0] == '#') return false;
-    if (theStationStr[0] == '/' && theStationStr[1] == '/') return false;
+    if (theStationStr[0] == '#')
+      return false;
+    if (theStationStr[0] == '/' && theStationStr[1] == '/')
+      return false;
 
     std::vector<std::string> stationParts = NFmiStringTools::Split(theStationStr, "\t");
     if (stationParts.size() >= 13)

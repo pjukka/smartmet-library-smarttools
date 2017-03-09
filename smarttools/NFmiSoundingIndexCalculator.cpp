@@ -354,7 +354,8 @@ void NFmiSoundingIndexCalculator::CalculateWholeSoundingData(NFmiQueryData &theS
   if (fUseOnlyOneThread || usedThreadCount < 2)
   {  // jos aikoja oli alle kaksi, lasketaan data yhdessä funktiossa
 
-    if (fDoCerrReporting) std::cerr << "making data in single thread" << std::endl;
+    if (fDoCerrReporting)
+      std::cerr << "making data in single thread" << std::endl;
     boost::shared_ptr<NFmiFastQueryInfo> sourceInfo(new NFmiFastQueryInfo(&theSourceData));
     boost::shared_ptr<NFmiFastQueryInfo> resultInfo(new NFmiFastQueryInfo(&theResultData));
     ::CalculatePartOfSoundingData(

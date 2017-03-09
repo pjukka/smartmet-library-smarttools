@@ -1,6 +1,6 @@
 #pragma once
 
-#include <NFmiInfoAreaMask.h>
+#include <newbase/NFmiInfoAreaMask.h>
 
 #include <boost/thread.hpp>
 
@@ -22,7 +22,12 @@ class NFmiStation2GridMask : public NFmiInfoAreaMask
   typedef std::map<NFmiMetTime, NFmiDataMatrix<float> > DataCache;
 
  public:
-     using GriddingFunctionCallBackType = std::function<void(NFmiGriddingHelperInterface*, const boost::shared_ptr<NFmiArea>&, boost::shared_ptr<NFmiDrawParam>&, NFmiDataMatrix<float>&, const NFmiMetTime&, float)>;
+  using GriddingFunctionCallBackType = std::function<void(NFmiGriddingHelperInterface *,
+                                                          const boost::shared_ptr<NFmiArea> &,
+                                                          boost::shared_ptr<NFmiDrawParam> &,
+                                                          NFmiDataMatrix<float> &,
+                                                          const NFmiMetTime &,
+                                                          float)>;
 
   NFmiStation2GridMask(Type theMaskType,
                        NFmiInfoData::Type theDataType,
@@ -33,10 +38,14 @@ class NFmiStation2GridMask : public NFmiInfoAreaMask
 
   double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
   void SetGriddingHelpers(NFmiArea *theArea,
-      NFmiGriddingHelperInterface *theGriddingHelper,
+                          NFmiGriddingHelperInterface *theGriddingHelper,
                           const NFmiPoint &theStation2GridSize,
                           float theObservationRadiusRelative);
-  static void SetGriddingStationDataCallback(GriddingFunctionCallBackType theGridStationDataCallback) { itsGridStationDataCallback = theGridStationDataCallback; }
+  static void SetGriddingStationDataCallback(
+      GriddingFunctionCallBackType theGridStationDataCallback)
+  {
+    itsGridStationDataCallback = theGridStationDataCallback;
+  }
 
  private:
   void DoGriddingCheck(const NFmiCalculationParams &theCalculationParams);
@@ -68,10 +77,9 @@ class NFmiStation2GridMask : public NFmiInfoAreaMask
       ReadLock;  // Read-lockia ei oikeasti tarvita, mutta laitan sen tähän, jos joskus tarvitaankin
   typedef boost::unique_lock<MutexType> WriteLock;
   // TÄMÄ jaetaan kaikkien kopioiden kesken, jotta multi-thread -koodi saa jaettua työtä
-  boost::shared_ptr<MutexType> itsCacheMutex;  
+  boost::shared_ptr<MutexType> itsCacheMutex;
   // Callback funktio asemadatan griddaus funktioon
   static GriddingFunctionCallBackType itsGridStationDataCallback;
-
 };
 
 // NFmiNearestObsValue2GridMask -luokka laskee havainto datasta sellaisen
@@ -96,7 +104,7 @@ class NFmiNearestObsValue2GridMask : public NFmiInfoAreaMask
 
   double Value(const NFmiCalculationParams &theCalculationParams, bool fUseTimeInterpolationAlways);
   void SetGriddingHelpers(NFmiArea *theArea,
-      NFmiGriddingHelperInterface *theGriddingHelper,
+                          NFmiGriddingHelperInterface *theGriddingHelper,
                           const NFmiPoint &theResultGridSize);
   void SetArguments(std::vector<float> &theArgumentVector);
 
@@ -131,4 +139,3 @@ class NFmiNearestObsValue2GridMask : public NFmiInfoAreaMask
   boost::shared_ptr<MutexType> itsCacheMutex;  // TÄMÄ jaetaan kaikkien kopioiden kesken, jotta
                                                // multi-thread -koodi saa jaettua työtä
 };
-

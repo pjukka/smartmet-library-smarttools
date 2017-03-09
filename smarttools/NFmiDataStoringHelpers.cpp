@@ -5,7 +5,7 @@
 //---------------------------------------------------------- NFmiDataStoringHelpers.cpp
 
 #include "NFmiDataStoringHelpers.h"
-#include "NFmiStringTools.h"
+#include <newbase/NFmiStringTools.h>
 
 namespace
 {

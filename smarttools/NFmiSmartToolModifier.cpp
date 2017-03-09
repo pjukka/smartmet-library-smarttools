@@ -1344,7 +1344,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateInfoVariableMask(
 boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateRampFunctionMask(
     const NFmiAreaMaskInfo &theAreaMaskInfo, bool &mustUsePressureInterpolation)
 {
-  if (fUseLevelData) itsParethesisCounter++;
+  if (fUseLevelData)
+    itsParethesisCounter++;
   NFmiInfoData::Type type = theAreaMaskInfo.GetDataType();
   if (type != NFmiInfoData::kCalculatedValue)
   {
@@ -1380,7 +1381,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaIntegrationMask
     info = tmp;
   }
 
-  if (fUseLevelData) itsParethesisCounter++;
+  if (fUseLevelData)
+    itsParethesisCounter++;
 
   int startX = static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().X());
   int startY = static_cast<int>(theAreaMaskInfo.GetOffsetPoint1().Y());
@@ -1412,7 +1414,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateAreaIntegrationMask
 boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateStartParenthesisMask(
     const NFmiAreaMaskInfo &theAreaMaskInfo)
 {
-  if (fUseLevelData) itsParethesisCounter++;
+  if (fUseLevelData)
+    itsParethesisCounter++;
   return boost::shared_ptr<NFmiAreaMask>(
       new NFmiCalculationSpecialCase(theAreaMaskInfo.GetCalculationOperator()));
 }
@@ -1457,7 +1460,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateMathFunctionStartMa
   boost::shared_ptr<NFmiAreaMask> areaMask =
       boost::shared_ptr<NFmiAreaMask>(new NFmiCalculationSpecialCase());
   areaMask->SetMathFunctionType(theAreaMaskInfo.GetMathFunctionType());
-  if (fUseLevelData) itsParethesisCounter++;
+  if (fUseLevelData)
+    itsParethesisCounter++;
   return areaMask;
 }
 
@@ -1483,7 +1487,8 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateOccurrenceMask(
 {
   bool synopXCase =
       theAreaMaskInfo.GetDataIdent().GetProducer()->GetIdent() == NFmiInfoData::kFmiSpSynoXProducer;
-  if (synopXCase) theAreaMaskInfo.GetDataIdent().GetProducer()->SetIdent(kFmiSYNOP);
+  if (synopXCase)
+    theAreaMaskInfo.GetDataIdent().GetProducer()->SetIdent(kFmiSYNOP);
   boost::shared_ptr<NFmiFastQueryInfo> info =
       CreateInfo(theAreaMaskInfo, mustUsePressureInterpolation);
   boost::shared_ptr<NFmiArea> calculationArea(UsedMacroParamData()->Area()->Clone());
@@ -1540,7 +1545,9 @@ boost::shared_ptr<NFmiAreaMask> NFmiSmartToolModifier::CreateClosestObsValueMask
   NFmiNearestObsValue2GridMask *nearestObsValue2GridMask = new NFmiNearestObsValue2GridMask(
       NFmiAreaMask::kInfo, info->DataType(), info, theAreaMaskInfo.FunctionArgumentCount());
   nearestObsValue2GridMask->SetGriddingHelpers(
-      itsWorkingGrid->itsArea, itsGriddingHelper, NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
+      itsWorkingGrid->itsArea,
+      itsGriddingHelper,
+      NFmiPoint(itsWorkingGrid->itsNX, itsWorkingGrid->itsNY));
   boost::shared_ptr<NFmiAreaMask> areaMask =
       boost::shared_ptr<NFmiAreaMask>(nearestObsValue2GridMask);
   MakeSoundingLevelFix(areaMask, theAreaMaskInfo);
@@ -2269,7 +2276,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateScriptVariable
     {
       itsScriptVariableInfos.push_back(tmp2);
       tmp = GetScriptVariableInfo(theDataIdent);
-      if (tmp) return NFmiSmartInfo::CreateShallowCopyOfHighestInfo(tmp);
+      if (tmp)
+        return NFmiSmartInfo::CreateShallowCopyOfHighestInfo(tmp);
     }
   }
 

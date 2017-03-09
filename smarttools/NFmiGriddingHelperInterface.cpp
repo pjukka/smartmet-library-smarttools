@@ -1,3 +1,3 @@
-#include <NFmiGriddingHelperInterface.h>
+#include "NFmiGriddingHelperInterface.h"
 
 NFmiGriddingHelperInterface::~NFmiGriddingHelperInterface() = default;

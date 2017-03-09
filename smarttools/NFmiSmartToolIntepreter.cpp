@@ -53,8 +53,13 @@ NFmiSmartToolCalculationBlockInfoVector::NFmiSmartToolCalculationBlockInfoVector
 {
 }
 
-NFmiSmartToolCalculationBlockInfoVector::~NFmiSmartToolCalculationBlockInfoVector(void) {}
-void NFmiSmartToolCalculationBlockInfoVector::Clear(void) { itsCalculationBlockInfos.clear(); }
+NFmiSmartToolCalculationBlockInfoVector::~NFmiSmartToolCalculationBlockInfoVector(void)
+{
+}
+void NFmiSmartToolCalculationBlockInfoVector::Clear(void)
+{
+  itsCalculationBlockInfos.clear();
+}
 // Ottaa pointterin 'omistukseensa' eli pitää luoda ulkona new:llä ja antaa tänne
 void NFmiSmartToolCalculationBlockInfoVector::Add(
     boost::shared_ptr<NFmiSmartToolCalculationBlockInfo> &theBlockInfo)
@@ -155,10 +160,10 @@ NFmiSmartToolIntepreter::NFmiSmartToolIntepreter(NFmiProducerSystem *theProducer
                                                  NFmiProducerSystem *theObservationProducerSystem)
     : itsProducerSystem(theProducerSystem),
       itsSmartToolCalculationBlocks(),
+      itsExtraMacroParamData(new NFmiExtraMacroParamData()),
       fNormalAssigmentFound(false),
       fMacroParamFound(false),
-      fMacroParamSkriptInProgress(false),
-      itsExtraMacroParamData(std::make_unique<NFmiExtraMacroParamData>())
+      fMacroParamSkriptInProgress(false)
 {
   NFmiSmartToolIntepreter::InitTokens(itsProducerSystem, theObservationProducerSystem);
 }
@@ -470,7 +475,8 @@ bool NFmiSmartToolIntepreter::IsPossibleElseConditionLine(const std::string &the
   stringstream sstream(theTextLine);
   string tmp;
   sstream >> tmp;
-  if (!FindAnyFromText(tmp, itsTokenElseCommands)) return false;
+  if (!FindAnyFromText(tmp, itsTokenElseCommands))
+    return false;
   tmp = "";  // nollataan tämä, koska MSVC++7.1 ei sijoita jostain syystä mitään kun ollaan tultu
              // loppuun (muilla kääntäjillä on sijoitettu tyhjä tmp-stringiin)
   sstream >> tmp;
@@ -737,7 +743,8 @@ bool NFmiSmartToolIntepreter::InterpretMasks(
   }
 
   // minimissään erilaisia lasku elementtejä pitää olla vahintäin 3 (esim. T > 15)
-  if (theAreaMaskSectionInfo->GetAreaMaskInfoVector().size() >= 3) return true;
+  if (theAreaMaskSectionInfo->GetAreaMaskInfoVector().size() >= 3)
+    return true;
   throw runtime_error(::GetDictionaryString("SmartToolErrorConditionalWasNotComplete") + ":\n" +
                       theMaskSectionText);
 }
@@ -771,7 +778,8 @@ bool NFmiSmartToolIntepreter::InterpretCalculationSection(
       {
         boost::shared_ptr<NFmiSmartToolCalculationInfo> calculationInfo =
             InterpretCalculationLine(nextLine);
-        if (calculationInfo) theSectionInfo->AddCalculationInfo(calculationInfo);
+        if (calculationInfo)
+          theSectionInfo->AddCalculationInfo(calculationInfo);
       }
     }
     catch (ExtraInfoMacroLineException &)
@@ -1971,10 +1979,14 @@ bool NFmiSmartToolIntepreter::IsVariableFunction(const std::string &theVariableT
                                                  boost::shared_ptr<NFmiAreaMaskInfo> &theMaskInfo)
 {
   // katsotaan onko jokin peek-funktioista
-  if (IsVariablePeekFunction(theVariableText, theMaskInfo)) return true;
-  if (IsVariableMetFunction(theVariableText, theMaskInfo)) return true;
-  if (IsVariableVertFunction(theVariableText, theMaskInfo)) return true;
-  if (IsVariableExtraInfoCommand(theVariableText)) throw ExtraInfoMacroLineException();
+  if (IsVariablePeekFunction(theVariableText, theMaskInfo))
+    return true;
+  if (IsVariableMetFunction(theVariableText, theMaskInfo))
+    return true;
+  if (IsVariableVertFunction(theVariableText, theMaskInfo))
+    return true;
+  if (IsVariableExtraInfoCommand(theVariableText))
+    throw ExtraInfoMacroLineException();
 
   // sitten katsotaan onko jokin integraatio funktioista
   std::string tmp(theVariableText);
@@ -2404,7 +2416,8 @@ std::string NFmiSmartToolIntepreter::HandlePossibleUnaryMarkers(const std::strin
     GetToken();
     returnStr += token;  // lisätään '-'-etumerkki ja seuraava token ja katsotaan mitä syntyy
   }
-  if (returnStr == string("+")) GetToken();  // +-merkki ohitetaan merkityksettömänä
+  if (returnStr == string("+"))
+    GetToken();  // +-merkki ohitetaan merkityksettömänä
   return returnStr;
 }
 

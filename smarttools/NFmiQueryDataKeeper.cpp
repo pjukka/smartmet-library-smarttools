@@ -119,7 +119,9 @@ NFmiQueryDataSetKeeper::NFmiQueryDataSetKeeper(boost::shared_ptr<NFmiOwnerInfo> 
   AddData(theData, true, dataWasDeleted);  // true tarkoittaa että kyse on 1. lisättävästä datasta
 }
 
-NFmiQueryDataSetKeeper::~NFmiQueryDataSetKeeper(void) {}
+NFmiQueryDataSetKeeper::~NFmiQueryDataSetKeeper(void)
+{
+}
 /*
 static void QDataListDestroyer(NFmiQueryDataSetKeeper::ListType *theQDataListToBeDestroyed)
 {
@@ -441,7 +443,8 @@ bool NFmiQueryDataSetKeeper::CheckKeepTime(ListType::iterator &it)
 {
   if ((*it)->Index() != 0)
   {  // vain viimeisin data jää tutkimatta, koska sitä ei ole tarkoitus poistaa muistista koskaan
-    if ((*it)->LastUsedInMS() > itsKeepInMemoryTime * 60 * 1000) return true;
+    if ((*it)->LastUsedInMS() > itsKeepInMemoryTime * 60 * 1000)
+      return true;
   }
   return false;
 }

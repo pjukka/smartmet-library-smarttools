@@ -245,7 +245,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(
     tmpDrawParam->ModelRunIndex(0);
     aInfo =
         Info(tmpDrawParam, fCrossSectionInfoWanted);  // koetetaan sitten hakea viimeisintä dataa
-    if (aInfo) fGetDataFromServer = true;
+    if (aInfo)
+      fGetDataFromServer = true;
   }
   return aInfo;
 }
@@ -493,7 +494,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
                                  theLevel,
                                  theModelRunIndex,
                                  iter);  // tämä saa olla 0-pointteri, jos kyse oli arkistodatasta
-            if (foundData) break;
+            if (foundData)
+              break;
           }
           else if (backupData == 0)
             backupData = ::DoArchiveCheck(
@@ -548,7 +550,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CrossSectionInfo(
                                0,
                                theModelRunIndex,
                                iter);  // tämä saa olla 0-pointteri, jos kyse oli arkistodatasta
-          if (foundData) break;
+          if (foundData)
+            break;
         }
         else if (backupData == 0)
           backupData = ::DoArchiveCheck(aInfo,
@@ -688,39 +691,44 @@ bool NFmiInfoOrganizer::IsTempData(unsigned long theProducerId, bool includeRawT
     return false;
 }
 
-int NFmiInfoOrganizer::CalcWantedParameterCount(boost::shared_ptr<NFmiFastQueryInfo> &info, const std::vector<FmiParameterName> &wantedParameters)
+int NFmiInfoOrganizer::CalcWantedParameterCount(
+    boost::shared_ptr<NFmiFastQueryInfo> &info,
+    const std::vector<FmiParameterName> &wantedParameters)
 {
-    int counter = 0;
-    if(info && wantedParameters.size())
+  int counter = 0;
+  if (info && wantedParameters.size())
+  {
+    FmiParameterName oldParamId = static_cast<FmiParameterName>(info->Param().GetParamIdent());
+    for (size_t i = 0; i < wantedParameters.size(); i++)
     {
-        FmiParameterName oldParamId = static_cast<FmiParameterName>(info->Param().GetParamIdent());
-        for(size_t i = 0; i < wantedParameters.size(); i++)
-        {
-            if(info->Param(wantedParameters[i]))
-                counter++;
-        }
-        info->Param(oldParamId);
+      if (info->Param(wantedParameters[i]))
+        counter++;
     }
-    return counter;
+    info->Param(oldParamId);
+  }
+  return counter;
 }
 
-boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfoWithMostWantedParams(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &infos, const std::vector<FmiParameterName> &wantedParameters)
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfoWithMostWantedParams(
+    checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &infos,
+    const std::vector<FmiParameterName> &wantedParameters)
 {
-    boost::shared_ptr<NFmiFastQueryInfo> info;
-    if(infos.size())
+  boost::shared_ptr<NFmiFastQueryInfo> info;
+  if (infos.size())
+  {
+    int maxWantedParams = 0;
+    for (size_t i = 0; i < infos.size(); i++)
     {
-        int maxWantedParams = 0;
-        for(size_t i = 0; i < infos.size(); i++)
-        {
-            int currentWantedParams = NFmiInfoOrganizer::CalcWantedParameterCount(infos[i], wantedParameters);
-            if(currentWantedParams > maxWantedParams)
-            {
-                info = infos[i];
-                maxWantedParams = currentWantedParams;
-            }
-        }
+      int currentWantedParams =
+          NFmiInfoOrganizer::CalcWantedParameterCount(infos[i], wantedParameters);
+      if (currentWantedParams > maxWantedParams)
+      {
+        info = infos[i];
+        maxWantedParams = currentWantedParams;
+      }
     }
-    return info;
+  }
+  return info;
 }
 
 bool NFmiInfoOrganizer::HasGoodParamsForSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
@@ -1040,7 +1048,8 @@ boost::shared_ptr<NFmiDrawParam> NFmiInfoOrganizer::CreateDrawParam(const NFmiDa
     return CreateSynopPlotDrawParam(theIdent, theLevel, theType);
   }
   drawParam = itsDrawParamFactory->CreateDrawParam(theIdent, theLevel);
-  if (drawParam) drawParam->DataType(theType);  // data tyyppi pitää myös asettaa!!
+  if (drawParam)
+    drawParam->DataType(theType);  // data tyyppi pitää myös asettaa!!
   return drawParam;
 }
 
@@ -1050,7 +1059,8 @@ boost::shared_ptr<NFmiDrawParam> NFmiInfoOrganizer::CreateCrossSectionDrawParam(
 {
   boost::shared_ptr<NFmiDrawParam> drawParam =
       itsDrawParamFactory->CreateCrossSectionDrawParam(theDataIdent);
-  if (drawParam) drawParam->DataType(theType);  // data tyyppi pitää myös asettaa!!
+  if (drawParam)
+    drawParam->DataType(theType);  // data tyyppi pitää myös asettaa!!
   return drawParam;
 }
 
@@ -1067,7 +1077,8 @@ boost::shared_ptr<NFmiDrawParam> NFmiInfoOrganizer::CreateSynopPlotDrawParam(
   boost::shared_ptr<NFmiDrawParam> drawParam = itsDrawParamFactory->CreateDrawParam(
       usedDataIdent,
       theLevel);  // false merkitsee, että parametria ei taas aseteta tuolla metodissa
-  if (drawParam) drawParam->DataType(theType);
+  if (drawParam)
+    drawParam->DataType(theType);
   return drawParam;
 }
 
@@ -1308,8 +1319,8 @@ static NFmiQueryData *CreateDefaultMacroParamQueryData(const NFmiArea *theArea,
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CreateNewMacroParamData_checkeInput(
     int x, int y, NFmiInfoData::Type theDataType)
 {
-    static boost::shared_ptr<NFmiArea> dummyArea(
-        new NFmiLatLonArea(NFmiPoint(19, 57), NFmiPoint(32, 71)));
+  static boost::shared_ptr<NFmiArea> dummyArea(
+      new NFmiLatLonArea(NFmiPoint(19, 57), NFmiPoint(32, 71)));
 
   // Luo uusi data jossa on yksi aika,param ja level ja luo hplaceDesc annetusta areasta ja hila
   // koosta

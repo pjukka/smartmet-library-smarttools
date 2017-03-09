@@ -39,7 +39,8 @@ bool NFmiSoundingDataOpt1::GetTandTdValuesFromNearestPressureLevel(double P,
       bool foundLevel = false;
       for (int i = 0; i < static_cast<int>(pV.size()); i++)
       {
-        if (i < 0) return false;  // jos 'tyhjä' luotaus, on tässä aluksi -1 indeksinä
+        if (i < 0)
+          return false;  // jos 'tyhjä' luotaus, on tässä aluksi -1 indeksinä
         if (pV[i] != kFloatMissing)
         {
           double pDiff = ::fabs(pV[i] - P);
@@ -368,7 +369,8 @@ static bool operator>(const ThetaEValues &theta1, const ThetaEValues &theta2)
 {
   if (theta1.P != kFloatMissing && theta2.P != kFloatMissing)
   {
-    if (theta1.P > theta2.P) return true;
+    if (theta1.P > theta2.P)
+      return true;
   }
   return false;
 }
@@ -598,7 +600,8 @@ bool NFmiSoundingDataOpt1::CalcLCLAvgValues(
       return false;
     int startP = static_cast<int>(round(GetPressureAtHeight(fromZ)));
     int endP = static_cast<int>(round(GetPressureAtHeight(toZ)));
-    if (startP == kFloatMissing || endP == kFloatMissing || startP <= endP) return false;
+    if (startP == kFloatMissing || endP == kFloatMissing || startP <= endP)
+      return false;
     NFmiDataModifierAvg avgT;   // riippuen moodista tässä lasketaan T tai Tpot keskiarvoa
     NFmiDataModifierAvg avgTd;  // riippuen moodista tässä lasketaan Td tai w keskiarvoa
     for (int pressure = startP; pressure > endP;
@@ -670,8 +673,10 @@ bool NFmiSoundingDataOpt1::GetValuesStartingLookingFromPressureLevel(double &T,
 
 // oletuksia paljon:
 // theInfo on validi, aika ja paikka on jo asetettu
-bool NFmiSoundingDataOpt1::FillParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-                                         FmiParameterName theId, NFmiQueryDataUtil::SignificantSoundingLevels &theSoungingLevels)
+bool NFmiSoundingDataOpt1::FillParamData(
+    const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+    FmiParameterName theId,
+    NFmiQueryDataUtil::SignificantSoundingLevels &theSoungingLevels)
 {
   try
   {
@@ -679,10 +684,10 @@ bool NFmiSoundingDataOpt1::FillParamData(const boost::shared_ptr<NFmiFastQueryIn
     bool paramFound = LookForFilledParamFromInfo(theInfo, theId);
     if (paramFound)
     {
-        if(theSoungingLevels)
-            FillParamDataFromSignificantLevels(theInfo, data, theSoungingLevels);
-        else
-            FillParamDataNormally(theInfo, data);
+      if (theSoungingLevels)
+        FillParamDataFromSignificantLevels(theInfo, data, theSoungingLevels);
+      else
+        FillParamDataNormally(theInfo, data);
       DoAfterFillChecks(theInfo, data, theId);
       return true;
     }
@@ -693,57 +698,66 @@ bool NFmiSoundingDataOpt1::FillParamData(const boost::shared_ptr<NFmiFastQueryIn
   return false;
 }
 
-void NFmiSoundingDataOpt1::FillParamDataNormally(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data)
+void NFmiSoundingDataOpt1::FillParamDataNormally(
+    const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data)
 {
-    int i = 0;
-    for(theInfo->ResetLevel(); theInfo->NextLevel(); i++)
-        data[i] = theInfo->FloatValue();
+  int i = 0;
+  for (theInfo->ResetLevel(); theInfo->NextLevel(); i++)
+    data[i] = theInfo->FloatValue();
 }
 
-void NFmiSoundingDataOpt1::FillParamDataFromSignificantLevels(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, NFmiQueryDataUtil::SignificantSoundingLevels &significantLevels)
+void NFmiSoundingDataOpt1::FillParamDataFromSignificantLevels(
+    const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+    std::deque<float> &data,
+    NFmiQueryDataUtil::SignificantSoundingLevels &significantLevels)
 {
-    int i = 0;
-    for(auto levelIndex : *significantLevels)
+  int i = 0;
+  for (auto levelIndex : *significantLevels)
+  {
+    if (theInfo->LevelIndex(levelIndex))
     {
-        if(theInfo->LevelIndex(levelIndex))
-        {
-            data[i++] = theInfo->FloatValue();
-        }
+      data[i++] = theInfo->FloatValue();
     }
+  }
 }
 
-std::deque<float> & NFmiSoundingDataOpt1::GetResizedParamData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-    FmiParameterName theId, NFmiQueryDataUtil::SignificantSoundingLevels &theSoungingLevels)
+std::deque<float> &NFmiSoundingDataOpt1::GetResizedParamData(
+    const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+    FmiParameterName theId,
+    NFmiQueryDataUtil::SignificantSoundingLevels &theSoungingLevels)
 {
-    std::deque<float> &data = GetParamData(theId);
-    if(theSoungingLevels)
-        data.resize(theSoungingLevels->size(), kFloatMissing);
-    else
-        data.resize(theInfo->SizeLevels(), kFloatMissing);
-    return data;
+  std::deque<float> &data = GetParamData(theId);
+  if (theSoungingLevels)
+    data.resize(theSoungingLevels->size(), kFloatMissing);
+  else
+    data.resize(theInfo->SizeLevels(), kFloatMissing);
+  return data;
 }
 
-// Asettaa fastInfon osoittamaan oikeaa parametria. 
+// Asettaa fastInfon osoittamaan oikeaa parametria.
 // Kastepiste parametri on erikoistapaus.
-bool NFmiSoundingDataOpt1::LookForFilledParamFromInfo(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId)
+bool NFmiSoundingDataOpt1::LookForFilledParamFromInfo(
+    const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, FmiParameterName theId)
 {
-    bool paramFound = theInfo->Param(theId);
-    // Kastepiste parametri voi tulla luotausten yhteydessä tällä 
-    // parametrilla ja mallidatan yhteydessä toisella
-    if(paramFound == false && theId == kFmiDewPoint)
-        paramFound = theInfo->Param(kFmiDewPoint2M);
-    return paramFound;
+  bool paramFound = theInfo->Param(theId);
+  // Kastepiste parametri voi tulla luotausten yhteydessä tällä
+  // parametrilla ja mallidatan yhteydessä toisella
+  if (paramFound == false && theId == kFmiDewPoint)
+    paramFound = theInfo->Param(kFmiDewPoint2M);
+  return paramFound;
 }
 
-void NFmiSoundingDataOpt1::DoAfterFillChecks(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo, std::deque<float> &data, FmiParameterName theId)
+void NFmiSoundingDataOpt1::DoAfterFillChecks(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
+                                             std::deque<float> &data,
+                                             FmiParameterName theId)
 {
-    // jos ei nousevassa järjestyksessä, käännetään vektorissa olevat arvot
-    if(theInfo->HeightParamIsRising() == false)
-        std::reverse(data.begin(), data.end());
-    if(theId == kFmiPressure)
-        fPressureDataAvailable = true;
-    if(theId == kFmiGeomHeight || theId == kFmiGeopHeight || theId == kFmiFlAltitude)
-        fHeightDataAvailable = true;
+  // jos ei nousevassa järjestyksessä, käännetään vektorissa olevat arvot
+  if (theInfo->HeightParamIsRising() == false)
+    std::reverse(data.begin(), data.end());
+  if (theId == kFmiPressure)
+    fPressureDataAvailable = true;
+  if (theId == kFmiGeomHeight || theId == kFmiGeopHeight || theId == kFmiFlAltitude)
+    fHeightDataAvailable = true;
 }
 
 // Oletus, tässä info on jo parametrissa ja ajassa kohdallaan.
@@ -1062,7 +1076,7 @@ static bool FindAmdarSoundingTime(const boost::shared_ptr<NFmiFastQueryInfo> &th
 
 bool NFmiSoundingDataOpt1::IsMovingSounding(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
 {
-    return theInfo->HasLatlonInfoInData();
+  return theInfo->HasLatlonInfoInData();
 }
 
 // Tälle anntaan asema dataa ja ei tehdä minkäänlaisia interpolointeja.
@@ -1101,14 +1115,17 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
         itsLocation = usedLocation;
         itsTime = usedTime;
         itsOriginTime = theOriginTime;
-        auto significantLevelIndices = NFmiQueryDataUtil::GetSignificantSoundingLevelIndices(*theInfo);
+        auto significantLevelIndices =
+            NFmiQueryDataUtil::GetSignificantSoundingLevelIndices(*theInfo);
 
         FillParamData(theInfo, kFmiTemperature, significantLevelIndices);
         FillParamData(theInfo, kFmiDewPoint, significantLevelIndices);
         FillParamData(theInfo, kFmiPressure, significantLevelIndices);
         if (!FillParamData(theInfo, kFmiGeomHeight, significantLevelIndices))
           if (!FillParamData(theInfo, kFmiGeopHeight, significantLevelIndices))
-            if (!FillParamData(theInfo, kFmiFlAltitude, significantLevelIndices))  // eri datoissa on geom ja geop heightia,
+            if (!FillParamData(theInfo,
+                               kFmiFlAltitude,
+                               significantLevelIndices))  // eri datoissa on geom ja geop heightia,
                                                           // kokeillaan molempia tarvittaessa
               FillHeightDataFromLevels(theInfo);
         FillParamData(theInfo, kFmiWindSpeedMS, significantLevelIndices);
@@ -2126,7 +2143,8 @@ double NFmiSoundingDataOpt1::CalcLFCIndex(FmiLCLCalcType theLCLCalcType, double 
 {
   double lfcIndexValue = kFloatMissing;
   // 1. Katso löytyykö valmiiksi lasketut arvot cachesta.
-  if (CheckLFCIndexCache(theLCLCalcType, lfcIndexValue, EL)) return lfcIndexValue;
+  if (CheckLFCIndexCache(theLCLCalcType, lfcIndexValue, EL))
+    return lfcIndexValue;
 
   // 2. Hae halutun laskentatavan (sur/500mix/mostUnstable) mukaiset T, Td ja P arvot.
   double T = kFloatMissing, Td = kFloatMissing, P = kFloatMissing;
@@ -2249,7 +2267,8 @@ double NFmiSoundingDataOpt1::CalcCAPE500Index(FmiLCLCalcType theLCLCalcType, dou
     return kFloatMissing;
 
   // HUOM! Pitää ottaa huomioon aseman korkeus kun tehdään laskuja!!!!
-  if (theHeightLimit != kFloatMissing) theHeightLimit += ZeroHeight();
+  if (theHeightLimit != kFloatMissing)
+    theHeightLimit += ZeroHeight();
 
   std::deque<float> &pValues = GetParamData(kFmiPressure);
   std::deque<float> &tValues = GetParamData(kFmiTemperature);
@@ -2654,7 +2673,7 @@ double NFmiSoundingDataOpt1::CalcWSatHeightIndex(double theH)
 
 std::string NFmiSoundingDataOpt1::MakeCacheString(double T, double Td, double fromP, double toP)
 {
-    return (boost::format("%f,%f,%f,%f") % T % Td % fromP % toP).str();
+  return (boost::format("%f,%f,%f,%f") % T % Td % fromP % toP).str();
 }
 
 // Laske ilmapaketin lämpötila nostamalla ilmapakettia
