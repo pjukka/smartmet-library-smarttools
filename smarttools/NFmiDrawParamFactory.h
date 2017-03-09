@@ -28,7 +28,6 @@
 #define NFMIDRAWPARAMFACTORY_H
 
 #include <boost/shared_ptr.hpp>
-#include <string>
 
 class NFmiDrawParam;
 class NFmiLevel;

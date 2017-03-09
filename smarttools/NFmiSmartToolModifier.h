@@ -50,6 +50,7 @@ class NFmiSmartToolCalculationBlockInfoVector;
 class MyGrid;
 class NFmiThreadCallBacks;
 class NFmiExtraMacroParamData;
+class NFmiGriddingHelperInterface;
 
 class NFmiSmartToolCalculationBlockVector
 {
@@ -94,10 +95,6 @@ class NFmiSmartToolCalculationBlock
   boost::shared_ptr<NFmiSmartToolCalculationSection> itsLastCalculationSection;
 };
 
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
-class NFmiEditMapGeneralDataDoc;
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
-
 class NFmiSmartToolModifier
 {
  public:
@@ -133,6 +130,7 @@ class NFmiSmartToolModifier
   // tapaista tekstiä
 
   void ModifiedLevel(boost::shared_ptr<NFmiLevel> &theLevel);
+  void SetGriddingHelper(NFmiGriddingHelperInterface *theGriddingHelper);
 
  private:
   void ModifyData(NFmiTimeDescriptor *theModifiedTimes,
@@ -292,13 +290,7 @@ class NFmiSmartToolModifier
   boost::shared_ptr<NFmiLevel> itsModifiedLevel;  // Jos ollaan editoimassa level-dataa, tähän on
                                                   // tarkoitus laittaa kulloinenkin muokattava level
                                                   // talteen.
-// Tämä asetetaan nyt vain NFmiSmartToolUtil::ModifyData-funktiosta, jossa käydään levelit läpi.
+                                                  // Tämä asetetaan nyt vain NFmiSmartToolUtil::ModifyData-funktiosta, jossa käydään levelit läpi.
 
-#ifdef FMI_SUPPORT_STATION_DATA_SMARTTOOL
- public:
-  void SetGeneralDoc(NFmiEditMapGeneralDataDoc *theDoc);
-
- private:
-  NFmiEditMapGeneralDataDoc *itsDoc;
-#endif  // FMI_SUPPORT_STATION_DATA_SMARTTOOL
+  NFmiGriddingHelperInterface *itsGriddingHelper;
 };

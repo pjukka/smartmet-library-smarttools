@@ -10,7 +10,6 @@
 
 #include "NFmiSmartToolCalculationInfo.h"
 #include "NFmiAreaMaskInfo.h"
-#include <algorithm>
 //--------------------------------------------------------
 // Constructor/Destructor
 //--------------------------------------------------------
@@ -19,11 +18,15 @@ NFmiSmartToolCalculationInfo::NFmiSmartToolCalculationInfo(void)
 {
 }
 
-NFmiSmartToolCalculationInfo::~NFmiSmartToolCalculationInfo(void) {}
+NFmiSmartToolCalculationInfo::~NFmiSmartToolCalculationInfo(void)
+{
+}
+
 void NFmiSmartToolCalculationInfo::AddCalculationInfo(
     boost::shared_ptr<NFmiAreaMaskInfo> &theAreaMaskInfo)
 {
-  if (theAreaMaskInfo) itsCalculationOperandInfoVector.push_back(theAreaMaskInfo);
+  if (theAreaMaskInfo)
+    itsCalculationOperandInfoVector.push_back(theAreaMaskInfo);
 }
 
 /*! tarkistaa onko lause muotoa:

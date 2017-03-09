@@ -17,9 +17,6 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include <iosfwd>
-#include <string>
-
 class NFmiArea;
 class NFmiHelpDataInfoSystem;
 

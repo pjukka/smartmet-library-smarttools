@@ -5,7 +5,6 @@
 #include <newbase/NFmiMetTime.h>
 #include <newbase/NFmiStation.h>
 
-#include <string>
 #include <vector>
 #include <map>
 

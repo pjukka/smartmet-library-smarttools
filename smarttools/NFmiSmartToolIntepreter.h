@@ -38,10 +38,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 
-#include <string>
 #include <map>
 #include <set>
-#include <queue>
 
 class NFmiSmartToolCalculationSectionInfo;
 class NFmiAreaMaskSectionInfo;

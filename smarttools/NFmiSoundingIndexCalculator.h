@@ -10,7 +10,6 @@
 #ifndef NFMISOUNDINGINDEXCALCULATOR_H
 #define NFMISOUNDINGINDEXCALCULATOR_H
 
-#include <string>
 #include <boost/shared_ptr.hpp>
 
 class NFmiQueryData;

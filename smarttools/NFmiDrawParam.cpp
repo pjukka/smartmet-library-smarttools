@@ -520,7 +520,10 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
 //-------------------------------------------------------
 // ~NFmiDrawParam
 //-------------------------------------------------------
-NFmiDrawParam::~NFmiDrawParam(void) {}
+NFmiDrawParam::~NFmiDrawParam(void)
+{
+}
+
 //-------------------------------------------------------
 // Init
 //-------------------------------------------------------
@@ -1061,7 +1064,8 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
     file << "possible_extra_data" << std::endl;
     file << extraData;
 
-    if (file.fail()) throw std::runtime_error("NFmiDrawParam::Write failed");
+    if (file.fail())
+      throw std::runtime_error("NFmiDrawParam::Write failed");
     //***********************************************
     //********** 'versio 3' parametreja *************
     //***********************************************
@@ -1093,7 +1097,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
   char temp[80];
   std::string tmpStr;
   int number;
-  if (!file) return file;
+  if (!file)
+    return file;
   file >> temp;
   if (std::string(temp) == std::string("Version"))
   {
@@ -1105,7 +1110,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
 
     if (itsInitFileVersionNumber >= 1.)  // tämä on vain esimerkki siitä mitä joskus tulee olemaan
     {
-      if (!file) return file;
+      if (!file)
+        return file;
       file >> temp;                // luetaan nimike pois
       std::getline(file, tmpStr);  // luetaan ed. rivinvaihto pois jaloista
       std::getline(file, tmpStr);  // luetaan rivin loppuun, jos lyhenteessä spaceja mahdollisesti
@@ -1161,7 +1167,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       file >> temp;  // luetaan nimike pois
       file >> itsAbsoluteMaxValue;
 
-      if (!file) return file;
+      if (!file)
+        return file;
 
       file >> temp;  // luetaan nimike pois
       file >> itsTimeSeriesScaleMin;
@@ -1180,14 +1187,16 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       file >> temp;  // luetaan nimike pois
       file >> itsPossibleViewTypeCount;
       file >> temp;  // luetaan nimike pois
-      if (!file) return file;
+      if (!file)
+        return file;
       for (int ind = 0; ind < itsPossibleViewTypeCount; ind++)
       {
         file >> number;
         itsPossibleViewTypeList[ind] = NFmiMetEditorTypes::View(number);
       }
 
-      if (!file) return file;
+      if (!file)
+        return file;
 
       file >> temp;  // luetaan nimike pois
       file >> itsTimeSerialModifyingLimit;
@@ -1204,7 +1213,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       // on pienempi kuin 1, annetaan arvoksi 1.
       file >> number;
       number -= 100;
-      if (number < 1) number = 1;
+      if (number < 1)
+        number = 1;
       itsStationDataViewType = NFmiMetEditorTypes::View(number);
       file >> temp;  // luetaan nimike pois
       bool tmpBool = false;
@@ -1212,7 +1222,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
 
       file >> temp;  // luetaan nimike pois
       file >> temp;
-      if (!file) return file;
+      if (!file)
+        return file;
       itsUnit = std::string(temp);
 
       file >> temp;  // luetaan nimike pois
@@ -1231,7 +1242,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       //***********************************************
       if (itsInitFileVersionNumber >= 2.)  // tämä on vain esimerkki siitä mitä joskus tulee olemaan
       {
-        if (!file) return file;
+        if (!file)
+          return file;
         file >> itsStationSymbolColorShadeLowValue;
         file >> itsStationSymbolColorShadeMidValue;
         file >> itsStationSymbolColorShadeHighValue;
@@ -1264,7 +1276,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         file >> itsSimpleIsoLineColorShadeHighValueColor;
         file >> itsSimpleIsoLineColorShadeClassCount;
 
-        if (!file) return file;
+        if (!file)
+          return file;
         int i = 0;
         int size;
         file >> size;
@@ -1302,18 +1315,21 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
           itsSpecialIsoLineShowLabelBox[i] = foobar;
         }
 
-        if (!file) return file;
+        if (!file)
+          return file;
         file >> fDrawOnlyOverMask;
         file >> fUseCustomColorContouring;
 
         file >> size;
-        if (!file) return file;
+        if (!file)
+          return file;
         itsSpecialColorContouringValues.resize(size);
         for (i = 0; i < size; i++)
           file >> itsSpecialColorContouringValues[i];
 
         file >> size;
-        if (!file) return file;
+        if (!file)
+          return file;
         itsSpecialColorContouringColorIndexies.resize(size);
         for (i = 0; i < size; i++)
           file >> itsSpecialColorContouringColorIndexies[i];
@@ -1340,7 +1356,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         file >> itsIsoLineHatchColor2;
         file >> itsColorContouringColorShadeHigh2ValueColor;
         file >> itsIsoLineLabelDigitCount;
-        if (!file) return file;
+        if (!file)
+          return file;
         //***********************************************
         //********** 'versio 2' parametreja *************
         //***********************************************
@@ -1370,7 +1387,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
 
         file >> fUseCustomIsoLineing >> itsContourLabelDigitCount;
 
-        if (file.fail()) throw std::runtime_error("NFmiDrawParam::Write failed");
+        if (file.fail())
+          throw std::runtime_error("NFmiDrawParam::Write failed");
 
         file >> temp;  // luetaan 'possible_extra_data' pois
         NFmiDataStoringHelpers::NFmiExtraDataStorage
@@ -1415,7 +1433,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
               extraData
                   .itsStringValues[0]));  // laitetaan asetus-funktion läpi, jossa raja tarkistukset
 
-        if (file.fail()) throw std::runtime_error("NFmiDrawParam::Write failed");
+        if (file.fail())
+          throw std::runtime_error("NFmiDrawParam::Write failed");
         //***********************************************
         //********** 'versio 3' parametreja *************
         //***********************************************
@@ -1474,8 +1493,10 @@ bool NFmiDrawParam::UseArchiveModelData(void) const
 {
   if (IsModelRunDataType())
   {
-    if (itsModelOriginTime != NFmiMetTime::gMissingTime) return true;
-    if (itsModelRunIndex < 0) return true;
+    if (itsModelOriginTime != NFmiMetTime::gMissingTime)
+      return true;
+    if (itsModelRunIndex < 0)
+      return true;
   }
   return false;
 }
@@ -1491,7 +1512,8 @@ bool NFmiDrawParam::IsModelRunDataType(NFmiInfoData::Type theDataType)
       theDataType == NFmiInfoData::kModelHelpData || theDataType == NFmiInfoData::kKepaData ||
       theDataType == NFmiInfoData::kTrajectoryHistoryData)
     return true;
-  if (theDataType == NFmiInfoData::kClimatologyData) return true;
+  if (theDataType == NFmiInfoData::kClimatologyData)
+    return true;
   return false;
 }
 
@@ -1499,7 +1521,34 @@ bool NFmiDrawParam::DoDataComparison(void)
 {
   if (itsDataComparisonProdId != 0)
   {
-    if (itsDataComparisonType != NFmiInfoData::kNoDataType) return true;
+    if (itsDataComparisonType != NFmiInfoData::kNoDataType)
+      return true;
+  }
+  return false;
+}
+
+bool NFmiDrawParam::IsMacroParamCase(NFmiInfoData::Type theDataType)
+{
+  if (theDataType == NFmiInfoData::kMacroParam ||
+      theDataType == NFmiInfoData::kCrossSectionMacroParam ||
+      theDataType == NFmiInfoData::kQ3MacroParam)
+    return true;
+  else
+    return false;
+}
+
+bool NFmiDrawParam::IsMacroParamCase(bool justCheckDataType)
+{
+  if (justCheckDataType)
+  {
+    if (IsMacroParamCase(itsDataType))
+      return true;
+  }
+  else
+  {
+    if (ViewMacroDrawParam() == false && (IsMacroParamCase(itsDataType)) &&
+        ParameterAbbreviation() != std::string("macroParam"))
+      return true;
   }
   return false;
 }

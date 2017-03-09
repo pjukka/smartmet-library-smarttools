@@ -11,7 +11,6 @@
 #include <newbase/NFmiDataMatrix.h>
 #include <newbase/NFmiPoint.h>
 
-#include <string>
 #include <map>
 
 class NFmiGrid;

@@ -77,7 +77,11 @@ NFmiAreaMaskInfo::NFmiAreaMaskInfo(const NFmiAreaMaskInfo &theOther)
 {
 }
 
-NFmiAreaMaskInfo::~NFmiAreaMaskInfo(void) { delete itsLevel; }
+NFmiAreaMaskInfo::~NFmiAreaMaskInfo(void)
+{
+  delete itsLevel;
+}
+
 void NFmiAreaMaskInfo::SetLevel(NFmiLevel *theLevel)
 {
   delete itsLevel;
