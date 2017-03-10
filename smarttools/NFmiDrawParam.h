@@ -30,21 +30,19 @@
 //**********************************************************
 #pragma once
 
+#include "GeneralData.h"
+
 #include "NFmiColor.h"
 #include "NFmiMetEditorTypes.h"
 
 #include <newbase/NFmiParameterName.h>
-#include <newbase/NFmiDataIdent.h>
 #include <newbase/NFmiPoint.h>
-#include <newbase/NFmiLevel.h>
-#include <newbase/NFmiInfoData.h>
 #include <newbase/NFmiDataMatrix.h>  // täältä tulee myös checkedVector
-#include <newbase/NFmiMetTime.h>
 #include <boost/shared_ptr.hpp>
 
 class NFmiDrawingEnvironment;
 
-class NFmiDrawParam
+class NFmiDrawParam : public GeneralData
 {
  public:
   NFmiDrawParam(void);
@@ -61,52 +59,17 @@ class NFmiDrawParam
   void Init(const boost::shared_ptr<NFmiDrawParam>& theDrawParam,
             bool fInitOnlyDrawingOptions = false);
   void HideParam(bool newValue) { fHidden = newValue; };
-  void EditParam(bool newValue) { fEditedParam = newValue; };
   bool IsParamHidden(void) const { return fHidden; };
-  bool IsParamEdited(void) const { return fEditedParam; };
-  const NFmiMetTime& ModelOriginTime(void) const { return itsModelOriginTime; }
-  void ModelOriginTime(const NFmiMetTime& newValue) { itsModelOriginTime = newValue; }
-  int ModelRunIndex(void) const { return itsModelRunIndex; }
-  void ModelRunIndex(int newValue) { itsModelRunIndex = newValue; }
   bool UseArchiveModelData(void) const;
   bool IsModelRunDataType(void) const;
   static bool IsModelRunDataType(NFmiInfoData::Type theDataType);
-  const NFmiMetTime& ModelOriginTimeCalculated(void) const { return itsModelOriginTimeCalculated; }
-  void ModelOriginTimeCalculated(const NFmiMetTime& newValue)
-  {
-    itsModelOriginTimeCalculated = newValue;
-  }
-  int TimeSerialModelRunCount(void) const { return itsTimeSerialModelRunCount; }
-  void TimeSerialModelRunCount(int newValue)
-  {
-    itsTimeSerialModelRunCount = newValue;
-    if (itsTimeSerialModelRunCount < 0)
-      itsTimeSerialModelRunCount = 0;
-  }
-  int ModelRunDifferenceIndex(void) const { return itsModelRunDifferenceIndex; }
-  void ModelRunDifferenceIndex(int newValue) { itsModelRunDifferenceIndex = newValue; }
-  unsigned long DataComparisonProdId(void) const { return itsDataComparisonProdId; }
-  void DataComparisonProdId(unsigned long newValue) { itsDataComparisonProdId = newValue; }
-  NFmiInfoData::Type DataComparisonType(void) const { return itsDataComparisonType; }
-  void DataComparisonType(NFmiInfoData::Type newValue) { itsDataComparisonType = newValue; }
   bool DoDataComparison(void);
 
-  NFmiInfoData::Type DataType(void) const { return itsDataType; }
-  // HUOM! tämä asettaa vain itsDataType-dataosan arvon, ei mahdollista itsInfon data tyyppiä!!!!!!
-  void DataType(NFmiInfoData::Type newValue) { itsDataType = newValue; };
   bool Init(const std::string& theFilename);
   bool StoreData(const std::string& theFilename);
 
   // --------------- "set" ja "get" metodit -----------------
-  const std::string& ParameterAbbreviation(void) const;
-  void ParameterAbbreviation(std::string theParameterAbbreviation)
-  {
-    itsParameterAbbreviation = theParameterAbbreviation;
-  }
-  NFmiDataIdent& Param(void) { return itsParameter; };
-  void Param(const NFmiDataIdent& theParameter) { itsParameter = theParameter; };
-  NFmiLevel& Level(void) { return itsLevel; }
-  void Level(const NFmiLevel& theLevel) { itsLevel = theLevel; }
+
   void Priority(int thePriority) { itsPriority = thePriority; };
   int Priority(void) const { return itsPriority; };
   void ViewType(const NFmiMetEditorTypes::View& theViewType) { itsViewType = theViewType; };
@@ -183,8 +146,6 @@ class NFmiDrawParam
     return itsPossibleViewTypeList;
   }
   int PossibleViewTypeCount(void) const { return itsPossibleViewTypeCount; };
-  const std::string& InitFileName(void) const { return itsInitFileName; }
-  void InitFileName(std::string theFileName) { itsInitFileName = theFileName; }
   double AbsoluteMinValue(void) const { return itsAbsoluteMinValue; }
   void AbsoluteMinValue(double theAbsoluteMinValue) { itsAbsoluteMinValue = theAbsoluteMinValue; }
   double AbsoluteMaxValue(void) const { return itsAbsoluteMaxValue; }
@@ -233,8 +194,6 @@ class NFmiDrawParam
     itsFileVersionNumber = theFileVersionNumber;
   };
   float FileVersionNumber(void) const { return itsFileVersionNumber; };
-  void Unit(const std::string& theUnit) { itsUnit = theUnit; };
-  const std::string& Unit(void) const { return itsUnit; };
   bool ShowNumbers(void) const { return fShowNumbers; }
   void ShowNumbers(bool theValue) { fShowNumbers = theValue; }
   bool ShowMasks(void) const { return fShowMasks; }
@@ -245,8 +204,6 @@ class NFmiDrawParam
   void ShowColoredNumbers(bool theValue) { fShowColoredNumbers = theValue; }
   bool ZeroColorMean(void) const { return fZeroColorMean; }
   void ZeroColorMean(bool theValue) { fZeroColorMean = theValue; }
-  bool IsActive(void) const { return fActive; };
-  void Activate(bool newState) { fActive = newState; };
   bool UseSecondaryColors(void) const { return fUseSecondaryColors; };
   void UseSecondaryColors(bool newState) { fUseSecondaryColors = newState; };
   bool ShowDifference(void) const { return fShowDifference; };
@@ -696,12 +653,6 @@ class NFmiDrawParam
       itsAlpha = 100.f;
   }
 
-  bool ViewMacroDrawParam(void) const { return fViewMacroDrawParam; }
-  void ViewMacroDrawParam(bool newState) { fViewMacroDrawParam = newState; }
-  const std::string& MacroParamRelativePath(void) const { return itsMacroParamRelativePath; }
-  void MacroParamRelativePath(const std::string& newValue) { itsMacroParamRelativePath = newValue; }
-  bool BorrowedParam(void) const { return fBorrowedParam; }
-  void BorrowedParam(bool newValue) { fBorrowedParam = newValue; }
   // ---------------------- operators ------------------------
   bool operator==(const NFmiDrawParam& theDrawParam) const;
   bool operator<(const NFmiDrawParam& theDrawParam) const;
@@ -714,22 +665,7 @@ class NFmiDrawParam
   bool IsMacroParamCase(bool justCheckDataType);
 
  protected:
-  NFmiDataIdent itsParameter;
-  NFmiLevel itsLevel;
-  std::string itsParameterAbbreviation;
   int itsPriority;
-
-  //   Tähän talletetaan tiedoston nimi, mistä luetaan/mihin
-  //   kirjoitetaan
-  //   kyseisen luokan tiedot.
-  std::string itsInitFileName;
-  std::string itsMacroParamRelativePath;  // tätä tarvitaan kun viewMacrojen yhteydessä on
-                                          // macroParametreja ja
-  // ne ovat alihakemistossa. Eli Kun viewMacro talletetaan tiedostoon, lisätään tämä
-  // tieto itsParameterAbbreviation-tiedosn yhteyteen ja se myös puretaan luettaessa tähän.
-  // Tämä avulla voidaan rakentaa oikea suhteellinen polku haluttuun macroParamiin
-  // Suhteellinen polku on ilman kenoviivoja alussa ja lopussa (esim. "euroMakrot" tai
-  // "euroMakrot\analyysi")
 
   //  Parametrin oletus näyttötyyppi (symboli,
   //  isoviiva, teksti...)
@@ -892,60 +828,13 @@ class NFmiDrawParam
   static float itsFileVersionNumber;
   float itsInitFileVersionNumber;
 
-  bool fHidden;       // näyttö voidaan piiloittaa tämän mukaisesti
-  bool fEditedParam;  // vain yksi parametreista voidaan editoida yhtä aikaa
+  bool fHidden;  // näyttö voidaan piiloittaa tämän mukaisesti
   //	bool fEditableParam;	// onko parametri suoraan editoitavissa ollenkaan? (esim. HESSAA tai
   // tuulivektori eivät ole)
 
-  std::string itsUnit;
-  bool fActive;  // onko kyseinen parametri näytön aktiivinen parametri (jokaisella näyttörivillä
-                 // aina yksi aktivoitunut parametri)
   bool fShowDifference;  // näytetäänkö kartalla parametrin arvo, vai erotus edelliseen aikaan (ei
                          // ole vielä talletettu tiedostoon)
   bool fShowDifferenceToOriginalData;
-
-  NFmiInfoData::Type itsDataType;  // lisäsin tämän, kun laitoin editoriin satelliitti kuvien
-                                   // katselun mahdollisuuden (satel-datalla ei ole infoa)
-  bool fViewMacroDrawParam;  // is this DrawParam from viewmacro, if it is, then some things are
-                             // handled
-                             // differently when modifying options, default value is false
-                             // This is not stored in file!
-  bool fBorrowedParam;       // onko parametri lainassa vai ei (A-J Punkan vilkutus juttu)
-
-  // Arkistodatan käyttöön liittyviä asetuksia (historialliseen dataan voidaan viitata kahdella eri
-  // tavalla)
-  // Joko suoraan fixatulla itsModelOriginTime:lla tai itsModelRunIndex:illä, jolla kerrotaan
-  // monesko ajo
-  // kiinnostaa viimeiseen nähden.
-  // Prioriteetti järjestys on, että ensin tarkistetaan löytyykö fiksattu aika (itsModelOriginTime)
-  // ja sitten vasta onko suhteellinen.
-  NFmiMetTime itsModelOriginTime;  // Jos tässä arvo, etsitään arkistosta (SmartMetin
-                                   // (tulevaisuudessa) oma tai Q2Server)
-  // suoraan kyseinen aika. Jos arvo on NFmiDrawParam::gMissingOriginTime, tämä ei
-  // ole käytössä.
-  int itsModelRunIndex;  // Jos tässä on negatiivinen arvo (-1 on edellinen malliajo, -2 on sitä
-                         // edellinen jne.), haetaan
-  // arkistosta dataa. Tämä luku on siis verrattuna kyseisen mallin viimeisimpään data osaan, joka
-  // löytyy.
-  // Tarkoittaen että jos Hirlamista on pinta ja painepinta datasta tullut jo 06:n ajo ja
-  // mallipintadatasta vasta 00, silloin viimeisin ajo on 06 ja -1 viittaa tällöin 00-ajoon.
-  // Jos tämä on 0 tai positiivinen, tämä ei ole käytössä.
-  NFmiMetTime itsModelOriginTimeCalculated;  // tähän lasketaan relatiivisen malliajon mukainen
-  // origin aika, jotä käytetään sitten mm. tooltipeissä
-  // ja muualla
-  int itsTimeSerialModelRunCount;  // tähän määrätään kuinka monta viimeista ajoa näytetään mallille
-  // kerrallaa aikasarjassa. Jos arvo on 0 (default), ei näytetä kuin viimeinen ajo normaalisti.
-  int itsModelRunDifferenceIndex;  // tämän avulla on tarkoitus verrata eri malliajoja. Jos tämä on
-                                   // >= 0, ei ole vertailua, jos se on -1 verrataan edelliseen
-                                   // ajoon, -2:lla verrataan sitä edelliseen jne
-
-  // Mallidatoja voidaan verrata analyysi ja havainto datoihin. Siis sellaiseen dataan, millä on
-  // vain yhdet arvot kullekin havainto hetkelle.
-  unsigned long itsDataComparisonProdId;  // Jos tämä on 0, ei vertailu-optio ole päällä. Muuten
-                                          // tässä on halutun vertailudatan tuottaja id
-                                          // (analyysi/havainto datan)
-  NFmiInfoData::Type
-      itsDataComparisonType;  // tässä on käytetty datatyyppi esim. kAnalyzeData tai kObservations
 };
 //@{ \name Globaalit NFmiDrawParam-luokan uudelleenohjaus-operaatiot
 inline std::ostream& operator<<(std::ostream& os, const NFmiDrawParam& item)

@@ -44,11 +44,8 @@ const float NFmiDrawParam::itsMinAlpha =
 // NFmiDrawParam(void)
 //--------------------------------------------------------
 NFmiDrawParam::NFmiDrawParam()
-    : itsParameter(NFmiParam(kFmiLastParameter)),
-      itsLevel(),
-      itsParameterAbbreviation("?"),
+    : GeneralData(),
       itsPriority(1),
-      itsInitFileName(""),
       itsViewType(NFmiMetEditorTypes::kFmiIsoLineView),
       itsStationDataViewType(NFmiMetEditorTypes::kFmiTextView),
       itsFrameColor(NFmiColor(0., 0., 0.))  // musta
@@ -174,23 +171,11 @@ NFmiDrawParam::NFmiDrawParam()
       itsContourLabelDigitCount(0),
       itsAlpha(100.f)  // dafault on 100 eli täysin läpinäkymätön
       ,
-      itsInitFileVersionNumber(itsFileVersionNumber),
       fHidden(false),
-      fEditedParam(false),
-      itsUnit("?"),
-      fActive(false),
       fShowDifference(false),
-      fShowDifferenceToOriginalData(false),
-      itsDataType(NFmiInfoData::kNoDataType),
-      fViewMacroDrawParam(false),
-      fBorrowedParam(false),
-      itsModelOriginTime(NFmiMetTime::gMissingTime),
-      itsModelRunIndex(0),
-      itsTimeSerialModelRunCount(0),
-      itsModelRunDifferenceIndex(0),
-      itsDataComparisonProdId(0),
-      itsDataComparisonType(NFmiInfoData::kNoDataType)
+      fShowDifferenceToOriginalData(false)
 {
+  GeneralData::InitFileVersionNumber(itsFileVersionNumber);
   itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
   itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
 }
@@ -202,11 +187,8 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
                              const NFmiLevel& theLevel,
                              int thePriority,
                              NFmiInfoData::Type theDataType)
-    : itsParameter(theParam),
-      itsLevel(theLevel),
-      itsParameterAbbreviation("?"),
+    : GeneralData(),
       itsPriority(thePriority),
-      itsInitFileName(""),
       itsViewType(NFmiMetEditorTypes::kFmiIsoLineView),
       itsStationDataViewType(NFmiMetEditorTypes::kFmiTextView),
       itsFrameColor(NFmiColor(0., 0., 0.))  // musta
@@ -330,38 +312,25 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       itsContourLabelDigitCount(0),
       itsAlpha(100.f)  // dafault on 100 eli täysin läpinäkymätön
       ,
-      itsInitFileVersionNumber(itsFileVersionNumber),
       fHidden(false),
-      fEditedParam(false),
-      itsUnit("?"),
-      fActive(false),
       fShowDifference(false),
-      fShowDifferenceToOriginalData(false),
-      itsDataType(theDataType),
-      fViewMacroDrawParam(false),
-      fBorrowedParam(false)
       //***********************************************
       //********** 'versio 3' parametreja *************
       //***********************************************
-      ,
-      itsModelOriginTime(NFmiMetTime::gMissingTime),
-      itsModelRunIndex(0),
-      itsTimeSerialModelRunCount(0),
-      itsModelRunDifferenceIndex(0),
-      itsDataComparisonProdId(0),
-      itsDataComparisonType(NFmiInfoData::kNoDataType)
+      fShowDifferenceToOriginalData(false)
 {
+  GeneralData::Param(theParam);
+  GeneralData::Level(theLevel);
+  GeneralData::InitFileVersionNumber(itsFileVersionNumber);
+  GeneralData::DataType(theDataType);
+
   itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
   itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
 }
 
 NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
-    : itsParameter(other.itsParameter),
-      itsLevel(other.itsLevel),
-      itsParameterAbbreviation(other.itsParameterAbbreviation),
+    : GeneralData(other),
       itsPriority(other.itsPriority),
-      itsInitFileName(other.itsInitFileName),
-      itsMacroParamRelativePath(other.itsMacroParamRelativePath),
       itsViewType(other.itsViewType),
       itsStationDataViewType(other.itsStationDataViewType),
       itsFrameColor(other.itsFrameColor),
@@ -487,30 +456,12 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       //***********************************************
       ,
       itsAlpha(other.itsAlpha),
-      itsInitFileVersionNumber(other.itsInitFileVersionNumber),
       fHidden(other.fHidden),
-      fEditedParam(other.fEditedParam),
-      itsUnit(other.itsUnit),
-      fActive(other.fActive),
       fShowDifference(other.fShowDifference),
-      fShowDifferenceToOriginalData(other.fShowDifferenceToOriginalData),
-      itsDataType(other.itsDataType),
-      fViewMacroDrawParam(other.fViewMacroDrawParam),
-      fBorrowedParam(other.fBorrowedParam)
-
       //***********************************************
       //********** 'versio 3' parametreja *************
       //***********************************************
-      //***********************************************
-      //********** 'versio 3' parametreja *************
-      //***********************************************
-      ,
-      itsModelOriginTime(other.itsModelOriginTime),
-      itsModelRunIndex(other.itsModelRunIndex),
-      itsTimeSerialModelRunCount(other.itsTimeSerialModelRunCount),
-      itsModelRunDifferenceIndex(other.itsModelRunDifferenceIndex),
-      itsDataComparisonProdId(other.itsDataComparisonProdId),
-      itsDataComparisonType(other.itsDataComparisonType)
+      fShowDifferenceToOriginalData(other.fShowDifferenceToOriginalData)
 {
   Alpha(itsAlpha);  // varmistus että pysytään rajoissa
   itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
@@ -539,20 +490,21 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
   {
     if (fInitOnlyDrawingOptions == false)
     {
-      itsInitFileName = theDrawParam->InitFileName();
-      // HUOM! itsMacroParamRelativePath-dataosaa ei saa initialisoida, koska sitä käytetään vain
+      GeneralData::InitFileName(theDrawParam->InitFileName());
+      // HUOM! GeneralData::MacroParamRelativePath -dataosaa ei saa initialisoida, koska sitä
+      // käytetään vain
       // viewmakrojen yhteydessä
-      itsParameterAbbreviation = theDrawParam->ParameterAbbreviation();
-      fViewMacroDrawParam = theDrawParam->ViewMacroDrawParam();
-      itsParameter = theDrawParam->itsParameter;
-      itsLevel = const_cast<NFmiDrawParam*>(theDrawParam)->Level();
-      itsDataType = theDrawParam->itsDataType;
-      itsModelOriginTime = theDrawParam->itsModelOriginTime;
-      itsModelRunIndex = theDrawParam->itsModelRunIndex;
-      itsTimeSerialModelRunCount = theDrawParam->itsTimeSerialModelRunCount;
-      itsModelRunDifferenceIndex = theDrawParam->itsModelRunDifferenceIndex;
-      itsDataComparisonProdId = theDrawParam->itsDataComparisonProdId;
-      itsDataComparisonType = theDrawParam->itsDataComparisonType;
+      GeneralData::ParameterAbbreviation(theDrawParam->ParameterAbbreviation());
+      GeneralData::ViewMacroDrawParam(theDrawParam->ViewMacroDrawParam());
+      GeneralData::Param(theDrawParam->Param());
+      GeneralData::Level(const_cast<NFmiDrawParam*>(theDrawParam)->Level());
+      GeneralData::DataType(theDrawParam->DataType());
+      GeneralData::ModelOriginTime(theDrawParam->ModelOriginTime());
+      GeneralData::ModelRunIndex(theDrawParam->ModelRunIndex());
+      GeneralData::TimeSerialModelRunCount(theDrawParam->TimeSerialModelRunCount());
+      GeneralData::ModelRunDifferenceIndex(theDrawParam->ModelRunDifferenceIndex());
+      GeneralData::DataComparisonProdId(theDrawParam->DataComparisonProdId());
+      GeneralData::DataComparisonType(theDrawParam->DataComparisonType());
     }
     itsPriority = theDrawParam->Priority();
 
@@ -600,7 +552,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 
     fHidden = theDrawParam->IsParamHidden();
 
-    itsUnit = theDrawParam->Unit();
+    GeneralData::Unit(theDrawParam->Unit());
 
     fShowNumbers = theDrawParam->ShowNumbers();
     fShowMasks = theDrawParam->ShowMasks();
@@ -734,9 +686,9 @@ bool NFmiDrawParam::Init(const std::string& theFilename)
       if (in)
       {
         in.close();
-        itsInitFileName = theFilename;
-        fViewMacroDrawParam = false;
-        fBorrowedParam = false;
+        GeneralData::InitFileName(theFilename);
+        GeneralData::ViewMacroDrawParam(false);
+        GeneralData::BorrowedParam(false);
         return true;
       }
     }
@@ -803,18 +755,18 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
   file << "Version ";
   file << itsFileVersionNumber << endl;
   file << "'ParameterAbbreviation'" << endl;  // selittävä teksti
-  if (fViewMacroDrawParam)
+  if (GeneralData::ViewMacroDrawParam())
   {  // jos viewmacro tapaus ja siinä oleva macroParam, sen drawParamin nimen lyhenteeseen
      // talletetaan suhteellinen polku
     // ('optimointia', näin minun ei vielä tarvitse muuttaa minkään macrosysteemien data tiedoston
     // rakennetta)
-    std::string tmpStr(itsMacroParamRelativePath);
+    std::string tmpStr(GeneralData::MacroParamRelativePath());
     tmpStr += tmpStr.empty() ? "" : "\\";
-    tmpStr += itsParameterAbbreviation;
+    tmpStr += GeneralData::ParameterAbbreviation();
     file << tmpStr << endl;
   }
   else
-    file << itsParameterAbbreviation << endl;
+    file << GeneralData::ParameterAbbreviation() << endl;
   file << "'Priority'" << endl;  // selittävä teksti
   file << itsPriority << endl;
   file << "'ViewType'" << endl;  // selittävä teksti
@@ -883,7 +835,7 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
   file << "'EditableParam'" << endl;  // selittävä teksti
   file << false << endl;     // tämä muuttuja poistettu, muttä jokin arvo laitettava tähän
   file << "'Unit'" << endl;  // selittävä teksti
-  file << itsUnit << endl;
+  file << GeneralData::Unit() << endl;
 
   file << "'ShowNumbers'" << endl;  // selittävä teksti
   file << fShowNumbers << endl;
@@ -1046,20 +998,23 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
     // Kun tulee uusia muuttujia, tee tähän extradatan täyttöä, jotta se saadaan talteen tiedopstoon
     // siten että
     // edelliset versiot eivät mene solmuun vaikka on tullut uutta dataa.
-    extraData.Add(itsAlpha);          // alpha on siis 1. uusista double-extra-parametreista
-    extraData.Add(itsModelRunIndex);  // modelRunIndex on 2. uusista double-extra-parametreista
+    extraData.Add(itsAlpha);  // alpha on siis 1. uusista double-extra-parametreista
     extraData.Add(
-        itsTimeSerialModelRunCount);  // modelRunIndex on 3. uusista double-extra-parametreista
-    extraData.Add(itsModelRunDifferenceIndex);  // itsModelRunDifferenceIndex on 4. uusista
-                                                // double-extra-parametreista
-    extraData.Add(static_cast<double>(itsDataComparisonProdId));  // itsDataComparisonProdId on 5.
-                                                                  // uusista
-                                                                  // double-extra-parametreista
+        GeneralData::ModelRunIndex());  // modelRunIndex on 2. uusista double-extra-parametreista
+    extraData.Add(GeneralData::TimeSerialModelRunCount());  // modelRunIndex on 3. uusista
+                                                            // double-extra-parametreista
     extraData.Add(
-        itsDataComparisonType);  // itsDataComparisonType on 6. uusista double-extra-parametreista
+        GeneralData::ModelRunDifferenceIndex());  // itsModelRunDifferenceIndex on 4. uusista
+                                                  // double-extra-parametreista
+    extraData.Add(
+        static_cast<double>(GeneralData::DataComparisonProdId()));  // itsDataComparisonProdId on 5.
+                                                                    // uusista
+                                                                    // double-extra-parametreista
+    extraData.Add(GeneralData::DataComparisonType());  // itsDataComparisonType on 6. uusista
+                                                       // double-extra-parametreista
 
     extraData.Add(::MetTime2String(
-        itsModelOriginTime));  // modelRunIndex on 1. uusista string-extra-parametreista
+        GeneralData::ModelOriginTime()));  // modelRunIndex on 1. uusista string-extra-parametreista
 
     file << "possible_extra_data" << std::endl;
     file << extraData;
@@ -1094,6 +1049,7 @@ static void FixBinaryReadParameterAbbreviation(std::string& paramNameInOut)
 //--------------------------------------------------------
 std::istream& NFmiDrawParam::Read(std::istream& file)
 {
+  float istreamFileVersionNumber = GeneralData::InitFileVersionNumber();
   char temp[80];
   std::string tmpStr;
   int number;
@@ -1102,13 +1058,13 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
   file >> temp;
   if (std::string(temp) == std::string("Version"))
   {
-    file >> itsInitFileVersionNumber;
-    if (itsInitFileVersionNumber > itsFileVersionNumber)
+    file >> istreamFileVersionNumber;
+    if (istreamFileVersionNumber > itsFileVersionNumber)
       throw std::runtime_error(
           "NFmiDrawParam::Read failed because version number in DrawParam was higher than program "
           "expects.");
 
-    if (itsInitFileVersionNumber >= 1.)  // tämä on vain esimerkki siitä mitä joskus tulee olemaan
+    if (istreamFileVersionNumber >= 1.)  // tämä on vain esimerkki siitä mitä joskus tulee olemaan
     {
       if (!file)
         return file;
@@ -1120,19 +1076,19 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         pos = tmpStr.find_last_of('\\');  // kokeillaan varmuuden vuoksi slasyä molempiin suuntiin
 
       if (pos != std::string::npos)
-      {  // jos löytyi kenoviiva lyhenteestä, laitetaan viemacrossa olevan macroparamin suhteellinen
-        // polku talteen
-        itsMacroParamRelativePath =
-            std::string(tmpStr.begin(), tmpStr.begin() + pos);  // huom! kenoa ei oteta talteen
-        itsParameterAbbreviation = std::string(tmpStr.begin() + pos + 1, tmpStr.end());
+      {
+        // jos löytyi kenoviiva lyhenteestä, laitetaan viemacrossa olevan macroparamin suhteellinen
+        // polku talteen -- huom! kenoa ei oteta talteen
+        GeneralData::MacroParamRelativePath(std::string(tmpStr.begin(), tmpStr.begin() + pos));
+        GeneralData::ParameterAbbreviation(std::string(tmpStr.begin() + pos + 1, tmpStr.end()));
       }
       else
       {
-        itsMacroParamRelativePath = "";
+        GeneralData::MacroParamRelativePath("");
         ::FixBinaryReadParameterAbbreviation(tmpStr);  // Binääri lukuun siirron takia pitää
                                                        // trimmata mahdollisia rivinvaihto merkkejä
                                                        // pois
-        itsParameterAbbreviation = tmpStr;
+        GeneralData::ParameterAbbreviation(tmpStr);
       }
       file >> temp;  // luetaan nimike pois
       file >> itsPriority;
@@ -1224,7 +1180,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       file >> temp;
       if (!file)
         return file;
-      itsUnit = std::string(temp);
+      GeneralData::Unit(std::string(temp));
 
       file >> temp;  // luetaan nimike pois
       file >> fShowNumbers;
@@ -1240,7 +1196,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       //***********************************************
       //********** 'versio 2' parametreja *************
       //***********************************************
-      if (itsInitFileVersionNumber >= 2.)  // tämä on vain esimerkki siitä mitä joskus tulee olemaan
+      if (istreamFileVersionNumber >= 2.)  // tämä on vain esimerkki siitä mitä joskus tulee olemaan
       {
         if (!file)
           return file;
@@ -1363,7 +1319,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         //***********************************************
       }
 
-      if (itsInitFileVersionNumber >= 3.)
+      if (istreamFileVersionNumber >= 3.)
       {
         //***********************************************
         //********** 'versio 3' parametreja *************
@@ -1401,35 +1357,36 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
           Alpha(static_cast<float>(
               extraData
                   .itsDoubleValues[0]));  // laitetaan asetus-funktion läpi, jossa raja tarkistukset
-        itsModelRunIndex = 0;             // 0 on default, eli ei ole käytössä
+        GeneralData::ModelRunIndex(0);    // 0 on default, eli ei ole käytössä
         if (extraData.itsDoubleValues.size() >= 2)
           ModelRunIndex(static_cast<int>(
               extraData
                   .itsDoubleValues[1]));  // laitetaan asetus-funktion läpi, jossa raja tarkistukset
-        itsTimeSerialModelRunCount = 0;
+        GeneralData::TimeSerialModelRunCount(0);
         if (extraData.itsDoubleValues.size() >= 3)
           TimeSerialModelRunCount(static_cast<int>(
               extraData
                   .itsDoubleValues[2]));  // laitetaan asetus-funktion läpi, jossa raja tarkistukset
-        itsModelRunDifferenceIndex = 0;   // 0 on default, eli ei ole käytössä
+        GeneralData::ModelRunDifferenceIndex(0);  // 0 on default, eli ei ole käytössä
         if (extraData.itsDoubleValues.size() >= 4)
           ModelRunDifferenceIndex(static_cast<int>(
               extraData
                   .itsDoubleValues[3]));  // laitetaan asetus-funktion läpi, jossa raja tarkistukset
-        itsDataComparisonProdId = 0;
+        GeneralData::DataComparisonProdId(0);
         if (extraData.itsDoubleValues.size() >= 5)
           DataComparisonProdId(static_cast<unsigned long>(
               extraData
                   .itsDoubleValues[4]));  // laitetaan asetus-funktion läpi, jossa raja tarkistukset
-        itsDataComparisonType = NFmiInfoData::kNoDataType;
+        GeneralData::DataComparisonType(NFmiInfoData::kNoDataType);
         if (extraData.itsDoubleValues.size() >= 6)
           DataComparisonType(static_cast<NFmiInfoData::Type>(
               static_cast<int>(extraData.itsDoubleValues[5])));  // laitetaan asetus-funktion läpi,
                                                                  // jossa raja tarkistukset
 
-        itsModelOriginTime = NFmiMetTime::gMissingTime;  // tämä on oletus arvo eli ei ole käytössä
+        GeneralData::ModelOriginTime(
+            NFmiMetTime::gMissingTime);  // tämä on oletus arvo eli ei ole käytössä
         if (extraData.itsStringValues.size() >= 1)
-          ModelOriginTime(::String2MetTime(
+          GeneralData::ModelOriginTime(::String2MetTime(
               extraData
                   .itsStringValues[0]));  // laitetaan asetus-funktion läpi, jossa raja tarkistukset
 
@@ -1470,32 +1427,20 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         itsAlpha = 100.f;  // tämä on siis default arvo alphalle (täysin läpinäkyvä)
       }
     }
-    itsInitFileVersionNumber = itsFileVersionNumber;  // lopuksi asetetaan versio numero
-                                                      // viimeisimmäksi, että tulevaisuudessa
-                                                      // talletus menee uudella versiolla
+    GeneralData::InitFileVersionNumber(itsFileVersionNumber);  // lopuksi asetetaan versio numero
+    // viimeisimmäksi, että tulevaisuudessa
+    // talletus menee uudella versiolla
   }
   return file;
-}
-
-const std::string& NFmiDrawParam::ParameterAbbreviation(void) const
-{
-  static std::string dummy;
-  if (itsParameterAbbreviation != std::string("") && itsParameterAbbreviation != std::string("?"))
-    return itsParameterAbbreviation;
-  else
-  {
-    dummy = std::string(static_cast<char*>(itsParameter.GetParamName()));
-    return dummy;
-  }
 }
 
 bool NFmiDrawParam::UseArchiveModelData(void) const
 {
   if (IsModelRunDataType())
   {
-    if (itsModelOriginTime != NFmiMetTime::gMissingTime)
+    if (GeneralData::ModelOriginTime() != NFmiMetTime::gMissingTime)
       return true;
-    if (itsModelRunIndex < 0)
+    if (GeneralData::ModelRunIndex() < 0)
       return true;
   }
   return false;
@@ -1519,9 +1464,9 @@ bool NFmiDrawParam::IsModelRunDataType(NFmiInfoData::Type theDataType)
 
 bool NFmiDrawParam::DoDataComparison(void)
 {
-  if (itsDataComparisonProdId != 0)
+  if (GeneralData::DataComparisonProdId() != 0)
   {
-    if (itsDataComparisonType != NFmiInfoData::kNoDataType)
+    if (GeneralData::DataComparisonType() != NFmiInfoData::kNoDataType)
       return true;
   }
   return false;
@@ -1541,13 +1486,13 @@ bool NFmiDrawParam::IsMacroParamCase(bool justCheckDataType)
 {
   if (justCheckDataType)
   {
-    if (IsMacroParamCase(itsDataType))
+    if (IsMacroParamCase(GeneralData::DataType()))
       return true;
   }
   else
   {
-    if (ViewMacroDrawParam() == false && (IsMacroParamCase(itsDataType)) &&
-        ParameterAbbreviation() != std::string("macroParam"))
+    if (GeneralData::ViewMacroDrawParam() == false && (IsMacroParamCase(GeneralData::DataType())) &&
+        GeneralData::ParameterAbbreviation() != std::string("macroParam"))
       return true;
   }
   return false;
