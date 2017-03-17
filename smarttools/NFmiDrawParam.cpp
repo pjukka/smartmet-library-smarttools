@@ -45,6 +45,7 @@ NFmiDrawParam::NFmiDrawParam()
     : GeneralData(),
       GeneralVisualization(),
       SimpleColorContour(),
+      CustomIsoline(),
       itsPriority(1),
       itsStationDataViewType(NFmiMetEditorTypes::kFmiTextView),
       itsFrameColor(NFmiColor(0., 0., 0.))  // musta
@@ -90,17 +91,6 @@ NFmiDrawParam::NFmiDrawParam()
       itsSimpleContourZeroValue(0),
       itsSimpleContourLabelHeight(4),
       fShowSimpleContourLabelBox(false),
-      itsSpecialIsoLineValues(),
-      itsSpecialContourValues(),
-      itsSpecialIsoLineLabelHeight(),
-      itsSpecialContourLabelHeight(),
-      itsSpecialIsoLineWidth(),
-      itsSpecialContourWidth(),
-      itsSpecialIsoLineStyle(),
-      itsSpecialContourStyle(),
-      itsSpecialIsoLineColorIndexies(),
-      itsSpecialContourColorIndexies(),
-      itsSpecialIsoLineShowLabelBox(),
       itsSpecialColorContouringValues(),
       itsSpecialColorContouringColorIndexies(),
       fUseWithIsoLineHatch1(false),
@@ -135,6 +125,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
     : GeneralData(),
       GeneralVisualization(),
       SimpleColorContour(),
+      CustomIsoline(),
       itsPriority(thePriority),
       itsStationDataViewType(NFmiMetEditorTypes::kFmiTextView),
       itsFrameColor(NFmiColor(0., 0., 0.))  // musta
@@ -180,17 +171,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       itsSimpleContourZeroValue(0),
       itsSimpleContourLabelHeight(4),
       fShowSimpleContourLabelBox(false),
-      itsSpecialIsoLineValues(),
-      itsSpecialContourValues(),
-      itsSpecialIsoLineLabelHeight(),
-      itsSpecialContourLabelHeight(),
-      itsSpecialIsoLineWidth(),
-      itsSpecialContourWidth(),
-      itsSpecialIsoLineStyle(),
-      itsSpecialContourStyle(),
-      itsSpecialIsoLineColorIndexies(),
-      itsSpecialContourColorIndexies(),
-      itsSpecialIsoLineShowLabelBox(),
       itsSpecialColorContouringValues(),
       itsSpecialColorContouringColorIndexies(),
       fUseWithIsoLineHatch1(false),
@@ -221,6 +201,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
     : GeneralData(other),
       GeneralVisualization(other),
       SimpleColorContour(other),
+      CustomIsoline(other),
       itsPriority(other.itsPriority),
       itsStationDataViewType(other.itsStationDataViewType),
       itsFrameColor(other.itsFrameColor),
@@ -267,17 +248,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       itsSimpleContourZeroValue(other.itsSimpleContourZeroValue),
       itsSimpleContourLabelHeight(other.itsSimpleContourLabelHeight),
       fShowSimpleContourLabelBox(other.fShowSimpleContourLabelBox),
-      itsSpecialIsoLineValues(other.itsSpecialIsoLineValues),
-      itsSpecialContourValues(other.itsSpecialContourValues),
-      itsSpecialIsoLineLabelHeight(other.itsSpecialIsoLineLabelHeight),
-      itsSpecialContourLabelHeight(other.itsSpecialContourLabelHeight),
-      itsSpecialIsoLineWidth(other.itsSpecialIsoLineWidth),
-      itsSpecialContourWidth(other.itsSpecialContourWidth),
-      itsSpecialIsoLineStyle(other.itsSpecialIsoLineStyle),
-      itsSpecialContourStyle(other.itsSpecialContourStyle),
-      itsSpecialIsoLineColorIndexies(other.itsSpecialIsoLineColorIndexies),
-      itsSpecialContourColorIndexies(other.itsSpecialContourColorIndexies),
-      itsSpecialIsoLineShowLabelBox(other.itsSpecialIsoLineShowLabelBox),
       itsSpecialColorContouringValues(other.itsSpecialColorContouringValues),
       itsSpecialColorContouringColorIndexies(other.itsSpecialColorContouringColorIndexies),
       fUseWithIsoLineHatch1(other.fUseWithIsoLineHatch1),
@@ -440,12 +410,12 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
         theDrawParam->SimpleIsoLineColorShadeHighValueColor());
     SimpleIsoline::SimpleIsoLineColorShadeClassCount(
         theDrawParam->SimpleIsoLineColorShadeClassCount());
-    itsSpecialIsoLineValues = theDrawParam->SpecialIsoLineValues();
-    itsSpecialIsoLineLabelHeight = theDrawParam->SpecialIsoLineLabelHeight();
-    itsSpecialIsoLineWidth = theDrawParam->SpecialIsoLineWidth();
-    itsSpecialIsoLineStyle = theDrawParam->SpecialIsoLineStyle();
-    itsSpecialIsoLineColorIndexies = theDrawParam->SpecialIsoLineColorIndexies();
-    itsSpecialIsoLineShowLabelBox = theDrawParam->SpecialIsoLineShowLabelBox();
+    CustomIsoline::SetSpecialIsoLineValues(theDrawParam->SpecialIsoLineValues());
+    CustomIsoline::SetSpecialIsoLineLabelHeight(theDrawParam->SpecialIsoLineLabelHeight());
+    CustomIsoline::SetSpecialIsoLineWidth(theDrawParam->SpecialIsoLineWidth());
+    CustomIsoline::SetSpecialIsoLineStyle(theDrawParam->SpecialIsoLineStyle());
+    CustomIsoline::SetSpecialIsoLineColorIndexies(theDrawParam->SpecialIsoLineColorIndexies());
+    CustomIsoline::SpecialIsoLineShowLabelBox(theDrawParam->SpecialIsoLineShowLabelBox());
     GeneralVisualization::DrawOnlyOverMask(theDrawParam->DrawOnlyOverMask());
     GeneralVisualization::UseCustomColorContouring(theDrawParam->UseCustomColorContouring());
     itsSpecialColorContouringValues = theDrawParam->SpecialColorContouringValues();
@@ -502,11 +472,11 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
         theDrawParam->SimpleIsoLineColorShadeHigh2Value());
     SimpleIsoline::SimpleIsoLineColorShadeHigh2ValueColor(
         theDrawParam->SimpleIsoLineColorShadeHigh2ValueColor());
-    itsSpecialContourValues = theDrawParam->itsSpecialContourValues;
-    itsSpecialContourLabelHeight = theDrawParam->itsSpecialContourLabelHeight;
-    itsSpecialContourWidth = theDrawParam->itsSpecialContourWidth;
-    itsSpecialContourStyle = theDrawParam->itsSpecialContourStyle;
-    itsSpecialContourColorIndexies = theDrawParam->itsSpecialContourColorIndexies;
+    CustomIsoline::SetSpecialContourValues(theDrawParam->SpecialContourValues());
+    CustomIsoline::SetSpecialContourLabelHeight(theDrawParam->SpecialContourLabelHeight());
+    CustomIsoline::SetSpecialcontourWidth(theDrawParam->SpecialcontourWidth());
+    CustomIsoline::SetSpecialContourStyle(theDrawParam->SpecialContourStyle());
+    CustomIsoline::SetSpecialContourColorIndexies(theDrawParam->SpecialContourColorIndexies());
     GeneralVisualization::UseCustomIsoLineing(theDrawParam->UseCustomIsoLineing());
     itsContourLabelDigitCount = theDrawParam->itsContourLabelDigitCount;
     //***********************************************
@@ -733,40 +703,40 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
     file << SimpleIsoline::SimpleIsoLineColorShadeClassCount() << endl;
 
     size_t i = 0;
-    size_t size = itsSpecialIsoLineValues.size();
+    size_t size = CustomIsoline::SpecialIsoLineValues().size();
     file << size << endl;
     for (i = 0; i < size; i++)
-      file << itsSpecialIsoLineValues[i] << " ";
+      file << CustomIsoline::SpecialIsoLineValues()[i] << " ";
     file << endl;
 
-    size = itsSpecialIsoLineLabelHeight.size();
+    size = CustomIsoline::SpecialIsoLineLabelHeight().size();
     file << size << endl;
     for (i = 0; i < size; i++)
-      file << itsSpecialIsoLineLabelHeight[i] << " ";
+      file << CustomIsoline::SpecialIsoLineLabelHeight()[i] << " ";
     file << endl;
 
-    size = itsSpecialIsoLineWidth.size();
+    size = CustomIsoline::SpecialIsoLineWidth().size();
     file << size << endl;
     for (i = 0; i < size; i++)
-      file << itsSpecialIsoLineWidth[i] << " ";
+      file << CustomIsoline::SpecialIsoLineWidth()[i] << " ";
     file << endl;
 
-    size = itsSpecialIsoLineStyle.size();
+    size = CustomIsoline::SpecialIsoLineStyle().size();
     file << size << endl;
     for (i = 0; i < size; i++)
-      file << itsSpecialIsoLineStyle[i] << " ";
+      file << CustomIsoline::SpecialIsoLineStyle()[i] << " ";
     file << endl;
 
-    size = itsSpecialIsoLineColorIndexies.size();
+    size = CustomIsoline::SpecialIsoLineColorIndexies().size();
     file << size << endl;
     for (i = 0; i < size; i++)
-      file << itsSpecialIsoLineColorIndexies[i] << " ";
+      file << CustomIsoline::SpecialIsoLineColorIndexies()[i] << " ";
     file << endl;
 
-    size = itsSpecialIsoLineShowLabelBox.size();
+    size = CustomIsoline::SpecialIsoLineShowLabelBox().size();
     file << size << endl;
     for (i = 0; i < size; i++)
-      file << itsSpecialIsoLineShowLabelBox[i] << " ";
+      file << CustomIsoline::SpecialIsoLineShowLabelBox()[i] << " ";
     file << endl;
 
     file << GeneralVisualization::DrawOnlyOverMask() << endl;
@@ -828,15 +798,20 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
          << SimpleIsoline::SimpleIsoLineColorShadeHigh2Value() << endl;
     file << SimpleIsoline::SimpleIsoLineColorShadeHigh2ValueColor() << endl;
 
-    NFmiDataStoringHelpers::WriteContainer(itsSpecialContourValues, file, std::string(" "));
+    NFmiDataStoringHelpers::WriteContainer(
+        CustomIsoline::SpecialContourValues(), file, std::string(" "));
     file << endl;
-    NFmiDataStoringHelpers::WriteContainer(itsSpecialContourLabelHeight, file, std::string(" "));
+    NFmiDataStoringHelpers::WriteContainer(
+        CustomIsoline::SpecialContourLabelHeight(), file, std::string(" "));
     file << endl;
-    NFmiDataStoringHelpers::WriteContainer(itsSpecialContourWidth, file, std::string(" "));
+    NFmiDataStoringHelpers::WriteContainer(
+        CustomIsoline::SpecialcontourWidth(), file, std::string(" "));
     file << endl;
-    NFmiDataStoringHelpers::WriteContainer(itsSpecialContourStyle, file, std::string(" "));
+    NFmiDataStoringHelpers::WriteContainer(
+        CustomIsoline::SpecialContourStyle(), file, std::string(" "));
     file << endl;
-    NFmiDataStoringHelpers::WriteContainer(itsSpecialContourColorIndexies, file, std::string(" "));
+    NFmiDataStoringHelpers::WriteContainer(
+        CustomIsoline::SpecialContourColorIndexies(), file, std::string(" "));
     file << endl;
 
     file << GeneralVisualization::UseCustomIsoLineing() << " " << itsContourLabelDigitCount << endl;
@@ -1111,39 +1086,45 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         int i = 0;
         int size;
         file >> size;
-        itsSpecialIsoLineValues.resize(size);
+        checkedVector<float> tmpFloatVector(size);
         for (i = 0; i < size; i++)
-          file >> itsSpecialIsoLineValues[i];
+          file >> tmpFloatVector[i];
+        CustomIsoline::SetSpecialIsoLineValues(tmpFloatVector);
 
         file >> size;
-        itsSpecialIsoLineLabelHeight.resize(size);
+        tmpFloatVector.resize(size);
         for (i = 0; i < size; i++)
-          file >> itsSpecialIsoLineLabelHeight[i];
+          file >> tmpFloatVector[i];
+        CustomIsoline::SetSpecialIsoLineLabelHeight(tmpFloatVector);
 
         file >> size;
-        itsSpecialIsoLineWidth.resize(size);
+        tmpFloatVector.resize(size);
         for (i = 0; i < size; i++)
-          file >> itsSpecialIsoLineWidth[i];
+          file >> tmpFloatVector[i];
+        CustomIsoline::SetSpecialIsoLineWidth(tmpFloatVector);
 
         file >> size;
-        itsSpecialIsoLineStyle.resize(size);
+        checkedVector<int> tmpIntVector(size);
         for (i = 0; i < size; i++)
-          file >> itsSpecialIsoLineStyle[i];
+          file >> tmpIntVector[i];
+        CustomIsoline::SetSpecialIsoLineStyle(tmpIntVector);
 
         file >> size;
-        itsSpecialIsoLineColorIndexies.resize(size);
+        tmpIntVector.resize(size);
         for (i = 0; i < size; i++)
-          file >> itsSpecialIsoLineColorIndexies[i];
+          file >> tmpIntVector[i];
+        CustomIsoline::SetSpecialIsoLineColorIndexies(tmpIntVector);
 
         file >> size;
-        itsSpecialIsoLineShowLabelBox.resize(size);
+        checkedVector<bool> tmpBoolVector(size);
         for (i = 0; i < size; i++)
         {
           // Mika: g++ 2.95 ei salli suoraa sijoitusta
           bool foobar;
           file >> foobar;
-          itsSpecialIsoLineShowLabelBox[i] = foobar;
+          tmpBoolVector[i] = foobar;
         }
+        CustomIsoline::SpecialIsoLineShowLabelBox(tmpBoolVector);
 
         if (!file)
           return file;
@@ -1227,11 +1208,23 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         SimpleIsoline::SimpleIsoLineColorShadeHigh2Value(tmpFloat2);
         file >> tmpColor;
         SimpleIsoline::SimpleIsoLineColorShadeHigh2ValueColor(tmpColor);
-        NFmiDataStoringHelpers::ReadContainer(itsSpecialContourValues, file);
-        NFmiDataStoringHelpers::ReadContainer(itsSpecialContourLabelHeight, file);
-        NFmiDataStoringHelpers::ReadContainer(itsSpecialContourWidth, file);
-        NFmiDataStoringHelpers::ReadContainer(itsSpecialContourStyle, file);
-        NFmiDataStoringHelpers::ReadContainer(itsSpecialContourColorIndexies, file);
+
+        checkedVector<float> tmpFloatVector;
+        NFmiDataStoringHelpers::ReadContainer(tmpFloatVector, file);
+        CustomIsoline::SetSpecialContourValues(tmpFloatVector);
+
+        NFmiDataStoringHelpers::ReadContainer(tmpFloatVector, file);
+        CustomIsoline::SetSpecialContourLabelHeight(tmpFloatVector);
+
+        NFmiDataStoringHelpers::ReadContainer(tmpFloatVector, file);
+        CustomIsoline::SetSpecialcontourWidth(tmpFloatVector);
+
+        checkedVector<int> tmpIntVector;
+        NFmiDataStoringHelpers::ReadContainer(tmpIntVector, file);
+        CustomIsoline::SetSpecialContourStyle(tmpIntVector);
+
+        NFmiDataStoringHelpers::ReadContainer(tmpIntVector, file);
+        CustomIsoline::SetSpecialContourColorIndexies(tmpIntVector);
 
         file >> tmpBool >> itsContourLabelDigitCount;
         GeneralVisualization::UseCustomIsoLineing(tmpBool);
@@ -1315,11 +1308,11 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         SimpleIsoline::SimpleIsoLineColorShadeHigh2ValueColor(
             SimpleIsoline::SimpleIsoLineColorShadeHighValueColor());
 
-        itsSpecialContourValues = itsSpecialIsoLineValues;
-        itsSpecialContourLabelHeight = itsSpecialIsoLineLabelHeight;
-        itsSpecialContourWidth = itsSpecialIsoLineWidth;
-        itsSpecialContourStyle = itsSpecialIsoLineStyle;
-        itsSpecialContourColorIndexies = itsSpecialIsoLineColorIndexies;
+        CustomIsoline::SetSpecialContourValues(CustomIsoline::SpecialIsoLineValues());
+        CustomIsoline::SetSpecialContourLabelHeight(CustomIsoline::SpecialIsoLineLabelHeight());
+        CustomIsoline::SetSpecialcontourWidth(CustomIsoline::SpecialIsoLineWidth());
+        CustomIsoline::SetSpecialContourStyle(CustomIsoline::SpecialIsoLineStyle());
+        CustomIsoline::SetSpecialContourColorIndexies(CustomIsoline::SpecialIsoLineColorIndexies());
 
         GeneralVisualization::UseCustomIsoLineing(GeneralVisualization::UseCustomColorContouring());
         itsContourLabelDigitCount = GeneralVisualization::IsoLineLabelDigitCount();
