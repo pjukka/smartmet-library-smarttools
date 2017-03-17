@@ -33,7 +33,7 @@
 #include "GeneralData.h"
 #include "GeneralVisualization.h"
 #include "SimpleColorContour.h"
-#include "CustomIsoline.h"
+#include "CustomColorContour.h"
 
 #include "NFmiColor.h"
 #include "NFmiMetEditorTypes.h"
@@ -48,7 +48,7 @@ class NFmiDrawingEnvironment;
 class NFmiDrawParam : public GeneralData,
                       public GeneralVisualization,
                       public SimpleColorContour,
-                      public CustomIsoline
+                      public CustomColorContour
 {
  public:
   NFmiDrawParam(void);
@@ -100,18 +100,6 @@ class NFmiDrawParam : public GeneralData,
   {
     return itsOnlyOneSymbolRelativePositionOffset;
   };
-  void UseIsoLineGabWithCustomContours(const bool newState)
-  {
-    fUseIsoLineGabWithCustomContours = newState;
-    fUseContourGabWithCustomContours =
-        newState;  // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
-  };
-  bool UseIsoLineGabWithCustomContours(void) const { return fUseIsoLineGabWithCustomContours; };
-  void UseContourGabWithCustomContours(const bool newState)
-  {
-    fUseContourGabWithCustomContours = newState;
-  };
-  bool UseContourGabWithCustomContours(void) const { return fUseContourGabWithCustomContours; };
   void ModifyingStep(const double theModifyingStep) { itsModifyingStep = theModifyingStep; };
   double ModifyingStep(void) const { return itsModifyingStep; };
   //	void				 ModifyingUnit (bool theModifyingUnit) { fModifyingUnit =
@@ -232,23 +220,6 @@ class NFmiDrawParam : public GeneralData,
   void SimpleContourLabelHeight(float newValue) { itsSimpleContourLabelHeight = newValue; }
   bool ShowSimpleContourLabelBox(void) const { return fShowSimpleContourLabelBox; }
   void ShowSimpleContourLabelBox(bool newValue) { fShowSimpleContourLabelBox = newValue; }
-  const checkedVector<float>& SpecialColorContouringValues(void) const
-  {
-    return itsSpecialColorContouringValues;
-  }
-  void SetSpecialColorContouringValues(const checkedVector<float>& newValue)
-  {
-    itsSpecialColorContouringValues = newValue;
-  }
-  const checkedVector<int>& SpecialColorContouringColorIndexies(void) const
-  {
-    return itsSpecialColorContouringColorIndexies;
-  }
-  void SpecialColorContouringColorIndexies(checkedVector<int>& newValue)
-  {
-    itsSpecialColorContouringColorIndexies = newValue;
-  }
-
   bool UseWithIsoLineHatch1(void) const { return fUseWithIsoLineHatch1; }
   void UseWithIsoLineHatch1(bool newValue) { fUseWithIsoLineHatch1 = newValue; }
   bool DrawIsoLineHatchWithBorders1(void) const { return fDrawIsoLineHatchWithBorders1; }
@@ -318,8 +289,6 @@ class NFmiDrawParam : public GeneralData,
   NFmiPoint itsRelativePositionOffset;
   NFmiPoint itsOnlyOneSymbolRelativeSize;
   NFmiPoint itsOnlyOneSymbolRelativePositionOffset;
-  bool fUseIsoLineGabWithCustomContours;
-  bool fUseContourGabWithCustomContours;  // **** Versio 3 parametri ****
   double itsModifyingStep;
   //	bool fModifyingUnit;	//(= 0, jos yksikkö on %, = 1, jos yksikkö on sama kuin itsUnit)
   double itsTimeSerialModifyingLimit;  // aikasarjanäytön muutos akselin minimi ja maksimi arvo
@@ -369,10 +338,6 @@ class NFmiDrawParam : public GeneralData,
   float itsSimpleContourLabelHeight;  // **** Versio 3 parametri ****
   bool fShowSimpleContourLabelBox;    // **** Versio 3 parametri ****
 
-  checkedVector<float> itsSpecialColorContouringValues;  // tähän laitetaan kaikki arvot, johon
-                                                         // halutaan color contour luokka rajoiksi
-  checkedVector<int> itsSpecialColorContouringColorIndexies;  // eri viivojen väri indeksit (pitää
-  // tehdä näyttö taulukko käyttäjälle)
   bool fUseWithIsoLineHatch1;
   bool fDrawIsoLineHatchWithBorders1;
   float itsIsoLineHatchLowValue1;   // hatch alueen ala-arvo

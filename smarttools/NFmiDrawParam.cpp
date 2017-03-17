@@ -45,7 +45,7 @@ NFmiDrawParam::NFmiDrawParam()
     : GeneralData(),
       GeneralVisualization(),
       SimpleColorContour(),
-      CustomIsoline(),
+      CustomColorContour(),
       itsPriority(1),
       itsStationDataViewType(NFmiMetEditorTypes::kFmiTextView),
       itsFrameColor(NFmiColor(0., 0., 0.))  // musta
@@ -56,8 +56,6 @@ NFmiDrawParam::NFmiDrawParam()
       itsRelativePositionOffset(NFmiPoint(0, 0)),
       itsOnlyOneSymbolRelativeSize(NFmiPoint(1, 1)),
       itsOnlyOneSymbolRelativePositionOffset(NFmiPoint(0, 0)),
-      fUseIsoLineGabWithCustomContours(false),
-      fUseContourGabWithCustomContours(false),
       itsModifyingStep(1.)
       //, fModifyingUnit						 (true)
       ,
@@ -91,8 +89,6 @@ NFmiDrawParam::NFmiDrawParam()
       itsSimpleContourZeroValue(0),
       itsSimpleContourLabelHeight(4),
       fShowSimpleContourLabelBox(false),
-      itsSpecialColorContouringValues(),
-      itsSpecialColorContouringColorIndexies(),
       fUseWithIsoLineHatch1(false),
       fDrawIsoLineHatchWithBorders1(false),
       itsIsoLineHatchLowValue1(0),
@@ -125,7 +121,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
     : GeneralData(),
       GeneralVisualization(),
       SimpleColorContour(),
-      CustomIsoline(),
+      CustomColorContour(),
       itsPriority(thePriority),
       itsStationDataViewType(NFmiMetEditorTypes::kFmiTextView),
       itsFrameColor(NFmiColor(0., 0., 0.))  // musta
@@ -136,8 +132,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       itsRelativePositionOffset(NFmiPoint(0, 0)),
       itsOnlyOneSymbolRelativeSize(NFmiPoint(1, 1)),
       itsOnlyOneSymbolRelativePositionOffset(NFmiPoint(0, 0)),
-      fUseIsoLineGabWithCustomContours(false),
-      fUseContourGabWithCustomContours(false),
       itsModifyingStep(1.)
       //, fModifyingUnit						 (true)
       ,
@@ -171,8 +165,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       itsSimpleContourZeroValue(0),
       itsSimpleContourLabelHeight(4),
       fShowSimpleContourLabelBox(false),
-      itsSpecialColorContouringValues(),
-      itsSpecialColorContouringColorIndexies(),
       fUseWithIsoLineHatch1(false),
       fDrawIsoLineHatchWithBorders1(false),
       itsIsoLineHatchLowValue1(0),
@@ -201,7 +193,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
     : GeneralData(other),
       GeneralVisualization(other),
       SimpleColorContour(other),
-      CustomIsoline(other),
+      CustomColorContour(other),
       itsPriority(other.itsPriority),
       itsStationDataViewType(other.itsStationDataViewType),
       itsFrameColor(other.itsFrameColor),
@@ -210,8 +202,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       itsRelativePositionOffset(other.itsRelativePositionOffset),
       itsOnlyOneSymbolRelativeSize(other.itsOnlyOneSymbolRelativeSize),
       itsOnlyOneSymbolRelativePositionOffset(other.itsOnlyOneSymbolRelativePositionOffset),
-      fUseIsoLineGabWithCustomContours(other.fUseIsoLineGabWithCustomContours),
-      fUseContourGabWithCustomContours(other.fUseContourGabWithCustomContours),
       itsModifyingStep(other.itsModifyingStep)
       //, fModifyingUnit(other.fModifyingUnit)
       ,
@@ -248,8 +238,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       itsSimpleContourZeroValue(other.itsSimpleContourZeroValue),
       itsSimpleContourLabelHeight(other.itsSimpleContourLabelHeight),
       fShowSimpleContourLabelBox(other.fShowSimpleContourLabelBox),
-      itsSpecialColorContouringValues(other.itsSpecialColorContouringValues),
-      itsSpecialColorContouringColorIndexies(other.itsSpecialColorContouringColorIndexies),
       fUseWithIsoLineHatch1(other.fUseWithIsoLineHatch1),
       fDrawIsoLineHatchWithBorders1(other.fDrawIsoLineHatchWithBorders1),
       itsIsoLineHatchLowValue1(other.itsIsoLineHatchLowValue1),
@@ -325,8 +313,10 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     itsOnlyOneSymbolRelativePositionOffset =
         NFmiPoint(theDrawParam->OnlyOneSymbolRelativePositionOffset());
 
-    fUseIsoLineGabWithCustomContours = theDrawParam->UseIsoLineGabWithCustomContours();
-    fUseContourGabWithCustomContours = theDrawParam->UseContourGabWithCustomContours();
+    CustomColorContour::UseIsoLineGabWithCustomContours(
+        theDrawParam->UseIsoLineGabWithCustomContours());
+    CustomColorContour::UseContourGabWithCustomContours(
+        theDrawParam->UseContourGabWithCustomContours());
     SimpleIsoline::IsoLineGab(theDrawParam->IsoLineGab());
     itsModifyingStep = theDrawParam->ModifyingStep();
     //		fModifyingUnit =  theDrawParam->ModifyingUnit();
@@ -418,8 +408,10 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     CustomIsoline::SpecialIsoLineShowLabelBox(theDrawParam->SpecialIsoLineShowLabelBox());
     GeneralVisualization::DrawOnlyOverMask(theDrawParam->DrawOnlyOverMask());
     GeneralVisualization::UseCustomColorContouring(theDrawParam->UseCustomColorContouring());
-    itsSpecialColorContouringValues = theDrawParam->SpecialColorContouringValues();
-    itsSpecialColorContouringColorIndexies = theDrawParam->SpecialColorContouringColorIndexies();
+    CustomColorContour::SetSpecialColorContouringValues(
+        theDrawParam->SpecialColorContouringValues());
+    CustomColorContour::SpecialColorContouringColorIndexies(
+        theDrawParam->SpecialColorContouringColorIndexies());
     SimpleColorContour::ColorContouringColorShadeLowValue(
         theDrawParam->ColorContouringColorShadeLowValue());
     SimpleColorContour::ColorContouringColorShadeMidValue(
@@ -458,7 +450,8 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     //********** 'versio 3' parametreja *************
     //***********************************************
     SimpleIsoline::ContourLabelBoxFillColor(theDrawParam->ContourLabelBoxFillColor());
-    fUseContourGabWithCustomContours = theDrawParam->fUseContourGabWithCustomContours;
+    CustomColorContour::UseContourGabWithCustomContours(
+        theDrawParam->UseContourGabWithCustomContours());
     SimpleColorContour::ContourGab(theDrawParam->ContourGab());
     SimpleColorContour::ContourColor(theDrawParam->ContourColor());
     itsContourTextColor = theDrawParam->itsContourTextColor;
@@ -588,7 +581,7 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
   file << "'ViewType'" << endl;  // selittävä teksti
   file << static_cast<int>(GeneralVisualization::ViewType()) << endl;
   file << "'UseIsoLineGabWithCustomContours'" << endl;  // selittävä teksti
-  file << static_cast<int>(fUseIsoLineGabWithCustomContours) << endl;
+  file << static_cast<int>(CustomColorContour::UseIsoLineGabWithCustomContours()) << endl;
   file << "'IsoLineGab'" << endl;  // selittävä teksti
   file << SimpleIsoline::IsoLineGab() << endl;
   file << "'IsolineColor'" << endl;  // selittävä teksti
@@ -742,16 +735,16 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
     file << GeneralVisualization::DrawOnlyOverMask() << endl;
     file << GeneralVisualization::UseCustomColorContouring() << endl;
 
-    size = itsSpecialColorContouringValues.size();
+    size = CustomColorContour::SpecialColorContouringValues().size();
     file << size << endl;
     for (i = 0; i < size; i++)
-      file << itsSpecialColorContouringValues[i] << " ";
+      file << CustomColorContour::SpecialColorContouringValues()[i] << " ";
     file << endl;
 
-    size = itsSpecialColorContouringColorIndexies.size();
+    size = CustomColorContour::SpecialColorContouringColorIndexies().size();
     file << size << endl;
     for (i = 0; i < size; i++)
-      file << itsSpecialColorContouringColorIndexies[i] << " ";
+      file << CustomColorContour::SpecialColorContouringColorIndexies()[i] << " ";
     file << endl;
 
     file << SimpleColorContour::ColorContouringColorShadeLowValue() << endl;
@@ -788,7 +781,8 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
     //***********************************************
     file << "Version_3_stuff" << endl;
     file << SimpleIsoline::ContourLabelBoxFillColor() << endl;
-    file << fUseContourGabWithCustomContours << " " << SimpleColorContour::ContourGab() << endl;
+    file << CustomColorContour::UseContourGabWithCustomContours() << " "
+         << SimpleColorContour::ContourGab() << endl;
     file << SimpleColorContour::ContourColor() << endl;
     file << itsContourTextColor << endl;
     file << fUseContourFeathering << " " << GeneralVisualization::UseSimpleContourDefinitions()
@@ -926,7 +920,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
 
       file >> temp;  // luetaan nimike pois
       file >> number;
-      fUseIsoLineGabWithCustomContours = number != 0;
+      CustomColorContour::UseIsoLineGabWithCustomContours(number != 0);
       file >> temp;  // luetaan nimike pois
       file >> tmpDouble;
       SimpleIsoline::IsoLineGab(tmpDouble);
@@ -1136,16 +1130,18 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         file >> size;
         if (!file)
           return file;
-        itsSpecialColorContouringValues.resize(size);
+        tmpFloatVector.resize(size);
         for (i = 0; i < size; i++)
-          file >> itsSpecialColorContouringValues[i];
+          file >> tmpFloatVector[i];
+        CustomColorContour::SetSpecialColorContouringValues(tmpFloatVector);
 
         file >> size;
         if (!file)
           return file;
-        itsSpecialColorContouringColorIndexies.resize(size);
+        tmpIntVector.resize(size);
         for (i = 0; i < size; i++)
-          file >> itsSpecialColorContouringColorIndexies[i];
+          file >> tmpIntVector[i];
+        CustomColorContour::SpecialColorContouringColorIndexies(tmpIntVector);
 
         file >> tmpFloat;
         SimpleColorContour::ColorContouringColorShadeLowValue(tmpFloat);
@@ -1193,12 +1189,12 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         file >> temp;  // luetaan 'Version_3_stuff' pois
         file >> tmpColor;
         SimpleIsoline::ContourLabelBoxFillColor(tmpColor);
-        file >> fUseContourGabWithCustomContours >> tmpDouble;
+        file >> tmpBool >> tmpDouble;
+        CustomColorContour::UseContourGabWithCustomContours(tmpBool);
         SimpleColorContour::ContourGab(tmpDouble);
         file >> tmpColor;
         SimpleColorContour::ContourColor(tmpColor);
         file >> itsContourTextColor;
-        bool tmpBool;
         file >> fUseContourFeathering >> tmpBool >> itsSimpleContourZeroValue >>
             itsSimpleContourLabelHeight;
         GeneralVisualization::UseSimpleContourDefinitions(tmpBool);
@@ -1291,7 +1287,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
             SimpleColorContour::ColorContouringColorShadeHighValueColor());
 
         SimpleIsoline::ContourLabelBoxFillColor(SimpleIsoline::IsolineLabelBoxFillColor());
-        fUseContourGabWithCustomContours = false;
+        CustomColorContour::UseContourGabWithCustomContours(false);
         SimpleColorContour::ContourGab(SimpleIsoline::IsoLineGab());
         SimpleColorContour::ContourColor(SimpleIsoline::IsolineColor());
         itsContourTextColor = SimpleIsoline::IsolineTextColor();
