@@ -35,6 +35,7 @@
 #include "SimpleColorContour.h"
 #include "CustomColorContour.h"
 #include "SymbolSettings.h"
+#include "DataEditing.h"
 
 #include "NFmiColor.h"
 #include "NFmiMetEditorTypes.h"
@@ -50,7 +51,8 @@ class NFmiDrawParam : public GeneralData,
                       public GeneralVisualization,
                       public SimpleColorContour,
                       public CustomColorContour,
-                      public SymbolSettings
+                      public SymbolSettings,
+                      public DataEditing
 {
  public:
   NFmiDrawParam(void);
@@ -78,8 +80,6 @@ class NFmiDrawParam : public GeneralData,
 
   void Priority(int thePriority) { itsPriority = thePriority; };
   int Priority(void) const { return itsPriority; };
-  void ModifyingStep(const double theModifyingStep) { itsModifyingStep = theModifyingStep; };
-  double ModifyingStep(void) const { return itsModifyingStep; };
   //	void				 ModifyingUnit (bool theModifyingUnit) { fModifyingUnit =
   // theModifyingUnit; }
   //	bool			 ModifyingUnit (void) const { return fModifyingUnit; }
@@ -88,20 +88,10 @@ class NFmiDrawParam : public GeneralData,
     return itsPossibleViewTypeList;
   }
   int PossibleViewTypeCount(void) const { return itsPossibleViewTypeCount; };
-  double AbsoluteMinValue(void) const { return itsAbsoluteMinValue; }
-  void AbsoluteMinValue(double theAbsoluteMinValue) { itsAbsoluteMinValue = theAbsoluteMinValue; }
-  double AbsoluteMaxValue(void) const { return itsAbsoluteMaxValue; }
-  void AbsoluteMaxValue(double theAbsoluteMaxValue) { itsAbsoluteMaxValue = theAbsoluteMaxValue; }
-  double TimeSeriesScaleMin(void) const { return itsTimeSeriesScaleMin; };
-  double TimeSeriesScaleMax(void) const { return itsTimeSeriesScaleMax; };
-  void TimeSeriesScaleMin(double theValue) { itsTimeSeriesScaleMin = theValue; };
-  void TimeSeriesScaleMax(double theValue) { itsTimeSeriesScaleMax = theValue; };
   void ContourTextColor(const NFmiColor& newColor) { itsContourTextColor = newColor; };
   const NFmiColor& ContourTextColor(void) const { return itsContourTextColor; };
   //	double TimeSerialModifyingLimit(void) const {return fModifyingUnit ?
   // itsTimeSerialModifyingLimit : 100;};
-  double TimeSerialModifyingLimit(void) const { return itsTimeSerialModifyingLimit; };
-  void TimeSerialModifyingLimit(double newValue) { itsTimeSerialModifyingLimit = newValue; };
   void FileVersionNumber(const float theFileVersionNumber)
   {
     itsFileVersionNumber = theFileVersionNumber;
@@ -188,17 +178,9 @@ class NFmiDrawParam : public GeneralData,
  protected:
   int itsPriority;
 
-  double itsModifyingStep;
   //	bool fModifyingUnit;	//(= 0, jos yksikkö on %, = 1, jos yksikkö on sama kuin itsUnit)
-  double itsTimeSerialModifyingLimit;  // aikasarjanäytön muutos akselin minimi ja maksimi arvo
-  NFmiColor itsContourTextColor;       // **** Versio 3 parametri ****
+  NFmiColor itsContourTextColor;  // **** Versio 3 parametri ****
   bool fUseSecondaryColors;
-
-  double itsAbsoluteMinValue;
-  double itsAbsoluteMaxValue;
-
-  double itsTimeSeriesScaleMin;  // käytetään aikasarjaeditorissa
-  double itsTimeSeriesScaleMax;  // käytetään aikasarjaeditorissa
 
   //   Lista mahdollisista näyttötyypeistä kyseiselle
   //   parametrille.

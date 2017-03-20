@@ -47,16 +47,10 @@ NFmiDrawParam::NFmiDrawParam()
       SimpleColorContour(),
       CustomColorContour(),
       SymbolSettings(),
+      DataEditing(),
       itsPriority(1),
-      itsModifyingStep(1.)
       //, fModifyingUnit						 (true)
-      ,
-      itsTimeSerialModifyingLimit(10),
       itsContourTextColor(NFmiColor(0., 0., 0.)),
-      itsAbsoluteMinValue(-1000000000),
-      itsAbsoluteMaxValue(1000000000),
-      itsTimeSeriesScaleMin(0),
-      itsTimeSeriesScaleMax(100),
       itsPossibleViewTypeCount(2),
       fUseContourFeathering(false),
       fIsoLineLabelsOverLapping(true),
@@ -99,16 +93,10 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       SimpleColorContour(),
       CustomColorContour(),
       SymbolSettings(),
+      DataEditing(),
       itsPriority(thePriority),
-      itsModifyingStep(1.)
       //, fModifyingUnit						 (true)
-      ,
-      itsTimeSerialModifyingLimit(10),
       itsContourTextColor(NFmiColor(0., 0., 0.)),
-      itsAbsoluteMinValue(-1000000000),
-      itsAbsoluteMaxValue(1000000000),
-      itsTimeSeriesScaleMin(0),
-      itsTimeSeriesScaleMax(100),
       itsPossibleViewTypeCount(2),
       fUseContourFeathering(false),
       fIsoLineLabelsOverLapping(true),
@@ -147,16 +135,10 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       SimpleColorContour(other),
       CustomColorContour(other),
       SymbolSettings(other),
+      DataEditing(other),
       itsPriority(other.itsPriority),
-      itsModifyingStep(other.itsModifyingStep)
       //, fModifyingUnit(other.fModifyingUnit)
-      ,
-      itsTimeSerialModifyingLimit(other.itsTimeSerialModifyingLimit),
       itsContourTextColor(other.itsContourTextColor),
-      itsAbsoluteMinValue(other.itsAbsoluteMinValue),
-      itsAbsoluteMaxValue(other.itsAbsoluteMaxValue),
-      itsTimeSeriesScaleMin(other.itsTimeSeriesScaleMin),
-      itsTimeSeriesScaleMax(other.itsTimeSeriesScaleMax),
       itsPossibleViewTypeCount(other.itsPossibleViewTypeCount),
 
       //***********************************************
@@ -250,9 +232,9 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     CustomColorContour::UseContourGabWithCustomContours(
         theDrawParam->UseContourGabWithCustomContours());
     SimpleIsoline::IsoLineGab(theDrawParam->IsoLineGab());
-    itsModifyingStep = theDrawParam->ModifyingStep();
+    DataEditing::ModifyingStep(theDrawParam->ModifyingStep());
     //		fModifyingUnit =  theDrawParam->ModifyingUnit();
-    itsTimeSerialModifyingLimit = theDrawParam->TimeSerialModifyingLimit();
+    DataEditing::TimeSerialModifyingLimit(theDrawParam->TimeSerialModifyingLimit());
 
     SimpleIsoline::IsolineColor(theDrawParam->SimpleIsoline::IsolineColor());
     SimpleIsoline::IsolineTextColor(theDrawParam->IsolineTextColor());
@@ -262,11 +244,11 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     //	itsSecondaryIsolineTextColor = theDrawParam->IsolineSecondaryTextColor();
     // ei tarvitse toistaiseksi alustaa sekundaarisia värejä
 
-    itsAbsoluteMinValue = theDrawParam->AbsoluteMinValue();
-    itsAbsoluteMaxValue = theDrawParam->AbsoluteMaxValue();
+    DataEditing::AbsoluteMinValue(theDrawParam->AbsoluteMinValue());
+    DataEditing::AbsoluteMaxValue(theDrawParam->AbsoluteMaxValue());
 
-    itsTimeSeriesScaleMin = theDrawParam->TimeSeriesScaleMin();
-    itsTimeSeriesScaleMax = theDrawParam->TimeSeriesScaleMax();
+    DataEditing::TimeSeriesScaleMin(theDrawParam->TimeSeriesScaleMin());
+    DataEditing::TimeSeriesScaleMax(theDrawParam->TimeSeriesScaleMax());
 
     itsPossibleViewTypeCount = theDrawParam->PossibleViewTypeCount();
 
@@ -527,7 +509,7 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
   file << "'IsolineTextColor'" << endl;  // selittävä teksti
   file << SimpleIsoline::IsolineTextColor() << endl;
   file << "'ModifyingStep'" << endl;  // selittävä teksti
-  file << itsModifyingStep << endl;
+  file << DataEditing::ModifyingStep() << endl;
   file << "'ModifyingUnit'" << endl;  // selittävä teksti
                                       //	file << fModifyingUnit << endl;
   file << true << endl;  // tässä on otettu pois modifyingUnit, mutta arvo pitää tallettaa että
@@ -541,14 +523,14 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
   file << SimpleIsoline::IsolineLabelBoxFillColor() << endl;
 
   file << "'itsAbsoluteMinValue'" << endl;  // selittävä testi
-  file << itsAbsoluteMinValue << endl;
+  file << DataEditing::AbsoluteMinValue() << endl;
   file << "'itsAbsoluteMaxValue'" << endl;  // selittävä teksti
-  file << itsAbsoluteMaxValue << endl;
+  file << DataEditing::AbsoluteMaxValue() << endl;
 
   file << "'TimeSeriesScaleMin'" << endl;  // selittävä teksti
-  file << itsTimeSeriesScaleMin << endl;
+  file << DataEditing::TimeSeriesScaleMin() << endl;
   file << "'TimeSeriesScaleMax'" << endl;  // selittävä teksti
-  file << itsTimeSeriesScaleMax << endl;
+  file << DataEditing::TimeSeriesScaleMax() << endl;
 
   file << "'RelativeSize'" << endl;  // selittävä teksti
   file << SymbolSettings::RelativeSize();
@@ -566,7 +548,7 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
     file << static_cast<int>(itsPossibleViewTypeList[ind]) << endl;
 
   file << "'TimeSerialModifyingLimit'" << endl;  // selittävä teksti
-  file << itsTimeSerialModifyingLimit << endl;
+  file << DataEditing::TimeSerialModifyingLimit() << endl;
 
   // ******************************************************************
   // StationDataViewType otetttiin käyttöön vasta v. 2007, kun halusin
@@ -870,7 +852,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       file >> tmpColor;
       SimpleIsoline::IsolineTextColor(tmpColor);
       file >> temp;  // luetaan nimike pois
-      file >> itsModifyingStep;
+      file >> tmpDouble;
+      DataEditing::ModifyingStep(tmpDouble);
       file >> temp;  // luetaan nimike pois
                      //			file >> fModifyingUnit;
       file >> temp;  // luetaan legacy-koodi modifyingUnit pois
@@ -886,17 +869,21 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       SimpleIsoline::IsolineLabelBoxFillColor(tmpColor);
 
       file >> temp;  // luetaan nimike pois
-      file >> itsAbsoluteMinValue;
+      file >> tmpDouble;
+      DataEditing::AbsoluteMinValue(tmpDouble);
       file >> temp;  // luetaan nimike pois
-      file >> itsAbsoluteMaxValue;
+      file >> tmpDouble;
+      DataEditing::AbsoluteMaxValue(tmpDouble);
 
       if (!file)
         return file;
 
       file >> temp;  // luetaan nimike pois
-      file >> itsTimeSeriesScaleMin;
+      file >> tmpDouble;
+      DataEditing::TimeSeriesScaleMin(tmpDouble);
       file >> temp;  // luetaan nimike pois
-      file >> itsTimeSeriesScaleMax;
+      file >> tmpDouble;
+      DataEditing::TimeSeriesScaleMax(tmpDouble);
 
       file >> temp;  // luetaan nimike pois
       file >> tmpPoint;
@@ -926,7 +913,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         return file;
 
       file >> temp;  // luetaan nimike pois
-      file >> itsTimeSerialModifyingLimit;
+      file >> tmpDouble;
+      DataEditing::TimeSerialModifyingLimit();
       file >> temp;  // luetaan nimike pois
 
       // ******************************************************************
