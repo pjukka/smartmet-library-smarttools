@@ -9,8 +9,7 @@
  */
 // ======================================================================
 
-#ifndef NFMIMETEDITORTYPES_H
-#define NFMIMETEDITORTYPES_H
+#pragma once
 
 namespace NFmiMetEditorTypes
 {
@@ -52,4 +51,3 @@ enum FmiUsedSmartMetTool
 
 }  // end of namespace NFmiMetEditorTypes
 
-#endif  // NFMIMETEDITORTYPES_H
