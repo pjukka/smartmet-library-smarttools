@@ -48,6 +48,7 @@ NFmiDrawParam::NFmiDrawParam()
       CustomColorContour(),
       SymbolSettings(),
       DataEditing(),
+      HatchSettings(),
       itsPriority(1),
       //, fModifyingUnit						 (true)
       itsContourTextColor(NFmiColor(0., 0., 0.)),
@@ -59,21 +60,7 @@ NFmiDrawParam::NFmiDrawParam()
       itsSimpleContourZeroValue(0),
       itsSimpleContourLabelHeight(4),
       fShowSimpleContourLabelBox(false),
-      fUseWithIsoLineHatch1(false),
-      fDrawIsoLineHatchWithBorders1(false),
-      itsIsoLineHatchLowValue1(0),
-      itsIsoLineHatchHighValue1(10),
-      itsIsoLineHatchType1(1),
-      itsIsoLineHatchColor1(0, 0, 0),
-      itsIsoLineHatchBorderColor1(0, 0, 0),
-      fUseWithIsoLineHatch2(false),
-      fDrawIsoLineHatchWithBorders2(false),
-      itsIsoLineHatchLowValue2(50),
-      itsIsoLineHatchHighValue2(60),
-      itsIsoLineHatchType2(2),
-      itsIsoLineHatchColor2(0.5f, 0.5f, 0.5f)
       // protected osa
-      ,
       itsContourLabelDigitCount(0)
 {
   GeneralData::InitFileVersionNumber(itsFileVersionNumber);
@@ -94,6 +81,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       CustomColorContour(),
       SymbolSettings(),
       DataEditing(),
+      HatchSettings(),
       itsPriority(thePriority),
       //, fModifyingUnit						 (true)
       itsContourTextColor(NFmiColor(0., 0., 0.)),
@@ -105,19 +93,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       itsSimpleContourZeroValue(0),
       itsSimpleContourLabelHeight(4),
       fShowSimpleContourLabelBox(false),
-      fUseWithIsoLineHatch1(false),
-      fDrawIsoLineHatchWithBorders1(false),
-      itsIsoLineHatchLowValue1(0),
-      itsIsoLineHatchHighValue1(10),
-      itsIsoLineHatchType1(1),
-      itsIsoLineHatchColor1(0, 0, 0),
-      itsIsoLineHatchBorderColor1(0, 0, 0),
-      fUseWithIsoLineHatch2(false),
-      fDrawIsoLineHatchWithBorders2(false),
-      itsIsoLineHatchLowValue2(50),
-      itsIsoLineHatchHighValue2(60),
-      itsIsoLineHatchType2(2),
-      itsIsoLineHatchColor2(0.5f, 0.5f, 0.5f),
       itsContourLabelDigitCount(0)
 {
   GeneralData::Param(theParam);
@@ -136,6 +111,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       CustomColorContour(other),
       SymbolSettings(other),
       DataEditing(other),
+      HatchSettings(other),
       itsPriority(other.itsPriority),
       //, fModifyingUnit(other.fModifyingUnit)
       itsContourTextColor(other.itsContourTextColor),
@@ -152,19 +128,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       itsSimpleContourZeroValue(other.itsSimpleContourZeroValue),
       itsSimpleContourLabelHeight(other.itsSimpleContourLabelHeight),
       fShowSimpleContourLabelBox(other.fShowSimpleContourLabelBox),
-      fUseWithIsoLineHatch1(other.fUseWithIsoLineHatch1),
-      fDrawIsoLineHatchWithBorders1(other.fDrawIsoLineHatchWithBorders1),
-      itsIsoLineHatchLowValue1(other.itsIsoLineHatchLowValue1),
-      itsIsoLineHatchHighValue1(other.itsIsoLineHatchHighValue1),
-      itsIsoLineHatchType1(other.itsIsoLineHatchType1),
-      itsIsoLineHatchColor1(other.itsIsoLineHatchColor1),
-      itsIsoLineHatchBorderColor1(other.itsIsoLineHatchBorderColor1),
-      fUseWithIsoLineHatch2(other.fUseWithIsoLineHatch2),
-      fDrawIsoLineHatchWithBorders2(other.fDrawIsoLineHatchWithBorders2),
-      itsIsoLineHatchLowValue2(other.itsIsoLineHatchLowValue2),
-      itsIsoLineHatchHighValue2(other.itsIsoLineHatchHighValue2),
-      itsIsoLineHatchType2(other.itsIsoLineHatchType2),
-      itsIsoLineHatchColor2(other.itsIsoLineHatchColor2),
       itsContourLabelDigitCount(other.itsContourLabelDigitCount)
 //***********************************************
 //********** 'versio 2' parametreja *************
@@ -348,19 +311,19 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
         theDrawParam->ColorContouringColorShadeHighValueColor());
     SimpleColorContour::ColorContouringColorShadeHigh2ValueColor(
         theDrawParam->ColorContouringColorShadeHigh2ValueColor());
-    fUseWithIsoLineHatch1 = theDrawParam->UseWithIsoLineHatch1();
-    fDrawIsoLineHatchWithBorders1 = theDrawParam->DrawIsoLineHatchWithBorders1();
-    itsIsoLineHatchLowValue1 = theDrawParam->IsoLineHatchLowValue1();
-    itsIsoLineHatchHighValue1 = theDrawParam->IsoLineHatchHighValue1();
-    itsIsoLineHatchType1 = theDrawParam->IsoLineHatchType1();
-    itsIsoLineHatchColor1 = theDrawParam->IsoLineHatchColor1();
-    itsIsoLineHatchBorderColor1 = theDrawParam->IsoLineHatchBorderColor1();
-    fUseWithIsoLineHatch2 = theDrawParam->UseWithIsoLineHatch2();
-    fDrawIsoLineHatchWithBorders2 = theDrawParam->DrawIsoLineHatchWithBorders2();
-    itsIsoLineHatchLowValue2 = theDrawParam->IsoLineHatchLowValue2();
-    itsIsoLineHatchHighValue2 = theDrawParam->IsoLineHatchHighValue2();
-    itsIsoLineHatchType2 = theDrawParam->IsoLineHatchType2();
-    itsIsoLineHatchColor2 = theDrawParam->IsoLineHatchColor2();
+    HatchSettings::UseWithIsoLineHatch1(theDrawParam->UseWithIsoLineHatch1());
+    HatchSettings::DrawIsoLineHatchWithBorders1(theDrawParam->DrawIsoLineHatchWithBorders1());
+    HatchSettings::IsoLineHatchLowValue1(theDrawParam->IsoLineHatchLowValue1());
+    HatchSettings::IsoLineHatchHighValue1(theDrawParam->IsoLineHatchHighValue1());
+    HatchSettings::IsoLineHatchType1(theDrawParam->IsoLineHatchType1());
+    HatchSettings::IsoLineHatchColor1(theDrawParam->IsoLineHatchColor1());
+    HatchSettings::IsoLineHatchBorderColor1(theDrawParam->IsoLineHatchBorderColor1());
+    HatchSettings::UseWithIsoLineHatch2(theDrawParam->UseWithIsoLineHatch2());
+    HatchSettings::DrawIsoLineHatchWithBorders2(theDrawParam->DrawIsoLineHatchWithBorders2());
+    HatchSettings::IsoLineHatchLowValue2(theDrawParam->IsoLineHatchLowValue2());
+    HatchSettings::IsoLineHatchHighValue2(theDrawParam->IsoLineHatchHighValue2());
+    HatchSettings::IsoLineHatchType2(theDrawParam->IsoLineHatchType2());
+    HatchSettings::IsoLineHatchColor2(theDrawParam->IsoLineHatchColor2());
     GeneralVisualization::IsoLineLabelDigitCount(theDrawParam->IsoLineLabelDigitCount());
     //***********************************************
     //********** 'versio 2' parametreja *************
@@ -674,19 +637,19 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
     file << SimpleColorContour::ColorContouringColorShadeMidValueColor() << endl;
     file << SimpleColorContour::ColorContouringColorShadeHighValueColor() << endl;
     file << SimpleColorContour::ColorContouringColorShadeHigh2Value() << endl;
-    file << fUseWithIsoLineHatch1 << endl;
-    file << fDrawIsoLineHatchWithBorders1 << endl;
-    file << itsIsoLineHatchLowValue1 << endl;
-    file << itsIsoLineHatchHighValue1 << endl;
-    file << itsIsoLineHatchType1 << endl;
-    file << itsIsoLineHatchColor1 << endl;
-    file << itsIsoLineHatchBorderColor1 << endl;
-    file << fUseWithIsoLineHatch2 << endl;
-    file << fDrawIsoLineHatchWithBorders2 << endl;
-    file << itsIsoLineHatchLowValue2 << endl;
-    file << itsIsoLineHatchHighValue2 << endl;
-    file << itsIsoLineHatchType2 << endl;
-    file << itsIsoLineHatchColor2 << endl;
+    file << HatchSettings::UseWithIsoLineHatch1() << endl;
+    file << HatchSettings::DrawIsoLineHatchWithBorders1() << endl;
+    file << HatchSettings::IsoLineHatchLowValue1() << endl;
+    file << HatchSettings::IsoLineHatchHighValue1() << endl;
+    file << HatchSettings::IsoLineHatchType1() << endl;
+    file << HatchSettings::IsoLineHatchColor1() << endl;
+    file << HatchSettings::IsoLineHatchBorderColor1() << endl;
+    file << HatchSettings::UseWithIsoLineHatch2() << endl;
+    file << HatchSettings::DrawIsoLineHatchWithBorders2() << endl;
+    file << HatchSettings::IsoLineHatchLowValue2() << endl;
+    file << HatchSettings::IsoLineHatchHighValue2() << endl;
+    file << HatchSettings::IsoLineHatchType2() << endl;
+    file << HatchSettings::IsoLineHatchColor2() << endl;
     file << SimpleColorContour::ColorContouringColorShadeHigh2ValueColor() << endl;
     file << GeneralVisualization::IsoLineLabelDigitCount() << endl;
     //***********************************************
@@ -1107,19 +1070,32 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         SimpleColorContour::ColorContouringColorShadeHighValueColor(tmpColor);
         file >> tmpFloat;
         SimpleColorContour::ColorContouringColorShadeHigh2Value(tmpFloat);
-        file >> fUseWithIsoLineHatch1;
-        file >> fDrawIsoLineHatchWithBorders1;
-        file >> itsIsoLineHatchLowValue1;
-        file >> itsIsoLineHatchHighValue1;
-        file >> itsIsoLineHatchType1;
-        file >> itsIsoLineHatchColor1;
-        file >> itsIsoLineHatchBorderColor1;
-        file >> fUseWithIsoLineHatch2;
-        file >> fDrawIsoLineHatchWithBorders2;
-        file >> itsIsoLineHatchLowValue2;
-        file >> itsIsoLineHatchHighValue2;
-        file >> itsIsoLineHatchType2;
-        file >> itsIsoLineHatchColor2;
+        file >> tmpBool;
+        HatchSettings::UseWithIsoLineHatch1(tmpBool);
+        file >> tmpBool;
+        HatchSettings::DrawIsoLineHatchWithBorders1(tmpBool);
+        file >> tmpFloat;
+        HatchSettings::IsoLineHatchLowValue1(tmpFloat);
+        file >> tmpFloat;
+        HatchSettings::IsoLineHatchHighValue1(tmpFloat);
+        file >> number;
+        HatchSettings::IsoLineHatchType1(number);
+        file >> tmpColor;
+        HatchSettings::IsoLineHatchColor1(tmpColor);
+        file >> tmpColor;
+        HatchSettings::IsoLineHatchBorderColor1(tmpColor);
+        file >> tmpBool;
+        HatchSettings::UseWithIsoLineHatch2(tmpBool);
+        file >> tmpBool;
+        HatchSettings::DrawIsoLineHatchWithBorders2(tmpBool);
+        file >> tmpFloat;
+        HatchSettings::IsoLineHatchLowValue2(tmpFloat);
+        file >> tmpFloat;
+        HatchSettings::IsoLineHatchHighValue2(tmpFloat);
+        file >> number;
+        HatchSettings::IsoLineHatchType2(number);
+        file >> tmpColor;
+        HatchSettings::IsoLineHatchColor2(tmpColor);
         file >> tmpColor;
         SimpleColorContour::ColorContouringColorShadeHigh2ValueColor(tmpColor);
         file >> number;

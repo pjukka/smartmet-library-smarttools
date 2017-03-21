@@ -36,6 +36,7 @@
 #include "CustomColorContour.h"
 #include "SymbolSettings.h"
 #include "DataEditing.h"
+#include "HatchSettings.h"
 
 #include "NFmiColor.h"
 #include "NFmiMetEditorTypes.h"
@@ -52,7 +53,8 @@ class NFmiDrawParam : public GeneralData,
                       public SimpleColorContour,
                       public CustomColorContour,
                       public SymbolSettings,
-                      public DataEditing
+                      public DataEditing,
+                      public HatchSettings
 {
  public:
   NFmiDrawParam(void);
@@ -122,36 +124,6 @@ class NFmiDrawParam : public GeneralData,
   void SimpleContourLabelHeight(float newValue) { itsSimpleContourLabelHeight = newValue; }
   bool ShowSimpleContourLabelBox(void) const { return fShowSimpleContourLabelBox; }
   void ShowSimpleContourLabelBox(bool newValue) { fShowSimpleContourLabelBox = newValue; }
-  bool UseWithIsoLineHatch1(void) const { return fUseWithIsoLineHatch1; }
-  void UseWithIsoLineHatch1(bool newValue) { fUseWithIsoLineHatch1 = newValue; }
-  bool DrawIsoLineHatchWithBorders1(void) const { return fDrawIsoLineHatchWithBorders1; }
-  void DrawIsoLineHatchWithBorders1(bool newValue) { fDrawIsoLineHatchWithBorders1 = newValue; }
-  float IsoLineHatchLowValue1(void) const { return itsIsoLineHatchLowValue1; }
-  void IsoLineHatchLowValue1(float newValue) { itsIsoLineHatchLowValue1 = newValue; }
-  float IsoLineHatchHighValue1(void) const { return itsIsoLineHatchHighValue1; }
-  void IsoLineHatchHighValue1(float newValue) { itsIsoLineHatchHighValue1 = newValue; }
-  int IsoLineHatchType1(void) const { return itsIsoLineHatchType1; }
-  void IsoLineHatchType1(int newValue) { itsIsoLineHatchType1 = newValue; }
-  const NFmiColor& IsoLineHatchColor1(void) const { return itsIsoLineHatchColor1; }
-  void IsoLineHatchColor1(const NFmiColor& newValue) { itsIsoLineHatchColor1 = newValue; }
-  const NFmiColor& IsoLineHatchBorderColor1(void) const { return itsIsoLineHatchBorderColor1; }
-  void IsoLineHatchBorderColor1(const NFmiColor& newValue)
-  {
-    itsIsoLineHatchBorderColor1 = newValue;
-  }
-
-  bool UseWithIsoLineHatch2(void) const { return fUseWithIsoLineHatch2; }
-  void UseWithIsoLineHatch2(bool newValue) { fUseWithIsoLineHatch2 = newValue; }
-  bool DrawIsoLineHatchWithBorders2(void) const { return fDrawIsoLineHatchWithBorders2; }
-  void DrawIsoLineHatchWithBorders2(bool newValue) { fDrawIsoLineHatchWithBorders2 = newValue; }
-  float IsoLineHatchLowValue2(void) const { return itsIsoLineHatchLowValue2; }
-  void IsoLineHatchLowValue2(float newValue) { itsIsoLineHatchLowValue2 = newValue; }
-  float IsoLineHatchHighValue2(void) const { return itsIsoLineHatchHighValue2; }
-  void IsoLineHatchHighValue2(float newValue) { itsIsoLineHatchHighValue2 = newValue; }
-  int IsoLineHatchType2(void) const { return itsIsoLineHatchType2; }
-  void IsoLineHatchType2(int newValue) { itsIsoLineHatchType2 = newValue; }
-  const NFmiColor& IsoLineHatchColor2(void) const { return itsIsoLineHatchColor2; }
-  void IsoLineHatchColor2(const NFmiColor& newValue) { itsIsoLineHatchColor2 = newValue; }
   int ContourLabelDigitCount(void) const { return itsContourLabelDigitCount; }
   void ContourLabelDigitCount(int newValue)
   {
@@ -200,19 +172,6 @@ class NFmiDrawParam : public GeneralData,
   float itsSimpleContourLabelHeight;  // **** Versio 3 parametri ****
   bool fShowSimpleContourLabelBox;    // **** Versio 3 parametri ****
 
-  bool fUseWithIsoLineHatch1;
-  bool fDrawIsoLineHatchWithBorders1;
-  float itsIsoLineHatchLowValue1;   // hatch alueen ala-arvo
-  float itsIsoLineHatchHighValue1;  // hatch alueen yläarvo
-  int itsIsoLineHatchType1;  // hatch tyyppi 1=vinoviiva oikealle, 2=vinoviiva vasemmalle jne.
-  NFmiColor itsIsoLineHatchColor1;
-  NFmiColor itsIsoLineHatchBorderColor1;
-  bool fUseWithIsoLineHatch2;
-  bool fDrawIsoLineHatchWithBorders2;
-  float itsIsoLineHatchLowValue2;   // hatch alueen ala-arvo
-  float itsIsoLineHatchHighValue2;  // hatch alueen yläarvo
-  int itsIsoLineHatchType2;  // hatch tyyppi 1=vinoviiva oikealle, 2=vinoviiva vasemmalle jne.
-  NFmiColor itsIsoLineHatchColor2;
   int itsContourLabelDigitCount;  // **** Versio 3 parametri ****
                                   //***********************************************
                                   //********** 'versio 2' parametreja *************
