@@ -32,6 +32,7 @@
 
 #include "GeneralData.h"
 #include "GeneralVisualization.h"
+#include "SimpleColorContour.h"
 
 #include "NFmiColor.h"
 #include "NFmiMetEditorTypes.h"
@@ -43,7 +44,7 @@
 
 class NFmiDrawingEnvironment;
 
-class NFmiDrawParam : public GeneralData, public GeneralVisualization
+class NFmiDrawParam : public GeneralData, public GeneralVisualization, public SimpleColorContour
 {
  public:
   NFmiDrawParam(void);
@@ -75,18 +76,6 @@ class NFmiDrawParam : public GeneralData, public GeneralVisualization
   const NFmiColor& FrameColor(void) const { return itsFrameColor; };
   void FillColor(const NFmiColor& theFillColor) { itsFillColor = theFillColor; };
   const NFmiColor& FillColor(void) const { return itsFillColor; };
-  void IsolineLabelBoxFillColor(const NFmiColor& theColor)
-  {
-    itsIsolineLabelBoxFillColor = theColor;
-    itsContourLabelBoxFillColor =
-        theColor;  // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
-  };
-  const NFmiColor& IsolineLabelBoxFillColor(void) const { return itsIsolineLabelBoxFillColor; };
-  void ContourLabelBoxFillColor(const NFmiColor& theColor)
-  {
-    itsContourLabelBoxFillColor = theColor;
-  };
-  const NFmiColor& ContourLabelBoxFillColor(void) const { return itsContourLabelBoxFillColor; };
   void RelativeSize(const NFmiPoint& theRelativeSize) { itsRelativeSize = theRelativeSize; };
   const NFmiPoint& RelativeSize(void) const { return itsRelativeSize; };
   void RelativePositionOffset(const NFmiPoint& theRelativePositionOffset)
@@ -119,20 +108,6 @@ class NFmiDrawParam : public GeneralData, public GeneralVisualization
     fUseContourGabWithCustomContours = newState;
   };
   bool UseContourGabWithCustomContours(void) const { return fUseContourGabWithCustomContours; };
-  void IsoLineGab(const double theIsoLineGab)
-  {
-    itsIsoLineGab = theIsoLineGab;
-    if (itsIsoLineGab == 0)
-      itsIsoLineGab = 1;  // gappi ei voi olla 0
-  }
-  double IsoLineGab(void) const { return itsIsoLineGab; };
-  void ContourGab(const double theContourGab)
-  {
-    itsContourGab = theContourGab;
-    if (itsContourGab == 0)
-      itsContourGab = 1;
-  }
-  double ContourGab(void) const { return itsContourGab; };
   void ModifyingStep(const double theModifyingStep) { itsModifyingStep = theModifyingStep; };
   double ModifyingStep(void) const { return itsModifyingStep; };
   //	void				 ModifyingUnit (bool theModifyingUnit) { fModifyingUnit =
@@ -151,29 +126,6 @@ class NFmiDrawParam : public GeneralData, public GeneralVisualization
   double TimeSeriesScaleMax(void) const { return itsTimeSeriesScaleMax; };
   void TimeSeriesScaleMin(double theValue) { itsTimeSeriesScaleMin = theValue; };
   void TimeSeriesScaleMax(double theValue) { itsTimeSeriesScaleMax = theValue; };
-  const NFmiColor& IsolineColor(void) const
-  {
-    return fUseSecondaryColors ? itsSecondaryIsolineColor : itsIsolineColor;
-  };
-  void IsolineColor(const NFmiColor& newColor)
-  {
-    itsIsolineColor = newColor;
-    itsContourColor = newColor;  // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
-  }
-
-  const NFmiColor& ContourColor(void) const { return itsContourColor; };
-  void ContourColor(const NFmiColor& newColor) { itsContourColor = newColor; };
-  void IsolineTextColor(const NFmiColor& newColor)
-  {
-    itsIsolineTextColor = newColor;
-    itsContourTextColor =
-        newColor;  // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
-  }
-  const NFmiColor& IsolineTextColor(void) const
-  {
-    return fUseSecondaryColors ? itsSecondaryIsolineTextColor : itsIsolineTextColor;
-  };
-
   void ContourTextColor(const NFmiColor& newColor) { itsContourTextColor = newColor; };
   const NFmiColor& ContourTextColor(void) const { return itsContourTextColor; };
   //	double TimeSerialModifyingLimit(void) const {return fModifyingUnit ?
@@ -262,8 +214,6 @@ class NFmiDrawParam : public GeneralData, public GeneralVisualization
   void IsoLineLabelsOverLapping(bool newValue) { fIsoLineLabelsOverLapping = newValue; }
   bool ShowColorLegend(void) const { return fShowColorLegend; }
   void ShowColorLegend(bool newValue) { fShowColorLegend = newValue; }
-  float SimpleIsoLineGap(void) const { return itsSimpleIsoLineGap; }
-  void SimpleIsoLineGap(float newValue) { itsSimpleIsoLineGap = newValue; }
   float SimpleIsoLineZeroValue(void) const { return itsSimpleIsoLineZeroValue; }
   void SimpleIsoLineZeroValue(float newValue)
   {
@@ -274,114 +224,10 @@ class NFmiDrawParam : public GeneralData, public GeneralVisualization
 
   float SimpleContourZeroValue(void) const { return itsSimpleContourZeroValue; }
   void SimpleContourZeroValue(float newValue) { itsSimpleContourZeroValue = newValue; }
-  float SimpleIsoLineLabelHeight(void) const { return itsSimpleIsoLineLabelHeight; }
-  void SimpleIsoLineLabelHeight(float newValue)
-  {
-    itsSimpleIsoLineLabelHeight = newValue;
-    itsSimpleContourLabelHeight =
-        newValue;  // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
-  }
-
   float SimpleContourLabelHeight(void) const { return itsSimpleContourLabelHeight; }
   void SimpleContourLabelHeight(float newValue) { itsSimpleContourLabelHeight = newValue; }
-  bool ShowSimpleIsoLineLabelBox(void) const { return fShowSimpleIsoLineLabelBox; }
-  void ShowSimpleIsoLineLabelBox(bool newValue)
-  {
-    fShowSimpleIsoLineLabelBox = newValue;
-    fShowSimpleContourLabelBox = newValue;
-  }
-
   bool ShowSimpleContourLabelBox(void) const { return fShowSimpleContourLabelBox; }
   void ShowSimpleContourLabelBox(bool newValue) { fShowSimpleContourLabelBox = newValue; }
-  float SimpleIsoLineWidth(void) const { return itsSimpleIsoLineWidth; }
-  void SimpleIsoLineWidth(float newValue)
-  {
-    itsSimpleIsoLineWidth = newValue;
-    itsSimpleContourWidth = newValue;
-  }
-
-  float SimpleContourWidth(void) const { return itsSimpleContourWidth; }
-  void SimpleContourWidth(float newValue) { itsSimpleContourWidth = newValue; }
-  int SimpleIsoLineLineStyle(void) const { return itsSimpleIsoLineLineStyle; }
-  void SimpleIsoLineLineStyle(int newValue)
-  {
-    itsSimpleIsoLineLineStyle = newValue;
-    itsSimpleContourLineStyle = newValue;
-  }
-
-  int SimpleContourLineStyle(void) const { return itsSimpleContourLineStyle; }
-  void SimpleContourLineStyle(int newValue) { itsSimpleContourLineStyle = newValue; }
-  bool UseSingleColorsWithSimpleIsoLines(void) const { return fUseSingleColorsWithSimpleIsoLines; }
-  void UseSingleColorsWithSimpleIsoLines(bool newValue)
-  {
-    fUseSingleColorsWithSimpleIsoLines = newValue;
-  }
-  float SimpleIsoLineColorShadeLowValue(void) const { return itsSimpleIsoLineColorShadeLowValue; }
-  void SimpleIsoLineColorShadeLowValue(float newValue)
-  {
-    itsSimpleIsoLineColorShadeLowValue = newValue;
-  }
-  float SimpleIsoLineColorShadeMidValue(void) const { return itsSimpleIsoLineColorShadeMidValue; }
-  void SimpleIsoLineColorShadeMidValue(float newValue)
-  {
-    itsSimpleIsoLineColorShadeMidValue = newValue;
-  }
-  float SimpleIsoLineColorShadeHighValue(void) const { return itsSimpleIsoLineColorShadeHighValue; }
-  void SimpleIsoLineColorShadeHighValue(float newValue)
-  {
-    itsSimpleIsoLineColorShadeHighValue = newValue;
-    itsSimpleIsoLineColorShadeHigh2Value = newValue;
-  }
-
-  float SimpleIsoLineColorShadeHigh2Value(void) const
-  {
-    return itsSimpleIsoLineColorShadeHigh2Value;
-  }
-  void SimpleIsoLineColorShadeHigh2Value(float newValue)
-  {
-    itsSimpleIsoLineColorShadeHigh2Value = newValue;
-  }
-
-  const NFmiColor& SimpleIsoLineColorShadeLowValueColor(void) const
-  {
-    return itsSimpleIsoLineColorShadeLowValueColor;
-  }
-  void SimpleIsoLineColorShadeLowValueColor(const NFmiColor& newValue)
-  {
-    itsSimpleIsoLineColorShadeLowValueColor = newValue;
-  }
-  const NFmiColor& SimpleIsoLineColorShadeMidValueColor(void) const
-  {
-    return itsSimpleIsoLineColorShadeMidValueColor;
-  }
-  void SimpleIsoLineColorShadeMidValueColor(const NFmiColor& newValue)
-  {
-    itsSimpleIsoLineColorShadeMidValueColor = newValue;
-  }
-  const NFmiColor& SimpleIsoLineColorShadeHighValueColor(void) const
-  {
-    return itsSimpleIsoLineColorShadeHighValueColor;
-  }
-  void SimpleIsoLineColorShadeHighValueColor(const NFmiColor& newValue)
-  {
-    itsSimpleIsoLineColorShadeHighValueColor = newValue;
-    itsSimpleIsoLineColorShadeHigh2ValueColor = newValue;
-  }
-
-  const NFmiColor& SimpleIsoLineColorShadeHigh2ValueColor(void) const
-  {
-    return itsSimpleIsoLineColorShadeHigh2ValueColor;
-  }
-  void SimpleIsoLineColorShadeHigh2ValueColor(const NFmiColor& newValue)
-  {
-    itsSimpleIsoLineColorShadeHigh2ValueColor = newValue;
-  }
-
-  int SimpleIsoLineColorShadeClassCount(void) const { return itsSimpleIsoLineColorShadeClassCount; }
-  void SimpleIsoLineColorShadeClassCount(int newValue)
-  {
-    itsSimpleIsoLineColorShadeClassCount = newValue;
-  }
   const checkedVector<float>& SpecialIsoLineValues(void) const { return itsSpecialIsoLineValues; }
   void SetSpecialIsoLineValues(const checkedVector<float>& newValue)
   {
@@ -480,70 +326,7 @@ class NFmiDrawParam : public GeneralData, public GeneralVisualization
   {
     itsSpecialColorContouringColorIndexies = newValue;
   }
-  float ColorContouringColorShadeLowValue(void) const
-  {
-    return itsColorContouringColorShadeLowValue;
-  }
-  void ColorContouringColorShadeLowValue(float newValue)
-  {
-    itsColorContouringColorShadeLowValue = newValue;
-  }
-  float ColorContouringColorShadeMidValue(void) const
-  {
-    return itsColorContouringColorShadeMidValue;
-  }
-  void ColorContouringColorShadeMidValue(float newValue)
-  {
-    itsColorContouringColorShadeMidValue = newValue;
-  }
-  float ColorContouringColorShadeHighValue(void) const
-  {
-    return itsColorContouringColorShadeHighValue;
-  }
-  void ColorContouringColorShadeHighValue(float newValue)
-  {
-    itsColorContouringColorShadeHighValue = newValue;
-  }
-  float ColorContouringColorShadeHigh2Value(void) const
-  {
-    return itsColorContouringColorShadeHigh2Value;
-  }
-  void ColorContouringColorShadeHigh2Value(float newValue)
-  {
-    itsColorContouringColorShadeHigh2Value = newValue;
-  }
-  const NFmiColor& ColorContouringColorShadeLowValueColor(void) const
-  {
-    return itsColorContouringColorShadeLowValueColor;
-  }
-  void ColorContouringColorShadeLowValueColor(const NFmiColor& newValue)
-  {
-    itsColorContouringColorShadeLowValueColor = newValue;
-  }
-  const NFmiColor& ColorContouringColorShadeMidValueColor(void) const
-  {
-    return itsColorContouringColorShadeMidValueColor;
-  }
-  void ColorContouringColorShadeMidValueColor(const NFmiColor& newValue)
-  {
-    itsColorContouringColorShadeMidValueColor = newValue;
-  }
-  const NFmiColor& ColorContouringColorShadeHighValueColor(void) const
-  {
-    return itsColorContouringColorShadeHighValueColor;
-  }
-  void ColorContouringColorShadeHighValueColor(const NFmiColor& newValue)
-  {
-    itsColorContouringColorShadeHighValueColor = newValue;
-  }
-  const NFmiColor& ColorContouringColorShadeHigh2ValueColor(void) const
-  {
-    return itsColorContouringColorShadeHigh2ValueColor;
-  }
-  void ColorContouringColorShadeHigh2ValueColor(const NFmiColor& newValue)
-  {
-    itsColorContouringColorShadeHigh2ValueColor = newValue;
-  }
+
   bool UseWithIsoLineHatch1(void) const { return fUseWithIsoLineHatch1; }
   void UseWithIsoLineHatch1(bool newValue) { fUseWithIsoLineHatch1 = newValue; }
   bool DrawIsoLineHatchWithBorders1(void) const { return fDrawIsoLineHatchWithBorders1; }
@@ -605,8 +388,6 @@ class NFmiDrawParam : public GeneralData, public GeneralVisualization
   NFmiColor itsFrameColor;
   NFmiColor itsFillColor;
 
-  NFmiColor itsIsolineLabelBoxFillColor;
-  NFmiColor itsContourLabelBoxFillColor;  // **** Versio 3 parametri ****
   //   Minkä kokoinen näyttöön piirrettävä 'symbolidata'
   //   on suhteessa
   //   annettuun asemalle/hilalle varattuun 'datalaatikkoon'.
@@ -617,17 +398,10 @@ class NFmiDrawParam : public GeneralData, public GeneralVisualization
   NFmiPoint itsOnlyOneSymbolRelativePositionOffset;
   bool fUseIsoLineGabWithCustomContours;
   bool fUseContourGabWithCustomContours;  // **** Versio 3 parametri ****
-  double itsIsoLineGab;
-  double itsContourGab;  // **** Versio 3 parametri ****
   double itsModifyingStep;
   //	bool fModifyingUnit;	//(= 0, jos yksikkö on %, = 1, jos yksikkö on sama kuin itsUnit)
   double itsTimeSerialModifyingLimit;  // aikasarjanäytön muutos akselin minimi ja maksimi arvo
-  NFmiColor itsIsolineColor;
-  NFmiColor itsContourColor;  // **** Versio 3 parametri ****
-  NFmiColor itsIsolineTextColor;
-  NFmiColor itsContourTextColor;  // **** Versio 3 parametri ****
-  NFmiColor itsSecondaryIsolineColor;
-  NFmiColor itsSecondaryIsolineTextColor;
+  NFmiColor itsContourTextColor;       // **** Versio 3 parametri ****
   bool fUseSecondaryColors;
 
   double itsAbsoluteMinValue;
@@ -668,32 +442,10 @@ class NFmiDrawParam : public GeneralData, public GeneralVisualization
   bool fIsoLineLabelsOverLapping;  // voivatko isoviiva labelit mennä päällekkäin vai ei?
   bool fShowColorLegend;  // piirretäänko rivin viimeiseen ruutuun color contouringin väri selitys
                           // laatikko?
-  float itsSimpleIsoLineGap;
   float itsSimpleIsoLineZeroValue;    // tämän arvon kautta isoviivat joutuvat menemään
   float itsSimpleContourZeroValue;    // **** Versio 3 parametri ****
-  float itsSimpleIsoLineLabelHeight;  // relatiivinen vai mm? (0=ei näytetä ollenkaan)
   float itsSimpleContourLabelHeight;  // **** Versio 3 parametri ****
-  bool fShowSimpleIsoLineLabelBox;    // ei vielä muita attribuutteja isoviiva labelille (tämä
-                                      // tarkoittaa lukua ympäroivää laatikkoa)
   bool fShowSimpleContourLabelBox;    // **** Versio 3 parametri ****
-  float itsSimpleIsoLineWidth;        // relatiivinen vai mm?
-  float itsSimpleContourWidth;        // **** Versio 3 parametri ****
-  int itsSimpleIsoLineLineStyle;      // 1=yht. viiva, 2=pisteviiva jne.
-  int itsSimpleContourLineStyle;      // **** Versio 3 parametri ****
-  bool fUseSingleColorsWithSimpleIsoLines;  // true=sama väri kaikille isoviivoille, false=tehdään
-                                            // väriskaala
-                                            // isoviivan väriskaalaus asetukset
-  float itsSimpleIsoLineColorShadeLowValue;    // väri skaalaus alkaa tästä arvosta
-  float itsSimpleIsoLineColorShadeMidValue;    // väri skaalauksen keskiarvo
-  float itsSimpleIsoLineColorShadeHighValue;   // väri skaalaus loppuu tähän arvoon
-  float itsSimpleIsoLineColorShadeHigh2Value;  // **** Versio 3 parametri ****
-  NFmiColor itsSimpleIsoLineColorShadeLowValueColor;
-  NFmiColor itsSimpleIsoLineColorShadeMidValueColor;
-  NFmiColor itsSimpleIsoLineColorShadeHighValueColor;
-  NFmiColor itsSimpleIsoLineColorShadeHigh2ValueColor;  // **** Versio 3 parametri ****
-  int itsSimpleIsoLineColorShadeClassCount;  // kuinka monta väri luokkaa tehdään skaalaukseen
-  // speciaali isoviiva asetukset (otetaan käyttöön, jos
-  // GeneralVisualization::UseSimpleIsoLineDefinitions() is false)
   checkedVector<float>
       itsSpecialIsoLineValues;  // tähän laitetaan kaikki arvot, johon halutaan isoviiva
   checkedVector<float> itsSpecialContourValues;       // **** Versio 3 parametri ****
@@ -713,15 +465,6 @@ class NFmiDrawParam : public GeneralData, public GeneralVisualization
                                                          // halutaan color contour luokka rajoiksi
   checkedVector<int> itsSpecialColorContouringColorIndexies;  // eri viivojen väri indeksit (pitää
   // tehdä näyttö taulukko käyttäjälle)
-  float itsColorContouringColorShadeLowValue;  // väri skaalaus alkaa tästä arvosta
-  float itsColorContouringColorShadeMidValue;  // väri skaalauksen keskiarvo
-  float itsColorContouringColorShadeHighValue;
-  float itsColorContouringColorShadeHigh2Value;  // väri skaalaus loppuu tähän arvoon
-  NFmiColor itsColorContouringColorShadeLowValueColor;
-  NFmiColor itsColorContouringColorShadeMidValueColor;
-  NFmiColor itsColorContouringColorShadeHighValueColor;
-  NFmiColor itsColorContouringColorShadeHigh2ValueColor;
-  // isoviivojen kanssa voi käyttää myös hatchättyjä alueita (2 kpl)
   bool fUseWithIsoLineHatch1;
   bool fDrawIsoLineHatchWithBorders1;
   float itsIsoLineHatchLowValue1;   // hatch alueen ala-arvo
