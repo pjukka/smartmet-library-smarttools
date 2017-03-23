@@ -37,16 +37,14 @@
 #include <fstream>
 
 float NFmiDrawParam::itsFileVersionNumber = 3.0;
-const float NFmiDrawParam::itsMinAlpha =
-    5.f;  // 5:kaan ei oikein erota enää mitään, on niin läpinäkyvä
 
 //--------------------------------------------------------
 // NFmiDrawParam(void)
 //--------------------------------------------------------
 NFmiDrawParam::NFmiDrawParam()
     : GeneralData(),
+      GeneralVisualization(),
       itsPriority(1),
-      itsViewType(NFmiMetEditorTypes::kFmiIsoLineView),
       itsStationDataViewType(NFmiMetEditorTypes::kFmiTextView),
       itsFrameColor(NFmiColor(0., 0., 0.))  // musta
       ,
@@ -98,14 +96,9 @@ NFmiDrawParam::NFmiDrawParam()
       fUseSymbolsInTextMode(false),
       itsUsedSymbolListIndex(0),
       itsSymbolIndexingMapListIndex(-1),
-      itsGridDataPresentationStyle(2),
-      fUseIsoLineFeathering(false),
       fUseContourFeathering(false),
       fIsoLineLabelsOverLapping(true),
       fShowColorLegend(false),
-      fUseSimpleIsoLineDefinitions(true),
-      fUseSimpleContourDefinitions(true),
-      fUseSeparatorLinesBetweenColorContourClasses(true),
       itsSimpleIsoLineGap(1),
       itsSimpleIsoLineZeroValue(0),
       itsSimpleContourZeroValue(0),
@@ -117,7 +110,6 @@ NFmiDrawParam::NFmiDrawParam()
       itsSimpleContourWidth(0.2f),
       itsSimpleIsoLineLineStyle(0),
       itsSimpleContourLineStyle(0),
-      itsIsoLineSplineSmoothingFactor(6),
       fUseSingleColorsWithSimpleIsoLines(true),
       itsSimpleIsoLineColorShadeLowValue(0),
       itsSimpleIsoLineColorShadeMidValue(50),
@@ -139,9 +131,6 @@ NFmiDrawParam::NFmiDrawParam()
       itsSpecialIsoLineColorIndexies(),
       itsSpecialContourColorIndexies(),
       itsSpecialIsoLineShowLabelBox(),
-      fDrawOnlyOverMask(false),
-      fUseCustomColorContouring(false),
-      fUseCustomIsoLineing(false),
       itsSpecialColorContouringValues(),
       itsSpecialColorContouringColorIndexies(),
       itsColorContouringColorShadeLowValue(0),
@@ -167,13 +156,7 @@ NFmiDrawParam::NFmiDrawParam()
       itsIsoLineHatchColor2(0.5f, 0.5f, 0.5f)
       // protected osa
       ,
-      itsIsoLineLabelDigitCount(0),
-      itsContourLabelDigitCount(0),
-      itsAlpha(100.f)  // dafault on 100 eli täysin läpinäkymätön
-      ,
-      fHidden(false),
-      fShowDifference(false),
-      fShowDifferenceToOriginalData(false)
+      itsContourLabelDigitCount(0)
 {
   GeneralData::InitFileVersionNumber(itsFileVersionNumber);
   itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
@@ -188,8 +171,8 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
                              int thePriority,
                              NFmiInfoData::Type theDataType)
     : GeneralData(),
+      GeneralVisualization(),
       itsPriority(thePriority),
-      itsViewType(NFmiMetEditorTypes::kFmiIsoLineView),
       itsStationDataViewType(NFmiMetEditorTypes::kFmiTextView),
       itsFrameColor(NFmiColor(0., 0., 0.))  // musta
       ,
@@ -241,14 +224,9 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       fUseSymbolsInTextMode(false),
       itsUsedSymbolListIndex(0),
       itsSymbolIndexingMapListIndex(-1),
-      itsGridDataPresentationStyle(2),
-      fUseIsoLineFeathering(false),
       fUseContourFeathering(false),
       fIsoLineLabelsOverLapping(true),
       fShowColorLegend(false),
-      fUseSimpleIsoLineDefinitions(true),
-      fUseSimpleContourDefinitions(true),
-      fUseSeparatorLinesBetweenColorContourClasses(true),
       itsSimpleIsoLineGap(1),
       itsSimpleIsoLineZeroValue(0),
       itsSimpleContourZeroValue(0),
@@ -260,7 +238,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       itsSimpleContourWidth(0.2f),
       itsSimpleIsoLineLineStyle(0),
       itsSimpleContourLineStyle(0),
-      itsIsoLineSplineSmoothingFactor(6),
       fUseSingleColorsWithSimpleIsoLines(true),
       itsSimpleIsoLineColorShadeLowValue(0),
       itsSimpleIsoLineColorShadeMidValue(50),
@@ -282,9 +259,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       itsSpecialIsoLineColorIndexies(),
       itsSpecialContourColorIndexies(),
       itsSpecialIsoLineShowLabelBox(),
-      fDrawOnlyOverMask(false),
-      fUseCustomColorContouring(false),
-      fUseCustomIsoLineing(false),
       itsSpecialColorContouringValues(),
       itsSpecialColorContouringColorIndexies(),
       itsColorContouringColorShadeLowValue(0),
@@ -308,16 +282,7 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       itsIsoLineHatchHighValue2(60),
       itsIsoLineHatchType2(2),
       itsIsoLineHatchColor2(0.5f, 0.5f, 0.5f),
-      itsIsoLineLabelDigitCount(0),
-      itsContourLabelDigitCount(0),
-      itsAlpha(100.f)  // dafault on 100 eli täysin läpinäkymätön
-      ,
-      fHidden(false),
-      fShowDifference(false),
-      //***********************************************
-      //********** 'versio 3' parametreja *************
-      //***********************************************
-      fShowDifferenceToOriginalData(false)
+      itsContourLabelDigitCount(0)
 {
   GeneralData::Param(theParam);
   GeneralData::Level(theLevel);
@@ -330,8 +295,8 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
 
 NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
     : GeneralData(other),
+      GeneralVisualization(other),
       itsPriority(other.itsPriority),
-      itsViewType(other.itsViewType),
       itsStationDataViewType(other.itsStationDataViewType),
       itsFrameColor(other.itsFrameColor),
       itsFillColor(other.itsFillColor),
@@ -380,15 +345,9 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       fUseSymbolsInTextMode(other.fUseSymbolsInTextMode),
       itsUsedSymbolListIndex(other.itsUsedSymbolListIndex),
       itsSymbolIndexingMapListIndex(other.itsSymbolIndexingMapListIndex),
-      itsGridDataPresentationStyle(other.itsGridDataPresentationStyle),
-      fUseIsoLineFeathering(other.fUseIsoLineFeathering),
       fUseContourFeathering(other.fUseContourFeathering),
       fIsoLineLabelsOverLapping(other.fIsoLineLabelsOverLapping),
       fShowColorLegend(other.fShowColorLegend),
-      fUseSimpleIsoLineDefinitions(other.fUseSimpleIsoLineDefinitions),
-      fUseSimpleContourDefinitions(other.fUseSimpleContourDefinitions),
-      fUseSeparatorLinesBetweenColorContourClasses(
-          other.fUseSeparatorLinesBetweenColorContourClasses),
       itsSimpleIsoLineGap(other.itsSimpleIsoLineGap),
       itsSimpleIsoLineZeroValue(other.itsSimpleIsoLineZeroValue),
       itsSimpleContourZeroValue(other.itsSimpleContourZeroValue),
@@ -400,7 +359,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       itsSimpleContourWidth(other.itsSimpleContourWidth),
       itsSimpleIsoLineLineStyle(other.itsSimpleIsoLineLineStyle),
       itsSimpleContourLineStyle(other.itsSimpleContourLineStyle),
-      itsIsoLineSplineSmoothingFactor(other.itsIsoLineSplineSmoothingFactor),
       fUseSingleColorsWithSimpleIsoLines(other.fUseSingleColorsWithSimpleIsoLines),
       itsSimpleIsoLineColorShadeLowValue(other.itsSimpleIsoLineColorShadeLowValue),
       itsSimpleIsoLineColorShadeMidValue(other.itsSimpleIsoLineColorShadeMidValue),
@@ -422,9 +380,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       itsSpecialIsoLineColorIndexies(other.itsSpecialIsoLineColorIndexies),
       itsSpecialContourColorIndexies(other.itsSpecialContourColorIndexies),
       itsSpecialIsoLineShowLabelBox(other.itsSpecialIsoLineShowLabelBox),
-      fDrawOnlyOverMask(other.fDrawOnlyOverMask),
-      fUseCustomColorContouring(other.fUseCustomColorContouring),
-      fUseCustomIsoLineing(other.fUseCustomIsoLineing),
       itsSpecialColorContouringValues(other.itsSpecialColorContouringValues),
       itsSpecialColorContouringColorIndexies(other.itsSpecialColorContouringColorIndexies),
       itsColorContouringColorShadeLowValue(other.itsColorContouringColorShadeLowValue),
@@ -449,21 +404,11 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       itsIsoLineHatchHighValue2(other.itsIsoLineHatchHighValue2),
       itsIsoLineHatchType2(other.itsIsoLineHatchType2),
       itsIsoLineHatchColor2(other.itsIsoLineHatchColor2),
-      itsIsoLineLabelDigitCount(other.itsIsoLineLabelDigitCount),
       itsContourLabelDigitCount(other.itsContourLabelDigitCount)
-      //***********************************************
-      //********** 'versio 2' parametreja *************
-      //***********************************************
-      ,
-      itsAlpha(other.itsAlpha),
-      fHidden(other.fHidden),
-      fShowDifference(other.fShowDifference),
-      //***********************************************
-      //********** 'versio 3' parametreja *************
-      //***********************************************
-      fShowDifferenceToOriginalData(other.fShowDifferenceToOriginalData)
+//***********************************************
+//********** 'versio 2' parametreja *************
+//***********************************************
 {
-  Alpha(itsAlpha);  // varmistus että pysytään rajoissa
   itsPossibleViewTypeList[0] = NFmiMetEditorTypes::kFmiTextView;
   itsPossibleViewTypeList[1] = NFmiMetEditorTypes::kFmiIsoLineView;
 }
@@ -508,7 +453,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     }
     itsPriority = theDrawParam->Priority();
 
-    itsViewType = theDrawParam->ViewType();
+    GeneralVisualization::ViewType(theDrawParam->ViewType());
     itsStationDataViewType = theDrawParam->StationDataViewType();
 
     itsFrameColor = NFmiColor(theDrawParam->FrameColor());
@@ -550,7 +495,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
       itsPossibleViewTypeList[typeNumber] = possibleViewTypeList[typeNumber];
     }
 
-    fHidden = theDrawParam->IsParamHidden();
+    GeneralVisualization::HideParam(theDrawParam->IsParamHidden());
 
     GeneralData::Unit(theDrawParam->Unit());
 
@@ -559,8 +504,9 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     fShowColors = theDrawParam->ShowColors();
     fShowColoredNumbers = theDrawParam->ShowColoredNumbers();
     fZeroColorMean = theDrawParam->ZeroColorMean();
-    fShowDifference = theDrawParam->ShowDifference();
-    fShowDifferenceToOriginalData = theDrawParam->ShowDifferenceToOriginalData();
+    GeneralVisualization::ShowDifference(theDrawParam->ShowDifference());
+    GeneralVisualization::ShowDifferenceToOriginalData(
+        theDrawParam->ShowDifferenceToOriginalData());
 
     //***********************************************
     //********** 'versio 2' parametreja *************
@@ -576,20 +522,21 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     fUseSymbolsInTextMode = theDrawParam->UseSymbolsInTextMode();
     itsUsedSymbolListIndex = theDrawParam->UsedSymbolListIndex();
     itsSymbolIndexingMapListIndex = theDrawParam->SymbolIndexingMapListIndex();
-    itsGridDataPresentationStyle = theDrawParam->GridDataPresentationStyle();
-    fUseIsoLineFeathering = theDrawParam->UseIsoLineFeathering();
+    GeneralVisualization::GridDataPresentationStyle(theDrawParam->GridDataPresentationStyle());
+    GeneralVisualization::UseIsoLineFeathering(theDrawParam->UseIsoLineFeathering());
     fIsoLineLabelsOverLapping = theDrawParam->IsoLineLabelsOverLapping();
     fShowColorLegend = theDrawParam->ShowColorLegend();
-    fUseSimpleIsoLineDefinitions = theDrawParam->UseSimpleIsoLineDefinitions();
-    fUseSeparatorLinesBetweenColorContourClasses =
-        theDrawParam->UseSeparatorLinesBetweenColorContourClasses();
+    GeneralVisualization::UseSimpleIsoLineDefinitions(theDrawParam->UseSimpleIsoLineDefinitions());
+    GeneralVisualization::UseSeparatorLinesBetweenColorContourClasses(
+        theDrawParam->UseSeparatorLinesBetweenColorContourClasses());
     itsSimpleIsoLineGap = theDrawParam->SimpleIsoLineGap();
     itsSimpleIsoLineZeroValue = theDrawParam->SimpleIsoLineZeroValue();
     itsSimpleIsoLineLabelHeight = theDrawParam->SimpleIsoLineLabelHeight();
     fShowSimpleIsoLineLabelBox = theDrawParam->ShowSimpleIsoLineLabelBox();
     itsSimpleIsoLineWidth = theDrawParam->SimpleIsoLineWidth();
     itsSimpleIsoLineLineStyle = theDrawParam->SimpleIsoLineLineStyle();
-    itsIsoLineSplineSmoothingFactor = theDrawParam->IsoLineSplineSmoothingFactor();
+    GeneralVisualization::IsoLineSplineSmoothingFactor(
+        theDrawParam->IsoLineSplineSmoothingFactor());
     fUseSingleColorsWithSimpleIsoLines = theDrawParam->UseSingleColorsWithSimpleIsoLines();
     itsSimpleIsoLineColorShadeLowValue = theDrawParam->SimpleIsoLineColorShadeLowValue();
     itsSimpleIsoLineColorShadeMidValue = theDrawParam->SimpleIsoLineColorShadeMidValue();
@@ -605,8 +552,8 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     itsSpecialIsoLineStyle = theDrawParam->SpecialIsoLineStyle();
     itsSpecialIsoLineColorIndexies = theDrawParam->SpecialIsoLineColorIndexies();
     itsSpecialIsoLineShowLabelBox = theDrawParam->SpecialIsoLineShowLabelBox();
-    fDrawOnlyOverMask = theDrawParam->DrawOnlyOverMask();
-    fUseCustomColorContouring = theDrawParam->UseCustomColorContouring();
+    GeneralVisualization::DrawOnlyOverMask(theDrawParam->DrawOnlyOverMask());
+    GeneralVisualization::UseCustomColorContouring(theDrawParam->UseCustomColorContouring());
     itsSpecialColorContouringValues = theDrawParam->SpecialColorContouringValues();
     itsSpecialColorContouringColorIndexies = theDrawParam->SpecialColorContouringColorIndexies();
     itsColorContouringColorShadeLowValue = theDrawParam->ColorContouringColorShadeLowValue();
@@ -634,7 +581,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     itsIsoLineHatchHighValue2 = theDrawParam->IsoLineHatchHighValue2();
     itsIsoLineHatchType2 = theDrawParam->IsoLineHatchType2();
     itsIsoLineHatchColor2 = theDrawParam->IsoLineHatchColor2();
-    itsIsoLineLabelDigitCount = theDrawParam->IsoLineLabelDigitCount();
+    GeneralVisualization::IsoLineLabelDigitCount(theDrawParam->IsoLineLabelDigitCount());
     //***********************************************
     //********** 'versio 2' parametreja *************
     //***********************************************
@@ -648,7 +595,7 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     itsContourColor = theDrawParam->itsContourColor;
     itsContourTextColor = theDrawParam->itsContourTextColor;
     fUseContourFeathering = theDrawParam->fUseContourFeathering;
-    fUseSimpleContourDefinitions = theDrawParam->fUseSimpleContourDefinitions;
+    GeneralVisualization::UseSimpleContourDefinitions(theDrawParam->UseSimpleContourDefinitions());
     itsSimpleContourZeroValue = theDrawParam->itsSimpleContourZeroValue;
     itsSimpleContourLabelHeight = theDrawParam->itsSimpleContourLabelHeight;
     fShowSimpleContourLabelBox = theDrawParam->fShowSimpleContourLabelBox;
@@ -662,12 +609,12 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     itsSpecialContourWidth = theDrawParam->itsSpecialContourWidth;
     itsSpecialContourStyle = theDrawParam->itsSpecialContourStyle;
     itsSpecialContourColorIndexies = theDrawParam->itsSpecialContourColorIndexies;
-    fUseCustomIsoLineing = theDrawParam->fUseCustomIsoLineing;
+    GeneralVisualization::UseCustomIsoLineing(theDrawParam->UseCustomIsoLineing());
     itsContourLabelDigitCount = theDrawParam->itsContourLabelDigitCount;
     //***********************************************
     //********** 'versio 3' parametreja *************
     //***********************************************
-    Alpha(theDrawParam->itsAlpha);
+    GeneralVisualization::Alpha(theDrawParam->Alpha());
   }
   return;
 }
@@ -692,6 +639,7 @@ bool NFmiDrawParam::Init(const std::string& theFilename)
         return true;
       }
     }
+    std::cerr << "Cannot open the file " << theFilename << "\n";
   }
   return false;
 }
@@ -770,7 +718,7 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
   file << "'Priority'" << endl;  // selittävä teksti
   file << itsPriority << endl;
   file << "'ViewType'" << endl;  // selittävä teksti
-  file << static_cast<int>(itsViewType) << endl;
+  file << static_cast<int>(GeneralVisualization::ViewType()) << endl;
   file << "'UseIsoLineGabWithCustomContours'" << endl;  // selittävä teksti
   file << static_cast<int>(fUseIsoLineGabWithCustomContours) << endl;
   file << "'IsoLineGab'" << endl;  // selittävä teksti
@@ -864,19 +812,19 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
     file << fUseSymbolsInTextMode << endl;
     file << itsUsedSymbolListIndex << endl;
     file << itsSymbolIndexingMapListIndex << endl;
-    file << itsGridDataPresentationStyle << endl;
-    file << fUseIsoLineFeathering << endl;
+    file << GeneralVisualization::GridDataPresentationStyle() << endl;
+    file << GeneralVisualization::UseIsoLineFeathering() << endl;
     file << fIsoLineLabelsOverLapping << endl;
     file << fShowColorLegend << endl;
-    file << fUseSimpleIsoLineDefinitions << endl;
-    file << fUseSeparatorLinesBetweenColorContourClasses << endl;
+    file << GeneralVisualization::UseSimpleIsoLineDefinitions() << endl;
+    file << GeneralVisualization::UseSeparatorLinesBetweenColorContourClasses() << endl;
     file << itsSimpleIsoLineGap << endl;
     file << itsSimpleIsoLineZeroValue << endl;
     file << itsSimpleIsoLineLabelHeight << endl;
     file << fShowSimpleIsoLineLabelBox << endl;
     file << itsSimpleIsoLineWidth << endl;
     file << itsSimpleIsoLineLineStyle << endl;
-    file << itsIsoLineSplineSmoothingFactor << endl;
+    file << GeneralVisualization::IsoLineSplineSmoothingFactor() << endl;
     file << fUseSingleColorsWithSimpleIsoLines << endl;
     file << itsSimpleIsoLineColorShadeLowValue << endl;
     file << itsSimpleIsoLineColorShadeMidValue << endl;
@@ -923,8 +871,8 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
       file << itsSpecialIsoLineShowLabelBox[i] << " ";
     file << endl;
 
-    file << fDrawOnlyOverMask << endl;
-    file << fUseCustomColorContouring << endl;
+    file << GeneralVisualization::DrawOnlyOverMask() << endl;
+    file << GeneralVisualization::UseCustomColorContouring() << endl;
 
     size = itsSpecialColorContouringValues.size();
     file << size << endl;
@@ -959,7 +907,7 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
     file << itsIsoLineHatchType2 << endl;
     file << itsIsoLineHatchColor2 << endl;
     file << itsColorContouringColorShadeHigh2ValueColor << endl;
-    file << itsIsoLineLabelDigitCount << endl;
+    file << GeneralVisualization::IsoLineLabelDigitCount() << endl;
     //***********************************************
     //********** 'versio 2' parametreja *************
     //***********************************************
@@ -975,8 +923,8 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
     file << fUseContourGabWithCustomContours << " " << itsContourGab << endl;
     file << itsContourColor << endl;
     file << itsContourTextColor << endl;
-    file << fUseContourFeathering << " " << fUseSimpleContourDefinitions << " "
-         << itsSimpleContourZeroValue << " " << itsSimpleContourLabelHeight << endl;
+    file << fUseContourFeathering << " " << GeneralVisualization::UseSimpleContourDefinitions()
+         << " " << itsSimpleContourZeroValue << " " << itsSimpleContourLabelHeight << endl;
     file << fShowSimpleContourLabelBox << " " << itsSimpleContourWidth << " "
          << itsSimpleContourLineStyle << " " << itsSimpleIsoLineColorShadeHigh2Value << endl;
     file << itsSimpleIsoLineColorShadeHigh2ValueColor << endl;
@@ -992,13 +940,14 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
     NFmiDataStoringHelpers::WriteContainer(itsSpecialContourColorIndexies, file, std::string(" "));
     file << endl;
 
-    file << fUseCustomIsoLineing << " " << itsContourLabelDigitCount << endl;
+    file << GeneralVisualization::UseCustomIsoLineing() << " " << itsContourLabelDigitCount << endl;
 
     NFmiDataStoringHelpers::NFmiExtraDataStorage extraData;  // lopuksi vielä mahdollinen extra data
     // Kun tulee uusia muuttujia, tee tähän extradatan täyttöä, jotta se saadaan talteen tiedopstoon
     // siten että
     // edelliset versiot eivät mene solmuun vaikka on tullut uutta dataa.
-    extraData.Add(itsAlpha);  // alpha on siis 1. uusista double-extra-parametreista
+    extraData.Add(
+        GeneralVisualization::Alpha());  // alpha on siis 1. uusista double-extra-parametreista
     extraData.Add(
         GeneralData::ModelRunIndex());  // modelRunIndex on 2. uusista double-extra-parametreista
     extraData.Add(GeneralData::TimeSerialModelRunCount());  // modelRunIndex on 3. uusista
@@ -1053,6 +1002,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
   char temp[80];
   std::string tmpStr;
   int number;
+  bool tmpBool = false;
+  float tmpFloat = 0.0;
   if (!file)
     return file;
   file >> temp;
@@ -1094,7 +1045,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       file >> itsPriority;
       file >> temp;  // luetaan nimike pois
       file >> number;
-      itsViewType = NFmiMetEditorTypes::View(number);
+      GeneralVisualization::ViewType(NFmiMetEditorTypes::View(number));
 
       file >> temp;  // luetaan nimike pois
       file >> number;
@@ -1172,8 +1123,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       if (number < 1)
         number = 1;
       itsStationDataViewType = NFmiMetEditorTypes::View(number);
-      file >> temp;  // luetaan nimike pois
-      bool tmpBool = false;
+      file >> temp;     // luetaan nimike pois
       file >> tmpBool;  // tämä on legacy koodia, pitää lukea bool arvo tässä
 
       file >> temp;  // luetaan nimike pois
@@ -1210,19 +1160,24 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         file >> fUseSymbolsInTextMode;
         file >> itsUsedSymbolListIndex;
         file >> itsSymbolIndexingMapListIndex;
-        file >> itsGridDataPresentationStyle;
-        file >> fUseIsoLineFeathering;
+        file >> number;
+        GeneralVisualization::GridDataPresentationStyle(number);
+        file >> tmpBool;
+        GeneralVisualization::UseIsoLineFeathering(tmpBool);
         file >> fIsoLineLabelsOverLapping;
         file >> fShowColorLegend;
-        file >> fUseSimpleIsoLineDefinitions;
-        file >> fUseSeparatorLinesBetweenColorContourClasses;
+        file >> tmpBool;
+        GeneralVisualization::UseSimpleIsoLineDefinitions(tmpBool);
+        file >> tmpBool;
+        GeneralVisualization::UseSeparatorLinesBetweenColorContourClasses(tmpBool);
         file >> itsSimpleIsoLineGap;
         file >> itsSimpleIsoLineZeroValue;
         file >> itsSimpleIsoLineLabelHeight;
         file >> fShowSimpleIsoLineLabelBox;
         file >> itsSimpleIsoLineWidth;
         file >> itsSimpleIsoLineLineStyle;
-        file >> itsIsoLineSplineSmoothingFactor;
+        file >> tmpFloat;
+        GeneralVisualization::IsoLineSplineSmoothingFactor(tmpFloat);
         file >> fUseSingleColorsWithSimpleIsoLines;
         file >> itsSimpleIsoLineColorShadeLowValue;
         file >> itsSimpleIsoLineColorShadeMidValue;
@@ -1273,8 +1228,10 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
 
         if (!file)
           return file;
-        file >> fDrawOnlyOverMask;
-        file >> fUseCustomColorContouring;
+        file >> tmpBool;
+        GeneralVisualization::DrawOnlyOverMask(tmpBool);
+        file >> tmpBool;
+        GeneralVisualization::UseCustomColorContouring(tmpBool);
 
         file >> size;
         if (!file)
@@ -1311,7 +1268,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         file >> itsIsoLineHatchType2;
         file >> itsIsoLineHatchColor2;
         file >> itsColorContouringColorShadeHigh2ValueColor;
-        file >> itsIsoLineLabelDigitCount;
+        file >> number;
+        GeneralVisualization::IsoLineLabelDigitCount(number);
         if (!file)
           return file;
         //***********************************************
@@ -1329,8 +1287,10 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         file >> fUseContourGabWithCustomContours >> itsContourGab;
         file >> itsContourColor;
         file >> itsContourTextColor;
-        file >> fUseContourFeathering >> fUseSimpleContourDefinitions >>
-            itsSimpleContourZeroValue >> itsSimpleContourLabelHeight;
+        bool tmpBool;
+        file >> fUseContourFeathering >> tmpBool >> itsSimpleContourZeroValue >>
+            itsSimpleContourLabelHeight;
+        GeneralVisualization::UseSimpleContourDefinitions(tmpBool);
         file >> fShowSimpleContourLabelBox >> itsSimpleContourWidth >> itsSimpleContourLineStyle >>
             itsSimpleIsoLineColorShadeHigh2Value;
         file >> itsSimpleIsoLineColorShadeHigh2ValueColor;
@@ -1341,7 +1301,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         NFmiDataStoringHelpers::ReadContainer(itsSpecialContourStyle, file);
         NFmiDataStoringHelpers::ReadContainer(itsSpecialContourColorIndexies, file);
 
-        file >> fUseCustomIsoLineing >> itsContourLabelDigitCount;
+        file >> tmpBool >> itsContourLabelDigitCount;
+        GeneralVisualization::UseCustomIsoLineing(tmpBool);
 
         if (file.fail())
           throw std::runtime_error("NFmiDrawParam::Write failed");
@@ -1352,7 +1313,8 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         file >> extraData;
         // Tässä sitten otetaaan extradatasta talteen uudet muuttujat, mitä on mahdollisesti tullut
         // eli jos uusia muutujia tai arvoja, käsittele tässä.
-        itsAlpha = 100.f;  // tämä on siis default arvo alphalle (täysin läpinäkyvä)
+        GeneralVisualization::Alpha(
+            100.f);  // tämä on siis default arvo alphalle (täysin läpinäkyvä)
         if (extraData.itsDoubleValues.size() >= 1)
           Alpha(static_cast<float>(
               extraData
@@ -1406,8 +1368,9 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         itsContourGab = itsIsoLineGab;
         itsContourColor = itsIsolineColor;
         itsContourTextColor = itsIsolineTextColor;
-        fUseContourFeathering = fUseIsoLineFeathering;
-        fUseSimpleContourDefinitions = fUseSimpleIsoLineDefinitions;
+        fUseContourFeathering = GeneralVisualization::UseIsoLineFeathering();
+        GeneralVisualization::UseSimpleContourDefinitions(
+            GeneralVisualization::UseSimpleIsoLineDefinitions());
         itsSimpleContourZeroValue = itsSimpleIsoLineZeroValue;
         itsSimpleContourLabelHeight = itsSimpleIsoLineLabelHeight;
         fShowSimpleContourLabelBox = fShowSimpleIsoLineLabelBox;
@@ -1422,9 +1385,10 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         itsSpecialContourStyle = itsSpecialIsoLineStyle;
         itsSpecialContourColorIndexies = itsSpecialIsoLineColorIndexies;
 
-        fUseCustomIsoLineing = fUseCustomColorContouring;
-        itsContourLabelDigitCount = itsIsoLineLabelDigitCount;
-        itsAlpha = 100.f;  // tämä on siis default arvo alphalle (täysin läpinäkyvä)
+        GeneralVisualization::UseCustomIsoLineing(GeneralVisualization::UseCustomColorContouring());
+        itsContourLabelDigitCount = GeneralVisualization::IsoLineLabelDigitCount();
+        GeneralVisualization::Alpha(
+            100.f);  // tämä on siis default arvo alphalle (täysin läpinäkyvä)
       }
     }
     GeneralData::InitFileVersionNumber(itsFileVersionNumber);  // lopuksi asetetaan versio numero

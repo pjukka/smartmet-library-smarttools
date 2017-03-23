@@ -31,6 +31,7 @@
 #pragma once
 
 #include "GeneralData.h"
+#include "GeneralVisualization.h"
 
 #include "NFmiColor.h"
 #include "NFmiMetEditorTypes.h"
@@ -42,7 +43,7 @@
 
 class NFmiDrawingEnvironment;
 
-class NFmiDrawParam : public GeneralData
+class NFmiDrawParam : public GeneralData, public GeneralVisualization
 {
  public:
   NFmiDrawParam(void);
@@ -58,8 +59,6 @@ class NFmiDrawParam : public GeneralData
   void Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawingOptions = false);
   void Init(const boost::shared_ptr<NFmiDrawParam>& theDrawParam,
             bool fInitOnlyDrawingOptions = false);
-  void HideParam(bool newValue) { fHidden = newValue; };
-  bool IsParamHidden(void) const { return fHidden; };
   bool UseArchiveModelData(void) const;
   bool IsModelRunDataType(void) const;
   static bool IsModelRunDataType(NFmiInfoData::Type theDataType);
@@ -72,8 +71,6 @@ class NFmiDrawParam : public GeneralData
 
   void Priority(int thePriority) { itsPriority = thePriority; };
   int Priority(void) const { return itsPriority; };
-  void ViewType(const NFmiMetEditorTypes::View& theViewType) { itsViewType = theViewType; };
-  NFmiMetEditorTypes::View ViewType(void) const { return itsViewType; };
   void FrameColor(const NFmiColor& theFrameColor) { itsFrameColor = theFrameColor; };
   const NFmiColor& FrameColor(void) const { return itsFrameColor; };
   void FillColor(const NFmiColor& theFillColor) { itsFillColor = theFillColor; };
@@ -206,10 +203,6 @@ class NFmiDrawParam : public GeneralData
   void ZeroColorMean(bool theValue) { fZeroColorMean = theValue; }
   bool UseSecondaryColors(void) const { return fUseSecondaryColors; };
   void UseSecondaryColors(bool newState) { fUseSecondaryColors = newState; };
-  bool ShowDifference(void) const { return fShowDifference; };
-  void ShowDifference(bool newState) { fShowDifference = newState; };
-  bool ShowDifferenceToOriginalData(void) const { return fShowDifferenceToOriginalData; }
-  void ShowDifferenceToOriginalData(bool newValue) { fShowDifferenceToOriginalData = newValue; }
   //**************************************************************
   //********** 'versio 2' parametrien asetusfunktiot *************
   //**************************************************************
@@ -263,40 +256,12 @@ class NFmiDrawParam : public GeneralData
   void UsedSymbolListIndex(int newValue) { itsUsedSymbolListIndex = newValue; }
   int SymbolIndexingMapListIndex(void) const { return itsSymbolIndexingMapListIndex; }
   void SymbolIndexingMapListIndex(int newValue) { itsSymbolIndexingMapListIndex = newValue; }
-  int GridDataPresentationStyle(void) const { return itsGridDataPresentationStyle; }
-  void GridDataPresentationStyle(int newValue) { itsGridDataPresentationStyle = newValue; }
-  bool UseIsoLineFeathering(void) const { return fUseIsoLineFeathering; }
-  void UseIsoLineFeathering(bool newValue)
-  {
-    fUseIsoLineFeathering = newValue;
-    fUseContourFeathering =
-        newValue;  // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
-  }
-
   bool UseContourFeathering(void) const { return fUseContourFeathering; }
   void UseContourFeathering(bool newValue) { fUseContourFeathering = newValue; }
   bool IsoLineLabelsOverLapping(void) const { return fIsoLineLabelsOverLapping; }
   void IsoLineLabelsOverLapping(bool newValue) { fIsoLineLabelsOverLapping = newValue; }
   bool ShowColorLegend(void) const { return fShowColorLegend; }
   void ShowColorLegend(bool newValue) { fShowColorLegend = newValue; }
-  bool UseSimpleIsoLineDefinitions(void) const { return fUseSimpleIsoLineDefinitions; }
-  void UseSimpleIsoLineDefinitions(bool newValue)
-  {
-    fUseSimpleIsoLineDefinitions = newValue;
-    fUseSimpleContourDefinitions =
-        newValue;  // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
-  }
-
-  bool UseSimpleContourDefinitions(void) const { return fUseSimpleContourDefinitions; }
-  void UseSimpleContourDefinitions(bool newValue) { fUseSimpleContourDefinitions = newValue; }
-  bool UseSeparatorLinesBetweenColorContourClasses(void) const
-  {
-    return fUseSeparatorLinesBetweenColorContourClasses;
-  }
-  void UseSeparatorLinesBetweenColorContourClasses(bool newValue)
-  {
-    fUseSeparatorLinesBetweenColorContourClasses = newValue;
-  }
   float SimpleIsoLineGap(void) const { return itsSimpleIsoLineGap; }
   void SimpleIsoLineGap(float newValue) { itsSimpleIsoLineGap = newValue; }
   float SimpleIsoLineZeroValue(void) const { return itsSimpleIsoLineZeroValue; }
@@ -346,8 +311,6 @@ class NFmiDrawParam : public GeneralData
 
   int SimpleContourLineStyle(void) const { return itsSimpleContourLineStyle; }
   void SimpleContourLineStyle(int newValue) { itsSimpleContourLineStyle = newValue; }
-  float IsoLineSplineSmoothingFactor(void) const { return itsIsoLineSplineSmoothingFactor; }
-  void IsoLineSplineSmoothingFactor(float newValue) { itsIsoLineSplineSmoothingFactor = newValue; }
   bool UseSingleColorsWithSimpleIsoLines(void) const { return fUseSingleColorsWithSimpleIsoLines; }
   void UseSingleColorsWithSimpleIsoLines(bool newValue)
   {
@@ -500,17 +463,7 @@ class NFmiDrawParam : public GeneralData
   {
     itsSpecialIsoLineShowLabelBox = newValue;
   }
-  bool DrawOnlyOverMask(void) const { return fDrawOnlyOverMask; }
-  void DrawOnlyOverMask(bool newValue) { fDrawOnlyOverMask = newValue; }
-  bool UseCustomColorContouring(void) const { return fUseCustomColorContouring; }
-  void UseCustomColorContouring(bool newValue)
-  {
-    fUseCustomColorContouring = newValue;
-    fUseCustomIsoLineing = newValue;
-  }
 
-  bool UseCustomIsoLineing(void) const { return fUseCustomIsoLineing; }
-  void UseCustomIsoLineing(bool newValue) { fUseCustomIsoLineing = newValue; }
   const checkedVector<float>& SpecialColorContouringValues(void) const
   {
     return itsSpecialColorContouringValues;
@@ -621,17 +574,6 @@ class NFmiDrawParam : public GeneralData
   void IsoLineHatchType2(int newValue) { itsIsoLineHatchType2 = newValue; }
   const NFmiColor& IsoLineHatchColor2(void) const { return itsIsoLineHatchColor2; }
   void IsoLineHatchColor2(const NFmiColor& newValue) { itsIsoLineHatchColor2 = newValue; }
-  int IsoLineLabelDigitCount(void) const { return itsIsoLineLabelDigitCount; }
-  void IsoLineLabelDigitCount(int newValue)
-  {
-    itsIsoLineLabelDigitCount = newValue;
-    if (itsIsoLineLabelDigitCount > 10)
-      itsIsoLineLabelDigitCount = 10;
-    itsContourLabelDigitCount = newValue;
-    if (itsContourLabelDigitCount > 10)
-      itsContourLabelDigitCount = 10;
-  }
-
   int ContourLabelDigitCount(void) const { return itsContourLabelDigitCount; }
   void ContourLabelDigitCount(int newValue)
   {
@@ -643,15 +585,6 @@ class NFmiDrawParam : public GeneralData
   //**************************************************************
   //********** 'versio 2' parametrien asetusfunktiot *************
   //**************************************************************
-  float Alpha(void) const { return itsAlpha; }
-  void Alpha(float newValue)
-  {
-    itsAlpha = newValue;
-    if (itsAlpha < NFmiDrawParam::itsMinAlpha)
-      itsAlpha = NFmiDrawParam::itsMinAlpha;
-    if (itsAlpha > 100.f)
-      itsAlpha = 100.f;
-  }
 
   // ---------------------- operators ------------------------
   bool operator==(const NFmiDrawParam& theDrawParam) const;
@@ -666,10 +599,6 @@ class NFmiDrawParam : public GeneralData
 
  protected:
   int itsPriority;
-
-  //  Parametrin oletus näyttötyyppi (symboli,
-  //  isoviiva, teksti...)
-  NFmiMetEditorTypes::View itsViewType;
   NFmiMetEditorTypes::View itsStationDataViewType;  // jos viewtype on isoviiva, mutta data on asema
   // dataa, pitää olla varalla joku näyttötyyppi
   // että voidaan piirtää tällöin
@@ -735,17 +664,10 @@ class NFmiDrawParam : public GeneralData
   int itsSymbolIndexingMapListIndex;  // indeksi johonkin symbolilistaan, jossa on mapattu arvot
                                       // haluttuihin symboleihin
 
-  int itsGridDataPresentationStyle;  // 1=asema muodossa, 2=isoviiva, 3=color contouring, 4=
-                                     // contour+isoviiva, 5=quick color contouring
-  bool fUseIsoLineFeathering;        // isoviivojen harvennus optio
-  bool fUseContourFeathering;        // **** Versio 3 parametri ****
-  bool fIsoLineLabelsOverLapping;    // voivatko isoviiva labelit mennä päällekkäin vai ei?
+  bool fUseContourFeathering;      // **** Versio 3 parametri ****
+  bool fIsoLineLabelsOverLapping;  // voivatko isoviiva labelit mennä päällekkäin vai ei?
   bool fShowColorLegend;  // piirretäänko rivin viimeiseen ruutuun color contouringin väri selitys
                           // laatikko?
-  bool fUseSimpleIsoLineDefinitions;  // otetaanko isoviivamääritykset simppelillä tavalla, vai
-                                      // kaikki arvot spesiaali tapauksina määritettyinä
-  bool fUseSimpleContourDefinitions;  // **** Versio 3 parametri ****
-  bool fUseSeparatorLinesBetweenColorContourClasses;  // piirrä viivat arvo/väri luokkien välille
   float itsSimpleIsoLineGap;
   float itsSimpleIsoLineZeroValue;    // tämän arvon kautta isoviivat joutuvat menemään
   float itsSimpleContourZeroValue;    // **** Versio 3 parametri ****
@@ -758,7 +680,6 @@ class NFmiDrawParam : public GeneralData
   float itsSimpleContourWidth;        // **** Versio 3 parametri ****
   int itsSimpleIsoLineLineStyle;      // 1=yht. viiva, 2=pisteviiva jne.
   int itsSimpleContourLineStyle;      // **** Versio 3 parametri ****
-  float itsIsoLineSplineSmoothingFactor;    // 0-10, 0=ei pehmennystä, 10=maksimi pyöritys
   bool fUseSingleColorsWithSimpleIsoLines;  // true=sama väri kaikille isoviivoille, false=tehdään
                                             // väriskaala
                                             // isoviivan väriskaalaus asetukset
@@ -771,7 +692,8 @@ class NFmiDrawParam : public GeneralData
   NFmiColor itsSimpleIsoLineColorShadeHighValueColor;
   NFmiColor itsSimpleIsoLineColorShadeHigh2ValueColor;  // **** Versio 3 parametri ****
   int itsSimpleIsoLineColorShadeClassCount;  // kuinka monta väri luokkaa tehdään skaalaukseen
-  // speciaali isoviiva asetukset (otetaan käyttöön, jos fUseSimpleIsoLineDefinitions=false)
+  // speciaali isoviiva asetukset (otetaan käyttöön, jos
+  // GeneralVisualization::UseSimpleIsoLineDefinitions() is false)
   checkedVector<float>
       itsSpecialIsoLineValues;  // tähän laitetaan kaikki arvot, johon halutaan isoviiva
   checkedVector<float> itsSpecialContourValues;       // **** Versio 3 parametri ****
@@ -787,9 +709,6 @@ class NFmiDrawParam : public GeneralData
   checkedVector<bool> itsSpecialIsoLineShowLabelBox;  // eri viivojen väri indeksit (pitää tehdä
                                                       // näyttö taulukko käyttäjälle)
   // colorcontouring ja quick contouring asetukset
-  bool fDrawOnlyOverMask;          // jos true, data piirretään vain maskin päälle
-  bool fUseCustomColorContouring;  // true ja saa määritellä luokka rajat ja värit
-  bool fUseCustomIsoLineing;       // **** Versio 3 parametri ****
   checkedVector<float> itsSpecialColorContouringValues;  // tähän laitetaan kaikki arvot, johon
                                                          // halutaan color contour luokka rajoiksi
   checkedVector<int> itsSpecialColorContouringColorIndexies;  // eri viivojen väri indeksit (pitää
@@ -816,25 +735,17 @@ class NFmiDrawParam : public GeneralData
   float itsIsoLineHatchHighValue2;  // hatch alueen yläarvo
   int itsIsoLineHatchType2;  // hatch tyyppi 1=vinoviiva oikealle, 2=vinoviiva vasemmalle jne.
   NFmiColor itsIsoLineHatchColor2;
-  int itsIsoLineLabelDigitCount;  // isoviiva labelin näytettävien digitaalien lukumäärä
   int itsContourLabelDigitCount;  // **** Versio 3 parametri ****
                                   //***********************************************
                                   //********** 'versio 2' parametreja *************
                                   //***********************************************
-  float itsAlpha;  // läpinäkyvyys kerroin, 0 on täysin läpinäkyvä ja 100 täysin läpinäkymätön (0 on
-                   // estetty ja itsMinAlpha on säädetty minimi raja)
 
  private:
   static float itsFileVersionNumber;
   float itsInitFileVersionNumber;
 
-  bool fHidden;  // näyttö voidaan piiloittaa tämän mukaisesti
   //	bool fEditableParam;	// onko parametri suoraan editoitavissa ollenkaan? (esim. HESSAA tai
   // tuulivektori eivät ole)
-
-  bool fShowDifference;  // näytetäänkö kartalla parametrin arvo, vai erotus edelliseen aikaan (ei
-                         // ole vielä talletettu tiedostoon)
-  bool fShowDifferenceToOriginalData;
 };
 //@{ \name Globaalit NFmiDrawParam-luokan uudelleenohjaus-operaatiot
 inline std::ostream& operator<<(std::ostream& os, const NFmiDrawParam& item)
