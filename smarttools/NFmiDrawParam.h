@@ -34,6 +34,7 @@
 #include "GeneralVisualization.h"
 #include "SimpleColorContour.h"
 #include "CustomColorContour.h"
+#include "SymbolSettings.h"
 
 #include "NFmiColor.h"
 #include "NFmiMetEditorTypes.h"
@@ -48,7 +49,8 @@ class NFmiDrawingEnvironment;
 class NFmiDrawParam : public GeneralData,
                       public GeneralVisualization,
                       public SimpleColorContour,
-                      public CustomColorContour
+                      public CustomColorContour,
+                      public SymbolSettings
 {
  public:
   NFmiDrawParam(void);
@@ -76,30 +78,6 @@ class NFmiDrawParam : public GeneralData,
 
   void Priority(int thePriority) { itsPriority = thePriority; };
   int Priority(void) const { return itsPriority; };
-  void FrameColor(const NFmiColor& theFrameColor) { itsFrameColor = theFrameColor; };
-  const NFmiColor& FrameColor(void) const { return itsFrameColor; };
-  void FillColor(const NFmiColor& theFillColor) { itsFillColor = theFillColor; };
-  const NFmiColor& FillColor(void) const { return itsFillColor; };
-  void RelativeSize(const NFmiPoint& theRelativeSize) { itsRelativeSize = theRelativeSize; };
-  const NFmiPoint& RelativeSize(void) const { return itsRelativeSize; };
-  void RelativePositionOffset(const NFmiPoint& theRelativePositionOffset)
-  {
-    itsRelativePositionOffset = theRelativePositionOffset;
-  };
-  const NFmiPoint& RelativePositionOffset(void) const { return itsRelativePositionOffset; };
-  void OnlyOneSymbolRelativeSize(const NFmiPoint& theOnlyOneSymbolRelativeSize)
-  {
-    itsOnlyOneSymbolRelativeSize = theOnlyOneSymbolRelativeSize;
-  };
-  const NFmiPoint& OnlyOneSymbolRelativeSize(void) const { return itsOnlyOneSymbolRelativeSize; };
-  void OnlyOneSymbolRelativePositionOffset(const NFmiPoint& theOnlyOneSymbolRelativePositionOffset)
-  {
-    itsOnlyOneSymbolRelativePositionOffset = theOnlyOneSymbolRelativePositionOffset;
-  };
-  const NFmiPoint& OnlyOneSymbolRelativePositionOffset(void) const
-  {
-    return itsOnlyOneSymbolRelativePositionOffset;
-  };
   void ModifyingStep(const double theModifyingStep) { itsModifyingStep = theModifyingStep; };
   double ModifyingStep(void) const { return itsModifyingStep; };
   //	void				 ModifyingUnit (bool theModifyingUnit) { fModifyingUnit =
@@ -123,83 +101,17 @@ class NFmiDrawParam : public GeneralData,
   //	double TimeSerialModifyingLimit(void) const {return fModifyingUnit ?
   // itsTimeSerialModifyingLimit : 100;};
   double TimeSerialModifyingLimit(void) const { return itsTimeSerialModifyingLimit; };
-  NFmiMetEditorTypes::View StationDataViewType(void) const { return itsStationDataViewType; };
   void TimeSerialModifyingLimit(double newValue) { itsTimeSerialModifyingLimit = newValue; };
-  void StationDataViewType(NFmiMetEditorTypes::View newValue)
-  {
-    itsStationDataViewType = newValue;
-  };
-
   void FileVersionNumber(const float theFileVersionNumber)
   {
     itsFileVersionNumber = theFileVersionNumber;
   };
   float FileVersionNumber(void) const { return itsFileVersionNumber; };
-  bool ShowNumbers(void) const { return fShowNumbers; }
-  void ShowNumbers(bool theValue) { fShowNumbers = theValue; }
-  bool ShowMasks(void) const { return fShowMasks; }
-  void ShowMasks(bool theValue) { fShowMasks = theValue; }
-  bool ShowColors(void) const { return fShowColors; }
-  void ShowColors(bool theValue) { fShowColors = theValue; }
-  bool ShowColoredNumbers(void) const { return fShowColoredNumbers; }
-  void ShowColoredNumbers(bool theValue) { fShowColoredNumbers = theValue; }
-  bool ZeroColorMean(void) const { return fZeroColorMean; }
-  void ZeroColorMean(bool theValue) { fZeroColorMean = theValue; }
   bool UseSecondaryColors(void) const { return fUseSecondaryColors; };
   void UseSecondaryColors(bool newState) { fUseSecondaryColors = newState; };
   //**************************************************************
   //********** 'versio 2' parametrien asetusfunktiot *************
   //**************************************************************
-  float StationSymbolColorShadeLowValue(void) const { return itsStationSymbolColorShadeLowValue; }
-  void StationSymbolColorShadeLowValue(float newValue)
-  {
-    itsStationSymbolColorShadeLowValue = newValue;
-  }
-  float StationSymbolColorShadeMidValue(void) const { return itsStationSymbolColorShadeMidValue; }
-  void StationSymbolColorShadeMidValue(float newValue)
-  {
-    itsStationSymbolColorShadeMidValue = newValue;
-  }
-  float StationSymbolColorShadeHighValue(void) const { return itsStationSymbolColorShadeHighValue; }
-  void StationSymbolColorShadeHighValue(float newValue)
-  {
-    itsStationSymbolColorShadeHighValue = newValue;
-  }
-  const NFmiColor& StationSymbolColorShadeLowValueColor(void) const
-  {
-    return itsStationSymbolColorShadeLowValueColor;
-  }
-  void StationSymbolColorShadeLowValueColor(const NFmiColor& newValue)
-  {
-    itsStationSymbolColorShadeLowValueColor = newValue;
-  }
-  const NFmiColor& StationSymbolColorShadeMidValueColor(void) const
-  {
-    return itsStationSymbolColorShadeMidValueColor;
-  }
-  void StationSymbolColorShadeMidValueColor(const NFmiColor& newValue)
-  {
-    itsStationSymbolColorShadeMidValueColor = newValue;
-  }
-  const NFmiColor& StationSymbolColorShadeHighValueColor(void) const
-  {
-    return itsStationSymbolColorShadeHighValueColor;
-  }
-  void StationSymbolColorShadeHighValueColor(const NFmiColor& newValue)
-  {
-    itsStationSymbolColorShadeHighValueColor = newValue;
-  }
-  int StationSymbolColorShadeClassCount(void) const { return itsStationSymbolColorShadeClassCount; }
-  void StationSymbolColorShadeClassCount(int newValue)
-  {
-    itsStationSymbolColorShadeClassCount = newValue;
-  }
-  bool UseSymbolsInTextMode(void) const { return fUseSymbolsInTextMode; }
-  void UseSymbolsInTextMode(bool newValue) { fUseSymbolsInTextMode = newValue; }
-  int UsedSymbolListIndex(void) const { return itsUsedSymbolListIndex; }
-  void UsedSymbolListIndex(int newValue) { itsUsedSymbolListIndex = newValue; }
-  int SymbolIndexingMapListIndex(void) const { return itsSymbolIndexingMapListIndex; }
-  void SymbolIndexingMapListIndex(int newValue) { itsSymbolIndexingMapListIndex = newValue; }
   bool UseContourFeathering(void) const { return fUseContourFeathering; }
   void UseContourFeathering(bool newValue) { fUseContourFeathering = newValue; }
   bool IsoLineLabelsOverLapping(void) const { return fIsoLineLabelsOverLapping; }
@@ -275,20 +187,7 @@ class NFmiDrawParam : public GeneralData,
 
  protected:
   int itsPriority;
-  NFmiMetEditorTypes::View itsStationDataViewType;  // jos viewtype on isoviiva, mutta data on asema
-  // dataa, pitää olla varalla joku näyttötyyppi
-  // että voidaan piirtää tällöin
-  NFmiColor itsFrameColor;
-  NFmiColor itsFillColor;
 
-  //   Minkä kokoinen näyttöön piirrettävä 'symbolidata'
-  //   on suhteessa
-  //   annettuun asemalle/hilalle varattuun 'datalaatikkoon'.
-  //   (oletusarvo)
-  NFmiPoint itsRelativeSize;  // nämä ovat asemadata symboli kokoja
-  NFmiPoint itsRelativePositionOffset;
-  NFmiPoint itsOnlyOneSymbolRelativeSize;
-  NFmiPoint itsOnlyOneSymbolRelativePositionOffset;
   double itsModifyingStep;
   //	bool fModifyingUnit;	//(= 0, jos yksikkö on %, = 1, jos yksikkö on sama kuin itsUnit)
   double itsTimeSerialModifyingLimit;  // aikasarjanäytön muutos akselin minimi ja maksimi arvo
@@ -306,28 +205,9 @@ class NFmiDrawParam : public GeneralData,
   NFmiMetEditorTypes::View itsPossibleViewTypeList[5];
   int itsPossibleViewTypeCount;
 
-  // Tekstinäyttö:
-  bool fShowNumbers;
-  bool fShowMasks;           // tämä on turha!!!!!
-  bool fShowColors;          // asema tekstiä varten
-  bool fShowColoredNumbers;  // asema tekstiä varten
-  bool fZeroColorMean;       // asema tekstiä varten
-
   //***********************************************
   //********** 'versio 2' parametreja *************
   //***********************************************
-  float itsStationSymbolColorShadeLowValue;   // väri skaalaus alkaa tästä arvosta
-  float itsStationSymbolColorShadeMidValue;   // väri skaalauksen keskiarvo
-  float itsStationSymbolColorShadeHighValue;  // väri skaalaus loppuu tähän arvoon
-  NFmiColor itsStationSymbolColorShadeLowValueColor;
-  NFmiColor itsStationSymbolColorShadeMidValueColor;
-  NFmiColor itsStationSymbolColorShadeHighValueColor;
-  int itsStationSymbolColorShadeClassCount;  // kuinka monta väri luokkaa tehdään skaalaukseen
-  bool fUseSymbolsInTextMode;  // käytetäänkö tekstiä vai mapataanko arvoja kohden jokin symboli
-                               // ruudulle?
-  int itsUsedSymbolListIndex;         // 0=ei mitään, 1=synopfont, 2=hessaa, ...
-  int itsSymbolIndexingMapListIndex;  // indeksi johonkin symbolilistaan, jossa on mapattu arvot
-                                      // haluttuihin symboleihin
 
   bool fUseContourFeathering;      // **** Versio 3 parametri ****
   bool fIsoLineLabelsOverLapping;  // voivatko isoviiva labelit mennä päällekkäin vai ei?

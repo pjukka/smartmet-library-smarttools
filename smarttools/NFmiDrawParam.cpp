@@ -46,16 +46,8 @@ NFmiDrawParam::NFmiDrawParam()
       GeneralVisualization(),
       SimpleColorContour(),
       CustomColorContour(),
+      SymbolSettings(),
       itsPriority(1),
-      itsStationDataViewType(NFmiMetEditorTypes::kFmiTextView),
-      itsFrameColor(NFmiColor(0., 0., 0.))  // musta
-      ,
-      itsFillColor(NFmiColor(0., 0., 0.))  // musta
-      ,
-      itsRelativeSize(NFmiPoint(1, 1)),
-      itsRelativePositionOffset(NFmiPoint(0, 0)),
-      itsOnlyOneSymbolRelativeSize(NFmiPoint(1, 1)),
-      itsOnlyOneSymbolRelativePositionOffset(NFmiPoint(0, 0)),
       itsModifyingStep(1.)
       //, fModifyingUnit						 (true)
       ,
@@ -66,22 +58,6 @@ NFmiDrawParam::NFmiDrawParam()
       itsTimeSeriesScaleMin(0),
       itsTimeSeriesScaleMax(100),
       itsPossibleViewTypeCount(2),
-      fShowNumbers(true),
-      fShowMasks(false)  // tämä on turha
-      ,
-      fShowColors(false),
-      fShowColoredNumbers(false),
-      fZeroColorMean(false),
-      itsStationSymbolColorShadeLowValue(0),
-      itsStationSymbolColorShadeMidValue(50),
-      itsStationSymbolColorShadeHighValue(100),
-      itsStationSymbolColorShadeLowValueColor(0, 0, 1),
-      itsStationSymbolColorShadeMidValueColor(0, 1, 0),
-      itsStationSymbolColorShadeHighValueColor(0, 1, 0),
-      itsStationSymbolColorShadeClassCount(9),
-      fUseSymbolsInTextMode(false),
-      itsUsedSymbolListIndex(0),
-      itsSymbolIndexingMapListIndex(-1),
       fUseContourFeathering(false),
       fIsoLineLabelsOverLapping(true),
       fShowColorLegend(false),
@@ -122,16 +98,8 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       GeneralVisualization(),
       SimpleColorContour(),
       CustomColorContour(),
+      SymbolSettings(),
       itsPriority(thePriority),
-      itsStationDataViewType(NFmiMetEditorTypes::kFmiTextView),
-      itsFrameColor(NFmiColor(0., 0., 0.))  // musta
-      ,
-      itsFillColor(NFmiColor(0., 0., 0.))  // musta
-      ,
-      itsRelativeSize(NFmiPoint(1, 1)),
-      itsRelativePositionOffset(NFmiPoint(0, 0)),
-      itsOnlyOneSymbolRelativeSize(NFmiPoint(1, 1)),
-      itsOnlyOneSymbolRelativePositionOffset(NFmiPoint(0, 0)),
       itsModifyingStep(1.)
       //, fModifyingUnit						 (true)
       ,
@@ -142,22 +110,6 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDataIdent& theParam,
       itsTimeSeriesScaleMin(0),
       itsTimeSeriesScaleMax(100),
       itsPossibleViewTypeCount(2),
-      fShowNumbers(true),
-      fShowMasks(false)  // tämä on turha
-      ,
-      fShowColors(false),
-      fShowColoredNumbers(false),
-      fZeroColorMean(false),
-      itsStationSymbolColorShadeLowValue(0),
-      itsStationSymbolColorShadeMidValue(50),
-      itsStationSymbolColorShadeHighValue(100),
-      itsStationSymbolColorShadeLowValueColor(0, 0, 1),
-      itsStationSymbolColorShadeMidValueColor(0, 1, 0),
-      itsStationSymbolColorShadeHighValueColor(0, 1, 0),
-      itsStationSymbolColorShadeClassCount(9),
-      fUseSymbolsInTextMode(false),
-      itsUsedSymbolListIndex(0),
-      itsSymbolIndexingMapListIndex(-1),
       fUseContourFeathering(false),
       fIsoLineLabelsOverLapping(true),
       fShowColorLegend(false),
@@ -194,14 +146,8 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       GeneralVisualization(other),
       SimpleColorContour(other),
       CustomColorContour(other),
+      SymbolSettings(other),
       itsPriority(other.itsPriority),
-      itsStationDataViewType(other.itsStationDataViewType),
-      itsFrameColor(other.itsFrameColor),
-      itsFillColor(other.itsFillColor),
-      itsRelativeSize(other.itsRelativeSize),
-      itsRelativePositionOffset(other.itsRelativePositionOffset),
-      itsOnlyOneSymbolRelativeSize(other.itsOnlyOneSymbolRelativeSize),
-      itsOnlyOneSymbolRelativePositionOffset(other.itsOnlyOneSymbolRelativePositionOffset),
       itsModifyingStep(other.itsModifyingStep)
       //, fModifyingUnit(other.fModifyingUnit)
       ,
@@ -212,25 +158,11 @@ NFmiDrawParam::NFmiDrawParam(const NFmiDrawParam& other)
       itsTimeSeriesScaleMin(other.itsTimeSeriesScaleMin),
       itsTimeSeriesScaleMax(other.itsTimeSeriesScaleMax),
       itsPossibleViewTypeCount(other.itsPossibleViewTypeCount),
-      fShowNumbers(other.fShowNumbers),
-      fShowMasks(other.fShowMasks),
-      fShowColors(other.fShowColors),
-      fShowColoredNumbers(other.fShowColoredNumbers),
-      fZeroColorMean(other.fZeroColorMean)
+
       //***********************************************
       //********** 'versio 2' parametreja *************
       //***********************************************
-      ,
-      itsStationSymbolColorShadeLowValue(other.itsStationSymbolColorShadeLowValue),
-      itsStationSymbolColorShadeMidValue(other.itsStationSymbolColorShadeMidValue),
-      itsStationSymbolColorShadeHighValue(other.itsStationSymbolColorShadeHighValue),
-      itsStationSymbolColorShadeLowValueColor(other.itsStationSymbolColorShadeLowValueColor),
-      itsStationSymbolColorShadeMidValueColor(other.itsStationSymbolColorShadeMidValueColor),
-      itsStationSymbolColorShadeHighValueColor(other.itsStationSymbolColorShadeHighValueColor),
-      itsStationSymbolColorShadeClassCount(other.itsStationSymbolColorShadeClassCount),
-      fUseSymbolsInTextMode(other.fUseSymbolsInTextMode),
-      itsUsedSymbolListIndex(other.itsUsedSymbolListIndex),
-      itsSymbolIndexingMapListIndex(other.itsSymbolIndexingMapListIndex),
+
       fUseContourFeathering(other.fUseContourFeathering),
       fIsoLineLabelsOverLapping(other.fIsoLineLabelsOverLapping),
       fShowColorLegend(other.fShowColorLegend),
@@ -301,17 +233,17 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     itsPriority = theDrawParam->Priority();
 
     GeneralVisualization::ViewType(theDrawParam->ViewType());
-    itsStationDataViewType = theDrawParam->StationDataViewType();
+    SymbolSettings::StationDataViewType(theDrawParam->StationDataViewType());
 
-    itsFrameColor = NFmiColor(theDrawParam->FrameColor());
-    itsFillColor = NFmiColor(theDrawParam->FillColor());
+    SymbolSettings::FrameColor(NFmiColor(theDrawParam->FrameColor()));
+    SymbolSettings::FillColor(NFmiColor(theDrawParam->FillColor()));
     SimpleIsoline::IsolineLabelBoxFillColor(NFmiColor(theDrawParam->IsolineLabelBoxFillColor()));
 
-    itsRelativeSize = NFmiPoint(theDrawParam->RelativeSize());
-    itsRelativePositionOffset = NFmiPoint(theDrawParam->RelativePositionOffset());
-    itsOnlyOneSymbolRelativeSize = NFmiPoint(theDrawParam->OnlyOneSymbolRelativeSize());
-    itsOnlyOneSymbolRelativePositionOffset =
-        NFmiPoint(theDrawParam->OnlyOneSymbolRelativePositionOffset());
+    SymbolSettings::RelativeSize(NFmiPoint(theDrawParam->RelativeSize()));
+    SymbolSettings::RelativePositionOffset(NFmiPoint(theDrawParam->RelativePositionOffset()));
+    SymbolSettings::OnlyOneSymbolRelativeSize(NFmiPoint(theDrawParam->OnlyOneSymbolRelativeSize()));
+    SymbolSettings::OnlyOneSymbolRelativePositionOffset(
+        NFmiPoint(theDrawParam->OnlyOneSymbolRelativePositionOffset()));
 
     CustomColorContour::UseIsoLineGabWithCustomContours(
         theDrawParam->UseIsoLineGabWithCustomContours());
@@ -348,11 +280,11 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
 
     GeneralData::Unit(theDrawParam->Unit());
 
-    fShowNumbers = theDrawParam->ShowNumbers();
-    fShowMasks = theDrawParam->ShowMasks();
-    fShowColors = theDrawParam->ShowColors();
-    fShowColoredNumbers = theDrawParam->ShowColoredNumbers();
-    fZeroColorMean = theDrawParam->ZeroColorMean();
+    SymbolSettings::ShowNumbers(theDrawParam->ShowNumbers());
+    SymbolSettings::ShowMasks(theDrawParam->ShowMasks());
+    SymbolSettings::ShowColors(theDrawParam->ShowColors());
+    SymbolSettings::ShowColoredNumbers(theDrawParam->ShowColoredNumbers());
+    SymbolSettings::ZeroColorMean(theDrawParam->ZeroColorMean());
     GeneralVisualization::ShowDifference(theDrawParam->ShowDifference());
     GeneralVisualization::ShowDifferenceToOriginalData(
         theDrawParam->ShowDifferenceToOriginalData());
@@ -360,17 +292,23 @@ void NFmiDrawParam::Init(const NFmiDrawParam* theDrawParam, bool fInitOnlyDrawin
     //***********************************************
     //********** 'versio 2' parametreja *************
     //***********************************************
-    itsStationSymbolColorShadeLowValue = theDrawParam->StationSymbolColorShadeLowValue();
-    itsStationSymbolColorShadeMidValue = theDrawParam->StationSymbolColorShadeMidValue();
-    itsStationSymbolColorShadeHighValue = theDrawParam->StationSymbolColorShadeHighValue();
-    itsStationSymbolColorShadeLowValueColor = theDrawParam->StationSymbolColorShadeLowValueColor();
-    itsStationSymbolColorShadeMidValueColor = theDrawParam->StationSymbolColorShadeMidValueColor();
-    itsStationSymbolColorShadeHighValueColor =
-        theDrawParam->StationSymbolColorShadeHighValueColor();
-    itsStationSymbolColorShadeClassCount = theDrawParam->StationSymbolColorShadeClassCount();
-    fUseSymbolsInTextMode = theDrawParam->UseSymbolsInTextMode();
-    itsUsedSymbolListIndex = theDrawParam->UsedSymbolListIndex();
-    itsSymbolIndexingMapListIndex = theDrawParam->SymbolIndexingMapListIndex();
+    SymbolSettings::StationSymbolColorShadeLowValue(
+        theDrawParam->StationSymbolColorShadeLowValue());
+    SymbolSettings::StationSymbolColorShadeMidValue(
+        theDrawParam->StationSymbolColorShadeMidValue());
+    SymbolSettings::StationSymbolColorShadeHighValue(
+        theDrawParam->StationSymbolColorShadeHighValue());
+    SymbolSettings::StationSymbolColorShadeLowValueColor(
+        theDrawParam->StationSymbolColorShadeLowValueColor());
+    SymbolSettings::StationSymbolColorShadeMidValueColor(
+        theDrawParam->StationSymbolColorShadeMidValueColor());
+    SymbolSettings::StationSymbolColorShadeHighValueColor(
+        theDrawParam->StationSymbolColorShadeHighValueColor());
+    SymbolSettings::StationSymbolColorShadeClassCount(
+        theDrawParam->StationSymbolColorShadeClassCount());
+    SymbolSettings::UseSymbolsInTextMode(theDrawParam->UseSymbolsInTextMode());
+    SymbolSettings::UsedSymbolListIndex(theDrawParam->UsedSymbolListIndex());
+    SymbolSettings::SymbolIndexingMapListIndex(theDrawParam->SymbolIndexingMapListIndex());
     GeneralVisualization::GridDataPresentationStyle(theDrawParam->GridDataPresentationStyle());
     GeneralVisualization::UseIsoLineFeathering(theDrawParam->UseIsoLineFeathering());
     fIsoLineLabelsOverLapping = theDrawParam->IsoLineLabelsOverLapping();
@@ -596,9 +534,9 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
                          // luku/kirjoitus operaatiot eivät mene rikki
 
   file << "'FrameColor'" << endl;  // selittävä teksti
-  file << itsFrameColor << endl;
+  file << SymbolSettings::FrameColor() << endl;
   file << "'FillColor'" << endl;  // selittävä teksti
-  file << itsFillColor << endl;
+  file << SymbolSettings::FillColor() << endl;
   file << "'IsolineLabelBoxFillColor'" << endl;  // selittävä teksti
   file << SimpleIsoline::IsolineLabelBoxFillColor() << endl;
 
@@ -613,13 +551,13 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
   file << itsTimeSeriesScaleMax << endl;
 
   file << "'RelativeSize'" << endl;  // selittävä teksti
-  file << itsRelativeSize;
+  file << SymbolSettings::RelativeSize();
   file << "'RelativePositionOffset'" << endl;  // selittävä teksti
-  file << itsRelativePositionOffset;
+  file << SymbolSettings::RelativePositionOffset();
   file << "'OnlyOneSymbolRelativeSize'" << endl;  // selittävä teksti
-  file << itsOnlyOneSymbolRelativeSize;
+  file << SymbolSettings::OnlyOneSymbolRelativeSize();
   file << "'OnlyOneSymbolRelativePositionOffset'" << endl;  // selittävä teksti
-  file << itsOnlyOneSymbolRelativePositionOffset;
+  file << SymbolSettings::OnlyOneSymbolRelativePositionOffset();
 
   file << "'PossibleViewTypeCount'" << endl;  // selittävä teksti
   file << itsPossibleViewTypeCount << endl;
@@ -640,39 +578,39 @@ std::ostream& NFmiDrawParam::Write(std::ostream& file) const
   // lukuun 100. Luettaessa vähennetään tuo 100. Jos luku tällöin
   // on pienempi kuin 1, annetaan arvoksi 1.
   file << "'StationDataViewType'" << endl;  // selittävä teksti
-  file << static_cast<int>(itsStationDataViewType + 100) << endl;
+  file << static_cast<int>(SymbolSettings::StationDataViewType() + 100) << endl;
   file << "'EditableParam'" << endl;  // selittävä teksti
   file << false << endl;     // tämä muuttuja poistettu, muttä jokin arvo laitettava tähän
   file << "'Unit'" << endl;  // selittävä teksti
   file << GeneralData::Unit() << endl;
 
   file << "'ShowNumbers'" << endl;  // selittävä teksti
-  file << fShowNumbers << endl;
+  file << SymbolSettings::ShowNumbers() << endl;
 
   file << "'ShowMasks'" << endl;  // selittävä teksti
-  file << fShowMasks << endl;
+  file << SymbolSettings::ShowMasks() << endl;
   file << "'ShowColors'" << endl;  // selittävä teksti
-  file << fShowColors << endl;
+  file << SymbolSettings::ShowColors() << endl;
   file << "'ShowColoredNumbers'" << endl;  // selittävä teksti
-  file << fShowColoredNumbers << endl;
+  file << SymbolSettings::ShowColoredNumbers() << endl;
   file << "'ZeroColorMean'" << endl;  // selittävä teksti
-  file << fZeroColorMean << endl;
+  file << SymbolSettings::ZeroColorMean() << endl;
 
   if (itsFileVersionNumber >= 2.)  // tämä on vain esimerkki siitä mitä joskus tulee olemaan
   {
     //***********************************************
     //********** 'versio 2' parametreja *************
     //***********************************************
-    file << itsStationSymbolColorShadeLowValue << endl;
-    file << itsStationSymbolColorShadeMidValue << endl;
-    file << itsStationSymbolColorShadeHighValue << endl;
-    file << itsStationSymbolColorShadeLowValueColor << endl;
-    file << itsStationSymbolColorShadeMidValueColor << endl;
-    file << itsStationSymbolColorShadeHighValueColor << endl;
-    file << itsStationSymbolColorShadeClassCount << endl;
-    file << fUseSymbolsInTextMode << endl;
-    file << itsUsedSymbolListIndex << endl;
-    file << itsSymbolIndexingMapListIndex << endl;
+    file << SymbolSettings::StationSymbolColorShadeLowValue() << endl;
+    file << SymbolSettings::StationSymbolColorShadeMidValue() << endl;
+    file << SymbolSettings::StationSymbolColorShadeHighValue() << endl;
+    file << SymbolSettings::StationSymbolColorShadeLowValueColor() << endl;
+    file << SymbolSettings::StationSymbolColorShadeMidValueColor() << endl;
+    file << SymbolSettings::StationSymbolColorShadeHighValueColor() << endl;
+    file << SymbolSettings::StationSymbolColorShadeClassCount() << endl;
+    file << SymbolSettings::UseSymbolsInTextMode() << endl;
+    file << SymbolSettings::UsedSymbolListIndex() << endl;
+    file << SymbolSettings::SymbolIndexingMapListIndex() << endl;
     file << GeneralVisualization::GridDataPresentationStyle() << endl;
     file << GeneralVisualization::UseIsoLineFeathering() << endl;
     file << fIsoLineLabelsOverLapping << endl;
@@ -875,6 +813,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
   float tmpFloat2 = 0.0;
   double tmpDouble = 0.0;
   NFmiColor tmpColor;
+  NFmiPoint tmpPoint;
   if (!file)
     return file;
   file >> temp;
@@ -937,9 +876,11 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       file >> temp;  // luetaan legacy-koodi modifyingUnit pois
 
       file >> temp;  // luetaan nimike pois
-      file >> itsFrameColor;
+      file >> tmpColor;
+      SymbolSettings::FrameColor(tmpColor);
       file >> temp;  // luetaan nimike pois
-      file >> itsFillColor;
+      file >> tmpColor;
+      SymbolSettings::FillColor(tmpColor);
       file >> temp;  // luetaan nimike pois
       file >> tmpColor;
       SimpleIsoline::IsolineLabelBoxFillColor(tmpColor);
@@ -958,13 +899,17 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       file >> itsTimeSeriesScaleMax;
 
       file >> temp;  // luetaan nimike pois
-      file >> itsRelativeSize;
+      file >> tmpPoint;
+      SymbolSettings::RelativeSize(tmpPoint);
       file >> temp;  // luetaan nimike pois
-      file >> itsRelativePositionOffset;
+      file >> tmpPoint;
+      SymbolSettings::RelativePositionOffset(tmpPoint);
       file >> temp;  // luetaan nimike pois
-      file >> itsOnlyOneSymbolRelativeSize;
+      file >> tmpPoint;
+      SymbolSettings::OnlyOneSymbolRelativeSize(tmpPoint);
       file >> temp;  // luetaan nimike pois
-      file >> itsOnlyOneSymbolRelativePositionOffset;
+      file >> tmpPoint;
+      SymbolSettings::OnlyOneSymbolRelativePositionOffset(tmpPoint);
 
       file >> temp;  // luetaan nimike pois
       file >> itsPossibleViewTypeCount;
@@ -997,7 +942,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       number -= 100;
       if (number < 1)
         number = 1;
-      itsStationDataViewType = NFmiMetEditorTypes::View(number);
+      SymbolSettings::StationDataViewType(NFmiMetEditorTypes::View(number));
       file >> temp;     // luetaan nimike pois
       file >> tmpBool;  // tämä on legacy koodia, pitää lukea bool arvo tässä
 
@@ -1008,15 +953,20 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       GeneralData::Unit(std::string(temp));
 
       file >> temp;  // luetaan nimike pois
-      file >> fShowNumbers;
+      file >> tmpBool;
+      SymbolSettings::ShowNumbers(tmpBool);
       file >> temp;  // luetaan nimike pois
-      file >> fShowMasks;
+      file >> tmpBool;
+      SymbolSettings::ShowMasks(tmpBool);
       file >> temp;  // luetaan nimike pois
-      file >> fShowColors;
+      file >> tmpBool;
+      SymbolSettings::ShowColors(tmpBool);
       file >> temp;  // luetaan nimike pois
-      file >> fShowColoredNumbers;
+      file >> tmpBool;
+      SymbolSettings::ShowColoredNumbers(tmpBool);
       file >> temp;  // luetaan nimike pois
-      file >> fZeroColorMean;
+      file >> tmpBool;
+      SymbolSettings::ZeroColorMean(tmpBool);
 
       //***********************************************
       //********** 'versio 2' parametreja *************
@@ -1025,16 +975,27 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
       {
         if (!file)
           return file;
-        file >> itsStationSymbolColorShadeLowValue;
-        file >> itsStationSymbolColorShadeMidValue;
-        file >> itsStationSymbolColorShadeHighValue;
-        file >> itsStationSymbolColorShadeLowValueColor;
-        file >> itsStationSymbolColorShadeMidValueColor;
-        file >> itsStationSymbolColorShadeHighValueColor;
-        file >> itsStationSymbolColorShadeClassCount;
-        file >> fUseSymbolsInTextMode;
-        file >> itsUsedSymbolListIndex;
-        file >> itsSymbolIndexingMapListIndex;
+
+        file >> tmpFloat;
+        SymbolSettings::StationSymbolColorShadeLowValue(tmpFloat);
+        file >> tmpFloat;
+        SymbolSettings::StationSymbolColorShadeMidValue(tmpFloat);
+        file >> tmpFloat;
+        SymbolSettings::StationSymbolColorShadeHighValue(tmpFloat);
+        file >> tmpColor;
+        SymbolSettings::StationSymbolColorShadeLowValueColor(tmpColor);
+        file >> tmpColor;
+        SymbolSettings::StationSymbolColorShadeMidValueColor(tmpColor);
+        file >> tmpColor;
+        SymbolSettings::StationSymbolColorShadeHighValueColor(tmpColor);
+        file >> number;
+        SymbolSettings::StationSymbolColorShadeClassCount(number);
+        file >> tmpBool;
+        SymbolSettings::UseSymbolsInTextMode(tmpBool);
+        file >> number;
+        SymbolSettings::UsedSymbolListIndex(number);
+        file >> number;
+        SymbolSettings::SymbolIndexingMapListIndex(number);
         file >> number;
         GeneralVisualization::GridDataPresentationStyle(number);
         file >> tmpBool;
@@ -1077,6 +1038,7 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
 
         if (!file)
           return file;
+
         int i = 0;
         int size;
         file >> size;
