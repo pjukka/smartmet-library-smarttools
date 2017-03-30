@@ -194,7 +194,6 @@ class NFmiSoundingDataOpt1
       const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
       std::deque<float> &data,
       NFmiQueryDataUtil::SignificantSoundingLevels &significantLevels);
-  bool IsMovingSounding(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
 
   NFmiLocation itsLocation;
   NFmiMetTime itsTime;

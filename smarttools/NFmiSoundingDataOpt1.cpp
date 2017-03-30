@@ -15,6 +15,7 @@
 #include <newbase/NFmiInterpolation.h>
 #include <newbase/NFmiValueString.h>
 #include <newbase/NFmiQueryDataUtil.h>
+#include <newbase/NFmiFastInfoUtils.h>
 
 #include <fstream>
 
@@ -987,98 +988,6 @@ void NFmiSoundingDataOpt1::CutEmptyData(void)
   itsTotalCloudinessData.resize(greatestNonMissingLevelIndex);
 }
 
-static bool FindTimeIndexies(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-                             const NFmiMetTime &theStartTime,
-                             long minuteRange,
-                             unsigned long &timeIndex1,
-                             unsigned long &timeIndex2)
-{
-  theInfo->FindNearestTime(theStartTime, kBackward);
-  timeIndex1 = theInfo->TimeIndex();
-  NFmiMetTime endTime(theStartTime);
-  endTime.ChangeByMinutes(minuteRange);
-  theInfo->FindNearestTime(endTime, kBackward);
-  timeIndex2 = theInfo->TimeIndex();
-
-  if (timeIndex1 == timeIndex2)  // pitää testata erikois tapaus, koska TimeToNearestStep-palauttaa
-                                 // aina jotain, jos on dataa
-  {
-    theInfo->TimeIndex(timeIndex1);
-    NFmiMetTime foundTime(theInfo->Time());
-    if (foundTime > endTime || foundTime < theStartTime)  // jos löydetty aika on alku ja loppu ajan
-                                                          // ulkopuolella ei piirretä salamaa
-      return false;
-  }
-  return true;
-}
-
-static bool FindAmdarSoundingTime(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
-                                  const NFmiMetTime &theTime,
-                                  NFmiLocation &theLocation)
-{
-  theInfo->FirstLocation();  // amdareissa vain yksi dummy paikka, laitetaan se päälle
-  NFmiMetTime timeStart(theTime);
-  timeStart.ChangeByMinutes(-30);
-  unsigned long timeIndex1 = 0;
-  unsigned long timeIndex2 = 0;
-  if (::FindTimeIndexies(theInfo, timeStart, 60, timeIndex1, timeIndex2) == false)
-    return false;
-
-  float lat = 0;
-  float lon = 0;
-  theInfo->Param(kFmiLatitude);
-  unsigned long latIndex = theInfo->ParamIndex();
-  theInfo->Param(kFmiLongitude);
-  unsigned long lonIndex = theInfo->ParamIndex();
-  double minDistance = 99999999;
-  unsigned long minDistTimeInd = static_cast<unsigned long>(-1);
-  for (unsigned long i = timeIndex1; i <= timeIndex2; i++)
-  {
-    theInfo->TimeIndex(i);
-
-    for (theInfo->ResetLevel(); theInfo->NextLevel();)
-    {
-      theInfo->ParamIndex(latIndex);
-      lat = theInfo->FloatValue();
-      theInfo->ParamIndex(lonIndex);
-      lon = theInfo->FloatValue();
-
-      if (lat != kFloatMissing && lon != kFloatMissing)
-      {
-        NFmiLocation loc(NFmiPoint(lon, lat));
-        double currDist = theLocation.Distance(loc);
-        if (currDist < minDistance)
-        {
-          minDistance = currDist;
-          minDistTimeInd = i;
-        }
-      }
-    }
-  }
-  if (minDistance < 1000 * 1000)  // jos lento löytyi vähintäin 1000 km säteeltä hiiren
-                                  // klikkauspaikasta, otetaan kyseinen amdar piirtoon
-  {
-    theInfo->TimeIndex(minDistTimeInd);
-    // pitää lisäksi asettaa locationiksi luotauksen alkupiste
-    theInfo->FirstLevel();
-    theInfo->ParamIndex(latIndex);
-    lat = theInfo->FloatValue();
-    theInfo->ParamIndex(lonIndex);
-    lon = theInfo->FloatValue();
-    theLocation.SetLatitude(lat);
-    theLocation.SetLongitude(lon);
-
-    return true;
-  }
-
-  return false;
-}
-
-bool NFmiSoundingDataOpt1::IsMovingSounding(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
-{
-  return theInfo->HasLatlonInfoInData();
-}
-
 // Tälle anntaan asema dataa ja ei tehdä minkäänlaisia interpolointeja.
 bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
                                             const NFmiMetTime &theTime,
@@ -1093,11 +1002,11 @@ bool NFmiSoundingDataOpt1::FillSoundingData(const boost::shared_ptr<NFmiFastQuer
   {
     fObservationData = true;
     theInfo->FirstLevel();
-    bool isMovingSounding = IsMovingSounding(theInfo);
+    bool isMovingSounding = NFmiFastInfoUtils::IsMovingSoundingData(theInfo);
     bool timeOk = false;
     if (isMovingSounding)
     {
-      timeOk = ::FindAmdarSoundingTime(theInfo, usedTime, usedLocation);
+      timeOk = NFmiFastInfoUtils::FindMovingSoundingDataTime(theInfo, usedTime, usedLocation);
       usedTime = theInfo->Time();
     }
     else
