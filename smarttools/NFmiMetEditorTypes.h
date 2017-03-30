@@ -1,11 +1,8 @@
 // ======================================================================
 /*!
  * \file NFmiMetEditorTypes.h
- * \brief NFmiInfoData namespace declarations \par
+ * \brief NFmiInfoData namespace declarations
  *
- * Tähän on kerätty määrityksiä, mitä tarvitaan mm. erilaisten maskien
- * ja datojen määrityksissä. Olen kerännyt ne tähän, koska Metkun editorin
- * luokkakirjastojen siivous vaatii tietyn koodin siirtämistä newbase:en.
  */
 // ======================================================================
 
@@ -13,8 +10,7 @@
 
 namespace NFmiMetEditorTypes
 {
-typedef enum
-{
+typedef enum {
   kFmiTextView = 1,
   kFmiIsoLineView = 2,
   kFmiColorContourView = 3,
@@ -31,11 +27,10 @@ typedef enum
   kFmiBetterWeatherSymbolView = 14
 } View;
 
-typedef enum
-{
+typedef enum {
   kFmiNoMask = 1,
   kFmiSelectionMask = 4,
-  kFmiDisplayedMask = 16
+  kFmiDisplayedMask = 16,
 } Mask;
 
 enum FmiUsedSmartMetTool
@@ -50,4 +45,3 @@ enum FmiUsedSmartMetTool
 };
 
 }  // end of namespace NFmiMetEditorTypes
-
