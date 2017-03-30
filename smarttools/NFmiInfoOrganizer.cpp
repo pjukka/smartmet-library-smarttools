@@ -8,6 +8,7 @@
 #include <newbase/NFmiGrid.h>
 #include <newbase/NFmiLatLonArea.h>
 #include <newbase/NFmiQueryDataUtil.h>
+#include <newbase/NFmiFastInfoUtils.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4239)  // poistaa VC++ 2010 varoituksen: warning C4239: nonstandard
@@ -666,12 +667,6 @@ static bool CheckForParams(boost::shared_ptr<NFmiFastQueryInfo> &theInfo,
   return false;
 }
 
-bool NFmiInfoOrganizer::IsAmdarData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
-{
-  theInfo->FirstLevel();
-  return (theInfo->Level()->LevelType() == kFmiAmdarLevel);
-}
-
 bool NFmiInfoOrganizer::IsTempData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo)
 {
   theInfo->FirstLevel();
@@ -763,10 +758,10 @@ int NFmiInfoOrganizer::IsGoodSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &
       if (theInfo->SizeLevels() >
           3)  // pitää olla väh 4 leveliä ennen kuin kelpuutetaan sounding dataksi
       {
-        // Datassa pitää olla tiettyjä parametreja, että se kelpaa luotaukseen, ja amdarit on
-        // poikkeus, ne pitää päästää läpi myös, koska niilla ei ole muka 'vertikaali' dataa
+        // Datassa pitää olla tiettyjä parametreja, että se kelpaa luotaukseen, ja liikkuvat 
+        // luotaukset ovat poikkeus, ne pitää päästää läpi myös, koska niilla ei ole muka 'vertikaali' dataa
         if (HasGoodParamsForSoundingData(theInfo, paramCheckFlags) ||
-            NFmiInfoOrganizer::IsAmdarData(theInfo))
+            NFmiFastInfoUtils::IsMovingSoundingData(theInfo))
         {
           if (theInfo->DataType() == NFmiInfoData::kHybridData)
             return 2;

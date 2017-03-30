@@ -82,7 +82,6 @@ class NFmiInfoOrganizer
   int CleanUnusedDataFromMemory(void);
   static boost::shared_ptr<NFmiFastQueryInfo> DoDynamicShallowCopy(
       const boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
-  static bool IsAmdarData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
   static bool IsTempData(boost::shared_ptr<NFmiFastQueryInfo> &theInfo);
   static bool IsTempData(unsigned long theProducerId, bool includeRawTemp = false);
   static int CalcWantedParameterCount(boost::shared_ptr<NFmiFastQueryInfo> &info,
