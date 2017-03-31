@@ -774,17 +774,37 @@ int NFmiInfoOrganizer::IsGoodSoundingData(boost::shared_ptr<NFmiFastQueryInfo> &
   return 0;
 }
 
+static bool IsGivenTimeInDataRange(const boost::shared_ptr<NFmiFastQueryInfo> &info, const NFmiMetTime &wantedDataTime)
+{
+    if(!info)
+        return false;
+    if(wantedDataTime == NFmiMetTime::gMissingTime)
+        return true; // with missing-time we don't care if time in data's range
+    return info->TimeDescriptor().IsInside(wantedDataTime);
+}
+
 // Hakee parhaan luotaus infon tuottajalle. Eli jos kyseessä esim hirlam tuottaja, katsotaan
 // löytyykö
 // hybridi dataa ja sitten tyydytään viewable-dataa (= painepinta)
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindSoundingInfo(
     const NFmiProducer &theProducer, int theIndex, ParamCheckFlags paramCheckFlags)
 {
+    return FindSoundingInfo(theProducer, NFmiMetTime::gMissingTime, theIndex, paramCheckFlags);
+}
+
+boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::FindSoundingInfo(
+        const NFmiProducer &theProducer,
+        const NFmiMetTime &theDataTime,
+        int theIndex,
+        ParamCheckFlags paramCheckFlags)
+{
   boost::shared_ptr<NFmiFastQueryInfo> exceptableInfo;
   for (MapType::iterator iter = itsDataMap.begin(); iter != itsDataMap.end(); ++iter)
   {
     boost::shared_ptr<NFmiFastQueryInfo> aInfo = iter->second->GetDataKeeper()->GetIter();
     int result = IsGoodSoundingData(aInfo, theProducer, false, paramCheckFlags);
+    if(!::IsGivenTimeInDataRange(aInfo, theDataTime))
+        result = 0;
     if (result != 0 && theIndex < 0)
     {  // haetaan vanhempaa malliajo dataa
       boost::shared_ptr<NFmiQueryDataKeeper> qDataKeeper = iter->second->GetDataKeeper(theIndex);

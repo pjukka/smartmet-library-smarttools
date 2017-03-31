@@ -142,6 +142,12 @@ class NFmiInfoOrganizer
       int theIndex = 0,
       ParamCheckFlags paramCheckFlags =
           ParamCheckFlags());  // Hakee parhaan luotaus infon tuottajalle
+  boost::shared_ptr<NFmiFastQueryInfo> FindSoundingInfo(
+      const NFmiProducer &theProducer,
+      const NFmiMetTime &theDataTime,
+      int theIndex = 0,
+      ParamCheckFlags paramCheckFlags =
+      ParamCheckFlags());  // Hakee parhaan luotaus infon tuottajalle
   boost::shared_ptr<NFmiFastQueryInfo> GetPrioritizedSoundingInfo(
       ParamCheckFlags paramCheckFlags =
           ParamCheckFlags());  // Hakee tietyn prioriteetin mukaisesti parhaan luotaus-infon
