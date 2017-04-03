@@ -4,16 +4,16 @@
 %define DEVELNAME %{SPECNAME}-devel
 Summary: smarttools library
 Name: %{SPECNAME}
-Version: 17.3.28
+Version: 17.4.3
 Release: 1%{?dist}.fmi
 License: MIT
 Group: Development/Libraries
 URL: https://github.com/fmidev/smartmet-library-smarttools
 Source: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
-BuildRequires: smartmet-library-newbase-devel >= 17.3.28
+BuildRequires: smartmet-library-newbase-devel >= 17.4.3
 BuildRequires: boost-devel
-Requires: smartmet-library-newbase >= 17.3.28
+Requires: smartmet-library-newbase >= 17.4.3
 Provides: %{LIBNAME}
 Obsoletes: libsmartmet-smarttools < 17.1.4
 Obsoletes: libsmartmet-smarttools-debuginfo < 17.1.4
@@ -56,6 +56,10 @@ FMI smarttools development files
 
 
 %changelog
+* Mon Apr  3 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.4.3-1.fmi
+- Improved handling of sounding data
+- Bug fix to sounding interpolations
+
 * Tue Mar 28 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.3.28-1.fmi
 - Refactored some code into newbase
 
