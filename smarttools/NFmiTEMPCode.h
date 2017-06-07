@@ -4,8 +4,8 @@
 #include <newbase/NFmiMetTime.h>
 #include <newbase/NFmiStation.h>
 
-#include <vector>
 #include <map>
+#include <vector>
 
 class NFmiQueryData;
 class NFmiAviationStationInfoSystem;
@@ -77,6 +77,7 @@ class NFmiTEMPCode
   const NFmiStation &Station(void) const { return itsStation; }
   void Station(const NFmiStation &theStation) { itsStation = theStation; }
   const std::map<double, TEMPLevelData> &LevelData(void) const { return itsLevels; }
+
  private:
   int Decode(void);
   bool DecodeA(void);
@@ -98,4 +99,3 @@ class NFmiTEMPCode
 
   std::map<double, TEMPLevelData> itsLevels;
 };
-

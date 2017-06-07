@@ -18,12 +18,12 @@
 // laskut suoritetaan.
 //**********************************************************
 
-#include <newbase/NFmiParamBag.h>
+#include <boost/shared_ptr.hpp>
+#include <newbase/NFmiAreaMask.h>
 #include <newbase/NFmiDataMatrix.h>
 #include <newbase/NFmiInfoData.h>
 #include <newbase/NFmiLevelType.h>
-#include <newbase/NFmiAreaMask.h>
-#include <boost/shared_ptr.hpp>
+#include <newbase/NFmiParamBag.h>
 #include <string>
 
 class NFmiInfoOrganizer;
@@ -68,6 +68,7 @@ class NFmiSmartToolCalculationBlockVector
   void Add(const boost::shared_ptr<NFmiSmartToolCalculationBlock> &theBlock);
   Iterator Begin(void) { return itsCalculationBlocks.begin(); }
   Iterator End(void) { return itsCalculationBlocks.end(); }
+
  private:
   // luokka ei omista vektorissa olevia otuksia, Clear pitää kutsua erikseen!!!
   checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlock> > itsCalculationBlocks;

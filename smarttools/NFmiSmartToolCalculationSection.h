@@ -11,9 +11,9 @@
 // P = P + 2
 //**********************************************************
 
-#include <newbase/NFmiDataMatrix.h>
-#include <newbase/NFmiAreaMask.h>
 #include <boost/shared_ptr.hpp>
+#include <newbase/NFmiAreaMask.h>
+#include <newbase/NFmiDataMatrix.h>
 
 class NFmiPoint;
 class NFmiMetTime;

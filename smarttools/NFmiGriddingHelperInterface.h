@@ -1,7 +1,7 @@
 #pragma once
 
-#include <newbase/NFmiDataMatrix.h>
 #include <boost/shared_ptr.hpp>
+#include <newbase/NFmiDataMatrix.h>
 
 class NFmiFastQueryInfo;
 class NFmiDrawParam;

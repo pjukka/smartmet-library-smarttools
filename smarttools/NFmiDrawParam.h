@@ -33,14 +33,14 @@
 #include "NFmiColor.h"
 #include "NFmiMetEditorTypes.h"
 
-#include <newbase/NFmiParameterName.h>
-#include <newbase/NFmiDataIdent.h>
-#include <newbase/NFmiPoint.h>
-#include <newbase/NFmiLevel.h>
-#include <newbase/NFmiInfoData.h>
-#include <newbase/NFmiDataMatrix.h>  // täältä tulee myös checkedVector
-#include <newbase/NFmiMetTime.h>
 #include <boost/shared_ptr.hpp>
+#include <newbase/NFmiDataIdent.h>
+#include <newbase/NFmiDataMatrix.h>  // täältä tulee myös checkedVector
+#include <newbase/NFmiInfoData.h>
+#include <newbase/NFmiLevel.h>
+#include <newbase/NFmiMetTime.h>
+#include <newbase/NFmiParameterName.h>
+#include <newbase/NFmiPoint.h>
 
 class NFmiDrawingEnvironment;
 
@@ -80,8 +80,7 @@ class NFmiDrawParam
   void TimeSerialModelRunCount(int newValue)
   {
     itsTimeSerialModelRunCount = newValue;
-    if (itsTimeSerialModelRunCount < 0)
-      itsTimeSerialModelRunCount = 0;
+    if (itsTimeSerialModelRunCount < 0) itsTimeSerialModelRunCount = 0;
   }
   int ModelRunDifferenceIndex(void) const { return itsModelRunDifferenceIndex; }
   void ModelRunDifferenceIndex(int newValue) { itsModelRunDifferenceIndex = newValue; }
@@ -162,15 +161,13 @@ class NFmiDrawParam
   void IsoLineGab(const double theIsoLineGab)
   {
     itsIsoLineGab = theIsoLineGab;
-    if (itsIsoLineGab == 0)
-      itsIsoLineGab = 1;  // gappi ei voi olla 0
+    if (itsIsoLineGab == 0) itsIsoLineGab = 1;  // gappi ei voi olla 0
   }
   double IsoLineGab(void) const { return itsIsoLineGab; };
   void ContourGab(const double theContourGab)
   {
     itsContourGab = theContourGab;
-    if (itsContourGab == 0)
-      itsContourGab = 1;
+    if (itsContourGab == 0) itsContourGab = 1;
   }
   double ContourGab(void) const { return itsContourGab; };
   void ModifyingStep(const double theModifyingStep) { itsModifyingStep = theModifyingStep; };
@@ -668,19 +665,16 @@ class NFmiDrawParam
   void IsoLineLabelDigitCount(int newValue)
   {
     itsIsoLineLabelDigitCount = newValue;
-    if (itsIsoLineLabelDigitCount > 10)
-      itsIsoLineLabelDigitCount = 10;
+    if (itsIsoLineLabelDigitCount > 10) itsIsoLineLabelDigitCount = 10;
     itsContourLabelDigitCount = newValue;
-    if (itsContourLabelDigitCount > 10)
-      itsContourLabelDigitCount = 10;
+    if (itsContourLabelDigitCount > 10) itsContourLabelDigitCount = 10;
   }
 
   int ContourLabelDigitCount(void) const { return itsContourLabelDigitCount; }
   void ContourLabelDigitCount(int newValue)
   {
     itsContourLabelDigitCount = newValue;
-    if (itsContourLabelDigitCount > 10)
-      itsContourLabelDigitCount = 10;
+    if (itsContourLabelDigitCount > 10) itsContourLabelDigitCount = 10;
   }
 
   //**************************************************************
@@ -690,10 +684,8 @@ class NFmiDrawParam
   void Alpha(float newValue)
   {
     itsAlpha = newValue;
-    if (itsAlpha < NFmiDrawParam::itsMinAlpha)
-      itsAlpha = NFmiDrawParam::itsMinAlpha;
-    if (itsAlpha > 100.f)
-      itsAlpha = 100.f;
+    if (itsAlpha < NFmiDrawParam::itsMinAlpha) itsAlpha = NFmiDrawParam::itsMinAlpha;
+    if (itsAlpha > 100.f) itsAlpha = 100.f;
   }
 
   bool ViewMacroDrawParam(void) const { return fViewMacroDrawParam; }
@@ -952,9 +944,5 @@ inline std::ostream& operator<<(std::ostream& os, const NFmiDrawParam& item)
 {
   return item.Write(os);
 }
-inline std::istream& operator>>(std::istream& is, NFmiDrawParam& item)
-{
-  return item.Read(is);
-}
+inline std::istream& operator>>(std::istream& is, NFmiDrawParam& item) { return item.Read(is); }
 //@}
-

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <newbase/NFmiProducer.h>
-#include <newbase/NFmiLevelType.h>
 #include <newbase/NFmiDataMatrix.h>
+#include <newbase/NFmiLevelType.h>
+#include <newbase/NFmiProducer.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -51,6 +51,7 @@ class NFmiExtraMacroParamData
   void ObservationRadiusInKm(float newValue) { itsObservationRadiusInKm = newValue; }
   float ObservationRadiusRelative() const { return itsObservationRadiusRelative; }
   void ObservationRadiusRelative(float newValue) { itsObservationRadiusRelative = newValue; }
+
  private:
   void InitializeResolutionWithEditedData(NFmiInfoOrganizer &theInfoOrganizer);
   void InitializeResolutionData(NFmiInfoOrganizer &theInfoOrganizer, float usedResolutionInKm);

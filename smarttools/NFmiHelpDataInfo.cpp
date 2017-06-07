@@ -8,12 +8,12 @@
 #endif
 
 #include "NFmiHelpDataInfo.h"
-#include <newbase/NFmiProducerName.h>
 #include <newbase/NFmiArea.h>
 #include <newbase/NFmiAreaFactory.h>
-#include <newbase/NFmiStereographicArea.h>
-#include <newbase/NFmiSettings.h>
 #include <newbase/NFmiFileString.h>
+#include <newbase/NFmiProducerName.h>
+#include <newbase/NFmiSettings.h>
+#include <newbase/NFmiStereographicArea.h>
 
 using namespace std;
 
@@ -100,8 +100,7 @@ NFmiHelpDataInfo &NFmiHelpDataInfo::operator=(const NFmiHelpDataInfo &theOther)
     itsFakeProducerId = theOther.itsFakeProducerId;
     itsImageProjectionString = theOther.itsImageProjectionString;
     itsImageDataIdent = theOther.itsImageDataIdent;
-    if (theOther.itsImageArea)
-      itsImageArea.reset(theOther.itsImageArea->Clone());
+    if (theOther.itsImageArea) itsImageArea.reset(theOther.itsImageArea->Clone());
     fNotifyOnLoad = theOther.fNotifyOnLoad;
     itsNotificationLabel = theOther.itsNotificationLabel;
     itsCustomMenuFolder = theOther.itsCustomMenuFolder;
@@ -158,8 +157,7 @@ static void FixPathEndWithSeparator(std::string &theFixedPathStr)
     theFixedPathStr = static_cast<char *>(tmpFileStr);
 
     std::string::value_type lastLetter = theFixedPathStr[theFixedPathStr.size() - 1];
-    if (lastLetter != kFmiDirectorySeparator)
-      theFixedPathStr.push_back(kFmiDirectorySeparator);
+    if (lastLetter != kFmiDirectorySeparator) theFixedPathStr.push_back(kFmiDirectorySeparator);
   }
 }
 
@@ -185,10 +183,8 @@ static void MakeCombinedDataFilePattern(NFmiHelpDataInfo &theDataInfo,
     size_t i = lastDirFilePattern.size() - 1;
     for (; i > 0; i--)
     {
-      if (lastDirFilePattern[i] == '\\')
-        slashesFound++;
-      if (slashesFound > 1)
-        break;
+      if (lastDirFilePattern[i] == '\\') slashesFound++;
+      if (slashesFound > 1) break;
     }
 
     if (slashesFound > 1)
@@ -240,8 +236,7 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey,
     itsModelRunTimeGapInHours =
         NFmiSettings::Optional<float>(itsBaseNameSpace + "::ModelRunTimeGapInHours", 0);
 
-    if (IsCombineData())
-      ::MakeCombinedDataFilePattern(*this, theHelpDataSystem);
+    if (IsCombineData()) ::MakeCombinedDataFilePattern(*this, theHelpDataSystem);
 
     std::string imageProjectionKey(itsBaseNameSpace + "::ImageProjection");
     if (NFmiSettings::IsSet(imageProjectionKey))
@@ -263,10 +258,7 @@ void NFmiHelpDataInfo::InitFromSettings(const std::string &theBaseKey,
   }
 }
 
-void NFmiHelpDataInfo::ImageArea(boost::shared_ptr<NFmiArea> &newValue)
-{
-  itsImageArea = newValue;
-}
+void NFmiHelpDataInfo::ImageArea(boost::shared_ptr<NFmiArea> &newValue) { itsImageArea = newValue; }
 
 static std::string MakeCacheFilePattern(const NFmiHelpDataInfo &theDataInfo,
                                         const NFmiHelpDataInfoSystem &theHelpDataSystem)
@@ -348,10 +340,8 @@ NFmiDataIdent NFmiHelpDataInfoSystem::GetNextSatelChannel(const NFmiDataIdent &t
       currentIndex++;
     else
       currentIndex--;
-    if (currentIndex < 0)
-      currentIndex = counter - 1;
-    if (currentIndex >= counter)
-      currentIndex = 0;
+    if (currentIndex < 0) currentIndex = counter - 1;
+    if (currentIndex >= counter) currentIndex = 0;
     returnDataIdent = dataIdentVec[currentIndex];
   }
   return returnDataIdent;
@@ -386,8 +376,7 @@ void NFmiHelpDataInfoSystem::InitDataType(const std::string &theBaseKey,
     // eri datojen enable-ominaisuudesta yhteen konffitiedostoon (mm.
     // helpdatainfo_enable_data_fmi_heavy.conf),
     // tuli mahdolliseksi, että tässä tuli ns. haamu dataInfoja, jotka nyt pitää karsia.
-    if (hdi.DataType() != NFmiInfoData::kNoDataType)
-      theHelpDataInfos.push_back(hdi);
+    if (hdi.DataType() != NFmiInfoData::kNoDataType) theHelpDataInfos.push_back(hdi);
   }
 }
 
@@ -526,8 +515,7 @@ static NFmiHelpDataInfo *FindHelpDataInfo(checkedVector<NFmiHelpDataInfo> &theHe
 // Käy ensin läpi dynaamiset helpDataInfot ja sitten staattiset.
 NFmiHelpDataInfo *NFmiHelpDataInfoSystem::FindHelpDataInfo(const std::string &theFileNameFilter)
 {
-  if (theFileNameFilter.empty())
-    return 0;
+  if (theFileNameFilter.empty()) return 0;
 
   NFmiHelpDataInfo *helpInfo =
       ::FindHelpDataInfo(itsDynamicHelpDataInfos, theFileNameFilter, *this);

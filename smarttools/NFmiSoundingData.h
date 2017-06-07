@@ -9,17 +9,16 @@
 
 #pragma once
 
-#include <newbase/NFmiMetTime.h>
-#include <newbase/NFmiLocation.h>
-#include <newbase/NFmiParameterName.h>
 #include <boost/shared_ptr.hpp>
+#include <newbase/NFmiLocation.h>
+#include <newbase/NFmiMetTime.h>
+#include <newbase/NFmiParameterName.h>
 #include <deque>
 
 class NFmiFastQueryInfo;
 
 // Miten LCL lasketaan, pinta-arvojen vai mixed layer arvojen avulla, vai most unstable?
-typedef enum
-{
+typedef enum {
   kLCLCalcNone = 0,
   kLCLCalcSurface = 1,
   kLCLCalc500m = 2,
@@ -161,4 +160,3 @@ class NFmiSoundingData
   bool fPressureDataAvailable;
   bool fHeightDataAvailable;
 };
-

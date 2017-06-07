@@ -23,6 +23,7 @@ class NFmiRawTempStationInfoSystem
   void Init(const std::string &theInitFileName);
   NFmiHPlaceDescriptor &Locations(void) { return itsLocations; }
   const std::string &InitLogMessage(void) const { return itsInitLogMessage; }
+
  private:
   std::string
       itsInitLogMessage;  // onnistuneen initialisoinnin viesti, missä voi olla varoituksia lokiin.
@@ -46,6 +47,7 @@ class NFmiSilamStationList
   void Clear(void);
   checkedVector<NFmiSilamStationList::Station> &Locations(void) { return itsLocations; }
   const std::string &InitLogMessage(void) const { return itsInitLogMessage; }
+
  private:
   std::string
       itsInitLogMessage;  // onnistuneen initialisoinnin viesti, missä voi olla varoituksia lokiin.
@@ -95,4 +97,3 @@ class NFmiWmoStationLookUpSystem
   std::string itsInitLogMessage;  // onnistuneen tai epäonnistuneen initialisoinnin viesti, missä
                                   // voi olla varoituksia lokiin.
 };
-

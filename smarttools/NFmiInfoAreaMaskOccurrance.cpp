@@ -1,9 +1,9 @@
 
 #include "NFmiInfoAreaMaskOccurrance.h"
-#include <newbase/NFmiFastQueryInfo.h>
 #include "NFmiDrawParam.h"
-#include <newbase/NFmiProducerName.h>
 #include "NFmiSmartInfo.h"
+#include <newbase/NFmiFastQueryInfo.h>
+#include <newbase/NFmiProducerName.h>
 
 // **********************************************************
 // *****    NFmiInfoAreaMaskOccurrance  *********************
@@ -14,9 +14,7 @@ std::function<void(checkedVector<boost::shared_ptr<NFmiFastQueryInfo> > &,
                    const boost::shared_ptr<NFmiArea> &)>
     NFmiInfoAreaMaskOccurrance::itsMultiSourceDataGetter;  // Alustetaan tyhjäksi ensin
 
-NFmiInfoAreaMaskOccurrance::~NFmiInfoAreaMaskOccurrance(void)
-{
-}
+NFmiInfoAreaMaskOccurrance::~NFmiInfoAreaMaskOccurrance(void) {}
 NFmiInfoAreaMaskOccurrance::NFmiInfoAreaMaskOccurrance(
     const NFmiCalculationCondition &theOperation,
     Type theMaskType,
@@ -80,8 +78,7 @@ void NFmiInfoAreaMaskOccurrance::Initialize(void)
   {
     boost::shared_ptr<NFmiDrawParam> drawParam(
         new NFmiDrawParam(itsInfo->Param(), *itsInfo->Level(), 0, itsInfo->DataType()));
-    if (fSynopXCase)
-      drawParam->Param().GetProducer()->SetIdent(NFmiInfoData::kFmiSpSynoXProducer);
+    if (fSynopXCase) drawParam->Param().GetProducer()->SetIdent(NFmiInfoData::kFmiSpSynoXProducer);
     itsMultiSourceDataGetter(itsInfoVector, drawParam, itsCalculationArea);
   }
   InitializeLocationIndexCaches();
@@ -127,12 +124,10 @@ bool NFmiInfoAreaMaskOccurrance::IsKnownMultiSourceData()
 {
   if (itsInfo)
   {
-    if (itsInfo->DataType() == NFmiInfoData::kFlashData)
-      return true;
+    if (itsInfo->DataType() == NFmiInfoData::kFlashData) return true;
     // HUOM! kaikkien synop datojen käyttö on aivan liian hidasta, käytetään vain primääri synop
     // dataa laskuissa.
-    if (itsInfo->Producer()->GetIdent() == kFmiSYNOP)
-      return true;
+    if (itsInfo->Producer()->GetIdent() == kFmiSYNOP) return true;
   }
   return false;
 }
@@ -254,14 +249,12 @@ void NFmiInfoAreaMaskOccurrance::DoCalculateCurrentLocation(
       theLocation.Distance(theIsStationLocationsStoredInData ? theInfo->GetLatlonFromData()
                                                              : theInfo->LatLon()) *
       0.001;
-  if (distanceInKM > itsSearchRangeInKM)
-    return;  // kyseinen piste oli ympyrän ulkopuolella
+  if (distanceInKM > itsSearchRangeInKM) return;  // kyseinen piste oli ympyrän ulkopuolella
 
   float value = theInfo->FloatValue();
   if (value != kFloatMissing)
   {
-    if (CheckProbabilityCondition(value))
-      theOccurranceCountInOut++;
+    if (CheckProbabilityCondition(value)) theOccurranceCountInOut++;
   }
 }
 

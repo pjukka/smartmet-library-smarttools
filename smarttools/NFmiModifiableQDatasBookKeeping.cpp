@@ -1,9 +1,9 @@
 // NFmiModifiableQDatasBookKeeping
 
 #include "NFmiModifiableQDatasBookKeeping.h"
-#include "NFmiUndoableMultiLevelMask.h"
 #include "NFmiMultiLevelMask.h"
 #include "NFmiUndoRedoQData.h"
+#include "NFmiUndoableMultiLevelMask.h"
 
 NFmiModifiableQDatasBookKeeping::NFmiModifiableQDatasBookKeeping(unsigned long theMaskSize)
     : itsAreaMask(theMaskSize ? new NFmiUndoableMultiLevelMask(theMaskSize) : 0),
@@ -28,14 +28,10 @@ void NFmiModifiableQDatasBookKeeping::CopyClonedDatas(
   {
     // HUOM! Tässä kopioidaan dataa vain this:issa oleviin ei 0-pointtereihin.
     // Eli ei luoda uusia olioita tässä, kuten ehkä normaalisti sijoitus operaatiossa tehtäisiin.
-    if (itsUndoRedoQData)
-      *itsUndoRedoQData = *(theOther.itsUndoRedoQData);
-    if (itsAreaMask)
-      *itsAreaMask = *(theOther.itsAreaMask);
-    if (fLoadedFromFile)
-      *fLoadedFromFile = *(theOther.fLoadedFromFile);
-    if (fDirty)
-      *fDirty = *(theOther.fDirty);
+    if (itsUndoRedoQData) *itsUndoRedoQData = *(theOther.itsUndoRedoQData);
+    if (itsAreaMask) *itsAreaMask = *(theOther.itsAreaMask);
+    if (fLoadedFromFile) *fLoadedFromFile = *(theOther.fLoadedFromFile);
+    if (fDirty) *fDirty = *(theOther.fDirty);
   }
 }
 
@@ -67,16 +63,14 @@ unsigned long NFmiModifiableQDatasBookKeeping::LocationMaskedCount(unsigned long
 
 bool NFmiModifiableQDatasBookKeeping::Mask(const NFmiBitMask& theMask, unsigned long theMaskType)
 {
-  if (itsAreaMask)
-    return itsAreaMask->Mask(theMask, theMaskType);
+  if (itsAreaMask) return itsAreaMask->Mask(theMask, theMaskType);
 
   return false;
 }
 
 const NFmiBitMask& NFmiModifiableQDatasBookKeeping::Mask(unsigned long theMaskType) const
 {
-  if (itsAreaMask)
-    return itsAreaMask->Mask(theMaskType);
+  if (itsAreaMask) return itsAreaMask->Mask(theMaskType);
 
   throw std::runtime_error("Error in application - NFmiSmartInfo::Mask has no mask.");
 }
@@ -93,10 +87,7 @@ void NFmiModifiableQDatasBookKeeping::MaskType(unsigned long theMaskType)
   (*itsAreaMask)->MaskType(theMaskType);
 }
 
-unsigned long NFmiModifiableQDatasBookKeeping::MaskType(void)
-{
-  return (*itsAreaMask)->MaskType();
-}
+unsigned long NFmiModifiableQDatasBookKeeping::MaskType(void) { return (*itsAreaMask)->MaskType(); }
 
 bool NFmiModifiableQDatasBookKeeping::IsMasked(unsigned long theIndex) const
 {
@@ -116,15 +107,13 @@ bool NFmiModifiableQDatasBookKeeping::SnapShotData(
 
 bool NFmiModifiableQDatasBookKeeping::Undo(void)
 {
-  if (itsUndoRedoQData)
-    return itsUndoRedoQData->Undo();
+  if (itsUndoRedoQData) return itsUndoRedoQData->Undo();
   return false;
 }
 
 bool NFmiModifiableQDatasBookKeeping::Redo(void)
 {
-  if (itsUndoRedoQData)
-    return itsUndoRedoQData->Redo();
+  if (itsUndoRedoQData) return itsUndoRedoQData->Redo();
   return false;
 }
 
@@ -167,8 +156,7 @@ void NFmiModifiableQDatasBookKeeping::UndoLevel(long theDepth, const NFmiRawData
   }
   else
   {
-    if (itsUndoRedoQData == 0)
-      itsUndoRedoQData = new NFmiUndoRedoQData;
+    if (itsUndoRedoQData == 0) itsUndoRedoQData = new NFmiUndoRedoQData;
 
     itsUndoRedoQData->UndoLevel(theDepth, theRawData);
   }
@@ -188,15 +176,9 @@ bool NFmiModifiableQDatasBookKeeping::LocationSelectionSnapShot(void)
   return itsAreaMask->SnapShotData();
 }
 
-bool NFmiModifiableQDatasBookKeeping::LocationSelectionUndo(void)
-{
-  return itsAreaMask->Undo();
-}
+bool NFmiModifiableQDatasBookKeeping::LocationSelectionUndo(void) { return itsAreaMask->Undo(); }
 
-bool NFmiModifiableQDatasBookKeeping::LocationSelectionRedo(void)
-{
-  return itsAreaMask->Redo();
-}
+bool NFmiModifiableQDatasBookKeeping::LocationSelectionRedo(void) { return itsAreaMask->Redo(); }
 
 bool NFmiModifiableQDatasBookKeeping::LocationSelectionUndoData(void)
 {

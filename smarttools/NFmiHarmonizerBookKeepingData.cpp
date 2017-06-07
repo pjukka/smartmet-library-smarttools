@@ -16,9 +16,7 @@ NFmiHarmonizerBookKeepingData::NFmiHarmonizerBookKeepingData(
 {
 }
 
-NFmiHarmonizerBookKeepingData::~NFmiHarmonizerBookKeepingData(void)
-{
-}
+NFmiHarmonizerBookKeepingData::~NFmiHarmonizerBookKeepingData(void) {}
 
 void NFmiHarmonizerBookKeepingData::InsertTime(const NFmiMetTime &theTime)
 {
