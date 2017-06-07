@@ -67,7 +67,8 @@ class _FMI_DLL NFmiInfoAreaMaskOccurrance : public NFmiInfoAreaMaskProbFunc
 
   static std::function<void(checkedVector<boost::shared_ptr<NFmiFastQueryInfo>> &,
                             boost::shared_ptr<NFmiDrawParam> &,
-                            const boost::shared_ptr<NFmiArea> &)> itsMultiSourceDataGetter;
+                            const boost::shared_ptr<NFmiArea> &)>
+      itsMultiSourceDataGetter;
 
  private:
   NFmiInfoAreaMaskProbFunc &operator=(const NFmiInfoAreaMaskProbFunc &theMask);

@@ -13,8 +13,8 @@
 // Yksi rivi on aina yksi lasku ja laskussa pitää olla sijoitus johonkin parametriin (=).
 //**********************************************************
 
-#include <newbase/NFmiDataMatrix.h>
 #include <boost/shared_ptr.hpp>
+#include <newbase/NFmiDataMatrix.h>
 #include <set>
 
 class NFmiSmartToolCalculationInfo;

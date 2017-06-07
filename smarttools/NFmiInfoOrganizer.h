@@ -22,12 +22,12 @@
 // TODO: keksi parempi nimi tai muuta lopuksi NFmiInfoOrganizer-nimiseksi ja
 // tuhoa alkuperäinen luokka.
 
-#include <newbase/NFmiPoint.h>
+#include <boost/shared_ptr.hpp>
 #include <newbase/NFmiDataMatrix.h>
 #include <newbase/NFmiInfoData.h>
 #include <newbase/NFmiParamBag.h>
+#include <newbase/NFmiPoint.h>
 #include <newbase/NFmiProducerName.h>
-#include <boost/shared_ptr.hpp>
 #include <map>
 
 class NFmiSmartInfo;
@@ -147,7 +147,7 @@ class NFmiInfoOrganizer
       const NFmiMetTime &theDataTime,
       int theIndex = 0,
       ParamCheckFlags paramCheckFlags =
-      ParamCheckFlags());  // Hakee parhaan luotaus infon tuottajalle
+          ParamCheckFlags());  // Hakee parhaan luotaus infon tuottajalle
   boost::shared_ptr<NFmiFastQueryInfo> GetPrioritizedSoundingInfo(
       ParamCheckFlags paramCheckFlags =
           ParamCheckFlags());  // Hakee tietyn prioriteetin mukaisesti parhaan luotaus-infon

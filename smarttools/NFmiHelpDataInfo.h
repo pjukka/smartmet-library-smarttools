@@ -9,9 +9,9 @@
 
 #pragma once
 
-#include <newbase/NFmiInfoData.h>
 #include <newbase/NFmiDataIdent.h>
 #include <newbase/NFmiDataMatrix.h>
+#include <newbase/NFmiInfoData.h>
 #include <newbase/NFmiProducerName.h>
 
 #include <boost/shared_ptr.hpp>
@@ -288,4 +288,3 @@ class NFmiHelpDataInfoSystem
 
   std::string itsBaseNameSpace;
 };
-

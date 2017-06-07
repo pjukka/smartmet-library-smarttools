@@ -1,7 +1,7 @@
 #pragma once
 
-#include <deque>
 #include "NFmiHarmonizerBookKeepingData.h"
+#include <deque>
 
 class NFmiRawData;
 

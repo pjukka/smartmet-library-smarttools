@@ -27,13 +27,13 @@
 // jälkeen pitää tulla calculationSection.
 //**********************************************************
 
-#include <newbase/NFmiParameterName.h>
-#include <newbase/NFmiProducerName.h>
 #include <newbase/NFmiAreaMask.h>
-#include <newbase/NFmiProducer.h>
+#include <newbase/NFmiDataMatrix.h>
 #include <newbase/NFmiLevelType.h>
 #include <newbase/NFmiParamBag.h>
-#include <newbase/NFmiDataMatrix.h>
+#include <newbase/NFmiParameterName.h>
+#include <newbase/NFmiProducer.h>
+#include <newbase/NFmiProducerName.h>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -62,6 +62,7 @@ class NFmiSmartToolCalculationBlockInfoVector
   Iterator Begin(void) { return itsCalculationBlockInfos.begin(); };
   Iterator End(void) { return itsCalculationBlockInfos.end(); };
   bool Empty(void) const { return itsCalculationBlockInfos.empty(); }
+
  private:
   // luokka ei omista vektorissa olevia otuksia, Clear pitää kutsua erikseen!!!
   checkedVector<boost::shared_ptr<NFmiSmartToolCalculationBlockInfo> > itsCalculationBlockInfos;
@@ -115,7 +116,6 @@ class NFmiSmartToolIntepreter
   std::unique_ptr<NFmiExtraMacroParamData> GetOwnershipOfExtraMacroParamData();
 
  private:
-
   bool CheckoutPossibleNextCalculationBlockVector(
       boost::shared_ptr<NFmiSmartToolCalculationBlockInfoVector> &theBlockVector);
   bool CheckoutPossibleNextCalculationBlock(NFmiSmartToolCalculationBlockInfo &theBlock,

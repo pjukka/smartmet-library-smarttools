@@ -1,10 +1,10 @@
 #pragma once
 
-#include <newbase/NFmiMilliSecondTimer.h>
-#include <newbase/NFmiDataMatrix.h>
-#include <newbase/NFmiMetTime.h>
-#include <newbase/NFmiInfoData.h>
 #include <boost/shared_ptr.hpp>
+#include <newbase/NFmiDataMatrix.h>
+#include <newbase/NFmiInfoData.h>
+#include <newbase/NFmiMetTime.h>
+#include <newbase/NFmiMilliSecondTimer.h>
 #include <list>
 #include <set>
 
@@ -133,4 +133,3 @@ class NFmiQueryDataSetKeeper
   int itsKeepInMemoryTime;  // kuinka kauan pidetään data muistissa, jos sitä ei ole käytetty.
                             // yksikkö on minuutteja
 };
-

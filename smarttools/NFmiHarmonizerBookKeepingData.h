@@ -21,6 +21,7 @@ class NFmiHarmonizerBookKeepingData
   bool HarmonizeAllTimes(void) const { return fHarmonizeAllTimes; }
   void HarmonizeAllTimes(bool newValue) { fHarmonizeAllTimes = newValue; }
   std::set<NFmiMetTime> &HarmonizerTimesSet(void) { return itsHarmonizerTimesSet; }
+
  private:
   std::set<NFmiMetTime>
       itsHarmonizerTimesSet;  // tänne laitetaan kaikki muokatut ajat jotta voidaan
@@ -30,4 +31,3 @@ class NFmiHarmonizerBookKeepingData
   NFmiParamBag
       itsHarmonizerParams;  // tähän merkitään parametrit, joita on muokattu eri työkaluilla.
 };
-
