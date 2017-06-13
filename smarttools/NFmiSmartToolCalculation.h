@@ -8,11 +8,11 @@
 // Tämä luokka hoitaa yhden laskurivin esim. T = T + 1
 //**********************************************************
 
+#include <boost/shared_ptr.hpp>
 #include <newbase/NFmiAreaMask.h>
-#include <newbase/NFmiPoint.h>
 #include <newbase/NFmiDataMatrix.h>
 #include <newbase/NFmiMetTime.h>
-#include <boost/shared_ptr.hpp>
+#include <newbase/NFmiPoint.h>
 
 class NFmiFastQueryInfo;
 class NFmiDataModifier;
@@ -66,6 +66,7 @@ class NFmiSmartToolCalculation
   void SetLimits(float theLowerLimit, float theUpperLimit, bool theDoLimitCheck);
   bool AllowMissingValueAssignment(void) { return fAllowMissingValueAssignment; };
   void AllowMissingValueAssignment(bool newState) { fAllowMissingValueAssignment = newState; };
+
  private:
   std::string itsCalculationText;  // originaali teksti, mistä tämä lasku on tulkittu
   typedef checkedVector<boost::shared_ptr<NFmiAreaMask> >::iterator CalcIter;

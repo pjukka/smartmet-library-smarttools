@@ -7,9 +7,9 @@
 //
 //**********************************************************
 
+#include <boost/shared_ptr.hpp>
 #include <newbase/NFmiAreaMaskImpl.h>
 #include <newbase/NFmiInfoAreaMask.h>
-#include <boost/shared_ptr.hpp>
 
 class NFmiDataModifier;
 class NFmiDataIterator;
@@ -28,6 +28,7 @@ class NFmiCalculationConstantValue : public NFmiAreaMaskImpl
 
   void SetValue(double value) { itsValue = value; }
   double GetValue(void) const { return itsValue; }
+
  private:
   double itsValue;
 };
@@ -53,6 +54,7 @@ class NFmiCalculationDeltaZValue : public NFmiAreaMaskImpl
   // tätä funktiota käyttämällä asetetaan korkeus 'siivun' paksuus. HUOM! se on staattinen kuten on
   // itsHeightValue-dataosakin, joten se tulee kaikille 'DeltaZ':oille yhteiseksi arvoksi.
   static void SetDeltaZValue(double value) { itsHeightValue = value; }
+
  private:
   static double itsHeightValue;
 };

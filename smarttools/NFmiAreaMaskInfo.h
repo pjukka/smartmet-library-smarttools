@@ -7,11 +7,11 @@
 //
 //**********************************************************
 
-#include <newbase/NFmiAreaMask.h>
-#include <newbase/NFmiDataIdent.h>
-#include <newbase/NFmiCalculationCondition.h>
-#include <newbase/NFmiPoint.h>
 #include "NFmiSoundingIndexCalculator.h"
+#include <newbase/NFmiAreaMask.h>
+#include <newbase/NFmiCalculationCondition.h>
+#include <newbase/NFmiDataIdent.h>
+#include <newbase/NFmiPoint.h>
 
 class NFmiLevel;
 
@@ -86,6 +86,7 @@ class NFmiAreaMaskInfo
   void SoundingParameter(FmiSoundingParameters newValue) { itsSoundingParameter = newValue; }
   int ModelRunIndex(void) const { return itsModelRunIndex; }
   void ModelRunIndex(int newValue) { itsModelRunIndex = newValue; }
+
  private:
   NFmiDataIdent itsDataIdent;
   bool fUseDefaultProducer;

@@ -57,7 +57,7 @@ FMI smarttools development files
 
 %changelog
 * Tue Jun 13 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.6.13-1.fmi
-- Reformatted all code with clang-format v4.0
+- Run clang-format after the revert to default include order in clang 4.0.0
 
 * Tue Apr  4 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.4.4-1.fmi
 - Recompiled to use the latest newbase API

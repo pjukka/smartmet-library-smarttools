@@ -1,26 +1,23 @@
 #include "NFmiDrawParam.h"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <algorithm>
 
-#include <regression/tframe.h>
 #include <newbase/NFmiDataIdent.h>
-#include <newbase/NFmiLevel.h>
 #include <newbase/NFmiDataMatrix.h>
+#include <newbase/NFmiLevel.h>
+#include <regression/tframe.h>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
+#include <boost/shared_ptr.hpp>
 
 //! Protection against conflicts with global functions
 namespace NFmiDrawParamTest
 {
 const std::string className = "NFmiDrawParam";
 
-void printError(const std::string& msg)
-{
-  std::cerr << "\n\t" << className << " - " << msg << " ";
-}
+void printError(const std::string& msg) { std::cerr << "\n\t" << className << " - " << msg << " "; }
 
 void constructors()
 {
@@ -87,8 +84,7 @@ void readWrite()
 
     // Read data from a file
     SharedNFmiDrawParam drawParam(new NFmiDrawParam);
-    if (not drawParam->Init(inFilename))
-      TEST_FAILED("Initialization of NFmiDrawParam failed!");
+    if (not drawParam->Init(inFilename)) TEST_FAILED("Initialization of NFmiDrawParam failed!");
 
     // Write back to a temporary file
     std::ofstream outFStream(outFilename.c_str());
@@ -133,8 +129,7 @@ void generalData()
   try
   {
     dP.Param(param);
-    if (dP.Param().GetParamIdent() != dataIdent.GetParamIdent())
-      TEST_FAILED("Value is not 10");
+    if (dP.Param().GetParamIdent() != dataIdent.GetParamIdent()) TEST_FAILED("Value is not 10");
   }
   catch (...)
   {
@@ -145,8 +140,7 @@ void generalData()
   try
   {
     dP.Level(level);
-    if (dP.Level().LevelValue() != 5)
-      TEST_FAILED("Value is not 5");
+    if (dP.Level().LevelValue() != 5) TEST_FAILED("Value is not 5");
   }
   catch (...)
   {
@@ -157,8 +151,7 @@ void generalData()
   try
   {
     dP.ParameterAbbreviation("FooBar");
-    if (dP.ParameterAbbreviation() != "FooBar")
-      TEST_FAILED("Value is not FooBar");
+    if (dP.ParameterAbbreviation() != "FooBar") TEST_FAILED("Value is not FooBar");
   }
   catch (...)
   {
@@ -168,8 +161,7 @@ void generalData()
   try
   {
     dP.InitFileName("FooBar.name");
-    if (dP.InitFileName() != "FooBar.name")
-      TEST_FAILED("Value is not FooBar.name");
+    if (dP.InitFileName() != "FooBar.name") TEST_FAILED("Value is not FooBar.name");
   }
   catch (...)
   {
@@ -180,8 +172,7 @@ void generalData()
   try
   {
     dP.MacroParamRelativePath("/fOO/Bar");
-    if (dP.MacroParamRelativePath() != "/fOO/Bar")
-      TEST_FAILED("Value is not /fOO/Bar");
+    if (dP.MacroParamRelativePath() != "/fOO/Bar") TEST_FAILED("Value is not /fOO/Bar");
   }
   catch (...)
   {
@@ -191,8 +182,7 @@ void generalData()
 
   try
   {
-    if (dP.FileVersionNumber() != 3.0)
-      TEST_FAILED("Value is not 3.0");
+    if (dP.FileVersionNumber() != 3.0) TEST_FAILED("Value is not 3.0");
   }
   catch (...)
   {
@@ -203,8 +193,7 @@ void generalData()
   try
   {
     dP.EditParam(true);
-    if (not dP.IsParamEdited())
-      TEST_FAILED("It is not edited");
+    if (not dP.IsParamEdited()) TEST_FAILED("It is not edited");
   }
   catch (...)
   {
@@ -215,8 +204,7 @@ void generalData()
   try
   {
     dP.Unit("ug/m2");
-    if (dP.Unit() != "ug/m2")
-      TEST_FAILED("Value is not ug/m2");
+    if (dP.Unit() != "ug/m2") TEST_FAILED("Value is not ug/m2");
   }
   catch (...)
   {
@@ -227,8 +215,7 @@ void generalData()
   try
   {
     dP.Activate(true);
-    if (not dP.IsActive())
-      TEST_FAILED("It is not active");
+    if (not dP.IsActive()) TEST_FAILED("It is not active");
   }
   catch (...)
   {
@@ -251,8 +238,7 @@ void generalData()
   try
   {
     dP.ViewMacroDrawParam(true);
-    if (not dP.ViewMacroDrawParam())
-      TEST_FAILED("It is not ViewMacroDrawParam");
+    if (not dP.ViewMacroDrawParam()) TEST_FAILED("It is not ViewMacroDrawParam");
   }
   catch (...)
   {
@@ -263,8 +249,7 @@ void generalData()
   try
   {
     dP.BorrowedParam(true);
-    if (not dP.BorrowedParam())
-      TEST_FAILED("It is not BorrowedParam");
+    if (not dP.BorrowedParam()) TEST_FAILED("It is not BorrowedParam");
   }
   catch (...)
   {
@@ -288,8 +273,7 @@ void generalData()
   try
   {
     dP.ModelRunIndex(1);
-    if (dP.ModelRunIndex() != 1)
-      TEST_FAILED("Value is not 1");
+    if (dP.ModelRunIndex() != 1) TEST_FAILED("Value is not 1");
   }
   catch (...)
   {
@@ -300,8 +284,7 @@ void generalData()
   try
   {
     dP.ModelOriginTimeCalculated(metTime);
-    if (dP.ModelOriginTimeCalculated() != metTime)
-      TEST_FAILED("Value is not correct");
+    if (dP.ModelOriginTimeCalculated() != metTime) TEST_FAILED("Value is not correct");
   }
   catch (...)
   {
@@ -312,8 +295,7 @@ void generalData()
   try
   {
     dP.TimeSerialModelRunCount(2);
-    if (dP.TimeSerialModelRunCount() != 2)
-      TEST_FAILED("Value is not 2");
+    if (dP.TimeSerialModelRunCount() != 2) TEST_FAILED("Value is not 2");
   }
   catch (...)
   {
@@ -324,8 +306,7 @@ void generalData()
   try
   {
     dP.ModelRunDifferenceIndex(3);
-    if (dP.ModelRunDifferenceIndex() != 3)
-      TEST_FAILED("Value is not 3");
+    if (dP.ModelRunDifferenceIndex() != 3) TEST_FAILED("Value is not 3");
   }
   catch (...)
   {
@@ -336,8 +317,7 @@ void generalData()
   try
   {
     dP.DataComparisonProdId(1);
-    if (dP.DataComparisonProdId() != 1)
-      TEST_FAILED("Value is not 1");
+    if (dP.DataComparisonProdId() != 1) TEST_FAILED("Value is not 1");
   }
   catch (...)
   {
@@ -385,8 +365,7 @@ void generalVisualization()
   {
     const int style = 2;
     dP.GridDataPresentationStyle(style);
-    if (dP.GridDataPresentationStyle() != style)
-      TEST_FAILED("Value is not 2");
+    if (dP.GridDataPresentationStyle() != style) TEST_FAILED("Value is not 2");
   }
   catch (...)
   {
@@ -397,8 +376,7 @@ void generalVisualization()
   try
   {
     dP.UseIsoLineFeathering(true);
-    if (not dP.UseIsoLineFeathering())
-      TEST_FAILED("Is not enabled");
+    if (not dP.UseIsoLineFeathering()) TEST_FAILED("Is not enabled");
   }
   catch (...)
   {
@@ -409,8 +387,7 @@ void generalVisualization()
   try
   {
     dP.UseSimpleIsoLineDefinitions(true);
-    if (not dP.UseSimpleIsoLineDefinitions())
-      TEST_FAILED("Is not enabled");
+    if (not dP.UseSimpleIsoLineDefinitions()) TEST_FAILED("Is not enabled");
   }
   catch (...)
   {
@@ -421,8 +398,7 @@ void generalVisualization()
   try
   {
     dP.UseSimpleContourDefinitions(true);
-    if (not dP.UseSimpleContourDefinitions())
-      TEST_FAILED("Is not enabled");
+    if (not dP.UseSimpleContourDefinitions()) TEST_FAILED("Is not enabled");
   }
   catch (...)
   {
@@ -433,8 +409,7 @@ void generalVisualization()
   try
   {
     dP.UseSeparatorLinesBetweenColorContourClasses(true);
-    if (not dP.UseSeparatorLinesBetweenColorContourClasses())
-      TEST_FAILED("Is not enabled");
+    if (not dP.UseSeparatorLinesBetweenColorContourClasses()) TEST_FAILED("Is not enabled");
   }
   catch (...)
   {
@@ -445,8 +420,7 @@ void generalVisualization()
   try
   {
     dP.SimpleIsoLineZeroValue(-1);
-    if (dP.SimpleIsoLineZeroValue() != -1)
-      TEST_FAILED("Value is not -1");
+    if (dP.SimpleIsoLineZeroValue() != -1) TEST_FAILED("Value is not -1");
   }
   catch (...)
   {
@@ -457,8 +431,7 @@ void generalVisualization()
   try
   {
     dP.IsoLineSplineSmoothingFactor(2);
-    if (dP.IsoLineSplineSmoothingFactor() != 2)
-      TEST_FAILED("Value is not 2");
+    if (dP.IsoLineSplineSmoothingFactor() != 2) TEST_FAILED("Value is not 2");
   }
   catch (...)
   {
@@ -469,8 +442,7 @@ void generalVisualization()
   try
   {
     dP.DrawOnlyOverMask(true);
-    if (not dP.DrawOnlyOverMask())
-      TEST_FAILED("Is not enabled");
+    if (not dP.DrawOnlyOverMask()) TEST_FAILED("Is not enabled");
   }
   catch (...)
   {
@@ -481,8 +453,7 @@ void generalVisualization()
   try
   {
     dP.UseCustomColorContouring(true);
-    if (not dP.UseCustomColorContouring())
-      TEST_FAILED("Is not enabled");
+    if (not dP.UseCustomColorContouring()) TEST_FAILED("Is not enabled");
   }
   catch (...)
   {
@@ -493,8 +464,7 @@ void generalVisualization()
   try
   {
     dP.UseCustomIsoLineing(true);
-    if (not dP.UseCustomIsoLineing())
-      TEST_FAILED("Is not enabled");
+    if (not dP.UseCustomIsoLineing()) TEST_FAILED("Is not enabled");
   }
   catch (...)
   {
@@ -505,8 +475,7 @@ void generalVisualization()
   try
   {
     dP.Alpha(20.0);
-    if (dP.Alpha() != 20.0)
-      TEST_FAILED("Value is noe 20.0");
+    if (dP.Alpha() != 20.0) TEST_FAILED("Value is noe 20.0");
   }
   catch (...)
   {
@@ -517,8 +486,7 @@ void generalVisualization()
   try
   {
     dP.HideParam(true);
-    if (not dP.IsParamHidden())
-      TEST_FAILED("Is not hidden");
+    if (not dP.IsParamHidden()) TEST_FAILED("Is not hidden");
     dP.HideParam(false);
   }
   catch (...)
@@ -530,8 +498,7 @@ void generalVisualization()
   try
   {
     dP.ShowDifference(true);
-    if (not dP.ShowDifference())
-      TEST_FAILED("Does not show difference");
+    if (not dP.ShowDifference()) TEST_FAILED("Does not show difference");
     dP.ShowDifference(false);
   }
   catch (...)
@@ -543,8 +510,7 @@ void generalVisualization()
   try
   {
     dP.ShowDifferenceToOriginalData(true);
-    if (not dP.ShowDifferenceToOriginalData())
-      TEST_FAILED("Does not show difference");
+    if (not dP.ShowDifferenceToOriginalData()) TEST_FAILED("Does not show difference");
     dP.ShowDifferenceToOriginalData(false);
   }
   catch (...)
@@ -569,8 +535,7 @@ void simpleIsoline()
   {
     NFmiColor color(1.0, 0.0, 0.0, 0.5);
     dP.IsolineLabelBoxFillColor(color);
-    if (dP.IsolineLabelBoxFillColor() != color)
-      TEST_FAILED("Color is not red");
+    if (dP.IsolineLabelBoxFillColor() != color) TEST_FAILED("Color is not red");
   }
   catch (...)
   {
@@ -582,8 +547,7 @@ void simpleIsoline()
   {
     NFmiColor color(1.0, 0.0, 0.0, 0.5);
     dP.ContourLabelBoxFillColor(color);
-    if (dP.ContourLabelBoxFillColor() != color)
-      TEST_FAILED("Color is not red");
+    if (dP.ContourLabelBoxFillColor() != color) TEST_FAILED("Color is not red");
   }
   catch (...)
   {
@@ -594,8 +558,7 @@ void simpleIsoline()
   try
   {
     dP.IsoLineGab(0.1);
-    if (dP.IsoLineGab() != 0.1)
-      TEST_FAILED("Value is not 0.1");
+    if (dP.IsoLineGab() != 0.1) TEST_FAILED("Value is not 0.1");
   }
   catch (...)
   {
@@ -607,8 +570,7 @@ void simpleIsoline()
   {
     NFmiColor color(1.0, 0.0, 0.0, 0.5);
     dP.IsolineColor(color);
-    if (dP.IsolineColor() != color)
-      TEST_FAILED("Color is not red");
+    if (dP.IsolineColor() != color) TEST_FAILED("Color is not red");
   }
   catch (...)
   {
@@ -620,8 +582,7 @@ void simpleIsoline()
   {
     NFmiColor color(1.0, 0.0, 0.0, 0.5);
     dP.IsolineTextColor(color);
-    if (dP.IsolineTextColor() != color)
-      TEST_FAILED("Color is not red");
+    if (dP.IsolineTextColor() != color) TEST_FAILED("Color is not red");
   }
   catch (...)
   {
@@ -632,8 +593,7 @@ void simpleIsoline()
   try
   {
     dP.SimpleIsoLineGap(0.1f);
-    if (dP.SimpleIsoLineGap() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.SimpleIsoLineGap() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -644,8 +604,7 @@ void simpleIsoline()
   try
   {
     dP.SimpleIsoLineLabelHeight(0.1f);
-    if (dP.SimpleIsoLineLabelHeight() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.SimpleIsoLineLabelHeight() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -656,8 +615,7 @@ void simpleIsoline()
   try
   {
     dP.ShowSimpleIsoLineLabelBox(true);
-    if (not dP.ShowSimpleIsoLineLabelBox())
-      TEST_FAILED("Is not enabled");
+    if (not dP.ShowSimpleIsoLineLabelBox()) TEST_FAILED("Is not enabled");
     dP.ShowSimpleIsoLineLabelBox(false);
   }
   catch (...)
@@ -669,8 +627,7 @@ void simpleIsoline()
   try
   {
     dP.SimpleIsoLineWidth(0.1f);
-    if (dP.SimpleIsoLineWidth() != 0.1f)
-      TEST_FAILED("Value is not 0.1");
+    if (dP.SimpleIsoLineWidth() != 0.1f) TEST_FAILED("Value is not 0.1");
   }
   catch (...)
   {
@@ -681,8 +638,7 @@ void simpleIsoline()
   try
   {
     dP.SimpleIsoLineLineStyle(2);
-    if (dP.SimpleIsoLineLineStyle() != 2)
-      TEST_FAILED("Value is not 2");
+    if (dP.SimpleIsoLineLineStyle() != 2) TEST_FAILED("Value is not 2");
   }
   catch (...)
   {
@@ -693,8 +649,7 @@ void simpleIsoline()
   try
   {
     dP.UseSingleColorsWithSimpleIsoLines(true);
-    if (not dP.UseSingleColorsWithSimpleIsoLines())
-      TEST_FAILED("Value is not enebled");
+    if (not dP.UseSingleColorsWithSimpleIsoLines()) TEST_FAILED("Value is not enebled");
     dP.UseSingleColorsWithSimpleIsoLines(false);
   }
   catch (...)
@@ -706,8 +661,7 @@ void simpleIsoline()
   try
   {
     dP.SimpleIsoLineColorShadeLowValue(0.1f);
-    if (dP.SimpleIsoLineColorShadeLowValue() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.SimpleIsoLineColorShadeLowValue() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -718,8 +672,7 @@ void simpleIsoline()
   try
   {
     dP.SimpleIsoLineColorShadeMidValue(0.2f);
-    if (dP.SimpleIsoLineColorShadeMidValue() != 0.2f)
-      TEST_FAILED("Value is not 0.2f");
+    if (dP.SimpleIsoLineColorShadeMidValue() != 0.2f) TEST_FAILED("Value is not 0.2f");
   }
   catch (...)
   {
@@ -730,8 +683,7 @@ void simpleIsoline()
   try
   {
     dP.SimpleIsoLineColorShadeHighValue(0.3f);
-    if (dP.SimpleIsoLineColorShadeHighValue() != 0.3f)
-      TEST_FAILED("Value is not 0.3f");
+    if (dP.SimpleIsoLineColorShadeHighValue() != 0.3f) TEST_FAILED("Value is not 0.3f");
   }
   catch (...)
   {
@@ -742,8 +694,7 @@ void simpleIsoline()
   try
   {
     dP.SimpleIsoLineColorShadeHigh2Value(0.2f);
-    if (dP.SimpleIsoLineColorShadeHigh2Value() != 0.2f)
-      TEST_FAILED("Value is not 0.2f");
+    if (dP.SimpleIsoLineColorShadeHigh2Value() != 0.2f) TEST_FAILED("Value is not 0.2f");
   }
   catch (...)
   {
@@ -755,8 +706,7 @@ void simpleIsoline()
   {
     NFmiColor color(1.0, 0.0, 0.0, 0.5);
     dP.SimpleIsoLineColorShadeLowValueColor(color);
-    if (dP.SimpleIsoLineColorShadeLowValueColor() != color)
-      TEST_FAILED("Color is not red");
+    if (dP.SimpleIsoLineColorShadeLowValueColor() != color) TEST_FAILED("Color is not red");
   }
   catch (...)
   {
@@ -768,8 +718,7 @@ void simpleIsoline()
   {
     NFmiColor color(1.0, 0.0, 0.0, 0.5);
     dP.SimpleIsoLineColorShadeMidValueColor(color);
-    if (dP.SimpleIsoLineColorShadeMidValueColor() != color)
-      TEST_FAILED("Color is not red");
+    if (dP.SimpleIsoLineColorShadeMidValueColor() != color) TEST_FAILED("Color is not red");
   }
   catch (...)
   {
@@ -781,8 +730,7 @@ void simpleIsoline()
   {
     NFmiColor color(1.0, 0.0, 0.0, 0.5);
     dP.SimpleIsoLineColorShadeHighValueColor(color);
-    if (dP.SimpleIsoLineColorShadeHighValueColor() != color)
-      TEST_FAILED("Color is not red");
+    if (dP.SimpleIsoLineColorShadeHighValueColor() != color) TEST_FAILED("Color is not red");
   }
   catch (...)
   {
@@ -794,8 +742,7 @@ void simpleIsoline()
   {
     NFmiColor color(1.0, 0.0, 0.0, 0.5);
     dP.SimpleIsoLineColorShadeHigh2ValueColor(color);
-    if (dP.SimpleIsoLineColorShadeHigh2ValueColor() != color)
-      TEST_FAILED("Color is not red");
+    if (dP.SimpleIsoLineColorShadeHigh2ValueColor() != color) TEST_FAILED("Color is not red");
   }
   catch (...)
   {
@@ -806,8 +753,7 @@ void simpleIsoline()
   try
   {
     dP.SimpleIsoLineColorShadeClassCount(3);
-    if (dP.SimpleIsoLineColorShadeClassCount() != 3)
-      TEST_FAILED("Value is not 3");
+    if (dP.SimpleIsoLineColorShadeClassCount() != 3) TEST_FAILED("Value is not 3");
   }
   catch (...)
   {
@@ -832,8 +778,7 @@ void simpleColorContour()
   try
   {
     dP.ContourGab(0.1);
-    if (dP.ContourGab() != 0.1)
-      TEST_FAILED("Value is not 0.1");
+    if (dP.ContourGab() != 0.1) TEST_FAILED("Value is not 0.1");
   }
   catch (...)
   {
@@ -844,8 +789,7 @@ void simpleColorContour()
   try
   {
     dP.ContourColor(color);
-    if (dP.ContourColor() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.ContourColor() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -856,8 +800,7 @@ void simpleColorContour()
   try
   {
     dP.SimpleContourWidth(0.1f);
-    if (dP.SimpleContourWidth() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.SimpleContourWidth() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -868,8 +811,7 @@ void simpleColorContour()
   try
   {
     dP.SimpleContourLineStyle(2);
-    if (dP.SimpleContourLineStyle() != 2)
-      TEST_FAILED("Value is not 2");
+    if (dP.SimpleContourLineStyle() != 2) TEST_FAILED("Value is not 2");
   }
   catch (...)
   {
@@ -880,8 +822,7 @@ void simpleColorContour()
   try
   {
     dP.ColorContouringColorShadeLowValue(0.1f);
-    if (dP.ColorContouringColorShadeLowValue() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.ColorContouringColorShadeLowValue() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -892,8 +833,7 @@ void simpleColorContour()
   try
   {
     dP.ColorContouringColorShadeMidValue(0.1f);
-    if (dP.ColorContouringColorShadeMidValue() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.ColorContouringColorShadeMidValue() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -904,8 +844,7 @@ void simpleColorContour()
   try
   {
     dP.ColorContouringColorShadeHighValue(0.1f);
-    if (dP.ColorContouringColorShadeHighValue() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.ColorContouringColorShadeHighValue() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -916,8 +855,7 @@ void simpleColorContour()
   try
   {
     dP.ColorContouringColorShadeHigh2Value(0.1f);
-    if (dP.ColorContouringColorShadeHigh2Value() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.ColorContouringColorShadeHigh2Value() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -928,8 +866,7 @@ void simpleColorContour()
   try
   {
     dP.ColorContouringColorShadeLowValueColor(color);
-    if (dP.ColorContouringColorShadeLowValueColor() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.ColorContouringColorShadeLowValueColor() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -940,8 +877,7 @@ void simpleColorContour()
   try
   {
     dP.ColorContouringColorShadeMidValueColor(color);
-    if (dP.ColorContouringColorShadeMidValueColor() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.ColorContouringColorShadeMidValueColor() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -952,8 +888,7 @@ void simpleColorContour()
   try
   {
     dP.ColorContouringColorShadeHighValueColor(color);
-    if (dP.ColorContouringColorShadeHighValueColor() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.ColorContouringColorShadeHighValueColor() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -964,8 +899,7 @@ void simpleColorContour()
   try
   {
     dP.ColorContouringColorShadeHigh2ValueColor(color);
-    if (dP.ColorContouringColorShadeHigh2ValueColor() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.ColorContouringColorShadeHigh2ValueColor() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -994,8 +928,7 @@ void customIsoline()
   try
   {
     dP.SetSpecialIsoLineValues(floatVector);
-    if (dP.SpecialIsoLineValues().at(2) != floatVector.at(2))
-      TEST_FAILED("Value is not 1.1f");
+    if (dP.SpecialIsoLineValues().at(2) != floatVector.at(2)) TEST_FAILED("Value is not 1.1f");
   }
   catch (...)
   {
@@ -1006,8 +939,7 @@ void customIsoline()
   try
   {
     dP.SetSpecialContourValues(floatVector);
-    if (dP.SpecialContourValues().at(2) != floatVector.at(2))
-      TEST_FAILED("Value is not 1.1f");
+    if (dP.SpecialContourValues().at(2) != floatVector.at(2)) TEST_FAILED("Value is not 1.1f");
   }
   catch (...)
   {
@@ -1018,8 +950,7 @@ void customIsoline()
   try
   {
     dP.SetSpecialIsoLineLabelHeight(floatVector);
-    if (dP.SpecialIsoLineLabelHeight().at(2) != floatVector.at(2))
-      TEST_FAILED("Value is not 1.1f");
+    if (dP.SpecialIsoLineLabelHeight().at(2) != floatVector.at(2)) TEST_FAILED("Value is not 1.1f");
   }
   catch (...)
   {
@@ -1030,8 +961,7 @@ void customIsoline()
   try
   {
     dP.SetSpecialContourLabelHeight(floatVector);
-    if (dP.SpecialContourLabelHeight().at(2) != floatVector.at(2))
-      TEST_FAILED("Value is not 1.1f");
+    if (dP.SpecialContourLabelHeight().at(2) != floatVector.at(2)) TEST_FAILED("Value is not 1.1f");
   }
   catch (...)
   {
@@ -1042,8 +972,7 @@ void customIsoline()
   try
   {
     dP.SetSpecialIsoLineWidth(floatVector);
-    if (dP.SpecialIsoLineWidth().at(2) != floatVector.at(2))
-      TEST_FAILED("Value is not 1.1f");
+    if (dP.SpecialIsoLineWidth().at(2) != floatVector.at(2)) TEST_FAILED("Value is not 1.1f");
   }
   catch (...)
   {
@@ -1054,8 +983,7 @@ void customIsoline()
   try
   {
     dP.SetSpecialcontourWidth(floatVector);
-    if (dP.SpecialcontourWidth().at(2) != floatVector.at(2))
-      TEST_FAILED("Value is not 1.1f");
+    if (dP.SpecialcontourWidth().at(2) != floatVector.at(2)) TEST_FAILED("Value is not 1.1f");
   }
   catch (...)
   {
@@ -1071,8 +999,7 @@ void customIsoline()
   try
   {
     dP.SetSpecialIsoLineStyle(intVector);
-    if (dP.SpecialIsoLineStyle().at(2) != intVector.at(2))
-      TEST_FAILED("Value is not 1");
+    if (dP.SpecialIsoLineStyle().at(2) != intVector.at(2)) TEST_FAILED("Value is not 1");
   }
   catch (...)
   {
@@ -1083,8 +1010,7 @@ void customIsoline()
   try
   {
     dP.SetSpecialContourStyle(intVector);
-    if (dP.SpecialContourStyle().at(2) != intVector.at(2))
-      TEST_FAILED("Value is not 1");
+    if (dP.SpecialContourStyle().at(2) != intVector.at(2)) TEST_FAILED("Value is not 1");
   }
   catch (...)
   {
@@ -1095,8 +1021,7 @@ void customIsoline()
   try
   {
     dP.SetSpecialIsoLineColorIndexies(intVector);
-    if (dP.SpecialIsoLineColorIndexies().at(2) != intVector.at(2))
-      TEST_FAILED("Value is not 1");
+    if (dP.SpecialIsoLineColorIndexies().at(2) != intVector.at(2)) TEST_FAILED("Value is not 1");
   }
   catch (...)
   {
@@ -1107,8 +1032,7 @@ void customIsoline()
   try
   {
     dP.SetSpecialContourColorIndexies(intVector);
-    if (dP.SpecialContourColorIndexies().at(2) != intVector.at(2))
-      TEST_FAILED("Value is not 1");
+    if (dP.SpecialContourColorIndexies().at(2) != intVector.at(2)) TEST_FAILED("Value is not 1");
   }
   catch (...)
   {
@@ -1150,8 +1074,7 @@ void customColorContour()
   try
   {
     dP.UseIsoLineGabWithCustomContours(true);
-    if (not dP.UseIsoLineGabWithCustomContours())
-      TEST_FAILED("Value is not true");
+    if (not dP.UseIsoLineGabWithCustomContours()) TEST_FAILED("Value is not true");
   }
   catch (...)
   {
@@ -1162,8 +1085,7 @@ void customColorContour()
   try
   {
     dP.UseContourGabWithCustomContours(true);
-    if (not dP.UseContourGabWithCustomContours())
-      TEST_FAILED("Value is not true");
+    if (not dP.UseContourGabWithCustomContours()) TEST_FAILED("Value is not true");
   }
   catch (...)
   {
@@ -1179,8 +1101,7 @@ void customColorContour()
   try
   {
     dP.SetSpecialColorContouringValues(floatVector);
-    if (dP.SpecialColorContouringValues().at(2) != 1.1f)
-      TEST_FAILED("Value is not 1.1f");
+    if (dP.SpecialColorContouringValues().at(2) != 1.1f) TEST_FAILED("Value is not 1.1f");
   }
   catch (...)
   {
@@ -1196,8 +1117,7 @@ void customColorContour()
   try
   {
     dP.SpecialColorContouringColorIndexies(intVector);
-    if (dP.SpecialColorContouringColorIndexies().at(2) != 1)
-      TEST_FAILED("Value is not 1");
+    if (dP.SpecialColorContouringColorIndexies().at(2) != 1) TEST_FAILED("Value is not 1");
   }
   catch (...)
   {
@@ -1222,8 +1142,7 @@ void symbolSettings()
   try
   {
     dP.StationDataViewType(stationDataViewType);
-    if (dP.StationDataViewType() != stationDataViewType)
-      TEST_FAILED("Value is not kFmiSymbolView");
+    if (dP.StationDataViewType() != stationDataViewType) TEST_FAILED("Value is not kFmiSymbolView");
   }
   catch (...)
   {
@@ -1234,8 +1153,7 @@ void symbolSettings()
   try
   {
     dP.FrameColor(color);
-    if (dP.FrameColor() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.FrameColor() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -1246,8 +1164,7 @@ void symbolSettings()
   try
   {
     dP.FillColor(color);
-    if (dP.FillColor() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.FillColor() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -1259,8 +1176,7 @@ void symbolSettings()
   {
     NFmiPoint symbolWidthAndHeight(0.5, 0.6);
     dP.RelativeSize(symbolWidthAndHeight);
-    if (dP.RelativeSize() != symbolWidthAndHeight)
-      TEST_FAILED("Value is not same as the input");
+    if (dP.RelativeSize() != symbolWidthAndHeight) TEST_FAILED("Value is not same as the input");
   }
   catch (...)
   {
@@ -1310,8 +1226,7 @@ void symbolSettings()
   try
   {
     dP.ShowNumbers(true);
-    if (not dP.ShowNumbers())
-      TEST_FAILED("Value is not true");
+    if (not dP.ShowNumbers()) TEST_FAILED("Value is not true");
   }
   catch (...)
   {
@@ -1322,8 +1237,7 @@ void symbolSettings()
   try
   {
     dP.ShowMasks(true);
-    if (not dP.ShowMasks())
-      TEST_FAILED("Value is not true");
+    if (not dP.ShowMasks()) TEST_FAILED("Value is not true");
   }
   catch (...)
   {
@@ -1334,8 +1248,7 @@ void symbolSettings()
   try
   {
     dP.ShowColors(true);
-    if (not dP.ShowColors())
-      TEST_FAILED("Value is not true");
+    if (not dP.ShowColors()) TEST_FAILED("Value is not true");
   }
   catch (...)
   {
@@ -1346,8 +1259,7 @@ void symbolSettings()
   try
   {
     dP.ShowColoredNumbers(true);
-    if (not dP.ShowColoredNumbers())
-      TEST_FAILED("Value is not true");
+    if (not dP.ShowColoredNumbers()) TEST_FAILED("Value is not true");
   }
   catch (...)
   {
@@ -1358,8 +1270,7 @@ void symbolSettings()
   try
   {
     dP.ZeroColorMean(true);
-    if (not dP.ZeroColorMean())
-      TEST_FAILED("Value is not true");
+    if (not dP.ZeroColorMean()) TEST_FAILED("Value is not true");
   }
   catch (...)
   {
@@ -1370,8 +1281,7 @@ void symbolSettings()
   try
   {
     dP.StationSymbolColorShadeLowValue(0.1f);
-    if (dP.StationSymbolColorShadeLowValue() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.StationSymbolColorShadeLowValue() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -1382,8 +1292,7 @@ void symbolSettings()
   try
   {
     dP.StationSymbolColorShadeMidValue(0.1f);
-    if (dP.StationSymbolColorShadeMidValue() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.StationSymbolColorShadeMidValue() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -1394,8 +1303,7 @@ void symbolSettings()
   try
   {
     dP.StationSymbolColorShadeHighValue(0.1f);
-    if (dP.StationSymbolColorShadeHighValue() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.StationSymbolColorShadeHighValue() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -1406,8 +1314,7 @@ void symbolSettings()
   try
   {
     dP.StationSymbolColorShadeLowValueColor(color);
-    if (dP.StationSymbolColorShadeLowValueColor() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.StationSymbolColorShadeLowValueColor() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -1418,8 +1325,7 @@ void symbolSettings()
   try
   {
     dP.StationSymbolColorShadeMidValueColor(color);
-    if (dP.StationSymbolColorShadeMidValueColor() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.StationSymbolColorShadeMidValueColor() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -1430,8 +1336,7 @@ void symbolSettings()
   try
   {
     dP.StationSymbolColorShadeHighValueColor(color);
-    if (dP.StationSymbolColorShadeHighValueColor() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.StationSymbolColorShadeHighValueColor() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -1442,8 +1347,7 @@ void symbolSettings()
   try
   {
     dP.StationSymbolColorShadeClassCount(2);
-    if (dP.StationSymbolColorShadeClassCount() != 2)
-      TEST_FAILED("Value is not 2");
+    if (dP.StationSymbolColorShadeClassCount() != 2) TEST_FAILED("Value is not 2");
   }
   catch (...)
   {
@@ -1454,8 +1358,7 @@ void symbolSettings()
   try
   {
     dP.UseSymbolsInTextMode(true);
-    if (not dP.UseSymbolsInTextMode())
-      TEST_FAILED("Value is not true");
+    if (not dP.UseSymbolsInTextMode()) TEST_FAILED("Value is not true");
   }
   catch (...)
   {
@@ -1466,8 +1369,7 @@ void symbolSettings()
   try
   {
     dP.UsedSymbolListIndex(2);
-    if (dP.UsedSymbolListIndex() != 2)
-      TEST_FAILED("Value is not 2");
+    if (dP.UsedSymbolListIndex() != 2) TEST_FAILED("Value is not 2");
   }
   catch (...)
   {
@@ -1478,8 +1380,7 @@ void symbolSettings()
   try
   {
     dP.SymbolIndexingMapListIndex(2);
-    if (dP.SymbolIndexingMapListIndex() != 2)
-      TEST_FAILED("Value is not 2");
+    if (dP.SymbolIndexingMapListIndex() != 2) TEST_FAILED("Value is not 2");
   }
   catch (...)
   {
@@ -1502,8 +1403,7 @@ void dataEditing()
   try
   {
     dP.ModifyingStep(2.1);
-    if (dP.ModifyingStep() != 2.1)
-      TEST_FAILED("Value is not 2.1");
+    if (dP.ModifyingStep() != 2.1) TEST_FAILED("Value is not 2.1");
   }
   catch (...)
   {
@@ -1514,8 +1414,7 @@ void dataEditing()
   try
   {
     dP.TimeSerialModifyingLimit(2.1);
-    if (dP.TimeSerialModifyingLimit() != 2.1)
-      TEST_FAILED("Value is not 2.1");
+    if (dP.TimeSerialModifyingLimit() != 2.1) TEST_FAILED("Value is not 2.1");
   }
   catch (...)
   {
@@ -1526,8 +1425,7 @@ void dataEditing()
   try
   {
     dP.AbsoluteMinValue(1.1);
-    if (dP.AbsoluteMinValue() != 1.1)
-      TEST_FAILED("Value is not 1.1");
+    if (dP.AbsoluteMinValue() != 1.1) TEST_FAILED("Value is not 1.1");
   }
   catch (...)
   {
@@ -1538,8 +1436,7 @@ void dataEditing()
   try
   {
     dP.AbsoluteMaxValue(3.1);
-    if (dP.AbsoluteMaxValue() != 3.1)
-      TEST_FAILED("Value is not 3.1");
+    if (dP.AbsoluteMaxValue() != 3.1) TEST_FAILED("Value is not 3.1");
   }
   catch (...)
   {
@@ -1550,8 +1447,7 @@ void dataEditing()
   try
   {
     dP.TimeSeriesScaleMin(0.1);
-    if (dP.TimeSeriesScaleMin() != 0.1)
-      TEST_FAILED("Value is not 0.1");
+    if (dP.TimeSeriesScaleMin() != 0.1) TEST_FAILED("Value is not 0.1");
   }
   catch (...)
   {
@@ -1562,8 +1458,7 @@ void dataEditing()
   try
   {
     dP.TimeSeriesScaleMax(3.1);
-    if (dP.TimeSeriesScaleMax() != 3.1)
-      TEST_FAILED("Value is not 3.1");
+    if (dP.TimeSeriesScaleMax() != 3.1) TEST_FAILED("Value is not 3.1");
   }
   catch (...)
   {
@@ -1588,8 +1483,7 @@ void hatchSettings()
   try
   {
     dP.UseWithIsoLineHatch1(true);
-    if (not dP.UseWithIsoLineHatch1())
-      TEST_FAILED("Value is not true");
+    if (not dP.UseWithIsoLineHatch1()) TEST_FAILED("Value is not true");
   }
   catch (...)
   {
@@ -1600,8 +1494,7 @@ void hatchSettings()
   try
   {
     dP.DrawIsoLineHatchWithBorders1(true);
-    if (not dP.DrawIsoLineHatchWithBorders1())
-      TEST_FAILED("Value is not true");
+    if (not dP.DrawIsoLineHatchWithBorders1()) TEST_FAILED("Value is not true");
   }
   catch (...)
   {
@@ -1612,8 +1505,7 @@ void hatchSettings()
   try
   {
     dP.IsoLineHatchLowValue1(0.1f);
-    if (dP.IsoLineHatchLowValue1() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.IsoLineHatchLowValue1() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -1624,8 +1516,7 @@ void hatchSettings()
   try
   {
     dP.IsoLineHatchHighValue1(0.2f);
-    if (dP.IsoLineHatchHighValue1() != 0.2f)
-      TEST_FAILED("Value is not 0.2f");
+    if (dP.IsoLineHatchHighValue1() != 0.2f) TEST_FAILED("Value is not 0.2f");
   }
   catch (...)
   {
@@ -1636,8 +1527,7 @@ void hatchSettings()
   try
   {
     dP.IsoLineHatchType1(2);
-    if (dP.IsoLineHatchType1() != 2)
-      TEST_FAILED("Value is not 2");
+    if (dP.IsoLineHatchType1() != 2) TEST_FAILED("Value is not 2");
   }
   catch (...)
   {
@@ -1648,8 +1538,7 @@ void hatchSettings()
   try
   {
     dP.IsoLineHatchColor1(color);
-    if (dP.IsoLineHatchColor1() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.IsoLineHatchColor1() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -1660,8 +1549,7 @@ void hatchSettings()
   try
   {
     dP.IsoLineHatchBorderColor1(color);
-    if (dP.IsoLineHatchBorderColor1() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.IsoLineHatchBorderColor1() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -1672,8 +1560,7 @@ void hatchSettings()
   try
   {
     dP.UseWithIsoLineHatch2(true);
-    if (not dP.UseWithIsoLineHatch2())
-      TEST_FAILED("Value is not true");
+    if (not dP.UseWithIsoLineHatch2()) TEST_FAILED("Value is not true");
   }
   catch (...)
   {
@@ -1684,8 +1571,7 @@ void hatchSettings()
   try
   {
     dP.DrawIsoLineHatchWithBorders2(true);
-    if (not dP.DrawIsoLineHatchWithBorders2())
-      TEST_FAILED("Value is not true");
+    if (not dP.DrawIsoLineHatchWithBorders2()) TEST_FAILED("Value is not true");
   }
   catch (...)
   {
@@ -1696,8 +1582,7 @@ void hatchSettings()
   try
   {
     dP.IsoLineHatchLowValue2(0.1f);
-    if (dP.IsoLineHatchLowValue2() != 0.1f)
-      TEST_FAILED("Value is not 0.1f");
+    if (dP.IsoLineHatchLowValue2() != 0.1f) TEST_FAILED("Value is not 0.1f");
   }
   catch (...)
   {
@@ -1708,8 +1593,7 @@ void hatchSettings()
   try
   {
     dP.IsoLineHatchHighValue2(0.2f);
-    if (dP.IsoLineHatchHighValue2() != 0.2f)
-      TEST_FAILED("Value is not 0.2f");
+    if (dP.IsoLineHatchHighValue2() != 0.2f) TEST_FAILED("Value is not 0.2f");
   }
   catch (...)
   {
@@ -1720,8 +1604,7 @@ void hatchSettings()
   try
   {
     dP.IsoLineHatchType2(2);
-    if (dP.IsoLineHatchType2() != 2)
-      TEST_FAILED("Value is not 2");
+    if (dP.IsoLineHatchType2() != 2) TEST_FAILED("Value is not 2");
   }
   catch (...)
   {
@@ -1732,8 +1615,7 @@ void hatchSettings()
   try
   {
     dP.IsoLineHatchColor2(color);
-    if (dP.IsoLineHatchColor2() != color)
-      TEST_FAILED("Value is not red");
+    if (dP.IsoLineHatchColor2() != color) TEST_FAILED("Value is not red");
   }
   catch (...)
   {
@@ -1744,9 +1626,7 @@ void hatchSettings()
   TEST_PASSED();
 }
 
-void init()
-{
-}
+void init() {}
 // ----------------------------------------------------------------------
 /*!
  * The actual test suite

@@ -11,8 +11,8 @@
 
 #include "NFmiSoundingData.h"
 
-#include <newbase/NFmiMetTime.h>
 #include <newbase/NFmiLocation.h>
+#include <newbase/NFmiMetTime.h>
 #include <newbase/NFmiParameterName.h>
 #include <newbase/NFmiQueryDataUtil.h>
 
@@ -225,4 +225,3 @@ class NFmiSoundingDataOpt1
   typedef std::unordered_map<std::string, double> LiftedAirParcelCacheType;
   LiftedAirParcelCacheType itsLiftedAirParcelCache;
 };
-

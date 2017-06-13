@@ -15,8 +15,8 @@
 // operandeja (n kpl) ja operaatioita (n-1 kpl).
 //**********************************************************
 
-#include <newbase/NFmiDataMatrix.h>
 #include <boost/shared_ptr.hpp>
+#include <newbase/NFmiDataMatrix.h>
 
 class NFmiAreaMaskInfo;
 
@@ -37,6 +37,7 @@ class NFmiSmartToolCalculationInfo
   void SetCalculationText(const std::string& theText) { itsCalculationText = theText; }
   void CheckIfAllowMissingValueAssignment(void);
   bool AllowMissingValueAssignment(void) { return fAllowMissingValueAssignment; };
+
  private:
   // HUOM!! Tämä erillinen ResultInfo-systeemi oli huono ratkaisu, laita ne mielluummin
   // osaksi laskentaketjua (itsCalculationOperandInfoVector:iin).

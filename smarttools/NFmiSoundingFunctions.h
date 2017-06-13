@@ -44,8 +44,7 @@ float CalcLogInterpolatedWindWectorValue(float x1, float x2, float x, float wv1,
 template <typename T>
 bool IsEqualEnough(T value1, T value2, T usedEpsilon)
 {
-  if (::fabs(static_cast<double>(value1 - value2)) < usedEpsilon)
-    return true;
+  if (::fabs(static_cast<double>(value1 - value2)) < usedEpsilon) return true;
   return false;
 }
 
@@ -62,4 +61,3 @@ MyPoint CalcTwoLineIntersectionPoint(const MyPoint &P1,
                                      const MyPoint &P3,
                                      const MyPoint &P4);
 }
-

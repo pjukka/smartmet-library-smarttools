@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <newbase/NFmiInfoAreaMask.h>
 #include "NFmiSoundingIndexCalculator.h"
+#include <newbase/NFmiInfoAreaMask.h>
 
 class NFmiFastQueryInfo;
 
@@ -37,4 +37,3 @@ class NFmiInfoAreaMaskSoundingIndex : public NFmiInfoAreaMask
   NFmiInfoAreaMaskSoundingIndex &operator=(const NFmiInfoAreaMaskPeekXY &theMask);
 
 };  // class NFmiInfoAreaMaskSoundingIndex
-
