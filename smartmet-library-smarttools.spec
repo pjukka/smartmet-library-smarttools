@@ -4,7 +4,7 @@
 %define DEVELNAME %{SPECNAME}-devel
 Summary: smarttools library
 Name: %{SPECNAME}
-Version: 17.4.4
+Version: 17.6.13
 Release: 1%{?dist}.fmi
 License: MIT
 Group: Development/Libraries
@@ -56,6 +56,9 @@ FMI smarttools development files
 
 
 %changelog
+* Tue Jun 13 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.6.13-1.fmi
+- Reformatted all code with clang-format v4.0
+
 * Tue Apr  4 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.4.4-1.fmi
 - Recompiled to use the latest newbase API
 
