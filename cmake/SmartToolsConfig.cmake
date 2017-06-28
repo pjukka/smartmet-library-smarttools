@@ -1,0 +1,7 @@
+get_filename_component(INSTALL_PREFIX ${SmartTools_DIR} DIRECTORY)
+get_filename_component(INSTALL_PREFIX ${INSTALL_PREFIX} DIRECTORY)
+get_filename_component(INSTALL_PREFIX ${INSTALL_PREFIX} DIRECTORY)
+set(SmartTools_INCLUDE_DIRS ${INSTALL_PREFIX}/include)
+set(SmartTools_LIBRARIES ${INSTALL_PREFIX}/lib/SmartTools.lib)
+set(SmartTools_INSTALLED_INCLUDE_DIRS ${INSTALL_PREFIX}/include/smarttools)
+set(SmartTools_INSTALLED_LIBRARIES ${INSTALL_PREFIX}/lib/SmartTools.lib)
