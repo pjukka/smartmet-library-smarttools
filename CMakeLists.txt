@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.7.1)
 project(SmartTools)
 
-set(CMAKE_MFC_FLAG 2)
+if(WIN32)
+    set(CMAKE_MFC_FLAG 2)
+else()
+    add_compile_options(-std=c++11 -DUNIX)
+endif()
 
 add_definitions(
     -DFMI_SUPPORT_STATION_DATA_SMARTTOOL
