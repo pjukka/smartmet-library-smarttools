@@ -269,7 +269,7 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::Info(
 boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(
     boost::shared_ptr<NFmiDrawParam> &theDrawParam)
 {
-  NFmiLevel *level = &theDrawParam->Level();
+  const NFmiLevel *level = &theDrawParam->Level();
   NFmiInfoData::Type dataType = theDrawParam->DataType();
   if (level && level->GetIdent() == 0)  // jos tämä on ns. default-level otus (GetIdent() == 0),
                                         // annetaan 0-pointteri Info-metodiin

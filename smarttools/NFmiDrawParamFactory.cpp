@@ -186,7 +186,7 @@ std::string NFmiDrawParamFactory::CreateFileName(boost::shared_ptr<NFmiDrawParam
         else
         {
           fileName += "_level_";
-          NFmiLevel& level = drawParam->Level();
+          const NFmiLevel& level = drawParam->Level();
           unsigned long levelTypeId = level.LevelTypeId();
           fileName += NFmiStringTools::Convert(levelTypeId);
           fileName += "_";
