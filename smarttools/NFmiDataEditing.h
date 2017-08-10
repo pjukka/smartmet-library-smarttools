@@ -1,11 +1,11 @@
 #pragma once
 
-class DataEditing
+class NFmiDataEditing
 {
  public:
-  DataEditing();
-  DataEditing(const DataEditing& other);
-  virtual ~DataEditing();
+  NFmiDataEditing();
+  NFmiDataEditing(const NFmiDataEditing& other);
+  virtual ~NFmiDataEditing();
 
   double ModifyingStep(void) const;
   void ModifyingStep(const double theModifyingStep);
@@ -29,7 +29,7 @@ class DataEditing
   void TimeSeriesScaleMax(const double& theValue);
 
  private:
-  DataEditing& operator=(const DataEditing& other) = delete;
+  NFmiDataEditing& operator=(const NFmiDataEditing& other) = delete;
 
   double itsModifyingStep;
   double itsTimeSerialModifyingLimit;

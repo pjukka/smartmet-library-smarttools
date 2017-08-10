@@ -4,12 +4,12 @@
 #include "NFmiMetEditorTypes.h"
 #include <newbase/NFmiPoint.h>
 
-class SymbolSettings
+class NFmiSymbolSettings
 {
  public:
-  SymbolSettings();
-  SymbolSettings(const SymbolSettings& other);
-  virtual ~SymbolSettings();
+  NFmiSymbolSettings();
+  NFmiSymbolSettings(const NFmiSymbolSettings& other);
+  virtual ~NFmiSymbolSettings();
 
   /* If viewtype is isoline but the data is station data
      ther must be some other view type defined that drawing
@@ -96,7 +96,7 @@ class SymbolSettings
   void SymbolIndexingMapListIndex(const int& newValue);
 
  private:
-  SymbolSettings& operator=(const SymbolSettings& other) = delete;
+  NFmiSymbolSettings& operator=(const NFmiSymbolSettings& other) = delete;
 
   NFmiMetEditorTypes::View itsStationDataViewType;
   NFmiColor itsFrameColor;

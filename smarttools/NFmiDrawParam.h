@@ -30,13 +30,13 @@
 //**********************************************************
 #pragma once
 
-#include "CustomColorContour.h"
-#include "DataEditing.h"
-#include "GeneralData.h"
-#include "GeneralVisualization.h"
-#include "HatchSettings.h"
-#include "SimpleColorContour.h"
-#include "SymbolSettings.h"
+#include "NFmiCustomColorContour.h"
+#include "NFmiDataEditing.h"
+#include "NFmiGeneralData.h"
+#include "NFmiGeneralVisualization.h"
+#include "NFmiHatchSettings.h"
+#include "NFmiSimpleColorContour.h"
+#include "NFmiSymbolSettings.h"
 
 #include "NFmiColor.h"
 #include "NFmiMetEditorTypes.h"
@@ -52,13 +52,13 @@
 
 class NFmiDrawingEnvironment;
 
-class NFmiDrawParam : public GeneralData,
-                      public GeneralVisualization,
-                      public SimpleColorContour,
-                      public CustomColorContour,
-                      public SymbolSettings,
-                      public DataEditing,
-                      public HatchSettings
+class NFmiDrawParam : public NFmiGeneralData,
+                      public NFmiGeneralVisualization,
+                      public NFmiSimpleColorContour,
+                      public NFmiCustomColorContour,
+                      public NFmiSymbolSettings,
+                      public NFmiDataEditing,
+                      public NFmiHatchSettings
 {
  public:
   NFmiDrawParam(void);

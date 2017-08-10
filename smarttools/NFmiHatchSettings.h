@@ -2,12 +2,12 @@
 
 #include "NFmiColor.h"
 
-class HatchSettings
+class NFmiHatchSettings
 {
  public:
-  HatchSettings();
-  HatchSettings(const HatchSettings& other);
-  virtual ~HatchSettings();
+  NFmiHatchSettings();
+  NFmiHatchSettings(const NFmiHatchSettings& other);
+  virtual ~NFmiHatchSettings();
 
   bool UseWithIsoLineHatch1(void) const;
   void UseWithIsoLineHatch1(const bool& newValue);
@@ -49,7 +49,7 @@ class HatchSettings
   void IsoLineHatchColor2(const NFmiColor& newValue);
 
  private:
-  HatchSettings& operator=(const HatchSettings& other) = delete;
+  NFmiHatchSettings& operator=(const NFmiHatchSettings& other) = delete;
 
   bool fUseWithIsoLineHatch1;
   bool fDrawIsoLineHatchWithBorders1;

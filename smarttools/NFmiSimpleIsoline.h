@@ -2,12 +2,12 @@
 
 #include "NFmiColor.h"
 
-class SimpleIsoline
+class NFmiSimpleIsoline
 {
  public:
-  SimpleIsoline();
-  SimpleIsoline(const SimpleIsoline& other);
-  virtual ~SimpleIsoline();
+  NFmiSimpleIsoline();
+  NFmiSimpleIsoline(const NFmiSimpleIsoline& other);
+  virtual ~NFmiSimpleIsoline();
 
   const NFmiColor& IsolineLabelBoxFillColor(void) const;
   void IsolineLabelBoxFillColor(const NFmiColor& theColor);
@@ -83,7 +83,7 @@ class SimpleIsoline
   void SimpleIsoLineColorShadeClassCount(const int& newValue);
 
  private:
-  SimpleIsoline& operator=(const SimpleIsoline& other) = delete;
+  NFmiSimpleIsoline& operator=(const NFmiSimpleIsoline& other) = delete;
 
   NFmiColor itsIsolineLabelBoxFillColor;
   NFmiColor itsContourLabelBoxFillColor;

@@ -1,6 +1,6 @@
-#include "SimpleIsoline.h"
+#include "NFmiSimpleIsoline.h"
 
-SimpleIsoline::SimpleIsoline()
+NFmiSimpleIsoline::NFmiSimpleIsoline()
     : itsIsolineLabelBoxFillColor(NFmiColor(1., 1., 0.)),  // yellow
       itsContourLabelBoxFillColor(NFmiColor(1., 1., 0.)),
       itsIsoLineGab(1.),
@@ -27,7 +27,7 @@ SimpleIsoline::SimpleIsoline()
 {
 }
 
-SimpleIsoline::SimpleIsoline(const SimpleIsoline& other)
+NFmiSimpleIsoline::NFmiSimpleIsoline(const NFmiSimpleIsoline& other)
     : itsIsolineLabelBoxFillColor(other.IsolineLabelBoxFillColor()),
       itsContourLabelBoxFillColor(other.ContourLabelBoxFillColor()),
       itsIsoLineGab(other.IsoLineGab()),
@@ -54,155 +54,155 @@ SimpleIsoline::SimpleIsoline(const SimpleIsoline& other)
 {
 }
 
-SimpleIsoline::~SimpleIsoline() {}
+NFmiSimpleIsoline::~NFmiSimpleIsoline() {}
 
-void SimpleIsoline::IsolineLabelBoxFillColor(const NFmiColor& theColor)
+void NFmiSimpleIsoline::IsolineLabelBoxFillColor(const NFmiColor& theColor)
 {
   itsIsolineLabelBoxFillColor = theColor;
   itsContourLabelBoxFillColor =
       theColor;  // **** Versio 3 parametri asetetaan toistaiseksi myös näin ****
 };
-const NFmiColor& SimpleIsoline::IsolineLabelBoxFillColor(void) const
+const NFmiColor& NFmiSimpleIsoline::IsolineLabelBoxFillColor(void) const
 {
   return itsIsolineLabelBoxFillColor;
 };
 
-void SimpleIsoline::ContourLabelBoxFillColor(const NFmiColor& theColor)
+void NFmiSimpleIsoline::ContourLabelBoxFillColor(const NFmiColor& theColor)
 {
   itsContourLabelBoxFillColor = theColor;
 };
-const NFmiColor& SimpleIsoline::ContourLabelBoxFillColor(void) const
+const NFmiColor& NFmiSimpleIsoline::ContourLabelBoxFillColor(void) const
 {
   return itsContourLabelBoxFillColor;
 };
 
-void SimpleIsoline::IsoLineGab(const double theIsoLineGab)
+void NFmiSimpleIsoline::IsoLineGab(const double theIsoLineGab)
 {
   itsIsoLineGab = theIsoLineGab;
   if (itsIsoLineGab == 0) itsIsoLineGab = 1;  // gappi ei voi olla 0
 }
-double SimpleIsoline::IsoLineGab(void) const { return itsIsoLineGab; };
+double NFmiSimpleIsoline::IsoLineGab(void) const { return itsIsoLineGab; };
 
-const NFmiColor& SimpleIsoline::IsolineColor(void) const
+const NFmiColor& NFmiSimpleIsoline::IsolineColor(void) const
 {
   return fUseSecondaryColors ? itsSecondaryIsolineColor : itsIsolineColor;
 };
-void SimpleIsoline::IsolineColor(const NFmiColor& newColor) { itsIsolineColor = newColor; }
+void NFmiSimpleIsoline::IsolineColor(const NFmiColor& newColor) { itsIsolineColor = newColor; }
 
-void SimpleIsoline::IsolineTextColor(const NFmiColor& newColor) { itsIsolineTextColor = newColor; }
-const NFmiColor& SimpleIsoline::IsolineTextColor(void) const
+void NFmiSimpleIsoline::IsolineTextColor(const NFmiColor& newColor) { itsIsolineTextColor = newColor; }
+const NFmiColor& NFmiSimpleIsoline::IsolineTextColor(void) const
 {
   return fUseSecondaryColors ? itsSecondaryIsolineTextColor : itsIsolineTextColor;
 }
 
-float SimpleIsoline::SimpleIsoLineGap(void) const { return itsSimpleIsoLineGap; }
-void SimpleIsoline::SimpleIsoLineGap(const float& newValue) { itsSimpleIsoLineGap = newValue; }
+float NFmiSimpleIsoline::SimpleIsoLineGap(void) const { return itsSimpleIsoLineGap; }
+void NFmiSimpleIsoline::SimpleIsoLineGap(const float& newValue) { itsSimpleIsoLineGap = newValue; }
 
-float SimpleIsoline::SimpleIsoLineLabelHeight(void) const { return itsSimpleIsoLineLabelHeight; }
-void SimpleIsoline::SimpleIsoLineLabelHeight(const float& newValue)
+float NFmiSimpleIsoline::SimpleIsoLineLabelHeight(void) const { return itsSimpleIsoLineLabelHeight; }
+void NFmiSimpleIsoline::SimpleIsoLineLabelHeight(const float& newValue)
 {
   itsSimpleIsoLineLabelHeight = newValue;
 }
 
-bool SimpleIsoline::ShowSimpleIsoLineLabelBox(void) const { return fShowSimpleIsoLineLabelBox; }
-void SimpleIsoline::ShowSimpleIsoLineLabelBox(const bool& newValue)
+bool NFmiSimpleIsoline::ShowSimpleIsoLineLabelBox(void) const { return fShowSimpleIsoLineLabelBox; }
+void NFmiSimpleIsoline::ShowSimpleIsoLineLabelBox(const bool& newValue)
 {
   fShowSimpleIsoLineLabelBox = newValue;
 }
 
-float SimpleIsoline::SimpleIsoLineWidth(void) const { return itsSimpleIsoLineWidth; }
-void SimpleIsoline::SimpleIsoLineWidth(const float& newValue) { itsSimpleIsoLineWidth = newValue; }
+float NFmiSimpleIsoline::SimpleIsoLineWidth(void) const { return itsSimpleIsoLineWidth; }
+void NFmiSimpleIsoline::SimpleIsoLineWidth(const float& newValue) { itsSimpleIsoLineWidth = newValue; }
 
-int SimpleIsoline::SimpleIsoLineLineStyle(void) const { return itsSimpleIsoLineLineStyle; }
-void SimpleIsoline::SimpleIsoLineLineStyle(const int& newValue)
+int NFmiSimpleIsoline::SimpleIsoLineLineStyle(void) const { return itsSimpleIsoLineLineStyle; }
+void NFmiSimpleIsoline::SimpleIsoLineLineStyle(const int& newValue)
 {
   itsSimpleIsoLineLineStyle = newValue;
 }
 
-bool SimpleIsoline::UseSingleColorsWithSimpleIsoLines(void) const
+bool NFmiSimpleIsoline::UseSingleColorsWithSimpleIsoLines(void) const
 {
   return fUseSingleColorsWithSimpleIsoLines;
 }
-void SimpleIsoline::UseSingleColorsWithSimpleIsoLines(const bool& newValue)
+void NFmiSimpleIsoline::UseSingleColorsWithSimpleIsoLines(const bool& newValue)
 {
   fUseSingleColorsWithSimpleIsoLines = newValue;
 }
 
-float SimpleIsoline::SimpleIsoLineColorShadeLowValue(void) const
+float NFmiSimpleIsoline::SimpleIsoLineColorShadeLowValue(void) const
 {
   return itsSimpleIsoLineColorShadeLowValue;
 }
-void SimpleIsoline::SimpleIsoLineColorShadeLowValue(const float& newValue)
+void NFmiSimpleIsoline::SimpleIsoLineColorShadeLowValue(const float& newValue)
 {
   itsSimpleIsoLineColorShadeLowValue = newValue;
 }
-float SimpleIsoline::SimpleIsoLineColorShadeMidValue(void) const
+float NFmiSimpleIsoline::SimpleIsoLineColorShadeMidValue(void) const
 {
   return itsSimpleIsoLineColorShadeMidValue;
 }
-void SimpleIsoline::SimpleIsoLineColorShadeMidValue(const float& newValue)
+void NFmiSimpleIsoline::SimpleIsoLineColorShadeMidValue(const float& newValue)
 {
   itsSimpleIsoLineColorShadeMidValue = newValue;
 }
-float SimpleIsoline::SimpleIsoLineColorShadeHighValue(void) const
+float NFmiSimpleIsoline::SimpleIsoLineColorShadeHighValue(void) const
 {
   return itsSimpleIsoLineColorShadeHighValue;
 }
-void SimpleIsoline::SimpleIsoLineColorShadeHighValue(const float& newValue)
+void NFmiSimpleIsoline::SimpleIsoLineColorShadeHighValue(const float& newValue)
 {
   itsSimpleIsoLineColorShadeHighValue = newValue;
   itsSimpleIsoLineColorShadeHigh2Value = newValue;
 }
 
-float SimpleIsoline::SimpleIsoLineColorShadeHigh2Value(void) const
+float NFmiSimpleIsoline::SimpleIsoLineColorShadeHigh2Value(void) const
 {
   return itsSimpleIsoLineColorShadeHigh2Value;
 }
-void SimpleIsoline::SimpleIsoLineColorShadeHigh2Value(const float& newValue)
+void NFmiSimpleIsoline::SimpleIsoLineColorShadeHigh2Value(const float& newValue)
 {
   itsSimpleIsoLineColorShadeHigh2Value = newValue;
 }
 
-const NFmiColor& SimpleIsoline::SimpleIsoLineColorShadeLowValueColor(void) const
+const NFmiColor& NFmiSimpleIsoline::SimpleIsoLineColorShadeLowValueColor(void) const
 {
   return itsSimpleIsoLineColorShadeLowValueColor;
 }
-void SimpleIsoline::SimpleIsoLineColorShadeLowValueColor(const NFmiColor& newValue)
+void NFmiSimpleIsoline::SimpleIsoLineColorShadeLowValueColor(const NFmiColor& newValue)
 {
   itsSimpleIsoLineColorShadeLowValueColor = newValue;
 }
-const NFmiColor& SimpleIsoline::SimpleIsoLineColorShadeMidValueColor(void) const
+const NFmiColor& NFmiSimpleIsoline::SimpleIsoLineColorShadeMidValueColor(void) const
 {
   return itsSimpleIsoLineColorShadeMidValueColor;
 }
-void SimpleIsoline::SimpleIsoLineColorShadeMidValueColor(const NFmiColor& newValue)
+void NFmiSimpleIsoline::SimpleIsoLineColorShadeMidValueColor(const NFmiColor& newValue)
 {
   itsSimpleIsoLineColorShadeMidValueColor = newValue;
 }
-const NFmiColor& SimpleIsoline::SimpleIsoLineColorShadeHighValueColor(void) const
+const NFmiColor& NFmiSimpleIsoline::SimpleIsoLineColorShadeHighValueColor(void) const
 {
   return itsSimpleIsoLineColorShadeHighValueColor;
 }
-void SimpleIsoline::SimpleIsoLineColorShadeHighValueColor(const NFmiColor& newValue)
+void NFmiSimpleIsoline::SimpleIsoLineColorShadeHighValueColor(const NFmiColor& newValue)
 {
   itsSimpleIsoLineColorShadeHighValueColor = newValue;
   itsSimpleIsoLineColorShadeHigh2ValueColor = newValue;
 }
 
-const NFmiColor& SimpleIsoline::SimpleIsoLineColorShadeHigh2ValueColor(void) const
+const NFmiColor& NFmiSimpleIsoline::SimpleIsoLineColorShadeHigh2ValueColor(void) const
 {
   return itsSimpleIsoLineColorShadeHigh2ValueColor;
 }
-void SimpleIsoline::SimpleIsoLineColorShadeHigh2ValueColor(const NFmiColor& newValue)
+void NFmiSimpleIsoline::SimpleIsoLineColorShadeHigh2ValueColor(const NFmiColor& newValue)
 {
   itsSimpleIsoLineColorShadeHigh2ValueColor = newValue;
 }
 
-int SimpleIsoline::SimpleIsoLineColorShadeClassCount(void) const
+int NFmiSimpleIsoline::SimpleIsoLineColorShadeClassCount(void) const
 {
   return itsSimpleIsoLineColorShadeClassCount;
 }
-void SimpleIsoline::SimpleIsoLineColorShadeClassCount(const int& newValue)
+void NFmiSimpleIsoline::SimpleIsoLineColorShadeClassCount(const int& newValue)
 {
   itsSimpleIsoLineColorShadeClassCount = newValue;
 }

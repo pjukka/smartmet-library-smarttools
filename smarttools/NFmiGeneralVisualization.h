@@ -2,15 +2,15 @@
 
 #include "NFmiMetEditorTypes.h"
 
-class GeneralVisualization
+class NFmiGeneralVisualization
 {
   /* 5 is hardly visible */
   const float itsMinAlpha = 5.f;
 
  public:
-  GeneralVisualization();
-  GeneralVisualization(const GeneralVisualization& other);
-  virtual ~GeneralVisualization();
+  NFmiGeneralVisualization();
+  NFmiGeneralVisualization(const NFmiGeneralVisualization& other);
+  virtual ~NFmiGeneralVisualization();
 
   /* Specifies a type of view e.g. symbol, isoline, text..  */
   void ViewType(const NFmiMetEditorTypes::View& theViewType);
@@ -74,7 +74,7 @@ class GeneralVisualization
   void ShowDifferenceToOriginalData(bool newValue);
 
  private:
-  GeneralVisualization& operator=(const GeneralVisualization& other) = delete;
+  NFmiGeneralVisualization& operator=(const NFmiGeneralVisualization& other) = delete;
 
   NFmiMetEditorTypes::View itsViewType;
   int itsGridDataPresentationStyle;

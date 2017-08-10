@@ -1,13 +1,13 @@
 #pragma once
 
-#include "SimpleIsoline.h"
+#include "NFmiSimpleIsoline.h"
 
-class SimpleColorContour : public SimpleIsoline
+class NFmiSimpleColorContour : public NFmiSimpleIsoline
 {
  public:
-  SimpleColorContour();
-  SimpleColorContour(const SimpleColorContour& other);
-  virtual ~SimpleColorContour();
+  NFmiSimpleColorContour();
+  NFmiSimpleColorContour(const NFmiSimpleColorContour& other);
+  virtual ~NFmiSimpleColorContour();
 
   const NFmiColor& ContourColor(void) const;
   void ContourColor(const NFmiColor& newColor);
@@ -59,7 +59,7 @@ class SimpleColorContour : public SimpleIsoline
   void ColorContouringColorShadeHigh2ValueColor(const NFmiColor& newValue);
 
  private:
-  SimpleColorContour& operator=(const SimpleColorContour& orher) = delete;
+  NFmiSimpleColorContour& operator=(const NFmiSimpleColorContour& orher) = delete;
 
   double itsContourGab;
   NFmiColor itsContourColor;

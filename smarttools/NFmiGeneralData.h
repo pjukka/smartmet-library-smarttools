@@ -7,12 +7,12 @@
 #include <newbase/NFmiLevel.h>
 #include <newbase/NFmiMetTime.h>
 
-class GeneralData
+class NFmiGeneralData
 {
  public:
-  explicit GeneralData();
-  explicit GeneralData(const GeneralData& other);
-  virtual ~GeneralData();
+  explicit NFmiGeneralData();
+  explicit NFmiGeneralData(const NFmiGeneralData& other);
+  virtual ~NFmiGeneralData();
 
   const NFmiDataIdent& Param(void) const;
   void Param(const NFmiDataIdent& theParameter);
@@ -115,7 +115,7 @@ class GeneralData
   void DataComparisonType(const NFmiInfoData::Type& newValue);
 
  private:
-  GeneralData& operator=(GeneralData& other) = delete;
+  NFmiGeneralData& operator=(NFmiGeneralData& other) = delete;
 
   NFmiDataIdent itsParameter;
   NFmiLevel itsLevel;

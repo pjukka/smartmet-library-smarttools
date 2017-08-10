@@ -1,13 +1,13 @@
 #pragma once
 
-#include "CustomIsoline.h"
+#include "NFmiCustomIsoline.h"
 
-class CustomColorContour : public CustomIsoline
+class NFmiCustomColorContour : public NFmiCustomIsoline
 {
  public:
-  CustomColorContour();
-  CustomColorContour(const CustomColorContour& other);
-  virtual ~CustomColorContour();
+  NFmiCustomColorContour();
+  NFmiCustomColorContour(const NFmiCustomColorContour& other);
+  virtual ~NFmiCustomColorContour();
 
   void UseIsoLineGabWithCustomContours(const bool newState);
   bool UseIsoLineGabWithCustomContours(void) const;
@@ -24,7 +24,7 @@ class CustomColorContour : public CustomIsoline
   void SpecialColorContouringColorIndexies(const checkedVector<int>& newValue);
 
  private:
-  CustomColorContour& operator=(const CustomColorContour& other) = delete;
+  NFmiCustomColorContour& operator=(const NFmiCustomColorContour& other) = delete;
 
   bool fUseIsoLineGabWithCustomContours;
   bool fUseContourGabWithCustomContours;

@@ -2,12 +2,12 @@
 
 #include <newbase/NFmiDataMatrix.h>
 
-class CustomIsoline
+class NFmiCustomIsoline
 {
  public:
-  CustomIsoline();
-  CustomIsoline(const CustomIsoline& other);
-  virtual ~CustomIsoline();
+  NFmiCustomIsoline();
+  NFmiCustomIsoline(const NFmiCustomIsoline& other);
+  virtual ~NFmiCustomIsoline();
 
   /* All the values where to set isoline. */
   const checkedVector<float>& SpecialIsoLineValues(void) const;
@@ -46,7 +46,7 @@ class CustomIsoline
   void SpecialIsoLineShowLabelBox(const checkedVector<bool>& newValue);
 
  private:
-  CustomIsoline& operator=(const CustomIsoline& other) = delete;
+  NFmiCustomIsoline& operator=(const NFmiCustomIsoline& other) = delete;
 
   checkedVector<float> itsSpecialIsoLineValues;
   checkedVector<float> itsSpecialContourValues;
