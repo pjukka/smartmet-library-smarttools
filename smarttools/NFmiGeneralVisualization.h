@@ -12,6 +12,8 @@ class NFmiGeneralVisualization
   NFmiGeneralVisualization(const NFmiGeneralVisualization& other);
   virtual ~NFmiGeneralVisualization();
 
+  NFmiGeneralVisualization& operator=(const NFmiGeneralVisualization& other) = default;
+
   /* Specifies a type of view e.g. symbol, isoline, text..  */
   void ViewType(const NFmiMetEditorTypes::View& theViewType);
   NFmiMetEditorTypes::View ViewType(void) const;
@@ -74,8 +76,6 @@ class NFmiGeneralVisualization
   void ShowDifferenceToOriginalData(bool newValue);
 
  private:
-  NFmiGeneralVisualization& operator=(const NFmiGeneralVisualization& other) = delete;
-
   NFmiMetEditorTypes::View itsViewType;
   int itsGridDataPresentationStyle;
   bool fUseIsoLineFeathering;

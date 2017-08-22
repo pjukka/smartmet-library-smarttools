@@ -14,6 +14,8 @@ class NFmiGeneralData
   explicit NFmiGeneralData(const NFmiGeneralData& other);
   virtual ~NFmiGeneralData();
 
+  NFmiGeneralData& operator=(NFmiGeneralData& other) = default;
+
   const NFmiDataIdent& Param(void) const;
   void Param(const NFmiDataIdent& theParameter);
 
@@ -115,8 +117,6 @@ class NFmiGeneralData
   void DataComparisonType(const NFmiInfoData::Type& newValue);
 
  private:
-  NFmiGeneralData& operator=(NFmiGeneralData& other) = delete;
-
   NFmiDataIdent itsParameter;
   NFmiLevel itsLevel;
   std::string itsParameterAbbreviation;

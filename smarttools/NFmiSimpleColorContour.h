@@ -9,6 +9,8 @@ class NFmiSimpleColorContour : public NFmiSimpleIsoline
   NFmiSimpleColorContour(const NFmiSimpleColorContour& other);
   virtual ~NFmiSimpleColorContour();
 
+  NFmiSimpleColorContour& operator=(const NFmiSimpleColorContour& other) = default;
+
   const NFmiColor& ContourColor(void) const;
   void ContourColor(const NFmiColor& newColor);
 
@@ -59,8 +61,6 @@ class NFmiSimpleColorContour : public NFmiSimpleIsoline
   void ColorContouringColorShadeHigh2ValueColor(const NFmiColor& newValue);
 
  private:
-  NFmiSimpleColorContour& operator=(const NFmiSimpleColorContour& orher) = delete;
-
   double itsContourGab;
   NFmiColor itsContourColor;
   float itsSimpleContourWidth;

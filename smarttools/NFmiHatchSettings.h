@@ -9,6 +9,8 @@ class NFmiHatchSettings
   NFmiHatchSettings(const NFmiHatchSettings& other);
   virtual ~NFmiHatchSettings();
 
+  NFmiHatchSettings& operator=(const NFmiHatchSettings& other) = default;
+
   bool UseWithIsoLineHatch1(void) const;
   void UseWithIsoLineHatch1(const bool& newValue);
 
@@ -49,8 +51,6 @@ class NFmiHatchSettings
   void IsoLineHatchColor2(const NFmiColor& newValue);
 
  private:
-  NFmiHatchSettings& operator=(const NFmiHatchSettings& other) = delete;
-
   bool fUseWithIsoLineHatch1;
   bool fDrawIsoLineHatchWithBorders1;
   float itsIsoLineHatchLowValue1;   // hatch alueen ala-arvo

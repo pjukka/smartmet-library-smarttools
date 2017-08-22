@@ -7,6 +7,8 @@ class NFmiDataEditing
   NFmiDataEditing(const NFmiDataEditing& other);
   virtual ~NFmiDataEditing();
 
+  NFmiDataEditing& operator=(const NFmiDataEditing& other) = default;
+
   double ModifyingStep(void) const;
   void ModifyingStep(const double theModifyingStep);
 
@@ -29,8 +31,6 @@ class NFmiDataEditing
   void TimeSeriesScaleMax(const double& theValue);
 
  private:
-  NFmiDataEditing& operator=(const NFmiDataEditing& other) = delete;
-
   double itsModifyingStep;
   double itsTimeSerialModifyingLimit;
 

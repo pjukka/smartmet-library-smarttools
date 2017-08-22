@@ -9,6 +9,8 @@ class NFmiCustomColorContour : public NFmiCustomIsoline
   NFmiCustomColorContour(const NFmiCustomColorContour& other);
   virtual ~NFmiCustomColorContour();
 
+  NFmiCustomColorContour& operator=(const NFmiCustomColorContour& other) = default;
+
   void UseIsoLineGabWithCustomContours(const bool newState);
   bool UseIsoLineGabWithCustomContours(void) const;
 
@@ -24,8 +26,6 @@ class NFmiCustomColorContour : public NFmiCustomIsoline
   void SpecialColorContouringColorIndexies(const checkedVector<int>& newValue);
 
  private:
-  NFmiCustomColorContour& operator=(const NFmiCustomColorContour& other) = delete;
-
   bool fUseIsoLineGabWithCustomContours;
   bool fUseContourGabWithCustomContours;
   checkedVector<float> itsSpecialColorContouringValues;

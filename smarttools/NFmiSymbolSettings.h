@@ -11,6 +11,8 @@ class NFmiSymbolSettings
   NFmiSymbolSettings(const NFmiSymbolSettings& other);
   virtual ~NFmiSymbolSettings();
 
+  NFmiSymbolSettings& operator=(const NFmiSymbolSettings& other) = default;
+
   /* If viewtype is isoline but the data is station data
      ther must be some other view type defined that drawing
      can be done. */
@@ -96,8 +98,6 @@ class NFmiSymbolSettings
   void SymbolIndexingMapListIndex(const int& newValue);
 
  private:
-  NFmiSymbolSettings& operator=(const NFmiSymbolSettings& other) = delete;
-
   NFmiMetEditorTypes::View itsStationDataViewType;
   NFmiColor itsFrameColor;
   NFmiColor itsFillColor;
