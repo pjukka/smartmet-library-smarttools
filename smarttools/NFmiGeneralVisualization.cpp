@@ -60,7 +60,10 @@ void NFmiGeneralVisualization::GridDataPresentationStyle(int newValue)
 }
 
 bool NFmiGeneralVisualization::UseIsoLineFeathering(void) const { return fUseIsoLineFeathering; }
-void NFmiGeneralVisualization::UseIsoLineFeathering(bool newValue) { fUseIsoLineFeathering = newValue; }
+void NFmiGeneralVisualization::UseIsoLineFeathering(bool newValue)
+{
+  fUseIsoLineFeathering = newValue;
+}
 
 bool NFmiGeneralVisualization::UseSimpleIsoLineDefinitions(void) const
 {
@@ -113,9 +116,15 @@ void NFmiGeneralVisualization::UseCustomColorContouring(bool newValue)
 }
 
 bool NFmiGeneralVisualization::UseCustomIsoLineing(void) const { return fUseCustomIsoLineing; }
-void NFmiGeneralVisualization::UseCustomIsoLineing(bool newValue) { fUseCustomIsoLineing = newValue; }
+void NFmiGeneralVisualization::UseCustomIsoLineing(bool newValue)
+{
+  fUseCustomIsoLineing = newValue;
+}
 
-int NFmiGeneralVisualization::IsoLineLabelDigitCount(void) const { return itsIsoLineLabelDigitCount; }
+int NFmiGeneralVisualization::IsoLineLabelDigitCount(void) const
+{
+  return itsIsoLineLabelDigitCount;
+}
 void NFmiGeneralVisualization::IsoLineLabelDigitCount(int newValue)
 {
   itsIsoLineLabelDigitCount = newValue;
@@ -126,7 +135,8 @@ float NFmiGeneralVisualization::Alpha(void) const { return itsAlpha; }
 void NFmiGeneralVisualization::Alpha(float newValue)
 {
   itsAlpha = newValue;
-  if (itsAlpha < NFmiGeneralVisualization::itsMinAlpha) itsAlpha = NFmiGeneralVisualization::itsMinAlpha;
+  if (itsAlpha < NFmiGeneralVisualization::itsMinAlpha)
+    itsAlpha = NFmiGeneralVisualization::itsMinAlpha;
   if (itsAlpha > 100.f) itsAlpha = 100.f;
 }
 

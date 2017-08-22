@@ -63,7 +63,10 @@ void NFmiSymbolSettings::StationDataViewType(const NFmiMetEditorTypes::View& new
   itsStationDataViewType = newValue;
 }
 
-void NFmiSymbolSettings::FrameColor(const NFmiColor& theFrameColor) { itsFrameColor = theFrameColor; }
+void NFmiSymbolSettings::FrameColor(const NFmiColor& theFrameColor)
+{
+  itsFrameColor = theFrameColor;
+}
 const NFmiColor& NFmiSymbolSettings::FrameColor(void) const { return itsFrameColor; }
 
 void NFmiSymbolSettings::FillColor(const NFmiColor& theFillColor) { itsFillColor = theFillColor; }
@@ -110,7 +113,10 @@ void NFmiSymbolSettings::ShowMasks(const bool& theValue) { fShowMasks = theValue
 bool NFmiSymbolSettings::ShowColors(void) const { return fShowColors; }
 void NFmiSymbolSettings::ShowColors(const bool& theValue) { fShowColors = theValue; }
 bool NFmiSymbolSettings::ShowColoredNumbers(void) const { return fShowColoredNumbers; }
-void NFmiSymbolSettings::ShowColoredNumbers(const bool& theValue) { fShowColoredNumbers = theValue; }
+void NFmiSymbolSettings::ShowColoredNumbers(const bool& theValue)
+{
+  fShowColoredNumbers = theValue;
+}
 bool NFmiSymbolSettings::ZeroColorMean(void) const { return fZeroColorMean; }
 void NFmiSymbolSettings::ZeroColorMean(const bool& theValue) { fZeroColorMean = theValue; }
 
@@ -176,8 +182,14 @@ void NFmiSymbolSettings::UseSymbolsInTextMode(const bool& newValue)
   fUseSymbolsInTextMode = newValue;
 }
 int NFmiSymbolSettings::UsedSymbolListIndex(void) const { return itsUsedSymbolListIndex; }
-void NFmiSymbolSettings::UsedSymbolListIndex(const int& newValue) { itsUsedSymbolListIndex = newValue; }
-int NFmiSymbolSettings::SymbolIndexingMapListIndex(void) const { return itsSymbolIndexingMapListIndex; }
+void NFmiSymbolSettings::UsedSymbolListIndex(const int& newValue)
+{
+  itsUsedSymbolListIndex = newValue;
+}
+int NFmiSymbolSettings::SymbolIndexingMapListIndex(void) const
+{
+  return itsSymbolIndexingMapListIndex;
+}
 void NFmiSymbolSettings::SymbolIndexingMapListIndex(const int& newValue)
 {
   itsSymbolIndexingMapListIndex = newValue;

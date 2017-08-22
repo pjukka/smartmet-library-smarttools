@@ -47,7 +47,13 @@ void NFmiDataEditing::AbsoluteMaxValue(const double& theAbsoluteMaxValue)
 }
 
 double NFmiDataEditing::TimeSeriesScaleMin(void) const { return itsTimeSeriesScaleMin; }
-void NFmiDataEditing::TimeSeriesScaleMin(const double& theValue) { itsTimeSeriesScaleMin = theValue; }
+void NFmiDataEditing::TimeSeriesScaleMin(const double& theValue)
+{
+  itsTimeSeriesScaleMin = theValue;
+}
 
 double NFmiDataEditing::TimeSeriesScaleMax(void) const { return itsTimeSeriesScaleMax; }
-void NFmiDataEditing::TimeSeriesScaleMax(const double& theValue) { itsTimeSeriesScaleMax = theValue; }
+void NFmiDataEditing::TimeSeriesScaleMax(const double& theValue)
+{
+  itsTimeSeriesScaleMax = theValue;
+}

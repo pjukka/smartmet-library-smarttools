@@ -52,9 +52,15 @@ void NFmiSimpleColorContour::IsolineColor(const NFmiColor& newColor)
   itsContourColor = newColor;
 }
 
-const NFmiColor& NFmiSimpleColorContour::IsolineColor() const { return NFmiSimpleIsoline::IsolineColor(); }
+const NFmiColor& NFmiSimpleColorContour::IsolineColor() const
+{
+  return NFmiSimpleIsoline::IsolineColor();
+}
 
-float NFmiSimpleColorContour::SimpleIsoLineWidth() const { return NFmiSimpleIsoline::SimpleIsoLineWidth(); }
+float NFmiSimpleColorContour::SimpleIsoLineWidth() const
+{
+  return NFmiSimpleIsoline::SimpleIsoLineWidth();
+}
 
 void NFmiSimpleColorContour::SimpleIsoLineWidth(const float& newValue)
 {

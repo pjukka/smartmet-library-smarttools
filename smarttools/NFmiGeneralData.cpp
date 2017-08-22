@@ -95,7 +95,10 @@ void NFmiGeneralData::ViewMacroDrawParam(const bool& newState) { fViewMacroDrawP
 bool NFmiGeneralData::BorrowedParam(void) const { return fBorrowedParam; }
 void NFmiGeneralData::BorrowedParam(const bool& newValue) { fBorrowedParam = newValue; }
 const NFmiMetTime& NFmiGeneralData::ModelOriginTime(void) const { return itsModelOriginTime; }
-void NFmiGeneralData::ModelOriginTime(const NFmiMetTime& newValue) { itsModelOriginTime = newValue; }
+void NFmiGeneralData::ModelOriginTime(const NFmiMetTime& newValue)
+{
+  itsModelOriginTime = newValue;
+}
 int NFmiGeneralData::ModelRunIndex(void) const { return itsModelRunIndex; }
 void NFmiGeneralData::ModelRunIndex(const int& newValue) { itsModelRunIndex = newValue; }
 const NFmiMetTime& NFmiGeneralData::ModelOriginTimeCalculated(void) const

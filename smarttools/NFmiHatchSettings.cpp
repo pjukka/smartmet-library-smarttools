@@ -35,7 +35,10 @@ NFmiHatchSettings::NFmiHatchSettings(const NFmiHatchSettings& other)
 NFmiHatchSettings::~NFmiHatchSettings() {}
 
 bool NFmiHatchSettings::UseWithIsoLineHatch1(void) const { return fUseWithIsoLineHatch1; }
-void NFmiHatchSettings::UseWithIsoLineHatch1(const bool& newValue) { fUseWithIsoLineHatch1 = newValue; }
+void NFmiHatchSettings::UseWithIsoLineHatch1(const bool& newValue)
+{
+  fUseWithIsoLineHatch1 = newValue;
+}
 bool NFmiHatchSettings::DrawIsoLineHatchWithBorders1(void) const
 {
   return fDrawIsoLineHatchWithBorders1;
@@ -71,7 +74,10 @@ void NFmiHatchSettings::IsoLineHatchBorderColor1(const NFmiColor& newValue)
 }
 
 bool NFmiHatchSettings::UseWithIsoLineHatch2(void) const { return fUseWithIsoLineHatch2; }
-void NFmiHatchSettings::UseWithIsoLineHatch2(const bool& newValue) { fUseWithIsoLineHatch2 = newValue; }
+void NFmiHatchSettings::UseWithIsoLineHatch2(const bool& newValue)
+{
+  fUseWithIsoLineHatch2 = newValue;
+}
 bool NFmiHatchSettings::DrawIsoLineHatchWithBorders2(void) const
 {
   return fDrawIsoLineHatchWithBorders2;

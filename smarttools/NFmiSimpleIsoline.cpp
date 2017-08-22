@@ -89,7 +89,10 @@ const NFmiColor& NFmiSimpleIsoline::IsolineColor(void) const
 };
 void NFmiSimpleIsoline::IsolineColor(const NFmiColor& newColor) { itsIsolineColor = newColor; }
 
-void NFmiSimpleIsoline::IsolineTextColor(const NFmiColor& newColor) { itsIsolineTextColor = newColor; }
+void NFmiSimpleIsoline::IsolineTextColor(const NFmiColor& newColor)
+{
+  itsIsolineTextColor = newColor;
+}
 const NFmiColor& NFmiSimpleIsoline::IsolineTextColor(void) const
 {
   return fUseSecondaryColors ? itsSecondaryIsolineTextColor : itsIsolineTextColor;
@@ -98,7 +101,10 @@ const NFmiColor& NFmiSimpleIsoline::IsolineTextColor(void) const
 float NFmiSimpleIsoline::SimpleIsoLineGap(void) const { return itsSimpleIsoLineGap; }
 void NFmiSimpleIsoline::SimpleIsoLineGap(const float& newValue) { itsSimpleIsoLineGap = newValue; }
 
-float NFmiSimpleIsoline::SimpleIsoLineLabelHeight(void) const { return itsSimpleIsoLineLabelHeight; }
+float NFmiSimpleIsoline::SimpleIsoLineLabelHeight(void) const
+{
+  return itsSimpleIsoLineLabelHeight;
+}
 void NFmiSimpleIsoline::SimpleIsoLineLabelHeight(const float& newValue)
 {
   itsSimpleIsoLineLabelHeight = newValue;
@@ -111,7 +117,10 @@ void NFmiSimpleIsoline::ShowSimpleIsoLineLabelBox(const bool& newValue)
 }
 
 float NFmiSimpleIsoline::SimpleIsoLineWidth(void) const { return itsSimpleIsoLineWidth; }
-void NFmiSimpleIsoline::SimpleIsoLineWidth(const float& newValue) { itsSimpleIsoLineWidth = newValue; }
+void NFmiSimpleIsoline::SimpleIsoLineWidth(const float& newValue)
+{
+  itsSimpleIsoLineWidth = newValue;
+}
 
 int NFmiSimpleIsoline::SimpleIsoLineLineStyle(void) const { return itsSimpleIsoLineLineStyle; }
 void NFmiSimpleIsoline::SimpleIsoLineLineStyle(const int& newValue)
