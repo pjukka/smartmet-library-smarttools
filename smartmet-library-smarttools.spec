@@ -4,7 +4,7 @@
 %define DEVELNAME %{SPECNAME}-devel
 Summary: smarttools library
 Name: %{SPECNAME}
-Version: 17.6.13
+Version: 17.8.28
 Release: 1%{?dist}.fmi
 License: MIT
 Group: Development/Libraries
@@ -13,9 +13,9 @@ Source: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
 BuildRequires: gcc-c++
 BuildRequires: make
-BuildRequires: smartmet-library-newbase-devel >= 17.4.4
+BuildRequires: smartmet-library-newbase-devel >= 17.8.28
 BuildRequires: boost-devel
-Requires: smartmet-library-newbase >= 17.4.4
+Requires: smartmet-library-newbase >= 17.8.28
 Provides: %{LIBNAME}
 Obsoletes: libsmartmet-smarttools < 17.1.4
 Obsoletes: libsmartmet-smarttools-debuginfo < 17.1.4
@@ -58,6 +58,9 @@ FMI smarttools development files
 
 
 %changelog
+* Mon Aug 28 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.8.28-1.fmi
+- Upgrade to boost 1.65
+
 * Tue Jun 13 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.6.13-1.fmi
 - Run clang-format after the revert to default include order in clang 4.0.0
 
