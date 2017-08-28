@@ -17,6 +17,8 @@
 #include <newbase/NFmiQueryDataUtil.h>
 #include <newbase/NFmiValueString.h>
 
+#include <boost/format.hpp>
+
 #include <fstream>
 
 // hakee lähimmän sopivan painepinnan, mistä löytyy halutuille parametreille arvot
