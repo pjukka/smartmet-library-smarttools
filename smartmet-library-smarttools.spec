@@ -50,6 +50,7 @@ rm -rf $RPM_BUILD_ROOT
 %package -n %{DEVELNAME}
 Summary: FMI smarttools development files
 Provides: %{DEVELNAME}
+Requires: %{SPECNAME}
 Obsoletes: libsmartmet-smarttools-devel < 17.1.4
 
 %description -n %{DEVELNAME}
