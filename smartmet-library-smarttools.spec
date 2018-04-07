@@ -4,7 +4,7 @@
 %define DEVELNAME %{SPECNAME}-devel
 Summary: smarttools library
 Name: %{SPECNAME}
-Version: 17.8.28
+Version: 18.4.7
 Release: 1%{?dist}.fmi
 License: MIT
 Group: Development/Libraries
@@ -13,9 +13,9 @@ Source: %{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot-%(%{__id_u} -n)
 BuildRequires: gcc-c++
 BuildRequires: make
-BuildRequires: smartmet-library-newbase-devel >= 17.8.28
+BuildRequires: smartmet-library-newbase-devel >= 18.4.7
 BuildRequires: boost-devel
-Requires: smartmet-library-newbase >= 17.8.28
+Requires: smartmet-library-newbase >= 18.4.7
 Requires: boost-filesystem
 Requires: boost-regex
 Requires: boost-thread
@@ -62,6 +62,9 @@ FMI smarttools development files
 
 
 %changelog
+* Sat Apr  7 2018 Mika Heiskanen <mika.heiskanen@fmi.fi> - 18.4.7-1.fmi
+- Upgrade to boost 1.66
+
 * Mon Aug 28 2017 Mika Heiskanen <mika.heiskanen@fmi.fi> - 17.8.28-1.fmi
 - Upgrade to boost 1.65
 
