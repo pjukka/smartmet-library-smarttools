@@ -1289,7 +1289,7 @@ void NFmiSoundingDataOpt1::InitZeroHeight(void)
                                     // validia kerrosta
              WS !=
                  kFloatMissing)  // tuulta ei tarvitse olla etsittäessä ensimmäistä validia kerrosta
-            )
+        )
         {
           itsZeroHeight = z;
           itsZeroHeightIndex = i;
@@ -1306,7 +1306,7 @@ void NFmiSoundingDataOpt1::InitZeroHeight(void)
                                          // validia kerrosta
                   WS != kFloatMissing)  // tuulta ei tarvitse olla etsittäessä ensimmäistä validia
                                         // kerrosta
-                 )
+        )
         {
           itsZeroHeight = closeLevelHeight;
           itsZeroHeightIndex = closeLevelHeightIndex;
@@ -2342,11 +2342,13 @@ Some tips here on how tyo calculate storm-relative helciity
 
 How to calculate storm-relative helicity
 
-Integrate the following from p = p_surface to p = p_top (or in case of height coordinates from h_surface to h_top):
+Integrate the following from p = p_surface to p = p_top (or in case of height coordinates from
+h_surface to h_top):
 
 storm_rel_helicity -= ((u_ID-u[p])*(v[p]-v[p+1]))-((v_ID - v[p])*(u[p]-u[p+1]));
 
-Here, u_ID and v_ID are the forecast storm motion vectors calculated with the so-called ID-method. These can be calculated as follows:
+Here, u_ID and v_ID are the forecast storm motion vectors calculated with the so-called ID-method.
+These can be calculated as follows:
 
 where
 

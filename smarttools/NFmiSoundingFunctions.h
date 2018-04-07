@@ -60,4 +60,4 @@ MyPoint CalcTwoLineIntersectionPoint(const MyPoint &P1,
                                      const MyPoint &P2,
                                      const MyPoint &P3,
                                      const MyPoint &P4);
-}
+}  // namespace NFmiSoundingFunctions

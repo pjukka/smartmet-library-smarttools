@@ -1651,7 +1651,7 @@ class tests : public tframe::tests
     TEST(NFmiDrawParamTest::hatchSettings);
   }
 };
-}
+}  // namespace NFmiDrawParamTest
 
 //! The main program
 int main(void)

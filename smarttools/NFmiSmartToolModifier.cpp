@@ -2150,9 +2150,8 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiSmartToolModifier::CreateInfo(
         theAreaMaskInfo.GetLevel() != 0)  // kokeillaan vielä jos halutaan hybridi datan leveliä
       info =
           GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kHybridData, kFmiHybridLevel);
-    if (info == 0 &&
-        theAreaMaskInfo.GetLevel() !=
-            0)  // kokeillaan vielä jos halutaan 'height' (type 105) datan leveliä
+    if (info == 0 && theAreaMaskInfo.GetLevel() !=
+                         0)  // kokeillaan vielä jos halutaan 'height' (type 105) datan leveliä
       info = GetWantedAreaMaskData(theAreaMaskInfo, false, NFmiInfoData::kViewable, kFmiHeight);
 
     if (info == 0)  // kokeillaan vielä model-help-dataa (esim. EPS-data, sounding-index-data jne)

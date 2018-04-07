@@ -431,9 +431,10 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::GetInfo(const NFmiDataId
                                                                 bool fUseParIdOnly,
                                                                 int theModelRunIndex)
 {
-  boost::shared_ptr<NFmiFastQueryInfo>
-      backupData;  // etsitää tähän 1. data joka muuten sopii kriteereihin, mutta
-                   // jonka tuottaja nimi on eri kuin haluttu. Jos oikealla nimellä ei löydy dataa, käytetään tätä.
+  boost::shared_ptr<NFmiFastQueryInfo> backupData;  // etsitää tähän 1. data joka muuten sopii
+                                                    // kriteereihin, mutta jonka tuottaja nimi on
+                                                    // eri kuin haluttu. Jos oikealla nimellä ei
+                                                    // löydy dataa, käytetään tätä.
   if (theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpSynoPlot ||
       theDataIdent.GetParamIdent() == NFmiInfoData::kFmiSpMinMaxPlot)  // synop plot paramille pitää
                                                                        // tehdä kikka (ja min/max
@@ -515,9 +516,10 @@ boost::shared_ptr<NFmiFastQueryInfo> NFmiInfoOrganizer::CrossSectionInfo(
 {
   if (theType == NFmiInfoData::kCrossSectionMacroParam || theType == NFmiInfoData::kMacroParam)
     return CrossSectionMacroParamData();
-  boost::shared_ptr<NFmiFastQueryInfo>
-      backupData;  // etsitää tähän 1. data joka muuten sopii kriteereihin, mutta
-                   // jonka tuottaja nimi on eri kuin haluttu. Jos oikealla nimellä ei löydy dataa, käytetään tätä.
+  boost::shared_ptr<NFmiFastQueryInfo> backupData;  // etsitää tähän 1. data joka muuten sopii
+                                                    // kriteereihin, mutta jonka tuottaja nimi on
+                                                    // eri kuin haluttu. Jos oikealla nimellä ei
+                                                    // löydy dataa, käytetään tätä.
   boost::shared_ptr<NFmiFastQueryInfo> foundData;
   if (itsEditedDataKeeper &&
       ::MatchCrossSectionData(itsEditedDataKeeper->GetIter(), theType, theDataIdent, true))

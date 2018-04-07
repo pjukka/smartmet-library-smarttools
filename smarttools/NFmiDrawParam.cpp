@@ -1381,10 +1381,9 @@ std::istream& NFmiDrawParam::Read(std::istream& file)
         // eli jos uusia muutujia tai arvoja, käsittele tässä.
         itsAlpha = 100.f;  // tämä on siis default arvo alphalle (täysin läpinäkyvä)
         if (extraData.itsDoubleValues.size() >= 1)
-          Alpha(static_cast<float>(
-              extraData
-                  .itsDoubleValues[0]));  // laitetaan asetus-funktion läpi, jossa raja tarkistukset
-        itsModelRunIndex = 0;             // 0 on default, eli ei ole käytössä
+          Alpha(static_cast<float>(extraData.itsDoubleValues[0]));  // laitetaan asetus-funktion
+                                                                    // läpi, jossa raja tarkistukset
+        itsModelRunIndex = 0;  // 0 on default, eli ei ole käytössä
         if (extraData.itsDoubleValues.size() >= 2)
           ModelRunIndex(static_cast<int>(
               extraData

@@ -279,7 +279,7 @@ static NFmiSilamStationList::Station GetSilamStationFromString(const std::string
     throw std::runtime_error(
         "GetSilamStationFromString - error in line string.");  // viestillä ei ole oikeastaan väliä,
                                                                // lähinnä kommentti
-  in >> str;                                                   // longtitude sign
+  in >> str;  // longtitude sign
   if (in.fail())
     throw std::runtime_error(
         "GetSilamStationFromString - error in line string.");  // viestillä ei ole oikeastaan väliä,

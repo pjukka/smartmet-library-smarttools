@@ -18,7 +18,8 @@
 class NFmiFastQueryInfo;
 
 // Miten LCL lasketaan, pinta-arvojen vai mixed layer arvojen avulla, vai most unstable?
-typedef enum {
+typedef enum
+{
   kLCLCalcNone = 0,
   kLCLCalcSurface = 1,
   kLCLCalc500m = 2,

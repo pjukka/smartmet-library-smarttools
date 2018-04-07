@@ -288,10 +288,12 @@ class NFmiSmartToolModifier
   boost::shared_ptr<MyGrid> itsWorkingGrid;  // Tähän talletetaan ns. työskentely gidi, eli missä on
   // työskentely alueen area-määritys ja laskennallinen
   // hila koko.
-  boost::shared_ptr<NFmiLevel> itsModifiedLevel;  // Jos ollaan editoimassa level-dataa, tähän on
-                                                  // tarkoitus laittaa kulloinenkin muokattava level
-                                                  // talteen.
-                                                  // Tämä asetetaan nyt vain NFmiSmartToolUtil::ModifyData-funktiosta, jossa käydään levelit läpi.
+  boost::shared_ptr<NFmiLevel>
+      itsModifiedLevel;  // Jos ollaan editoimassa level-dataa, tähän on
+                         // tarkoitus laittaa kulloinenkin muokattava level
+                         // talteen.
+                         // Tämä asetetaan nyt vain NFmiSmartToolUtil::ModifyData-funktiosta, jossa
+                         // käydään levelit läpi.
 
   NFmiGriddingHelperInterface *itsGriddingHelper;
 };

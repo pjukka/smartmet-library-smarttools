@@ -100,7 +100,7 @@ class NFmiAreaMaskInfo
   NFmiAreaMask::BinaryOperator itsBinaryOperator;
   NFmiInfoData::Type itsDataType;  // jos kyseessä infoVariable, tarvitaan vielä datan tyyppi, että
                                    // parametri saadaan tietokannasta (=infoOrganizerista)
-  NFmiLevel* itsLevel;             // mahd. level tieto, omistaa ja tuhoaa
+  NFmiLevel* itsLevel;  // mahd. level tieto, omistaa ja tuhoaa
   std::string itsMaskText;  // originaali teksti, mistä tämä maskinfo on tulkittu, tämä on siis vain
                             // yksi sana tai luku
   std::string itsOrigLineText;  // originaali koko rivin teksti, mistä tämä currentti sana

@@ -518,7 +518,7 @@ int NFmiDrawParamList::FindEdited(void)
 /*!
  * Tekee annetusta listasta kopioidut drawParamit omaan listaansa. clearList parametrilla voidaan
  * 'this' -lista tyhjentää ennen kopiointia.
-*/
+ */
 void NFmiDrawParamList::CopyList(NFmiDrawParamList& theList, bool clearFirst)
 {
   if (clearFirst) Clear();

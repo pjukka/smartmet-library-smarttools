@@ -120,7 +120,7 @@ struct NFmiExtraDataStorage
   std::vector<std::string> itsStringValues;
 };
 
-}  // end of namespace
+}  // namespace NFmiDataStoringHelpers
 
 inline std::ostream &operator<<(std::ostream &os,
                                 const NFmiDataStoringHelpers::NFmiExtraDataStorage &item)

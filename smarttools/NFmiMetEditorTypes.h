@@ -10,7 +10,8 @@
 
 namespace NFmiMetEditorTypes
 {
-typedef enum {
+typedef enum
+{
   kFmiTextView = 1,
   kFmiIsoLineView = 2,
   kFmiColorContourView = 3,
@@ -27,7 +28,8 @@ typedef enum {
   kFmiBetterWeatherSymbolView = 14
 } View;
 
-typedef enum {
+typedef enum
+{
   kFmiNoMask = 1,
   kFmiSelectionMask = 4,
   kFmiDisplayedMask = 16,

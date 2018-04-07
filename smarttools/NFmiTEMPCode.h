@@ -49,7 +49,7 @@ NFmiQueryData *MakeNewDataFromTEMPStr(const std::string &theTEMPStr,
 // TempCode-vektorissa on siis luotauksia tempcode-olioihin talletettuna.
 NFmiQueryData *CreateNewQData(std::vector<NFmiTEMPCode> &theTempCodeVec,
                               const NFmiProducer &theWantedProducer);
-}
+}  // namespace DecodeTEMP
 
 // Luokka joka saa 4 stringiä, missä on koko temp-koodi.
 // Purkaa koodin ja laskee leveleiksi ja muuksi dataksi.

@@ -27,7 +27,8 @@ class NFmiStopFunctor;
 // Sitä varten tein oman parametrilistan, joka kuuluisi NFmiParameterName-enumiin.
 // Mutta en halua sotkea sitä näillä, joten tein oman listan, jota kuitenkin käytetään
 // kuin se olisi originaali NFmiParameterName-enumissa.
-typedef enum {
+typedef enum
+{
   kSoundingParNone =
       4619,  // aloitan luvut jostain numerosta mikä ei mene sekaisin originaali param-listan kanssa
   // aluksi surface (sur) arvojen avulla lasketut parametrit
