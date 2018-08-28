@@ -3,8 +3,6 @@ project(SmartTools)
 
 if(WIN32)
     set(CMAKE_MFC_FLAG 2)
-else()
-    add_compile_options(-std=c++11 -DUNIX)
 endif()
 
 include(cmake/${CMAKE_SYSTEM_NAME}.cmake OPTIONAL)
