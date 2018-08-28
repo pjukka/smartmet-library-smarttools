@@ -44,7 +44,7 @@ if (SmartTools_FOUND)
     file(GLOB INSTALLED_FILES
 	${SmartTools_DIR}
 	${SmartTools_INSTALLED_INCLUDE_DIRS}
-	${SmartTools_INSTALLED_LIBRARIES})
+	${SmartTools_LIBRARIES})
     add_custom_target(uninstall rm -rf ${INSTALLED_FILES})
 endif()
 
